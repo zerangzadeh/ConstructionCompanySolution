@@ -1,0 +1,174 @@
+import uuid
+from decimal import Decimal
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+    initial = True
+
+    dependencies = [
+        ("organizations", "0003_organizationinvitation"),
+        ("projects", "0001_initial"),
+        ("contracts", "0001_initial"),
+        ("audit", "0002_alter_auditevent_action"),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="Estimate",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("estimate_number", models.CharField(max_length=80)),
+                ("title", models.CharField(max_length=255)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("draft", "Draft"),
+                            ("approved", "Approved"),
+                            ("revised", "Revised"),
+                            ("archived", "Archived"),
+                        ],
+                        db_index=True,
+                        default="draft",
+                        max_length=20,
+                    ),
+                ),
+                ("notes", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("deleted_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "contract",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="estimates",
+                        to="contracts.contract",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="estimates_created",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="estimates",
+                        to="organizations.organization",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="estimates",
+                        to="projects.project",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="estimates_updated",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={"ordering": ["-created_at"]},
+        ),
+        migrations.CreateModel(
+            name="EstimateItem",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("description", models.CharField(max_length=255)),
+                (
+                    "quantity",
+                    models.DecimalField(decimal_places=4, max_digits=18),
+                ),
+                ("unit", models.CharField(default="unit", max_length=30)),
+                (
+                    "unit_price",
+                    models.DecimalField(decimal_places=2, max_digits=18),
+                ),
+                ("sort_order", models.PositiveIntegerField(default=0)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "estimate",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="items",
+                        to="estimates.estimate",
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="estimate_items",
+                        to="organizations.organization",
+                    ),
+                ),
+            ],
+            options={"ordering": ["sort_order", "created_at"]},
+        ),
+        migrations.AddConstraint(
+            model_name="estimate",
+            constraint=models.UniqueConstraint(
+                fields=("organization", "estimate_number"),
+                name="unique_estimate_number_per_organization",
+            ),
+        ),
+        migrations.AddIndex(
+            model_name="estimate",
+            index=models.Index(
+                fields=["organization", "status"],
+                name="estimate_org_status_idx",
+            ),
+        ),
+        migrations.AddIndex(
+            model_name="estimate",
+            index=models.Index(
+                fields=["organization", "deleted_at"],
+                name="estimate_org_deleted_idx",
+            ),
+        ),
+        migrations.AddIndex(
+            model_name="estimateitem",
+            index=models.Index(
+                fields=["organization", "estimate"],
+                name="estimate_item_org_est_idx",
+            ),
+        ),
+    ]

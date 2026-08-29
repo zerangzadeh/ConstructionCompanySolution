@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard | Construction ERP{% endblock %}
+
+{% block content %}
+<div>
+    <p class="text-sm font-medium text-blue-600">Workspace</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Organization dashboard</h1>
+    <p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
+</div>
+<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Projects</p><p class="mt-2 text-3xl font-bold">{{ summary.project_count }}</p></div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Contracts</p><p class="mt-2 text-3xl font-bold">{{ summary.contract_count }}</p></div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Estimates</p><p class="mt-2 text-3xl font-bold">{{ summary.estimate_count }}</p></div>
+</div>
+<div class="mt-6 grid gap-4 md:grid-cols-3">
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Approved estimates</p><p class="mt-2 text-xl font-bold text-slate-900">{{ summary.approved_estimate_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Recorded expenses</p><p class="mt-2 text-xl font-bold text-slate-900">{{ summary.recorded_expense_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
+    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Variance</p><p class="mt-2 text-xl font-bold {% if summary.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}">{{ summary.variance|floatformat:2 }} {{ request.organization.currency }}</p></div>
+</div>
+<div class="mt-8 flex flex-wrap gap-3">
+    <a class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'projects:list' %}">View projects</a>
+    <a class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700" href="{% url 'financials:report' %}">Financial report</a>
+</div>
+{% endblock %}

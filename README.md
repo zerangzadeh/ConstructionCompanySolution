@@ -6,9 +6,20 @@ contractor companies. Each company is represented by an `Organization`
 
 ## Current status
 
-The repository is currently in the project-foundation stage. Django project
-code, applications, database models, authentication, and tenant handling have
-not been implemented yet.
+The repository currently contains the first SaaS foundation:
+
+- Custom username-based authentication (`email` is optional).
+- Organization and membership models with active-organization session
+  resolution and tenant-isolated views.
+- Organization creation with an atomic owner membership.
+- Existing-user invitations with expiring, hashed tokens.
+- Organization-scoped audit events and an audit log view.
+- Tenant-scoped projects with role-based creation, detail, and soft-archive
+  workflows.
+- Development, production, and SQL Server settings split by environment.
+
+The invitation, audit, and projects migrations are present in the repository
+but must be applied to each configured database before using those workflows.
 
 ## Planned technology stack
 
@@ -30,9 +41,31 @@ not been implemented yet.
 ## Environment configuration
 
 Copy `.env.example` to `.env` and replace all placeholder values with local
-development values when the Django project is available.
+development values. Load those variables in the shell or through your chosen
+process manager before running Django.
 
 Never commit `.env`, passwords, tokens, or other credentials.
+
+## Common commands
+
+Run these commands from an activated virtual environment:
+
+```powershell
+python manage.py check
+python manage.py migrate
+python -m pytest
+python -m ruff check .
+python -m ruff format --check .
+```
+
+For a production configuration review:
+
+```powershell
+python manage.py check --deploy --settings=config.settings.production
+```
+
+The deployment check expects a strong `DJANGO_SECRET_KEY` and non-empty
+`DJANGO_ALLOWED_HOSTS` supplied through environment variables.
 
 ## Development principles
 

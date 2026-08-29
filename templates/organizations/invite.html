@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Invite member | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="mx-auto max-w-xl">
+        <h1 class="text-3xl font-bold tracking-tight">Invite member</h1>
+        <p class="mt-2 text-slate-500">Invite an existing user to {{ request.organization.name }}.</p>
+        <div class="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                <button class="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" type="submit">
+                    Create invitation
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

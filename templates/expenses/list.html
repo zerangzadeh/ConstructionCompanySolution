@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Expenses | Construction ERP{% endblock %}
+
+{% block content %}
+<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <p class="text-sm font-medium text-blue-600">Expenses</p>
+        <h1 class="mt-1 text-3xl font-bold tracking-tight">Project expenses</h1>
+        <p class="mt-2 text-slate-500">Expenses in {{ request.organization.name }}.</p>
+    </div>
+    <a class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" href="{% url 'expenses:create' %}">Record expense</a>
+</div>
+<div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+{% if expenses %}
+{% for expense in expenses %}
+<div class="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <p class="font-semibold text-slate-900">{{ expense.description }}</p>
+        <p class="mt-1 text-sm text-slate-500">{{ expense.project.name }} · {{ expense.get_category_display }}{% if expense.vendor_name %} · {{ expense.vendor_name }}{% endif %}</p>
+    </div>
+    <div class="text-right"><p class="font-semibold text-slate-900">{{ expense.amount|floatformat:2 }} {{ request.organization.currency }}</p><p class="text-sm text-slate-500">{{ expense.incurred_on }}</p></div>
+</div>
+{% endfor %}
+{% else %}<p class="p-8 text-center text-slate-500">No expenses recorded yet.</p>{% endif %}
+</div>
+{% endblock %}

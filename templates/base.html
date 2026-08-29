@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Construction ERP{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-100 text-slate-900">
+    <nav class="border-b border-slate-200 bg-white">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+            <a class="text-lg font-bold tracking-tight text-slate-900" href="{% url 'organizations:select' %}">
+                Construction ERP
+            </a>
+            <div class="flex items-center gap-3 text-sm">
+                {% if request.user.is_authenticated %}
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:select' %}">
+                        Organizations
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:members' %}">
+                        Members
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:invite' %}">
+                        Invite
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'audit:log' %}">
+                        Audit
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'projects:list' %}">
+                        Projects
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'contracts:list' %}">
+                        Contracts
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'estimates:list' %}">
+                        Estimates
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'expenses:list' %}">
+                        Expenses
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'financials:report' %}">
+                        Financials
+                    </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'financials:dashboard' %}">
+                        Dashboard
+                    </a>
+                    <a class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" href="{% url 'organizations:create' %}">
+                        New organization
+                    </a>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button class="text-slate-600 hover:text-slate-900" type="submit">
+                            Sign out
+                        </button>
+                    </form>
+                {% else %}
+                    <a class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" href="{% url 'accounts:login' %}">
+                        Sign in
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

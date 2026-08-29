@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Estimates | Construction ERP{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold">Project estimates</h1>
+<p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
+<a class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" href="{% url 'estimates:create' %}">New estimate</a>
+<div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+{% if estimates %}
+{% for estimate in estimates %}
+<a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'estimates:detail' estimate.id %}">
+<p class="font-semibold">{{ estimate.estimate_number }} · {{ estimate.title }}</p>
+<p class="text-sm text-slate-500">{{ estimate.project.name }} · {{ estimate.total_amount|floatformat:2 }} {{ request.organization.currency }}</p>
+</a>
+{% endfor %}
+{% else %}<p class="p-8 text-center text-slate-500">No estimates yet.</p>{% endif %}
+</div>
+{% endblock %}

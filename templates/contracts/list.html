@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Contracts | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-sm font-medium text-blue-600">Contracts</p>
+            <h1 class="mt-1 text-3xl font-bold tracking-tight">Project contracts</h1>
+            <p class="mt-2 text-slate-500">Contracts in {{ request.organization.name }}.</p>
+        </div>
+        <a class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'contracts:create' %}">
+            New contract
+        </a>
+    </div>
+
+    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        {% if contracts %}
+            <div class="divide-y divide-slate-100">
+                {% for contract in contracts %}
+                    <div class="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <p class="font-semibold text-slate-900">{{ contract.contract_number }} · {{ contract.title }}</p>
+                            <p class="mt-1 text-sm text-slate-500">{{ contract.project.name }} · {{ contract.counterparty_name }}</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-sm">
+                            <span class="rounded-full bg-slate-100 px-2.5 py-1 font-medium capitalize text-slate-700">{{ contract.get_status_display }}</span>
+                            <span class="text-slate-600">{{ contract.contract_value|floatformat:2 }} {{ request.organization.currency }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="p-8 text-center">
+                <h2 class="text-lg font-semibold">No contracts yet</h2>
+                <p class="mt-2 text-sm text-slate-500">Create the first contract for this organization.</p>
+                <a class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'contracts:create' %}">
+                    Create contract
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

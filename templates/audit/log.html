@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Audit log | Construction ERP{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl">
+    <div class="mb-6">
+        <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Audit</p>
+        <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">Organization activity</h1>
+        <p class="mt-2 text-slate-600">
+            Important actions recorded for {{ request.organization.name }}.
+        </p>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        {% if events %}
+            <div class="divide-y divide-slate-100">
+                {% for event in events %}
+                    <div class="grid gap-2 px-6 py-4 sm:grid-cols-[12rem_1fr_auto] sm:items-center">
+                        <div class="text-sm text-slate-500">{{ event.created_at|date:"Y-m-d H:i" }}</div>
+                        <div>
+                            <p class="font-medium text-slate-900">{{ event.get_action_display }}</p>
+                            <p class="text-sm text-slate-500">
+                                {{ event.entity_type }}{% if event.entity_id %} · {{ event.entity_id }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="text-sm text-slate-500">
+                            {% if event.actor %}{{ event.actor.username }}{% else %}System{% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="px-6 py-8 text-center text-slate-500">No activity recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

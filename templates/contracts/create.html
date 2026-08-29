@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}New contract | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="mx-auto max-w-2xl">
+        <p class="text-sm font-medium text-blue-600">Contracts</p>
+        <h1 class="mt-1 text-3xl font-bold tracking-tight">Create contract</h1>
+        <p class="mt-2 text-slate-500">Add a contract to {{ request.organization.name }}.</p>
+        <form class="mt-8 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{{ form.non_field_errors }}</div>
+            {% endif %}
+            {% for field in form %}
+                <div>
+                    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<p class="mt-1 text-sm text-red-600">{{ field.errors|striptags }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="flex justify-end gap-3 pt-2">
+                <a class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600" href="{% url 'contracts:list' %}">Cancel</a>
+                <button class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Create contract</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

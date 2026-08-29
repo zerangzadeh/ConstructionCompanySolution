@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Invitation created | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="mx-auto max-w-2xl">
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+            <h1 class="text-2xl font-bold">Invitation created</h1>
+            <p class="mt-2 text-sm text-slate-500">
+                Share this one-time token securely with {{ invitation.invitee.username }}.
+            </p>
+            <code class="mt-6 block break-all rounded-lg bg-slate-100 p-4 text-sm text-slate-800">{{ token }}</code>
+            <p class="mt-4 text-xs text-amber-700">The raw token is not stored and cannot be shown again.</p>
+            <a class="mt-6 inline-flex rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'organizations:members' %}">
+                Back to members
+            </a>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}{{ project.name }} | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-sm font-medium text-blue-600">{{ project.code }}</p>
+            <h1 class="mt-1 text-3xl font-bold tracking-tight">{{ project.name }}</h1>
+            <p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
+        </div>
+        <a class="text-sm font-semibold text-blue-600 hover:text-blue-700" href="{% url 'projects:list' %}">Back to projects</a>
+    </div>
+
+    <div class="mt-8 grid gap-5 md:grid-cols-2">
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="font-semibold text-slate-900">Project information</h2>
+            <dl class="mt-5 space-y-4 text-sm">
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Status</dt><dd class="font-medium text-slate-900">{{ project.get_status_display }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Budget</dt><dd class="font-medium text-slate-900">{{ project.budget|floatformat:2 }} {{ request.organization.currency }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">Start date</dt><dd class="font-medium text-slate-900">{{ project.start_date|default:"—" }}</dd></div>
+                <div class="flex justify-between gap-4"><dt class="text-slate-500">End date</dt><dd class="font-medium text-slate-900">{{ project.end_date|default:"—" }}</dd></div>
+            </dl>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+            <h2 class="font-semibold text-slate-900">Description</h2>
+            <p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">{{ project.description|default:"No description provided." }}</p>
+            <form class="mt-8" method="post" action="{% url 'projects:archive' project.id %}">
+                {% csrf_token %}
+                <button class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50" type="submit">Archive project</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

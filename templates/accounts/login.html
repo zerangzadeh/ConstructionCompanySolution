@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="mx-auto max-w-md">
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+            <div class="mb-6">
+                <p class="text-sm font-medium text-blue-600">Welcome back</p>
+                <h1 class="mt-2 text-2xl font-bold tracking-tight">Sign in</h1>
+                <p class="mt-2 text-sm text-slate-500">Use your username and password to continue.</p>
+            </div>
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+                {{ form.non_field_errors }}
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.username.id_for_label }}">
+                        Username
+                    </label>
+                    {{ form.username }}
+                    {{ form.username.errors }}
+                </div>
+                <div>
+                    <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.password.id_for_label }}">
+                        Password
+                    </label>
+                    {{ form.password }}
+                    {{ form.password.errors }}
+                </div>
+                <button class="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" type="submit">
+                    Sign in
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
