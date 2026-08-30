@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Create daily report | Construction ERP{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl">
+    <p class="text-sm font-medium text-blue-600">Daily reports</p>
+    <h1 class="mt-1 text-3xl font-bold tracking-tight">Create daily report</h1>
+    <p class="mt-2 text-slate-500">Record worksite activity, progress, safety, and quality observations.</p>
+
+    <form class="mt-8 space-y-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
+        {% csrf_token %}
+        {% include "components/form_errors.html" with form=form only %}
+        {% for field in form %}
+        {% include "components/form_field.html" with field=field only %}
+        {% endfor %}
+        <div class="flex items-center gap-4">
+            <button class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" type="submit">Save draft</button>
+            <a class="text-sm font-semibold text-slate-600 hover:text-slate-900" href="{% url 'daily_reports:list' %}">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

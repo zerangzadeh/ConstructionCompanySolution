@@ -38,6 +38,9 @@
                     <a class="text-slate-600 hover:text-slate-900" href="{% url 'expenses:list' %}">
                         Expenses
                     </a>
+                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'daily_reports:list' %}">
+                        Daily reports
+                    </a>
                     <a class="text-slate-600 hover:text-slate-900" href="{% url 'financials:report' %}">
                         Financials
                     </a>
@@ -63,6 +66,7 @@
     </nav>
 
     <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        {% include "components/messages.html" %}
         {% block content %}{% endblock %}
     </main>
 </body>

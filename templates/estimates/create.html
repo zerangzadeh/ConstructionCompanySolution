@@ -7,9 +7,9 @@
 <p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
 <form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
 {% csrf_token %}
-{% if form.non_field_errors %}<div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+{% include "components/form_errors.html" with form=form only %}
 {% for field in form %}
-<div><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="text-sm text-red-600">{{ field.errors|striptags }}</p>{% endif %}</div>
+{% include "components/form_field.html" with field=field only %}
 {% endfor %}
 <button class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" type="submit">Create estimate</button>
 </form>

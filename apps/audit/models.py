@@ -8,11 +8,24 @@ class AuditAction(models.TextChoices):
     ORGANIZATION_CREATED = "organization.created", "Organization created"
     PROJECT_CREATED = "project.created", "Project created"
     PROJECT_ARCHIVED = "project.archived", "Project archived"
+    PROJECT_SITE_CREATED = "project_site.created", "Project site created"
     CONTRACT_CREATED = "contract.created", "Contract created"
     ESTIMATE_CREATED = "estimate.created", "Estimate created"
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "Estimate item added"
     ESTIMATE_APPROVED = "estimate.approved", "Estimate approved"
     EXPENSE_RECORDED = "expense.recorded", "Expense recorded"
+    DAILY_REPORT_CREATED = "daily_report.created", "Daily report created"
+    DAILY_REPORT_SUBMITTED = "daily_report.submitted", "Daily report submitted"
+    DAILY_REPORT_APPROVED = "daily_report.approved", "Daily report approved"
+    DAILY_REPORT_LABOR_ADDED = "daily_report.labor_added", "Daily report labor added"
+    DAILY_REPORT_EQUIPMENT_ADDED = (
+        "daily_report.equipment_added",
+        "Daily report equipment added",
+    )
+    DAILY_REPORT_MATERIAL_ADDED = (
+        "daily_report.material_added",
+        "Daily report material added",
+    )
     MEMBERSHIP_INVITED = "membership.invited", "Membership invited"
     MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
 

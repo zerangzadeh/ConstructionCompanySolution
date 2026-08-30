@@ -265,3 +265,130 @@ relevant checks after any code or configuration change.
    stable and the extraction has a clear benefit.
 7. Reassess DRF and Celery/Redis when API or background-processing requirements
    are approved.
+
+## 16. Product Domain Map
+
+The planned Construction ERP domain is organized into bounded Django apps. Add a
+new app only when the domain has clear ownership, data boundaries, and business
+responsibilities:
+
+- `organizations`: tenants, memberships, invitations, and tenant settings
+- `accounts`: authentication and user identity
+- `projects`: projects, sites, phases, and project-level access
+- `contracts`: client and subcontractor contracts
+- `estimates`: estimates, line items, revisions, and approvals
+- `expenses`: operational expenses and expense categories
+- `procurement`: purchase requests, purchase orders, and vendor workflows
+- `inventory`: materials, warehouses, stock movements, and transfers
+- `equipment`: equipment, assignments, usage, maintenance, and fuel
+- `workforce`: workers, teams, time entries, and labor costs
+- `daily_reports`: daily site progress, labor, equipment, materials, and events
+- `safety`: incidents, inspections, risks, and corrective actions
+- `quality`: inspections, non-conformities, and quality checklists
+- `documents`: secure documents, attachments, metadata, and versions
+- `billing`: invoices, progress claims, retention, and receivables
+- `payments`: payments, settlements, and cash-flow transactions
+- `audit`: immutable records of important business and security actions
+- `financials`: cross-domain financial reporting and read-only aggregates
+
+Cross-domain dependencies must be explicit. Avoid circular imports and avoid
+duplicating the same business concept in multiple apps.
+
+## 17. SaaS Tenant Lifecycle
+
+The tenant model must support a controlled lifecycle, even if subscription
+billing is introduced later:
+
+- `active`: normal access is allowed
+- `suspended`: sign-in may be allowed for administrators, but business
+  mutations are blocked
+- `cancelled`: normal access is blocked; retention and export policies still
+  apply
+
+Tenant status, plan limits, feature flags, and quotas must be checked on the
+server. Never rely on frontend visibility to enforce subscription or quota
+rules. Organization deletion, export, and suspension operations must be
+audited and transactional.
+
+Tenant configuration such as timezone, currency, fiscal settings, and numbering
+schemes belongs to the organization and must not be inferred from global
+defaults after the organization has configured it.
+
+## 18. Authorization and RBAC
+
+Authorization must be explicit and deny by default:
+
+- Organization roles define broad capabilities such as `OWNER`, `ADMIN`,
+  `MANAGER`, `ACCOUNTANT`, `SUPERVISOR`, and `VIEWER`.
+- Project or site roles may further restrict access within an organization.
+- Object-level permission checks are required for viewing, editing, approving,
+  archiving, exporting, and deleting sensitive records.
+- A role check must be performed server-side in services and views; hiding a
+  button is not authorization.
+- Privilege escalation, role changes, invitation acceptance, and membership
+  removal must be audited.
+
+Use the existing membership and active-organization services as the source of
+truth. Do not introduce a second independent permission model without documenting
+its relationship to organization membership.
+
+## 19. Workflow and Approval Rules
+
+Business records with lifecycle states must define:
+
+- Allowed states and valid transitions
+- The role allowed to perform each transition
+- Required fields and validations for each transition
+- Whether a transition is reversible
+- Audit data for actor, timestamp, previous state, new state, and reason
+
+Approved, posted, paid, or otherwise finalized financial records should be
+immutable. Corrections must use a documented revision, reversal, or adjustment
+workflow rather than silently changing historical values.
+
+Approval services must use transactions and re-check authorization and current
+state inside the transaction to avoid race conditions.
+
+## 20. Operational Reliability
+
+For multi-step or externally visible operations:
+
+- Use `transaction.atomic()` for all-or-nothing business workflows.
+- Make retryable operations idempotent where duplicate requests are possible.
+- Define unique business keys for important external or user-facing actions.
+- Handle concurrent updates explicitly and avoid lost updates.
+- Keep structured logs free of passwords, tokens, and unnecessary personal data.
+- Record correlation or request identifiers when introducing background jobs or
+  integrations.
+- External integrations must fail safely and must not bypass tenant checks.
+
+Background processing, queues, and scheduled jobs remain deferred until approved,
+but new services should not assume that every operation is synchronous forever.
+
+## 21. Construction-Specific Data Rules
+
+- Preserve the hierarchy between organization, project, site, phase, contract,
+  and cost center where the business process requires it.
+- Separate budget, committed cost, actual cost, forecast, and variance; do not
+  overload one amount field with multiple meanings.
+- Use explicit units of measure and quantities for materials, labor, and
+  equipment usage.
+- Store document and estimate revisions instead of overwriting approved history.
+- Daily site reports should record their reporting date, site, author, approval
+  state, and relevant labor, equipment, material, progress, safety, and quality
+  data.
+- Financial and operational aggregates must state their source records and
+  organization scope.
+
+## 22. Data Governance and Compliance
+
+- Audit records for security and financial actions must be append-only from the
+  application layer.
+- Define retention and archival behavior before implementing hard deletion.
+- Support organization-scoped data export when the product requires it.
+- Treat uploaded documents as untrusted input and retain metadata about type,
+  size, uploader, tenant, and version.
+- Use the organization's configured timezone and currency in presentation and
+  reporting, while storing canonical values consistently.
+- Sensitive data must not appear in logs, test fixtures, screenshots, or error
+  messages.

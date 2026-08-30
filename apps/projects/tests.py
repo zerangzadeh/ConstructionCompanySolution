@@ -18,7 +18,9 @@ from apps.projects.models import ProjectStatus
 from apps.projects.services import (
     archive_project,
     create_project,
+    create_project_site,
     get_organization_project,
+    get_organization_project_sites,
     get_organization_projects,
 )
 
@@ -303,4 +305,58 @@ class ProjectServiceTests(TestCase):
                 user=self.owner,
                 organization=self.organization,
                 project_id=str(project.pk),
+            )
+
+    def test_create_project_site_is_tenant_scoped_and_audited(self) -> None:
+        project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-SITE",
+            name="Site project",
+        )
+
+        site = create_project_site(
+            organization=self.organization,
+            project=project,
+            actor=self.owner,
+            code="SITE-001",
+            name="Main worksite",
+            address="123 Construction Road",
+        )
+
+        self.assertEqual(site.organization, self.organization)
+        self.assertEqual(site.project, project)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.PROJECT_SITE_CREATED,
+                organization=self.organization,
+                entity_id=str(site.pk),
+            ).exists()
+        )
+        self.assertEqual(
+            list(
+                get_organization_project_sites(
+                    user=self.owner,
+                    organization=self.organization,
+                    project_id=str(project.pk),
+                )
+            ),
+            [site],
+        )
+
+    def test_project_site_rejects_project_from_another_organization(self) -> None:
+        other_project = self.other_organization.projects.create(
+            code="P-OTHER-SITE",
+            name="Other site project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            create_project_site(
+                organization=self.organization,
+                project=other_project,
+                actor=self.owner,
+                code="SITE-OTHER",
+                name="Unauthorized worksite",
             )

@@ -81,3 +81,124 @@ class Project(models.Model):
 
     def __str__(self) -> str:
         return f"{self.code} - {self.name}"
+
+
+class ProjectSite(models.Model):
+    """A worksite belonging to one project and its organization."""
+
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="project_sites",
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="sites",
+    )
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
+    address = models.TextField(blank=True)
+    is_active = models.BooleanField(default=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="project_sites_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="project_sites_updated",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "project", "code"],
+                name="unique_site_code_per_project",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "project", "is_active"],
+                name="site_org_project_active_idx",
+            ),
+        ]
+        ordering = ["name"]  # noqa: RUF012
+
+    def __str__(self) -> str:
+        return f"{self.project.code} · {self.code} - {self.name}"
+
+
+class ProjectPhaseStatus(models.TextChoices):
+    PLANNING = "planning", "Planning"
+    ACTIVE = "active", "Active"
+    ON_HOLD = "on_hold", "On hold"
+    COMPLETED = "completed", "Completed"
+
+
+class ProjectPhase(models.Model):
+    """A planned or active execution phase within one project worksite."""
+
+    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="project_phases",
+    )
+    site = models.ForeignKey(
+        ProjectSite,
+        on_delete=models.CASCADE,
+        related_name="phases",
+    )
+    code = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=20,
+        choices=ProjectPhaseStatus.choices,
+        default=ProjectPhaseStatus.PLANNING,
+        db_index=True,
+    )
+    planned_start_date = models.DateField(null=True, blank=True)
+    planned_end_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="project_phases_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="project_phases_updated",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "site", "code"],
+                name="unique_phase_code_per_site",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "site", "status"],
+                name="phase_org_site_status_idx",
+            ),
+        ]
+        ordering = ["name"]  # noqa: RUF012
+
+    def __str__(self) -> str:
+        return f"{self.site.code} · {self.code} - {self.name}"

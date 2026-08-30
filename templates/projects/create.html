@@ -12,19 +12,9 @@
 
         <form class="mt-8 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
             {% csrf_token %}
-            {% if form.non_field_errors %}
-                <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
+            {% include "components/form_errors.html" with form=form only %}
             {% for field in form %}
-                <div>
-                    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {% if field.errors %}
-                        <p class="mt-1 text-sm text-red-600">{{ field.errors|striptags }}</p>
-                    {% endif %}
-                </div>
+                {% include "components/form_field.html" with field=field only %}
             {% endfor %}
             <div class="flex items-center justify-end gap-3 pt-2">
                 <a class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900" href="{% url 'projects:list' %}">Cancel</a>

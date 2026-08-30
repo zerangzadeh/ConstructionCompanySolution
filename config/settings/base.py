@@ -24,6 +24,7 @@ INSTALLED_APPS: list[str] = [
     "apps.estimates",
     "apps.expenses",
     "apps.financials",
+    "apps.daily_reports",
 ]
 
 MIDDLEWARE: list[str] = [

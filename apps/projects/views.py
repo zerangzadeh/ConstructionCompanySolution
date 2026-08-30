@@ -4,11 +4,13 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.decorators import active_organization_required
-from apps.projects.forms import ProjectForm
+from apps.projects.forms import ProjectForm, ProjectSiteForm
 from apps.projects.services import (
     archive_project,
     create_project,
+    create_project_site,
     get_organization_project,
+    get_organization_project_sites,
     get_organization_projects,
 )
 
@@ -61,6 +63,56 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
         project_id=project_id,
     )
     return render(request, "projects/detail.html", {"project": project})
+
+
+@active_organization_required
+@require_GET
+def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+    sites = get_organization_project_sites(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+    return render(
+        request,
+        "projects/site_list.html",
+        {"project": project, "sites": sites},
+    )
+
+
+@active_organization_required
+def project_site_create(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+    form = ProjectSiteForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        try:
+            create_project_site(
+                organization=request.organization,
+                project=project,
+                actor=request.user,
+                code=data["code"],
+                name=data["name"],
+                address=data["address"],
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect("projects:site_list", project_id=project.pk)
+    return render(
+        request,
+        "projects/site_create.html",
+        {"project": project, "form": form},
+    )
 
 
 @active_organization_required

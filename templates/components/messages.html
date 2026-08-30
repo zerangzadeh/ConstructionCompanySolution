@@ -1,0 +1,9 @@
+{% if messages %}
+    <div class="mb-6 space-y-3" aria-live="polite">
+        {% for message in messages %}
+            <div class="rounded-lg px-4 py-3 text-sm {% if 'error' in message.tags %}bg-red-50 text-red-700{% elif 'success' in message.tags %}bg-emerald-50 text-emerald-700{% else %}bg-blue-50 text-blue-700{% endif %}" role="status">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
