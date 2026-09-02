@@ -9,6 +9,7 @@ class ExpenseAdmin(admin.ModelAdmin):
         "description",
         "organization",
         "project",
+        "phase",
         "category",
         "amount",
         "incurred_on",
@@ -20,6 +21,7 @@ class ExpenseAdmin(admin.ModelAdmin):
         "vendor_name",
         "receipt_reference",
         "project__name",
+        "phase__name",
         "organization__name",
     )
     readonly_fields = ("id", "created_at", "updated_at")

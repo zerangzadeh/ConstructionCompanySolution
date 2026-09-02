@@ -20,7 +20,12 @@ from apps.daily_reports.services import (
 )
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
-from apps.projects.services import create_project, create_project_site
+from apps.projects.models import ProjectPhaseStatus
+from apps.projects.services import (
+    create_project,
+    create_project_phase,
+    create_project_site,
+)
 
 
 class DailyReportServiceTests(TestCase):
@@ -62,6 +67,14 @@ class DailyReportServiceTests(TestCase):
             actor=self.owner,
             code="SITE-DAILY",
             name="Daily report worksite",
+        )
+        self.phase = create_project_phase(
+            organization=self.organization,
+            site=self.site,
+            actor=self.owner,
+            code="PH-DAILY",
+            name="Foundation works",
+            status=ProjectPhaseStatus.ACTIVE,
         )
 
     def create_report(self):
@@ -259,6 +272,58 @@ class DailyReportServiceTests(TestCase):
                 actor=self.owner,
                 reporting_date=date(2026, 8, 31),
                 work_performed="Invalid worksite assignment.",
+            )
+
+    def test_report_optionally_scopes_to_an_active_worksite_phase(self) -> None:
+        report = create_daily_report(
+            organization=self.organization,
+            project=self.project,
+            site=self.site,
+            phase=self.phase,
+            actor=self.owner,
+            reporting_date=date(2026, 8, 31),
+            work_performed="Completed concrete foundation pour.",
+        )
+
+        self.assertEqual(report.phase, self.phase)
+        event = AuditEvent.objects.get(
+            action=AuditAction.DAILY_REPORT_CREATED,
+            entity_id=str(report.pk),
+        )
+        self.assertEqual(event.metadata["phase_id"], str(self.phase.pk))
+
+    def test_report_rejects_phase_from_another_worksite(self) -> None:
+        other_project = self.organization.projects.create(
+            code="P-PHASE-OTHER",
+            name="Other phase project",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        other_site = create_project_site(
+            organization=self.organization,
+            project=other_project,
+            actor=self.owner,
+            code="SITE-PHASE-OTHER",
+            name="Other phase worksite",
+        )
+        other_phase = create_project_phase(
+            organization=self.organization,
+            site=other_site,
+            actor=self.owner,
+            code="PH-PHASE-OTHER",
+            name="Other foundation works",
+            status=ProjectPhaseStatus.ACTIVE,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            create_daily_report(
+                organization=self.organization,
+                project=self.project,
+                site=self.site,
+                phase=other_phase,
+                actor=self.owner,
+                reporting_date=date(2026, 8, 31),
+                work_performed="Invalid phase assignment.",
             )
 
     def test_draft_report_accepts_operational_entries_and_locks_on_submit(self) -> None:

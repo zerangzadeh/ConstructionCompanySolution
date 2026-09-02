@@ -43,6 +43,7 @@ def daily_report_create(request: HttpRequest) -> HttpResponse:
                 organization=request.organization,
                 project=data["project"],
                 site=data["site"],
+                phase=data["phase"],
                 actor=request.user,
                 reporting_date=data["reporting_date"],
                 work_performed=data["work_performed"],

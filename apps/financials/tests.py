@@ -15,6 +15,8 @@ from apps.financials.services import (
     get_project_financial_report,
 )
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.payments.models import PaymentDirection
+from apps.payments.services import create_payment, void_payment
 from apps.projects.services import create_project
 
 
@@ -165,6 +167,27 @@ class FinancialReportTests(TestCase):
             amount=Decimal("125.50"),
             incurred_on=date(2026, 8, 29),
         )
+        create_payment(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            payment_number="PAY-DASH-RECEIPT",
+            direction=PaymentDirection.RECEIPT,
+            amount=Decimal("600.00"),
+            paid_on=date(2026, 8, 29),
+            counterparty_name="Client LLC",
+        )
+        payment_to_void = create_payment(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            payment_number="PAY-DASH-VOID",
+            direction=PaymentDirection.DISBURSEMENT,
+            amount=Decimal("90.00"),
+            paid_on=date(2026, 8, 29),
+            counterparty_name="Supplier LLC",
+        )
+        void_payment(payment=payment_to_void, actor=self.owner, reason="Duplicate")
 
         summary = get_organization_dashboard(
             user=self.owner,
@@ -177,6 +200,10 @@ class FinancialReportTests(TestCase):
         self.assertEqual(summary.approved_estimate_total, Decimal("1000.00"))
         self.assertEqual(summary.recorded_expense_total, Decimal("125.50"))
         self.assertEqual(summary.variance, Decimal("874.50"))
+        self.assertEqual(summary.posted_payment_count, 1)
+        self.assertEqual(summary.receipt_total, Decimal("600.00"))
+        self.assertEqual(summary.disbursement_total, Decimal("0.00"))
+        self.assertEqual(summary.net_cash_flow, Decimal("600.00"))
 
     def test_dashboard_view_requires_active_organization(self) -> None:
         self.client.force_login(self.other_user)

@@ -32,6 +32,7 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
                 organization=request.organization,
                 project=data["project"],
                 contract=data["contract"],
+                phase=data["phase"],
                 actor=request.user,
                 estimate_number=data["estimate_number"],
                 title=data["title"],
@@ -47,7 +48,7 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
     estimate = get_object_or_404(
-        Estimate.objects.prefetch_related("items"),
+        Estimate.objects.select_related("project", "phase").prefetch_related("items"),
         pk=estimate_id,
         organization=request.organization,
         deleted_at__isnull=True,

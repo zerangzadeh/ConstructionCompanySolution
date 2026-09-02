@@ -26,6 +26,13 @@ class Estimate(models.Model):
         on_delete=models.CASCADE,
         related_name="estimates",
     )
+    phase = models.ForeignKey(
+        "projects.ProjectPhase",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="estimates",
+    )
     contract = models.ForeignKey(
         "contracts.Contract",
         on_delete=models.SET_NULL,
@@ -83,6 +90,10 @@ class Estimate(models.Model):
             models.Index(
                 fields=["organization", "deleted_at"],
                 name="estimate_org_deleted_idx",
+            ),
+            models.Index(
+                fields=["organization", "phase", "status"],
+                name="estimate_org_phase_status_idx",
             ),
         ]
         ordering = ["-created_at"]  # noqa: RUF012

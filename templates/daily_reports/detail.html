@@ -5,7 +5,7 @@
 {% block content %}
 <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
     <div>
-        <p class="text-sm font-medium text-blue-600">{{ report.project.name }} · {{ report.site.name }}</p>
+        <p class="text-sm font-medium text-blue-600">{{ report.project.name }} · {{ report.site.name }}{% if report.phase %} · {{ report.phase.name }}{% endif %}</p>
         <h1 class="mt-1 text-3xl font-bold tracking-tight">Daily report · {{ report.reporting_date }}</h1>
         <p class="mt-2 text-slate-500">Status: {{ report.get_status_display }} · Author: {{ report.created_by|default:"Unknown" }}</p>
     </div>

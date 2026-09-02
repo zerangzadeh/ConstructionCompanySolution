@@ -23,6 +23,19 @@ from apps.projects.models import (
     ProjectStatus,
 )
 
+_ALLOWED_PHASE_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
+    ProjectPhaseStatus.PLANNING: (
+        ProjectPhaseStatus.ACTIVE,
+        ProjectPhaseStatus.ON_HOLD,
+    ),
+    ProjectPhaseStatus.ACTIVE: (
+        ProjectPhaseStatus.ON_HOLD,
+        ProjectPhaseStatus.COMPLETED,
+    ),
+    ProjectPhaseStatus.ON_HOLD: (ProjectPhaseStatus.ACTIVE,),
+    ProjectPhaseStatus.COMPLETED: (),
+}
+
 
 def _has_active_membership(user: User, organization: Organization) -> bool:
     return organization.memberships.filter(
@@ -279,7 +292,7 @@ def create_project_phase(
     ).exists():
         raise ValueError("A phase with this code already exists for the worksite.")
 
-    return ProjectPhase.objects.create(
+    phase = ProjectPhase.objects.create(
         organization=organization,
         site=site,
         code=normalized_code,
@@ -290,6 +303,15 @@ def create_project_phase(
         created_by=actor,
         updated_by=actor,
     )
+    record_audit_event(
+        action=AuditAction.PROJECT_PHASE_CREATED,
+        entity_type="project_phase",
+        entity_id=phase.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"site_id": str(site.pk), "code": phase.code},
+    )
+    return phase
 
 
 def get_organization_project_phases(
@@ -311,6 +333,100 @@ def get_organization_project_phases(
         organization=organization,
         site=site,
     ).select_related("site", "site__project")
+
+
+def get_organization_project_phase(
+    *,
+    user: User,
+    organization: Organization,
+    project_id: str,
+    site_id: str,
+    phase_id: str,
+) -> ProjectPhase:
+    """Return one phase only when it belongs to the active tenant hierarchy."""
+
+    phases = get_organization_project_phases(
+        user=user,
+        organization=organization,
+        project_id=project_id,
+        site_id=site_id,
+    )
+    try:
+        return phases.get(pk=phase_id)
+    except ProjectPhase.DoesNotExist as exc:
+        raise PermissionDenied("Project phase not found in this worksite.") from exc
+
+
+def get_available_phase_statuses(
+    phase: ProjectPhase,
+) -> tuple[tuple[str, str], ...]:
+    """Return valid next status values for display in a phase detail page."""
+
+    return tuple(
+        (status, ProjectPhaseStatus(status).label)
+        for status in _ALLOWED_PHASE_STATUS_TRANSITIONS[phase.status]
+    )
+
+
+@transaction.atomic
+def transition_project_phase_status(
+    *,
+    organization: Organization,
+    project_id: str,
+    site_id: str,
+    phase_id: str,
+    actor: User,
+    target_status: str,
+) -> ProjectPhase:
+    """Apply one allowed, audited phase status transition atomically."""
+
+    if not actor.is_authenticated or not actor.is_active:
+        raise PermissionDenied("Authentication is required.")
+    if (
+        organization.status != OrganizationStatus.ACTIVE
+        or organization.deleted_at is not None
+    ):
+        raise PermissionDenied("The organization is not active.")
+    if not _can_manage_projects(actor, organization):
+        raise PermissionDenied("You cannot update project phases in this organization.")
+    site = get_organization_project_site(
+        user=actor,
+        organization=organization,
+        project_id=project_id,
+        site_id=site_id,
+    )
+    if not site.is_active or site.project.deleted_at is not None:
+        raise PermissionDenied("The worksite is not active.")
+    try:
+        phase = (
+            ProjectPhase.objects.select_for_update()
+            .select_related("site", "site__project")
+            .get(pk=phase_id, organization=organization, site=site)
+        )
+    except ProjectPhase.DoesNotExist as exc:
+        raise PermissionDenied("Project phase not found in this worksite.") from exc
+    if target_status not in ProjectPhaseStatus.values:
+        raise ValueError("Invalid project phase status.")
+    if target_status not in _ALLOWED_PHASE_STATUS_TRANSITIONS[phase.status]:
+        raise ValueError("This project phase status transition is not allowed.")
+
+    previous_status = phase.status
+    phase.status = target_status
+    phase.updated_by = actor
+    phase.save(update_fields=["status", "updated_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.PROJECT_PHASE_STATUS_CHANGED,
+        entity_type="project_phase",
+        entity_id=phase.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "site_id": str(site.pk),
+            "previous_status": previous_status,
+            "new_status": phase.status,
+        },
+    )
+    return phase
 
 
 @transaction.atomic

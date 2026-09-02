@@ -25,6 +25,7 @@ def expense_create(request: HttpRequest) -> HttpResponse:
             create_expense(
                 organization=request.organization,
                 project=data["project"],
+                phase=data["phase"],
                 actor=request.user,
                 description=data["description"],
                 amount=data["amount"],

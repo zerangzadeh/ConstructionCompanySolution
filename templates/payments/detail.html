@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ payment.payment_number }} | Construction ERP{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold">{{ payment.payment_number }}</h1>
+<p class="mt-2 text-slate-500">{{ payment.get_direction_display }} · {{ payment.counterparty_name }} · {{ payment.amount|floatformat:2 }} {{ request.organization.currency }}</p>
+<div class="mt-8 grid gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2">
+<p><span class="text-sm text-slate-500">Project</span><br><strong>{{ payment.project.name }}</strong></p>
+<p><span class="text-sm text-slate-500">Payment date</span><br><strong>{{ payment.paid_on }}</strong></p>
+<p><span class="text-sm text-slate-500">Method</span><br><strong>{{ payment.get_method_display }}</strong></p>
+<p><span class="text-sm text-slate-500">Reference</span><br><strong>{{ payment.reference|default:"—" }}</strong></p>
+{% if payment.contract %}<p><span class="text-sm text-slate-500">Contract</span><br><strong>{{ payment.contract.contract_number }}</strong></p>{% endif %}
+{% if payment.phase %}<p><span class="text-sm text-slate-500">Phase</span><br><strong>{{ payment.phase.name }}</strong></p>{% endif %}
+</div>
+{% if payment.notes %}<p class="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">{{ payment.notes }}</p>{% endif %}
+{% if payment.status == 'posted' %}
+<form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post" action="{% url 'payments:void' payment.id %}">
+{% csrf_token %}
+<h2 class="font-semibold">Void payment</h2>
+<p class="text-sm text-slate-500">Voiding preserves the original payment and excludes it from cash-flow totals.</p>
+{% include "components/form_errors.html" with form=form only %}
+{% include "components/form_field.html" with field=form.reason only %}
+<button class="rounded-lg bg-red-600 px-4 py-2.5 font-semibold text-white" type="submit">Void payment</button>
+</form>
+{% else %}
+<div class="mt-8 rounded-xl bg-slate-100 p-5"><p class="font-semibold text-slate-800">Voided payment</p><p class="mt-1 text-sm text-slate-600">{{ payment.void_reason }}{% if payment.voided_by %} · Voided by {{ payment.voided_by.username }}{% endif %}</p></div>
+{% endif %}
+{% endblock %}

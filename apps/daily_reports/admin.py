@@ -10,7 +10,14 @@ from apps.daily_reports.models import (
 
 @admin.register(DailyReport)
 class DailyReportAdmin(admin.ModelAdmin):
-    list_display = ("project", "site", "reporting_date", "status", "organization")
+    list_display = (
+        "project",
+        "site",
+        "phase",
+        "reporting_date",
+        "status",
+        "organization",
+    )
     list_filter = ("status", "organization")
     search_fields = (
         "project__name",

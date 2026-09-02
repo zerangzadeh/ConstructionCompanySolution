@@ -14,14 +14,17 @@ from apps.organizations.models import (
     Organization,
 )
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
-from apps.projects.models import ProjectStatus
+from apps.projects.models import ProjectPhaseStatus, ProjectStatus
 from apps.projects.services import (
     archive_project,
     create_project,
+    create_project_phase,
     create_project_site,
     get_organization_project,
+    get_organization_project_phases,
     get_organization_project_sites,
     get_organization_projects,
+    transition_project_phase_status,
 )
 
 
@@ -359,4 +362,162 @@ class ProjectServiceTests(TestCase):
                 actor=self.owner,
                 code="SITE-OTHER",
                 name="Unauthorized worksite",
+            )
+
+    def test_create_project_phase_is_tenant_scoped_and_audited(self) -> None:
+        project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-PHASE",
+            name="Phase project",
+        )
+        site = create_project_site(
+            organization=self.organization,
+            project=project,
+            actor=self.owner,
+            code="SITE-PHASE",
+            name="Phase worksite",
+        )
+
+        phase = create_project_phase(
+            organization=self.organization,
+            site=site,
+            actor=self.owner,
+            code="PH-001",
+            name="Foundation works",
+            status=ProjectPhaseStatus.ACTIVE,
+            planned_start_date=date(2026, 9, 1),
+            planned_end_date=date(2026, 9, 30),
+        )
+
+        self.assertEqual(phase.organization, self.organization)
+        self.assertEqual(phase.site, site)
+        self.assertEqual(phase.status, ProjectPhaseStatus.ACTIVE)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.PROJECT_PHASE_CREATED,
+                organization=self.organization,
+                entity_id=str(phase.pk),
+            ).exists()
+        )
+        self.assertEqual(
+            list(
+                get_organization_project_phases(
+                    user=self.owner,
+                    organization=self.organization,
+                    project_id=str(project.pk),
+                    site_id=str(site.pk),
+                )
+            ),
+            [phase],
+        )
+
+    def test_project_phase_rejects_cross_tenant_site_and_invalid_dates(self) -> None:
+        project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-VALID-PHASE",
+            name="Valid phase project",
+        )
+        site = create_project_site(
+            organization=self.organization,
+            project=project,
+            actor=self.owner,
+            code="SITE-VALID-PHASE",
+            name="Valid phase worksite",
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Phase end date cannot be before start date.",
+        ):
+            create_project_phase(
+                organization=self.organization,
+                site=site,
+                actor=self.owner,
+                code="PH-DATE",
+                name="Invalid date phase",
+                planned_start_date=date(2026, 9, 2),
+                planned_end_date=date(2026, 9, 1),
+            )
+
+        other_project = self.other_organization.projects.create(
+            code="P-OTHER-PHASE",
+            name="Other phase project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        other_site = self.other_organization.project_sites.create(
+            project=other_project,
+            code="SITE-OTHER-PHASE",
+            name="Other phase worksite",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        with self.assertRaises(PermissionDenied):
+            create_project_phase(
+                organization=self.organization,
+                site=other_site,
+                actor=self.owner,
+                code="PH-OTHER",
+                name="Unauthorized phase",
+            )
+
+    def test_project_phase_allows_only_valid_audited_status_transitions(self) -> None:
+        project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-PHASE-WORKFLOW",
+            name="Phase workflow project",
+        )
+        site = create_project_site(
+            organization=self.organization,
+            project=project,
+            actor=self.owner,
+            code="SITE-PHASE-WORKFLOW",
+            name="Phase workflow worksite",
+        )
+        phase = create_project_phase(
+            organization=self.organization,
+            site=site,
+            actor=self.owner,
+            code="PH-WORKFLOW",
+            name="Structural works",
+        )
+
+        activated_phase = transition_project_phase_status(
+            organization=self.organization,
+            project_id=str(project.pk),
+            site_id=str(site.pk),
+            phase_id=str(phase.pk),
+            actor=self.owner,
+            target_status=ProjectPhaseStatus.ACTIVE,
+        )
+        completed_phase = transition_project_phase_status(
+            organization=self.organization,
+            project_id=str(project.pk),
+            site_id=str(site.pk),
+            phase_id=str(phase.pk),
+            actor=self.owner,
+            target_status=ProjectPhaseStatus.COMPLETED,
+        )
+
+        self.assertEqual(activated_phase.status, ProjectPhaseStatus.ACTIVE)
+        self.assertEqual(completed_phase.status, ProjectPhaseStatus.COMPLETED)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.PROJECT_PHASE_STATUS_CHANGED,
+                entity_id=str(phase.pk),
+            ).exists()
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "This project phase status transition is not allowed.",
+        ):
+            transition_project_phase_status(
+                organization=self.organization,
+                project_id=str(project.pk),
+                site_id=str(site.pk),
+                phase_id=str(phase.pk),
+                actor=self.owner,
+                target_status=ProjectPhaseStatus.ACTIVE,
             )

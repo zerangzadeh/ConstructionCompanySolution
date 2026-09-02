@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}New payment | Construction ERP{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold">Record payment</h1>
+<p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
+<form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
+{% csrf_token %}
+{% include "components/form_errors.html" with form=form only %}
+{% for field in form %}
+{% include "components/form_field.html" with field=field only %}
+{% endfor %}
+<button class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" type="submit">Post payment</button>
+</form>
+{% endblock %}

@@ -9,6 +9,7 @@ from apps.contracts.models import Contract
 from apps.estimates.models import Estimate, EstimateStatus
 from apps.expenses.models import Expense, ExpenseStatus
 from apps.organizations.models import MembershipStatus, Organization, OrganizationStatus
+from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.projects.models import Project
 
 ZERO = Decimal("0.00")
@@ -22,6 +23,10 @@ class ProjectFinancialReport:
     variance: Decimal
     approved_estimate_count: int
     recorded_expense_count: int
+    receipt_total: Decimal
+    disbursement_total: Decimal
+    net_cash_flow: Decimal
+    posted_payment_count: int
 
 
 @dataclass(frozen=True)
@@ -32,6 +37,10 @@ class OrganizationDashboard:
     approved_estimate_total: Decimal
     recorded_expense_total: Decimal
     variance: Decimal
+    receipt_total: Decimal
+    disbursement_total: Decimal
+    net_cash_flow: Decimal
+    posted_payment_count: int
 
 
 def _money(value: Decimal) -> Decimal:
@@ -56,10 +65,31 @@ def _validate_view_context(user: User, organization: Organization) -> None:
 def _build_report(project: Project) -> ProjectFinancialReport:
     approved_estimates = list(project.estimates.all())
     recorded_expenses = list(project.expenses.all())
+    posted_payments = list(project.payments.all())
     estimate_total = _money(
         sum((estimate.total_amount for estimate in approved_estimates), ZERO)
     )
     expense_total = _money(sum((expense.amount for expense in recorded_expenses), ZERO))
+    receipt_total = _money(
+        sum(
+            (
+                payment.amount
+                for payment in posted_payments
+                if payment.direction == PaymentDirection.RECEIPT
+            ),
+            ZERO,
+        )
+    )
+    disbursement_total = _money(
+        sum(
+            (
+                payment.amount
+                for payment in posted_payments
+                if payment.direction == PaymentDirection.DISBURSEMENT
+            ),
+            ZERO,
+        )
+    )
     return ProjectFinancialReport(
         project=project,
         approved_estimate_total=estimate_total,
@@ -67,6 +97,10 @@ def _build_report(project: Project) -> ProjectFinancialReport:
         variance=_money(estimate_total - expense_total),
         approved_estimate_count=len(approved_estimates),
         recorded_expense_count=len(recorded_expenses),
+        receipt_total=receipt_total,
+        disbursement_total=disbursement_total,
+        net_cash_flow=_money(receipt_total - disbursement_total),
+        posted_payment_count=len(posted_payments),
     )
 
 
@@ -99,6 +133,10 @@ def get_project_financial_report(
                     status=ExpenseStatus.RECORDED,
                     deleted_at__isnull=True,
                 ),
+            ),
+            Prefetch(
+                "payments",
+                queryset=Payment.objects.filter(status=PaymentStatus.POSTED),
             ),
         )
         .first()
@@ -136,6 +174,10 @@ def get_organization_financial_reports(
                     deleted_at__isnull=True,
                 ),
             ),
+            Prefetch(
+                "payments",
+                queryset=Payment.objects.filter(status=PaymentStatus.POSTED),
+            ),
         )
         .order_by("name")
     )
@@ -160,6 +202,10 @@ def get_organization_dashboard(
     recorded_expense_total = _money(
         sum((report.recorded_expense_total for report in reports), ZERO)
     )
+    receipt_total = _money(sum((report.receipt_total for report in reports), ZERO))
+    disbursement_total = _money(
+        sum((report.disbursement_total for report in reports), ZERO)
+    )
     return OrganizationDashboard(
         project_count=len(reports),
         contract_count=Contract.objects.filter(
@@ -175,4 +221,8 @@ def get_organization_dashboard(
         approved_estimate_total=approved_estimate_total,
         recorded_expense_total=recorded_expense_total,
         variance=_money(approved_estimate_total - recorded_expense_total),
+        receipt_total=receipt_total,
+        disbursement_total=disbursement_total,
+        net_cash_flow=_money(receipt_total - disbursement_total),
+        posted_payment_count=sum(report.posted_payment_count for report in reports),
     )

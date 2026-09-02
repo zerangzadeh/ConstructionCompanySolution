@@ -11,7 +11,7 @@
 {% for estimate in estimates %}
 <a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'estimates:detail' estimate.id %}">
 <p class="font-semibold">{{ estimate.estimate_number }} · {{ estimate.title }}</p>
-<p class="text-sm text-slate-500">{{ estimate.project.name }} · {{ estimate.total_amount|floatformat:2 }} {{ request.organization.currency }}</p>
+<p class="text-sm text-slate-500">{{ estimate.project.name }}{% if estimate.phase %} · {{ estimate.phase.name }}{% endif %} · {{ estimate.total_amount|floatformat:2 }} {{ request.organization.currency }}</p>
 </a>
 {% endfor %}
 {% else %}<p class="p-8 text-center text-slate-500">No estimates yet.</p>{% endif %}

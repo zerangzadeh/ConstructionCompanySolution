@@ -30,6 +30,13 @@ class DailyReport(models.Model):
         on_delete=models.PROTECT,
         related_name="daily_reports",
     )
+    phase = models.ForeignKey(
+        "projects.ProjectPhase",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="daily_reports",
+    )
     reporting_date = models.DateField()
     status = models.CharField(
         max_length=20,
@@ -85,6 +92,10 @@ class DailyReport(models.Model):
             models.Index(
                 fields=["organization", "status"],
                 name="daily_report_org_status_idx",
+            ),
+            models.Index(
+                fields=["organization", "phase", "reporting_date"],
+                name="dailyrep_org_phase_date_idx",
             ),
         ]
         ordering = ["-reporting_date", "-created_at"]  # noqa: RUF012

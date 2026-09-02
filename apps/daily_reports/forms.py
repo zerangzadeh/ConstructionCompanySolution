@@ -6,7 +6,7 @@ from apps.daily_reports.models import (
     DailyReportLaborEntry,
     DailyReportMaterialEntry,
 )
-from apps.projects.models import Project, ProjectSite
+from apps.projects.models import Project, ProjectPhase, ProjectPhaseStatus, ProjectSite
 
 
 class DailyReportForm(forms.ModelForm):
@@ -14,12 +14,18 @@ class DailyReportForm(forms.ModelForm):
 
     project = forms.ModelChoiceField(queryset=Project.objects.none())
     site = forms.ModelChoiceField(queryset=ProjectSite.objects.none())
+    phase = forms.ModelChoiceField(
+        queryset=ProjectPhase.objects.none(),
+        required=False,
+        empty_label="No phase",
+    )
 
     class Meta:
         model = DailyReport
         fields = [  # noqa: RUF012
             "project",
             "site",
+            "phase",
             "reporting_date",
             "weather_conditions",
             "labor_count",
@@ -59,6 +65,16 @@ class DailyReportForm(forms.ModelForm):
             .select_related("project")
             .order_by("project__name", "name")
         )
+        self.fields["phase"].queryset = (
+            ProjectPhase.objects.filter(
+                organization=organization,
+                site__project__deleted_at__isnull=True,
+                site__is_active=True,
+                status=ProjectPhaseStatus.ACTIVE,
+            )
+            .select_related("site", "site__project")
+            .order_by("site__project__name", "site__name", "name")
+        )
         field_class = (
             "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 "
             "text-slate-900 outline-none focus:border-blue-500 focus:ring-2 "
@@ -71,8 +87,11 @@ class DailyReportForm(forms.ModelForm):
         cleaned_data = super().clean()
         project = cleaned_data.get("project")
         site = cleaned_data.get("site")
+        phase = cleaned_data.get("phase")
         if project and site and site.project_id != project.pk:
             self.add_error("site", "Selected worksite does not belong to the project.")
+        if phase and site and phase.site_id != site.pk:
+            self.add_error("phase", "Selected phase does not belong to the worksite.")
         return cleaned_data
 
 

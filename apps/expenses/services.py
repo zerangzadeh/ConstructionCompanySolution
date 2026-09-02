@@ -15,7 +15,7 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project
+from apps.projects.models import Project, ProjectPhase
 
 
 def _can_manage_expenses(user: User, organization: Organization) -> bool:
@@ -49,6 +49,16 @@ def _validate_context(
         raise PermissionDenied("The project does not belong to this organization.")
 
 
+def _validate_phase(
+    *,
+    organization: Organization,
+    project: Project,
+    phase: ProjectPhase,
+) -> None:
+    if phase.organization_id != organization.pk or phase.site.project_id != project.pk:
+        raise PermissionDenied("The project phase does not belong to this project.")
+
+
 @transaction.atomic
 def create_expense(
     *,
@@ -58,6 +68,7 @@ def create_expense(
     description: str,
     amount: Decimal,
     incurred_on: date,
+    phase: ProjectPhase | None = None,
     category: str = ExpenseCategory.OTHER,
     vendor_name: str = "",
     status: str = ExpenseStatus.RECORDED,
@@ -67,6 +78,8 @@ def create_expense(
     """Record a non-negative expense for a project."""
 
     _validate_context(actor=actor, organization=organization, project=project)
+    if phase is not None:
+        _validate_phase(organization=organization, project=project, phase=phase)
     if not description.strip():
         raise ValueError("Expense description is required.")
     if amount < Decimal("0.00"):
@@ -79,6 +92,7 @@ def create_expense(
     expense = Expense.objects.create(
         organization=organization,
         project=project,
+        phase=phase,
         category=category,
         description=description.strip(),
         vendor_name=vendor_name.strip(),
@@ -98,6 +112,7 @@ def create_expense(
         actor=actor,
         metadata={
             "project_id": str(project.pk),
+            "phase_id": str(phase.pk) if phase else None,
             "amount": str(expense.amount),
             "category": expense.category,
         },
@@ -130,6 +145,6 @@ def get_organization_expenses(
             deleted_at__isnull=True,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "created_by", "updated_by")
+        .select_related("project", "phase", "created_by", "updated_by")
         .order_by("-incurred_on", "-created_at")
     )

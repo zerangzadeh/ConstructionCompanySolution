@@ -10,7 +10,12 @@ from apps.audit.models import AuditAction, AuditEvent
 from apps.expenses.models import ExpenseCategory
 from apps.expenses.services import create_expense, get_organization_expenses
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
-from apps.projects.services import create_project
+from apps.projects.models import ProjectPhaseStatus
+from apps.projects.services import (
+    create_project,
+    create_project_phase,
+    create_project_site,
+)
 
 
 class ExpenseServiceTests(TestCase):
@@ -45,6 +50,21 @@ class ExpenseServiceTests(TestCase):
             actor=self.owner,
             code="P-EXPENSE",
             name="Expense project",
+        )
+        self.site = create_project_site(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            code="SITE-EXPENSE",
+            name="Expense worksite",
+        )
+        self.phase = create_project_phase(
+            organization=self.organization,
+            site=self.site,
+            actor=self.owner,
+            code="PH-EXPENSE",
+            name="Foundation works",
+            status=ProjectPhaseStatus.ACTIVE,
         )
 
     def test_create_expense_records_decimal_amount_and_audit(self) -> None:
@@ -96,6 +116,58 @@ class ExpenseServiceTests(TestCase):
                 project=other_project,
                 actor=self.owner,
                 description="Invalid tenant expense",
+                amount=Decimal("10.00"),
+                incurred_on=date(2026, 8, 29),
+            )
+
+    def test_expense_optionally_scopes_to_a_project_phase(self) -> None:
+        expense = create_expense(
+            organization=self.organization,
+            project=self.project,
+            phase=self.phase,
+            actor=self.owner,
+            description="Foundation concrete",
+            amount=Decimal("3250.00"),
+            incurred_on=date(2026, 8, 29),
+        )
+
+        self.assertEqual(expense.phase, self.phase)
+        event = AuditEvent.objects.get(
+            action=AuditAction.EXPENSE_RECORDED,
+            entity_id=str(expense.pk),
+        )
+        self.assertEqual(event.metadata["phase_id"], str(self.phase.pk))
+
+    def test_expense_rejects_phase_from_another_project(self) -> None:
+        other_project = self.organization.projects.create(
+            code="P-OTHER-PHASE-EXP",
+            name="Other expense project",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        other_site = create_project_site(
+            organization=self.organization,
+            project=other_project,
+            actor=self.owner,
+            code="SITE-OTHER-PHASE-EXP",
+            name="Other expense worksite",
+        )
+        other_phase = create_project_phase(
+            organization=self.organization,
+            site=other_site,
+            actor=self.owner,
+            code="PH-OTHER-EXP",
+            name="Other expense phase",
+            status=ProjectPhaseStatus.ACTIVE,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            create_expense(
+                organization=self.organization,
+                project=self.project,
+                phase=other_phase,
+                actor=self.owner,
+                description="Invalid phase expense",
                 amount=Decimal("10.00"),
                 incurred_on=date(2026, 8, 29),
             )

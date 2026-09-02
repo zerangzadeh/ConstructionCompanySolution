@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from apps.projects.models import Project, ProjectSite
+from apps.projects.models import Project, ProjectPhase, ProjectSite
 
 
 @admin.register(Project)
@@ -16,4 +16,12 @@ class ProjectSiteAdmin(admin.ModelAdmin):
     list_display = ("code", "name", "project", "organization", "is_active")
     list_filter = ("organization", "is_active")
     search_fields = ("code", "name", "project__name", "organization__name")
+    readonly_fields = ("id", "created_at", "updated_at")
+
+
+@admin.register(ProjectPhase)
+class ProjectPhaseAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "site", "organization", "status")
+    list_filter = ("organization", "status")
+    search_fields = ("code", "name", "site__name", "organization__name")
     readonly_fields = ("id", "created_at", "updated_at")

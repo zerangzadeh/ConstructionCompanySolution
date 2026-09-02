@@ -1,0 +1,170 @@
+import django.db.models.deletion
+import uuid
+from decimal import Decimal
+
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        ("contracts", "0001_initial"),
+        ("organizations", "0003_organizationinvitation"),
+        ("projects", "0003_projectphase"),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="Payment",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid.uuid4,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("payment_number", models.CharField(max_length=80)),
+                (
+                    "direction",
+                    models.CharField(
+                        choices=[
+                            ("receipt", "Receipt"),
+                            ("disbursement", "Disbursement"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "amount",
+                    models.DecimalField(
+                        decimal_places=2,
+                        max_digits=18,
+                    ),
+                ),
+                ("paid_on", models.DateField()),
+                (
+                    "method",
+                    models.CharField(
+                        choices=[
+                            ("bank_transfer", "Bank transfer"),
+                            ("cash", "Cash"),
+                            ("check", "Check"),
+                            ("other", "Other"),
+                        ],
+                        default="bank_transfer",
+                        max_length=30,
+                    ),
+                ),
+                ("counterparty_name", models.CharField(max_length=255)),
+                ("reference", models.CharField(blank=True, max_length=120)),
+                ("notes", models.TextField(blank=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[("posted", "Posted"), ("void", "Void")],
+                        db_index=True,
+                        default="posted",
+                        max_length=20,
+                    ),
+                ),
+                ("void_reason", models.TextField(blank=True)),
+                ("voided_at", models.DateTimeField(blank=True, null=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "contract",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="payments",
+                        to="contracts.contract",
+                    ),
+                ),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="payments_created",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "organization",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="organizations.organization",
+                    ),
+                ),
+                (
+                    "phase",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="payments",
+                        to="projects.projectphase",
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="payments",
+                        to="projects.project",
+                    ),
+                ),
+                (
+                    "updated_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="payments_updated",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "voided_by",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="payments_voided",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+            options={"ordering": ["-paid_on", "-created_at"]},
+        ),
+        migrations.AddConstraint(
+            model_name="payment",
+            constraint=models.UniqueConstraint(
+                fields=("organization", "payment_number"),
+                name="unique_payment_number_per_organization",
+            ),
+        ),
+        migrations.AddIndex(
+            model_name="payment",
+            index=models.Index(
+                fields=["organization", "paid_on", "status"],
+                name="payment_org_paid_status_idx",
+            ),
+        ),
+        migrations.AddIndex(
+            model_name="payment",
+            index=models.Index(
+                fields=["organization", "project", "paid_on"],
+                name="payment_org_project_paid_idx",
+            ),
+        ),
+    ]

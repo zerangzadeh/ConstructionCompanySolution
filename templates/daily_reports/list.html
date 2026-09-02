@@ -18,7 +18,7 @@
     <a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'daily_reports:detail' report.id %}">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <p class="font-semibold text-slate-900">{{ report.project.name }} · {{ report.site.name }}</p>
+                <p class="font-semibold text-slate-900">{{ report.project.name }} · {{ report.site.name }}{% if report.phase %} · {{ report.phase.name }}{% endif %}</p>
                 <p class="mt-1 text-sm text-slate-500">{{ report.reporting_date }} · {{ report.labor_count }} workers · {{ report.get_status_display }}</p>
             </div>
             <p class="text-sm text-slate-500">{{ report.created_by|default:"Unknown author" }}</p>

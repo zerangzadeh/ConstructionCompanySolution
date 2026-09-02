@@ -23,6 +23,8 @@ INSTALLED_APPS: list[str] = [
     "apps.contracts",
     "apps.estimates",
     "apps.expenses",
+    "apps.payments",
+    "apps.documents",
     "apps.financials",
     "apps.daily_reports",
 ]
@@ -89,4 +91,6 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = "/media/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

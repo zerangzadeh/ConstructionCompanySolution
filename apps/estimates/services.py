@@ -16,7 +16,7 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project
+from apps.projects.models import Project, ProjectPhase
 
 
 def _can_manage_estimates(user: User, organization: Organization) -> bool:
@@ -58,6 +58,16 @@ def _validate_context(
         raise PermissionDenied("The project does not belong to this organization.")
 
 
+def _validate_phase(
+    *,
+    organization: Organization,
+    project: Project,
+    phase: ProjectPhase,
+) -> None:
+    if phase.organization_id != organization.pk or phase.site.project_id != project.pk:
+        raise PermissionDenied("The project phase does not belong to this project.")
+
+
 @transaction.atomic
 def create_estimate(
     *,
@@ -67,6 +77,7 @@ def create_estimate(
     estimate_number: str,
     title: str,
     contract: Contract | None = None,
+    phase: ProjectPhase | None = None,
     status: str = EstimateStatus.DRAFT,
     notes: str = "",
 ) -> Estimate:
@@ -79,6 +90,8 @@ def create_estimate(
         or contract.deleted_at is not None
     ):
         raise PermissionDenied("The contract does not belong to this project.")
+    if phase is not None:
+        _validate_phase(organization=organization, project=project, phase=phase)
     if not estimate_number.strip() or not title.strip():
         raise ValueError("Estimate number and title are required.")
     if status != EstimateStatus.DRAFT:
@@ -94,6 +107,7 @@ def create_estimate(
         organization=organization,
         project=project,
         contract=contract,
+        phase=phase,
         estimate_number=normalized_number,
         title=title.strip(),
         status=status,
@@ -110,6 +124,7 @@ def create_estimate(
         metadata={
             "estimate_number": estimate.estimate_number,
             "project_id": str(project.pk),
+            "phase_id": str(phase.pk) if phase else None,
         },
     )
     return estimate
@@ -237,7 +252,13 @@ def get_organization_estimates(
             deleted_at__isnull=True,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "contract", "created_by", "updated_by")
+        .select_related(
+            "project",
+            "phase",
+            "contract",
+            "created_by",
+            "updated_by",
+        )
         .prefetch_related("items")
         .order_by("-created_at")
     )

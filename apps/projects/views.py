@@ -1,17 +1,24 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.decorators import active_organization_required
-from apps.projects.forms import ProjectForm, ProjectSiteForm
+from apps.projects.forms import ProjectForm, ProjectPhaseForm, ProjectSiteForm
 from apps.projects.services import (
     archive_project,
     create_project,
+    create_project_phase,
     create_project_site,
+    get_available_phase_statuses,
     get_organization_project,
+    get_organization_project_phase,
+    get_organization_project_phases,
+    get_organization_project_site,
     get_organization_project_sites,
     get_organization_projects,
+    transition_project_phase_status,
 )
 
 
@@ -112,6 +119,119 @@ def project_site_create(request: HttpRequest, project_id: str) -> HttpResponse:
         request,
         "projects/site_create.html",
         {"project": project, "form": form},
+    )
+
+
+@active_organization_required
+@require_GET
+def project_phase_list(
+    request: HttpRequest,
+    project_id: str,
+    site_id: str,
+) -> HttpResponse:
+    site = get_organization_project_site(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+        site_id=site_id,
+    )
+    phases = get_organization_project_phases(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+        site_id=site_id,
+    )
+    return render(request, "projects/phase_list.html", {"site": site, "phases": phases})
+
+
+@active_organization_required
+def project_phase_create(
+    request: HttpRequest,
+    project_id: str,
+    site_id: str,
+) -> HttpResponse:
+    site = get_organization_project_site(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+        site_id=site_id,
+    )
+    form = ProjectPhaseForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        try:
+            create_project_phase(
+                organization=request.organization,
+                site=site,
+                actor=request.user,
+                code=data["code"],
+                name=data["name"],
+                status=data["status"],
+                planned_start_date=data["planned_start_date"],
+                planned_end_date=data["planned_end_date"],
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect(
+                "projects:phase_list",
+                project_id=project_id,
+                site_id=site_id,
+            )
+    return render(request, "projects/phase_create.html", {"site": site, "form": form})
+
+
+@active_organization_required
+@require_GET
+def project_phase_detail(
+    request: HttpRequest,
+    project_id: str,
+    site_id: str,
+    phase_id: str,
+) -> HttpResponse:
+    phase = get_organization_project_phase(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+        site_id=site_id,
+        phase_id=phase_id,
+    )
+    return render(
+        request,
+        "projects/phase_detail.html",
+        {
+            "phase": phase,
+            "available_statuses": get_available_phase_statuses(phase),
+        },
+    )
+
+
+@active_organization_required
+@require_POST
+def project_phase_transition(
+    request: HttpRequest,
+    project_id: str,
+    site_id: str,
+    phase_id: str,
+) -> HttpResponse:
+    try:
+        transition_project_phase_status(
+            organization=request.organization,
+            project_id=project_id,
+            site_id=site_id,
+            phase_id=phase_id,
+            actor=request.user,
+            target_status=request.POST.get("status", ""),
+        )
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    else:
+        messages.success(request, "Project phase status updated.")
+    return redirect(
+        "projects:phase_detail",
+        project_id=project_id,
+        site_id=site_id,
+        phase_id=phase_id,
     )
 
 

@@ -9,11 +9,20 @@ class AuditAction(models.TextChoices):
     PROJECT_CREATED = "project.created", "Project created"
     PROJECT_ARCHIVED = "project.archived", "Project archived"
     PROJECT_SITE_CREATED = "project_site.created", "Project site created"
+    PROJECT_PHASE_CREATED = "project_phase.created", "Project phase created"
+    PROJECT_PHASE_STATUS_CHANGED = (
+        "project_phase.status_changed",
+        "Project phase status changed",
+    )
     CONTRACT_CREATED = "contract.created", "Contract created"
     ESTIMATE_CREATED = "estimate.created", "Estimate created"
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "Estimate item added"
     ESTIMATE_APPROVED = "estimate.approved", "Estimate approved"
     EXPENSE_RECORDED = "expense.recorded", "Expense recorded"
+    PAYMENT_RECORDED = "payment.recorded", "Payment recorded"
+    PAYMENT_VOIDED = "payment.voided", "Payment voided"
+    DOCUMENT_UPLOADED = "document.uploaded", "Document uploaded"
+    DOCUMENT_DOWNLOADED = "document.downloaded", "Document downloaded"
     DAILY_REPORT_CREATED = "daily_report.created", "Daily report created"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "Daily report submitted"
     DAILY_REPORT_APPROVED = "daily_report.approved", "Daily report approved"

@@ -13,7 +13,12 @@ from apps.estimates.services import (
     get_organization_estimates,
 )
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
-from apps.projects.services import create_project
+from apps.projects.models import ProjectPhaseStatus
+from apps.projects.services import (
+    create_project,
+    create_project_phase,
+    create_project_site,
+)
 
 
 class EstimateServiceTests(TestCase):
@@ -48,6 +53,21 @@ class EstimateServiceTests(TestCase):
             actor=self.owner,
             code="P-ESTIMATE",
             name="Estimate project",
+        )
+        self.site = create_project_site(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            code="SITE-ESTIMATE",
+            name="Estimate site",
+        )
+        self.phase = create_project_phase(
+            organization=self.organization,
+            site=self.site,
+            actor=self.owner,
+            code="PH-ESTIMATE",
+            name="Estimate phase",
+            status=ProjectPhaseStatus.PLANNING,
         )
 
     def test_create_estimate_and_add_decimal_items(self) -> None:
@@ -112,6 +132,58 @@ class EstimateServiceTests(TestCase):
                 actor=self.owner,
                 estimate_number="E-003",
                 title="Invalid estimate",
+            )
+
+    def test_estimate_can_be_assigned_to_a_project_phase(self) -> None:
+        estimate = create_estimate(
+            organization=self.organization,
+            project=self.project,
+            phase=self.phase,
+            actor=self.owner,
+            estimate_number="E-PHASE-001",
+            title="Phase estimate",
+        )
+
+        self.assertEqual(estimate.phase, self.phase)
+        event = AuditEvent.objects.get(
+            action=AuditAction.ESTIMATE_CREATED,
+            entity_id=estimate.pk,
+        )
+        self.assertEqual(event.metadata["phase_id"], str(self.phase.pk))
+
+    def test_estimate_rejects_phase_from_another_project(self) -> None:
+        other_project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="P-ESTIMATE-OTHER",
+            name="Other estimate project",
+        )
+        other_site = create_project_site(
+            organization=self.organization,
+            project=other_project,
+            actor=self.owner,
+            code="SITE-ESTIMATE-OTHER",
+            name="Other estimate site",
+        )
+        other_phase = create_project_phase(
+            organization=self.organization,
+            site=other_site,
+            actor=self.owner,
+            code="PH-ESTIMATE-OTHER",
+            name="Other estimate phase",
+        )
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "The project phase does not belong to this project.",
+        ):
+            create_estimate(
+                organization=self.organization,
+                project=self.project,
+                phase=other_phase,
+                actor=self.owner,
+                estimate_number="E-PHASE-INVALID",
+                title="Invalid phase estimate",
             )
 
     def test_estimate_rejects_invalid_item_values(self) -> None:

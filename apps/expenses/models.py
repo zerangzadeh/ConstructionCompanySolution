@@ -33,6 +33,13 @@ class Expense(models.Model):
         on_delete=models.CASCADE,
         related_name="expenses",
     )
+    phase = models.ForeignKey(
+        "projects.ProjectPhase",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="expenses",
+    )
     category = models.CharField(
         max_length=30,
         choices=ExpenseCategory.choices,
@@ -86,6 +93,10 @@ class Expense(models.Model):
             models.Index(
                 fields=["organization", "deleted_at"],
                 name="expense_org_deleted_idx",
+            ),
+            models.Index(
+                fields=["organization", "phase", "incurred_on"],
+                name="expense_org_phase_date_idx",
             ),
         ]
         ordering = ["-incurred_on", "-created_at"]  # noqa: RUF012

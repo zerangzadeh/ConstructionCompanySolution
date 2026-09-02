@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1 class="text-3xl font-bold">{{ estimate.estimate_number }} · {{ estimate.title }}</h1>
-<p class="mt-2 text-slate-500">{{ estimate.project.name }} · {{ request.organization.name }}</p>
+<p class="mt-2 text-slate-500">{{ estimate.project.name }}{% if estimate.phase %} · {{ estimate.phase.name }}{% endif %} · {{ request.organization.name }}</p>
 {% if estimate.status == "draft" %}
 <form class="mt-5" method="post" action="{% url 'estimates:approve' estimate.id %}">
 {% csrf_token %}<button class="rounded-lg bg-emerald-600 px-4 py-2.5 font-semibold text-white" type="submit">Approve estimate</button>

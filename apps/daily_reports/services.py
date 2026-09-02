@@ -22,7 +22,7 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project, ProjectSite
+from apps.projects.models import Project, ProjectPhase, ProjectPhaseStatus, ProjectSite
 
 
 def _get_active_role(user: User, organization: Organization) -> str:
@@ -59,6 +59,20 @@ def _validate_site(
         or not site.is_active
     ):
         raise PermissionDenied("The worksite does not belong to this project.")
+
+
+def _validate_phase(
+    *,
+    organization: Organization,
+    site: ProjectSite,
+    phase: ProjectPhase,
+) -> None:
+    if (
+        phase.organization_id != organization.pk
+        or phase.site_id != site.pk
+        or phase.status != ProjectPhaseStatus.ACTIVE
+    ):
+        raise PermissionDenied("The project phase is not active for this worksite.")
 
 
 def _can_create_daily_reports(role: str) -> bool:
@@ -125,6 +139,7 @@ def create_daily_report(
     site: ProjectSite,
     actor: User,
     reporting_date: date,
+    phase: ProjectPhase | None = None,
     work_performed: str,
     weather_conditions: str = "",
     labor_count: int = 0,
@@ -140,6 +155,8 @@ def create_daily_report(
         raise PermissionDenied("You cannot create daily reports in this organization.")
     _validate_project(organization=organization, project=project)
     _validate_site(organization=organization, project=project, site=site)
+    if phase is not None:
+        _validate_phase(organization=organization, site=site, phase=phase)
     if not work_performed.strip():
         raise ValueError("Work performed is required.")
     if labor_count < 0:
@@ -155,6 +172,7 @@ def create_daily_report(
         organization=organization,
         project=project,
         site=site,
+        phase=phase,
         reporting_date=reporting_date,
         weather_conditions=weather_conditions.strip(),
         labor_count=labor_count,
@@ -175,6 +193,7 @@ def create_daily_report(
         metadata={
             "project_id": str(project.pk),
             "site_id": str(site.pk),
+            "phase_id": str(phase.pk) if phase else None,
             "reporting_date": report.reporting_date.isoformat(),
         },
     )
@@ -194,7 +213,7 @@ def get_organization_daily_reports(
             organization=organization,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "site", "created_by", "approved_by")
+        .select_related("project", "site", "phase", "created_by", "approved_by")
         .order_by("-reporting_date", "-created_at")
     )
 

@@ -13,8 +13,21 @@ class EstimateItemInline(admin.TabularInline):
 
 @admin.register(Estimate)
 class EstimateAdmin(admin.ModelAdmin):
-    list_display = ("estimate_number", "title", "organization", "project", "status")
+    list_display = (
+        "estimate_number",
+        "title",
+        "organization",
+        "project",
+        "phase",
+        "status",
+    )
     list_filter = ("status", "organization")
-    search_fields = ("estimate_number", "title", "project__name", "organization__name")
+    search_fields = (
+        "estimate_number",
+        "title",
+        "project__name",
+        "phase__name",
+        "organization__name",
+    )
     readonly_fields = ("id", "created_at", "updated_at")
     inlines: ClassVar = [EstimateItemInline]
