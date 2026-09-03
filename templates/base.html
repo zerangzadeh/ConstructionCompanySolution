@@ -12,62 +12,21 @@
             <a class="text-lg font-bold tracking-tight text-slate-900" href="{% url 'organizations:select' %}">
                 Construction ERP
             </a>
-            <div class="flex items-center gap-3 text-sm">
-                {% if request.user.is_authenticated %}
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:select' %}">
-                        Organizations
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:members' %}">
-                        Members
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'organizations:invite' %}">
-                        Invite
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'audit:log' %}">
-                        Audit
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'projects:list' %}">
-                        Projects
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'contracts:list' %}">
-                        Contracts
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'estimates:list' %}">
-                        Estimates
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'expenses:list' %}">
-                        Expenses
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'payments:list' %}">
-                        Payments
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'documents:list' %}">
-                        Documents
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'daily_reports:list' %}">
-                        Daily reports
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'financials:report' %}">
-                        Financials
-                    </a>
-                    <a class="text-slate-600 hover:text-slate-900" href="{% url 'financials:dashboard' %}">
-                        Dashboard
-                    </a>
-                    <a class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" href="{% url 'organizations:create' %}">
-                        New organization
-                    </a>
-                    <form method="post" action="{% url 'accounts:logout' %}">
-                        {% csrf_token %}
-                        <button class="text-slate-600 hover:text-slate-900" type="submit">
-                            Sign out
-                        </button>
-                    </form>
-                {% else %}
-                    <a class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" href="{% url 'accounts:login' %}">
-                        Sign in
-                    </a>
-                {% endif %}
+            <div class="hidden items-center gap-3 text-sm lg:flex">
+                {% with navigation_is_authenticated=request.user.is_authenticated %}
+                    {% include "components/navigation_links.html" with navigation_is_authenticated=navigation_is_authenticated navigation_link_class="text-slate-600 hover:text-slate-900" navigation_primary_class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" csrf_token=csrf_token only %}
+                {% endwith %}
             </div>
+            <details class="relative lg:hidden">
+                <summary class="cursor-pointer list-none rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Menu
+                </summary>
+                <div class="absolute right-0 z-10 mt-2 flex w-56 flex-col gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
+                    {% with navigation_is_authenticated=request.user.is_authenticated %}
+                        {% include "components/navigation_links.html" with navigation_is_authenticated=navigation_is_authenticated navigation_link_class="rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" navigation_primary_class="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700" csrf_token=csrf_token only %}
+                    {% endwith %}
+                </div>
+            </details>
         </div>
     </nav>
 

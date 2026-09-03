@@ -19,6 +19,7 @@ from apps.organizations.services import (
     accept_organization_invitation,
     create_organization_invitation,
     create_organization_with_owner,
+    get_organization_members,
     get_valid_memberships,
     resolve_active_organization,
 )
@@ -81,6 +82,19 @@ class OrganizationTenantIsolationTests(TestCase):
         organization = resolve_active_organization(self.user)
 
         self.assertEqual(organization, self.organization)
+
+    def test_member_listing_requires_active_organization_membership(self) -> None:
+        memberships = get_organization_members(
+            user=self.user,
+            organization=self.organization,
+        )
+
+        self.assertEqual(list(memberships), [self.user.organization_memberships.get()])
+        with self.assertRaises(PermissionDenied):
+            get_organization_members(
+                user=self.other_user,
+                organization=self.organization,
+            )
 
     def test_switch_view_rejects_unauthorized_organization(self) -> None:
         self.client.force_login(self.user)
@@ -167,6 +181,13 @@ class OrganizationTenantIsolationTests(TestCase):
 
     def test_suspended_organization_is_not_valid(self) -> None:
         self.organization.status = OrganizationStatus.SUSPENDED
+        self.organization.save(update_fields=["status"])
+
+        self.assertFalse(get_valid_memberships(self.user).exists())
+        self.assertIsNone(resolve_active_organization(self.user))
+
+    def test_cancelled_organization_is_not_valid(self) -> None:
+        self.organization.status = OrganizationStatus.CANCELLED
         self.organization.save(update_fields=["status"])
 
         self.assertFalse(get_valid_memberships(self.user).exists())
@@ -329,6 +350,20 @@ class OrganizationInvitationTests(TestCase):
         self.assertNotEqual(invitation.token_hash, raw_token)
         self.assertEqual(invitation.status, InvitationStatus.PENDING)
         self.assertEqual(len(invitation.token_hash), 64)
+
+    def test_cancelled_organization_cannot_create_invitation(self) -> None:
+        self.organization.status = OrganizationStatus.CANCELLED
+        self.organization.save(update_fields=["status"])
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "The organization is not active.",
+        ):
+            create_organization_invitation(
+                organization=self.organization,
+                invited_by=self.owner,
+                invitee=self.invitee,
+            )
 
     def test_invitation_can_be_accepted_by_intended_user(self) -> None:
         invitation, raw_token = create_organization_invitation(

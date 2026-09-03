@@ -140,10 +140,11 @@ requests, or remote changes unless explicitly requested.
 
 ## 11. Project Snapshot and Implementation Status
 
-> Last Updated: 2026-08-30
+> Last Updated: 2026-09-03
 >
-> Status: Active Development — MVP foundation and core financial workflows are
-> implemented; the feature layer is still in progress.
+> Status: Active Development — the multi-tenant MVP foundation, daily reporting,
+> payments, documents, and core financial workflows are implemented. Production
+> deployment verification and several planned product domains remain in progress.
 
 ### 11.1 Completed Project Foundation
 
@@ -155,6 +156,13 @@ requests, or remote changes unless explicitly requested.
   groups.
 - SQL Server connectivity has been verified from Django using the configured
   development settings.
+- Local `.env` values are loaded through `python-dotenv`; `.env.example` is the
+  safe configuration template and must not contain real credentials.
+- Production settings reject missing, placeholder, or insecure database/TLS
+  configuration.
+- `core/models.py` provides stable UUID and timestamp mixins used by the
+  business models where the schema pattern has stabilized.
+- Shared template conventions are documented in `templates/components/`.
 
 ### 11.2 Implemented Django Apps
 
@@ -174,7 +182,8 @@ requests, or remote changes unless explicitly requested.
     tests.
 - `apps/projects/`
   - Organization-scoped project model and services.
-  - Create, list, detail, and soft-archive flows.
+  - Project, worksite, and phase create/list/detail flows, lifecycle changes,
+    and soft archival.
   - Role-based creation and Decimal project budget handling.
 - `apps/contracts/`
   - Organization-scoped contract model and services.
@@ -189,21 +198,45 @@ requests, or remote changes unless explicitly requested.
   - Create, list, and detail templates with tests.
 - `apps/expenses/`
   - Organization-scoped expense model and services.
-  - Category, Decimal amount, role validation, create, and list flows.
+  - Category, Decimal amount, project/phase validation, create, and list flows.
+  - Audited void workflow that preserves the original amount; voided expenses
+    are excluded from financial reporting.
+- `apps/payments/`
+  - Organization-scoped posted receipts and disbursements linked to projects,
+    contracts, and phases where applicable.
+  - Organization-scoped unique payment numbers, Decimal values, audited void
+    workflow, and financial-reporting integration.
+  - Admin does not allow direct add, edit, or delete operations for payments.
+- `apps/documents/`
+  - Private organization-scoped project and payment documents.
+  - Validates PDF/JPEG/PNG extension, MIME type, signature, and a 10 MB size
+    limit before storage.
+  - Stores original filename, content type, size, SHA-256 hash, uploader, and
+    archive metadata; authorized downloads are audited.
+- `apps/daily_reports/`
+  - Organization-scoped daily worksite reports with labor, equipment, material,
+    progress, safety, quality, and approval-state information.
+  - Project, worksite, and phase relationships are validated at the service
+    boundary.
 - `apps/audit/`
-  - `AuditEvent` model and audit service.
+  - Append-only `AuditEvent` model and audit service; application-layer updates,
+    deletes, and bulk creation are rejected.
+  - Audit metadata rejects sensitive keys such as password, token, secret,
+    credential, and authorization values.
   - Audit log view and events for important organization and business actions.
 - `apps/financials/`
   - Reporting/service-only layer with no own business models.
   - Financial report and dashboard views/templates.
-  - Aggregates approved estimates, contracts, and recorded expenses within the
-    active organization.
+  - Aggregates approved estimates, contracts, recorded expenses, and posted
+    payments within the active organization.
 
 ### 11.3 Main Current Routes
 
-The implemented UI currently covers organization management and selection,
-projects, contracts, estimates, expenses, audit logs, and financial reporting.
-Financial pages include `/financials/` and `/financials/dashboard/`.
+The implemented UI currently covers authentication, organization management and
+selection, projects/sites/phases, daily reports, contracts, estimates, expenses,
+payments, documents, audit logs, and financial reporting. Financial pages include
+`/financials/` and `/financials/dashboard/`; payment and document pages begin at
+`/payments/` and `/documents/`.
 
 ## 12. Database and Migration Status
 
@@ -215,7 +248,20 @@ Migration files are present for:
 - `projects`
 - `contracts`
 - `estimates` (including the approval workflow migration)
-- `expenses`
+- `expenses` (including project phase and financial void fields)
+- `payments`
+- `documents` (including document archival fields)
+- `daily_reports`
+
+Recent migrations that may need to be applied in a developer database are:
+
+- `organizations.0004_alter_organization_status`
+- `audit.0003_alter_auditevent_action`
+- `audit.0004_alter_auditevent_action`
+- `expenses.0003_expense_void_fields`
+- `payments.0001_initial`
+- `documents.0001_initial`
+- `documents.0002_projectdocument_archive_reason`
 
 The application uses Microsoft SQL Server through Django's ORM. Every environment
 must run `python manage.py migrate` against its own configured database before
@@ -231,40 +277,51 @@ The latest recorded validation checkpoints include:
 - `python manage.py check` passed.
 - `python -m ruff check .` passed.
 - `python -m ruff format --check .` passed.
-- The full recorded test checkpoint was `75 passed`.
-- The financial dashboard targeted test checkpoint was `7 passed`.
+- Updated shared Django templates compile successfully.
+- Lightweight Django-admin immutability tests for payments and expenses passed.
+- The historical full test checkpoint was `75 passed`; it must be rerun after
+  applying the current migrations.
 
 These checkpoints describe the state at the last validation run; rerun the
 relevant checks after any code or configuration change.
 
+The current Codex process may be unable to run database-backed tests because its
+SQL Server TLS credential provider cannot authenticate. This does not replace
+validation from a developer terminal connected to the configured SQL Server.
+
 ## 14. Known Gaps and Technical Debt
 
-- `core/` shared base models and mixins for UUID, timestamps, soft delete, and
-  audit fields have not yet been extracted; some behavior remains app-local.
-- A shared `templates/components/` directory and component conventions are not
-  yet established.
-- Tailwind utility patterns are repeated in some templates and need gradual
+- `core/` UUID and timestamp mixins are established, but soft-delete and audit
+  actor fields remain app-local until their recurring patterns are fully stable.
+- Shared components exist for navigation, page headers, form fields/errors, and
+  framework messages; Tailwind utility patterns still need gradual
   consolidation.
 - More cross-tenant integration coverage is needed as new endpoints are added.
 - Production environment configuration and deployment verification remain
   incomplete.
-- File/document upload validation and document management are not yet a complete
-  feature.
+- Full database-backed regression tests and browser workflow verification should
+  be rerun after the current migrations are applied.
+- Document versioning, retention policy enforcement, and organization data
+  export remain future work.
 - DRF and Celery/Redis are intentionally deferred.
 
 ## 15. Prioritized Next Work
 
-1. Daily worksite reporting as the next MVP feature for contractors.
-2. Reusable template components and documented component conventions.
-3. Additional tenant-isolation and permission integration tests for every new
-   endpoint.
-4. Payment and cash-flow workflows built on the existing financial reporting
-   foundation.
-5. Document and receipt management with secure upload validation.
-6. Extract shared `core/` mixins only after the recurring model patterns are
-   stable and the extraction has a clear benefit.
-7. Reassess DRF and Celery/Redis when API or background-processing requirements
-   are approved.
+1. Apply migrations and run the full database-backed test suite from a normal
+   developer terminal.
+2. Verify authenticated browser workflows with a real owner user and active
+   organization.
+3. Add tenant-isolation and permission integration tests for every new endpoint
+   and lifecycle transition.
+4. Complete production deployment configuration, secure SQL Server TLS
+   verification, and operational monitoring.
+5. Extend payments into approved billing, receivables, settlements, and
+   cash-flow workflows only after their business rules are agreed.
+6. Extend document retention, versioning, and export behavior when those
+   governance requirements are approved.
+7. Extract further `core/` mixins only after a repeated model pattern has a
+   demonstrated benefit; reassess DRF and Celery/Redis when API or background
+   processing is approved.
 
 ## 16. Product Domain Map
 
@@ -293,6 +350,148 @@ responsibilities:
 
 Cross-domain dependencies must be explicit. Avoid circular imports and avoid
 duplicating the same business concept in multiple apps.
+
+## Target Domain Model
+
+The approved **Construction ERP Domain Model v1.0** and **Target ERD v1.0** are
+the architectural source of truth for future domain evolution. They define the
+target business concepts and relationships, but they do **not** authorize a
+broad rewrite of existing working code.
+
+The product must support the same core model for organizations ranging from
+small single-project contractors with only a few employees to larger
+multi-project contractors with departments, subcontractors, warehouses,
+equipment, formal procurement, project controls, and progress-claim workflows.
+Advanced structures must therefore be optional and introduced only when the
+tenant needs them.
+
+### Target domain boundaries
+
+The target model is organized around these business domains:
+
+- **Tenant and identity:** `Organization`, `OrganizationSettings`, `User`,
+  `OrganizationMembership`, `OrganizationInvitation`, and optional
+  project/site access restrictions.
+- **Organization structure and workforce:** `Employee`, `Department`,
+  `Position`, `WorkTeam`, and `EmployeeProjectAssignment`.
+- **Business parties:** `BusinessParty`, `PartyRole`, and `PartyContact`.
+  Employer/client, consultant, supplier, and subcontractor are roles of a
+  business party rather than duplicated company records.
+- **Projects and project control:** `Project`, `ProjectSite`, `ProjectPhase`,
+  `CostCenter`, `WBSNode`, `Activity`, `ProjectBaseline`, and
+  `ProgressRecord`.
+- **Contracts:** `Contract`, `ContractItem`, and `ContractAmendment`. Contracts
+  must support both receivable/client contracts and payable/subcontractor or
+  supplier contracts through an explicit direction/type.
+- **Estimation:** `Estimate`, `EstimateRevision`, and `EstimateItem`.
+- **Daily site operations:** `DailyReport`, `DailyActivity`,
+  `DailyLaborEntry`, `DailyMaterialEntry`, `DailyEquipmentEntry`, and
+  `DelayEvent`.
+- **Shared material masters:** `UnitOfMeasure`, `MaterialCategory`, and
+  `Material`.
+- **Procurement:** `PurchaseRequest`, `PurchaseRequestItem`, `PurchaseOrder`,
+  `PurchaseOrderItem`, `GoodsReceipt`, and `GoodsReceiptItem`.
+- **Inventory:** `Warehouse` and `StockTransaction`; stock balances are derived
+  from controlled movements or maintained as validated projections, not edited
+  as arbitrary quantities.
+- **Equipment:** `Equipment`, `EquipmentAssignment`, and
+  `MaintenanceRecord`.
+- **Finance:** `ExpenseCategory`, `Expense`, `Payment`, and
+  `PaymentAllocation`. The current `financials` app remains a reporting/read
+  model and must not become a duplicate accounting ledger.
+- **Billing and progress claims:** `ProgressClaim`, `ProgressClaimItem`, and
+  `ClaimAdjustment`, including retention, tax, insurance, advance deductions,
+  penalties, and other documented adjustments.
+- **Documents:** `Document`, `DocumentVersion`, and `DocumentLink`, with secure
+  tenant-scoped access and preserved approved/history versions.
+- **Safety and quality:** lightweight daily-report notes remain valid for small
+  tenants; independent `SafetyIncident` and `QualityIssue` workflows may be
+  enabled for organizations that need them.
+- **System:** append-only `AuditEvent` and user-facing `Notification`.
+
+### Core modeling rules
+
+1. `Organization` is the tenant boundary.
+2. Existing tenant isolation, membership resolution, authorization rules,
+   service-layer checks, UUID identifiers, Decimal financial handling, audit
+   behavior, and immutable finalized financial workflows must be preserved.
+3. Every tenant-owned aggregate must have explicit organization scope unless a
+   documented architectural decision proves that an indirect scope is safer and
+   equally enforceable.
+4. Cross-organization foreign-key relationships are forbidden.
+5. `User` and `Employee` are different concepts. A user is an authenticated
+   identity; an employee is workforce/personnel data. `Employee.user` may be
+   nullable.
+6. Master business concepts must not be duplicated as uncontrolled free text
+   when a shared master exists. Examples include counterparties, materials,
+   units of measure, equipment, and expense categories.
+7. `BusinessParty` is the shared counterparty master. Roles such as
+   `EMPLOYER`, `CLIENT`, `CONSULTANT`, `SUPPLIER`, and `SUBCONTRACTOR` are
+   modeled through party roles.
+8. WBS, departments, positions, warehouses, formal procurement, equipment
+   management, safety, and quality modules must remain optional so that a small
+   contractor can operate without enterprise-only setup.
+9. Approved or posted historical records must be revised, reversed, adjusted,
+   voided, or superseded through explicit workflows; never silently overwritten.
+10. Full general-ledger accounting, payroll, CRM, generic BPM/workflow engines,
+    microservices, event sourcing, and other large adjacent platforms are outside
+    Domain Model v1.0 unless explicitly approved later.
+
+### Schema evolution rules
+
+Existing working behavior must be preserved unless an approved refactoring phase
+explicitly replaces it. Never perform a broad rewrite merely to make the code
+look like the target ERD.
+
+All schema evolution that affects existing data or behavior must use an
+incremental **expand → migrate/backfill → switch → validate → contract**
+approach where practical.
+
+Do not remove a legacy model or field until all of the following are true:
+
+1. The replacement model or field has been deployed.
+2. Historical data has been migrated or intentionally preserved.
+3. Application code no longer depends on the legacy field.
+4. Tenant isolation and business invariants have been revalidated.
+5. Relevant tests and migrations pass.
+6. Removal has been explicitly approved for that refactoring phase.
+
+When replacing current free-text references, add nullable foreign keys first and
+preserve compatibility during migration. Typical examples include:
+
+- `Contract.counterparty_name` → `BusinessParty`
+- `Expense.vendor_name` → `BusinessParty`
+- `Payment.counterparty_name` → `BusinessParty`
+- daily-report `material_name` / `unit` → `Material` / `UnitOfMeasure`
+- daily-report `equipment_name` → `Equipment`
+
+Do not create future modules simply because they exist in the target model.
+Implement them only in dependency order and only after their workflow,
+ownership, tenant scope, lifecycle, and acceptance criteria are approved.
+
+### Refactoring priority
+
+Domain evolution should generally follow this dependency order:
+
+1. Baseline validation and tenant hardening.
+2. `OrganizationSettings`.
+3. `BusinessParty` and `UnitOfMeasure`.
+4. Material master data.
+5. Project WBS and activities.
+6. Daily-report integration with shared masters and project-control data.
+7. Contract and estimate evolution.
+8. Expense and payment reference refactoring.
+9. Workforce.
+10. Procurement.
+11. Inventory.
+12. Equipment.
+13. Billing and progress claims.
+14. Document version/link generalization.
+15. Optional safety and quality workflows.
+
+Each phase must remain independently testable and deployable. Do not combine
+multiple unrelated refactoring phases in one Codex task.
+
 
 ## 17. SaaS Tenant Lifecycle
 

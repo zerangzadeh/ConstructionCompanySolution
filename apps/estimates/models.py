@@ -1,8 +1,9 @@
-import uuid
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.db import models
+
+from core.models import TimeStampedModel, UUIDModel
 
 
 class EstimateStatus(models.TextChoices):
@@ -12,10 +13,9 @@ class EstimateStatus(models.TextChoices):
     ARCHIVED = "archived", "Archived"
 
 
-class Estimate(models.Model):
+class Estimate(UUIDModel, TimeStampedModel):
     """A project estimate belonging to exactly one organization."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -49,8 +49,6 @@ class Estimate(models.Model):
         db_index=True,
     )
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -109,10 +107,9 @@ class Estimate(models.Model):
         ).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
-class EstimateItem(models.Model):
+class EstimateItem(UUIDModel, TimeStampedModel):
     """A priced line item belonging to one estimate and organization."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -128,8 +125,6 @@ class EstimateItem(models.Model):
     unit = models.CharField(max_length=30, default="unit")
     unit_price = models.DecimalField(max_digits=18, decimal_places=2)
     sort_order = models.PositiveIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["sort_order", "created_at"]  # noqa: RUF012

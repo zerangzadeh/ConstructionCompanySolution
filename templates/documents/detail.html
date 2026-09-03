@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.title }} | Construction ERP{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold">{{ document.title }}</h1>
+<p class="mt-2 text-slate-500">{{ document.get_document_type_display }} · {{ document.project.name }} · {{ document.original_file_name }}</p>
+<div class="mt-8 grid gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2">
+<p><span class="text-sm text-slate-500">File type</span><br><strong>{{ document.content_type }}</strong></p>
+<p><span class="text-sm text-slate-500">Size</span><br><strong>{{ document.file_size }} bytes</strong></p>
+<p><span class="text-sm text-slate-500">Uploaded by</span><br><strong>{{ document.created_by.username|default:"—" }}</strong></p>
+<p><span class="text-sm text-slate-500">Uploaded</span><br><strong>{{ document.created_at }}</strong></p>
+{% if document.payment %}<p><span class="text-sm text-slate-500">Payment</span><br><strong>{{ document.payment.payment_number }}</strong></p>{% endif %}
+</div>
+<a class="mt-5 inline-flex rounded-lg border border-slate-300 px-4 py-2.5 font-semibold text-slate-700" href="{% url 'documents:download' document.id %}">Download private file</a>
+<form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post" action="{% url 'documents:archive' document.id %}">
+{% csrf_token %}
+<h2 class="font-semibold">Archive document</h2>
+<p class="text-sm text-slate-500">Archiving removes the document from active lists but retains the evidence and audit trail.</p>
+{% include "components/form_errors.html" with form=form only %}
+{% include "components/form_field.html" with field=form.reason only %}
+<button class="rounded-lg bg-red-600 px-4 py-2.5 font-semibold text-white" type="submit">Archive document</button>
+</form>
+{% endblock %}

@@ -1,7 +1,8 @@
-import uuid
-
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+
+from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
@@ -19,10 +20,12 @@ class AuditAction(models.TextChoices):
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "Estimate item added"
     ESTIMATE_APPROVED = "estimate.approved", "Estimate approved"
     EXPENSE_RECORDED = "expense.recorded", "Expense recorded"
+    EXPENSE_VOIDED = "expense.voided", "Expense voided"
     PAYMENT_RECORDED = "payment.recorded", "Payment recorded"
     PAYMENT_VOIDED = "payment.voided", "Payment voided"
     DOCUMENT_UPLOADED = "document.uploaded", "Document uploaded"
     DOCUMENT_DOWNLOADED = "document.downloaded", "Document downloaded"
+    DOCUMENT_ARCHIVED = "document.archived", "Document archived"
     DAILY_REPORT_CREATED = "daily_report.created", "Daily report created"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "Daily report submitted"
     DAILY_REPORT_APPROVED = "daily_report.approved", "Daily report approved"
@@ -39,14 +42,26 @@ class AuditAction(models.TextChoices):
     MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
 
 
-class AuditEvent(models.Model):
+class AuditEventQuerySet(models.QuerySet):
+    """Prevent bulk mutation of immutable audit evidence."""
+
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("Audit events are immutable.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("Audit events are immutable.")
+
+
+class AuditEventManager(models.Manager.from_queryset(AuditEventQuerySet)):
+    """Allow only normal single-event creation through the default manager."""
+
+    def bulk_create(self, *args: object, **kwargs: object) -> list[models.Model]:
+        raise ValidationError("Audit events must be created individually.")
+
+
+class AuditEvent(UUIDModel, CreatedAtModel):
     """Immutable record of an important business action."""
 
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-    )
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.SET_NULL,
@@ -65,7 +80,8 @@ class AuditEvent(models.Model):
     entity_type = models.CharField(max_length=100)
     entity_id = models.CharField(max_length=100, blank=True)
     metadata = models.JSONField(default=dict, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = AuditEventManager()
 
     class Meta:
         ordering = ["-created_at"]  # noqa: RUF012
@@ -82,3 +98,11 @@ class AuditEvent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.action} ({self.entity_type}:{self.entity_id})"
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("Audit events are immutable.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("Audit events are immutable.")

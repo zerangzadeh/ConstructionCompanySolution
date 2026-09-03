@@ -11,6 +11,21 @@ from apps.organizations.models import (
     OrganizationStatus,
 )
 
+_SENSITIVE_METADATA_KEY_PARTS = frozenset(
+    {"password", "token", "secret", "credential", "authorization"}
+)
+
+
+def _validate_audit_metadata(metadata: dict[str, Any]) -> None:
+    """Reject metadata keys that could expose secrets in immutable evidence."""
+
+    for key, value in metadata.items():
+        normalized_key = str(key).lower()
+        if any(part in normalized_key for part in _SENSITIVE_METADATA_KEY_PARTS):
+            raise ValueError("Audit metadata must not contain sensitive values.")
+        if isinstance(value, dict):
+            _validate_audit_metadata(value)
+
 
 def record_audit_event(
     *,
@@ -25,13 +40,15 @@ def record_audit_event(
 
     if action not in AuditAction.values:
         raise ValueError("Invalid audit action.")
+    normalized_metadata = metadata or {}
+    _validate_audit_metadata(normalized_metadata)
     return AuditEvent.objects.create(
         action=action,
         entity_type=entity_type,
         entity_id=str(entity_id),
         organization=organization,
         actor=actor,
-        metadata=metadata or {},
+        metadata=normalized_metadata,
     )
 
 

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import HttpRequest
 
 from apps.payments.models import Payment
 
@@ -24,3 +25,22 @@ class PaymentAdmin(admin.ModelAdmin):
         "organization__name",
     )
     readonly_fields = ("id", "created_at", "updated_at", "voided_at")
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        """Payments must be created through the audited service workflow."""
+
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Payment | None = None
+    ) -> bool:
+        """Posted financial records cannot be edited in the admin interface."""
+
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Payment | None = None
+    ) -> bool:
+        """Financial corrections use the audited void workflow, never deletion."""
+
+        return False

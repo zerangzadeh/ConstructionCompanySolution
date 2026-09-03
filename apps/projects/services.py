@@ -440,11 +440,11 @@ def archive_project(
 
     if not _can_manage_projects(user, organization):
         raise PermissionDenied("You cannot archive projects in this organization.")
-    project = get_organization_project(
-        user=user,
-        organization=organization,
-        project_id=project_id,
-    )
+    projects = get_organization_projects(user=user, organization=organization)
+    try:
+        project = projects.select_for_update().get(pk=project_id)
+    except Project.DoesNotExist as exc:
+        raise PermissionDenied("Project not found in this organization.") from exc
     project.deleted_at = timezone.now()
     project.updated_by = user
     project.save(update_fields=["deleted_at", "updated_by", "updated_at"])

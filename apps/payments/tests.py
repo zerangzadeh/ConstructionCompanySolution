@@ -9,7 +9,7 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.contracts.services import create_contract
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
-from apps.payments.models import PaymentDirection, PaymentStatus
+from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.payments.services import (
     create_payment,
     get_organization_payments,
@@ -252,3 +252,56 @@ class PaymentServiceTests(TestCase):
         response = self.client.get(reverse("payments:list"))
 
         self.assertRedirects(response, reverse("organizations:select"))
+
+    def test_payment_detail_and_void_reject_cross_tenant_uuid(self) -> None:
+        other_project = self.other_organization.projects.create(
+            code="P-OTHER-PRIVATE",
+            name="Other private project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        other_payment = Payment.objects.create(
+            organization=self.other_organization,
+            project=other_project,
+            payment_number="PAY-OTHER-PRIVATE",
+            direction=PaymentDirection.DISBURSEMENT,
+            amount=Decimal("99.00"),
+            paid_on=date(2026, 9, 3),
+            counterparty_name="Other supplier",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        detail_response = self.client.get(
+            reverse("payments:detail", kwargs={"payment_id": other_payment.pk})
+        )
+        void_response = self.client.post(
+            reverse("payments:void", kwargs={"payment_id": other_payment.pk}),
+            {"reason": "Unauthorized attempt"},
+        )
+
+        self.assertEqual(detail_response.status_code, 404)
+        self.assertEqual(void_response.status_code, 404)
+        other_payment.refresh_from_db()
+        self.assertEqual(other_payment.status, PaymentStatus.POSTED)
+
+    def test_payment_void_view_rejects_a_repeat_void_request(self) -> None:
+        payment = self._create_payment()
+        void_payment(payment=payment, actor=self.owner, reason="Duplicate entry")
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.post(
+            reverse("payments:void", kwargs={"payment_id": payment.pk}),
+            {"reason": "Repeated request"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        payment.refresh_from_db()
+        self.assertEqual(payment.status, PaymentStatus.VOID)

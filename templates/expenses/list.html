@@ -3,25 +3,36 @@
 {% block title %}Expenses | Construction ERP{% endblock %}
 
 {% block content %}
-<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-        <p class="text-sm font-medium text-blue-600">Expenses</p>
-        <h1 class="mt-1 text-3xl font-bold tracking-tight">Project expenses</h1>
-        <p class="mt-2 text-slate-500">Expenses in {{ request.organization.name }}.</p>
-    </div>
-    <a class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" href="{% url 'expenses:create' %}">Record expense</a>
-</div>
+{% url "expenses:create" as expense_create_url %}
+{% include "components/page_header.html" with page_eyebrow="Expenses" page_title="Project expenses" page_description=request.organization.name page_action_url=expense_create_url page_action_label="Record expense" only %}
 <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-{% if expenses %}
-{% for expense in expenses %}
-<div class="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-    <div>
-        <p class="font-semibold text-slate-900">{{ expense.description }}</p>
-        <p class="mt-1 text-sm text-slate-500">{{ expense.project.name }}{% if expense.phase %} · {{ expense.phase.name }}{% endif %} · {{ expense.get_category_display }}{% if expense.vendor_name %} · {{ expense.vendor_name }}{% endif %}</p>
-    </div>
-    <div class="text-right"><p class="font-semibold text-slate-900">{{ expense.amount|floatformat:2 }} {{ request.organization.currency }}</p><p class="text-sm text-slate-500">{{ expense.incurred_on }}</p></div>
-</div>
-{% endfor %}
-{% else %}<p class="p-8 text-center text-slate-500">No expenses recorded yet.</p>{% endif %}
+    {% if expenses %}
+        {% for expense in expenses %}
+            <div class="flex flex-col gap-3 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <p class="font-semibold text-slate-900">{{ expense.description }}</p>
+                    <p class="mt-1 text-sm text-slate-500">
+                        {{ expense.project.name }}{% if expense.phase %} · {{ expense.phase.name }}{% endif %} · {{ expense.get_category_display }}{% if expense.vendor_name %} · {{ expense.vendor_name }}{% endif %}
+                    </p>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-slate-900">{{ expense.amount|floatformat:2 }} {{ request.organization.currency }}</p>
+                    <p class="text-sm text-slate-500">{{ expense.incurred_on }}</p>
+                </div>
+                {% if expense.status == "recorded" %}
+                    <form class="flex gap-2" method="post" action="{% url 'expenses:void' expense.pk %}">
+                        {% csrf_token %}
+                        <label class="sr-only" for="void-reason-{{ expense.pk }}">
+                            Void reason for {{ expense.description }}
+                        </label>
+                        <input class="w-36 rounded border px-2 text-sm" id="void-reason-{{ expense.pk }}" name="reason" required placeholder="Void reason">
+                        <button class="rounded bg-rose-600 px-2 py-1 text-sm text-white" type="submit">Void</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    {% else %}
+        <p class="p-8 text-center text-slate-500">No expenses recorded yet.</p>
+    {% endif %}
 </div>
 {% endblock %}

@@ -143,14 +143,19 @@ def add_estimate_item(
 ) -> EstimateItem:
     """Add a positive-quantity, non-negative-price item to an estimate."""
 
+    locked_estimate = (
+        Estimate.objects.select_for_update()
+        .select_related("organization", "project")
+        .get(pk=estimate.pk)
+    )
     _validate_context(
         actor=actor,
-        organization=estimate.organization,
-        project=estimate.project,
+        organization=locked_estimate.organization,
+        project=locked_estimate.project,
     )
-    if estimate.deleted_at is not None:
+    if locked_estimate.deleted_at is not None:
         raise ValueError("Cannot add items to a deleted estimate.")
-    if estimate.status == EstimateStatus.APPROVED:
+    if locked_estimate.status == EstimateStatus.APPROVED:
         raise ValueError("Cannot modify an approved estimate.")
     if not description.strip():
         raise ValueError("Item description is required.")
@@ -159,8 +164,8 @@ def add_estimate_item(
     if unit_price < Decimal("0.00"):
         raise ValueError("Item unit price cannot be negative.")
     item = EstimateItem.objects.create(
-        organization=estimate.organization,
-        estimate=estimate,
+        organization=locked_estimate.organization,
+        estimate=locked_estimate,
         description=description.strip(),
         quantity=quantity,
         unit=unit.strip() or "unit",
@@ -171,9 +176,12 @@ def add_estimate_item(
         action=AuditAction.ESTIMATE_ITEM_ADDED,
         entity_type="estimate_item",
         entity_id=item.pk,
-        organization=estimate.organization,
+        organization=locked_estimate.organization,
         actor=actor,
-        metadata={"estimate_id": str(estimate.pk), "line_total": str(item.line_total)},
+        metadata={
+            "estimate_id": str(locked_estimate.pk),
+            "line_total": str(item.line_total),
+        },
     )
     return item
 
@@ -186,28 +194,33 @@ def approve_estimate(
 ) -> Estimate:
     """Approve a draft estimate and lock its line items."""
 
+    locked_estimate = (
+        Estimate.objects.select_for_update()
+        .select_related("organization", "project")
+        .get(pk=estimate.pk)
+    )
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("Authentication is required.")
-    if not _can_approve_estimates(actor, estimate.organization):
+    if not _can_approve_estimates(actor, locked_estimate.organization):
         raise PermissionDenied("You cannot approve estimates in this organization.")
     if (
-        estimate.organization.status != OrganizationStatus.ACTIVE
-        or estimate.organization.deleted_at is not None
-        or estimate.project.organization_id != estimate.organization_id
-        or estimate.project.deleted_at is not None
+        locked_estimate.organization.status != OrganizationStatus.ACTIVE
+        or locked_estimate.organization.deleted_at is not None
+        or locked_estimate.project.organization_id != locked_estimate.organization_id
+        or locked_estimate.project.deleted_at is not None
     ):
         raise PermissionDenied("The estimate context is not active.")
-    if estimate.deleted_at is not None:
+    if locked_estimate.deleted_at is not None:
         raise ValueError("Cannot approve a deleted estimate.")
-    if estimate.status != EstimateStatus.DRAFT:
+    if locked_estimate.status != EstimateStatus.DRAFT:
         raise ValueError("Only draft estimates can be approved.")
 
     now = timezone.now()
-    estimate.status = EstimateStatus.APPROVED
-    estimate.approved_by = actor
-    estimate.approved_at = now
-    estimate.updated_by = actor
-    estimate.save(
+    locked_estimate.status = EstimateStatus.APPROVED
+    locked_estimate.approved_by = actor
+    locked_estimate.approved_at = now
+    locked_estimate.updated_by = actor
+    locked_estimate.save(
         update_fields=[
             "status",
             "approved_by",
@@ -219,12 +232,12 @@ def approve_estimate(
     record_audit_event(
         action=AuditAction.ESTIMATE_APPROVED,
         entity_type="estimate",
-        entity_id=estimate.pk,
-        organization=estimate.organization,
+        entity_id=locked_estimate.pk,
+        organization=locked_estimate.organization,
         actor=actor,
-        metadata={"estimate_number": estimate.estimate_number},
+        metadata={"estimate_number": locked_estimate.estimate_number},
     )
-    return estimate
+    return locked_estimate
 
 
 def get_organization_estimates(

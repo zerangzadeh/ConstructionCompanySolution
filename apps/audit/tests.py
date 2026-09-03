@@ -1,9 +1,9 @@
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
 from apps.accounts.models import User
-from apps.audit.models import AuditAction
+from apps.audit.models import AuditAction, AuditEvent
 from apps.audit.services import (
     get_organization_audit_events,
     record_audit_event,
@@ -58,6 +58,20 @@ class AuditServiceTests(TestCase):
         self.assertEqual(event.actor, self.user)
         self.assertEqual(event.metadata["name"], "Audit Company")
 
+    def test_record_audit_event_rejects_sensitive_metadata(self) -> None:
+        with self.assertRaisesMessage(
+            ValueError,
+            "Audit metadata must not contain sensitive values.",
+        ):
+            record_audit_event(
+                action=AuditAction.ORGANIZATION_CREATED,
+                entity_type="organization",
+                entity_id=self.organization.pk,
+                organization=self.organization,
+                actor=self.user,
+                metadata={"request": {"access_token": "sensitive"}},
+            )
+
     def test_events_are_scoped_to_member_organization(self) -> None:
         record_audit_event(
             action=AuditAction.ORGANIZATION_CREATED,
@@ -88,6 +102,27 @@ class AuditServiceTests(TestCase):
                 user=self.other_user,
                 organization=self.organization,
             )
+
+    def test_audit_events_are_append_only(self) -> None:
+        event = record_audit_event(
+            action=AuditAction.ORGANIZATION_CREATED,
+            entity_type="organization",
+            entity_id=self.organization.pk,
+            organization=self.organization,
+            actor=self.user,
+        )
+
+        event.action = AuditAction.PROJECT_CREATED
+        with self.assertRaises(ValidationError):
+            event.save()
+        with self.assertRaises(ValidationError):
+            event.delete()
+        with self.assertRaises(ValidationError):
+            AuditEvent.objects.filter(pk=event.pk).update(
+                action=AuditAction.PROJECT_CREATED
+            )
+        with self.assertRaises(ValidationError):
+            AuditEvent.objects.filter(pk=event.pk).delete()
 
     def test_audit_view_shows_only_active_organization_events(self) -> None:
         record_audit_event(

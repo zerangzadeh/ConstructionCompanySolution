@@ -1,7 +1,7 @@
-import uuid
-
 from django.conf import settings
 from django.db import models
+
+from core.models import TimeStampedModel, UUIDModel
 
 
 class PaymentDirection(models.TextChoices):
@@ -21,10 +21,9 @@ class PaymentStatus(models.TextChoices):
     VOID = "void", "Void"
 
 
-class Payment(models.Model):
+class Payment(UUIDModel, TimeStampedModel):
     """An immutable posted cash transaction for one organization and project."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -69,8 +68,6 @@ class Payment(models.Model):
     )
     void_reason = models.TextField(blank=True)
     voided_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

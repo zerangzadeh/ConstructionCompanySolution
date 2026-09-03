@@ -4,7 +4,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.organizations.decorators import active_organization_required
 from apps.payments.forms import PaymentForm, PaymentVoidForm
-from apps.payments.models import Payment
 from apps.payments.services import (
     create_payment,
     get_organization_payments,
@@ -52,10 +51,11 @@ def payment_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 def payment_detail(request: HttpRequest, payment_id: str) -> HttpResponse:
     payment = get_object_or_404(
-        Payment.objects.select_related("project", "contract", "phase", "voided_by"),
+        get_organization_payments(
+            user=request.user,
+            organization=request.organization,
+        ),
         pk=payment_id,
-        organization=request.organization,
-        project__deleted_at__isnull=True,
     )
     form = PaymentVoidForm(request.POST or None)
     return render(
@@ -70,10 +70,11 @@ def payment_void(request: HttpRequest, payment_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)
     payment = get_object_or_404(
-        Payment,
+        get_organization_payments(
+            user=request.user,
+            organization=request.organization,
+        ),
         pk=payment_id,
-        organization=request.organization,
-        project__deleted_at__isnull=True,
     )
     form = PaymentVoidForm(request.POST)
     if not form.is_valid():
@@ -87,12 +88,20 @@ def payment_void(request: HttpRequest, payment_id: str) -> HttpResponse:
         void_payment(
             payment=payment, actor=request.user, reason=form.cleaned_data["reason"]
         )
-    except (PermissionDenied, ValueError) as exc:
+    except PermissionDenied as exc:
         form.add_error(None, str(exc))
         return render(
             request,
             "payments/detail.html",
             {"payment": payment, "form": form},
             status=403,
+        )
+    except ValueError as exc:
+        form.add_error(None, str(exc))
+        return render(
+            request,
+            "payments/detail.html",
+            {"payment": payment, "form": form},
+            status=400,
         )
     return redirect("payments:detail", payment_id=payment.pk)

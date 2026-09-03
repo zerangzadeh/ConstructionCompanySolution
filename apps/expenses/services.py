@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
@@ -145,6 +146,51 @@ def get_organization_expenses(
             deleted_at__isnull=True,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "phase", "created_by", "updated_by")
+        .select_related("project", "phase", "created_by", "updated_by", "voided_by")
         .order_by("-incurred_on", "-created_at")
     )
+
+
+@transaction.atomic
+def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
+    """Void a recorded expense without changing its original financial amount."""
+
+    locked_expense = (
+        Expense.objects.select_for_update()
+        .select_related("organization", "project")
+        .get(pk=expense.pk)
+    )
+    _validate_context(
+        actor=actor,
+        organization=locked_expense.organization,
+        project=locked_expense.project,
+    )
+    if locked_expense.status != ExpenseStatus.RECORDED:
+        raise ValueError("Only recorded expenses can be voided.")
+    if not reason.strip():
+        raise ValueError("An expense void reason is required.")
+
+    locked_expense.status = ExpenseStatus.VOID
+    locked_expense.void_reason = reason.strip()
+    locked_expense.voided_at = timezone.now()
+    locked_expense.voided_by = actor
+    locked_expense.updated_by = actor
+    locked_expense.save(
+        update_fields=[
+            "status",
+            "void_reason",
+            "voided_at",
+            "voided_by",
+            "updated_by",
+            "updated_at",
+        ]
+    )
+    record_audit_event(
+        action=AuditAction.EXPENSE_VOIDED,
+        entity_type="expense",
+        entity_id=locked_expense.pk,
+        organization=locked_expense.organization,
+        actor=actor,
+        metadata={"reason": locked_expense.void_reason},
+    )
+    return locked_expense

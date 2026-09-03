@@ -12,6 +12,7 @@ from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
     Organization,
+    OrganizationStatus,
 )
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.projects.models import ProjectPhaseStatus, ProjectStatus
@@ -113,6 +114,21 @@ class ProjectServiceTests(TestCase):
                 actor=self.other_user,
                 code="P-002",
                 name="Unauthorized project",
+            )
+
+    def test_project_creation_rejects_cancelled_organization(self) -> None:
+        self.organization.status = OrganizationStatus.CANCELLED
+        self.organization.save(update_fields=["status"])
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "The organization is not active.",
+        ):
+            create_project(
+                organization=self.organization,
+                actor=self.owner,
+                code="P-CANCELLED",
+                name="Blocked project",
             )
 
     def test_project_creation_rejects_member_role(self) -> None:
@@ -269,6 +285,19 @@ class ProjectServiceTests(TestCase):
                 action=AuditAction.PROJECT_ARCHIVED,
                 entity_id=str(project.pk),
             ).exists()
+        )
+        with self.assertRaises(PermissionDenied):
+            archive_project(
+                user=self.owner,
+                organization=self.organization,
+                project_id=str(project.pk),
+            )
+        self.assertEqual(
+            AuditEvent.objects.filter(
+                action=AuditAction.PROJECT_ARCHIVED,
+                entity_id=str(project.pk),
+            ).count(),
+            1,
         )
 
     def test_member_cannot_archive_project(self) -> None:

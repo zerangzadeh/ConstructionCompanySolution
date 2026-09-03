@@ -52,6 +52,11 @@ def create_organization_invitation(
 ) -> tuple[OrganizationInvitation, str]:
     """Create a hashed-token invitation for an existing user."""
 
+    if (
+        organization.status != OrganizationStatus.ACTIVE
+        or organization.deleted_at is not None
+    ):
+        raise PermissionDenied("The organization is not active.")
     if not _can_manage_memberships(invited_by, organization):
         raise PermissionDenied("You cannot invite members to this organization.")
     if invited_by == invitee:
@@ -234,6 +239,26 @@ def get_valid_memberships(user: Any) -> QuerySet[OrganizationMembership]:
         )
         .select_related("organization")
         .order_by("organization__name")
+    )
+
+
+def get_organization_members(
+    *,
+    user: User,
+    organization: Organization,
+) -> QuerySet[OrganizationMembership]:
+    """Return active members only after validating active tenant access."""
+
+    has_access = get_valid_memberships(user).filter(organization=organization).exists()
+    if not has_access:
+        raise PermissionDenied("You do not have access to this organization.")
+    return (
+        OrganizationMembership.objects.filter(
+            organization=organization,
+            status=MembershipStatus.ACTIVE,
+        )
+        .select_related("user")
+        .order_by("user__username")
     )
 
 

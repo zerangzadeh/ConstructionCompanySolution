@@ -3,7 +3,6 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.estimates.forms import EstimateForm, EstimateItemForm
-from apps.estimates.models import Estimate
 from apps.estimates.services import (
     add_estimate_item,
     approve_estimate,
@@ -48,11 +47,11 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
     estimate = get_object_or_404(
-        Estimate.objects.select_related("project", "phase").prefetch_related("items"),
+        get_organization_estimates(
+            user=request.user,
+            organization=request.organization,
+        ),
         pk=estimate_id,
-        organization=request.organization,
-        deleted_at__isnull=True,
-        project__deleted_at__isnull=True,
     )
     item_form = EstimateItemForm(request.POST or None)
     if request.method == "POST" and item_form.is_valid():
@@ -86,10 +85,11 @@ def estimate_approve(request: HttpRequest, estimate_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)
     estimate = get_object_or_404(
-        Estimate,
+        get_organization_estimates(
+            user=request.user,
+            organization=request.organization,
+        ),
         pk=estimate_id,
-        organization=request.organization,
-        deleted_at__isnull=True,
     )
     try:
         approve_estimate(estimate=estimate, actor=request.user)

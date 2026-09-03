@@ -1,8 +1,9 @@
-import uuid
 from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
+
+from core.models import TimeStampedModel, UUIDModel
 
 
 class ContractStatus(models.TextChoices):
@@ -12,10 +13,9 @@ class ContractStatus(models.TextChoices):
     TERMINATED = "terminated", "Terminated"
 
 
-class Contract(models.Model):
+class Contract(UUIDModel, TimeStampedModel):
     """A project contract owned by one organization."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -44,8 +44,6 @@ class Contract(models.Model):
     start_date = models.DateField(null=True, blank=True)
     end_date = models.DateField(null=True, blank=True)
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

@@ -1,8 +1,9 @@
-import uuid
 from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
+
+from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 
 
 class DailyReportStatus(models.TextChoices):
@@ -11,10 +12,9 @@ class DailyReportStatus(models.TextChoices):
     APPROVED = "approved", "Approved"
 
 
-class DailyReport(models.Model):
+class DailyReport(UUIDModel, TimeStampedModel):
     """An operational report for one project on one reporting date."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -60,8 +60,6 @@ class DailyReport(models.Model):
         blank=True,
         related_name="daily_reports_approved",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -104,10 +102,9 @@ class DailyReport(models.Model):
         return f"{self.site} - {self.reporting_date}"
 
 
-class DailyReportLaborEntry(models.Model):
+class DailyReportLaborEntry(UUIDModel, CreatedAtModel):
     """Labor recorded against a daily report while it is still a draft."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -122,7 +119,6 @@ class DailyReportLaborEntry(models.Model):
     worker_count = models.PositiveIntegerField()
     hours_worked = models.DecimalField(max_digits=8, decimal_places=2)
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -144,10 +140,9 @@ class DailyReportLaborEntry(models.Model):
         return f"{self.team_name} ({self.worker_count})"
 
 
-class DailyReportEquipmentEntry(models.Model):
+class DailyReportEquipmentEntry(UUIDModel, CreatedAtModel):
     """Equipment usage recorded against a daily report draft."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -161,7 +156,6 @@ class DailyReportEquipmentEntry(models.Model):
     equipment_name = models.CharField(max_length=255)
     hours_used = models.DecimalField(max_digits=8, decimal_places=2)
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -183,10 +177,9 @@ class DailyReportEquipmentEntry(models.Model):
         return f"{self.equipment_name} ({self.hours_used} h)"
 
 
-class DailyReportMaterialEntry(models.Model):
+class DailyReportMaterialEntry(UUIDModel, CreatedAtModel):
     """Material consumption recorded against a daily report draft."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -205,7 +198,6 @@ class DailyReportMaterialEntry(models.Model):
     )
     unit = models.CharField(max_length=30)
     notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

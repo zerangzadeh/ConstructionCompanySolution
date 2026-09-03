@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import HttpRequest
 
 from apps.expenses.models import Expense
 
@@ -25,3 +26,22 @@ class ExpenseAdmin(admin.ModelAdmin):
         "organization__name",
     )
     readonly_fields = ("id", "created_at", "updated_at")
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        """Expenses must be recorded through the audited service workflow."""
+
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Expense | None = None
+    ) -> bool:
+        """Recorded expenses cannot be edited in the admin interface."""
+
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Expense | None = None
+    ) -> bool:
+        """Expense corrections use the audited void workflow, never deletion."""
+
+        return False

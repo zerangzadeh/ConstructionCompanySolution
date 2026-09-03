@@ -1,12 +1,13 @@
-import uuid
-
 from django.conf import settings
 from django.db import models
+
+from core.models import TimeStampedModel, UUIDModel
 
 
 class OrganizationStatus(models.TextChoices):
     ACTIVE = "active", "Active"
     SUSPENDED = "suspended", "Suspended"
+    CANCELLED = "cancelled", "Cancelled"
     ARCHIVED = "archived", "Archived"
 
 
@@ -39,14 +40,9 @@ class InvitationStatus(models.TextChoices):
     REVOKED = "revoked", "Revoked"
 
 
-class Organization(models.Model):
+class Organization(UUIDModel, TimeStampedModel):
     """A construction company tenant."""
 
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-    )
     name = models.CharField(max_length=255)
     legal_name = models.CharField(max_length=255, blank=True)
     slug = models.SlugField(max_length=255, unique=True)
@@ -58,8 +54,6 @@ class Organization(models.Model):
     )
     timezone = models.CharField(max_length=64, default="UTC")
     currency = models.CharField(max_length=3, default="USD")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -83,14 +77,9 @@ class Organization(models.Model):
         return self.name
 
 
-class OrganizationMembership(models.Model):
+class OrganizationMembership(UUIDModel, TimeStampedModel):
     """A user's membership and role within an organization."""
 
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-    )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
@@ -119,8 +108,6 @@ class OrganizationMembership(models.Model):
         blank=True,
         related_name="organization_memberships_invited",
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         constraints = [  # noqa: RUF012
@@ -135,14 +122,9 @@ class OrganizationMembership(models.Model):
         return f"{self.user.username} - {self.organization.name}"
 
 
-class OrganizationInvitation(models.Model):
+class OrganizationInvitation(UUIDModel, TimeStampedModel):
     """A time-limited invitation for an existing user to join an organization."""
 
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-    )
     organization = models.ForeignKey(
         Organization,
         on_delete=models.CASCADE,
@@ -174,8 +156,6 @@ class OrganizationInvitation(models.Model):
     token_hash = models.CharField(max_length=64, unique=True)
     expires_at = models.DateTimeField()
     accepted_at = models.DateTimeField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-created_at"]  # noqa: RUF012

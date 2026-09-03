@@ -7,8 +7,12 @@ from django.urls import reverse
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.expenses.models import ExpenseCategory
-from apps.expenses.services import create_expense, get_organization_expenses
+from apps.expenses.models import ExpenseCategory, ExpenseStatus
+from apps.expenses.services import (
+    create_expense,
+    get_organization_expenses,
+    void_expense,
+)
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 from apps.projects.models import ProjectPhaseStatus
 from apps.projects.services import (
@@ -101,6 +105,62 @@ class ExpenseServiceTests(TestCase):
                 amount=Decimal("-1.00"),
                 incurred_on=date(2026, 8, 29),
             )
+
+    def test_void_expense_preserves_amount_and_records_audit(self) -> None:
+        expense = create_expense(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            description="Duplicate delivery",
+            amount=Decimal("1250.75"),
+            incurred_on=date(2026, 8, 29),
+        )
+        void_expense(expense=expense, actor=self.owner, reason="Duplicate entry")
+        expense.refresh_from_db()
+        self.assertEqual(expense.status, ExpenseStatus.VOID)
+        self.assertEqual(expense.amount, Decimal("1250.75"))
+        self.assertEqual(expense.void_reason, "Duplicate entry")
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.EXPENSE_VOIDED,
+                entity_id=str(expense.pk),
+            ).exists()
+        )
+
+    def test_member_cannot_void_expense(self) -> None:
+        member = User.objects.create_user(
+            username="expense-void-member",
+            password="test-password",
+        )
+        self.organization.memberships.create(
+            user=member,
+            role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+        )
+        expense = create_expense(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            description="Protected expense",
+            amount=Decimal("30.00"),
+            incurred_on=date(2026, 8, 29),
+        )
+
+        with self.assertRaises(PermissionDenied):
+            void_expense(
+                expense=expense,
+                actor=member,
+                reason="Unauthorized void",
+            )
+
+        expense.refresh_from_db()
+        self.assertEqual(expense.status, ExpenseStatus.RECORDED)
+        self.assertFalse(
+            AuditEvent.objects.filter(
+                action=AuditAction.EXPENSE_VOIDED,
+                entity_id=str(expense.pk),
+            ).exists()
+        )
 
     def test_expense_rejects_cross_tenant_project(self) -> None:
         other_project = self.other_organization.projects.create(
@@ -267,5 +327,69 @@ class ExpenseServiceTests(TestCase):
         self.assertTrue(
             self.organization.expenses.filter(
                 description="View delivery",
+            ).exists()
+        )
+
+    def test_expense_void_view_rejects_cross_tenant_expense_identifier(self) -> None:
+        other_project = self.other_organization.projects.create(
+            code="P-VOID-HIDDEN",
+            name="Hidden void project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        other_expense = self.other_organization.expenses.create(
+            project=other_project,
+            description="Other tenant expense",
+            amount=Decimal("90.00"),
+            incurred_on=date(2026, 8, 29),
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.post(
+            reverse("expenses:void", args=[other_expense.pk]),
+            {"reason": "Attempted cross-tenant void"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        other_expense.refresh_from_db()
+        self.assertEqual(other_expense.status, ExpenseStatus.RECORDED)
+        self.assertFalse(
+            AuditEvent.objects.filter(
+                action=AuditAction.EXPENSE_VOIDED,
+                entity_id=str(other_expense.pk),
+            ).exists()
+        )
+
+    def test_expense_void_view_rejects_blank_reason_without_mutation(self) -> None:
+        expense = create_expense(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            description="Missing void reason",
+            amount=Decimal("45.00"),
+            incurred_on=date(2026, 8, 29),
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.post(
+            reverse("expenses:void", args=[expense.pk]),
+            {"reason": ""},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        expense.refresh_from_db()
+        self.assertEqual(expense.status, ExpenseStatus.RECORDED)
+        self.assertFalse(
+            AuditEvent.objects.filter(
+                action=AuditAction.EXPENSE_VOIDED,
+                entity_id=str(expense.pk),
             ).exists()
         )

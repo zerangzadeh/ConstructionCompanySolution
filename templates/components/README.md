@@ -9,6 +9,13 @@ remain clear and they do not accidentally rely on tenant or request state.
 - `form_field.html` renders one labelled Django form field and its errors.
 - `messages.html` renders Django's framework messages from the shared context
   processor.
+- `navigation_links.html` renders shared module links. Pass
+  `navigation_is_authenticated`, `navigation_link_class`,
+  `navigation_primary_class`, and `csrf_token` explicitly; it supports both
+  the desktop and mobile navigation layouts in `base.html`.
+- `page_header.html` renders a page eyebrow, title, optional description, and
+  optional primary action. Pass `page_eyebrow`, `page_title`,
+  `page_description`, `page_action_url`, and `page_action_label` explicitly.
 
 Keep business decisions, authorization checks, and formatting of financial
 values outside components. Components are presentation-only and must preserve

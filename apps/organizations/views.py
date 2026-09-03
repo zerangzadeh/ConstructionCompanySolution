@@ -7,11 +7,11 @@ from django.views.decorators.http import require_GET, require_POST
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.forms import OrganizationForm
 from apps.organizations.invitation_forms import OrganizationInvitationForm
-from apps.organizations.models import MembershipStatus, OrganizationMembership
 from apps.organizations.services import (
     accept_organization_invitation,
     create_organization_invitation,
     create_organization_with_owner,
+    get_organization_members,
     get_valid_memberships,
     resolve_active_organization,
     set_active_organization,
@@ -78,13 +78,9 @@ def create_organization(request: HttpRequest) -> HttpResponse:
 def organization_members(request: HttpRequest) -> HttpResponse:
     """List active members belonging only to the active organization."""
 
-    memberships = (
-        OrganizationMembership.objects.filter(
-            organization=request.organization,
-            status=MembershipStatus.ACTIVE,
-        )
-        .select_related("user")
-        .order_by("user__username")
+    memberships = get_organization_members(
+        user=request.user,
+        organization=request.organization,
     )
     return render(
         request,

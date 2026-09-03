@@ -1,8 +1,9 @@
-import uuid
 from decimal import Decimal
 
 from django.conf import settings
 from django.db import models
+
+from core.models import TimeStampedModel, UUIDModel
 
 
 class ProjectStatus(models.TextChoices):
@@ -13,14 +14,9 @@ class ProjectStatus(models.TextChoices):
     CANCELLED = "cancelled", "Cancelled"
 
 
-class Project(models.Model):
+class Project(UUIDModel, TimeStampedModel):
     """A construction project belonging to exactly one organization."""
 
-    id = models.UUIDField(
-        default=uuid.uuid4,
-        editable=False,
-        primary_key=True,
-    )
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -42,8 +38,6 @@ class Project(models.Model):
         decimal_places=2,
         default=Decimal("0.00"),
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -83,10 +77,9 @@ class Project(models.Model):
         return f"{self.code} - {self.name}"
 
 
-class ProjectSite(models.Model):
+class ProjectSite(UUIDModel, TimeStampedModel):
     """A worksite belonging to one project and its organization."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -101,8 +94,6 @@ class ProjectSite(models.Model):
     name = models.CharField(max_length=255)
     address = models.TextField(blank=True)
     is_active = models.BooleanField(default=True, db_index=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -144,10 +135,9 @@ class ProjectPhaseStatus(models.TextChoices):
     COMPLETED = "completed", "Completed"
 
 
-class ProjectPhase(models.Model):
+class ProjectPhase(UUIDModel, TimeStampedModel):
     """A planned or active execution phase within one project worksite."""
 
-    id = models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True)
     organization = models.ForeignKey(
         "organizations.Organization",
         on_delete=models.CASCADE,
@@ -168,8 +158,6 @@ class ProjectPhase(models.Model):
     )
     planned_start_date = models.DateField(null=True, blank=True)
     planned_end_date = models.DateField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

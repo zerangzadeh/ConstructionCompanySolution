@@ -1,9 +1,13 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
-from apps.expenses.forms import ExpenseForm
-from apps.expenses.services import create_expense, get_organization_expenses
+from apps.expenses.forms import ExpenseForm, ExpenseVoidForm
+from apps.expenses.services import (
+    create_expense,
+    get_organization_expenses,
+    void_expense,
+)
 from apps.organizations.decorators import active_organization_required
 
 
@@ -40,3 +44,30 @@ def expense_create(request: HttpRequest) -> HttpResponse:
         else:
             return redirect("expenses:list")
     return render(request, "expenses/create.html", {"form": form})
+
+
+@active_organization_required
+def expense_void(request: HttpRequest, expense_id: str) -> HttpResponse:
+    if request.method != "POST":
+        return HttpResponse(status=405)
+    expense = get_object_or_404(
+        get_organization_expenses(
+            user=request.user,
+            organization=request.organization,
+        ),
+        pk=expense_id,
+    )
+    form = ExpenseVoidForm(request.POST)
+    if not form.is_valid():
+        return HttpResponse(status=400)
+    try:
+        void_expense(
+            expense=expense,
+            actor=request.user,
+            reason=form.cleaned_data["reason"],
+        )
+    except PermissionDenied:
+        return HttpResponse(status=403)
+    except ValueError:
+        return HttpResponse(status=400)
+    return redirect("expenses:list")

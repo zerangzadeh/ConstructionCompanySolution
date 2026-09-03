@@ -56,3 +56,10 @@ class ExpenseForm(forms.ModelForm):
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "Selected phase does not belong to the project.")
         return cleaned_data
+
+
+class ExpenseVoidForm(forms.Form):
+    reason = forms.CharField(
+        max_length=1000,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )

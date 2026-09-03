@@ -3,16 +3,8 @@
 {% block title %}Contracts | Construction ERP{% endblock %}
 
 {% block content %}
-    <div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-            <p class="text-sm font-medium text-blue-600">Contracts</p>
-            <h1 class="mt-1 text-3xl font-bold tracking-tight">Project contracts</h1>
-            <p class="mt-2 text-slate-500">Contracts in {{ request.organization.name }}.</p>
-        </div>
-        <a class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'contracts:create' %}">
-            New contract
-        </a>
-    </div>
+    {% url "contracts:create" as contract_create_url %}
+    {% include "components/page_header.html" with page_eyebrow="Contracts" page_title="Project contracts" page_description=request.organization.name page_action_url=contract_create_url page_action_label="New contract" only %}
 
     <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
         {% if contracts %}

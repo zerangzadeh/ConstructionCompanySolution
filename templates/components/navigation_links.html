@@ -1,0 +1,24 @@
+{% if navigation_is_authenticated %}
+    <a class="{{ navigation_link_class }}" href="{% url 'organizations:select' %}">Organizations</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'organizations:members' %}">Members</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'organizations:invite' %}">Invite</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'audit:log' %}">Audit</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'projects:list' %}">Projects</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'contracts:list' %}">Contracts</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'estimates:list' %}">Estimates</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'expenses:list' %}">Expenses</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'payments:list' %}">Payments</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'documents:list' %}">Documents</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'daily_reports:list' %}">Daily reports</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'financials:report' %}">Financials</a>
+    <a class="{{ navigation_link_class }}" href="{% url 'financials:dashboard' %}">Dashboard</a>
+    <a class="{{ navigation_primary_class }}" href="{% url 'organizations:create' %}">
+        New organization
+    </a>
+    <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button class="{{ navigation_link_class }}" type="submit">Sign out</button>
+    </form>
+{% else %}
+    <a class="{{ navigation_primary_class }}" href="{% url 'accounts:login' %}">Sign in</a>
+{% endif %}
