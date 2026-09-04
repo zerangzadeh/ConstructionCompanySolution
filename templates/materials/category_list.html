@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Material categories | Construction ERP{% endblock %}
+{% block content %}
+<div class="flex items-end justify-between gap-4"><div><p class="text-sm font-medium text-blue-600">Master data</p><h1 class="mt-1 text-3xl font-bold">Material categories</h1></div><a class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'materials:category_create' %}">Add category</a></div>
+<div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">{% for category in categories %}<div class="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><a class="font-semibold text-slate-900 hover:text-blue-600" href="{% url 'materials:category_detail' category.pk %}">{{ category.name }}</a><p class="text-sm text-slate-500">{{ category.code }}{% if category.parent %} · Parent: {{ category.parent.name }}{% endif %}</p></div><form method="post" action="{% url 'materials:category_archive' category.pk %}">{% csrf_token %}<button class="text-sm font-semibold text-red-700">Archive</button></form></div>{% empty %}<p class="p-8 text-center text-slate-500">No material categories yet.</p>{% endfor %}</div>
+{% endblock %}

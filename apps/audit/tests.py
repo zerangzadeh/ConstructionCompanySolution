@@ -43,6 +43,11 @@ class AuditServiceTests(TestCase):
             role=MembershipRole.OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        self.other_organization.memberships.create(
+            user=self.other_user,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
 
     def test_record_audit_event_persists_metadata(self) -> None:
         event = record_audit_event(
@@ -70,6 +75,16 @@ class AuditServiceTests(TestCase):
                 organization=self.organization,
                 actor=self.user,
                 metadata={"request": {"access_token": "sensitive"}},
+            )
+
+    def test_record_audit_event_rejects_actor_from_another_organization(self) -> None:
+        with self.assertRaises(PermissionDenied):
+            record_audit_event(
+                action=AuditAction.ORGANIZATION_CREATED,
+                entity_type="organization",
+                entity_id=self.organization.pk,
+                organization=self.organization,
+                actor=self.other_user,
             )
 
     def test_events_are_scoped_to_member_organization(self) -> None:

@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
+from core.identifiers import canonicalize_lower_identifier
+
 INPUT_CLASSES = (
     "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 "
     "text-slate-900 outline-none transition placeholder:text-slate-400 "
@@ -29,3 +31,6 @@ class UserLoginForm(AuthenticationForm):
             }
         )
     )
+
+    def clean_username(self) -> str:
+        return canonicalize_lower_identifier(self.cleaned_data["username"])

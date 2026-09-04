@@ -2,9 +2,11 @@ import uuid
 from pathlib import Path
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from core.models import CreatedAtModel, UUIDModel
+from core.tenant_validation import validate_related_organizations
 
 
 class DocumentType(models.TextChoices):
@@ -53,7 +55,7 @@ class ProjectDocument(UUIDModel, CreatedAtModel):
     )
     title = models.CharField(max_length=255)
     original_file_name = models.CharField(max_length=255)
-    file = models.FileField(upload_to=document_upload_path)
+    file = models.FileField(upload_to=document_upload_path, max_length=255)
     content_type = models.CharField(max_length=100)
     file_size = models.PositiveBigIntegerField()
     sha256 = models.CharField(max_length=64)
@@ -89,3 +91,20 @@ class ProjectDocument(UUIDModel, CreatedAtModel):
 
     def __str__(self) -> str:
         return self.title
+
+    def clean(self) -> None:
+        super().clean()
+        relations = {}
+        if self.project_id:
+            relations["project"] = self.project
+        if self.payment_id:
+            relations["payment"] = self.payment
+        validate_related_organizations(self, **relations)
+        if self.payment_id and self.payment.project_id != self.project_id:
+            raise ValidationError(
+                {"payment": "The payment must belong to the selected project."}
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)

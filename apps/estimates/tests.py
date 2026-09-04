@@ -420,3 +420,49 @@ class EstimateServiceTests(TestCase):
         )
         estimate.refresh_from_db()
         self.assertEqual(estimate.total_amount, Decimal("250.00"))
+
+    def test_approved_estimate_detail_hides_item_form_and_reports_stale_post(
+        self,
+    ) -> None:
+        estimate = create_estimate(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            estimate_number="E-VIEW-LOCKED",
+            title="Locked view estimate",
+        )
+        add_estimate_item(
+            estimate=estimate,
+            actor=self.owner,
+            description="Concrete",
+            quantity=Decimal("2.5"),
+            unit_price=Decimal("80.20"),
+        )
+        approve_estimate(estimate=estimate, actor=self.owner)
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+        detail_url = reverse("estimates:detail", kwargs={"estimate_id": estimate.pk})
+
+        response = self.client.get(detail_url)
+
+        self.assertContains(response, "Approved estimate — line items are locked.")
+        self.assertNotContains(response, "Add item")
+
+        response = self.client.post(
+            detail_url,
+            {
+                "description": "Rejected item",
+                "quantity": "1",
+                "unit": "unit",
+                "unit_price": "1.00",
+                "sort_order": "2",
+            },
+            follow=True,
+        )
+
+        self.assertContains(response, "Cannot modify an approved estimate.")
+        estimate.refresh_from_db()
+        self.assertEqual(estimate.items.count(), 1)
+        self.assertEqual(estimate.total_amount, Decimal("200.50"))

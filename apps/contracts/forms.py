@@ -1,7 +1,9 @@
 from django import forms
 
 from apps.contracts.models import Contract, ContractStatus
+from apps.parties.models import BusinessParty
 from apps.projects.models import Project
+from core.identifiers import canonicalize_upper_identifier
 
 
 class ContractForm(forms.ModelForm):
@@ -19,6 +21,9 @@ class ContractForm(forms.ModelForm):
             "contract_number",
             "title",
             "counterparty_name",
+            "party",
+            "direction",
+            "contract_type",
             "status",
             "contract_value",
             "signed_at",
@@ -33,12 +38,18 @@ class ContractForm(forms.ModelForm):
             organization=organization,
             deleted_at__isnull=True,
         ).order_by("name")
+        self.fields["party"].queryset = BusinessParty.objects.filter(
+            organization=organization, archived_at__isnull=True
+        ).order_by("display_name")
 
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ContractStatus.values:
             raise forms.ValidationError("Invalid contract status.")
         return status
+
+    def clean_contract_number(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["contract_number"])
 
     def clean(self):
         cleaned_data = super().clean()

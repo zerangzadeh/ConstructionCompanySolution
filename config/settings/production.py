@@ -29,23 +29,12 @@ ALLOWED_HOSTS = [
 for database_setting in ("DB_NAME", "DB_USER", "DB_PASSWORD"):
     _required_env(database_setting)
 
-if DATABASE_ENGINE == "postgresql":
-    _required_env("DB_HOST")
-    database_ssl_mode = _required_env("DB_SSLMODE").lower()
-    if database_ssl_mode != "verify-full":
-        raise ImproperlyConfigured(
-            "Production PostgreSQL connections must use DB_SSLMODE=verify-full."
-        )
-else:
-    database_extra_params = _required_env("DB_EXTRA_PARAMS").lower().replace(" ", "")
-    if (
-        "encrypt=yes" not in database_extra_params
-        or "trustservercertificate=yes" in database_extra_params
-    ):
-        raise ImproperlyConfigured(
-            "Production SQL Server connections must use Encrypt=yes and validate "
-            "the server certificate."
-        )
+_required_env("DB_HOST")
+database_ssl_mode = _required_env("DB_SSLMODE").lower()
+if database_ssl_mode != "verify-full":
+    raise ImproperlyConfigured(
+        "Production PostgreSQL connections must use DB_SSLMODE=verify-full."
+    )
 
 SECURE_SSL_REDIRECT = _env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
 SESSION_COOKIE_SECURE = _env_bool("DJANGO_SESSION_COOKIE_SECURE", True)

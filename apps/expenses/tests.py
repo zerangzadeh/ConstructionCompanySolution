@@ -7,13 +7,17 @@ from django.urls import reverse
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.expenses.models import ExpenseCategory, ExpenseStatus
+from apps.expenses.models import ExpenseStatus
+from apps.expenses.models import LegacyExpenseCategory as ExpenseCategory
 from apps.expenses.services import (
     create_expense,
+    create_expense_category,
     get_organization_expenses,
     void_expense,
 )
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.parties.models import PartyKind
+from apps.parties.services import create_business_party
 from apps.projects.models import ProjectPhaseStatus
 from apps.projects.services import (
     create_project,
@@ -197,6 +201,34 @@ class ExpenseServiceTests(TestCase):
             entity_id=str(expense.pk),
         )
         self.assertEqual(event.metadata["phase_id"], str(self.phase.pk))
+
+    def test_expense_uses_scoped_party_and_category_snapshots(self) -> None:
+        party = create_business_party(
+            organization=self.organization,
+            actor=self.owner,
+            party_kind=PartyKind.COMPANY,
+            display_name="Concrete Supplier",
+        )
+        category = create_expense_category(
+            organization=self.organization,
+            actor=self.owner,
+            code="concrete",
+            name="Concrete",
+        )
+        expense = create_expense(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            description="Concrete delivery",
+            amount=Decimal("25.00"),
+            incurred_on=date(2026, 8, 29),
+            party=party,
+            expense_category=category,
+        )
+        self.assertEqual(expense.party, party)
+        self.assertEqual(expense.expense_category, category)
+        self.assertEqual(expense.vendor_name, "Concrete Supplier")
+        self.assertEqual(expense.category, ExpenseCategory.OTHER)
 
     def test_expense_rejects_phase_from_another_project(self) -> None:
         other_project = self.organization.projects.create(

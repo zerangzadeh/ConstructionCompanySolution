@@ -1,12 +1,16 @@
 from django import forms
 
+from apps.materials.models import UnitOfMeasure
 from apps.projects.models import (
+    Activity,
     Project,
     ProjectPhase,
     ProjectPhaseStatus,
     ProjectSite,
     ProjectStatus,
+    WBSNode,
 )
+from core.identifiers import canonicalize_upper_identifier
 
 
 class ProjectForm(forms.ModelForm):
@@ -69,6 +73,9 @@ class ProjectForm(forms.ModelForm):
             ),
         }
 
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])
+
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ProjectStatus.values:
@@ -97,6 +104,9 @@ class ProjectSiteForm(forms.ModelForm):
         )
         for field in self.fields.values():
             field.widget.attrs["class"] = field_class
+
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])
 
 
 class ProjectPhaseForm(forms.ModelForm):
@@ -128,8 +138,66 @@ class ProjectPhaseForm(forms.ModelForm):
         for field in self.fields.values():
             field.widget.attrs["class"] = field_class
 
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])
+
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ProjectPhaseStatus.values:
             raise forms.ValidationError("Invalid project phase status.")
         return status
+
+
+class WBSNodeForm(forms.ModelForm):
+    class Meta:
+        model = WBSNode
+        fields = ["code", "title", "parent", "sort_order"]  # noqa: RUF012
+
+    def __init__(self, *args: object, project: Project, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["parent"].queryset = WBSNode.objects.filter(
+            project=project, archived_at__isnull=True, is_active=True
+        )
+
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])
+
+
+class ActivityForm(forms.ModelForm):
+    class Meta:
+        model = Activity
+        fields = [  # noqa: RUF012
+            "code",
+            "name",
+            "wbs_node",
+            "site",
+            "phase",
+            "unit_of_measure",
+            "planned_quantity",
+            "planned_start_date",
+            "planned_end_date",
+            "status",
+        ]
+        widgets = {  # noqa: RUF012
+            "planned_start_date": forms.DateInput(attrs={"type": "date"}),
+            "planned_end_date": forms.DateInput(attrs={"type": "date"}),
+        }
+
+    def __init__(self, *args: object, project: Project, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        organization = project.organization
+        self.fields["wbs_node"].queryset = WBSNode.objects.filter(
+            project=project, archived_at__isnull=True, is_active=True
+        )
+        self.fields["site"].queryset = ProjectSite.objects.filter(
+            project=project, is_active=True
+        )
+        self.fields["phase"].queryset = ProjectPhase.objects.filter(
+            site__project=project
+        )
+        self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
+            organization=organization, archived_at__isnull=True, is_active=True
+        )
+
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])

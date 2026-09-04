@@ -20,6 +20,9 @@
                         <div class="flex items-center gap-4 text-sm">
                             <span class="rounded-full bg-slate-100 px-2.5 py-1 font-medium capitalize text-slate-700">{{ project.get_status_display }}</span>
                             <span class="text-slate-600">{{ project.budget|floatformat:2 }} {{ request.organization.currency }}</span>
+                            <a class="font-semibold text-blue-600 hover:text-blue-800" href="{% url 'projects:detail' project.id %}">
+                                View details
+                            </a>
                         </div>
                     </div>
                 {% endfor %}

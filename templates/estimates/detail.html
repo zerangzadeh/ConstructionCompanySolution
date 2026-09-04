@@ -14,12 +14,14 @@
 {% endif %}
 <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
 <div class="flex justify-between border-b border-slate-100 p-5"><h2 class="font-semibold">Estimate items</h2><strong>{{ estimate.total_amount|floatformat:2 }} {{ request.organization.currency }}</strong></div>
-{% for item in estimate.items.all %}<div class="flex justify-between border-b border-slate-100 p-5"><span>{{ item.description }} ({{ item.quantity }} {{ item.unit }} × {{ item.unit_price }})</span><strong>{{ item.line_total|floatformat:2 }}</strong></div>{% empty %}<p class="p-6 text-center text-slate-500">No items yet.</p>{% endfor %}
+{% for item in estimate.current_revision.items.all %}<div class="flex justify-between border-b border-slate-100 p-5"><span>{{ item.description }} ({{ item.quantity }} {{ item.unit }} × {{ item.unit_price }})</span><strong>{{ item.line_total|floatformat:2 }}</strong></div>{% empty %}<p class="p-6 text-center text-slate-500">No items yet.</p>{% endfor %}
 </div>
+{% if estimate.status == "draft" %}
 <form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
 {% csrf_token %}<h2 class="font-semibold">Add item</h2>
 {% if item_form.non_field_errors %}<div class="rounded-lg bg-red-50 p-3 text-sm text-red-700">{{ item_form.non_field_errors }}</div>{% endif %}
 {% for field in item_form %}<div><label class="mb-1 block text-sm font-medium" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.errors %}<p class="text-sm text-red-600">{{ field.errors|striptags }}</p>{% endif %}</div>{% endfor %}
 <button class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" type="submit">Add item</button>
 </form>
+{% endif %}
 {% endblock %}

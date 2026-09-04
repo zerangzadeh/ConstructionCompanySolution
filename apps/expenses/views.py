@@ -36,6 +36,8 @@ def expense_create(request: HttpRequest) -> HttpResponse:
                 incurred_on=data["incurred_on"],
                 category=data["category"],
                 vendor_name=data["vendor_name"],
+                party=data["party"],
+                expense_category=data["expense_category"],
                 receipt_reference=data["receipt_reference"],
                 notes=data["notes"],
             )

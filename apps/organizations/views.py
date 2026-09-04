@@ -5,16 +5,18 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.decorators import active_organization_required
-from apps.organizations.forms import OrganizationForm
+from apps.organizations.forms import OrganizationForm, OrganizationSettingsForm
 from apps.organizations.invitation_forms import OrganizationInvitationForm
 from apps.organizations.services import (
     accept_organization_invitation,
     create_organization_invitation,
     create_organization_with_owner,
     get_organization_members,
+    get_organization_settings,
     get_valid_memberships,
     resolve_active_organization,
     set_active_organization,
+    update_organization_settings,
 )
 
 
@@ -87,6 +89,33 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         "organizations/members.html",
         {"memberships": memberships},
     )
+
+
+@active_organization_required
+def organization_settings(request: HttpRequest) -> HttpResponse:
+    """View and update settings for the resolved active organization."""
+
+    settings_record = get_organization_settings(organization=request.organization)
+    if request.method == "POST":
+        form = OrganizationSettingsForm(request.POST, instance=settings_record)
+        if form.is_valid():
+            try:
+                update_organization_settings(
+                    organization=request.organization,
+                    updated_by=request.user,
+                    timezone_name=form.cleaned_data["timezone"],
+                    currency=form.cleaned_data["currency"],
+                    fiscal_year_start_month=form.cleaned_data[
+                        "fiscal_year_start_month"
+                    ],
+                )
+            except PermissionDenied as exc:
+                return HttpResponseForbidden(str(exc))
+            return redirect("organizations:settings")
+    else:
+        form = OrganizationSettingsForm(instance=settings_record)
+
+    return render(request, "organizations/settings.html", {"form": form})
 
 
 @active_organization_required

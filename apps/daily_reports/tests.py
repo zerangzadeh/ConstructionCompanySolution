@@ -9,22 +9,31 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.daily_reports.models import DailyReportStatus
 from apps.daily_reports.services import (
+    add_daily_activity,
     add_daily_report_equipment_entry,
     add_daily_report_labor_entry,
     add_daily_report_material_entry,
+    add_delay_event,
     approve_daily_report,
     create_daily_report,
     get_organization_daily_report,
     get_organization_daily_reports,
     submit_daily_report,
 )
+from apps.materials.services import (
+    create_material,
+    create_material_category,
+    create_unit_of_measure,
+)
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.projects.models import ProjectPhaseStatus
 from apps.projects.services import (
+    create_activity,
     create_project,
     create_project_phase,
     create_project_site,
+    create_wbs_node,
 )
 
 
@@ -52,6 +61,11 @@ class DailyReportServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.other_organization.memberships.create(
+            user=self.other_user,
             role=MembershipRole.OWNER,
             status=MembershipStatus.ACTIVE,
         )
@@ -128,6 +142,11 @@ class DailyReportServiceTests(TestCase):
             created_by=self.other_user,
             updated_by=self.other_user,
         )
+        """ self.other_organization.memberships.create(
+            user=self.other_user,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        ) """
         other_site = create_project_site(
             organization=self.other_organization,
             project=other_project,
@@ -391,4 +410,149 @@ class DailyReportServiceTests(TestCase):
                 material_name="Cement",
                 quantity=Decimal("2.0000"),
                 unit="bag",
+            )
+
+    def test_structured_entries_validate_master_scope_and_preserve_material_snapshots(
+        self,
+    ) -> None:
+        unit = create_unit_of_measure(
+            organization=self.organization,
+            actor=self.owner,
+            code="M3",
+            name="Cubic metre",
+            symbol="m³",
+            category="volume",
+            decimal_places=3,
+        )
+        category = create_material_category(
+            organization=self.organization,
+            actor=self.owner,
+            code="CONC",
+            name="Concrete",
+        )
+        material = create_material(
+            organization=self.organization,
+            actor=self.owner,
+            code="RMX",
+            name="Ready-mix concrete",
+            category=category,
+            unit_of_measure=unit,
+        )
+        node = create_wbs_node(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            code="01",
+            title="Foundation",
+        )
+        activity = create_activity(
+            organization=self.organization,
+            project=self.project,
+            wbs_node=node,
+            actor=self.owner,
+            code="POUR",
+            name="Pour concrete",
+            site=self.site,
+            phase=self.phase,
+            unit_of_measure=unit,
+            planned_quantity=Decimal("50.0000"),
+        )
+        report = create_daily_report(
+            organization=self.organization,
+            project=self.project,
+            site=self.site,
+            phase=self.phase,
+            actor=self.owner,
+            reporting_date=date(2026, 8, 31),
+            work_performed="Concrete placement.",
+        )
+        material_entry = add_daily_report_material_entry(
+            organization=self.organization,
+            report_id=str(report.pk),
+            actor=self.owner,
+            material_name="ignored",
+            quantity=Decimal("12.5000"),
+            unit="ignored",
+            material=material,
+        )
+        daily_activity = add_daily_activity(
+            organization=self.organization,
+            report_id=str(report.pk),
+            actor=self.owner,
+            activity=activity,
+            description="",
+            quantity=Decimal("12.5000"),
+            progress_percent=Decimal("25.00"),
+        )
+        delay = add_delay_event(
+            organization=self.organization,
+            report_id=str(report.pk),
+            actor=self.owner,
+            activity=activity,
+            occurred_on=date(2026, 8, 31),
+            cause="Pump failure",
+            duration_hours=Decimal("1.50"),
+        )
+        self.assertEqual(material_entry.material_name, material.name)
+        self.assertEqual(material_entry.unit, "m³")
+        self.assertEqual(daily_activity.description, activity.name)
+        self.assertEqual(delay.activity, activity)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.DAILY_ACTIVITY_ADDED,
+                entity_id=str(daily_activity.pk),
+            ).exists()
+        )
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.DELAY_EVENT_ADDED, entity_id=str(delay.pk)
+            ).exists()
+        )
+
+    def test_structured_entries_are_locked_after_submission_and_reject_cross_project_activity(
+        self,
+    ) -> None:
+        report = self.create_report()
+        other_project = self.other_organization.projects.create(
+            code="OTHER", name="Other"
+        )
+        other_site = self.other_organization.project_sites.create(
+            project=other_project, code="OTHER-SITE", name="Other site"
+        )
+        other_node = create_wbs_node(
+            organization=self.other_organization,
+            project=other_project,
+            actor=self.other_user,
+            code="01",
+            title="Other",
+        )
+        other_activity = create_activity(
+            organization=self.other_organization,
+            project=other_project,
+            wbs_node=other_node,
+            actor=self.other_user,
+            code="OTHER-ACT",
+            name="Other activity",
+            site=other_site,
+        )
+        with self.assertRaises(PermissionDenied):
+            add_daily_activity(
+                organization=self.organization,
+                report_id=str(report.pk),
+                actor=self.owner,
+                activity=other_activity,
+                description="Other",
+            )
+        submit_daily_report(
+            organization=self.organization, report_id=str(report.pk), actor=self.owner
+        )
+        with self.assertRaisesMessage(
+            ValueError, "Only draft daily reports can be updated."
+        ):
+            add_delay_event(
+                organization=self.organization,
+                report_id=str(report.pk),
+                actor=self.owner,
+                occurred_on=date(2026, 8, 30),
+                cause="Late delivery",
             )

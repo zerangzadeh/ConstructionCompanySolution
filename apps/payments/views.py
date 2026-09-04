@@ -38,6 +38,7 @@ def payment_create(request: HttpRequest) -> HttpResponse:
                 paid_on=data["paid_on"],
                 method=data["method"],
                 counterparty_name=data["counterparty_name"],
+                party=data["party"],
                 reference=data["reference"],
                 notes=data["notes"],
             )

@@ -10,19 +10,28 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.daily_reports.models import (
+    DailyActivity,
     DailyReport,
     DailyReportEquipmentEntry,
     DailyReportLaborEntry,
     DailyReportMaterialEntry,
     DailyReportStatus,
+    DelayEvent,
 )
+from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project, ProjectPhase, ProjectPhaseStatus, ProjectSite
+from apps.projects.models import (
+    Activity,
+    Project,
+    ProjectPhase,
+    ProjectPhaseStatus,
+    ProjectSite,
+)
 
 
 def _get_active_role(user: User, organization: Organization) -> str:
@@ -229,7 +238,15 @@ def get_organization_daily_report(
     reports = get_organization_daily_reports(
         user=user,
         organization=organization,
-    ).prefetch_related("labor_entries", "equipment_entries", "material_entries")
+    ).prefetch_related(
+        "labor_entries",
+        "equipment_entries",
+        "material_entries__material",
+        "material_entries__unit_of_measure",
+        "daily_activities__activity",
+        "daily_activities__unit_of_measure",
+        "delay_events__activity",
+    )
     try:
         return reports.get(pk=report_id)
     except DailyReport.DoesNotExist as exc:
@@ -378,6 +395,8 @@ def add_daily_report_material_entry(
     quantity: Decimal,
     unit: str,
     notes: str = "",
+    material: Material | None = None,
+    unit_of_measure: UnitOfMeasure | None = None,
 ) -> DailyReportMaterialEntry:
     """Add validated material usage to a draft daily report."""
 
@@ -386,6 +405,28 @@ def add_daily_report_material_entry(
         report_id=report_id,
         actor=actor,
     )
+    if material is not None:
+        if (
+            material.organization_id != organization.id
+            or not material.is_active
+            or material.archived_at
+        ):
+            raise PermissionDenied(
+                "The material does not belong to this active organization."
+            )
+        unit_of_measure = material.unit_of_measure
+        material_name = material.name
+        unit = unit_of_measure.symbol
+    elif unit_of_measure is not None:
+        if (
+            unit_of_measure.organization_id != organization.id
+            or not unit_of_measure.is_active
+            or unit_of_measure.archived_at
+        ):
+            raise PermissionDenied(
+                "The unit does not belong to this active organization."
+            )
+        unit = unit_of_measure.symbol
     if not material_name.strip() or not unit.strip():
         raise ValueError("Material name and unit are required.")
     if quantity <= Decimal("0.0000"):
@@ -396,8 +437,10 @@ def add_daily_report_material_entry(
         organization=organization,
         report=report,
         material_name=material_name.strip(),
+        material=material,
         quantity=quantity,
         unit=unit.strip(),
+        unit_of_measure=unit_of_measure,
         notes=notes.strip(),
         created_by=actor,
     )
@@ -411,6 +454,131 @@ def add_daily_report_material_entry(
             "report_id": str(report.pk),
             "quantity": str(entry.quantity),
             "unit": entry.unit,
+            "material_id": str(entry.material_id) if entry.material_id else None,
+        },
+    )
+    return entry
+
+
+def _validate_daily_activity_scope(*, report: DailyReport, activity: Activity) -> None:
+    if (
+        activity.organization_id != report.organization_id
+        or activity.project_id != report.project_id
+        or not activity.is_active
+        or activity.archived_at is not None
+    ):
+        raise PermissionDenied(
+            "The activity does not belong to this active report project."
+        )
+    if activity.site_id and activity.site_id != report.site_id:
+        raise PermissionDenied("The activity does not belong to the report worksite.")
+    if activity.phase_id and activity.phase_id != report.phase_id:
+        raise PermissionDenied("The activity does not belong to the report phase.")
+
+
+@transaction.atomic
+def add_daily_activity(
+    *,
+    organization: Organization,
+    report_id: str,
+    actor: User,
+    description: str,
+    activity: Activity | None = None,
+    quantity: Decimal | None = None,
+    unit_of_measure: UnitOfMeasure | None = None,
+    progress_percent: Decimal | None = None,
+    notes: str = "",
+) -> DailyActivity:
+    report = _get_draft_report_for_update(
+        organization=organization, report_id=report_id, actor=actor
+    )
+    if activity is not None:
+        _validate_daily_activity_scope(report=report, activity=activity)
+        if not description.strip():
+            description = activity.name
+        if (
+            activity.unit_of_measure_id
+            and unit_of_measure
+            and activity.unit_of_measure_id != unit_of_measure.id
+        ):
+            raise ValueError("Unit must match the activity's canonical unit.")
+        if activity.unit_of_measure_id and unit_of_measure is None:
+            unit_of_measure = activity.unit_of_measure
+    if unit_of_measure is not None and (
+        unit_of_measure.organization_id != organization.id
+        or not unit_of_measure.is_active
+        or unit_of_measure.archived_at
+    ):
+        raise PermissionDenied("The unit does not belong to this active organization.")
+    entry = DailyActivity.objects.create(
+        organization=organization,
+        report=report,
+        activity=activity,
+        description=description.strip(),
+        quantity=quantity,
+        unit_of_measure=unit_of_measure,
+        progress_percent=progress_percent,
+        notes=notes.strip(),
+        created_by=actor,
+    )
+    report.updated_by = actor
+    report.save(update_fields=["updated_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.DAILY_ACTIVITY_ADDED,
+        entity_type="daily_activity",
+        entity_id=entry.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "report_id": str(report.pk),
+            "activity_id": str(activity.pk) if activity else None,
+        },
+    )
+    return entry
+
+
+@transaction.atomic
+def add_delay_event(
+    *,
+    organization: Organization,
+    report_id: str,
+    actor: User,
+    occurred_on: date,
+    cause: str,
+    activity: Activity | None = None,
+    category: str = "",
+    impact: str = "",
+    responsible_party: str = "",
+    duration_hours: Decimal | None = None,
+) -> DelayEvent:
+    report = _get_draft_report_for_update(
+        organization=organization, report_id=report_id, actor=actor
+    )
+    if activity is not None:
+        _validate_daily_activity_scope(report=report, activity=activity)
+    entry = DelayEvent.objects.create(
+        organization=organization,
+        report=report,
+        activity=activity,
+        occurred_on=occurred_on,
+        cause=cause.strip(),
+        category=category.strip(),
+        impact=impact.strip(),
+        responsible_party=responsible_party.strip(),
+        duration_hours=duration_hours,
+        created_by=actor,
+    )
+    report.updated_by = actor
+    report.save(update_fields=["updated_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.DELAY_EVENT_ADDED,
+        entity_type="delay_event",
+        entity_id=entry.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "report_id": str(report.pk),
+            "activity_id": str(activity.pk) if activity else None,
         },
     )
     return entry

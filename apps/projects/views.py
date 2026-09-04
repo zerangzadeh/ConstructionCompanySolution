@@ -5,19 +5,32 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.decorators import active_organization_required
-from apps.projects.forms import ProjectForm, ProjectPhaseForm, ProjectSiteForm
+from apps.projects.forms import (
+    ActivityForm,
+    ProjectForm,
+    ProjectPhaseForm,
+    ProjectSiteForm,
+    WBSNodeForm,
+)
 from apps.projects.services import (
+    archive_activity,
     archive_project,
+    archive_wbs_node,
+    create_activity,
     create_project,
     create_project_phase,
     create_project_site,
+    create_wbs_node,
     get_available_phase_statuses,
+    get_organization_activities,
     get_organization_project,
     get_organization_project_phase,
     get_organization_project_phases,
     get_organization_project_site,
     get_organization_project_sites,
     get_organization_projects,
+    get_organization_wbs_nodes,
+    transition_activity_status,
     transition_project_phase_status,
 )
 
@@ -247,3 +260,147 @@ def project_archive(request: HttpRequest, project_id: str) -> HttpResponse:
     except PermissionDenied as exc:
         return HttpResponse(str(exc), status=403)
     return redirect("projects:list")
+
+
+@active_organization_required
+def project_controls(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    return render(
+        request,
+        "projects/controls.html",
+        {
+            "project": project,
+            "wbs_nodes": get_organization_wbs_nodes(
+                user=request.user,
+                organization=request.organization,
+                project_id=project_id,
+            ),
+            "activities": get_organization_activities(
+                user=request.user,
+                organization=request.organization,
+                project_id=project_id,
+            ),
+            "wbs_form": WBSNodeForm(project=project),
+            "activity_form": ActivityForm(project=project),
+        },
+    )
+
+
+@active_organization_required
+@require_POST
+def wbs_node_create(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    form = WBSNodeForm(request.POST, project=project)
+    if form.is_valid():
+        try:
+            create_wbs_node(
+                organization=request.organization,
+                project=project,
+                actor=request.user,
+                **form.cleaned_data,
+            )
+            messages.success(request, "WBS node added.")
+        except (PermissionDenied, ValueError) as exc:
+            messages.error(request, str(exc))
+    else:
+        messages.error(request, "Review the WBS node fields and try again.")
+    return redirect("projects:controls", project_id=project_id)
+
+
+@active_organization_required
+@require_POST
+def activity_create(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    form = ActivityForm(request.POST, project=project)
+    if form.is_valid():
+        try:
+            create_activity(
+                organization=request.organization,
+                project=project,
+                actor=request.user,
+                **form.cleaned_data,
+            )
+            messages.success(request, "Activity added.")
+        except (PermissionDenied, ValueError) as exc:
+            messages.error(request, str(exc))
+    else:
+        messages.error(request, "Review the activity fields and try again.")
+    return redirect("projects:controls", project_id=project_id)
+
+
+@active_organization_required
+@require_POST
+def activity_transition(
+    request: HttpRequest, project_id: str, activity_id: str
+) -> HttpResponse:
+    activity = (
+        get_organization_activities(
+            user=request.user, organization=request.organization, project_id=project_id
+        )
+        .filter(pk=activity_id)
+        .first()
+    )
+    if activity is None:
+        return HttpResponse("Activity not found.", status=404)
+    try:
+        transition_activity_status(
+            organization=request.organization,
+            actor=request.user,
+            activity=activity,
+            target_status=request.POST.get("status", ""),
+        )
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("projects:controls", project_id=project_id)
+
+
+@active_organization_required
+@require_POST
+def activity_archive_view(
+    request: HttpRequest, project_id: str, activity_id: str
+) -> HttpResponse:
+    activity = (
+        get_organization_activities(
+            user=request.user, organization=request.organization, project_id=project_id
+        )
+        .filter(pk=activity_id)
+        .first()
+    )
+    if activity is None:
+        return HttpResponse("Activity not found.", status=404)
+    try:
+        archive_activity(
+            organization=request.organization, actor=request.user, activity=activity
+        )
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("projects:controls", project_id=project_id)
+
+
+@active_organization_required
+@require_POST
+def wbs_node_archive_view(
+    request: HttpRequest, project_id: str, node_id: str
+) -> HttpResponse:
+    node = (
+        get_organization_wbs_nodes(
+            user=request.user, organization=request.organization, project_id=project_id
+        )
+        .filter(pk=node_id)
+        .first()
+    )
+    if node is None:
+        return HttpResponse("WBS node not found.", status=404)
+    try:
+        archive_wbs_node(
+            organization=request.organization, actor=request.user, node=node
+        )
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("projects:controls", project_id=project_id)

@@ -8,14 +8,25 @@ from django.db.models import QuerySet
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.contracts.models import Contract, ContractStatus
+from apps.contracts.models import (
+    Contract,
+    ContractAmendment,
+    ContractAmendmentStatus,
+    ContractDirection,
+    ContractItem,
+    ContractStatus,
+    ContractType,
+)
+from apps.materials.models import UnitOfMeasure
 from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project
+from apps.parties.models import BusinessParty
+from apps.projects.models import Project, WBSNode
+from core.identifiers import canonicalize_upper_identifier
 
 
 def _can_manage_contracts(user: User, organization: Organization) -> bool:
@@ -39,6 +50,9 @@ def create_contract(
     contract_number: str,
     title: str,
     counterparty_name: str,
+    party: BusinessParty | None = None,
+    direction: str | None = None,
+    contract_type: str | None = None,
     status: str = ContractStatus.DRAFT,
     contract_value: Decimal = Decimal("0.00"),
     signed_at: date | None = None,
@@ -65,13 +79,19 @@ def create_contract(
         or not counterparty_name.strip()
     ):
         raise ValueError("Contract number, title, and counterparty are required.")
+    if party and (party.organization_id != organization.pk or party.archived_at):
+        raise PermissionDenied("The party does not belong to this organization.")
+    if direction is not None and direction not in ContractDirection.values:
+        raise ValueError("Invalid contract direction.")
+    if contract_type is not None and contract_type not in ContractType.values:
+        raise ValueError("Invalid contract type.")
     if status not in ContractStatus.values:
         raise ValueError("Invalid contract status.")
     if contract_value < Decimal("0.00"):
         raise ValueError("Contract value cannot be negative.")
     if start_date and end_date and end_date < start_date:
         raise ValueError("Contract end date cannot be before start date.")
-    normalized_contract_number = contract_number.strip()
+    normalized_contract_number = canonicalize_upper_identifier(contract_number)
     if Contract.objects.filter(
         organization=organization,
         contract_number=normalized_contract_number,
@@ -84,6 +104,9 @@ def create_contract(
         contract_number=normalized_contract_number,
         title=title.strip(),
         counterparty_name=counterparty_name.strip(),
+        party=party,
+        direction=direction,
+        contract_type=contract_type,
         status=status,
         contract_value=contract_value,
         signed_at=signed_at,
@@ -102,6 +125,8 @@ def create_contract(
         metadata={
             "contract_number": contract.contract_number,
             "project_id": str(project.pk),
+            "party_id": str(party.pk) if party else None,
+            "direction": direction,
         },
     )
     return contract
@@ -132,6 +157,175 @@ def get_organization_contracts(
             deleted_at__isnull=True,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "created_by", "updated_by")
+        .select_related("project", "party", "created_by", "updated_by")
         .order_by("-created_at")
     )
+
+
+def _get_locked_contract(*, contract: Contract, organization: Organization) -> Contract:
+    locked = Contract.objects.select_for_update().get(pk=contract.pk)
+    if locked.organization_id != organization.pk:
+        raise PermissionDenied("The contract does not belong to this organization.")
+    return locked
+
+
+@transaction.atomic
+def update_draft_contract(
+    *,
+    organization: Organization,
+    actor: User,
+    contract: Contract,
+    title: str,
+    counterparty_name: str,
+    party: BusinessParty | None,
+    direction: str | None,
+    contract_type: str | None,
+    contract_value: Decimal,
+    notes: str = "",
+) -> Contract:
+    """Edit only a draft contract; finalized commercial terms use amendments."""
+    if not _can_manage_contracts(actor, organization):
+        raise PermissionDenied("You cannot manage contracts in this organization.")
+    locked = _get_locked_contract(contract=contract, organization=organization)
+    if locked.status != ContractStatus.DRAFT:
+        raise ValueError("Only draft contracts can be edited.")
+    if (
+        not title.strip()
+        or not counterparty_name.strip()
+        or contract_value < Decimal("0.00")
+    ):
+        raise ValueError("Draft contract data is invalid.")
+    if party and (party.organization_id != organization.pk or party.archived_at):
+        raise PermissionDenied("The party does not belong to this organization.")
+    if direction is not None and direction not in ContractDirection.values:
+        raise ValueError("Invalid contract direction.")
+    if contract_type is not None and contract_type not in ContractType.values:
+        raise ValueError("Invalid contract type.")
+    locked.title, locked.counterparty_name, locked.party = (
+        title.strip(),
+        counterparty_name.strip(),
+        party,
+    )
+    locked.direction, locked.contract_type, locked.contract_value = (
+        direction,
+        contract_type,
+        contract_value,
+    )
+    locked.notes, locked.updated_by = notes.strip(), actor
+    locked.save()
+    record_audit_event(
+        action=AuditAction.CONTRACT_UPDATED,
+        entity_type="contract",
+        entity_id=locked.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"contract_number": locked.contract_number},
+    )
+    return locked
+
+
+@transaction.atomic
+def transition_contract_status(
+    *, organization: Organization, actor: User, contract: Contract, status: str
+) -> Contract:
+    """Apply the deliberately narrow contract lifecycle under a row lock."""
+    if not _can_manage_contracts(actor, organization):
+        raise PermissionDenied("You cannot manage contracts in this organization.")
+    locked = _get_locked_contract(contract=contract, organization=organization)
+    allowed = {
+        ContractStatus.DRAFT: {ContractStatus.ACTIVE, ContractStatus.TERMINATED},
+        ContractStatus.ACTIVE: {ContractStatus.COMPLETED, ContractStatus.TERMINATED},
+    }
+    if status not in allowed.get(locked.status, set()):
+        raise ValueError("Invalid contract status transition.")
+    previous_status = locked.status
+    locked.status, locked.updated_by = status, actor
+    locked.save(update_fields=["status", "updated_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.CONTRACT_STATUS_CHANGED,
+        entity_type="contract",
+        entity_id=locked.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"previous_status": previous_status, "status": status},
+    )
+    return locked
+
+
+@transaction.atomic
+def add_contract_item(
+    *,
+    organization: Organization,
+    actor: User,
+    contract: Contract,
+    description: str,
+    quantity: Decimal,
+    unit_price: Decimal,
+    unit: str = "unit",
+    unit_of_measure: UnitOfMeasure | None = None,
+    wbs_node: WBSNode | None = None,
+    sort_order: int = 0,
+) -> ContractItem:
+    if not _can_manage_contracts(actor, organization):
+        raise PermissionDenied("You cannot manage contracts in this organization.")
+    locked = _get_locked_contract(contract=contract, organization=organization)
+    if locked.status != ContractStatus.DRAFT:
+        raise ValueError("Only draft contracts can have items changed.")
+    if not description.strip() or quantity <= Decimal(0) or unit_price < Decimal(0):
+        raise ValueError("Contract item data is invalid.")
+    item = ContractItem.objects.create(
+        organization=organization,
+        contract=locked,
+        description=description.strip(),
+        quantity=quantity,
+        unit=unit.strip() or "unit",
+        unit_price=unit_price,
+        unit_of_measure=unit_of_measure,
+        wbs_node=wbs_node,
+        sort_order=sort_order,
+    )
+    record_audit_event(
+        action=AuditAction.CONTRACT_ITEM_ADDED,
+        entity_type="contract_item",
+        entity_id=item.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"contract_id": str(locked.pk), "line_total": str(item.line_total)},
+    )
+    return item
+
+
+@transaction.atomic
+def approve_contract_amendment(
+    *, organization: Organization, actor: User, amendment: ContractAmendment
+) -> ContractAmendment:
+    """Approve a single immutable amendment without changing the legacy header value."""
+    if not _can_manage_contracts(actor, organization):
+        raise PermissionDenied("You cannot manage contracts in this organization.")
+    locked = ContractAmendment.objects.select_for_update().get(pk=amendment.pk)
+    if locked.organization_id != organization.pk:
+        raise PermissionDenied("The amendment does not belong to this organization.")
+    if locked.contract.status not in {ContractStatus.ACTIVE, ContractStatus.COMPLETED}:
+        raise ValueError("Only finalized contracts can be amended.")
+    if locked.status != ContractAmendmentStatus.DRAFT:
+        raise ValueError("Only draft amendments can be approved.")
+    from django.utils import timezone
+
+    locked.status, locked.approved_by, locked.approved_at = (
+        ContractAmendmentStatus.APPROVED,
+        actor,
+        timezone.now(),
+    )
+    locked.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+    record_audit_event(
+        action=AuditAction.CONTRACT_AMENDMENT_APPROVED,
+        entity_type="contract_amendment",
+        entity_id=locked.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "contract_id": str(locked.contract_id),
+            "value_change": str(locked.value_change),
+        },
+    )
+    return locked

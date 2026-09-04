@@ -1,12 +1,21 @@
 from django import forms
 
 from apps.daily_reports.models import (
+    DailyActivity,
     DailyReport,
     DailyReportEquipmentEntry,
     DailyReportLaborEntry,
     DailyReportMaterialEntry,
+    DelayEvent,
 )
-from apps.projects.models import Project, ProjectPhase, ProjectPhaseStatus, ProjectSite
+from apps.materials.models import Material, UnitOfMeasure
+from apps.projects.models import (
+    Activity,
+    Project,
+    ProjectPhase,
+    ProjectPhaseStatus,
+    ProjectSite,
+)
 
 
 class DailyReportForm(forms.ModelForm):
@@ -135,7 +144,14 @@ class DailyReportEquipmentEntryForm(_DailyReportEntryForm):
 class DailyReportMaterialEntryForm(_DailyReportEntryForm):
     class Meta:
         model = DailyReportMaterialEntry
-        fields = ["material_name", "quantity", "unit", "notes"]  # noqa: RUF012
+        fields = [  # noqa: RUF012
+            "material",
+            "material_name",
+            "quantity",
+            "unit_of_measure",
+            "unit",
+            "notes",
+        ]
         widgets = {  # noqa: RUF012
             "material_name": forms.TextInput(
                 attrs={"placeholder": "Ready-mix concrete"}
@@ -144,3 +160,103 @@ class DailyReportMaterialEntryForm(_DailyReportEntryForm):
             "unit": forms.TextInput(attrs={"placeholder": "m³"}),
             "notes": forms.Textarea(attrs={"rows": 2}),
         }
+
+    def __init__(
+        self, *args: object, organization_id: object | None = None, **kwargs: object
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        if organization_id is not None:
+            self.fields["material"].queryset = Material.objects.filter(
+                organization_id=organization_id,
+                archived_at__isnull=True,
+                is_active=True,
+            )
+            self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
+                organization_id=organization_id,
+                archived_at__isnull=True,
+                is_active=True,
+            )
+        self.fields["material"].required = False
+        self.fields["unit_of_measure"].required = False
+
+    def clean(self) -> dict[str, object]:
+        cleaned_data = super().clean()
+        material = cleaned_data.get("material")
+        if material:
+            cleaned_data["material_name"] = material.name
+            cleaned_data["unit_of_measure"] = material.unit_of_measure
+            cleaned_data["unit"] = material.unit_of_measure.symbol
+        return cleaned_data
+
+
+class DailyActivityForm(_DailyReportEntryForm):
+    class Meta:
+        model = DailyActivity
+        fields = [  # noqa: RUF012
+            "activity",
+            "description",
+            "quantity",
+            "unit_of_measure",
+            "progress_percent",
+            "notes",
+        ]
+        widgets = {  # noqa: RUF012
+            "description": forms.Textarea(attrs={"rows": 2}),
+            "quantity": forms.NumberInput(attrs={"min": "0.0001", "step": "0.0001"}),
+            "progress_percent": forms.NumberInput(
+                attrs={"min": "0", "max": "100", "step": "0.01"}
+            ),
+            "notes": forms.Textarea(attrs={"rows": 2}),
+        }
+
+    def __init__(self, *args: object, report: DailyReport, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["activity"].queryset = Activity.objects.filter(
+            organization=report.organization,
+            project=report.project,
+            archived_at__isnull=True,
+            is_active=True,
+        )
+        self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
+            organization=report.organization, archived_at__isnull=True, is_active=True
+        )
+        self.fields["activity"].required = False
+        self.fields["unit_of_measure"].required = False
+        self.fields["description"].required = False
+
+    def clean(self) -> dict[str, object]:
+        cleaned_data = super().clean()
+        activity = cleaned_data.get("activity")
+        if activity and not cleaned_data.get("description"):
+            cleaned_data["description"] = activity.name
+        return cleaned_data
+
+
+class DelayEventForm(_DailyReportEntryForm):
+    class Meta:
+        model = DelayEvent
+        fields = [  # noqa: RUF012
+            "activity",
+            "occurred_on",
+            "category",
+            "cause",
+            "impact",
+            "responsible_party",
+            "duration_hours",
+        ]
+        widgets = {  # noqa: RUF012
+            "occurred_on": forms.DateInput(attrs={"type": "date"}),
+            "cause": forms.Textarea(attrs={"rows": 2}),
+            "impact": forms.Textarea(attrs={"rows": 2}),
+            "duration_hours": forms.NumberInput(attrs={"min": "0.01", "step": "0.01"}),
+        }
+
+    def __init__(self, *args: object, report: DailyReport, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["activity"].queryset = Activity.objects.filter(
+            organization=report.organization,
+            project=report.project,
+            archived_at__isnull=True,
+            is_active=True,
+        )
+        self.fields["activity"].required = False

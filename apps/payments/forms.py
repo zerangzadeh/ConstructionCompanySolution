@@ -1,8 +1,10 @@
 from django import forms
 
 from apps.contracts.models import Contract
+from apps.parties.models import BusinessParty
 from apps.payments.models import Payment
 from apps.projects.models import Project, ProjectPhase
+from core.identifiers import canonicalize_upper_identifier
 
 
 class PaymentForm(forms.ModelForm):
@@ -32,6 +34,7 @@ class PaymentForm(forms.ModelForm):
             "paid_on",
             "method",
             "counterparty_name",
+            "party",
             "reference",
             "notes",
         ]
@@ -59,6 +62,9 @@ class PaymentForm(forms.ModelForm):
             .select_related("site", "site__project")
             .order_by("site__project__name", "site__name", "name")
         )
+        self.fields["party"].queryset = BusinessParty.objects.filter(
+            organization=organization, archived_at__isnull=True
+        ).order_by("display_name")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -72,6 +78,9 @@ class PaymentForm(forms.ModelForm):
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "Selected phase does not belong to the project.")
         return cleaned_data
+
+    def clean_payment_number(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["payment_number"])
 
 
 class PaymentVoidForm(forms.Form):

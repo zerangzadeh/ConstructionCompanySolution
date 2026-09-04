@@ -9,8 +9,11 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.contracts.services import create_contract
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.parties.models import PartyKind
+from apps.parties.services import create_business_party
 from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.payments.services import (
+    allocate_payment,
     create_payment,
     get_organization_payments,
     void_payment,
@@ -186,6 +189,46 @@ class PaymentServiceTests(TestCase):
             "Only posted payments can be voided.",
         ):
             void_payment(payment=payment, actor=self.owner, reason="Repeated request")
+
+    def test_payment_allocation_cannot_exceed_payment_and_reverses_on_void(
+        self,
+    ) -> None:
+        payment = self._create_payment()
+        allocation = allocate_payment(
+            payment=payment,
+            contract=self.contract,
+            actor=self.owner,
+            amount=Decimal("1000.00"),
+        )
+        with self.assertRaisesMessage(
+            ValueError,
+            "Payment allocations cannot exceed the payment amount.",
+        ):
+            allocate_payment(
+                payment=payment,
+                contract=self.contract,
+                actor=self.owner,
+                amount=Decimal("300.76"),
+            )
+
+        void_payment(payment=payment, actor=self.owner, reason="Correction")
+        allocation.refresh_from_db()
+        self.assertEqual(allocation.status, "reversed")
+
+    def test_payment_uses_party_counterparty_snapshot(self) -> None:
+        party = create_business_party(
+            organization=self.organization,
+            actor=self.owner,
+            party_kind=PartyKind.COMPANY,
+            display_name="Client party",
+        )
+        payment = self._create_payment(
+            payment_number="PAY-PARTY",
+            counterparty_name="",
+            party=party,
+        )
+        self.assertEqual(payment.party, party)
+        self.assertEqual(payment.counterparty_name, "Client party")
 
     def test_member_cannot_create_or_void_payment(self) -> None:
         member = User.objects.create_user(

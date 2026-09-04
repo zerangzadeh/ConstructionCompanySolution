@@ -18,6 +18,8 @@ urlpatterns = [
         views.daily_report_material_add,
         name="material_add",
     ),
+    path("<uuid:report_id>/activities/", views.daily_activity_add, name="activity_add"),
+    path("<uuid:report_id>/delays/", views.delay_event_add, name="delay_add"),
     path("<uuid:report_id>/", views.daily_report_detail, name="detail"),
     path("<uuid:report_id>/submit/", views.daily_report_submit, name="submit"),
     path("<uuid:report_id>/approve/", views.daily_report_approve, name="approve"),

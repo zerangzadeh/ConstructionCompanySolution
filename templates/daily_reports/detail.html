@@ -89,6 +89,31 @@
     </section>
 </div>
 
+<div class="mt-8 grid gap-5 lg:grid-cols-2">
+    <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="font-semibold text-slate-900">Structured activities</h2>
+        <div class="mt-4 space-y-3 text-sm">
+            {% for entry in report.daily_activities.all %}
+                <div class="border-b border-slate-100 pb-3"><p class="font-medium text-slate-900">{{ entry.description }}</p><p class="mt-1 text-slate-500">{% if entry.activity %}{{ entry.activity.code }} · {% endif %}{% if entry.quantity %}{{ entry.quantity }} {{ entry.unit_of_measure.symbol }} · {% endif %}{% if entry.progress_percent is not None %}{{ entry.progress_percent }}% progress{% endif %}</p>{% if entry.notes %}<p class="mt-1 text-slate-500">{{ entry.notes }}</p>{% endif %}</div>
+            {% empty %}
+                <p class="text-slate-500">No structured activities.</p>
+            {% endfor %}
+        </div>
+        {% if report.status == "draft" %}<form class="mt-5 space-y-4 border-t border-slate-100 pt-5" method="post" action="{% url 'daily_reports:activity_add' report.id %}">{% csrf_token %}{% for field in daily_activity_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white" type="submit">Add activity</button></form>{% endif %}
+    </section>
+    <section class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
+        <h2 class="font-semibold text-slate-900">Delay events</h2>
+        <div class="mt-4 space-y-3 text-sm">
+            {% for event in report.delay_events.all %}
+                <div class="border-b border-slate-100 pb-3"><p class="font-medium text-slate-900">{{ event.cause }}</p><p class="mt-1 text-slate-500">{{ event.occurred_on }}{% if event.category %} · {{ event.category }}{% endif %}{% if event.duration_hours %} · {{ event.duration_hours }} hours{% endif %}</p>{% if event.impact %}<p class="mt-1 text-slate-500">{{ event.impact }}</p>{% endif %}</div>
+            {% empty %}
+                <p class="text-slate-500">No delay events.</p>
+            {% endfor %}
+        </div>
+        {% if report.status == "draft" %}<form class="mt-5 space-y-4 border-t border-slate-100 pt-5" method="post" action="{% url 'daily_reports:delay_add' report.id %}">{% csrf_token %}{% for field in delay_event_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<button class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white" type="submit">Add delay event</button></form>{% endif %}
+    </section>
+</div>
+
 {% if report.status == "draft" %}
 <form class="mt-8" method="post" action="{% url 'daily_reports:submit' report.id %}">
     {% csrf_token %}

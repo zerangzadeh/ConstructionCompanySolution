@@ -16,8 +16,17 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.payments.models import Payment, PaymentDirection, PaymentMethod, PaymentStatus
+from apps.parties.models import BusinessParty
+from apps.payments.models import (
+    Payment,
+    PaymentAllocation,
+    PaymentAllocationStatus,
+    PaymentDirection,
+    PaymentMethod,
+    PaymentStatus,
+)
 from apps.projects.models import Project, ProjectPhase
+from core.identifiers import canonicalize_upper_identifier
 
 
 def _can_manage_payments(user: User, organization: Organization) -> bool:
@@ -86,6 +95,7 @@ def create_payment(
     amount: Decimal,
     paid_on: date,
     counterparty_name: str,
+    party: BusinessParty | None = None,
     contract: Contract | None = None,
     phase: ProjectPhase | None = None,
     method: str = PaymentMethod.BANK_TRANSFER,
@@ -103,7 +113,7 @@ def create_payment(
         )
     if phase is not None:
         _validate_phase(organization=organization, project=project, phase=phase)
-    if not payment_number.strip() or not counterparty_name.strip():
+    if not payment_number.strip() or (not counterparty_name.strip() and party is None):
         raise ValueError("Payment number and counterparty are required.")
     if amount <= Decimal("0.00"):
         raise ValueError("Payment amount must be positive.")
@@ -111,8 +121,10 @@ def create_payment(
         raise ValueError("Invalid payment direction.")
     if method not in PaymentMethod.values:
         raise ValueError("Invalid payment method.")
+    if party and (party.organization_id != organization.pk or party.archived_at):
+        raise PermissionDenied("The party does not belong to this organization.")
 
-    normalized_number = payment_number.strip()
+    normalized_number = canonicalize_upper_identifier(payment_number)
     if Payment.objects.filter(
         organization=organization,
         payment_number=normalized_number,
@@ -129,7 +141,8 @@ def create_payment(
         amount=amount,
         paid_on=paid_on,
         method=method,
-        counterparty_name=counterparty_name.strip(),
+        counterparty_name=counterparty_name.strip() or party.display_name,
+        party=party,
         reference=reference.strip(),
         notes=notes.strip(),
         created_by=actor,
@@ -148,6 +161,7 @@ def create_payment(
             "phase_id": str(phase.pk) if phase else None,
             "direction": payment.direction,
             "amount": str(payment.amount),
+            "party_id": str(party.pk) if party else None,
         },
     )
     return payment
@@ -157,11 +171,7 @@ def create_payment(
 def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
     """Void a posted payment without deleting or changing the original amount."""
 
-    locked_payment = (
-        Payment.objects.select_for_update()
-        .select_related("organization", "project")
-        .get(pk=payment.pk)
-    )
+    locked_payment = Payment.objects.select_for_update().get(pk=payment.pk)
     _validate_context(
         actor=actor,
         organization=locked_payment.organization,
@@ -187,6 +197,7 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
             "updated_at",
         ]
     )
+    _reverse_active_allocations(payment=locked_payment, actor=actor)
     record_audit_event(
         action=AuditAction.PAYMENT_VOIDED,
         entity_type="payment",
@@ -199,6 +210,80 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
         },
     )
     return locked_payment
+
+
+def _reverse_active_allocations(*, payment: Payment, actor: User) -> None:
+    """Keep allocation history while excluding it when its payment is voided."""
+    for allocation in PaymentAllocation.objects.filter(
+        payment=payment, status=PaymentAllocationStatus.ACTIVE
+    ):
+        allocation.status = PaymentAllocationStatus.REVERSED
+        allocation.reversed_at = timezone.now()
+        allocation.reversed_by = actor
+        allocation.save(
+            update_fields=["status", "reversed_at", "reversed_by", "updated_at"]
+        )
+        record_audit_event(
+            action=AuditAction.PAYMENT_ALLOCATION_REVERSED,
+            entity_type="payment_allocation",
+            entity_id=allocation.pk,
+            organization=payment.organization,
+            actor=actor,
+            metadata={"payment_id": str(payment.pk), "amount": str(allocation.amount)},
+        )
+
+
+@transaction.atomic
+def allocate_payment(
+    *, payment: Payment, contract: Contract, actor: User, amount: Decimal
+) -> PaymentAllocation:
+    """Allocate part of a posted payment without exceeding its original amount."""
+    locked_payment = Payment.objects.select_for_update().get(pk=payment.pk)
+    _validate_context(
+        actor=actor,
+        organization=locked_payment.organization,
+        project=locked_payment.project,
+    )
+    _validate_contract(
+        organization=locked_payment.organization,
+        project=locked_payment.project,
+        contract=contract,
+    )
+    if locked_payment.status != PaymentStatus.POSTED:
+        raise ValueError("Only posted payments can be allocated.")
+    if amount <= Decimal("0.00"):
+        raise ValueError("Allocation amount must be positive.")
+    allocated = sum(
+        (
+            allocation.amount
+            for allocation in locked_payment.allocations.filter(
+                status=PaymentAllocationStatus.ACTIVE
+            )
+        ),
+        Decimal("0.00"),
+    )
+    if allocated + amount > locked_payment.amount:
+        raise ValueError("Payment allocations cannot exceed the payment amount.")
+    allocation = PaymentAllocation.objects.create(
+        organization=locked_payment.organization,
+        payment=locked_payment,
+        contract=contract,
+        amount=amount,
+        created_by=actor,
+    )
+    record_audit_event(
+        action=AuditAction.PAYMENT_ALLOCATION_CREATED,
+        entity_type="payment_allocation",
+        entity_id=allocation.pk,
+        organization=locked_payment.organization,
+        actor=actor,
+        metadata={
+            "payment_id": str(locked_payment.pk),
+            "contract_id": str(contract.pk),
+            "amount": str(amount),
+        },
+    )
+    return allocation
 
 
 def get_organization_payments(
@@ -225,6 +310,8 @@ def get_organization_payments(
             organization=organization,
             project__deleted_at__isnull=True,
         )
-        .select_related("project", "contract", "phase", "created_by", "voided_by")
+        .select_related(
+            "project", "contract", "phase", "party", "created_by", "voided_by"
+        )
         .order_by("-paid_on", "-created_at")
     )

@@ -6,12 +6,14 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import User
+from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.models import (
     InvitationStatus,
     MembershipRole,
     MembershipStatus,
     Organization,
     OrganizationMembership,
+    OrganizationSettings,
     OrganizationStatus,
 )
 from apps.organizations.services import (
@@ -20,8 +22,10 @@ from apps.organizations.services import (
     create_organization_invitation,
     create_organization_with_owner,
     get_organization_members,
+    get_organization_settings,
     get_valid_memberships,
     resolve_active_organization,
+    update_organization_settings,
 )
 
 
@@ -89,7 +93,14 @@ class OrganizationTenantIsolationTests(TestCase):
             organization=self.organization,
         )
 
-        self.assertEqual(list(memberships), [self.user.organization_memberships.get()])
+        self.assertEqual(
+            list(memberships),
+            [
+                self.user.organization_memberships.get(
+                    organization=self.organization,
+                )
+            ],
+        )
         with self.assertRaises(PermissionDenied):
             get_organization_members(
                 user=self.other_user,
@@ -247,6 +258,8 @@ class OrganizationCreationServiceTests(TestCase):
         self.assertEqual(membership.role, MembershipRole.OWNER)
         self.assertEqual(membership.status, MembershipStatus.ACTIVE)
         self.assertIsNotNone(membership.joined_at)
+        self.assertEqual(organization.settings.timezone, "America/New_York")
+        self.assertEqual(organization.settings.currency, "USD")
 
     def test_create_organization_rejects_unauthenticated_owner(self) -> None:
         owner = User(username="inactive-owner")
@@ -262,6 +275,131 @@ class OrganizationCreationServiceTests(TestCase):
             )
 
         self.assertFalse(Organization.objects.filter(slug="invalid-company").exists())
+
+
+class OrganizationSettingsServiceTests(TestCase):
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="settings-owner",
+            password="test-password",
+        )
+        self.member = User.objects.create_user(
+            username="settings-member",
+            password="test-password",
+        )
+        self.other_owner = User.objects.create_user(
+            username="other-settings-owner",
+            password="test-password",
+        )
+        self.organization = Organization.objects.create(
+            name="Settings Company",
+            slug="settings-company",
+            timezone="Asia/Tehran",
+            currency="IRR",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Settings Company",
+            slug="other-settings-company",
+            created_by=self.other_owner,
+            updated_by=self.other_owner,
+        )
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.owner,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.member,
+            role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+        )
+        OrganizationMembership.objects.create(
+            organization=self.other_organization,
+            user=self.other_owner,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+
+    def test_get_settings_uses_legacy_values_when_compatibility_row_is_missing(
+        self,
+    ) -> None:
+        settings_record = get_organization_settings(organization=self.organization)
+
+        self.assertEqual(settings_record.timezone, "Asia/Tehran")
+        self.assertEqual(settings_record.currency, "IRR")
+        self.assertEqual(settings_record.fiscal_year_start_month, 1)
+        self.assertEqual(
+            OrganizationSettings.objects.filter(organization=self.organization).count(),
+            1,
+        )
+
+    def test_update_is_scoped_and_dual_writes_legacy_values(self) -> None:
+        settings_record = update_organization_settings(
+            organization=self.organization,
+            updated_by=self.owner,
+            timezone_name="UTC",
+            currency="USD",
+            fiscal_year_start_month=4,
+        )
+
+        self.organization.refresh_from_db()
+        self.assertEqual(settings_record.timezone, "UTC")
+        self.assertEqual(settings_record.currency, "USD")
+        self.assertEqual(self.organization.timezone, "UTC")
+        self.assertEqual(self.organization.currency, "USD")
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                organization=self.organization,
+                actor=self.owner,
+                action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
+                entity_id=str(settings_record.pk),
+            ).exists()
+        )
+
+    def test_member_cannot_update_settings(self) -> None:
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "You cannot update settings for this organization.",
+        ):
+            update_organization_settings(
+                organization=self.organization,
+                updated_by=self.member,
+                timezone_name="UTC",
+                currency="USD",
+                fiscal_year_start_month=1,
+            )
+
+    def test_owner_cannot_update_another_organization_settings(self) -> None:
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "You cannot update settings for this organization.",
+        ):
+            update_organization_settings(
+                organization=self.other_organization,
+                updated_by=self.owner,
+                timezone_name="UTC",
+                currency="USD",
+                fiscal_year_start_month=1,
+            )
+
+    def test_suspended_organization_settings_cannot_be_updated(self) -> None:
+        self.organization.status = OrganizationStatus.SUSPENDED
+        self.organization.save(update_fields=["status"])
+
+        with self.assertRaisesMessage(
+            PermissionDenied, "The organization is not active."
+        ):
+            update_organization_settings(
+                organization=self.organization,
+                updated_by=self.owner,
+                timezone_name="UTC",
+                currency="USD",
+                fiscal_year_start_month=1,
+            )
 
 
 class OrganizationCreationViewTests(TestCase):

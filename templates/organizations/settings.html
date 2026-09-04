@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Organization settings | Construction ERP{% endblock %}
+
+{% block content %}
+    <div class="mx-auto max-w-2xl">
+        <div class="mb-6">
+            <p class="text-sm font-medium text-blue-600">Organization</p>
+            <h1 class="mt-1 text-3xl font-bold tracking-tight">Settings</h1>
+            <p class="mt-2 text-slate-500">Configure the active organization's reporting defaults.</p>
+        </div>
+        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+            <form method="post" class="space-y-5">
+                {% csrf_token %}
+                {% include "components/form_errors.html" with form=form %}
+                {% for field in form %}
+                    {% include "components/form_field.html" with field=field %}
+                {% endfor %}
+                <div class="flex justify-end pt-2">
+                    <button class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700" type="submit">Save settings</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

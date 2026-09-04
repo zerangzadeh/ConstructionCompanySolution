@@ -286,6 +286,7 @@ class ProjectDocumentServiceTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["X-Content-Type-Options"], "nosniff")
+        response._resource_closers[0]()
         self.assertTrue(
             AuditEvent.objects.filter(
                 action=AuditAction.DOCUMENT_DOWNLOADED,
@@ -336,9 +337,9 @@ class ProjectDocumentServiceTests(TestCase):
             {"reason": "Unauthorized attempt"},
         )
 
-        self.assertEqual(detail_response.status_code, 404)
-        self.assertEqual(download_response.status_code, 404)
-        self.assertEqual(archive_response.status_code, 404)
+        self.assertEqual(detail_response.status_code, 403)
+        self.assertEqual(download_response.status_code, 403)
+        self.assertEqual(archive_response.status_code, 403)
         other_document.refresh_from_db()
         self.assertIsNone(other_document.archived_at)
         self.assertFalse(

@@ -8,6 +8,7 @@ from django.urls import reverse
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
+from apps.materials.services import create_unit_of_measure
 from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
@@ -15,17 +16,24 @@ from apps.organizations.models import (
     OrganizationStatus,
 )
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
-from apps.projects.models import ProjectPhaseStatus, ProjectStatus
+from apps.projects.models import ActivityStatus, ProjectPhaseStatus, ProjectStatus
 from apps.projects.services import (
+    archive_activity,
     archive_project,
+    archive_wbs_node,
+    create_activity,
     create_project,
     create_project_phase,
     create_project_site,
+    create_wbs_node,
     get_organization_project,
     get_organization_project_phases,
     get_organization_project_sites,
     get_organization_projects,
+    get_organization_wbs_nodes,
+    transition_activity_status,
     transition_project_phase_status,
+    update_wbs_node,
 )
 
 
@@ -214,7 +222,7 @@ class ProjectServiceTests(TestCase):
         self.assertRedirects(response, reverse("organizations:select"))
 
     def test_project_list_is_tenant_scoped(self) -> None:
-        self.organization.projects.create(
+        project = self.organization.projects.create(
             code="P-006",
             name="Visible project",
             created_by=self.owner,
@@ -236,6 +244,11 @@ class ProjectServiceTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Visible project")
         self.assertNotContains(response, "Hidden project")
+        self.assertContains(
+            response,
+            reverse("projects:detail", kwargs={"project_id": project.pk}),
+        )
+        self.assertContains(response, "View details")
 
     def test_project_detail_is_tenant_scoped(self) -> None:
         project = self.organization.projects.create(
@@ -550,3 +563,131 @@ class ProjectServiceTests(TestCase):
                 actor=self.owner,
                 target_status=ProjectPhaseStatus.ACTIVE,
             )
+
+
+class ProjectControlsServiceTests(TestCase):
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="controls-owner", password="test-password"
+        )
+        self.other_owner = User.objects.create_user(
+            username="controls-other", password="test-password"
+        )
+        self.organization = Organization.objects.create(
+            name="Controls Co", slug="controls-co"
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Controls Co", slug="other-controls-co"
+        )
+        self.organization.memberships.create(
+            user=self.owner, role=MembershipRole.OWNER, status=MembershipStatus.ACTIVE
+        )
+        self.other_organization.memberships.create(
+            user=self.other_owner,
+            role=MembershipRole.OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.project = create_project(
+            organization=self.organization,
+            actor=self.owner,
+            code="CTRL",
+            name="Controls Project",
+        )
+        self.unit = create_unit_of_measure(
+            organization=self.organization,
+            actor=self.owner,
+            code="M",
+            name="Metre",
+            symbol="m",
+            category="length",
+            decimal_places=2,
+        )
+
+    def test_wbs_hierarchy_activity_scope_and_lifecycle_are_enforced(self) -> None:
+        root = create_wbs_node(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            code="01",
+            title="Structure",
+        )
+        child = create_wbs_node(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            code="01-01",
+            title="Concrete",
+            parent=root,
+        )
+        with self.assertRaisesMessage(ValueError, "cannot contain a cycle"):
+            update_wbs_node(
+                organization=self.organization,
+                actor=self.owner,
+                node=root,
+                code="01",
+                title="Structure",
+                parent=child,
+            )
+        activity = create_activity(
+            organization=self.organization,
+            project=self.project,
+            wbs_node=child,
+            actor=self.owner,
+            code="CAST",
+            name="Cast concrete",
+            unit_of_measure=self.unit,
+            planned_quantity=Decimal("25.0000"),
+        )
+        active = transition_activity_status(
+            organization=self.organization,
+            actor=self.owner,
+            activity=activity,
+            target_status=ActivityStatus.ACTIVE,
+        )
+        self.assertEqual(active.status, ActivityStatus.ACTIVE)
+        with self.assertRaisesMessage(ValueError, "active children or activities"):
+            archive_wbs_node(
+                organization=self.organization, actor=self.owner, node=child
+            )
+        archive_activity(
+            organization=self.organization, actor=self.owner, activity=activity
+        )
+        archive_wbs_node(organization=self.organization, actor=self.owner, node=child)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.ACTIVITY_STATUS_CHANGED, entity_id=str(activity.pk)
+            ).exists()
+        )
+
+    def test_controls_are_tenant_scoped(self) -> None:
+        other_project = create_project(
+            organization=self.other_organization,
+            actor=self.other_owner,
+            code="OTHER",
+            name="Other",
+        )
+        other_node = create_wbs_node(
+            organization=self.other_organization,
+            project=other_project,
+            actor=self.other_owner,
+            code="01",
+            title="Other",
+        )
+        with self.assertRaises(PermissionDenied):
+            create_activity(
+                organization=self.organization,
+                project=self.project,
+                wbs_node=other_node,
+                actor=self.owner,
+                code="BAD",
+                name="Cross tenant",
+            )
+        self.assertFalse(
+            get_organization_wbs_nodes(
+                user=self.owner,
+                organization=self.organization,
+                project_id=str(self.project.pk),
+            )
+            .filter(pk=other_node.pk)
+            .exists()
+        )

@@ -21,8 +21,10 @@ from apps.organizations.models import (
     Organization,
     OrganizationInvitation,
     OrganizationMembership,
+    OrganizationSettings,
     OrganizationStatus,
 )
+from core.identifiers import canonicalize_lower_identifier
 
 ACTIVE_ORGANIZATION_SESSION_KEY = "active_organization_id"
 INVITATION_LIFETIME = timedelta(days=7)
@@ -39,6 +41,75 @@ def _can_manage_memberships(user: User, organization: Organization) -> bool:
         status=MembershipStatus.ACTIVE,
         role__in=[MembershipRole.OWNER, MembershipRole.ADMIN],
     ).exists()
+
+
+def get_organization_settings(*, organization: Organization) -> OrganizationSettings:
+    """Return settings, safely restoring a missing compatibility row if needed."""
+
+    settings_record, _ = OrganizationSettings.objects.get_or_create(
+        organization=organization,
+        defaults={
+            "timezone": organization.timezone,
+            "currency": organization.currency,
+        },
+    )
+    return settings_record
+
+
+@transaction.atomic
+def update_organization_settings(
+    *,
+    organization: Organization,
+    updated_by: User,
+    timezone_name: str,
+    currency: str,
+    fiscal_year_start_month: int,
+) -> OrganizationSettings:
+    """Update tenant settings for an active owner or administrator only."""
+
+    locked_organization = Organization.objects.select_for_update().get(
+        pk=organization.pk
+    )
+    if (
+        locked_organization.status != OrganizationStatus.ACTIVE
+        or locked_organization.deleted_at is not None
+    ):
+        raise PermissionDenied("The organization is not active.")
+    if not _can_manage_memberships(updated_by, locked_organization):
+        raise PermissionDenied("You cannot update settings for this organization.")
+
+    settings_record = get_organization_settings(organization=locked_organization)
+    settings_record.timezone = timezone_name
+    settings_record.currency = currency
+    settings_record.fiscal_year_start_month = fiscal_year_start_month
+    settings_record.full_clean()
+    settings_record.save(
+        update_fields=[
+            "timezone",
+            "currency",
+            "fiscal_year_start_month",
+            "updated_at",
+        ]
+    )
+    locked_organization.timezone = settings_record.timezone
+    locked_organization.currency = settings_record.currency
+    locked_organization.updated_by = updated_by
+    locked_organization.save(
+        update_fields=["timezone", "currency", "updated_by", "updated_at"]
+    )
+    record_audit_event(
+        action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
+        entity_type="organization_settings",
+        entity_id=settings_record.pk,
+        organization=locked_organization,
+        actor=updated_by,
+        metadata={
+            "timezone": settings_record.timezone,
+            "currency": settings_record.currency,
+            "fiscal_year_start_month": settings_record.fiscal_year_start_month,
+        },
+    )
+    return settings_record
 
 
 @transaction.atomic
@@ -201,11 +272,16 @@ def create_organization_with_owner(
     organization = Organization.objects.create(
         name=name,
         legal_name=legal_name,
-        slug=slug,
+        slug=canonicalize_lower_identifier(slug),
         timezone=timezone_name,
         currency=currency,
         created_by=owner,
         updated_by=owner,
+    )
+    OrganizationSettings.objects.create(
+        organization=organization,
+        timezone=timezone_name,
+        currency=currency,
     )
     OrganizationMembership.objects.create(
         organization=organization,

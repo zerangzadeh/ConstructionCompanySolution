@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from django.contrib import admin
+from django.http import HttpRequest
 
 from apps.estimates.models import Estimate, EstimateItem
 
@@ -31,3 +32,16 @@ class EstimateAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("id", "created_at", "updated_at")
     inlines: ClassVar = [EstimateItemInline]
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: Estimate | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: Estimate | None = None
+    ) -> bool:
+        return False

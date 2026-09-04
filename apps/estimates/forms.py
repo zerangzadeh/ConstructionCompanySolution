@@ -2,7 +2,9 @@ from django import forms
 
 from apps.contracts.models import Contract
 from apps.estimates.models import Estimate, EstimateItem
+from apps.materials.models import UnitOfMeasure
 from apps.projects.models import Project, ProjectPhase
+from core.identifiers import canonicalize_upper_identifier
 
 
 class EstimateForm(forms.ModelForm):
@@ -68,10 +70,32 @@ class EstimateForm(forms.ModelForm):
             self.add_error("phase", "Selected phase does not belong to the project.")
         return cleaned_data
 
+    def clean_estimate_number(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["estimate_number"])
+
 
 class EstimateItemForm(forms.ModelForm):
     """Form for adding a priced item to an estimate."""
 
+    unit_of_measure = forms.ModelChoiceField(
+        queryset=UnitOfMeasure.objects.none(),
+        required=False,
+        empty_label="Legacy unit text",
+    )
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["unit_of_measure"].queryset = UnitOfMeasure.objects.filter(
+            organization=organization, is_active=True, archived_at__isnull=True
+        ).order_by("name")
+
     class Meta:
         model = EstimateItem
-        fields = ["description", "quantity", "unit", "unit_price", "sort_order"]  # noqa: RUF012
+        fields = [  # noqa: RUF012
+            "description",
+            "quantity",
+            "unit",
+            "unit_of_measure",
+            "unit_price",
+            "sort_order",
+        ]

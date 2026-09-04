@@ -1,6 +1,7 @@
 from django import forms
 
-from apps.expenses.models import Expense, ExpenseCategory
+from apps.expenses.models import Expense, ExpenseCategory, LegacyExpenseCategory
+from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectPhase
 
 
@@ -22,6 +23,8 @@ class ExpenseForm(forms.ModelForm):
             "category",
             "description",
             "vendor_name",
+            "party",
+            "expense_category",
             "amount",
             "incurred_on",
             "receipt_reference",
@@ -42,10 +45,16 @@ class ExpenseForm(forms.ModelForm):
             .select_related("site", "site__project")
             .order_by("site__project__name", "site__name", "name")
         )
+        self.fields["party"].queryset = BusinessParty.objects.filter(
+            organization=organization, archived_at__isnull=True
+        ).order_by("display_name")
+        self.fields["expense_category"].queryset = ExpenseCategory.objects.filter(
+            organization=organization, is_active=True, archived_at__isnull=True
+        ).order_by("name")
 
     def clean_category(self) -> str:
         category = self.cleaned_data["category"]
-        if category not in ExpenseCategory.values:
+        if category not in LegacyExpenseCategory.values:
             raise forms.ValidationError("Invalid expense category.")
         return category
 

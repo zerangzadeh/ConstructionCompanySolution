@@ -25,6 +25,8 @@ INSTALLED_APPS: list[str] = [
     "apps.accounts",
     "apps.organizations",
     "apps.audit",
+    "apps.parties",
+    "apps.materials",
     "apps.projects",
     "apps.contracts",
     "apps.estimates",
@@ -74,10 +76,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
-DATABASE_ENGINE = os.getenv("DB_ENGINE", "mssql").strip().lower()
-if DATABASE_ENGINE not in {"mssql", "postgresql"}:
-    raise ImproperlyConfigured("DB_ENGINE must be either 'postgresql' or 'mssql'.")
-
 
 def _positive_int_env(name: str, default: int) -> int:
     raw_value = os.getenv(name, str(default)).strip()
@@ -91,44 +89,23 @@ def _positive_int_env(name: str, default: int) -> int:
 
 
 def _database_configuration() -> dict:
-    configuration = {
+    options = {
+        "sslmode": os.getenv("DB_SSLMODE", "prefer").strip() or "prefer",
+        "connect_timeout": _positive_int_env("DB_CONNECT_TIMEOUT", 10),
+    }
+    ssl_root_certificate = os.getenv("DB_SSLROOTCERT", "").strip()
+    if ssl_root_certificate:
+        options["sslrootcert"] = ssl_root_certificate
+
+    return {
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("DB_NAME", ""),
         "USER": os.getenv("DB_USER", ""),
         "PASSWORD": os.getenv("DB_PASSWORD", ""),
         "HOST": os.getenv("DB_HOST", "localhost"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+        "OPTIONS": options,
     }
-
-    if DATABASE_ENGINE == "postgresql":
-        options = {
-            "sslmode": os.getenv("DB_SSLMODE", "prefer").strip() or "prefer",
-            "connect_timeout": _positive_int_env("DB_CONNECT_TIMEOUT", 10),
-        }
-        ssl_root_certificate = os.getenv("DB_SSLROOTCERT", "").strip()
-        if ssl_root_certificate:
-            options["sslrootcert"] = ssl_root_certificate
-        configuration.update(
-            {
-                "ENGINE": "django.db.backends.postgresql",
-                "PORT": os.getenv("DB_PORT", "5432"),
-                "OPTIONS": options,
-            }
-        )
-        return configuration
-
-    configuration.update(
-        {
-            "ENGINE": "mssql",
-            "PORT": os.getenv("DB_PORT", "1433"),
-            "OPTIONS": {
-                "driver": os.getenv(
-                    "DB_DRIVER",
-                    "ODBC Driver 17 for SQL Server",
-                ),
-                "extra_params": os.getenv("DB_EXTRA_PARAMS", ""),
-            },
-        },
-    )
-    return configuration
 
 
 DATABASES: dict = {

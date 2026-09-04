@@ -1,30 +1,36 @@
 # Construction ERP
 
-Construction ERP is planned as a multi-tenant SaaS platform for construction
+Construction ERP is a multi-tenant SaaS platform for construction
 contractor companies. Each company is represented by an `Organization`
 (tenant), and business data must remain isolated between organizations.
 
 ## Current status
 
-The repository currently contains the first SaaS foundation:
+The repository currently implements the accepted R1-R8 foundation and domain
+refactors on PostgreSQL 18.6:
 
 - Custom username-based authentication (`email` is optional).
-- Organization and membership models with active-organization session
-  resolution and tenant-isolated views.
-- Organization creation with an atomic owner membership.
-- Existing-user invitations with expiring, hashed tokens.
-- Organization-scoped audit events and an audit log view.
-- Tenant-scoped projects with role-based creation, detail, and soft-archive
-  workflows.
-- Development, production, and SQL Server settings split by environment.
+- Tenant lifecycle, settings, memberships, invitations, active-organization
+  resolution, and append-only auditing.
+- Tenant-scoped party, unit-of-measure, material, project, site, phase, WBS, and
+  activity masters and workflows.
+- Versioned estimates, contracts/amendments, expenses, payments/allocations,
+  daily reports, private documents, and financial read models.
+- Service-layer tenant validation, Decimal financial handling, row-locked
+  transitions, and immutable finalized financial history.
 
-The invitation, audit, and projects migrations are present in the repository
-but must be applied to each configured database before using those workflows.
+Migrations for the implemented apps are present and must be applied to each
+configured database. The current logical model is summarized in
+`docs/architecture/DOMAIN_AND_DATA_MODEL.md`; models and migrations remain the
+schema source of truth.
+
+R9 workforce is the next product-development phase. R9+ phases are not yet
+implemented and require separate approval.
 
 ## Planned technology stack
 
 - Python and Django
-- Microsoft SQL Server
+- PostgreSQL 18.6 with Psycopg 3
 - Django Templates with Tailwind CSS
 - HTMX for small dynamic interactions when needed
 - Django REST Framework (future API)

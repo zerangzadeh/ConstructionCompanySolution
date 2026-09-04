@@ -1,8 +1,10 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.estimates.forms import EstimateForm, EstimateItemForm
+from apps.estimates.models import EstimateStatus
 from apps.estimates.services import (
     add_estimate_item,
     approve_estimate,
@@ -53,7 +55,13 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
         ),
         pk=estimate_id,
     )
-    item_form = EstimateItemForm(request.POST or None)
+    if request.method == "POST" and estimate.status != EstimateStatus.DRAFT:
+        messages.error(request, "Cannot modify an approved estimate.")
+        return redirect("estimates:detail", estimate_id=estimate.pk)
+
+    item_form = EstimateItemForm(
+        request.POST or None, organization=request.organization
+    )
     if request.method == "POST" and item_form.is_valid():
         data = item_form.cleaned_data
         try:
@@ -63,11 +71,13 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
                 description=data["description"],
                 quantity=data["quantity"],
                 unit=data["unit"],
+                unit_of_measure=data["unit_of_measure"],
                 unit_price=data["unit_price"],
                 sort_order=data["sort_order"],
             )
         except (PermissionDenied, ValueError) as exc:
-            item_form.add_error(None, str(exc))
+            messages.error(request, str(exc))
+            return redirect("estimates:detail", estimate_id=estimate.pk)
         else:
             return redirect(
                 "estimates:detail",

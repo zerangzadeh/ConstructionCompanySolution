@@ -10,5 +10,6 @@ urlpatterns = [
     path("invite/", views.invite_member, name="invite"),
     path("accept-invitation/", views.accept_invitation, name="accept_invitation"),
     path("members/", views.organization_members, name="members"),
+    path("settings/", views.organization_settings, name="settings"),
     path("switch/", views.switch_organization, name="switch"),
 ]

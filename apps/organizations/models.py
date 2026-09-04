@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 
+from core.identifiers import canonicalize_lower_identifier
 from core.models import TimeStampedModel, UUIDModel
 
 
@@ -73,8 +75,49 @@ class Organization(UUIDModel, TimeStampedModel):
     class Meta:
         ordering = ["name"]  # noqa: RUF012
 
+    def clean(self) -> None:
+        super().clean()
+        self.slug = canonicalize_lower_identifier(self.slug)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.slug = canonicalize_lower_identifier(self.slug)
+        super().save(*args, **kwargs)
+
     def __str__(self) -> str:
         return self.name
+
+
+class OrganizationSettings(UUIDModel, TimeStampedModel):
+    """Configuration owned by exactly one organization.
+
+    The timezone and currency fields on :class:`Organization` remain during the
+    compatibility period. Services keep their values synchronized when settings
+    are changed.
+    """
+
+    organization = models.OneToOneField(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="settings",
+    )
+    timezone = models.CharField(max_length=64, default="UTC")
+    currency = models.CharField(
+        max_length=3,
+        default="USD",
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z]{3}$",
+                message="Currency must be a three-letter uppercase code.",
+            )
+        ],
+    )
+    fiscal_year_start_month = models.PositiveSmallIntegerField(
+        default=1,
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+    )
+
+    def __str__(self) -> str:
+        return f"Settings for {self.organization.name}"
 
 
 class OrganizationMembership(UUIDModel, TimeStampedModel):

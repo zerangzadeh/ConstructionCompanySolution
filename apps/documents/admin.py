@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.http import HttpRequest
 
 from apps.documents.models import ProjectDocument
 
@@ -31,3 +32,16 @@ class ProjectDocumentAdmin(admin.ModelAdmin):
         "created_at",
         "archived_at",
     )
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: ProjectDocument | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: ProjectDocument | None = None
+    ) -> bool:
+        return False

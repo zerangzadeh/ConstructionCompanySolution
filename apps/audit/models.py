@@ -7,6 +7,32 @@ from core.models import CreatedAtModel, UUIDModel
 
 class AuditAction(models.TextChoices):
     ORGANIZATION_CREATED = "organization.created", "Organization created"
+    ORGANIZATION_SETTINGS_UPDATED = (
+        "organization_settings.updated",
+        "Organization settings updated",
+    )
+    BUSINESS_PARTY_CREATED = "business_party.created", "Business party created"
+    BUSINESS_PARTY_UPDATED = "business_party.updated", "Business party updated"
+    BUSINESS_PARTY_ARCHIVED = "business_party.archived", "Business party archived"
+    PARTY_ROLE_ASSIGNED = "party_role.assigned", "Party role assigned"
+    PARTY_CONTACT_ADDED = "party_contact.added", "Party contact added"
+    UNIT_OF_MEASURE_CREATED = "unit_of_measure.created", "Unit of measure created"
+    UNIT_OF_MEASURE_ARCHIVED = "unit_of_measure.archived", "Unit of measure archived"
+    MATERIAL_CATEGORY_CREATED = (
+        "material_category.created",
+        "Material category created",
+    )
+    MATERIAL_CATEGORY_UPDATED = (
+        "material_category.updated",
+        "Material category updated",
+    )
+    MATERIAL_CATEGORY_ARCHIVED = (
+        "material_category.archived",
+        "Material category archived",
+    )
+    MATERIAL_CREATED = "material.created", "Material created"
+    MATERIAL_UPDATED = "material.updated", "Material updated"
+    MATERIAL_ARCHIVED = "material.archived", "Material archived"
     PROJECT_CREATED = "project.created", "Project created"
     PROJECT_ARCHIVED = "project.archived", "Project archived"
     PROJECT_SITE_CREATED = "project_site.created", "Project site created"
@@ -15,14 +41,42 @@ class AuditAction(models.TextChoices):
         "project_phase.status_changed",
         "Project phase status changed",
     )
+    WBS_NODE_CREATED = "wbs_node.created", "WBS node created"
+    WBS_NODE_UPDATED = "wbs_node.updated", "WBS node updated"
+    WBS_NODE_ARCHIVED = "wbs_node.archived", "WBS node archived"
+    ACTIVITY_CREATED = "activity.created", "Activity created"
+    ACTIVITY_STATUS_CHANGED = "activity.status_changed", "Activity status changed"
+    ACTIVITY_ARCHIVED = "activity.archived", "Activity archived"
     CONTRACT_CREATED = "contract.created", "Contract created"
+    CONTRACT_UPDATED = "contract.updated", "Contract updated"
+    CONTRACT_STATUS_CHANGED = "contract.status_changed", "Contract status changed"
+    CONTRACT_ITEM_ADDED = "contract.item_added", "Contract item added"
+    CONTRACT_AMENDMENT_APPROVED = (
+        "contract.amendment_approved",
+        "Contract amendment approved",
+    )
     ESTIMATE_CREATED = "estimate.created", "Estimate created"
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "Estimate item added"
     ESTIMATE_APPROVED = "estimate.approved", "Estimate approved"
+    ESTIMATE_REVISION_CREATED = "estimate.revision_created", "Estimate revision created"
+    ESTIMATE_REVISION_APPROVED = (
+        "estimate.revision_approved",
+        "Estimate revision approved",
+    )
     EXPENSE_RECORDED = "expense.recorded", "Expense recorded"
     EXPENSE_VOIDED = "expense.voided", "Expense voided"
+    EXPENSE_CATEGORY_CREATED = "expense_category.created", "Expense category created"
+    EXPENSE_CATEGORY_ARCHIVED = "expense_category.archived", "Expense category archived"
     PAYMENT_RECORDED = "payment.recorded", "Payment recorded"
     PAYMENT_VOIDED = "payment.voided", "Payment voided"
+    PAYMENT_ALLOCATION_CREATED = (
+        "payment_allocation.created",
+        "Payment allocation created",
+    )
+    PAYMENT_ALLOCATION_REVERSED = (
+        "payment_allocation.reversed",
+        "Payment allocation reversed",
+    )
     DOCUMENT_UPLOADED = "document.uploaded", "Document uploaded"
     DOCUMENT_DOWNLOADED = "document.downloaded", "Document downloaded"
     DOCUMENT_ARCHIVED = "document.archived", "Document archived"
@@ -38,6 +92,8 @@ class AuditAction(models.TextChoices):
         "daily_report.material_added",
         "Daily report material added",
     )
+    DAILY_ACTIVITY_ADDED = "daily_activity.added", "Daily activity added"
+    DELAY_EVENT_ADDED = "delay_event.added", "Delay event added"
     MEMBERSHIP_INVITED = "membership.invited", "Membership invited"
     MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
 

@@ -5,6 +5,8 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from core.identifiers import canonicalize_lower_identifier
+
 
 class UserManager(BaseUserManager["User"]):
     """Manager for creating users identified by username."""
@@ -18,6 +20,7 @@ class UserManager(BaseUserManager["User"]):
         email: str = "",
         **extra_fields: Any,
     ) -> "User":
+        username = canonicalize_lower_identifier(username)
         if not username:
             raise ValueError("The username is required.")
 
@@ -29,6 +32,11 @@ class UserManager(BaseUserManager["User"]):
         user.set_password(password)
         user.save(using=self._db)
         return user
+
+    def get_by_natural_key(self, username: str) -> "User":
+        """Resolve authentication usernames using their canonical form."""
+
+        return self.get(username=canonicalize_lower_identifier(username))
 
     def create_superuser(
         self,
@@ -66,6 +74,14 @@ class User(AbstractUser):
     REQUIRED_FIELDS: list[str] = []  # noqa: RUF012
 
     objects = UserManager()
+
+    def clean(self) -> None:
+        super().clean()
+        self.username = canonicalize_lower_identifier(self.username)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.username = canonicalize_lower_identifier(self.username)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.username

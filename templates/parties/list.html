@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Business parties | Construction ERP{% endblock %}
+{% block content %}
+    <div class="flex items-end justify-between gap-4"><div><p class="text-sm font-medium text-blue-600">Master data</p><h1 class="mt-1 text-3xl font-bold tracking-tight">Business parties</h1></div><a class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'parties:create' %}">Add party</a></div>
+    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        {% for party in parties %}<a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'parties:detail' party.pk %}"><p class="font-semibold">{{ party.display_name }}</p><p class="text-sm text-slate-500">{{ party.get_party_kind_display }} · {% for role in party.roles.all %}{{ role.get_role_display }}{% if not forloop.last %}, {% endif %}{% empty %}No roles{% endfor %}</p></a>{% empty %}<p class="p-8 text-center text-slate-500">No business parties yet.</p>{% endfor %}
+    </div>
+{% endblock %}

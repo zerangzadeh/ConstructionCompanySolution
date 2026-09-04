@@ -5,15 +5,19 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.daily_reports.forms import (
+    DailyActivityForm,
     DailyReportEquipmentEntryForm,
     DailyReportForm,
     DailyReportLaborEntryForm,
     DailyReportMaterialEntryForm,
+    DelayEventForm,
 )
 from apps.daily_reports.services import (
+    add_daily_activity,
     add_daily_report_equipment_entry,
     add_daily_report_labor_entry,
     add_daily_report_material_entry,
+    add_delay_event,
     approve_daily_report,
     create_daily_report,
     get_organization_daily_report,
@@ -76,7 +80,11 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
             "report": report,
             "labor_form": DailyReportLaborEntryForm(),
             "equipment_form": DailyReportEquipmentEntryForm(),
-            "material_form": DailyReportMaterialEntryForm(),
+            "material_form": DailyReportMaterialEntryForm(
+                organization_id=request.organization.id
+            ),
+            "daily_activity_form": DailyActivityForm(report=report),
+            "delay_event_form": DelayEventForm(report=report),
         },
     )
 
@@ -133,7 +141,9 @@ def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResp
 @active_organization_required
 @require_POST
 def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpResponse:
-    form = DailyReportMaterialEntryForm(request.POST)
+    form = DailyReportMaterialEntryForm(
+        request.POST, organization_id=request.organization.id
+    )
     if form.is_valid():
         data = form.cleaned_data
         try:
@@ -145,6 +155,8 @@ def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpRespo
                 quantity=data["quantity"],
                 unit=data["unit"],
                 notes=data["notes"],
+                material=data["material"],
+                unit_of_measure=data["unit_of_measure"],
             )
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
@@ -152,6 +164,54 @@ def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpRespo
             messages.success(request, "Material entry added.")
     else:
         messages.error(request, "Review the material entry fields and try again.")
+    return redirect("daily_reports:detail", report_id=report_id)
+
+
+@active_organization_required
+@require_POST
+def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
+    report = get_organization_daily_report(
+        user=request.user, organization=request.organization, report_id=report_id
+    )
+    form = DailyActivityForm(request.POST, report=report)
+    if form.is_valid():
+        try:
+            add_daily_activity(
+                organization=request.organization,
+                report_id=report_id,
+                actor=request.user,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            messages.error(request, str(exc))
+        else:
+            messages.success(request, "Activity entry added.")
+    else:
+        messages.error(request, "Review the activity entry fields and try again.")
+    return redirect("daily_reports:detail", report_id=report_id)
+
+
+@active_organization_required
+@require_POST
+def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
+    report = get_organization_daily_report(
+        user=request.user, organization=request.organization, report_id=report_id
+    )
+    form = DelayEventForm(request.POST, report=report)
+    if form.is_valid():
+        try:
+            add_delay_event(
+                organization=request.organization,
+                report_id=report_id,
+                actor=request.user,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            messages.error(request, str(exc))
+        else:
+            messages.success(request, "Delay event added.")
+    else:
+        messages.error(request, "Review the delay event fields and try again.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 

@@ -42,6 +42,15 @@ def record_audit_event(
         raise ValueError("Invalid audit action.")
     normalized_metadata = metadata or {}
     _validate_audit_metadata(normalized_metadata)
+    if (
+        organization is not None
+        and actor is not None
+        and not organization.memberships.filter(
+            user=actor,
+            status=MembershipStatus.ACTIVE,
+        ).exists()
+    ):
+        raise PermissionDenied("The audit actor does not belong to this organization.")
     return AuditEvent.objects.create(
         action=action,
         entity_type=entity_type,
