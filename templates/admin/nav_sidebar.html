@@ -1,0 +1,9 @@
+{% load i18n static %}
+<button class="sticky toggle-nav-sidebar" id="toggle-nav-sidebar" aria-label="نمایش یا پنهان‌کردن ناوبری"></button>
+<nav class="sticky" id="nav-sidebar" aria-label="ناوبری مدیریت">
+    <div class="erp-admin-sidebar-heading"><span class="erp-admin-sidebar-mark">ERP</span><span>مدیریت سامانه</span></div>
+    <label class="visually-hidden" for="nav-filter">فیلتر بخش‌های مدیریت</label>
+    <input type="search" id="nav-filter" placeholder="جست‌وجو در بخش‌ها…" aria-label="فیلتر بخش‌های مدیریت">
+    {% include "admin/app_list.html" with app_list=available_apps show_changelinks=False sidebar_mode=True %}
+</nav>
+<script src="{% static 'admin/js/erp_admin_sidebar.js' %}" defer></script>

@@ -1,8 +1,35 @@
-{% extends "base.html" %}
-{% block title %}Business parties | Construction ERP{% endblock %}
-{% block content %}
-    <div class="flex items-end justify-between gap-4"><div><p class="text-sm font-medium text-blue-600">Master data</p><h1 class="mt-1 text-3xl font-bold tracking-tight">Business parties</h1></div><a class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'parties:create' %}">Add party</a></div>
-    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-        {% for party in parties %}<a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'parties:detail' party.pk %}"><p class="font-semibold">{{ party.display_name }}</p><p class="text-sm text-slate-500">{{ party.get_party_kind_display }} · {% for role in party.roles.all %}{{ role.get_role_display }}{% if not forloop.last %}, {% endif %}{% empty %}No roles{% endfor %}</p></a>{% empty %}<p class="p-8 text-center text-slate-500">No business parties yet.</p>{% endfor %}
+{% extends "base.html" %}{% block title %}طرف‌های تجاری | Construction ERP{% endblock %} {% block content %} {% url "parties:create" as create_url %} {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری"
+page_description=" شرکت‌های مرتبط " page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
+<section class="erp-surface mt-6 overflow-hidden rounded-xl">
+    {% if parties %}
+
+    <div class="divide-y divide-slate-100">
+        {% for party in parties %}
+
+        <a class="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-blue-50/40" href="{% url 'parties:detail' party.pk %}">
+            <div>
+                <p class="font-semibold text-slate-900">
+                    {{ party.display_name }}
+                </p>
+
+                <p class="mt-0.5 text-[11px] text-slate-400">
+                    {{ party.get_party_kind_display }} · {% for role in party.roles.all %} {{ role.get_role_display }} {% if not forloop.last %}، {% endif %} {% empty %} بدون نقش {% endfor %}
+                </p>
+            </div>
+
+            <span class="text-slate-300">←</span>
+        </a>
+
+        {% endfor %}
     </div>
+
+    {% else %}
+
+    <p class="p-12 text-center text-sm text-slate-500">
+        هنوز طرف تجاری ثبت نشده است.
+    </p>
+
+    {% endif %}
+</section>
+
 {% endblock %}

@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Audit log | Construction ERP{% endblock %}
+{% block title %}گزارش رویدادها | Construction ERP{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-5xl">
     <div class="mb-6">
-        <p class="text-sm font-semibold uppercase tracking-wide text-slate-500">Audit</p>
-        <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">Organization activity</h1>
-        <p class="mt-2 text-slate-600">
-            Important actions recorded for {{ request.organization.name }}.
+        <p class="text-xs font-semibold text-blue-600">گزارش رویدادها</p>
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">فعالیت‌های سازمان</h1>
+        <p class="mt-1 text-sm text-slate-500">
+            اقدامات مهم ثبت‌شده برای {{ request.organization.name }}.
         </p>
     </div>
 
-    <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="erp-surface overflow-hidden rounded-xl">
         {% if events %}
             <div class="divide-y divide-slate-100">
                 {% for event in events %}
@@ -25,13 +25,13 @@
                             </p>
                         </div>
                         <div class="text-sm text-slate-500">
-                            {% if event.actor %}{{ event.actor.username }}{% else %}System{% endif %}
+                            {% if event.actor %}{{ event.actor.username }}{% else %}سامانه{% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-            <p class="px-6 py-8 text-center text-slate-500">No activity recorded yet.</p>
+            <p class="px-6 py-8 text-center text-slate-500">هنوز رویدادی ثبت نشده است.</p>
         {% endif %}
     </div>
 </div>

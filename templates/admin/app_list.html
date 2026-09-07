@@ -1,0 +1,72 @@
+{% if app_list %}
+    <div class="erp-admin-app-grid{% if sidebar_mode %} erp-admin-app-grid--sidebar{% endif %}">
+        {% for app in app_list %}
+            {% if sidebar_mode %}<details class="app-{{ app.app_label }} module erp-admin-app-card erp-admin-sidebar-group{% if app.app_url in request.path|urlencode %} current-app{% endif %}" data-app-label="{{ app.app_label }}"{% if app.app_url in request.path|urlencode %} open{% endif %}>{% else %}<section class="app-{{ app.app_label }} module erp-admin-app-card{% if app.app_url in request.path|urlencode %} current-app{% endif %}" data-app-label="{{ app.app_label }}">{% endif %}
+                {% if sidebar_mode %}<summary class="erp-admin-app-card__header">{% else %}<div class="erp-admin-app-card__header">{% endif %}
+                    {% if sidebar_mode %}<span class="erp-admin-app-card__title section">{% else %}<a href="{{ app.app_url }}" class="erp-admin-app-card__title section">{% endif %}
+                        <span class="erp-admin-app-icon" aria-hidden="true">
+                            {% if app.app_label == "accounts" or app.app_label == "auth" %}
+                                <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            {% elif app.app_label == "organizations" %}
+                                <svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4v18M19 21V11l-7-4M8 10h1M8 14h1M8 18h1M15 13h1M15 17h1"/></svg>
+                            {% elif app.app_label == "projects" %}
+                                <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v11H3zM3 7V5h6l2 2"/></svg>
+                            {% elif app.app_label == "contracts" or app.app_label == "documents" %}
+                                <svg viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6zM14 2v5h5M9 12h7M9 16h7"/></svg>
+                            {% elif app.app_label == "estimates" or app.app_label == "payments" or app.app_label == "expenses" %}
+                                <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4zM8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h8"/></svg>
+                            {% elif app.app_label == "materials" %}
+                                <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
+                            {% elif app.app_label == "daily_reports" or app.app_label == "audit" %}
+                                <svg viewBox="0 0 24 24"><path d="M4 4h16v17H4zM8 2v4M16 2v4M4 9h16M8 13h3M8 17h8"/></svg>
+                            {% elif app.app_label == "parties" %}
+                                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M17 8h5M19.5 5.5v5"/></svg>
+                            {% else %}
+                                <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+                            {% endif %}
+                        </span>
+                        <span class="erp-admin-app-title-copy">
+                            <strong>{% if app.app_label == "accounts" %}حساب‌های کاربری{% elif app.app_label == "organizations" %}سازمان‌ها{% elif app.app_label == "projects" %}پروژه‌ها{% elif app.app_label == "contracts" %}قراردادها{% elif app.app_label == "estimates" %}برآوردها{% elif app.app_label == "expenses" %}هزینه‌ها{% elif app.app_label == "payments" %}پرداخت‌ها{% elif app.app_label == "documents" %}اسناد{% elif app.app_label == "daily_reports" %}گزارش‌های روزانه{% elif app.app_label == "parties" %}طرف‌های تجاری{% elif app.app_label == "materials" %}مصالح و واحدها{% elif app.app_label == "audit" %}ممیزی{% elif app.app_label == "auth" %}احراز هویت و مجوزها{% else %}{{ app.name }}{% endif %}</strong>
+                            {% if not sidebar_mode %}<small>مدیریت اطلاعات و عملیات این بخش</small>{% endif %}
+                        </span>
+                    {% if sidebar_mode %}</span>{% else %}</a>{% endif %}
+                    <span class="erp-admin-model-count" title="تعداد مدل‌ها">{{ app.models|length }}</span>
+                    {% if sidebar_mode %}<span class="erp-admin-sidebar-chevron" aria-hidden="true">⌄</span>{% endif %}
+                {% if sidebar_mode %}</summary>{% else %}</div>{% endif %}
+
+                {% if sidebar_mode %}
+                    <table><thead class="visually-hidden"><tr><th>مدل</th><th>افزودن</th></tr></thead><tbody>
+                        {% for model in app.models %}{% with model_name=model.object_name|lower %}
+                            <tr class="model-{{ model_name }}{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
+                                <th scope="row">{% if model.admin_url %}<a href="{{ model.admin_url }}"{% if model.admin_url in request.path|urlencode %} aria-current="page"{% endif %}>{% include "admin/model_name.html" with model=model %}</a>{% else %}{% include "admin/model_name.html" with model=model %}{% endif %}</th>
+                                <td>{% if model.add_url %}<a href="{{ model.add_url }}" class="addlink" title="افزودن">+</a>{% endif %}</td>
+                            </tr>
+                        {% endwith %}{% endfor %}
+                    </tbody></table>
+                {% else %}
+                    <div class="erp-admin-model-list">
+                        {% for model in app.models %}{% with model_name=model.object_name|lower %}
+                            <div class="erp-admin-model-item{% if model.admin_url in request.path|urlencode %} current-model{% endif %}">
+                                {% if model.admin_url %}
+                                    <a class="erp-admin-model-link" href="{{ model.admin_url }}">
+                                        <span class="erp-admin-model-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></span>
+                                        <span>{% include "admin/model_name.html" with model=model %}</span>
+                                        <span class="erp-admin-model-arrow" aria-hidden="true">‹</span>
+                                    </a>
+                                {% else %}
+                                    <span class="erp-admin-model-link erp-admin-model-link--disabled"><span>{% include "admin/model_name.html" with model=model %}</span></span>
+                                {% endif %}
+                                <div class="erp-admin-model-actions">
+                                    {% if model.add_url %}<a href="{{ model.add_url }}" class="erp-admin-action-link erp-admin-action-link--add">افزودن</a>{% endif %}
+                                    {% if model.admin_url and show_changelinks %}<a href="{{ model.admin_url }}" class="erp-admin-action-link">{% if model.view_only %}مشاهده{% else %}مدیریت{% endif %}</a>{% endif %}
+                                </div>
+                            </div>
+                        {% endwith %}{% endfor %}
+                    </div>
+                {% endif %}
+            {% if sidebar_mode %}</details>{% else %}</section>{% endif %}
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="erp-admin-empty"><span class="erp-admin-empty__icon" aria-hidden="true">!</span><strong>بخشی در دسترس نیست</strong><span>مجوز مشاهده یا ویرایش هیچ بخشی را ندارید.</span></div>
+{% endif %}

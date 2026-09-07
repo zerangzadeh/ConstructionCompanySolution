@@ -1,0 +1,1145 @@
+"""Seed a deterministic, development-only Persian ERP demonstration dataset."""
+
+import os
+from collections.abc import Callable
+from datetime import date, timedelta
+from decimal import Decimal
+from typing import Any, TypeVar
+
+from django.conf import settings
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management.base import BaseCommand, CommandError
+from django.db import models, transaction
+
+from apps.accounts.models import User
+from apps.audit.models import AuditEvent
+from apps.contracts.models import Contract, ContractAmendment, ContractItem
+from apps.contracts.services import (
+    add_contract_item,
+    approve_contract_amendment,
+    create_contract,
+    transition_contract_status,
+)
+from apps.daily_reports.models import (
+    DailyActivity,
+    DailyReport,
+    DailyReportEquipmentEntry,
+    DailyReportLaborEntry,
+    DailyReportMaterialEntry,
+    DelayEvent,
+)
+from apps.daily_reports.services import (
+    add_daily_activity,
+    add_daily_report_equipment_entry,
+    add_daily_report_labor_entry,
+    add_daily_report_material_entry,
+    add_delay_event,
+    approve_daily_report,
+    create_daily_report,
+    submit_daily_report,
+)
+from apps.documents.models import ProjectDocument
+from apps.documents.services import upload_project_document
+from apps.estimates.models import Estimate, EstimateItem, EstimateRevision
+from apps.estimates.services import add_estimate_item, approve_estimate, create_estimate
+from apps.expenses.models import Expense, ExpenseCategory
+from apps.expenses.services import create_expense, create_expense_category
+from apps.materials.models import Material, MaterialCategory, UnitOfMeasure
+from apps.materials.services import (
+    create_material,
+    create_material_category,
+    create_unit_of_measure,
+)
+from apps.organizations.models import (
+    Organization,
+    OrganizationInvitation,
+    OrganizationMembership,
+    OrganizationSettings,
+)
+from apps.organizations.services import (
+    accept_organization_invitation,
+    create_organization_invitation,
+    create_organization_with_owner,
+)
+from apps.parties.models import BusinessParty, PartyContact, PartyRole
+from apps.parties.services import (
+    add_party_contact,
+    assign_party_role,
+    create_business_party,
+)
+from apps.payments.models import Payment, PaymentAllocation
+from apps.payments.services import allocate_payment, create_payment
+from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite, WBSNode
+from apps.projects.services import (
+    create_activity,
+    create_project,
+    create_project_phase,
+    create_project_site,
+    create_wbs_node,
+)
+
+ModelType = TypeVar("ModelType", bound=models.Model)
+
+ORGANIZATION_NAMES = (
+    "شرکت سازه‌پردازان پارس",
+    "گروه عمرانی افق تهران",
+    "شرکت توسعه ابنیه سپهر",
+    "مهندسان راه و سازه البرز",
+    "شرکت عمران پایدار کویر",
+    "گروه ساختمانی آریا بنا",
+    "شرکت طرح و اجرای زاگرس",
+    "مهندسی سازه‌های ماندگار",
+    "شرکت توسعه شهری خاوران",
+    "گروه پیمانکاری نقش جهان",
+)
+
+PERSON_NAMES = (
+    ("علی", "رضایی"),
+    ("مریم", "کاظمی"),
+    ("رضا", "محمدی"),
+    ("نگار", "احمدی"),
+    ("سعید", "مرادی"),
+    ("زهرا", "اکبری"),
+    ("امیرحسین", "نوری"),
+    ("الهام", "کریمی"),
+    ("محمد", "حیدری"),
+    ("پریسا", "جعفری"),
+    ("حامد", "صادقی"),
+    ("سمیه", "موسوی"),
+    ("آرش", "بهرامی"),
+    ("سارا", "قاسمی"),
+    ("فرهاد", "امینی"),
+    ("لیلا", "رحیمی"),
+    ("پویان", "خسروی"),
+    ("نرگس", "سلطانی"),
+    ("بابک", "شریفی"),
+    ("مهسا", "یوسفی"),
+    ("کیوان", "رستمی"),
+    ("آتنا", "مهدوی"),
+    ("وحید", "نوروزی"),
+    ("شبنم", "طاهری"),
+    ("سامان", "فرهمند"),
+    ("بهاره", "زمانی"),
+    ("نیما", "زارعی"),
+    ("نازنین", "راد"),
+    ("مسعود", "پارسایی"),
+    ("ترانه", "دانشور"),
+)
+
+PROJECTS = (
+    (
+        "مجتمع مسکونی باغستان",
+        "احداث مجموعه مسکونی با رویکرد کاهش مصرف انرژی و محوطه‌سازی کامل",
+        "تهران، منطقه ۲۲، بلوار پژوهش",
+        Decimal("980000000000"),
+        "active",
+    ),
+    (
+        "مرکز درمانی مهر",
+        "ساخت مرکز درمانی تخصصی همراه با تأسیسات مکانیکی و برقی پیشرفته",
+        "کرج، بلوار جمهوری، خیابان بهار",
+        Decimal("640000000000"),
+        "active",
+    ),
+    (
+        "بازسازی کارخانه نوآوران",
+        "مقاوم‌سازی سازه موجود و نوسازی خطوط پشتیبانی و ساختمان اداری",
+        "قزوین، شهر صنعتی البرز",
+        Decimal("315000000000"),
+        "on_hold",
+    ),
+    (
+        "ساختمان اداری آفتاب",
+        "اجرای ساختمان اداری هوشمند با نمای خشک و پارکینگ طبقاتی",
+        "اصفهان، خیابان هزارجریب",
+        Decimal("520000000000"),
+        "planning",
+    ),
+)
+
+PARTIES = (
+    ("شرکت سرمایه‌گذاری شهر فردا", "client"),
+    ("مهندسان مشاور دیدگاه سازه", "consultant"),
+    ("تأمین بتن البرز", "supplier"),
+    ("بازرگانی فولاد ایرانیان", "supplier"),
+    ("پیمانکاری تأسیسات نیروی شرق", "subcontractor"),
+    ("شرکت اجرای نمای سپید", "subcontractor"),
+    ("خدمات ماشین‌آلات راهبرد", "supplier"),
+    ("آزمایشگاه فنی پایش بنا", "other"),
+)
+
+UNITS = (
+    ("M", "متر", "m", "length", 2),
+    ("M2", "متر مربع", "m2", "area", 2),
+    ("M3", "متر مکعب", "m3", "volume", 3),
+    ("KG", "کیلوگرم", "kg", "weight", 2),
+    ("EA", "عدد", "ea", "count", 0),
+)
+
+MATERIAL_CATEGORIES = (
+    ("CON", "بتن و افزودنی‌ها"),
+    ("STL", "فولاد و میلگرد"),
+    ("FIN", "مصالح نازک‌کاری"),
+    ("MEP", "تأسیسات مکانیکی و برقی"),
+)
+
+MATERIALS = (
+    ("CON-C30", "بتن آماده رده سی سی", 0, 2, "اسلامپ کنترل‌شده برای اعضای سازه‌ای"),
+    ("CEM-T2", "سیمان پرتلند تیپ دو", 0, 3, "مناسب محیط‌های با حمله متوسط سولفات"),
+    ("REB-16", "میلگرد آجدار شانزده", 1, 3, "رده مقاومتی آج چهارصد"),
+    ("REB-20", "میلگرد آجدار بیست", 1, 3, "رده مقاومتی آج چهارصد"),
+    ("BRK-CLY", "آجر سفالی دیواری", 2, 4, "بلوک سفالی سبک برای تیغه داخلی"),
+    ("TIL-GRY", "کاشی پرسلانی طوسی", 2, 1, "سطح مات و مقاوم در برابر سایش"),
+    ("PLS-WHT", "گچ سفیدکاری ممتاز", 2, 3, "دانه‌بندی یکنواخت برای پرداخت نهایی"),
+    ("PIP-PPR", "لوله پلیمری آب‌رسانی", 3, 0, "مناسب شبکه آب سرد و گرم ساختمان"),
+    ("CAB-4", "کابل مسی چهار رشته", 3, 0, "روکش مقاوم و سطح مقطع استاندارد"),
+    ("VAL-BRS", "شیرآلات برنجی صنعتی", 3, 4, "مناسب رایزرهای تأسیساتی"),
+)
+
+CONTRACT_SUBJECTS = (
+    ("قرارداد مدیریت پیمان و اجرای عملیات اصلی", 0, "receivable", "client"),
+    ("قرارداد تأمین بتن آماده و خدمات پمپاژ", 2, "payable", "supplier"),
+    ("قرارداد خرید و تحویل فولاد مصرفی", 3, "payable", "supplier"),
+    ("قرارداد اجرای تأسیسات مکانیکی و برقی", 4, "payable", "subcontract"),
+    ("قرارداد اجرای نما و پوسته ساختمان", 5, "payable", "subcontract"),
+)
+
+EXPENSES = (
+    ("خرید اقلام مصرفی تجهیز کارگاه", "materials", 0),
+    ("هزینه حمل مصالح تا محل پروژه", "other", 1),
+    ("اجاره ماهانه جرثقیل و بالابر", "equipment", 2),
+    ("دستمزد نیروی اجرایی پیمان روزمزد", "labor", 3),
+    ("هزینه آزمایش مقاومت نمونه‌های بتن", "other", 4),
+)
+
+REPORT_WORK = (
+    "آماده‌سازی بستر و کنترل تراز محورهای اجرایی انجام شد.",
+    "آرماتوربندی و قالب‌بندی بخش شرقی فونداسیون ادامه یافت.",
+    "بتن‌ریزی پی نواری با کنترل پیوسته کیفیت اجرا شد.",
+    "نصب ستون‌ها و مهاربندی موقت جبهه شمالی انجام شد.",
+    "دیوارچینی پیرامونی طبقه همکف مطابق نقشه پیش رفت.",
+    "اجرای رایزرهای تأسیساتی و جانمایی غلاف‌ها تکمیل شد.",
+    "زیرسازی نما و کنترل اتصالات مکانیکی انجام گرفت.",
+    "پاک‌سازی کارگاه و تحویل جبهه کاری مرحله بعد انجام شد.",
+)
+
+
+class Command(BaseCommand):
+    help = "Create deterministic Persian demo data in development only."
+
+    tracked_models = (
+        User,
+        Organization,
+        OrganizationSettings,
+        OrganizationMembership,
+        OrganizationInvitation,
+        BusinessParty,
+        PartyRole,
+        PartyContact,
+        UnitOfMeasure,
+        MaterialCategory,
+        Material,
+        Project,
+        ProjectSite,
+        ProjectPhase,
+        WBSNode,
+        Activity,
+        Contract,
+        ContractItem,
+        ContractAmendment,
+        Estimate,
+        EstimateRevision,
+        EstimateItem,
+        ExpenseCategory,
+        Expense,
+        Payment,
+        PaymentAllocation,
+        ProjectDocument,
+        DailyReport,
+        DailyReportLaborEntry,
+        DailyReportEquipmentEntry,
+        DailyReportMaterialEntry,
+        DailyActivity,
+        DelayEvent,
+        AuditEvent,
+    )
+
+    def handle(self, *args: object, **options: object) -> None:
+        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
+        if settings_module != "config.settings.development" or not settings.DEBUG:
+            raise CommandError(
+                "seed_demo_data is restricted to config.settings.development with DEBUG=True."
+            )
+
+        before = {model: model.objects.count() for model in self.tracked_models}
+        with transaction.atomic():
+            for organization_index, organization_name in enumerate(
+                ORGANIZATION_NAMES, start=1
+            ):
+                self._seed_organization(organization_index, organization_name)
+
+        self.stdout.write(self.style.SUCCESS("Persian demo dataset is ready."))
+        for model in self.tracked_models:
+            created = model.objects.count() - before[model]
+            self.stdout.write(f"{model._meta.label}: {created} created")
+
+    def _existing_or_create(
+        self,
+        model: type[ModelType],
+        lookup: dict[str, Any],
+        creator: Callable[[], ModelType],
+    ) -> ModelType:
+        existing = model.objects.filter(**lookup).first()
+        return existing if existing is not None else creator()
+
+    def _user(self, index: int, role: str, name_index: int) -> User:
+        first_name, last_name = PERSON_NAMES[name_index % len(PERSON_NAMES)]
+        username = f"demo.o{index:02d}.{role}"
+        user = User.objects.filter(username=username).first()
+        if user is None:
+            user = User.objects.create_user(
+                username=username,
+                email=f"{username}@example.test",
+                first_name=first_name,
+                last_name=last_name,
+            )
+            user.set_unusable_password()
+            user.save(update_fields=["password"])
+        return user
+
+    def _seed_organization(self, index: int, name: str) -> None:
+        owner = self._user(index, "owner", (index - 1) * 3)
+        manager = self._user(index, "manager", (index - 1) * 3 + 1)
+        accountant = self._user(index, "accountant", (index - 1) * 3 + 2)
+        slug = f"demo-construction-{index:02d}"
+        organization = self._existing_or_create(
+            Organization,
+            {"slug": slug},
+            lambda: create_organization_with_owner(
+                owner=owner,
+                name=name,
+                legal_name=f"{name} (سهامی خاص)",
+                slug=slug,
+                timezone_name="Asia/Tehran",
+                currency="IRR",
+            ),
+        )
+        OrganizationMembership.objects.get_or_create(
+            organization=organization,
+            user=owner,
+            defaults={
+                "role": "owner",
+                "status": "active",
+                "joined_at": organization.created_at,
+            },
+        )
+        self._ensure_membership(organization, owner, manager, "manager")
+        self._ensure_membership(organization, owner, accountant, "admin")
+
+        parties = self._seed_parties(index, organization, owner)
+        units = self._seed_units(organization, owner)
+        categories = self._seed_material_categories(organization, owner)
+        materials = self._seed_materials(organization, owner, units, categories)
+        expense_categories = self._seed_expense_categories(organization, owner)
+
+        for project_index, project_data in enumerate(PROJECTS, start=1):
+            self._seed_project(
+                organization_index=index,
+                project_index=project_index,
+                organization=organization,
+                owner=owner,
+                manager=manager,
+                parties=parties,
+                units=units,
+                materials=materials,
+                expense_categories=expense_categories,
+                project_data=project_data,
+            )
+
+    def _ensure_membership(
+        self,
+        organization: Organization,
+        owner: User,
+        member: User,
+        role: str,
+    ) -> None:
+        membership = OrganizationMembership.objects.filter(
+            organization=organization, user=member, status="active"
+        ).first()
+        if membership is not None:
+            return
+        pending = OrganizationInvitation.objects.filter(
+            organization=organization, invitee=member, status="pending"
+        ).first()
+        if pending is not None:
+            raise CommandError(
+                f"Reserved demo invitation {pending.pk} is pending without its raw token."
+            )
+        _invitation, token = create_organization_invitation(
+            organization=organization,
+            invited_by=owner,
+            invitee=member,
+            role=role,
+        )
+        accept_organization_invitation(token=token, user=member)
+
+    def _seed_parties(
+        self, index: int, organization: Organization, owner: User
+    ) -> list[BusinessParty]:
+        result = []
+        for party_index, (party_name, role) in enumerate(PARTIES, start=1):
+            tax_identifier = f"DEMO{index:02d}{party_index:09d}"
+            party = self._existing_or_create(
+                BusinessParty,
+                {"organization": organization, "tax_identifier": tax_identifier},
+                lambda party_name=party_name, tax_identifier=tax_identifier: create_business_party(
+                    organization=organization,
+                    actor=owner,
+                    party_kind="company",
+                    display_name=party_name,
+                    legal_name=f"{party_name} (ثبت‌شده)",
+                    tax_identifier=tax_identifier,
+                ),
+            )
+            if not PartyRole.objects.filter(
+                organization=organization, party=party, role=role
+            ).exists():
+                assign_party_role(
+                    organization=organization, actor=owner, party=party, role=role
+                )
+            phone = f"021-88{index:02d}{party_index:04d}"
+            if not PartyContact.objects.filter(
+                organization=organization,
+                party=party,
+                contact_type="phone",
+                value=phone,
+            ).exists():
+                add_party_contact(
+                    organization=organization,
+                    actor=owner,
+                    party=party,
+                    contact_type="phone",
+                    value=phone,
+                    label="دفتر مرکزی",
+                    is_primary=True,
+                )
+            result.append(party)
+        return result
+
+    def _seed_units(
+        self, organization: Organization, owner: User
+    ) -> list[UnitOfMeasure]:
+        result = []
+        for code, name, symbol, category, decimal_places in UNITS:
+            unit = self._existing_or_create(
+                UnitOfMeasure,
+                {"organization": organization, "code": code},
+                lambda code=code, name=name, symbol=symbol, category=category, decimal_places=decimal_places: create_unit_of_measure(
+                    organization=organization,
+                    actor=owner,
+                    code=code,
+                    name=name,
+                    symbol=symbol,
+                    category=category,
+                    decimal_places=decimal_places,
+                ),
+            )
+            result.append(unit)
+        return result
+
+    def _seed_material_categories(
+        self, organization: Organization, owner: User
+    ) -> list[MaterialCategory]:
+        result = []
+        for code, name in MATERIAL_CATEGORIES:
+            category = self._existing_or_create(
+                MaterialCategory,
+                {"organization": organization, "code": code},
+                lambda code=code, name=name: create_material_category(
+                    organization=organization,
+                    actor=owner,
+                    code=code,
+                    name=name,
+                ),
+            )
+            result.append(category)
+        return result
+
+    def _seed_materials(
+        self,
+        organization: Organization,
+        owner: User,
+        units: list[UnitOfMeasure],
+        categories: list[MaterialCategory],
+    ) -> list[Material]:
+        result = []
+        for code, name, category_index, unit_index, specifications in MATERIALS:
+            material = self._existing_or_create(
+                Material,
+                {"organization": organization, "code": code},
+                lambda code=code, name=name, category_index=category_index, unit_index=unit_index, specifications=specifications: create_material(
+                    organization=organization,
+                    actor=owner,
+                    code=code,
+                    name=name,
+                    category=categories[category_index],
+                    unit_of_measure=units[unit_index],
+                    specifications=specifications,
+                ),
+            )
+            result.append(material)
+        return result
+
+    def _seed_expense_categories(
+        self, organization: Organization, owner: User
+    ) -> list[ExpenseCategory]:
+        names = (
+            "خرید مصالح",
+            "حمل و لجستیک",
+            "ماشین‌آلات و تجهیزات",
+            "دستمزد اجرایی",
+            "کنترل کیفیت و آزمایشگاه",
+        )
+        result = []
+        for category_index, name in enumerate(names, start=1):
+            code = f"demo-{category_index:02d}"
+            category = self._existing_or_create(
+                ExpenseCategory,
+                {"organization": organization, "code": code},
+                lambda code=code, name=name: create_expense_category(
+                    organization=organization, actor=owner, code=code, name=name
+                ),
+            )
+            result.append(category)
+        return result
+
+    def _seed_project(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        manager: User,
+        parties: list[BusinessParty],
+        units: list[UnitOfMeasure],
+        materials: list[Material],
+        expense_categories: list[ExpenseCategory],
+        project_data: tuple[str, str, str, Decimal, str],
+    ) -> None:
+        name, description, address, budget, status = project_data
+        code = f"PRJ-{organization_index:02d}-{project_index:02d}"
+        start = date(2025, 3, 21) + timedelta(days=project_index * 35)
+        project = self._existing_or_create(
+            Project,
+            {"organization": organization, "code": code},
+            lambda: create_project(
+                organization=organization,
+                actor=owner,
+                code=code,
+                name=name,
+                description=description,
+                status=status,
+                start_date=start,
+                end_date=start + timedelta(days=540),
+                budget=budget + Decimal(organization_index * 7_500_000_000),
+            ),
+        )
+        site = self._existing_or_create(
+            ProjectSite,
+            {"organization": organization, "project": project, "code": "SITE-01"},
+            lambda: create_project_site(
+                organization=organization,
+                project=project,
+                actor=owner,
+                code="SITE-01",
+                name="کارگاه اصلی پروژه",
+                address=address,
+            ),
+        )
+        phases = self._seed_phases(organization, owner, site, start)
+        wbs_nodes = self._seed_wbs(organization, owner, project)
+        activities = self._seed_activities(
+            organization, owner, project, site, phases, wbs_nodes, units, start
+        )
+        contracts = self._seed_contracts(
+            organization_index,
+            project_index,
+            organization,
+            owner,
+            project,
+            parties,
+            units,
+            wbs_nodes,
+            start,
+            budget,
+        )
+        self._seed_estimates(
+            organization_index,
+            project_index,
+            organization,
+            owner,
+            project,
+            phases,
+            contracts,
+            units,
+        )
+        payments = self._seed_payments(
+            organization_index,
+            project_index,
+            organization,
+            owner,
+            project,
+            phases,
+            contracts,
+            parties,
+            start,
+        )
+        self._seed_expenses(
+            organization_index,
+            project_index,
+            organization,
+            owner,
+            project,
+            phases,
+            parties,
+            expense_categories,
+            start,
+        )
+        self._seed_documents(
+            organization_index,
+            project_index,
+            organization,
+            owner,
+            project,
+            payments,
+        )
+        self._seed_daily_reports(
+            organization,
+            owner,
+            manager,
+            project,
+            site,
+            phases,
+            activities,
+            materials,
+            start,
+        )
+
+    def _seed_phases(
+        self,
+        organization: Organization,
+        owner: User,
+        site: ProjectSite,
+        start: date,
+    ) -> list[ProjectPhase]:
+        phase_data = (
+            ("PH-01", "عملیات زیرسازی و سازه", "active"),
+            ("PH-02", "نازک‌کاری و تأسیسات", "planning"),
+        )
+        result = []
+        for phase_index, (code, name, status) in enumerate(phase_data):
+            phase_start = start + timedelta(days=phase_index * 210)
+            phase = self._existing_or_create(
+                ProjectPhase,
+                {"organization": organization, "site": site, "code": code},
+                lambda code=code, name=name, status=status, phase_start=phase_start: create_project_phase(
+                    organization=organization,
+                    site=site,
+                    actor=owner,
+                    code=code,
+                    name=name,
+                    status=status,
+                    planned_start_date=phase_start,
+                    planned_end_date=phase_start + timedelta(days=240),
+                ),
+            )
+            result.append(phase)
+        return result
+
+    def _seed_wbs(
+        self, organization: Organization, owner: User, project: Project
+    ) -> list[WBSNode]:
+        data = (
+            ("01", "عملیات تجهیز و آماده‌سازی", None),
+            ("02", "عملیات سازه و معماری", None),
+            ("02-01", "اجرای فونداسیون و اسکلت", 1),
+        )
+        result: list[WBSNode] = []
+        for sort_order, (code, title, parent_index) in enumerate(data, start=1):
+            parent = result[parent_index] if parent_index is not None else None
+            node = self._existing_or_create(
+                WBSNode,
+                {"project": project, "code": code},
+                lambda code=code, title=title, parent=parent, sort_order=sort_order: create_wbs_node(
+                    organization=organization,
+                    project=project,
+                    actor=owner,
+                    code=code,
+                    title=title,
+                    parent=parent,
+                    sort_order=sort_order,
+                ),
+            )
+            result.append(node)
+        return result
+
+    def _seed_activities(
+        self,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        site: ProjectSite,
+        phases: list[ProjectPhase],
+        wbs_nodes: list[WBSNode],
+        units: list[UnitOfMeasure],
+        start: date,
+    ) -> list[Activity]:
+        data = (
+            ("ACT-01", "تجهیز و حصارکشی کارگاه", 0, 4, Decimal("1")),
+            ("ACT-02", "خاک‌برداری و آماده‌سازی بستر", 1, 2, Decimal("2200")),
+            ("ACT-03", "آرماتوربندی و بتن‌ریزی فونداسیون", 2, 2, Decimal("780")),
+            ("ACT-04", "اجرای اسکلت و سقف طبقات", 2, 1, Decimal("6400")),
+        )
+        result = []
+        for activity_index, (code, name, wbs_index, unit_index, quantity) in enumerate(
+            data
+        ):
+            activity_start = start + timedelta(days=activity_index * 35)
+            activity = self._existing_or_create(
+                Activity,
+                {"project": project, "code": code},
+                lambda code=code, name=name, wbs_index=wbs_index, unit_index=unit_index, quantity=quantity, activity_index=activity_index, activity_start=activity_start: create_activity(
+                    organization=organization,
+                    project=project,
+                    wbs_node=wbs_nodes[wbs_index],
+                    actor=owner,
+                    code=code,
+                    name=name,
+                    site=site,
+                    phase=phases[0],
+                    unit_of_measure=units[unit_index],
+                    planned_quantity=quantity,
+                    planned_start_date=activity_start,
+                    planned_end_date=activity_start + timedelta(days=75),
+                    status="active" if activity_index < 3 else "planning",
+                ),
+            )
+            result.append(activity)
+        return result
+
+    def _seed_contracts(
+        self,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        parties: list[BusinessParty],
+        units: list[UnitOfMeasure],
+        wbs_nodes: list[WBSNode],
+        start: date,
+        budget: Decimal,
+    ) -> list[Contract]:
+        result = []
+        target_statuses = ("active", "active", "draft", "completed", "active")
+        for contract_index, (title, party_index, direction, contract_type) in enumerate(
+            CONTRACT_SUBJECTS, start=1
+        ):
+            number = (
+                f"CTR-{organization_index:02d}-{project_index:02d}-{contract_index:02d}"
+            )
+            party = parties[party_index]
+            value = (budget * Decimal("0.62" if contract_index == 1 else "0.08")) + Decimal(
+                contract_index * 900_000_000
+            )
+            contract = Contract.objects.filter(
+                organization=organization, contract_number=number
+            ).first()
+            if contract is None:
+                contract = create_contract(
+                    organization=organization,
+                    project=project,
+                    actor=owner,
+                    contract_number=number,
+                    title=title,
+                    counterparty_name=party.display_name,
+                    party=party,
+                    direction=direction,
+                    contract_type=contract_type,
+                    contract_value=value,
+                    signed_at=start - timedelta(days=12 - contract_index),
+                    start_date=start,
+                    end_date=start + timedelta(days=420),
+                    notes="شرایط پرداخت مرحله‌ای و کنترل کیفیت مطابق اسناد پیمان است.",
+                )
+            for item_index, item_description in enumerate(
+                ("عملیات اجرایی و تأمین نیروی متخصص", "تأمین مصالح و تجهیزات مرتبط"),
+                start=1,
+            ):
+                if not ContractItem.objects.filter(
+                    contract=contract, sort_order=item_index
+                ).exists():
+                    add_contract_item(
+                        organization=organization,
+                        actor=owner,
+                        contract=contract,
+                        description=item_description,
+                        quantity=Decimal("1.0000"),
+                        unit_price=(
+                            value * Decimal("0.55" if item_index == 1 else "0.45")
+                        ).quantize(Decimal("0.01")),
+                        unit=units[4].symbol,
+                        unit_of_measure=units[4],
+                        wbs_node=wbs_nodes[min(item_index, 2)],
+                        sort_order=item_index,
+                    )
+            target_status = target_statuses[contract_index - 1]
+            if contract.status == "draft" and target_status != "draft":
+                contract = transition_contract_status(
+                    organization=organization,
+                    actor=owner,
+                    contract=contract,
+                    status="active",
+                )
+                if target_status == "completed":
+                    contract = transition_contract_status(
+                        organization=organization,
+                        actor=owner,
+                        contract=contract,
+                        status="completed",
+                    )
+            result.append(contract)
+
+        amendment = ContractAmendment.objects.filter(
+            contract=result[0], amendment_number=1
+        ).first()
+        if amendment is None:
+            amendment = ContractAmendment.objects.create(
+                organization=organization,
+                contract=result[0],
+                amendment_number=1,
+                title="الحاقیه تعدیل برنامه تأمین مصالح",
+                reason="هماهنگی زمان تحویل مصالح با برنامه به‌روزشده اجرای پروژه",
+                value_change=Decimal("1750000000"),
+                created_by=owner,
+            )
+            approve_contract_amendment(
+                organization=organization, actor=owner, amendment=amendment
+            )
+        return result
+
+    def _seed_estimates(
+        self,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        phases: list[ProjectPhase],
+        contracts: list[Contract],
+        units: list[UnitOfMeasure],
+    ) -> None:
+        titles = ("برآورد عملیات سازه و فونداسیون", "برآورد نازک‌کاری و تأسیسات")
+        for estimate_index, title in enumerate(titles, start=1):
+            number = (
+                f"EST-{organization_index:02d}-{project_index:02d}-{estimate_index:02d}"
+            )
+            estimate = Estimate.objects.filter(
+                organization=organization, estimate_number=number
+            ).first()
+            if estimate is None:
+                estimate = create_estimate(
+                    organization=organization,
+                    project=project,
+                    actor=owner,
+                    estimate_number=number,
+                    title=title,
+                    contract=contracts[0],
+                    phase=phases[estimate_index - 1],
+                    notes="مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.",
+                )
+            estimate_items = (
+                ("تأمین و اجرای بتن سازه‌ای", Decimal("540"), units[2], Decimal("9800000")),
+                ("تهیه و نصب فولاد تقویتی", Decimal("72000"), units[3], Decimal("940000")),
+                ("خدمات اجرایی و کنترل کیفی", Decimal("1"), units[4], Decimal("2600000000")),
+            )
+            for sort_order, (description, quantity, unit, price) in enumerate(
+                estimate_items, start=1
+            ):
+                if not EstimateItem.objects.filter(
+                    estimate=estimate,
+                    revision=estimate.current_revision,
+                    sort_order=sort_order,
+                ).exists():
+                    add_estimate_item(
+                        estimate=estimate,
+                        actor=owner,
+                        description=description,
+                        quantity=quantity,
+                        unit_price=price,
+                        unit=unit.symbol,
+                        unit_of_measure=unit,
+                        sort_order=sort_order,
+                    )
+            if estimate_index == 1 and estimate.status == "draft":
+                approve_estimate(estimate=estimate, actor=owner)
+
+    def _seed_payments(
+        self,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        phases: list[ProjectPhase],
+        contracts: list[Contract],
+        parties: list[BusinessParty],
+        start: date,
+    ) -> list[Payment]:
+        result = []
+        methods = ("bank_transfer", "check", "bank_transfer", "cash", "bank_transfer")
+        for payment_index in range(1, 6):
+            number = (
+                f"PAY-{organization_index:02d}-{project_index:02d}-{payment_index:02d}"
+            )
+            contract = contracts[0] if payment_index == 1 else contracts[payment_index - 1]
+            party = parties[0] if payment_index == 1 else parties[min(payment_index, 5)]
+            direction = "receipt" if payment_index == 1 else "disbursement"
+            amount = Decimal(2_200_000_000 + payment_index * 475_000_000)
+            payment = Payment.objects.filter(
+                organization=organization, payment_number=number
+            ).first()
+            if payment is None:
+                payment = create_payment(
+                    organization=organization,
+                    project=project,
+                    actor=owner,
+                    payment_number=number,
+                    direction=direction,
+                    amount=amount,
+                    paid_on=start + timedelta(days=payment_index * 18),
+                    method=methods[payment_index - 1],
+                    counterparty_name=party.display_name,
+                    party=party,
+                    contract=contract,
+                    phase=phases[0],
+                    reference=f"REF-{organization_index:02d}{project_index:02d}{payment_index:02d}",
+                    notes="پرداخت پس از کنترل صورت‌وضعیت و تأیید مسئول پروژه ثبت شده است.",
+                )
+            if not PaymentAllocation.objects.filter(
+                payment=payment, contract=contract, status="active"
+            ).exists():
+                allocate_payment(
+                    payment=payment,
+                    contract=contract,
+                    actor=owner,
+                    amount=amount * Decimal("0.75"),
+                )
+            result.append(payment)
+        return result
+
+    def _seed_expenses(
+        self,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        phases: list[ProjectPhase],
+        parties: list[BusinessParty],
+        expense_categories: list[ExpenseCategory],
+        start: date,
+    ) -> None:
+        for expense_index, (description, legacy_category, category_index) in enumerate(
+            EXPENSES, start=1
+        ):
+            reference = (
+                f"EXP-{organization_index:02d}-{project_index:02d}-{expense_index:02d}"
+            )
+            if Expense.objects.filter(
+                organization=organization, receipt_reference=reference
+            ).exists():
+                continue
+            party = parties[min(expense_index + 1, len(parties) - 1)]
+            create_expense(
+                organization=organization,
+                project=project,
+                actor=owner,
+                description=description,
+                amount=Decimal(85_000_000 + expense_index * 47_500_000),
+                incurred_on=start + timedelta(days=expense_index * 11),
+                phase=phases[0],
+                category=legacy_category,
+                vendor_name=party.display_name,
+                party=party,
+                expense_category=expense_categories[category_index],
+                receipt_reference=reference,
+                notes="اسناد هزینه بررسی شده و به دوره مالی پروژه تخصیص یافته است.",
+            )
+
+    def _seed_documents(
+        self,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        payments: list[Payment],
+    ) -> None:
+        titles = ("صورت‌جلسه هماهنگی اجرایی", "گزارش کنترل کیفیت مصالح")
+        for document_index, title in enumerate(titles, start=1):
+            file_name = (
+                f"DOC-{organization_index:02d}-{project_index:02d}-{document_index:02d}.pdf"
+            )
+            if ProjectDocument.objects.filter(
+                organization=organization,
+                project=project,
+                original_file_name=file_name,
+            ).exists():
+                continue
+            upload = SimpleUploadedFile(
+                file_name,
+                b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n",
+                content_type="application/pdf",
+            )
+            upload_project_document(
+                organization=organization,
+                project=project,
+                actor=owner,
+                document_type="general" if document_index == 1 else "other",
+                title=title,
+                upload=upload,
+                payment=payments[document_index - 1],
+            )
+
+    def _seed_daily_reports(
+        self,
+        organization: Organization,
+        owner: User,
+        manager: User,
+        project: Project,
+        site: ProjectSite,
+        phases: list[ProjectPhase],
+        activities: list[Activity],
+        materials: list[Material],
+        start: date,
+    ) -> None:
+        weather = ("آفتابی", "نیمه‌ابری", "صاف و خنک", "ابری با باد ملایم")
+        equipment = ("بیل مکانیکی", "جرثقیل برجی", "پمپ بتن", "بالابر کارگاهی")
+        teams = ("گروه آرماتوربندی", "گروه قالب‌بندی", "گروه تأسیسات", "گروه بنایی")
+        for report_index, work_performed in enumerate(REPORT_WORK, start=1):
+            reporting_date = start + timedelta(days=report_index * 3)
+            report = DailyReport.objects.filter(
+                organization=organization,
+                site=site,
+                reporting_date=reporting_date,
+            ).first()
+            if report is None:
+                report = create_daily_report(
+                    organization=organization,
+                    project=project,
+                    site=site,
+                    actor=manager,
+                    reporting_date=reporting_date,
+                    phase=phases[0],
+                    work_performed=work_performed,
+                    weather_conditions=weather[(report_index - 1) % len(weather)],
+                    labor_count=18 + report_index,
+                    progress_summary=f"پیشرفت روزانه بخش اجرایی شماره {report_index} مطابق برنامه ثبت شد.",
+                    issues_and_delays="هماهنگی ورود مصالح و دسترسی ماشین‌آلات پیگیری شد.",
+                    safety_notes="جلسه ایمنی آغاز شیفت برگزار و تجهیزات حفاظت فردی کنترل شد.",
+                    quality_notes="ابعاد، تراز و کیفیت مصالح مصرفی توسط ناظر کارگاه بررسی شد.",
+                )
+            if report.status == "draft":
+                self._seed_report_entries(
+                    organization,
+                    manager,
+                    report,
+                    report_index,
+                    activities,
+                    materials,
+                    equipment,
+                    teams,
+                )
+                if report_index <= 5:
+                    report = submit_daily_report(
+                        organization=organization,
+                        report_id=str(report.pk),
+                        actor=manager,
+                    )
+                if report_index <= 3:
+                    approve_daily_report(
+                        organization=organization,
+                        report_id=str(report.pk),
+                        actor=owner,
+                    )
+
+    def _seed_report_entries(
+        self,
+        organization: Organization,
+        manager: User,
+        report: DailyReport,
+        report_index: int,
+        activities: list[Activity],
+        materials: list[Material],
+        equipment: tuple[str, ...],
+        teams: tuple[str, ...],
+    ) -> None:
+        activity = activities[(report_index - 1) % len(activities)]
+        material = materials[(report_index - 1) % len(materials)]
+        if not report.labor_entries.exists():
+            add_daily_report_labor_entry(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=manager,
+                team_name=teams[(report_index - 1) % len(teams)],
+                worker_count=8 + report_index,
+                hours_worked=Decimal(56 + report_index * 4),
+                notes="حضور گروه اجرایی و ساعات کارکرد در دفتر کارگاه ثبت شد.",
+            )
+        if not report.equipment_entries.exists():
+            add_daily_report_equipment_entry(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=manager,
+                equipment_name=equipment[(report_index - 1) % len(equipment)],
+                hours_used=Decimal("6.50") + Decimal(report_index) / 10,
+                notes="بازرسی پیش از کار انجام شد و تجهیز در وضعیت عملیاتی قرار داشت.",
+            )
+        if not report.material_entries.exists():
+            add_daily_report_material_entry(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=manager,
+                material_name=material.name,
+                material=material,
+                quantity=Decimal(20 + report_index * 7),
+                unit=material.unit_of_measure.symbol,
+                notes="مقدار مصرف پس از کنترل حواله انبار ثبت شد.",
+            )
+        if not report.daily_activities.exists():
+            add_daily_activity(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=manager,
+                description=activity.name,
+                activity=activity,
+                quantity=Decimal(12 + report_index * 3),
+                unit_of_measure=activity.unit_of_measure,
+                progress_percent=Decimal(min(100, report_index * 9)),
+                notes="مقدار اجرا توسط سرپرست کارگاه اندازه‌گیری و تأیید شد.",
+            )
+        if not report.delay_events.exists():
+            add_delay_event(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=manager,
+                occurred_on=report.reporting_date,
+                activity=activity,
+                category="تدارکات و هماهنگی",
+                cause="ورود محموله مصالح با فاصله کوتاه از برنامه روزانه انجام شد.",
+                impact="ترتیب اجرای دو جبهه کاری برای حفظ بهره‌وری اصلاح شد.",
+                responsible_party="واحد تدارکات پروژه",
+                duration_hours=Decimal("0.75") + Decimal(report_index) / 10,
+            )

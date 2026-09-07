@@ -1,30 +1,6 @@
 {% extends "base.html" %}
-
-{% block title %}Financial report | Construction ERP{% endblock %}
-
+{% block title %}گزارش مالی | Construction ERP{% endblock %}
 {% block content %}
-<div class="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-    <div>
-        <p class="text-sm font-medium text-blue-600">Financials</p>
-        <h1 class="mt-1 text-3xl font-bold tracking-tight">Project financial report</h1>
-        <p class="mt-2 text-slate-500">Budget performance and posted cash flow in {{ request.organization.name }}.</p>
-    </div>
-</div>
-<div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-{% if reports %}
-    <div class="divide-y divide-slate-100">
-    {% for report in reports %}
-        <div class="grid gap-3 px-5 py-5 sm:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] sm:items-center">
-            <div><p class="font-semibold text-slate-900">{{ report.project.code }} · {{ report.project.name }}</p><p class="text-sm text-slate-500">{{ report.approved_estimate_count }} approved estimate(s), {{ report.recorded_expense_count }} recorded expense(s), {{ report.posted_payment_count }} posted payment(s)</p></div>
-            <div><p class="text-xs uppercase tracking-wide text-slate-500">Approved estimates</p><p class="font-semibold text-slate-900">{{ report.approved_estimate_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
-            <div><p class="text-xs uppercase tracking-wide text-slate-500">Actual expenses</p><p class="font-semibold text-slate-900">{{ report.recorded_expense_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
-            <div><p class="text-xs uppercase tracking-wide text-slate-500">Variance</p><p class="font-semibold {% if report.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}">{{ report.variance|floatformat:2 }} {{ request.organization.currency }}</p></div>
-            <div><p class="text-xs uppercase tracking-wide text-slate-500">Net cash flow</p><p class="font-semibold {% if report.net_cash_flow < 0 %}text-red-700{% else %}text-emerald-700{% endif %}">{{ report.net_cash_flow|floatformat:2 }} {{ request.organization.currency }}</p><p class="mt-1 text-xs text-slate-500">In {{ report.receipt_total|floatformat:2 }} · Out {{ report.disbursement_total|floatformat:2 }}</p></div>
-        </div>
-    {% endfor %}
-    </div>
-{% else %}
-    <p class="p-8 text-center text-slate-500">No active projects to report.</p>
-{% endif %}
-</div>
+{% include "components/page_header.html" with page_eyebrow="امور مالی" page_title="گزارش مالی پروژه‌ها" page_description=request.organization.name only %}
+<section class="erp-surface mt-6 overflow-hidden rounded-xl">{% if reports %}<div class="overflow-x-auto"><table class="w-full min-w-[1050px] text-right text-sm"><thead class="bg-slate-50 text-[11px] font-semibold text-slate-500"><tr><th class="border-b px-4 py-3">پروژه</th><th class="border-b px-4 py-3 text-left">برآورد مصوب</th><th class="border-b px-4 py-3 text-left">هزینه واقعی</th><th class="border-b px-4 py-3 text-left">انحراف</th><th class="border-b px-4 py-3 text-left">دریافت</th><th class="border-b px-4 py-3 text-left">پرداخت</th><th class="border-b px-4 py-3 text-left">خالص جریان نقدی</th></tr></thead><tbody class="divide-y divide-slate-100">{% for report in reports %}<tr class="hover:bg-blue-50/40"><td class="px-4 py-3.5"><p class="font-semibold text-slate-900">{{ report.project.name }}</p><p class="mt-0.5 text-[11px] text-slate-400"><span dir="ltr">{{ report.project.code }}</span> · {{ report.approved_estimate_count }} برآورد · {{ report.recorded_expense_count }} هزینه · {{ report.posted_payment_count }} پرداخت</p></td><td class="px-4 py-3.5 text-left" dir="ltr">{{ report.approved_estimate_total|floatformat:2 }}</td><td class="px-4 py-3.5 text-left" dir="ltr">{{ report.recorded_expense_total|floatformat:2 }}</td><td class="px-4 py-3.5 text-left font-semibold {% if report.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.variance|floatformat:2 }}</td><td class="px-4 py-3.5 text-left" dir="ltr">{{ report.receipt_total|floatformat:2 }}</td><td class="px-4 py-3.5 text-left" dir="ltr">{{ report.disbursement_total|floatformat:2 }}</td><td class="px-4 py-3.5 text-left font-semibold {% if report.net_cash_flow < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.net_cash_flow|floatformat:2 }} <span dir="rtl">{{ request.organization.currency }}</span></td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="px-6 py-16 text-center"><h2 class="font-bold text-slate-900">پروژه فعالی برای گزارش وجود ندارد</h2><p class="mt-1 text-sm text-slate-500">پس از ثبت پروژه، اطلاعات مالی آن در این بخش نمایش داده می‌شود.</p></div>{% endif %}</section>
 {% endblock %}

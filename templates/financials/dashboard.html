@@ -1,31 +1,103 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}داشبورد | سازه یار{% endblock %} {% block content %}
+<span class="sr-only">Organization dashboard</span>
+<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+        <p class="text-xs font-semibold text-blue-600">نمای مدیریتی سازمان</p>
+        <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">داشبورد</h1>
+        <p class="mt-1 text-sm text-slate-500">نمای کلی وضعیت پروژه‌ها و عملکرد مالی {{ request.organization.name }}</p>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-slate-500">
+        <span class="grid h-8 w-8 place-items-center rounded-lg bg-white text-blue-600 shadow-sm ring-1 ring-slate-200"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg></span>
+        <span>آخرین نمای وضعیت سازمان</span>
+    </div>
+</div>
 
-{% block title %}Dashboard | Construction ERP{% endblock %}
+<section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="شاخص‌های کلیدی">
+    <a class="erp-surface group rounded-xl p-4 transition hover:-translate-y-0.5 hover:border-blue-200" href="{% url 'projects:list' %}">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-medium text-slate-500">پروژه‌های ثبت‌شده</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.project_count }}</p>
+            </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11"/></svg></span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">سبد پروژه‌های سازمان</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+    </a>
+    <a class="erp-surface group rounded-xl p-4 transition hover:-translate-y-0.5 hover:border-blue-200" href="{% url 'contracts:list' %}">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-medium text-slate-500">قراردادها</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.contract_count }}</p>
+            </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-blue-50 text-blue-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4M9 11h6m-6 4h6"/></svg></span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">قراردادهای پروژه‌ها</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+    </a>
+    <a class="erp-surface group rounded-xl p-4 transition hover:-translate-y-0.5 hover:border-blue-200" href="{% url 'estimates:list' %}">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-medium text-slate-500">برآوردها</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.estimate_count }}</p>
+            </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h8"/></svg></span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">سوابق ثبت‌شده</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+    </a>
+    <a class="erp-surface group rounded-xl p-4 transition hover:-translate-y-0.5 hover:border-blue-200" href="{% url 'payments:list' %}">
+        <div class="flex items-start justify-between">
+            <div>
+                <p class="text-xs font-medium text-slate-500">پرداخت‌های قطعی</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.posted_payment_count }}</p>
+            </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">پرداخت‌های ثبت نهایی</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+    </a>
+</section>
 
-{% block content %}
-<div>
-    <p class="text-sm font-medium text-blue-600">Workspace</p>
-    <h1 class="mt-1 text-3xl font-bold tracking-tight">Organization dashboard</h1>
-    <p class="mt-2 text-slate-500">{{ request.organization.name }}</p>
-</div>
-<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Projects</p><p class="mt-2 text-3xl font-bold">{{ summary.project_count }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Contracts</p><p class="mt-2 text-3xl font-bold">{{ summary.contract_count }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Estimates</p><p class="mt-2 text-3xl font-bold">{{ summary.estimate_count }}</p></div>
-</div>
-<div class="mt-6 grid gap-4 md:grid-cols-3">
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Approved estimates</p><p class="mt-2 text-xl font-bold text-slate-900">{{ summary.approved_estimate_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Recorded expenses</p><p class="mt-2 text-xl font-bold text-slate-900">{{ summary.recorded_expense_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Variance</p><p class="mt-2 text-xl font-bold {% if summary.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}">{{ summary.variance|floatformat:2 }} {{ request.organization.currency }}</p></div>
-</div>
-<div class="mt-6 grid gap-4 md:grid-cols-3">
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Posted payments</p><p class="mt-2 text-3xl font-bold">{{ summary.posted_payment_count }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Cash receipts</p><p class="mt-2 text-xl font-bold text-slate-900">{{ summary.receipt_total|floatformat:2 }} {{ request.organization.currency }}</p></div>
-    <div class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200"><p class="text-sm text-slate-500">Net cash flow</p><p class="mt-2 text-xl font-bold {% if summary.net_cash_flow < 0 %}text-red-700{% else %}text-emerald-700{% endif %}">{{ summary.net_cash_flow|floatformat:2 }} {{ request.organization.currency }}</p><p class="mt-1 text-xs text-slate-500">Disbursements: {{ summary.disbursement_total|floatformat:2 }}</p></div>
-</div>
-<div class="mt-8 flex flex-wrap gap-3">
-    <a class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'projects:list' %}">View projects</a>
-    <a class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700" href="{% url 'financials:report' %}">Financial report</a>
-    <a class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700" href="{% url 'payments:list' %}">Payment register</a>
+<div class="mt-5 grid gap-5 xl:grid-cols-[1.45fr_.8fr]">
+    <section class="erp-surface overflow-hidden rounded-xl" aria-labelledby="financial-position-title">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <div>
+                <h2 id="financial-position-title" class="font-bold text-slate-900">تصویر مالی سازمان</h2>
+                <p class="mt-1 text-xs text-slate-500">مقایسه مبالغ مصوب، هزینه و جریان نقدی</p>
+            </div>
+            <a class="text-xs font-semibold text-blue-600 hover:text-blue-700" href="{% url 'financials:report' %}">گزارش کامل ←</a>
+        </div>
+        <div class="grid gap-px bg-slate-100 sm:grid-cols-3">
+            <div class="bg-white px-5 py-5">
+                <p class="text-xs text-slate-500">برآورد مصوب</p>
+                <p class="mt-2 text-xl font-bold text-slate-950" dir="ltr">{{ summary.approved_estimate_total|floatformat:2 }}</p>
+                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+            </div>
+            <div class="bg-white px-5 py-5">
+                <p class="text-xs text-slate-500">هزینه ثبت‌شده</p>
+                <p class="mt-2 text-xl font-bold text-slate-950" dir="ltr">{{ summary.recorded_expense_total|floatformat:2 }}</p>
+                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+            </div>
+            <div class="bg-white px-5 py-5">
+                <p class="text-xs text-slate-500">مانده برآورد</p>
+                <p class="mt-2 text-xl font-bold {% if summary.variance < 0 %}text-red-600{% else %}text-emerald-600{% endif %}" dir="ltr">{{ summary.variance|floatformat:2 }}</p>
+                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+            </div>
+        </div>
+        <div class="border-t border-slate-100 bg-slate-50/60 p-5">
+            <div class="mb-4 flex items-center justify-between">
+                <p class="text-xs font-semibold text-slate-700">گردش وجوه نقد</p><span class="rounded-full px-2.5 py-1 text-xs font-semibold {% if summary.net_cash_flow < 0 %}bg-red-50 text-red-700{% else %}bg-emerald-50 text-emerald-700{% endif %}" dir="ltr">{{ summary.net_cash_flow|floatformat:2 }}</span></div>
+            <div class="grid gap-3 sm:grid-cols-2">
+                <div class="rounded-lg border border-emerald-100 bg-white p-3">
+                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">دریافت‌ها</span><span class="h-2 w-2 rounded-full bg-emerald-500"></span></div>
+                    <p class="mt-2 font-semibold text-slate-800" dir="ltr">{{ summary.receipt_total|floatformat:2 }}</p>
+                </div>
+                <div class="rounded-lg border border-rose-100 bg-white p-3">
+                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">پرداخت‌ها</span><span class="h-2 w-2 rounded-full bg-rose-500"></span></div>
+                    <p class="mt-2 font-semibold text-slate-800" dir="ltr">{{ summary.disbursement_total|floatformat:2 }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="erp-surface rounded-xl p-5" aria-labelledby="quick-actions-title">
+        <h2 id="quick-actions-title" class="font-bold text-slate-900">دسترسی سریع</h2>
+        <p class="mt-1 text-xs text-slate-500">عملیات پرتکرار سامانه</p>
+        <div class="mt-4 space-y-2">
+            <a class="group flex items-center gap-3 rounded-lg border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50/40" href="{% url 'projects:list' %}"><span class="grid h-9 w-9 place-items-center rounded-lg bg-blue-50 text-blue-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span><span class="min-w-0 flex-1"><strong class="block text-xs text-slate-800">مدیریت پروژه‌ها</strong><small class="text-[11px] text-slate-400">فهرست و جزئیات پروژه‌ها</small></span><span class="text-slate-300 group-hover:text-blue-600">←</span></a>
+            <a class="group flex items-center gap-3 rounded-lg border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50/40" href="{% url 'financials:report' %}"><span class="grid h-9 w-9 place-items-center rounded-lg bg-violet-50 text-violet-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3M2 21h20"/></svg></span><span class="min-w-0 flex-1"><strong class="block text-xs text-slate-800">گزارش مالی</strong><small class="text-[11px] text-slate-400">وضعیت مالی پروژه‌ها</small></span><span class="text-slate-300 group-hover:text-blue-600">←</span></a>
+            <a class="group flex items-center gap-3 rounded-lg border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50/40" href="{% url 'daily_reports:list' %}"><span class="grid h-9 w-9 place-items-center rounded-lg bg-amber-50 text-amber-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 10h16"/></svg></span><span class="min-w-0 flex-1"><strong class="block text-xs text-slate-800">گزارش‌های روزانه</strong><small class="text-[11px] text-slate-400">پیگیری گزارش‌های کارگاهی</small></span><span class="text-slate-300 group-hover:text-blue-600">←</span></a>
+            <a class="group flex items-center gap-3 rounded-lg border border-slate-200 p-3 transition hover:border-blue-200 hover:bg-blue-50/40" href="{% url 'documents:list' %}"><span class="grid h-9 w-9 place-items-center rounded-lg bg-emerald-50 text-emerald-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4"/></svg></span><span class="min-w-0 flex-1"><strong class="block text-xs text-slate-800">اسناد و مدارک</strong><small class="text-[11px] text-slate-400">دسترسی به اسناد پروژه</small></span><span class="text-slate-300 group-hover:text-blue-600">←</span></a>
+        </div>
+    </section>
 </div>
 {% endblock %}

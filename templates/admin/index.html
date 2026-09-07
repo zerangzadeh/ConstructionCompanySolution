@@ -1,0 +1,41 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static log %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard erp-admin-dashboard{% endblock %}
+{% block coltype %}colM{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+    <div class="erp-admin-dashboard-header">
+        <div class="erp-admin-dashboard-title">
+            <span class="erp-admin-page-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z"/></svg></span>
+            <div><span class="erp-admin-eyebrow">مدیریت سیستم</span><h1>داشبورد مدیریت</h1><p>دسترسی یکپارچه به داده‌ها و تنظیمات سامانه</p></div>
+        </div>
+        <div class="erp-admin-header-actions"><span class="erp-admin-access-summary"><strong>{{ app_list|length }}</strong> بخش در دسترس</span><a class="erp-admin-view-site" href="{{ site_url|default:'/' }}"><span>بازگشت به سامانه</span><span aria-hidden="true">←</span></a></div>
+    </div>
+    <div id="content-main" class="erp-admin-dashboard-main">
+        <div class="erp-admin-section-heading"><div><span class="erp-admin-eyebrow">دسترسی سریع</span><h2>بخش‌های سامانه</h2><p>مدل‌ها براساس حوزه کاری گروه‌بندی شده‌اند.</p></div></div>
+        {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+    <aside id="content-related" class="erp-admin-recent">
+        <div class="module" id="recent-actions-module">
+            <div class="erp-admin-recent-heading"><div><span class="erp-admin-eyebrow">فعالیت حساب</span><h2>آخرین اقدامات من</h2></div><span class="erp-admin-recent-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></svg></span></div>
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}<p class="erp-admin-empty">اقدامی ثبت نشده است.</p>{% else %}
+                <ul class="actionlist">{% for entry in admin_log %}
+                    <li class="{% if entry.is_addition %}addlink{% elif entry.is_change %}changelink{% elif entry.is_deletion %}deletelink{% endif %}">
+                        <span class="erp-admin-action-dot" aria-hidden="true"></span>
+                        <span class="erp-admin-action-object">{% if entry.is_deletion or not entry.get_admin_url %}{{ entry.object_repr }}{% else %}<a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>{% endif %}</span>
+                        <span class="erp-admin-action-badge">{% if entry.is_addition %}افزودن{% elif entry.is_change %}ویرایش{% elif entry.is_deletion %}حذف{% else %}اقدام{% endif %}</span>
+                        {% if entry.content_type %}<span class="erp-admin-action-meta">{{ entry.content_type.name }}</span>{% endif %}
+                    </li>
+                {% endfor %}</ul>
+            {% endif %}
+        </div>
+    </aside>
+{% endblock %}

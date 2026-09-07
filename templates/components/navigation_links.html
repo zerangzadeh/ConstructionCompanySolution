@@ -1,28 +1,50 @@
 {% if navigation_is_authenticated %}
-    <a class="{{ navigation_link_class }}" href="{% url 'organizations:select' %}">Organizations</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'organizations:members' %}">Members</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'organizations:invite' %}">Invite</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'organizations:settings' %}">Settings</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'audit:log' %}">Audit</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'parties:list' %}">Parties</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'materials:unit_list' %}">Units</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'materials:material_list' %}">Materials</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'projects:list' %}">Projects</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'contracts:list' %}">Contracts</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'estimates:list' %}">Estimates</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'expenses:list' %}">Expenses</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'payments:list' %}">Payments</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'documents:list' %}">Documents</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'daily_reports:list' %}">Daily reports</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'financials:report' %}">Financials</a>
-    <a class="{{ navigation_link_class }}" href="{% url 'financials:dashboard' %}">Dashboard</a>
-    <a class="{{ navigation_primary_class }}" href="{% url 'organizations:create' %}">
-        New organization
-    </a>
-    <form method="post" action="{% url 'accounts:logout' %}">
-        {% csrf_token %}
-        <button class="{{ navigation_link_class }}" type="submit">Sign out</button>
-    </form>
+    <nav class="erp-nav" aria-label="ناوبری اصلی">
+        <a class="erp-nav-link{% if current_namespace == 'financials' and current_url_name == 'dashboard' %} is-active{% endif %}" {% if current_namespace == 'financials' and current_url_name == 'dashboard' %}aria-current="page"{% endif %} href="{% url 'financials:dashboard' %}">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13h7V3H3v10Zm11 8h7V11h-7v10ZM3 21h7v-4H3v4Zm11-14h7V3h-7v4Z"/></svg><span>داشبورد</span>
+        </a>
+
+        <details class="erp-nav-group" open>
+            <summary><span>عملیات پروژه</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></summary>
+            <div class="erp-nav-group__items">
+                <a class="erp-nav-link{% if current_namespace == 'projects' %} is-active{% endif %}" {% if current_namespace == 'projects' %}aria-current="page"{% endif %} href="{% url 'projects:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg><span>پروژه‌ها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'contracts' %} is-active{% endif %}" {% if current_namespace == 'contracts' %}aria-current="page"{% endif %} href="{% url 'contracts:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4M9 11h6m-6 4h6"/></svg><span>قراردادها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'estimates' %} is-active{% endif %}" {% if current_namespace == 'estimates' %}aria-current="page"{% endif %} href="{% url 'estimates:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h8"/></svg><span>برآوردها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'daily_reports' %} is-active{% endif %}" {% if current_namespace == 'daily_reports' %}aria-current="page"{% endif %} href="{% url 'daily_reports:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4m8-4v4M4 10h16m-12 4h3m-3 3h6"/></svg><span>گزارش‌های روزانه</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'documents' %} is-active{% endif %}" {% if current_namespace == 'documents' %}aria-current="page"{% endif %} href="{% url 'documents:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l3 3v15H6V3Zm9 0v4h4M9 12h6m-6 4h6"/></svg><span>اسناد و مدارک</span></a>
+            </div>
+        </details>
+
+        <details class="erp-nav-group" open>
+            <summary><span>مالی و گزارش‌ها</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></summary>
+            <div class="erp-nav-group__items">
+                <a class="erp-nav-link{% if current_namespace == 'expenses' %} is-active{% endif %}" {% if current_namespace == 'expenses' %}aria-current="page"{% endif %} href="{% url 'expenses:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v12H3V7Zm0 4h18M7 15h3M7 7V5h10v2"/></svg><span>هزینه‌ها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'payments' %} is-active{% endif %}" {% if current_namespace == 'payments' %}aria-current="page"{% endif %} href="{% url 'payments:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span>پرداخت‌ها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'financials' and current_url_name == 'report' %} is-active{% endif %}" {% if current_namespace == 'financials' and current_url_name == 'report' %}aria-current="page"{% endif %} href="{% url 'financials:report' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3M2 21h20"/></svg><span>گزارش مالی</span></a>
+            </div>
+        </details>
+
+        <details class="erp-nav-group" open>
+            <summary><span>اطلاعات پایه</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></summary>
+            <div class="erp-nav-group__items">
+                <a class="erp-nav-link{% if current_namespace == 'parties' %} is-active{% endif %}" {% if current_namespace == 'parties' %}aria-current="page"{% endif %} href="{% url 'parties:list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 2.5-6 6-6s6 2 6 6m0-5c3.5 0 6 1.7 6 5"/></svg><span>طرف‌های تجاری</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'materials' and current_url_name != 'unit_list' %} is-active{% endif %}" {% if current_namespace == 'materials' and current_url_name != 'unit_list' %}aria-current="page"{% endif %} href="{% url 'materials:material_list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 8 4-8 4-8-4 8-4Zm-8 9 8 4 8-4m-16 5 8 4 8-4"/></svg><span>مصالح</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'materials' and current_url_name == 'unit_list' %} is-active{% endif %}" {% if current_namespace == 'materials' and current_url_name == 'unit_list' %}aria-current="page"{% endif %} href="{% url 'materials:unit_list' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17 17 4l3 3L7 20H4v-3ZM12 9l3 3m-6 0 3 3"/></svg><span>واحدهای اندازه‌گیری</span></a>
+            </div>
+        </details>
+
+        <details class="erp-nav-group" open>
+            <summary><span>مدیریت سازمان</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 10 4 4 4-4"/></svg></summary>
+            <div class="erp-nav-group__items">
+                <a class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'settings' %} is-active{% endif %}" {% if current_namespace == 'organizations' and current_url_name == 'settings' %}aria-current="page"{% endif %} href="{% url 'organizations:settings' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4V21a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9A1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3A1.7 1.7 0 0 0 10 3V2.8h4V3a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg><span>تنظیمات سازمان</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'members' %} is-active{% endif %}" {% if current_namespace == 'organizations' and current_url_name == 'members' %}aria-current="page"{% endif %} href="{% url 'organizations:members' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-4 2.5-6 6-6s6 2 6 6m0-5c3.5 0 6 1.7 6 5"/></svg><span>اعضا و دعوت‌ها</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'invite' %} is-active{% endif %}" {% if current_namespace == 'organizations' and current_url_name == 'invite' %}aria-current="page"{% endif %} href="{% url 'organizations:invite' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 19a6 6 0 0 0-12 0m6-8a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm9-5v6m3-3h-6"/></svg><span>دعوت عضو جدید</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'select' %} is-active{% endif %}" {% if current_namespace == 'organizations' and current_url_name == 'select' %}aria-current="page"{% endif %} href="{% url 'organizations:select' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span>تغییر سازمان</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'create' %} is-active{% endif %}" {% if current_namespace == 'organizations' and current_url_name == 'create' %}aria-current="page"{% endif %} href="{% url 'organizations:create' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>سازمان جدید</span></a>
+                <a class="erp-nav-link{% if current_namespace == 'audit' %} is-active{% endif %}" {% if current_namespace == 'audit' %}aria-current="page"{% endif %} href="{% url 'audit:log' %}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.8 2.9 8.3 7 10 4.1-1.7 7-5.2 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-5"/></svg><span>گزارش رویدادها</span></a>
+            </div>
+        </details>
+    </nav>
 {% else %}
-    <a class="{{ navigation_primary_class }}" href="{% url 'accounts:login' %}">Sign in</a>
+    <a class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'accounts:login' %}">ورود</a>
 {% endif %}

@@ -1,22 +1,27 @@
 {% extends "base.html" %}
-
-{% block title %}Estimates | Construction ERP{% endblock %}
-
+{% load erp_format %}
+{% block title %}برآوردها | Construction ERP{% endblock %}
 {% block content %}
+<div dir="rtl">
 {% url "estimates:create" as estimate_create_url %}
-{% include "components/page_header.html" with page_eyebrow="Estimates" page_title="Project estimates" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="New estimate" only %}
-<div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-    {% if estimates %}
-        {% for estimate in estimates %}
-            <a class="block border-b border-slate-100 px-5 py-4 hover:bg-slate-50" href="{% url 'estimates:detail' estimate.id %}">
-                <p class="font-semibold">{{ estimate.estimate_number }} · {{ estimate.title }}</p>
-                <p class="text-sm text-slate-500">
-                    {{ estimate.project.name }}{% if estimate.phase %} · {{ estimate.phase.name }}{% endif %} · {{ estimate.total_amount|floatformat:2 }} {{ request.organization.currency }}
-                </p>
-            </a>
-        {% endfor %}
-    {% else %}
-        <p class="p-8 text-center text-slate-500">No estimates yet.</p>
-    {% endif %}
+{% include "components/page_header.html" with page_eyebrow="مدیریت برآوردها" page_title="فهرست برآوردها" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="برآورد جدید" only %}
+<div class="erp-surface mt-6 overflow-x-auto rounded-xl">
+{% if estimates %}
+<div class="min-w-[58rem]">
+<div class="grid grid-cols-[minmax(18rem,1fr)_minmax(14rem,1fr)_9rem_12rem_7rem] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-semibold text-slate-500"><span>برآورد</span><span>پروژه / فاز</span><span>وضعیت</span><span class="text-left">مبلغ</span><span class="text-left">عملیات</span></div>
+<div class="divide-y divide-slate-100">
+{% for estimate in estimates %}
+<div class="grid grid-cols-[minmax(18rem,1fr)_minmax(14rem,1fr)_9rem_12rem_7rem] items-center gap-4 px-5 py-4 hover:bg-slate-50">
+<div class="min-w-0"><p class="truncate font-semibold text-slate-900"><span dir="ltr" class="inline-block text-slate-600">{{ estimate.estimate_number }}</span><span class="px-1 text-slate-400" aria-hidden="true">—</span>{{ estimate.title }}</p>{% if estimate.notes %}<p class="mt-1 truncate text-sm text-slate-500">{{ estimate.notes }}</p>{% endif %}</div>
+<div class="min-w-0 text-sm text-slate-600"><p class="truncate">{{ estimate.project.name }}</p><p class="mt-1 truncate text-xs text-slate-500">{% if estimate.phase %}{{ estimate.phase.name }}{% endif %}{% if estimate.contract %}{% if estimate.phase %} · {% endif %}<span dir="ltr">{{ estimate.contract.contract_number }}</span>{% endif %}</p></div>
+<div><span class="inline-flex rounded-full {% if estimate.status == 'approved' %}bg-emerald-50 text-emerald-700{% elif estimate.status == 'revised' %}bg-blue-50 text-blue-700{% else %}bg-slate-100 text-slate-700{% endif %} px-2.5 py-1 text-xs font-semibold">{% if estimate.status == 'draft' %}پیش‌نویس{% elif estimate.status == 'approved' %}تأییدشده{% elif estimate.status == 'revised' %}اصلاح‌شده{% elif estimate.status == 'archived' %}بایگانی‌شده{% else %}{{ estimate.status|status_fa }}{% endif %}</span></div>
+<div class="text-left text-sm text-slate-700" dir="ltr">{{ estimate.total_amount|erp_number }} <span dir="rtl">{{ request.organization.currency }}</span></div>
+<div class="text-left"><a class="text-sm font-semibold text-blue-600 hover:text-blue-700" href="{% url 'estimates:detail' estimate.id %}">مشاهده جزئیات</a></div>
 </div>
+{% endfor %}
+</div></div>
+{% else %}
+<div class="p-12 text-center"><h2 class="text-lg font-semibold text-slate-900">هنوز برآوردی ثبت نشده است</h2><p class="mt-2 text-sm text-slate-500">برای شروع، یک برآورد جدید ثبت کنید.</p><a class="mt-5 inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'estimates:create' %}">ایجاد برآورد</a></div>
+{% endif %}
+</div></div>
 {% endblock %}

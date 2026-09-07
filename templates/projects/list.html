@@ -1,40 +1,49 @@
 {% extends "base.html" %}
 
-{% block title %}Projects | Construction ERP{% endblock %}
+{% block title %}پروژه‌ها | Construction ERP{% endblock %}
 
 {% block content %}
-    {% url "projects:create" as project_create_url %}
-    {% include "components/page_header.html" with page_eyebrow="Projects" page_title="Project portfolio" page_description=request.organization.name page_action_url=project_create_url page_action_label="New project" only %}
-
-    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-        {% if projects %}
-            <div class="divide-y divide-slate-100">
-                {% for project in projects %}
-                    <div class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <p class="font-semibold text-slate-900">{{ project.code }} · {{ project.name }}</p>
-                            {% if project.description %}
-                                <p class="mt-1 text-sm text-slate-500">{{ project.description }}</p>
-                            {% endif %}
-                        </div>
-                        <div class="flex items-center gap-4 text-sm">
-                            <span class="rounded-full bg-slate-100 px-2.5 py-1 font-medium capitalize text-slate-700">{{ project.get_status_display }}</span>
-                            <span class="text-slate-600">{{ project.budget|floatformat:2 }} {{ request.organization.currency }}</span>
-                            <a class="font-semibold text-blue-600 hover:text-blue-800" href="{% url 'projects:detail' project.id %}">
-                                View details
-                            </a>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="p-8 text-center">
-                <h2 class="text-lg font-semibold">No projects yet</h2>
-                <p class="mt-2 text-sm text-slate-500">Create the first project for this organization.</p>
-                <a class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'projects:create' %}">
-                    Create project
-                </a>
-            </div>
-        {% endif %}
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div><p class="text-xs font-semibold text-blue-600">مدیریت پروژه‌ها</p><h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">پروژه‌ها</h1><p class="mt-1 text-sm text-slate-500">فهرست پروژه‌های {{ request.organization.name }}</p></div>
+        <a class="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700" href="{% url 'projects:create' %}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>پروژه جدید</a>
     </div>
+
+    <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست پروژه‌ها">
+        <div class="flex flex-col gap-3 border-b border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-2"><span class="grid h-8 w-8 place-items-center rounded-lg bg-blue-50 text-blue-600"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span><div><h2 class="text-sm font-bold text-slate-900">فهرست پروژه‌ها</h2><p class="text-[11px] text-slate-400">اطلاعات کلیدی و وضعیت اجرایی</p></div></div>
+            {% if projects %}<span class="inline-flex w-fit rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ projects|length }} پروژه</span>{% endif %}
+        </div>
+        {% if projects %}
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-[900px] border-collapse text-right text-sm">
+                    <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
+                        <tr><th class="border-b border-slate-200 px-4 py-3">کد پروژه</th><th class="border-b border-slate-200 px-4 py-3">نام پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">تاریخ شروع</th><th class="border-b border-slate-200 px-4 py-3">تاریخ پایان</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        {% for project in projects %}
+                            <tr class="group transition hover:bg-blue-50/40">
+                                <td class="whitespace-nowrap px-4 py-3.5"><a class="font-medium text-blue-700 hover:text-blue-900" dir="ltr" href="{% url 'projects:detail' project.id %}">{{ project.code }}</a></td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a>{% if project.description %}<p class="mt-0.5 max-w-sm truncate text-[11px] text-slate-400">{{ project.description }}</p>{% endif %}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5">
+                                    {% if project.status == "active" %}<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>{{ project.get_status_display }}</span>
+                                    {% elif project.status == "completed" %}<span class="inline-flex items-center gap-1.5 rounded-full bg-teal-50 px-2.5 py-1 text-[11px] font-semibold text-teal-700"><span class="h-1.5 w-1.5 rounded-full bg-teal-500"></span>{{ project.get_status_display }}</span>
+                                    {% elif project.status == "planning" %}<span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700"><span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>{{ project.get_status_display }}</span>
+                                    {% elif project.status == "on_hold" %}<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>{{ project.get_status_display }}</span>
+                                    {% elif project.status == "cancelled" %}<span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>{{ project.get_status_display }}</span>
+                                    {% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700">{{ project.get_status_display }}</span>{% endif %}
+                                </td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.start_date|default:"—" }}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.end_date|default:"—" }}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.budget|floatformat:2 }}</td>
+                                <td class="px-4 py-3.5 text-center"><a class="inline-grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-300 hover:text-blue-700" href="{% url 'projects:detail' project.id %}" aria-label="مشاهده {{ project.name }}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="flex items-center justify-between border-t border-slate-100 bg-slate-50/50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه</span><span>مرتب‌شده براساس نام پروژه</span></div>
+        {% else %}
+            <div class="px-6 py-16 text-center"><span class="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-slate-100 text-slate-400"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span><h2 class="mt-4 text-base font-bold text-slate-900">هنوز پروژه‌ای ثبت نشده است</h2><p class="mt-1 text-sm text-slate-500">اولین پروژه این سازمان را ایجاد کنید.</p><a class="mt-5 inline-flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700" href="{% url 'projects:create' %}">ایجاد پروژه</a></div>
+        {% endif %}
+    </section>
 {% endblock %}

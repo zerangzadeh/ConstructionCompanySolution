@@ -140,11 +140,13 @@ requests, or remote changes unless explicitly requested.
 
 ## 11. Project Snapshot and Implementation Status
 
-> Last Updated: 2026-09-04
+> Last Updated: 2026-09-06
 >
 > Status: **Active Product Development.** The current ERP core is implemented
-> and validated on PostgreSQL 18.6 with Psycopg 3. Workforce is the next planned
-> product domain; other future product domains are not yet implemented.
+> and validated on PostgreSQL 18.6 with Psycopg 3. The existing ERP and Django
+> Admin interfaces now share the approved Persian-first RTL design system.
+> Workforce is the next planned product domain; other future product domains are
+> not yet implemented.
 
 The implemented core covers tenant identity/settings, parties, material masters,
 projects and project controls, contracts, estimates, daily reporting, expenses,
@@ -154,9 +156,18 @@ are maintained in `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; Django models an
 migrations remain the schema source of truth.
 
 The current server-rendered UI uses Django templates and Tailwind CSS, with HTMX
-only where useful. Configuration remains split by environment, production
-settings reject insecure database/TLS configuration, and shared model/template
-conventions live under `core/` and `templates/components/`.
+only where useful. It provides a responsive RTL application shell, shared page,
+form, table, and feedback patterns, and Django Admin template/style overrides
+that preserve native Admin behavior. Configuration remains split by environment,
+production settings reject insecure database/TLS configuration, and shared
+model/template conventions live under `core/` and `templates/components/`.
+
+A development-only, idempotent `seed_demo_data` management command populates all
+existing first-party business models with realistic Persian demo content through
+the Django ORM and existing application services. Its current deterministic
+dataset contains 10 organizations, 40 projects, 200 contracts, 80 estimates, 200
+payments, 200 expenses, 320 daily reports, their supported related records, and
+generated audit history; Django internal/system tables are intentionally excluded.
 
 ## 12. Database and Migration Status
 

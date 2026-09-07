@@ -1,29 +1,17 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load erp_format %}
 
 {% block title %}{{ payment.payment_number }} | Construction ERP{% endblock %}
 
 {% block content %}
-<h1 class="text-3xl font-bold">{{ payment.payment_number }}</h1>
-<p class="mt-2 text-slate-500">{{ payment.get_direction_display }} · {{ payment.counterparty_name }} · {{ payment.amount|floatformat:2 }} {{ request.organization.currency }}</p>
-<div class="mt-8 grid gap-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:grid-cols-2">
-<p><span class="text-sm text-slate-500">Project</span><br><strong>{{ payment.project.name }}</strong></p>
-<p><span class="text-sm text-slate-500">Payment date</span><br><strong>{{ payment.paid_on }}</strong></p>
-<p><span class="text-sm text-slate-500">Method</span><br><strong>{{ payment.get_method_display }}</strong></p>
-<p><span class="text-sm text-slate-500">Reference</span><br><strong>{{ payment.reference|default:"—" }}</strong></p>
-{% if payment.contract %}<p><span class="text-sm text-slate-500">Contract</span><br><strong>{{ payment.contract.contract_number }}</strong></p>{% endif %}
-{% if payment.phase %}<p><span class="text-sm text-slate-500">Phase</span><br><strong>{{ payment.phase.name }}</strong></p>{% endif %}
-</div>
-{% if payment.notes %}<p class="mt-5 rounded-xl bg-slate-50 p-4 text-sm text-slate-700">{{ payment.notes }}</p>{% endif %}
-{% if payment.status == 'posted' %}
-<form class="mt-8 max-w-2xl space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post" action="{% url 'payments:void' payment.id %}">
-{% csrf_token %}
-<h2 class="font-semibold">Void payment</h2>
-<p class="text-sm text-slate-500">Voiding preserves the original payment and excludes it from cash-flow totals.</p>
-{% include "components/form_errors.html" with form=form only %}
-{% include "components/form_field.html" with field=form.reason only %}
-<button class="rounded-lg bg-red-600 px-4 py-2.5 font-semibold text-white" type="submit">Void payment</button>
-</form>
-{% else %}
-<div class="mt-8 rounded-xl bg-slate-100 p-5"><p class="font-semibold text-slate-800">Voided payment</p><p class="mt-1 text-sm text-slate-600">{{ payment.void_reason }}{% if payment.voided_by %} · Voided by {{ payment.voided_by.username }}{% endif %}</p></div>
-{% endif %}
+    <div dir="rtl">
+        <nav class="text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-700" href="{% url 'payments:list' %}">پرداخت‌ها</a><span class="px-2 text-slate-400" aria-hidden="true">/</span><span class="text-slate-700" dir="ltr">{{ payment.payment_number }}</span></nav>
+        <div class="mt-5 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div><p class="text-xs font-semibold text-blue-600" dir="ltr">{{ payment.payment_number }}</p><h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">{{ payment.counterparty_name }}</h1><p class="mt-1 text-sm text-slate-500">{{ payment.get_direction_display|status_fa }} · {{ payment.project.name }} · {{ request.organization.name }}</p></div>
+            <a class="text-sm font-semibold text-blue-600 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="{% url 'payments:list' %}">بازگشت به پرداخت‌ها</a>
+        </div>
+        <div class="mt-5 flex flex-wrap items-center gap-3">{% if payment.status == "posted" %}<span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">ثبت‌شده</span>{% else %}<span class="inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">باطل‌شده</span>{% endif %}<span class="text-sm text-slate-500">{{ payment.get_method_display|status_fa }}</span></div>
+        <div class="mt-6 grid gap-3 md:grid-cols-3"><div class="erp-surface rounded-xl p-4"><p class="text-sm text-slate-500">مبلغ</p><p class="mt-3 text-2xl font-bold text-slate-900" dir="ltr">{{ payment.amount|erp_number }} <span class="text-base font-medium text-slate-500" dir="rtl">{{ request.organization.currency }}</span></p></div><div class="erp-surface rounded-xl p-4"><p class="text-sm text-slate-500">تاریخ پرداخت</p><p class="mt-3 text-lg font-semibold text-slate-900" dir="ltr">{{ payment.paid_on }}</p></div><div class="erp-surface rounded-xl p-4"><p class="text-sm text-slate-500">شماره پرداخت</p><p class="mt-3 text-lg font-semibold text-slate-900" dir="ltr">{{ payment.payment_number }}</p></div></div>
+        <div class="mt-5 grid gap-5 md:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">اطلاعات پرداخت</h2><dl class="mt-5 space-y-4 text-sm"><div class="flex justify-between gap-4"><dt class="text-slate-500">پروژه</dt><dd class="text-left font-medium text-slate-900">{{ payment.project.name }}</dd></div>{% if payment.contract %}<div class="flex justify-between gap-4"><dt class="text-slate-500">قرارداد</dt><dd class="text-left font-medium text-slate-900" dir="ltr">{{ payment.contract.contract_number }}</dd></div>{% endif %}{% if payment.phase %}<div class="flex justify-between gap-4"><dt class="text-slate-500">فاز</dt><dd class="text-left font-medium text-slate-900">{{ payment.phase.name }}</dd></div>{% endif %}<div class="flex justify-between gap-4"><dt class="text-slate-500">روش</dt><dd class="text-left font-medium text-slate-900">{{ payment.get_method_display|status_fa }}</dd></div>{% if payment.party %}<div class="flex justify-between gap-4"><dt class="text-slate-500">طرف تجاری</dt><dd class="text-left font-medium text-slate-900">{{ payment.party.display_name }}</dd></div>{% endif %}<div class="flex justify-between gap-4"><dt class="text-slate-500">مرجع</dt><dd class="text-left font-medium text-slate-900" dir="ltr">{{ payment.reference|default:"—" }}</dd></div></dl></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold text-slate-900">یادداشت‌ها</h2><p class="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">{{ payment.notes|default:"یادداشتی ثبت نشده است." }}</p></section></div>
+        {% if payment.status == "posted" %}<form class="erp-surface mt-5 max-w-2xl space-y-5 rounded-xl border-red-100 p-5" method="post" action="{% url 'payments:void' payment.id %}">{% csrf_token %}<div><h2 class="font-semibold text-slate-900">باطل‌کردن پرداخت</h2><p class="mt-1 text-sm text-slate-500">ابطال، پرداخت اصلی را حفظ می‌کند و آن را از مجموع جریان نقدی خارج می‌سازد.</p></div>{% include "components/form_errors.html" with form=form only %}{% include "components/form_field.html" with field=form.reason only %}<button class="inline-flex items-center justify-center rounded-lg border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2" type="submit">باطل‌کردن پرداخت</button></form>{% else %}<section class="mt-5 rounded-xl border border-red-100 bg-red-50 p-5"><h2 class="font-semibold text-red-900">پرداخت باطل‌شده</h2><p class="mt-2 text-sm leading-6 text-red-800">{{ payment.void_reason|default:"دلیل ابطال ثبت نشده است." }}{% if payment.voided_by %} · باطل‌شده توسط <span dir="ltr">{{ payment.voided_by.username }}</span>{% endif %}</p>{% if payment.voided_at %}<p class="mt-2 text-xs text-red-700" dir="ltr">{{ payment.voided_at }}</p>{% endif %}</section>{% endif %}
+    </div>
 {% endblock %}

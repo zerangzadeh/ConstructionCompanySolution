@@ -1,0 +1,16 @@
+<div class="actions">
+  {% block actions %}
+    {% block actions-form %}{% for field in action_form %}{% if field.label %}<label>{{ field.label }} {{ field }}</label>{% else %}{{ field }}{% endif %}{% endfor %}{% endblock %}
+    {% block actions-submit %}<button type="submit" class="button" title="اجرای عملیات انتخاب‌شده" name="index" value="{{ action_index|default:0 }}">اجرا</button>{% endblock %}
+    {% block actions-counter %}
+      {% if actions_selection_counter %}
+        <span class="action-counter" data-actions-icnt="{{ cl.result_list|length }}">{{ selection_note }}</span>
+        {% if cl.result_count != cl.result_list|length %}
+          <span class="all hidden">{{ selection_note_all }}</span>
+          <span class="question hidden"><a role="button" href="#" title="انتخاب همه موارد در همه صفحه‌ها">انتخاب همه {{ cl.result_count }} {{ module_name }}</a></span>
+          <span class="clear hidden"><a role="button" href="#">لغو انتخاب</a></span>
+        {% endif %}
+      {% endif %}
+    {% endblock %}
+  {% endblock %}
+</div>

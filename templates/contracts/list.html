@@ -1,35 +1,6 @@
-{% extends "base.html" %}
-
-{% block title %}Contracts | Construction ERP{% endblock %}
-
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}قراردادها | Construction ERP{% endblock %}
 {% block content %}
-    {% url "contracts:create" as contract_create_url %}
-    {% include "components/page_header.html" with page_eyebrow="Contracts" page_title="Project contracts" page_description=request.organization.name page_action_url=contract_create_url page_action_label="New contract" only %}
-
-    <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-        {% if contracts %}
-            <div class="divide-y divide-slate-100">
-                {% for contract in contracts %}
-                    <div class="flex flex-col gap-2 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                        <div>
-                            <p class="font-semibold text-slate-900">{{ contract.contract_number }} · {{ contract.title }}</p>
-                            <p class="mt-1 text-sm text-slate-500">{{ contract.project.name }} · {{ contract.counterparty_name }}</p>
-                        </div>
-                        <div class="flex items-center gap-4 text-sm">
-                            <span class="rounded-full bg-slate-100 px-2.5 py-1 font-medium capitalize text-slate-700">{{ contract.get_status_display }}</span>
-                            <span class="text-slate-600">{{ contract.contract_value|floatformat:2 }} {{ request.organization.currency }}</span>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="p-8 text-center">
-                <h2 class="text-lg font-semibold">No contracts yet</h2>
-                <p class="mt-2 text-sm text-slate-500">Create the first contract for this organization.</p>
-                <a class="mt-5 inline-flex rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'contracts:create' %}">
-                    Create contract
-                </a>
-            </div>
-        {% endif %}
-    </div>
+{% url "contracts:create" as create_url %}{% include "components/page_header.html" with page_eyebrow="مدیریت قراردادها" page_title="قراردادها" page_description=request.organization.name page_action_url=create_url page_action_label="قرارداد جدید" only %}
+<section class="erp-surface mt-6 overflow-hidden rounded-xl"><div class="overflow-x-auto">{% if contracts %}<table class="w-full min-w-[850px] text-right text-sm"><thead class="bg-slate-50 text-[11px] font-semibold text-slate-500"><tr><th class="border-b border-slate-200 px-4 py-3">شماره قرارداد</th><th class="border-b border-slate-200 px-4 py-3">عنوان و پروژه</th><th class="border-b border-slate-200 px-4 py-3">طرف قرارداد</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3 text-left">ارزش قرارداد</th></tr></thead><tbody class="divide-y divide-slate-100">{% for contract in contracts %}<tr class="hover:bg-blue-50/40"><td class="whitespace-nowrap px-4 py-3.5 font-medium text-blue-700" dir="ltr">{{ contract.contract_number }}</td><td class="px-4 py-3.5"><p class="font-semibold text-slate-900">{{ contract.title }}</p><p class="mt-0.5 text-[11px] text-slate-400">{{ contract.project.name }}</p></td><td class="px-4 py-3.5 text-slate-600">{{ contract.counterparty_name }}</td><td class="px-4 py-3.5">{% if contract.status == "active" %}<span class="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">فعال</span>{% elif contract.status == "completed" %}<span class="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">تکمیل‌شده</span>{% elif contract.status == "terminated" %}<span class="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">خاتمه‌یافته</span>{% else %}<span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-700">پیش‌نویس</span>{% endif %}</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums" dir="ltr">{{ contract.contract_value|erp_number }} <span dir="rtl">{{ request.organization.currency }}</span></td></tr>{% endfor %}</tbody></table>{% else %}<div class="px-6 py-16 text-center"><h2 class="font-bold text-slate-900">هنوز قراردادی ثبت نشده است</h2><p class="mt-1 text-sm text-slate-500">اولین قرارداد این سازمان را ایجاد کنید.</p><a class="mt-5 inline-flex h-10 items-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" href="{% url 'contracts:create' %}">ایجاد قرارداد</a></div>{% endif %}</div></section>
 {% endblock %}

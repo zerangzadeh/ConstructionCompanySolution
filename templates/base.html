@@ -1,38 +1,525 @@
+{% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="fa" dir="rtl">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Construction ERP{% endblock %}</title>
+    <title>{% block title %}سازه یار{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("{% static 'fonts/vazirmatn/Vazirmatn-Regular.woff2' %}") format("woff2");
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("{% static 'fonts/vazirmatn/Vazirmatn-Medium.woff2' %}") format("woff2");
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("{% static 'fonts/vazirmatn/Vazirmatn-SemiBold.woff2' %}") format("woff2");
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("{% static 'fonts/vazirmatn/Vazirmatn-Bold.woff2' %}") format("woff2");
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+        }
+        
+        body {
+            font-family: "Vazirmatn", Tahoma, "Segoe UI", Arial, sans-serif;
+        }
+        
+         :where(a,
+        button,
+        input,
+        select,
+        textarea,
+        summary):focus-visible {
+            outline: 2px solid rgb(59 130 246);
+            outline-offset: 2px;
+        }
+        
+        main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+        main select,
+        main textarea {
+            display: block;
+            width: 100%;
+            min-height: 2.75rem;
+            border: 1px solid rgb(203 213 225);
+            border-radius: .625rem;
+            background: white;
+            padding: .625rem .75rem;
+            color: rgb(15 23 42);
+        }
+        
+        main textarea {
+            min-height: 7rem;
+        }
+        
+        main input[type="file"],
+        main select[multiple] {
+            height: auto;
+        }
+        
+        main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus,
+        main select:focus,
+        main textarea:focus {
+            border-color: rgb(37 99 235);
+            outline: none;
+            box-shadow: 0 0 0 3px rgb(219 234 254);
+        }
+        
+        main input:disabled,
+        main select:disabled,
+        main textarea:disabled {
+            background: rgb(248 250 252);
+            color: rgb(100 116 139);
+        }
+        
+        main input[type="email"],
+        main input[type="url"],
+        main input[type="password"],
+        main input[type="number"],
+        main input[type="date"],
+        main input[type="datetime-local"],
+        main input[type="time"],
+        main input[name="username"],
+        main input[name="code"],
+        main input[name$="-code"],
+        main input[name$="_code"],
+        main input[name$="number"],
+        main input[name*="uuid"],
+        main input[name$="_id"] {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: plaintext;
+        }
+        
+        .erp-surface {
+            border: 1px solid rgb(226 232 240);
+            background: white;
+            box-shadow: 0 1px 2px rgb(15 23 42 / .04), 0 8px 24px rgb(15 23 42 / .035);
+        }
+        
+        .erp-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgb(71 85 105) transparent;
+        }
+        
+        .erp-skip-link {
+            position: fixed;
+            top: .5rem;
+            right: .5rem;
+            z-index: 100;
+            transform: translateY(-150%);
+            border-radius: .5rem;
+            background: rgb(37 99 235);
+            padding: .65rem 1rem;
+            color: white;
+            font-size: .75rem;
+            font-weight: 700;
+            transition: transform .15s ease;
+        }
+        
+        .erp-skip-link:focus {
+            transform: translateY(0);
+        }
+        
+        .erp-nav {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+        
+        .erp-nav-link {
+            position: relative;
+            display: flex;
+            min-height: 2.5rem;
+            align-items: center;
+            gap: .7rem;
+            border-radius: .55rem;
+            padding: .55rem .7rem;
+            color: rgb(203 213 225);
+            font-size: .78rem;
+            font-weight: 500;
+            transition: color .15s ease, background-color .15s ease, transform .15s ease;
+        }
+        
+        .erp-nav-link:hover {
+            background: rgb(255 255 255 / .08);
+            color: white;
+        }
+        
+        .erp-nav-link.is-active {
+            background: linear-gradient(90deg, rgb(37 99 235), rgb(29 78 216));
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgb(2 6 23 / .22);
+        }
+        
+        .erp-nav-link.is-active::after {
+            position: absolute;
+            inset-block: .55rem;
+            right: -.75rem;
+            width: 3px;
+            border-radius: 99px 0 0 99px;
+            background: rgb(147 197 253);
+            content: "";
+        }
+        
+        .erp-nav-link>svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            flex: 0 0 1.1rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.7;
+        }
+        
+        .erp-nav-group {
+            margin-top: .35rem;
+        }
+        
+        .erp-nav-group>summary {
+            display: flex;
+            min-height: 1.9rem;
+            cursor: pointer;
+            list-style: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: .25rem .7rem;
+            color: rgb(148 163 184);
+            font-size: .64rem;
+            font-weight: 600;
+            letter-spacing: .025em;
+        }
+        
+        .erp-nav-group>summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .erp-nav-group>summary svg {
+            width: .9rem;
+            height: .9rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            transition: transform .15s ease;
+        }
+        
+        .erp-nav-group:not([open])>summary svg {
+            transform: rotate(90deg);
+        }
+        
+        .erp-nav-group>summary:hover {
+            color: rgb(226 232 240);
+        }
+        
+        .erp-nav-group__items {
+            display: grid;
+            gap: .1rem;
+            border-right: 1px solid rgb(148 163 184 / .14);
+            margin-right: .7rem;
+            padding-right: .35rem;
+        }
+        
+        .erp-page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+        
+        .erp-page-header__copy {
+            min-width: 0;
+        }
+        
+        .erp-page-header__action:focus-visible {
+            outline-color: rgb(30 64 175);
+            outline-offset: 3px;
+        }
+        
+        .erp-required {
+            margin-right: .2rem;
+            color: rgb(220 38 38);
+            font-weight: 700;
+        }
+        
+        .erp-form-field--invalid label {
+            color: rgb(153 27 27);
+        }
+        
+        .erp-form-field--invalid :where(input,
+        select,
+        textarea) {
+            border-color: rgb(248 113 113) !important;
+            background-color: rgb(254 242 242 / .5);
+        }
+        
+        .erp-field-help {
+            line-height: 1.6;
+        }
+        
+        .erp-field-error {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            font-size: .75rem;
+            font-weight: 500;
+        }
+        
+        .erp-field-error::before {
+            display: grid;
+            width: 1rem;
+            height: 1rem;
+            place-items: center;
+            border-radius: 50%;
+            background: rgb(254 226 226);
+            content: "!";
+            font-size: .65rem;
+            font-weight: 700;
+        }
+        
+        .erp-message {
+            display: flex;
+            align-items: flex-start;
+            gap: .65rem;
+            line-height: 1.7;
+        }
+        
+        .erp-message__icon {
+            display: grid;
+            width: 1.35rem;
+            height: 1.35rem;
+            flex: 0 0 1.35rem;
+            place-items: center;
+            border-radius: 50%;
+            color: white;
+            font-size: .7rem;
+            font-weight: 800;
+        }
+        
+        .erp-message--error .erp-message__icon {
+            background: rgb(220 38 38);
+        }
+        
+        .erp-message--warning .erp-message__icon {
+            background: rgb(217 119 6);
+        }
+        
+        .erp-message--success .erp-message__icon {
+            background: rgb(5 150 105);
+        }
+        
+        .erp-message--info .erp-message__icon {
+            background: rgb(37 99 235);
+        }
+        
+        main form.erp-surface>section+section {
+            border-top: 1px solid rgb(241 245 249);
+            padding-top: 1.25rem;
+        }
+        
+        main form.erp-surface>section>h2,
+        main .erp-surface>h2 {
+            color: rgb(15 23 42);
+            font-weight: 700;
+            letter-spacing: -.01em;
+        }
+        
+        main form.erp-surface> :last-child:is(.border-t) {
+            margin-top: 1.25rem;
+            background: rgb(248 250 252 / .7);
+            margin-inline: -1.25rem;
+            margin-bottom: -1.25rem;
+            padding: 1rem 1.25rem;
+        }
+        
+        main .overflow-x-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgb(148 163 184) rgb(241 245 249);
+        }
+        
+        main table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        main table thead th {
+            position: relative;
+            background: rgb(248 250 252);
+            color: rgb(71 85 105);
+            font-size: .68rem;
+            font-weight: 700;
+            letter-spacing: .01em;
+            line-height: 1.45;
+            white-space: nowrap;
+        }
+        
+        main table tbody tr {
+            transition: background-color .12s ease, box-shadow .12s ease;
+        }
+        
+        main table tbody tr:hover {
+            background: rgb(239 246 255 / .68);
+            box-shadow: inset -3px 0 0 rgb(59 130 246);
+        }
+        
+        main table tbody td {
+            color: rgb(51 65 85);
+            vertical-align: middle;
+        }
+        
+        main table :where(td,
+        th)[dir="ltr"],
+        main table :where(.tabular-nums) {
+            text-align: left;
+            font-variant-numeric: tabular-nums;
+        }
+        
+         :where(code,
+        kbd,
+        samp,
+        [dir="ltr"]) {
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+        
+        main :where(button,
+        a)[class*="bg-blue-600"] {
+            transition: background-color .15s ease, box-shadow .15s ease, transform .15s ease;
+        }
+        
+        main :where(button,
+        a)[class*="bg-blue-600"]:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 14px rgb(37 99 235 / .18);
+        }
+        
+        main :where(button,
+        input,
+        select,
+        textarea):disabled {
+            cursor: not-allowed;
+            opacity: .68;
+        }
+        
+        main [aria-busy="true"] {
+            cursor: progress;
+            opacity: .72;
+        }
+        
+        main .erp-surface> :where(.p-12,
+        .py-16):where(.text-center) {
+            min-height: 11rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, white, rgb(248 250 252 / .75));
+            color: rgb(100 116 139);
+        }
+        
+        @media (max-width: 639px) {
+            .erp-page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .erp-page-header__action {
+                width: 100%;
+            }
+            main form.erp-surface> :last-child:is(.border-t) {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+            main form.erp-surface> :last-child:is(.border-t) :where(a,
+            button) {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
 </head>
-<body class="min-h-screen bg-slate-100 text-slate-900">
-    <nav class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-            <a class="text-lg font-bold tracking-tight text-slate-900" href="{% url 'organizations:select' %}">
-                Construction ERP
-            </a>
-            <div class="hidden items-center gap-3 text-sm lg:flex">
-                {% with navigation_is_authenticated=request.user.is_authenticated %}
-                    {% include "components/navigation_links.html" with navigation_is_authenticated=navigation_is_authenticated navigation_link_class="text-slate-600 hover:text-slate-900" navigation_primary_class="rounded-lg bg-slate-900 px-3 py-2 font-medium text-white hover:bg-slate-700" csrf_token=csrf_token only %}
-                {% endwith %}
-            </div>
-            <details class="relative lg:hidden">
-                <summary class="cursor-pointer list-none rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                    Menu
-                </summary>
-                <div class="absolute right-0 z-10 mt-2 flex w-56 flex-col gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-lg">
-                    {% with navigation_is_authenticated=request.user.is_authenticated %}
-                        {% include "components/navigation_links.html" with navigation_is_authenticated=navigation_is_authenticated navigation_link_class="rounded-md px-3 py-2 text-sm text-slate-700 hover:bg-slate-100" navigation_primary_class="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700" csrf_token=csrf_token only %}
-                    {% endwith %}
-                </div>
-            </details>
-        </div>
-    </nav>
 
-    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        {% include "components/messages.html" %}
-        {% block content %}{% endblock %}
-    </main>
+<body class="min-h-screen bg-[#f4f7fb] text-slate-900 antialiased">
+    <a class="erp-skip-link" href="#main-content">رفتن به محتوای اصلی</a> {% if request.user.is_authenticated %}
+    <div class="min-h-screen lg:pr-64">
+        <aside class="erp-sidebar fixed inset-y-0 right-0 z-40 hidden w-64 flex-col overflow-hidden border-l border-white/10 bg-[#0b203b] text-slate-200 shadow-2xl lg:flex" aria-label="نوار کناری سامانه">
+            <a class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-5" href="{% url 'financials:dashboard' %}">
+                <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15"><svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11M12 6v2m0 3v2m0 3v2"/></svg></span>
+                <span><strong class="block text-sm font-semibold text-white">سامانه مدیریت ساخت</strong><small class="mt-0.5 block text-[10px] tracking-wide text-slate-400" dir="ltr">Construction ERP</small></span>
+            </a>
+            <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
+                {% include "components/navigation_links.html" with navigation_is_authenticated=True current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token only %}
+            </div>
+            <div class="border-t border-white/10 p-3">
+                <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" type="submit"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>خروج از حساب</button></form>
+            </div>
+        </aside>
+        <header class="sticky top-0 z-30 h-16 border-b border-slate-200/80 bg-white/95 shadow-sm backdrop-blur">
+            <div class="flex h-full items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <details class="relative lg:hidden">
+                    <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
+                    <div class="absolute right-0 z-50 mt-2 max-h-[75vh] w-72 overflow-y-auto rounded-xl bg-[#0b203b] p-3 shadow-2xl ring-1 ring-black/10">{% include "components/navigation_links.html" with navigation_is_authenticated=True current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token only %}</div>
+                </details>
+                <a class="hidden min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm sm:flex" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="max-w-48 truncate">{{ request.organization.name|default:"انتخاب سازمان" }}</span></a>
+                <div class="relative hidden max-w-md flex-1 md:block"><svg class="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3-3"/></svg>
+                    <div class="h-10 rounded-lg border border-slate-200 bg-slate-50 pr-10 text-xs leading-10 text-slate-400">جست‌وجوی سریع در سامانه...</div>
+                </div>
+                <div class="mr-auto flex items-center gap-2 border-r border-slate-200 pr-3"><span class="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-blue-600 to-blue-800 text-xs font-bold text-white">{{ request.user.username|first|upper }}</span><span class="hidden text-right sm:block"><strong class="block max-w-36 truncate text-xs font-semibold text-slate-800">{{ request.user.get_full_name|default:request.user.username }}</strong><small class="block text-[10px] text-slate-500">کاربر سامانه</small></span></div>
+            </div>
+        </header>
+        {% endif %}
+        <main id="main-content" tabindex="-1" class="mx-auto {% if request.user.is_authenticated %}max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8 lg:py-7{% else %}min-h-screen max-w-7xl px-4 py-10 sm:px-6 lg:px-8{% endif %}">
+            {% include "components/messages.html" %} {% block content %}{% endblock %}
+        </main>
+        {% if request.user.is_authenticated %}
+    </div>
+    {% endif %}
+    <script>
+        (() => {
+            const persianLabels = new Map([
+                ["Draft", "پیش‌نویس"], ["Active", "فعال"], ["Approved", "تأییدشده"],
+                ["Completed", "تکمیل‌شده"], ["Labor", "نیروی انسانی"],
+                ["Equipment", "تجهیزات"], ["Material", "مصالح"], ["Other", "سایر"],
+                ["Planning", "در حال برنامه‌ریزی"], ["On hold", "متوقف‌شده"],
+                ["Cancelled", "لغوشده"], ["Submitted", "ارسال‌شده"],
+                ["Terminated", "خاتمه‌یافته"], ["Recorded", "ثبت‌شده"],
+                ["Posted", "ثبت‌شده"], ["Void", "باطل‌شده"],
+            ]);
+            const skippedTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "CODE", "PRE"]);
+            const localize = () => {
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                const nodes = [];
+                while (walker.nextNode()) {
+                    if (!skippedTags.has(walker.currentNode.parentElement?.tagName)) nodes.push(walker.currentNode);
+                }
+                nodes.forEach((node) => {
+                    const trimmed = node.nodeValue.trim();
+                    if (persianLabels.has(trimmed)) node.nodeValue = node.nodeValue.replace(trimmed, persianLabels.get(trimmed));
+                });
+            };
+            if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", localize, {once: true});
+            else localize();
+        })();
+    </script>
 </body>
+
 </html>

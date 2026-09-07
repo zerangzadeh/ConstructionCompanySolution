@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
-{% block title %}Record expense | Construction ERP{% endblock %}
+{% block title %}ثبت هزینه | Construction ERP{% endblock %}
 
 {% block content %}
 <div class="mx-auto max-w-2xl">
-<p class="text-sm font-medium text-blue-600">Expenses</p>
-<h1 class="mt-1 text-3xl font-bold tracking-tight">Record expense</h1>
-<p class="mt-2 text-slate-500">Add a project expense to {{ request.organization.name }}.</p>
-<form class="mt-8 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200" method="post">
+<p class="text-xs font-semibold text-blue-600">مدیریت هزینه‌ها</p>
+<h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">ثبت هزینه</h1>
+<p class="mt-1 text-sm text-slate-500">ثبت هزینه پروژه برای {{ request.organization.name }}</p>
+<form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post">
 {% csrf_token %}
 {% include "components/form_errors.html" with form=form only %}
 {% for field in form %}
 {% include "components/form_field.html" with field=field only %}
 {% endfor %}
-<div class="flex justify-end gap-3 pt-2"><a class="rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600" href="{% url 'expenses:list' %}">Cancel</a><button class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white" type="submit">Record expense</button></div>
+<div class="flex justify-end gap-3 border-t border-slate-100 pt-5"><a class="inline-flex h-10 items-center rounded-lg px-4 text-sm font-semibold text-slate-600 hover:bg-slate-50" href="{% url 'expenses:list' %}">انصراف</a><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white hover:bg-blue-700" type="submit">ثبت هزینه</button></div>
 </form>
 </div>
 {% endblock %}

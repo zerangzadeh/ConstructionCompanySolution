@@ -1,12 +1,77 @@
-<div>
+<div class="erp-form-field{% if field.errors %} erp-form-field--invalid{% endif %}">
     <label class="mb-1.5 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">
-        {{ field.label }}{% if field.field.required %}<span aria-hidden="true"> *</span>{% endif %}
+        {% if field.name == "project" %}پروژه
+        {% elif field.name == "site" %}کارگاه
+        {% elif field.name == "phase" %}فاز
+        {% elif field.name == "contract" %}قرارداد
+        {% elif field.name == "payment" %}پرداخت
+        {% elif field.name == "estimate" %}برآورد
+        {% elif field.name == "code" %}کد
+        {% elif field.name == "name" %}نام
+        {% elif field.name == "description" %}توضیحات
+        {% elif field.name == "address" %}نشانی
+        {% elif field.name == "status" %}وضعیت
+        {% elif field.name == "budget" %}بودجه
+        {% elif field.name == "start_date" %}تاریخ شروع
+        {% elif field.name == "end_date" %}تاریخ پایان
+        {% elif field.name == "contract_number" %}شماره قرارداد
+        {% elif field.name == "contract_value" %}ارزش قرارداد
+        {% elif field.name == "estimate_number" %}شماره برآورد
+        {% elif field.name == "title" %}عنوان
+        {% elif field.name == "counterparty_name" %}نام طرف مقابل
+        {% elif field.name == "direction" %}نوع تراکنش
+        {% elif field.name == "amount" %}مبلغ
+        {% elif field.name == "paid_on" %}تاریخ پرداخت
+        {% elif field.name == "method" %}روش پرداخت
+        {% elif field.name == "party" %}طرف تجاری
+        {% elif field.name == "reference" %}مرجع
+        {% elif field.name == "notes" %}یادداشت‌ها
+        {% elif field.name == "reason" %}دلیل
+        {% elif field.name == "category" %}دسته‌بندی
+        {% elif field.name == "unit_of_measure" %}واحد اندازه‌گیری
+        {% elif field.name == "unit" %}واحد
+        {% elif field.name == "symbol" %}نماد
+        {% elif field.name == "decimal_places" %}تعداد رقم اعشار
+        {% elif field.name == "legal_name" %}نام حقوقی
+        {% elif field.name == "display_name" %}نام نمایشی
+        {% elif field.name == "tax_identifier" %}شناسه مالیاتی
+        {% elif field.name == "role" %}نقش
+        {% elif field.name == "contact_type" %}نوع تماس
+        {% elif field.name == "value" %}مقدار
+        {% elif field.name == "label" %}برچسب
+        {% elif field.name == "is_primary" %}اصلی
+        {% elif field.name == "timezone" %}منطقه زمانی
+        {% elif field.name == "currency" %}واحد پول
+        {% elif field.name == "fiscal_year_start_month" %}ماه شروع سال مالی
+        {% elif field.name == "reporting_date" %}تاریخ گزارش
+        {% elif field.name == "weather_conditions" %}شرایط آب‌وهوا
+        {% elif field.name == "labor_count" %}تعداد نیروی کار
+        {% elif field.name == "work_performed" %}کار انجام‌شده
+        {% elif field.name == "progress_summary" %}خلاصه پیشرفت
+        {% elif field.name == "issues_and_delays" %}مسائل و تأخیرها
+        {% elif field.name == "safety_notes" %}یادداشت‌های ایمنی
+        {% elif field.name == "quality_notes" %}یادداشت‌های کیفیت
+        {% elif field.name == "team_name" %}نام تیم
+        {% elif field.name == "worker_count" %}تعداد نیرو
+        {% elif field.name == "hours_worked" %}ساعات کار
+        {% elif field.name == "equipment_name" %}نام تجهیز
+        {% elif field.name == "hours_used" %}ساعات استفاده
+        {% elif field.name == "material" %}مصالح
+        {% elif field.name == "material_name" %}نام مصالح
+        {% elif field.name == "quantity" %}مقدار
+        {% elif field.name == "activity" %}فعالیت
+        {% elif field.name == "progress_percent" %}درصد پیشرفت
+        {% elif field.name == "occurred_on" %}تاریخ وقوع
+        {% elif field.name == "cause" %}علت
+        {% elif field.name == "duration_hours" %}مدت (ساعت)
+        {% elif field.name == "category" %}دسته‌بندی
+        {% else %}{{ field.label }}{% endif %}{% if field.field.required %}<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>{% endif %}
     </label>
     {{ field }}
     {% if field.help_text %}
-        <p class="mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+        <p class="erp-field-help mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
     {% endif %}
     {% if field.errors %}
-        <p class="mt-1 text-sm text-red-600" role="alert">{{ field.errors|striptags }}</p>
+        <p class="erp-field-error mt-1 text-sm text-red-600" role="alert">{{ field.errors|striptags }}</p>
     {% endif %}
 </div>
