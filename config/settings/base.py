@@ -36,6 +36,7 @@ INSTALLED_APPS: list[str] = [
     "apps.financials",
     "apps.daily_reports",
     "apps.workforce",
+    "apps.procurement",
 ]
 
 MIDDLEWARE: list[str] = [

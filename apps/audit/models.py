@@ -111,6 +111,30 @@ class AuditAction(models.TextChoices):
         "employee_project_assignment.status_changed",
         "Employee project assignment status changed",
     )
+    PURCHASE_REQUEST_CREATED = "purchase_request.created", "Purchase request created"
+    PURCHASE_REQUEST_ITEM_ADDED = (
+        "purchase_request.item_added",
+        "Purchase request item added",
+    )
+    PURCHASE_REQUEST_SUBMITTED = (
+        "purchase_request.submitted",
+        "Purchase request submitted",
+    )
+    PURCHASE_REQUEST_APPROVED = "purchase_request.approved", "Purchase request approved"
+    PURCHASE_REQUEST_REJECTED = "purchase_request.rejected", "Purchase request rejected"
+    PURCHASE_REQUEST_CANCELLED = (
+        "purchase_request.cancelled",
+        "Purchase request cancelled",
+    )
+    PURCHASE_ORDER_CREATED = "purchase_order.created", "Purchase order created"
+    PURCHASE_ORDER_ITEM_ADDED = "purchase_order.item_added", "Purchase order item added"
+    PURCHASE_ORDER_ISSUED = "purchase_order.issued", "Purchase order issued"
+    PURCHASE_ORDER_COMPLETED = "purchase_order.completed", "Purchase order completed"
+    PURCHASE_ORDER_CANCELLED = "purchase_order.cancelled", "Purchase order cancelled"
+    GOODS_RECEIPT_CREATED = "goods_receipt.created", "Goods receipt created"
+    GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "Goods receipt item added"
+    GOODS_RECEIPT_POSTED = "goods_receipt.posted", "Goods receipt posted"
+    GOODS_RECEIPT_VOIDED = "goods_receipt.voided", "Goods receipt voided"
     MEMBERSHIP_INVITED = "membership.invited", "Membership invited"
     MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
 

@@ -21,6 +21,7 @@ This document describes the currently implemented logical domains and data model
 | Materials | `UnitOfMeasure`, `MaterialCategory`, `Material` | Tenant unit and material masters, including hierarchical categories and canonical material units. |
 | Projects | `Project`, `ProjectSite`, `ProjectPhase`, `WBSNode`, `Activity` | Project/site/phase hierarchy and optional project-control structure. WBS nodes form a tree; each activity belongs to a WBS node and may reference a site, phase, and unit. |
 | Workforce | `Employee`, `Department`, `Position`, `WorkTeam`, `EmployeeProjectAssignment` | Optional tenant personnel structure, employee lifecycle, teams, and project/site assignments. Personnel identity remains separate from an optional login user. |
+| Procurement | `PurchaseRequest`, `PurchaseRequestItem`, `PurchaseOrder`, `PurchaseOrderItem`, `GoodsReceipt`, `GoodsReceiptItem` | Tenant purchasing from internal material request and approval through supplier order and quantity-controlled goods receipt. Receipts do not create inventory movements. |
 | Contracts | `Contract`, `ContractItem`, `ContractAmendment` | Receivable/payable commercial commitments, line items, controlled status changes, and immutable approved amendments. Optional party/direction/type references coexist with the legacy counterparty snapshot. |
 | Estimates | `Estimate`, `EstimateRevision`, `EstimateItem` | Versioned estimates, Decimal line totals, approval, and preservation of approved history. The estimate points to its current revision; item text units coexist with optional shared units. |
 | Daily reports | `DailyReport`, `DailyReportLaborEntry`, `DailyReportEquipmentEntry`, `DailyReportMaterialEntry`, `DailyActivity`, `DelayEvent` | Draft site reporting, structured labor/equipment/material/activity/delay details, and submit/approve workflow. Legacy descriptive snapshots remain alongside optional material, unit, and activity references. |
@@ -74,6 +75,23 @@ erDiagram
     EMPLOYEE ||--o{ EMPLOYEE_PROJECT_ASSIGNMENT : receives
     PROJECT ||--o{ EMPLOYEE_PROJECT_ASSIGNMENT : staffs
     PROJECT_SITE o|--o{ EMPLOYEE_PROJECT_ASSIGNMENT : locates
+
+    PROJECT ||--o{ PURCHASE_REQUEST : requests
+    PURCHASE_REQUEST ||--o{ PURCHASE_REQUEST_ITEM : contains
+    MATERIAL ||--o{ PURCHASE_REQUEST_ITEM : identifies
+    UNIT_OF_MEASURE ||--o{ PURCHASE_REQUEST_ITEM : measures
+    PROJECT ||--o{ PURCHASE_ORDER : purchases
+    PURCHASE_REQUEST o|--o{ PURCHASE_ORDER : authorizes
+    BUSINESS_PARTY ||--o{ PURCHASE_ORDER : supplies
+    PURCHASE_ORDER ||--o{ PURCHASE_ORDER_ITEM : contains
+    PURCHASE_REQUEST_ITEM o|--o{ PURCHASE_ORDER_ITEM : sources
+    MATERIAL ||--o{ PURCHASE_ORDER_ITEM : identifies
+    UNIT_OF_MEASURE ||--o{ PURCHASE_ORDER_ITEM : measures
+    PURCHASE_ORDER ||--o{ GOODS_RECEIPT : receives
+    GOODS_RECEIPT ||--o{ GOODS_RECEIPT_ITEM : contains
+    PURCHASE_ORDER_ITEM ||--o{ GOODS_RECEIPT_ITEM : fulfills
+    MATERIAL ||--o{ GOODS_RECEIPT_ITEM : identifies
+    UNIT_OF_MEASURE ||--o{ GOODS_RECEIPT_ITEM : measures
 
     PROJECT ||--o{ CONTRACT : has
     BUSINESS_PARTY o|--o{ CONTRACT : counterparty
@@ -130,6 +148,8 @@ erDiagram
 - Parties and master data are tenant-local. Archived parties, units, categories, materials, WBS nodes, and activities cannot be selected for new work. Category and WBS parent links must remain in the same tenant and hierarchy and cannot form cycles. Masters with active dependants cannot be archived where doing so would invalidate current references.
 - A site belongs to one project and a phase to one site. Activity site/phase/WBS references must belong to the activity's project; a phase must belong to the selected site. A planned quantity requires an active unit and must be positive.
 - Workforce structures are optional. An employee may link to at most one active organization-member user per tenant, but employee personnel data remains independent of authentication identity. Department hierarchies cannot cycle; department, position, team, employee, project, and optional site links must share a tenant, and assignment sites must belong to their project.
+- Procurement requests, orders, receipts, their lines, projects, suppliers, materials, and units must share a tenant. Suppliers require an active supplier party role, material lines use the material's active canonical unit, ordered quantities linked to a request cannot exceed the requested quantity, and cumulative posted receipts cannot exceed an issued order line. Goods receipts record purchasing evidence only and do not create inventory movements.
+- Request decisions, order issue/completion, and receipt posting/voiding are atomic and audited. Only draft documents accept line changes; approved requests, issued order terms, and posted receipt details are immutable. Voiding preserves receipt lines and reopens a completed order when its remaining posted receipts no longer fulfill it.
 - Contract, estimate, expense, payment, daily-report, and document project/phase/site references must match both organization and project hierarchy. Optional party, material, unit, WBS, and activity references receive the same validation.
 - Contract terms and items are editable only in `draft`. Once active or otherwise finalized, commercial change is represented by an amendment; approving an amendment does not silently overwrite the legacy contract header value.
 - Versioned estimate items belong to a revision; the nullable revision link remains only for migration compatibility with legacy items. Approval locks the estimate aggregate, approves exactly one draft current revision, and supersedes any older approved revision. Creating a revision copies the approved current lines into a new draft; approved and superseded revisions are historical records.
@@ -149,6 +169,7 @@ erDiagram
 - Contracts and estimates: contract number and estimate number each unique per organization; amendment number unique per contract; revision number unique per estimate.
 - Operations and finance: one daily report per `(organization, site, reporting_date)`; expense-category code and payment number each unique per organization.
 - Workforce: department, position, work-team, and employee numbers are unique per organization; a login user links to at most one employee per organization; duplicate active employee assignments to the same project or project site are prevented.
+- Procurement: request, order, and goods-receipt numbers are each unique per organization; quantities are positive, order prices are non-negative, and an order line may appear at most once in a goods receipt.
 - Additional organization-first indexes support scoped lists and financial/reporting queries. Exact index definitions, foreign-key deletion behavior, lengths, precision, nullability, and defaults remain defined by migrations and models.
 
 ## Major lifecycle states
@@ -165,6 +186,7 @@ erDiagram
 | Payment / allocation | Payment: posted -> void. Allocation: active -> reversed; payment void reverses all active allocations. |
 | Document and masters | Documents and reusable masters use archival/deactivation rather than destructive deletion of business history. |
 | Workforce | Employee: active -> inactive/terminated; inactive -> active/terminated; terminated is terminal. Assignment: active -> completed/cancelled; completed/cancelled are terminal. Workforce masters and employees use archival rather than deletion. |
+| Procurement | Request: draft -> submitted -> approved/rejected, with draft/submitted cancellation. Order: draft -> issued -> completed, with draft/issued cancellation before receipt. Receipt: draft -> posted -> void; void preserves the posted evidence and may reopen its order. |
 
 ## Workforce future integration
 
@@ -177,7 +199,6 @@ The following approved target concepts are not implemented. Their presence here 
 | Future domain | Approved direction |
 | --- | --- |
 | Project control extensions | `CostCenter`, `ProjectBaseline`, and `ProgressRecord`, plus optional project/site access restrictions. Existing WBS nodes, activities, and daily progress observations do not replace these concepts. |
-| Procurement | `PurchaseRequest`/items, `PurchaseOrder`/items, and `GoodsReceipt`/items linked to parties, projects, materials, and units. |
 | Inventory | `Warehouse` and controlled `StockTransaction` movements; balances are derived or validated projections, not arbitrary editable quantities. |
 | Equipment | `Equipment`, `EquipmentAssignment`, and `MaintenanceRecord`, with later integration into daily usage and cost workflows. Current free-text daily equipment entries are not an equipment master. |
 | Billing and progress claims | `ProgressClaim`, `ProgressClaimItem`, and `ClaimAdjustment`, including retention, tax, insurance, advance deductions, penalties, and other documented adjustments. |

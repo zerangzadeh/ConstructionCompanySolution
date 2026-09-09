@@ -1,7 +1,9 @@
 from datetime import date
+from io import StringIO
 
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.management import call_command
 from django.db import IntegrityError, transaction
 from django.test import RequestFactory, TestCase
 
@@ -536,3 +538,48 @@ class WorkforceAdminTests(TestCase):
                 self.assertFalse(model_admin.has_add_permission(request))
                 self.assertFalse(model_admin.has_change_permission(request))
                 self.assertFalse(model_admin.has_delete_permission(request))
+
+
+class SeedWorkforceCommandTests(TestCase):
+    def test_seed_workforce_is_idempotent_and_preserves_tenant_scope(self) -> None:
+        call_command("seed_workforce", stdout=StringIO())
+
+        organization = Organization.objects.get(slug="seed-workforce-demo")
+        self.assertEqual(
+            Department.objects.filter(organization=organization).count(), 3
+        )
+        self.assertEqual(Position.objects.filter(organization=organization).count(), 4)
+        self.assertEqual(WorkTeam.objects.filter(organization=organization).count(), 2)
+        self.assertEqual(Employee.objects.filter(organization=organization).count(), 5)
+        self.assertEqual(
+            set(
+                Employee.objects.filter(organization=organization).values_list(
+                    "status", flat=True
+                )
+            ),
+            {EmployeeStatus.ACTIVE, EmployeeStatus.INACTIVE, EmployeeStatus.TERMINATED},
+        )
+        self.assertEqual(
+            set(
+                EmployeeProjectAssignment.objects.filter(
+                    organization=organization
+                ).values_list("status", flat=True)
+            ),
+            {
+                AssignmentStatus.ACTIVE,
+                AssignmentStatus.COMPLETED,
+                AssignmentStatus.CANCELLED,
+            },
+        )
+
+        call_command("seed_workforce", stdout=StringIO())
+        self.assertEqual(
+            Department.objects.filter(organization=organization).count(), 3
+        )
+        self.assertEqual(Position.objects.filter(organization=organization).count(), 4)
+        self.assertEqual(WorkTeam.objects.filter(organization=organization).count(), 2)
+        self.assertEqual(Employee.objects.filter(organization=organization).count(), 5)
+        self.assertEqual(
+            EmployeeProjectAssignment.objects.filter(organization=organization).count(),
+            3,
+        )

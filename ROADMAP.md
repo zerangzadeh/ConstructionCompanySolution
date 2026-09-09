@@ -40,7 +40,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F2 — Procurement
 
-- **Status:** PLANNED
+- **Status:** IMPLEMENTED
 - **Goal:** Control purchasing from internal request through supplier order and
   receipt against existing projects and masters.
 - **Main scope/entities:** `PurchaseRequest`/items, `PurchaseOrder`/items,
@@ -51,7 +51,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F3 — Inventory
 
-- **Status:** PLANNED
+- **Status:** NEXT
 - **Goal:** Provide warehouse-level material control based on validated stock
   movements and procurement receipts.
 - **Main scope/entities:** `Warehouse`, `StockTransaction`, material balances,
