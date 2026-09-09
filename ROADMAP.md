@@ -28,7 +28,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F1 — Workforce
 
-- **Status:** NEXT
+- **Status:** IMPLEMENTED
 - **Goal:** Establish optional tenant-scoped personnel and team management while
   keeping workforce identity separate from authenticated user identity.
 - **Main scope/entities:** `Employee`, `Department`, `Position`, `WorkTeam`,

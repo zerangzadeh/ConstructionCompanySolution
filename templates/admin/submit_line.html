@@ -1,0 +1,11 @@
+{% load admin_urls %}
+<div class="submit-row">
+{% block submit-row %}
+{% if show_save %}<input type="submit" value="ذخیره" class="default" name="_save">{% endif %}
+{% if show_save_as_new %}<input type="submit" value="ذخیره به‌عنوان مورد جدید" name="_saveasnew">{% endif %}
+{% if show_save_and_add_another %}<input type="submit" value="ذخیره و افزودن مورد جدید" name="_addanother">{% endif %}
+{% if show_save_and_continue %}<input type="submit" value="{% if can_change %}ذخیره و ادامه ویرایش{% else %}ذخیره و مشاهده{% endif %}" name="_continue">{% endif %}
+{% if show_close %}{% url opts|admin_urlname:'changelist' as changelist_url %}<a href="{% add_preserved_filters changelist_url %}" class="closelink">بستن</a>{% endif %}
+{% if show_delete_link and original %}{% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}<a href="{% add_preserved_filters delete_url %}" class="deletelink">حذف</a>{% endif %}
+{% endblock %}
+</div>

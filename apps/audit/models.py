@@ -94,6 +94,23 @@ class AuditAction(models.TextChoices):
     )
     DAILY_ACTIVITY_ADDED = "daily_activity.added", "Daily activity added"
     DELAY_EVENT_ADDED = "delay_event.added", "Delay event added"
+    DEPARTMENT_CREATED = "department.created", "Department created"
+    DEPARTMENT_ARCHIVED = "department.archived", "Department archived"
+    POSITION_CREATED = "position.created", "Position created"
+    POSITION_ARCHIVED = "position.archived", "Position archived"
+    WORK_TEAM_CREATED = "work_team.created", "Work team created"
+    WORK_TEAM_ARCHIVED = "work_team.archived", "Work team archived"
+    EMPLOYEE_CREATED = "employee.created", "Employee created"
+    EMPLOYEE_STATUS_CHANGED = "employee.status_changed", "Employee status changed"
+    EMPLOYEE_ARCHIVED = "employee.archived", "Employee archived"
+    EMPLOYEE_PROJECT_ASSIGNED = (
+        "employee_project_assignment.created",
+        "Employee assigned to project",
+    )
+    EMPLOYEE_PROJECT_ASSIGNMENT_STATUS_CHANGED = (
+        "employee_project_assignment.status_changed",
+        "Employee project assignment status changed",
+    )
     MEMBERSHIP_INVITED = "membership.invited", "Membership invited"
     MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
 

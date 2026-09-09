@@ -1,5 +1,4 @@
-{% extends "base.html" %}{% block title %}طرف‌های تجاری | Construction ERP{% endblock %} {% block content %} {% url "parties:create" as create_url %} {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری"
-page_description=" شرکت‌های مرتبط " page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
+{% extends "base.html" %}{% block title %}طرف‌های تجاری | Construction ERP{% endblock %} {% block content %} {% url "parties:create" as create_url %} {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری" page_description="شرکت‌های مرتبط" page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl">
     {% if parties %}
 

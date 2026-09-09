@@ -2545,6 +2545,96 @@ body.change-list #changelist-filter li a {
     white-space: nowrap;
 }
 
+/* Native Admin action controls: keep permission-gated controls visible. */
+body.change-list #content-main > .object-tools,
+body.change-form #content-main > .object-tools {
+    display: flex !important;
+    float: none;
+    clear: both;
+    width: 100%;
+    min-height: 40px;
+    margin: 0 0 16px;
+    padding: 0;
+    gap: 8px;
+    direction: rtl;
+    justify-content: flex-start;
+    list-style: none;
+}
+
+body.change-list #content-main > .object-tools:empty,
+body.change-form #content-main > .object-tools:empty {
+    display: none !important;
+}
+
+body.change-list #content-main > .object-tools li,
+body.change-form #content-main > .object-tools li {
+    display: block;
+    float: none;
+    margin: 0;
+}
+
+body.change-list #content-main > .object-tools a,
+body.change-form #content-main > .object-tools a {
+    display: inline-flex;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 9px 14px;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-decoration: none;
+}
+
+body.change-form #content-main > .object-tools a {
+    border-color: #dbe4ef;
+    background: #fff;
+    color: #1e40af;
+}
+
+body.change-list #content-main > .object-tools a:hover,
+body.change-list #content-main > .object-tools a:focus-visible {
+    border-color: #1d4ed8;
+    background: #1d4ed8;
+    color: #fff;
+}
+
+body.change-form #content-main > .object-tools a:hover,
+body.change-form #content-main > .object-tools a:focus-visible {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+body.change-form #content-main > form {
+    clear: both;
+    min-width: 0;
+}
+
+body.change-form .submit-row {
+    display: flex;
+    position: static;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    direction: rtl;
+}
+
+body.change-form .submit-row input,
+body.change-form .submit-row a {
+    float: none;
+    margin: 0;
+}
+
+body.change-form .submit-row .deletelink {
+    margin-right: auto;
+}
+
 @media (max-width: 1023px) {
     body.change-list #changelist.filtered {
         grid-template-columns: minmax(0, 1fr);
