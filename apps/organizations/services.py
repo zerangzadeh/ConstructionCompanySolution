@@ -74,9 +74,9 @@ def update_organization_settings(
         locked_organization.status != OrganizationStatus.ACTIVE
         or locked_organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_memberships(updated_by, locked_organization):
-        raise PermissionDenied("You cannot update settings for this organization.")
+        raise PermissionDenied("اجازه به‌روزرسانی تنظیمات این سازمان را ندارید.")
 
     settings_record = get_organization_settings(organization=locked_organization)
     settings_record.timezone = timezone_name
@@ -127,20 +127,20 @@ def create_organization_invitation(
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_memberships(invited_by, organization):
-        raise PermissionDenied("You cannot invite members to this organization.")
+        raise PermissionDenied("اجازه دعوت عضو به این سازمان را ندارید.")
     if invited_by == invitee:
-        raise ValueError("You cannot invite yourself.")
+        raise ValueError("نمی‌توانید خودتان را دعوت کنید.")
     if role not in InvitationRole.values:
-        raise ValueError("Invalid invitation role.")
+        raise ValueError("نقش دعوت‌نامه معتبر نیست.")
 
     existing_membership = OrganizationMembership.objects.filter(
         organization=organization,
         user=invitee,
     ).first()
     if existing_membership and existing_membership.status == MembershipStatus.ACTIVE:
-        raise ValueError("The user is already an active member.")
+        raise ValueError("کاربر از قبل عضو فعال سازمان است.")
 
     now = timezone.now()
     OrganizationInvitation.objects.filter(
@@ -155,7 +155,7 @@ def create_organization_invitation(
         invitee=invitee,
         status=InvitationStatus.PENDING,
     ).exists():
-        raise ValueError("A pending invitation already exists.")
+        raise ValueError("یک دعوت‌نامه در انتظار از قبل وجود دارد.")
 
     raw_token = secrets.token_urlsafe(32)
     invitation = OrganizationInvitation.objects.create(
@@ -185,7 +185,7 @@ def accept_organization_invitation(
     """Accept a valid invitation for its intended user."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
 
     expired = False
     with transaction.atomic():
@@ -196,11 +196,11 @@ def accept_organization_invitation(
             .first()
         )
         if invitation is None:
-            raise ValueError("Invitation is invalid.")
+            raise ValueError("دعوت‌نامه معتبر نیست.")
         if invitation.invitee_id != user.id:
-            raise PermissionDenied("This invitation belongs to another user.")
+            raise PermissionDenied("این دعوت‌نامه متعلق به کاربر دیگری است.")
         if invitation.status != InvitationStatus.PENDING:
-            raise ValueError("Invitation is no longer pending.")
+            raise ValueError("دعوت‌نامه دیگر در وضعیت انتظار نیست.")
 
         now = timezone.now()
         if invitation.expires_at <= now:
@@ -209,7 +209,7 @@ def accept_organization_invitation(
             expired = True
         else:
             if invitation.organization.status != OrganizationStatus.ACTIVE:
-                raise ValueError("Organization is not active.")
+                raise ValueError("سازمان فعال نیست.")
 
             membership, _ = OrganizationMembership.objects.get_or_create(
                 organization=invitation.organization,
@@ -250,8 +250,8 @@ def accept_organization_invitation(
             return membership
 
     if expired:
-        raise ValueError("Invitation has expired.")
-    raise ValueError("Invitation could not be accepted.")
+        raise ValueError("دعوت‌نامه منقضی شده است.")
+    raise ValueError("پذیرش دعوت‌نامه ممکن نشد.")
 
 
 @transaction.atomic
@@ -267,7 +267,7 @@ def create_organization_with_owner(
     """Create an organization and its active owner membership atomically."""
 
     if not owner.is_authenticated or owner._state.adding or not owner.is_active:
-        raise ValueError("An authenticated user is required.")
+        raise ValueError("کاربر واردشده به سامانه الزامی است.")
 
     organization = Organization.objects.create(
         name=name,
@@ -327,7 +327,7 @@ def get_organization_members(
 
     has_access = get_valid_memberships(user).filter(organization=organization).exists()
     if not has_access:
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         OrganizationMembership.objects.filter(
             organization=organization,

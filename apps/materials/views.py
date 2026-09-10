@@ -56,7 +56,7 @@ def unit_archive(request: HttpRequest, unit_id: str) -> HttpResponse:
         pk=unit_id, organization=request.organization, archived_at__isnull=True
     ).first()
     if unit is None:
-        return HttpResponseNotFound("Unit not found.")
+        return HttpResponseNotFound("واحد اندازه‌گیری یافت نشد.")
     try:
         archive_unit_of_measure(
             organization=request.organization, actor=request.user, unit=unit
@@ -113,7 +113,7 @@ def category_create(request: HttpRequest) -> HttpResponse:
 def category_detail(request: HttpRequest, category_id: str) -> HttpResponse:
     category = _get_active_category(request, category_id)
     if category is None:
-        return HttpResponseNotFound("Material category not found.")
+        return HttpResponseNotFound("دسته‌بندی مصالح یافت نشد.")
     form = MaterialCategoryForm(
         request.POST or None, instance=category, organization_id=request.organization.id
     )
@@ -139,7 +139,7 @@ def category_detail(request: HttpRequest, category_id: str) -> HttpResponse:
 def category_archive(request: HttpRequest, category_id: str) -> HttpResponse:
     category = _get_active_category(request, category_id)
     if category is None:
-        return HttpResponseNotFound("Material category not found.")
+        return HttpResponseNotFound("دسته‌بندی مصالح یافت نشد.")
     try:
         archive_material_category(
             organization=request.organization, actor=request.user, category=category
@@ -182,7 +182,7 @@ def material_create(request: HttpRequest) -> HttpResponse:
 def material_detail(request: HttpRequest, material_id: str) -> HttpResponse:
     material = _get_active_material(request, material_id)
     if material is None:
-        return HttpResponseNotFound("Material not found.")
+        return HttpResponseNotFound("مصالح یافت نشد.")
     form = MaterialForm(
         request.POST or None, instance=material, organization_id=request.organization.id
     )
@@ -208,7 +208,7 @@ def material_detail(request: HttpRequest, material_id: str) -> HttpResponse:
 def material_archive(request: HttpRequest, material_id: str) -> HttpResponse:
     material = _get_active_material(request, material_id)
     if material is None:
-        return HttpResponseNotFound("Material not found.")
+        return HttpResponseNotFound("مصالح یافت نشد.")
     try:
         archive_material(
             organization=request.organization, actor=request.user, material=material

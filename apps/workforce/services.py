@@ -47,17 +47,17 @@ _ASSIGNMENT_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
 
 def _require_active_access(*, organization: Organization, user: User) -> None:
     if not user.is_authenticated or not user.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 
 def _require_management_access(*, organization: Organization, actor: User) -> None:
@@ -67,7 +67,7 @@ def _require_management_access(*, organization: Organization, actor: User) -> No
         status=MembershipStatus.ACTIVE,
         role__in=_MANAGEMENT_ROLES,
     ).exists():
-        raise PermissionDenied("You cannot manage workforce in this organization.")
+        raise PermissionDenied("اجازه مدیریت نیروی انسانی این سازمان را ندارید.")
 
 
 def _save_validated(instance: object, error_message: str) -> None:
@@ -82,7 +82,7 @@ def _require_active_master(
     record: Department | Position | WorkTeam, label: str
 ) -> None:
     if record.archived_at is not None or not record.is_active:
-        raise ValueError(f"The selected {label} is not active.")
+        raise ValueError(f"{label} انتخاب‌شده فعال نیست.")
 
 
 def _require_same_organization(
@@ -100,7 +100,7 @@ def _require_same_organization(
         for record in records.values()
     ):
         raise PermissionDenied(
-            "The related workforce record belongs to another tenant."
+            "رکورد مرتبط نیروی انسانی متعلق به سازمان دیگری است."
         )
 
 
@@ -127,7 +127,7 @@ def create_department(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(department, "Department data is invalid or its code exists.")
+    _save_validated(department, "اطلاعات واحد سازمانی معتبر نیست یا کد آن تکراری است.")
     record_audit_event(
         action=AuditAction.DEPARTMENT_CREATED,
         entity_type="department",
@@ -162,7 +162,7 @@ def create_position(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(position, "Position data is invalid or its code exists.")
+    _save_validated(position, "اطلاعات سمت شغلی معتبر نیست یا کد آن تکراری است.")
     record_audit_event(
         action=AuditAction.POSITION_CREATED,
         entity_type="position",
@@ -192,7 +192,7 @@ def create_work_team(
     if lead is not None and (
         lead.archived_at is not None or lead.status != EmployeeStatus.ACTIVE
     ):
-        raise ValueError("Only an active employee can lead a work team.")
+        raise ValueError("فقط کارمند فعال می‌تواند سرپرست گروه کاری باشد.")
     team = WorkTeam(
         organization=organization,
         department=department,
@@ -203,7 +203,7 @@ def create_work_team(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(team, "Work team data is invalid or its code exists.")
+    _save_validated(team, "اطلاعات گروه کاری معتبر نیست یا کد آن تکراری است.")
     record_audit_event(
         action=AuditAction.WORK_TEAM_CREATED,
         entity_type="work_team",
@@ -260,7 +260,7 @@ def create_employee(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(employee, "Employee data is invalid or already exists.")
+    _save_validated(employee, "اطلاعات کارمند معتبر نیست یا از قبل وجود دارد.")
     record_audit_event(
         action=AuditAction.EMPLOYEE_CREATED,
         entity_type="employee",
@@ -321,14 +321,14 @@ def transition_employee_status(
     _require_management_access(organization=organization, actor=actor)
     locked = Employee.objects.select_for_update().get(pk=employee.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied("The employee does not belong to this organization.")
+        raise PermissionDenied("کارمند متعلق به این سازمان نیست.")
     if target_status not in _EMPLOYEE_STATUS_TRANSITIONS.get(locked.status, ()):
-        raise ValueError("This employee status transition is not allowed.")
+        raise ValueError("این تغییر وضعیت کارمند مجاز نیست.")
     if (
         target_status != EmployeeStatus.ACTIVE
         and locked.project_assignments.filter(status=AssignmentStatus.ACTIVE).exists()
     ):
-        raise ValueError("End active project assignments before changing status.")
+        raise ValueError("پیش از تغییر وضعیت، مأموریت‌های فعال پروژه را خاتمه دهید.")
     previous_status = locked.status
     locked.status = target_status
     locked.termination_date = (
@@ -342,7 +342,7 @@ def transition_employee_status(
             update_fields=["status", "termination_date", "updated_by", "updated_at"]
         )
     except ValidationError as exc:
-        raise ValueError("Employee status data is invalid.") from exc
+        raise ValueError("اطلاعات وضعیت کارمند معتبر نیست.") from exc
     record_audit_event(
         action=AuditAction.EMPLOYEE_STATUS_CHANGED,
         entity_type="employee",
@@ -374,11 +374,11 @@ def assign_employee_to_project(
         site=site,
     )
     if employee.status != EmployeeStatus.ACTIVE or employee.archived_at is not None:
-        raise ValueError("Only an active employee can be assigned.")
+        raise ValueError("فقط کارمند فعال قابل تخصیص است.")
     if project.deleted_at is not None:
-        raise ValueError("An archived project cannot receive assignments.")
+        raise ValueError("امکان تخصیص نیرو به پروژه بایگانی‌شده وجود ندارد.")
     if site is not None and not site.is_active:
-        raise ValueError("An inactive worksite cannot receive assignments.")
+        raise ValueError("امکان تخصیص نیرو به کارگاه غیرفعال وجود ندارد.")
     assignment = EmployeeProjectAssignment(
         organization=organization,
         employee=employee,
@@ -390,7 +390,7 @@ def assign_employee_to_project(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(assignment, "Project assignment data is invalid or duplicated.")
+    _save_validated(assignment, "اطلاعات تخصیص پروژه معتبر نیست یا تکراری است.")
     record_audit_event(
         action=AuditAction.EMPLOYEE_PROJECT_ASSIGNED,
         entity_type="employee_project_assignment",
@@ -415,7 +415,7 @@ def get_organization_project_assignments(
     assignments = EmployeeProjectAssignment.objects.filter(organization=organization)
     if project is not None:
         if project.organization_id != organization.pk:
-            raise PermissionDenied("The project does not belong to this organization.")
+            raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
         assignments = assignments.filter(project=project)
     return assignments.select_related("employee", "project", "site")
 
@@ -432,9 +432,9 @@ def transition_project_assignment_status(
     _require_management_access(organization=organization, actor=actor)
     locked = EmployeeProjectAssignment.objects.select_for_update().get(pk=assignment.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied("The assignment does not belong to this organization.")
+        raise PermissionDenied("تخصیص نیرو متعلق به این سازمان نیست.")
     if target_status not in _ASSIGNMENT_STATUS_TRANSITIONS.get(locked.status, ()):
-        raise ValueError("This assignment status transition is not allowed.")
+        raise ValueError("این تغییر وضعیت تخصیص نیرو مجاز نیست.")
     previous_status = locked.status
     locked.status = target_status
     locked.end_date = end_date
@@ -442,7 +442,7 @@ def transition_project_assignment_status(
     try:
         locked.save(update_fields=["status", "end_date", "updated_by", "updated_at"])
     except ValidationError as exc:
-        raise ValueError("Assignment end date is invalid.") from exc
+        raise ValueError("تاریخ پایان تخصیص معتبر نیست.") from exc
     record_audit_event(
         action=AuditAction.EMPLOYEE_PROJECT_ASSIGNMENT_STATUS_CHANGED,
         entity_type="employee_project_assignment",
@@ -461,15 +461,15 @@ def archive_employee(
     _require_management_access(organization=organization, actor=actor)
     locked = Employee.objects.select_for_update().get(pk=employee.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied("The employee does not belong to this organization.")
+        raise PermissionDenied("کارمند متعلق به این سازمان نیست.")
     if locked.archived_at is not None:
-        raise ValueError("The employee is already archived.")
+        raise ValueError("کارمند از قبل بایگانی شده است.")
     if locked.project_assignments.filter(status=AssignmentStatus.ACTIVE).exists():
         raise ValueError(
-            "An employee with active project assignments cannot be archived."
+            "کارمند دارای تخصیص فعال پروژه قابل بایگانی نیست."
         )
     if locked.teams_led.filter(archived_at__isnull=True).exists():
-        raise ValueError("An employee leading an active team cannot be archived.")
+        raise ValueError("سرپرست گروه کاری فعال قابل بایگانی نیست.")
     locked.archived_at = timezone.now()
     if locked.status == EmployeeStatus.ACTIVE:
         locked.status = EmployeeStatus.INACTIVE
@@ -498,10 +498,10 @@ def _archive_master(
     locked = record.__class__.objects.select_for_update().get(pk=record.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied(
-            "The workforce record does not belong to this organization."
+            "رکورد نیروی انسانی متعلق به این سازمان نیست."
         )
     if locked.archived_at is not None:
-        raise ValueError("The workforce record is already archived.")
+        raise ValueError("رکورد نیروی انسانی از قبل بایگانی شده است.")
     if isinstance(locked, Department) and (
         locked.children.filter(archived_at__isnull=True).exists()
         or locked.positions.filter(archived_at__isnull=True).exists()
@@ -509,18 +509,18 @@ def _archive_master(
         or locked.employees.filter(archived_at__isnull=True).exists()
     ):
         raise ValueError(
-            "A department with active workforce records cannot be archived."
+            "واحد سازمانی دارای رکورد فعال نیروی انسانی قابل بایگانی نیست."
         )
     if (
         isinstance(locked, Position)
         and locked.employees.filter(archived_at__isnull=True).exists()
     ):
-        raise ValueError("A position assigned to active employees cannot be archived.")
+        raise ValueError("سمت شغلی تخصیص‌یافته به کارکنان فعال قابل بایگانی نیست.")
     if (
         isinstance(locked, WorkTeam)
         and locked.members.filter(archived_at__isnull=True).exists()
     ):
-        raise ValueError("A team with active members cannot be archived.")
+        raise ValueError("گروه کاری دارای اعضای فعال قابل بایگانی نیست.")
     locked.archived_at = timezone.now()
     locked.is_active = False
     locked.updated_by = actor

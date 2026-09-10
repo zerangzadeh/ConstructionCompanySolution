@@ -10,16 +10,18 @@ from core.identifiers import canonicalize_upper_identifier
 class EstimateForm(forms.ModelForm):
     """Form for creating an estimate in the active organization."""
 
-    project = forms.ModelChoiceField(queryset=Project.objects.none())
+    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     contract = forms.ModelChoiceField(
+        label="قرارداد",
         queryset=Contract.objects.none(),
         required=False,
-        empty_label="No contract",
+        empty_label="بدون قرارداد",
     )
     phase = forms.ModelChoiceField(
+        label="فاز پروژه",
         queryset=ProjectPhase.objects.none(),
         required=False,
-        empty_label="No phase",
+        empty_label="بدون فاز",
     )
 
     class Meta:
@@ -64,10 +66,10 @@ class EstimateForm(forms.ModelForm):
         phase = cleaned_data.get("phase")
         if project and contract and contract.project_id != project.pk:
             raise forms.ValidationError(
-                "Selected contract does not belong to the selected project."
+                "قرارداد انتخاب‌شده متعلق به این پروژه نیست."
             )
         if phase and project and phase.site.project_id != project.pk:
-            self.add_error("phase", "Selected phase does not belong to the project.")
+            self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data
 
     def clean_estimate_number(self) -> str:
@@ -78,9 +80,10 @@ class EstimateItemForm(forms.ModelForm):
     """Form for adding a priced item to an estimate."""
 
     unit_of_measure = forms.ModelChoiceField(
+        label="واحد اندازه‌گیری",
         queryset=UnitOfMeasure.objects.none(),
         required=False,
-        empty_label="Legacy unit text",
+        empty_label="استفاده از واحد متنی قدیمی",
     )
 
     def __init__(self, *args, organization=None, **kwargs):

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ project.name }} | Construction ERP{% endblock %}
+{% block title %}{{ project.name }} | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
     <nav class="flex items-center gap-2 text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-600" href="{% url 'projects:list' %}">پروژه‌ها</a><span>/</span><span class="truncate text-slate-600">{{ project.name }}</span><span>/</span><span>جزئیات</span></nav>

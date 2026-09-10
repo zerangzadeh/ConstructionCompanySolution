@@ -7,6 +7,7 @@ from threading import Barrier
 
 from django.db import close_old_connections, connection
 from django.test import TransactionTestCase
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
@@ -16,6 +17,14 @@ from apps.estimates.models import Estimate, EstimateStatus
 from apps.estimates.services import approve_estimate
 from apps.expenses.models import Expense, ExpenseStatus
 from apps.expenses.services import void_expense
+from apps.inventory.models import StockTransaction, StockTransactionType
+from apps.inventory.services import (
+    create_stock_transaction,
+    create_warehouse,
+    get_stock_balance,
+    post_stock_transaction,
+)
+from apps.materials.models import Material, UnitCategory, UnitOfMeasure
 from apps.organizations.models import (
     InvitationStatus,
     MembershipRole,
@@ -139,6 +148,42 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
             counterparty_name="Lock supplier",
             created_by=self.owner,
             updated_by=self.owner,
+        )
+        self.inventory_unit = UnitOfMeasure.objects.create(
+            organization=self.organization,
+            code="LOCK-KG",
+            name="Lock kilogram",
+            symbol="lock-kg",
+            category=UnitCategory.WEIGHT,
+            decimal_places=4,
+        )
+        self.inventory_material = Material.objects.create(
+            organization=self.organization,
+            code="LOCK-MATERIAL",
+            name="Lock material",
+            unit_of_measure=self.inventory_unit,
+        )
+        self.inventory_warehouse = create_warehouse(
+            organization=self.organization,
+            actor=self.owner,
+            code="LOCK-WAREHOUSE",
+            name="Lock warehouse",
+        )
+        opening = create_stock_transaction(
+            organization=self.organization,
+            actor=self.owner,
+            transaction_number="LOCK-OPENING",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            destination_warehouse=self.inventory_warehouse,
+            material=self.inventory_material,
+            unit_of_measure=self.inventory_unit,
+            quantity=Decimal("10.0000"),
+            occurred_at=timezone.now(),
+        )
+        post_stock_transaction(
+            organization=self.organization,
+            actor=self.owner,
+            stock_transaction=opening,
         )
 
     def _run_race(self, action: Callable[[], object]) -> list[ValueError | None]:
@@ -327,4 +372,41 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
                 entity_id=str(self.planning_phase.pk),
             ).count(),
             1,
+        )
+
+    def test_concurrent_stock_issues_cannot_overdraw_warehouse(self) -> None:
+        transaction_ids: Queue = Queue()
+        for index in range(2):
+            draft = create_stock_transaction(
+                organization=self.organization,
+                actor=self.owner,
+                transaction_number=f"LOCK-ISSUE-{index}",
+                transaction_type=StockTransactionType.ISSUE,
+                source_warehouse=self.inventory_warehouse,
+                material=self.inventory_material,
+                unit_of_measure=self.inventory_unit,
+                project=self.project,
+                quantity=Decimal("6.0000"),
+                occurred_at=timezone.now(),
+            )
+            transaction_ids.put(draft.pk)
+
+        def post_issue() -> object:
+            return post_stock_transaction(
+                organization=Organization.objects.get(pk=self.organization.pk),
+                actor=User.objects.get(pk=self.owner.pk),
+                stock_transaction=StockTransaction.objects.get(
+                    pk=transaction_ids.get_nowait()
+                ),
+            )
+
+        self._assert_one_success_and_one_state_rejection(self._run_race(post_issue))
+        self.assertEqual(
+            get_stock_balance(
+                user=self.owner,
+                organization=self.organization,
+                warehouse=self.inventory_warehouse,
+                material=self.inventory_material,
+            ),
+            Decimal("4.0000"),
         )

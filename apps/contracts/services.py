@@ -63,40 +63,40 @@ def create_contract(
     """Create a contract with organization and project scope validation."""
 
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_contracts(actor, organization):
-        raise PermissionDenied("You cannot create contracts in this organization.")
+        raise PermissionDenied("اجازه ایجاد قرارداد در این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if (
         not contract_number.strip()
         or not title.strip()
         or not counterparty_name.strip()
     ):
-        raise ValueError("Contract number, title, and counterparty are required.")
+        raise ValueError("وارد کردن شماره، عنوان و طرف قرارداد الزامی است.")
     if party and (party.organization_id != organization.pk or party.archived_at):
-        raise PermissionDenied("The party does not belong to this organization.")
+        raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
     if direction is not None and direction not in ContractDirection.values:
-        raise ValueError("Invalid contract direction.")
+        raise ValueError("جهت قرارداد معتبر نیست.")
     if contract_type is not None and contract_type not in ContractType.values:
-        raise ValueError("Invalid contract type.")
+        raise ValueError("نوع قرارداد معتبر نیست.")
     if status not in ContractStatus.values:
-        raise ValueError("Invalid contract status.")
+        raise ValueError("وضعیت قرارداد معتبر نیست.")
     if contract_value < Decimal("0.00"):
-        raise ValueError("Contract value cannot be negative.")
+        raise ValueError("مبلغ قرارداد نمی‌تواند منفی باشد.")
     if start_date and end_date and end_date < start_date:
-        raise ValueError("Contract end date cannot be before start date.")
+        raise ValueError("تاریخ پایان قرارداد نمی‌تواند پیش از تاریخ شروع باشد.")
     normalized_contract_number = canonicalize_upper_identifier(contract_number)
     if Contract.objects.filter(
         organization=organization,
         contract_number=normalized_contract_number,
     ).exists():
-        raise ValueError("A contract with this contract number already exists.")
+        raise ValueError("قراردادی با این شماره از قبل وجود دارد.")
 
     contract = Contract.objects.create(
         organization=organization,
@@ -140,17 +140,17 @@ def get_organization_contracts(
     """Return non-deleted contracts in the user's active organization."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Contract.objects.filter(
             organization=organization,
@@ -165,7 +165,7 @@ def get_organization_contracts(
 def _get_locked_contract(*, contract: Contract, organization: Organization) -> Contract:
     locked = Contract.objects.select_for_update().get(pk=contract.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied("The contract does not belong to this organization.")
+        raise PermissionDenied("قرارداد متعلق به این سازمان نیست.")
     return locked
 
 
@@ -185,22 +185,22 @@ def update_draft_contract(
 ) -> Contract:
     """Edit only a draft contract; finalized commercial terms use amendments."""
     if not _can_manage_contracts(actor, organization):
-        raise PermissionDenied("You cannot manage contracts in this organization.")
+        raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
     locked = _get_locked_contract(contract=contract, organization=organization)
     if locked.status != ContractStatus.DRAFT:
-        raise ValueError("Only draft contracts can be edited.")
+        raise ValueError("فقط قراردادهای پیش‌نویس قابل ویرایش هستند.")
     if (
         not title.strip()
         or not counterparty_name.strip()
         or contract_value < Decimal("0.00")
     ):
-        raise ValueError("Draft contract data is invalid.")
+        raise ValueError("اطلاعات قرارداد پیش‌نویس معتبر نیست.")
     if party and (party.organization_id != organization.pk or party.archived_at):
-        raise PermissionDenied("The party does not belong to this organization.")
+        raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
     if direction is not None and direction not in ContractDirection.values:
-        raise ValueError("Invalid contract direction.")
+        raise ValueError("جهت قرارداد معتبر نیست.")
     if contract_type is not None and contract_type not in ContractType.values:
-        raise ValueError("Invalid contract type.")
+        raise ValueError("نوع قرارداد معتبر نیست.")
     locked.title, locked.counterparty_name, locked.party = (
         title.strip(),
         counterparty_name.strip(),
@@ -230,14 +230,14 @@ def transition_contract_status(
 ) -> Contract:
     """Apply the deliberately narrow contract lifecycle under a row lock."""
     if not _can_manage_contracts(actor, organization):
-        raise PermissionDenied("You cannot manage contracts in this organization.")
+        raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
     locked = _get_locked_contract(contract=contract, organization=organization)
     allowed = {
         ContractStatus.DRAFT: {ContractStatus.ACTIVE, ContractStatus.TERMINATED},
         ContractStatus.ACTIVE: {ContractStatus.COMPLETED, ContractStatus.TERMINATED},
     }
     if status not in allowed.get(locked.status, set()):
-        raise ValueError("Invalid contract status transition.")
+        raise ValueError("تغییر وضعیت قرارداد مجاز نیست.")
     previous_status = locked.status
     locked.status, locked.updated_by = status, actor
     locked.save(update_fields=["status", "updated_by", "updated_at"])
@@ -267,12 +267,12 @@ def add_contract_item(
     sort_order: int = 0,
 ) -> ContractItem:
     if not _can_manage_contracts(actor, organization):
-        raise PermissionDenied("You cannot manage contracts in this organization.")
+        raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
     locked = _get_locked_contract(contract=contract, organization=organization)
     if locked.status != ContractStatus.DRAFT:
-        raise ValueError("Only draft contracts can have items changed.")
+        raise ValueError("فقط ردیف‌های قرارداد پیش‌نویس قابل تغییر هستند.")
     if not description.strip() or quantity <= Decimal(0) or unit_price < Decimal(0):
-        raise ValueError("Contract item data is invalid.")
+        raise ValueError("اطلاعات ردیف قرارداد معتبر نیست.")
     item = ContractItem.objects.create(
         organization=organization,
         contract=locked,
@@ -301,14 +301,14 @@ def approve_contract_amendment(
 ) -> ContractAmendment:
     """Approve a single immutable amendment without changing the legacy header value."""
     if not _can_manage_contracts(actor, organization):
-        raise PermissionDenied("You cannot manage contracts in this organization.")
+        raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
     locked = ContractAmendment.objects.select_for_update().get(pk=amendment.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied("The amendment does not belong to this organization.")
+        raise PermissionDenied("الحاقیه متعلق به این سازمان نیست.")
     if locked.contract.status not in {ContractStatus.ACTIVE, ContractStatus.COMPLETED}:
-        raise ValueError("Only finalized contracts can be amended.")
+        raise ValueError("فقط قراردادهای نهایی‌شده می‌توانند الحاقیه داشته باشند.")
     if locked.status != ContractAmendmentStatus.DRAFT:
-        raise ValueError("Only draft amendments can be approved.")
+        raise ValueError("فقط الحاقیه‌های پیش‌نویس قابل تأیید هستند.")
     from django.utils import timezone
 
     locked.status, locked.approved_by, locked.approved_at = (

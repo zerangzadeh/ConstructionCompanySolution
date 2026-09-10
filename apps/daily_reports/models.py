@@ -9,9 +9,9 @@ from core.tenant_validation import validate_related_organizations
 
 
 class DailyReportStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    SUBMITTED = "submitted", "Submitted"
-    APPROVED = "approved", "Approved"
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    APPROVED = "approved", "تأییدشده"
 
 
 class DailyReport(UUIDModel, TimeStampedModel):
@@ -19,44 +19,50 @@ class DailyReport(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="daily_reports",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.CASCADE,
         related_name="daily_reports",
     )
     site = models.ForeignKey(
         "projects.ProjectSite",
+        verbose_name="کارگاه",
         on_delete=models.PROTECT,
         related_name="daily_reports",
     )
     phase = models.ForeignKey(
         "projects.ProjectPhase",
+        verbose_name="فاز پروژه",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="daily_reports",
     )
-    reporting_date = models.DateField()
+    reporting_date = models.DateField("تاریخ گزارش")
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=DailyReportStatus.choices,
         default=DailyReportStatus.DRAFT,
         db_index=True,
     )
-    weather_conditions = models.CharField(max_length=255, blank=True)
-    labor_count = models.PositiveIntegerField(default=0)
-    work_performed = models.TextField()
-    progress_summary = models.TextField(blank=True)
-    issues_and_delays = models.TextField(blank=True)
-    safety_notes = models.TextField(blank=True)
-    quality_notes = models.TextField(blank=True)
-    submitted_at = models.DateTimeField(null=True, blank=True)
-    approved_at = models.DateTimeField(null=True, blank=True)
+    weather_conditions = models.CharField("شرایط آب‌وهوا", max_length=255, blank=True)
+    labor_count = models.PositiveIntegerField("تعداد نیروی انسانی", default=0)
+    work_performed = models.TextField("کارهای انجام‌شده")
+    progress_summary = models.TextField("خلاصه پیشرفت", blank=True)
+    issues_and_delays = models.TextField("مسائل و تأخیرها", blank=True)
+    safety_notes = models.TextField("یادداشت‌های ایمنی", blank=True)
+    quality_notes = models.TextField("یادداشت‌های کیفیت", blank=True)
+    submitted_at = models.DateTimeField("زمان ارسال", null=True, blank=True)
+    approved_at = models.DateTimeField("زمان تأیید", null=True, blank=True)
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="تأییدکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -64,6 +70,7 @@ class DailyReport(UUIDModel, TimeStampedModel):
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -71,6 +78,7 @@ class DailyReport(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -78,6 +86,8 @@ class DailyReport(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "گزارش روزانه"
+        verbose_name_plural = "گزارش‌های روزانه"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "site", "reporting_date"],
@@ -115,11 +125,11 @@ class DailyReport(UUIDModel, TimeStampedModel):
         validate_related_organizations(self, **relations)
         if self.site_id and self.site.project_id != self.project_id:
             raise ValidationError(
-                {"site": "The worksite must belong to the selected project."}
+                {"site": "کارگاه باید متعلق به پروژه انتخاب‌شده باشد."}
             )
         if self.phase_id and self.phase.site_id != self.site_id:
             raise ValidationError(
-                {"phase": "The phase must belong to the selected worksite."}
+                {"phase": "فاز باید متعلق به کارگاه انتخاب‌شده باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -132,20 +142,23 @@ class DailyReportLaborEntry(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="daily_report_labor_entries",
     )
     report = models.ForeignKey(
         DailyReport,
+        verbose_name="گزارش روزانه",
         on_delete=models.CASCADE,
         related_name="labor_entries",
     )
-    team_name = models.CharField(max_length=120)
-    worker_count = models.PositiveIntegerField()
-    hours_worked = models.DecimalField(max_digits=8, decimal_places=2)
-    notes = models.TextField(blank=True)
+    team_name = models.CharField("نام گروه کاری", max_length=120)
+    worker_count = models.PositiveIntegerField("تعداد نیرو")
+    hours_worked = models.DecimalField("ساعات کارکرد", max_digits=8, decimal_places=2)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -153,6 +166,8 @@ class DailyReportLaborEntry(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "رکورد نیروی انسانی گزارش روزانه"
+        verbose_name_plural = "رکوردهای نیروی انسانی گزارش روزانه"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "report"],
@@ -179,19 +194,22 @@ class DailyReportEquipmentEntry(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="daily_report_equipment_entries",
     )
     report = models.ForeignKey(
         DailyReport,
+        verbose_name="گزارش روزانه",
         on_delete=models.CASCADE,
         related_name="equipment_entries",
     )
-    equipment_name = models.CharField(max_length=255)
-    hours_used = models.DecimalField(max_digits=8, decimal_places=2)
-    notes = models.TextField(blank=True)
+    equipment_name = models.CharField("نام تجهیز", max_length=255)
+    hours_used = models.DecimalField("ساعات کارکرد", max_digits=8, decimal_places=2)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -199,6 +217,8 @@ class DailyReportEquipmentEntry(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "رکورد تجهیز گزارش روزانه"
+        verbose_name_plural = "رکوردهای تجهیزات گزارش روزانه"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "report"],
@@ -208,7 +228,7 @@ class DailyReportEquipmentEntry(UUIDModel, CreatedAtModel):
         ordering = ["created_at"]  # noqa: RUF012
 
     def __str__(self) -> str:
-        return f"{self.equipment_name} ({self.hours_used} h)"
+        return f"{self.equipment_name} ({self.hours_used} ساعت)"
 
     def clean(self) -> None:
         super().clean()
@@ -225,38 +245,44 @@ class DailyReportMaterialEntry(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="daily_report_material_entries",
     )
     report = models.ForeignKey(
         DailyReport,
+        verbose_name="گزارش روزانه",
         on_delete=models.CASCADE,
         related_name="material_entries",
     )
-    material_name = models.CharField(max_length=255)
+    material_name = models.CharField("نام مصالح", max_length=255)
     material = models.ForeignKey(
         "materials.Material",
+        verbose_name="مصالح",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="daily_report_entries",
     )
     quantity = models.DecimalField(
+        "مقدار مصرف",
         max_digits=18,
         decimal_places=4,
         default=Decimal("0.0000"),
     )
-    unit = models.CharField(max_length=30)
+    unit = models.CharField("واحد قدیمی", max_length=30)
     unit_of_measure = models.ForeignKey(
         "materials.UnitOfMeasure",
+        verbose_name="واحد اندازه‌گیری",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="daily_report_entries",
     )
-    notes = models.TextField(blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -264,6 +290,8 @@ class DailyReportMaterialEntry(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "رکورد مصالح گزارش روزانه"
+        verbose_name_plural = "رکوردهای مصالح گزارش روزانه"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "report"],
@@ -282,12 +310,12 @@ class DailyReportMaterialEntry(UUIDModel, CreatedAtModel):
         if self.material_id:
             validate_related_organizations(self, material=self.material)
             if not self.material.is_active or self.material.archived_at:
-                raise ValidationError({"material": "Material must be active."})
+                raise ValidationError({"material": "مصالح باید فعال باشد."})
         if self.unit_of_measure_id:
             validate_related_organizations(self, unit_of_measure=self.unit_of_measure)
             if not self.unit_of_measure.is_active or self.unit_of_measure.archived_at:
                 raise ValidationError(
-                    {"unit_of_measure": "Unit of measure must be active."}
+                    {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
                 )
         if (
             self.material_id
@@ -295,7 +323,7 @@ class DailyReportMaterialEntry(UUIDModel, CreatedAtModel):
             and self.material.unit_of_measure_id != self.unit_of_measure_id
         ):
             raise ValidationError(
-                {"unit_of_measure": "Unit must match the material's canonical unit."}
+                {"unit_of_measure": "واحد باید با واحد اصلی مصالح مطابقت داشته باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -308,36 +336,45 @@ class DailyActivity(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="daily_activities",
     )
     report = models.ForeignKey(
-        DailyReport, on_delete=models.CASCADE, related_name="daily_activities"
+        DailyReport,
+        verbose_name="گزارش روزانه",
+        on_delete=models.CASCADE,
+        related_name="daily_activities",
     )
     activity = models.ForeignKey(
         "projects.Activity",
+        verbose_name="فعالیت",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="daily_entries",
     )
-    description = models.TextField()
+    description = models.TextField("شرح فعالیت")
     quantity = models.DecimalField(
+        "مقدار",
         max_digits=18, decimal_places=4, null=True, blank=True
     )
     unit_of_measure = models.ForeignKey(
         "materials.UnitOfMeasure",
+        verbose_name="واحد اندازه‌گیری",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="daily_activities",
     )
     progress_percent = models.DecimalField(
+        "درصد پیشرفت",
         max_digits=5, decimal_places=2, null=True, blank=True
     )
-    notes = models.TextField(blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -345,6 +382,8 @@ class DailyActivity(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "فعالیت روزانه"
+        verbose_name_plural = "فعالیت‌های روزانه"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "report"], name="daily_activity_org_report_idx"
@@ -356,19 +395,19 @@ class DailyActivity(UUIDModel, CreatedAtModel):
         super().clean()
         self.description = self.description.strip()
         if not self.description:
-            raise ValidationError({"description": "Activity description is required."})
+            raise ValidationError({"description": "وارد کردن شرح فعالیت الزامی است."})
         relations = {}
         if self.report_id:
             relations["report"] = self.report
         if self.activity_id:
             relations["activity"] = self.activity
             if not self.activity.is_active or self.activity.archived_at:
-                raise ValidationError({"activity": "Activity must be active."})
+                raise ValidationError({"activity": "فعالیت باید فعال باشد."})
         if self.unit_of_measure_id:
             relations["unit_of_measure"] = self.unit_of_measure
             if not self.unit_of_measure.is_active or self.unit_of_measure.archived_at:
                 raise ValidationError(
-                    {"unit_of_measure": "Unit of measure must be active."}
+                    {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
                 )
         validate_related_organizations(self, **relations)
         if (
@@ -377,22 +416,22 @@ class DailyActivity(UUIDModel, CreatedAtModel):
             and self.activity.project_id != self.report.project_id
         ):
             raise ValidationError(
-                {"activity": "Activity must belong to the report project."}
+                {"activity": "فعالیت باید متعلق به پروژه گزارش باشد."}
             )
         if self.quantity is not None:
             if self.quantity <= Decimal("0.0000"):
-                raise ValidationError({"quantity": "Quantity must be positive."})
+                raise ValidationError({"quantity": "مقدار باید مثبت باشد."})
             if not self.unit_of_measure_id:
                 raise ValidationError(
-                    {"unit_of_measure": "A unit is required for quantity."}
+                    {"unit_of_measure": "برای مقدار واردشده، انتخاب واحد الزامی است."}
                 )
         elif self.unit_of_measure_id:
-            raise ValidationError({"quantity": "Quantity is required with a unit."})
+            raise ValidationError({"quantity": "با انتخاب واحد، وارد کردن مقدار الزامی است."})
         if self.progress_percent is not None and not Decimal(
             0
         ) <= self.progress_percent <= Decimal(100):
             raise ValidationError(
-                {"progress_percent": "Progress must be between 0 and 100."}
+                {"progress_percent": "درصد پیشرفت باید بین ۰ تا ۱۰۰ باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -401,8 +440,8 @@ class DailyActivity(UUIDModel, CreatedAtModel):
 
 
 class DelayEventStatus(models.TextChoices):
-    OPEN = "open", "Open"
-    RESOLVED = "resolved", "Resolved"
+    OPEN = "open", "باز"
+    RESOLVED = "resolved", "رفع‌شده"
 
 
 class DelayEvent(UUIDModel, CreatedAtModel):
@@ -410,32 +449,39 @@ class DelayEvent(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="delay_events",
     )
     report = models.ForeignKey(
-        DailyReport, on_delete=models.CASCADE, related_name="delay_events"
+        DailyReport,
+        verbose_name="گزارش روزانه",
+        on_delete=models.CASCADE,
+        related_name="delay_events",
     )
     activity = models.ForeignKey(
         "projects.Activity",
+        verbose_name="فعالیت",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="delay_events",
     )
-    occurred_on = models.DateField()
-    category = models.CharField(max_length=100, blank=True)
-    cause = models.TextField()
-    impact = models.TextField(blank=True)
-    responsible_party = models.CharField(max_length=255, blank=True)
+    occurred_on = models.DateField("تاریخ وقوع")
+    category = models.CharField("دسته تأخیر", max_length=100, blank=True)
+    cause = models.TextField("علت تأخیر")
+    impact = models.TextField("اثر تأخیر", blank=True)
+    responsible_party = models.CharField("طرف مسئول", max_length=255, blank=True)
     duration_hours = models.DecimalField(
+        "مدت تأخیر (ساعت)",
         max_digits=8, decimal_places=2, null=True, blank=True
     )
     status = models.CharField(
-        max_length=20, choices=DelayEventStatus.choices, default=DelayEventStatus.OPEN
+        "وضعیت", max_length=20, choices=DelayEventStatus.choices, default=DelayEventStatus.OPEN
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -443,6 +489,8 @@ class DelayEvent(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "رویداد تأخیر"
+        verbose_name_plural = "رویدادهای تأخیر"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "report"], name="delay_event_org_report_idx"
@@ -459,12 +507,12 @@ class DelayEvent(UUIDModel, CreatedAtModel):
         )
         self.responsible_party = self.responsible_party.strip()
         if not self.cause:
-            raise ValidationError({"cause": "Delay cause is required."})
+            raise ValidationError({"cause": "وارد کردن علت تأخیر الزامی است."})
         relations = {"report": self.report} if self.report_id else {}
         if self.activity_id:
             relations["activity"] = self.activity
             if not self.activity.is_active or self.activity.archived_at:
-                raise ValidationError({"activity": "Activity must be active."})
+                raise ValidationError({"activity": "فعالیت باید فعال باشد."})
         validate_related_organizations(self, **relations)
         if (
             self.report_id
@@ -472,11 +520,11 @@ class DelayEvent(UUIDModel, CreatedAtModel):
             and self.activity.project_id != self.report.project_id
         ):
             raise ValidationError(
-                {"activity": "Activity must belong to the report project."}
+                {"activity": "فعالیت باید متعلق به پروژه گزارش باشد."}
             )
         if self.duration_hours is not None and self.duration_hours <= Decimal("0.00"):
             raise ValidationError(
-                {"duration_hours": "Delay duration must be positive."}
+                {"duration_hours": "مدت تأخیر باید مثبت باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:

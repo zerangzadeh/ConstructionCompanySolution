@@ -20,13 +20,13 @@ class OrganizationForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
-                    "placeholder": "Company name",
+                    "placeholder": "نام شرکت",
                 }
             ),
             "legal_name": forms.TextInput(
                 attrs={
                     "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
-                    "placeholder": "Legal name (optional)",
+                    "placeholder": "نام قانونی (اختیاری)",
                 }
             ),
             "slug": forms.TextInput(

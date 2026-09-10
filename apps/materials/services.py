@@ -1,3 +1,6 @@
+from collections import defaultdict
+from decimal import Decimal
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
@@ -32,11 +35,11 @@ def _require_active_management_access(
     *, organization: Organization, actor: User
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if organization.status != OrganizationStatus.ACTIVE or organization.deleted_at:
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_units(actor, organization):
-        raise PermissionDenied("You cannot manage units in this organization.")
+        raise PermissionDenied("اجازه مدیریت واحدهای اندازه‌گیری این سازمان را ندارید.")
 
 
 @transaction.atomic
@@ -52,7 +55,7 @@ def create_unit_of_measure(
 ) -> UnitOfMeasure:
     _require_active_management_access(organization=organization, actor=actor)
     if category not in UnitCategory.values:
-        raise ValueError("Invalid unit category.")
+        raise ValueError("دسته‌بندی واحد اندازه‌گیری معتبر نیست.")
     unit = UnitOfMeasure(
         organization=organization,
         code=code,
@@ -66,7 +69,7 @@ def create_unit_of_measure(
     try:
         unit.save()
     except (IntegrityError, ValidationError) as exc:
-        raise ValueError("A unit with this code or symbol already exists.") from exc
+        raise ValueError("واحدی با این کد یا نماد از قبل وجود دارد.") from exc
     record_audit_event(
         action=AuditAction.UNIT_OF_MEASURE_CREATED,
         entity_type="unit_of_measure",
@@ -84,7 +87,7 @@ def get_organization_units(
     if not organization.memberships.filter(
         user=user, status=MembershipStatus.ACTIVE
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return UnitOfMeasure.objects.filter(
         organization=organization, archived_at__isnull=True
     )
@@ -97,11 +100,11 @@ def archive_unit_of_measure(
     _require_active_management_access(organization=organization, actor=actor)
     locked_unit = UnitOfMeasure.objects.select_for_update().get(pk=unit.pk)
     if locked_unit.organization_id != organization.id:
-        raise PermissionDenied("The unit does not belong to this organization.")
+        raise PermissionDenied("واحد اندازه‌گیری متعلق به این سازمان نیست.")
     if locked_unit.archived_at is not None:
-        raise ValueError("The unit is already archived.")
+        raise ValueError("واحد اندازه‌گیری از قبل بایگانی شده است.")
     if locked_unit.materials.filter(archived_at__isnull=True).exists():
-        raise ValueError("A unit used by active materials cannot be archived.")
+        raise ValueError("واحد مورد استفاده مصالح فعال قابل بایگانی نیست.")
     locked_unit.archived_at = timezone.now()
     locked_unit.is_active = False
     locked_unit.updated_by = actor
@@ -123,7 +126,7 @@ def _validate_category_parent(category: MaterialCategory) -> None:
     parent = category.parent
     while parent is not None:
         if parent.pk == category.pk:
-            raise ValueError("Material category hierarchy cannot contain a cycle.")
+            raise ValueError("ساختار دسته‌بندی مصالح نمی‌تواند شامل چرخه باشد.")
         parent = parent.parent
 
 
@@ -139,7 +142,7 @@ def create_material_category(
     _require_active_management_access(organization=organization, actor=actor)
     if parent and parent.organization_id != organization.id:
         raise PermissionDenied(
-            "The parent category does not belong to this organization."
+            "دسته‌بندی والد متعلق به این سازمان نیست."
         )
     category = MaterialCategory(
         organization=organization,
@@ -154,7 +157,7 @@ def create_material_category(
         _validate_category_parent(category)
         category.save()
     except (IntegrityError, ValidationError) as exc:
-        raise ValueError("A material category with this code already exists.") from exc
+        raise ValueError("دسته‌بندی مصالح با این کد از قبل وجود دارد.") from exc
     record_audit_event(
         action=AuditAction.MATERIAL_CATEGORY_CREATED,
         entity_type="material_category",
@@ -180,13 +183,13 @@ def update_material_category(
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
         raise PermissionDenied(
-            "The material category does not belong to this organization."
+            "دسته‌بندی مصالح متعلق به این سازمان نیست."
         )
     if locked_category.archived_at is not None:
-        raise ValueError("Archived material categories cannot be updated.")
+        raise ValueError("دسته‌بندی مصالح بایگانی‌شده قابل به‌روزرسانی نیست.")
     if parent and parent.organization_id != organization.id:
         raise PermissionDenied(
-            "The parent category does not belong to this organization."
+            "دسته‌بندی والد متعلق به این سازمان نیست."
         )
     locked_category.code, locked_category.name, locked_category.parent = (
         code,
@@ -199,7 +202,7 @@ def update_material_category(
         _validate_category_parent(locked_category)
         locked_category.save()
     except (IntegrityError, ValidationError) as exc:
-        raise ValueError("A material category with this code already exists.") from exc
+        raise ValueError("دسته‌بندی مصالح با این کد از قبل وجود دارد.") from exc
     record_audit_event(
         action=AuditAction.MATERIAL_CATEGORY_UPDATED,
         entity_type="material_category",
@@ -217,7 +220,7 @@ def get_organization_material_categories(
     if not organization.memberships.filter(
         user=user, status=MembershipStatus.ACTIVE
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return MaterialCategory.objects.filter(
         organization=organization, archived_at__isnull=True
     )
@@ -231,16 +234,16 @@ def archive_material_category(
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
         raise PermissionDenied(
-            "The material category does not belong to this organization."
+            "دسته‌بندی مصالح متعلق به این سازمان نیست."
         )
     if locked_category.archived_at is not None:
-        raise ValueError("The material category is already archived.")
+        raise ValueError("دسته‌بندی مصالح از قبل بایگانی شده است.")
     if (
         locked_category.children.filter(archived_at__isnull=True).exists()
         or locked_category.materials.filter(archived_at__isnull=True).exists()
     ):
         raise ValueError(
-            "A category with active child categories or materials cannot be archived."
+            "دسته‌ای که زیرمجموعه یا مصالح فعال دارد قابل بایگانی نیست."
         )
     (
         locked_category.archived_at,
@@ -288,7 +291,7 @@ def create_material(
         material.save()
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(
-            "Material data is invalid or its code already exists."
+            "اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد."
         ) from exc
     record_audit_event(
         action=AuditAction.MATERIAL_CREATED,
@@ -319,9 +322,9 @@ def update_material(
     _require_active_management_access(organization=organization, actor=actor)
     locked_material = Material.objects.select_for_update().get(pk=material.pk)
     if locked_material.organization_id != organization.id:
-        raise PermissionDenied("The material does not belong to this organization.")
+        raise PermissionDenied("مصالح متعلق به این سازمان نیست.")
     if locked_material.archived_at is not None:
-        raise ValueError("Archived materials cannot be updated.")
+        raise ValueError("مصالح بایگانی‌شده قابل به‌روزرسانی نیست.")
     locked_material.code, locked_material.name = code, name
     locked_material.category, locked_material.unit_of_measure = (
         category,
@@ -333,7 +336,7 @@ def update_material(
         locked_material.save()
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(
-            "Material data is invalid or its code already exists."
+            "اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد."
         ) from exc
     record_audit_event(
         action=AuditAction.MATERIAL_UPDATED,
@@ -355,7 +358,7 @@ def get_organization_materials(
     if not organization.memberships.filter(
         user=user, status=MembershipStatus.ACTIVE
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     queryset = Material.objects.filter(
         organization=organization, archived_at__isnull=True
     ).select_related("category", "unit_of_measure")
@@ -375,9 +378,29 @@ def archive_material(
     _require_active_management_access(organization=organization, actor=actor)
     locked_material = Material.objects.select_for_update().get(pk=material.pk)
     if locked_material.organization_id != organization.id:
-        raise PermissionDenied("The material does not belong to this organization.")
+        raise PermissionDenied("مصالح متعلق به این سازمان نیست.")
     if locked_material.archived_at is not None:
-        raise ValueError("The material is already archived.")
+        raise ValueError("مصالح از قبل بایگانی شده است.")
+    from apps.inventory.models import StockTransactionStatus
+
+    stock_transactions = locked_material.stock_transactions.all()
+    if stock_transactions.filter(status=StockTransactionStatus.DRAFT).exists():
+        raise ValueError("مصالح دارای تراکنش پیش‌نویس انبار قابل بایگانی نیست.")
+    warehouse_balances: defaultdict[object, Decimal] = defaultdict(
+        lambda: Decimal("0.0000")
+    )
+    for source_id, destination_id, quantity in stock_transactions.filter(
+        status__in=[
+            StockTransactionStatus.POSTED,
+            StockTransactionStatus.REVERSED,
+        ]
+    ).values_list("source_warehouse_id", "destination_warehouse_id", "quantity"):
+        if source_id is not None:
+            warehouse_balances[source_id] -= quantity
+        if destination_id is not None:
+            warehouse_balances[destination_id] += quantity
+    if any(balance != Decimal("0.0000") for balance in warehouse_balances.values()):
+        raise ValueError("مصالح دارای موجودی انبار قابل بایگانی نیست.")
     (
         locked_material.archived_at,
         locked_material.is_active,

@@ -9,15 +9,15 @@ from core.tenant_validation import validate_related_organizations
 
 
 class EmployeeStatus(models.TextChoices):
-    ACTIVE = "active", "Active"
-    INACTIVE = "inactive", "Inactive"
-    TERMINATED = "terminated", "Terminated"
+    ACTIVE = "active", "فعال"
+    INACTIVE = "inactive", "غیرفعال"
+    TERMINATED = "terminated", "خاتمه همکاری"
 
 
 class AssignmentStatus(models.TextChoices):
-    ACTIVE = "active", "Active"
-    COMPLETED = "completed", "Completed"
-    CANCELLED = "cancelled", "Cancelled"
+    ACTIVE = "active", "فعال"
+    COMPLETED = "completed", "تکمیل‌شده"
+    CANCELLED = "cancelled", "لغوشده"
 
 
 class Department(UUIDModel, TimeStampedModel):
@@ -25,23 +25,26 @@ class Department(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="departments",
     )
     parent = models.ForeignKey(
         "self",
+        verbose_name="واحد سازمانی والد",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="children",
     )
-    code = models.CharField(max_length=50)
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True, db_index=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    code = models.CharField("کد واحد سازمانی", max_length=50)
+    name = models.CharField("نام واحد سازمانی", max_length=255)
+    description = models.TextField("شرح", blank=True)
+    is_active = models.BooleanField("فعال", default=True, db_index=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -49,6 +52,7 @@ class Department(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -56,6 +60,8 @@ class Department(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "واحد سازمانی"
+        verbose_name_plural = "واحدهای سازمانی"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "code"],
@@ -75,19 +81,19 @@ class Department(UUIDModel, TimeStampedModel):
         self.code = canonicalize_upper_identifier(self.code)
         self.name = self.name.strip()
         if not self.code or not self.name:
-            raise ValidationError("Department code and name are required.")
+            raise ValidationError("وارد کردن کد و نام واحد سازمانی الزامی است.")
         if self.parent_id:
             validate_related_organizations(self, parent=self.parent)
             if self.parent_id == self.pk:
                 raise ValidationError(
-                    {"parent": "A department cannot be its own parent."}
+                    {"parent": "واحد سازمانی نمی‌تواند والد خودش باشد."}
                 )
             ancestor = self.parent
             visited: set[object] = {self.pk}
             while ancestor is not None:
                 if ancestor.pk in visited:
                     raise ValidationError(
-                        {"parent": "A department hierarchy cannot contain a cycle."}
+                        {"parent": "ساختار واحدهای سازمانی نمی‌تواند شامل چرخه باشد."}
                     )
                 visited.add(ancestor.pk)
                 ancestor = ancestor.parent
@@ -105,23 +111,26 @@ class Position(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="positions",
     )
     department = models.ForeignKey(
         Department,
+        verbose_name="واحد سازمانی",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="positions",
     )
-    code = models.CharField(max_length=50)
-    title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True, db_index=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    code = models.CharField("کد سمت", max_length=50)
+    title = models.CharField("عنوان سمت", max_length=255)
+    description = models.TextField("شرح", blank=True)
+    is_active = models.BooleanField("فعال", default=True, db_index=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -129,6 +138,7 @@ class Position(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -136,6 +146,8 @@ class Position(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "سمت شغلی"
+        verbose_name_plural = "سمت‌های شغلی"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "code"],
@@ -155,7 +167,7 @@ class Position(UUIDModel, TimeStampedModel):
         self.code = canonicalize_upper_identifier(self.code)
         self.title = self.title.strip()
         if not self.code or not self.title:
-            raise ValidationError("Position code and title are required.")
+            raise ValidationError("وارد کردن کد و عنوان سمت شغلی الزامی است.")
         if self.department_id:
             validate_related_organizations(self, department=self.department)
 
@@ -172,11 +184,13 @@ class WorkTeam(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="work_teams",
     )
     department = models.ForeignKey(
         Department,
+        verbose_name="واحد سازمانی",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -184,18 +198,20 @@ class WorkTeam(UUIDModel, TimeStampedModel):
     )
     lead = models.ForeignKey(
         "Employee",
+        verbose_name="سرپرست گروه",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="teams_led",
     )
-    code = models.CharField(max_length=50)
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-    is_active = models.BooleanField(default=True, db_index=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    code = models.CharField("کد گروه کاری", max_length=50)
+    name = models.CharField("نام گروه کاری", max_length=255)
+    description = models.TextField("شرح", blank=True)
+    is_active = models.BooleanField("فعال", default=True, db_index=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -203,6 +219,7 @@ class WorkTeam(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -210,6 +227,8 @@ class WorkTeam(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "گروه کاری"
+        verbose_name_plural = "گروه‌های کاری"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "code"],
@@ -229,7 +248,7 @@ class WorkTeam(UUIDModel, TimeStampedModel):
         self.code = canonicalize_upper_identifier(self.code)
         self.name = self.name.strip()
         if not self.code or not self.name:
-            raise ValidationError("Work team code and name are required.")
+            raise ValidationError("وارد کردن کد و نام گروه کاری الزامی است.")
         relations = {}
         if self.department_id:
             relations["department"] = self.department
@@ -250,11 +269,13 @@ class Employee(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="employees",
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="حساب کاربری",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -262,6 +283,7 @@ class Employee(UUIDModel, TimeStampedModel):
     )
     department = models.ForeignKey(
         Department,
+        verbose_name="واحد سازمانی",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -269,6 +291,7 @@ class Employee(UUIDModel, TimeStampedModel):
     )
     position = models.ForeignKey(
         Position,
+        verbose_name="سمت شغلی",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -276,27 +299,30 @@ class Employee(UUIDModel, TimeStampedModel):
     )
     work_team = models.ForeignKey(
         WorkTeam,
+        verbose_name="گروه کاری",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="members",
     )
-    employee_number = models.CharField(max_length=50)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.EmailField(blank=True)
-    phone_number = models.CharField(max_length=32, blank=True)
-    hire_date = models.DateField(null=True, blank=True)
-    termination_date = models.DateField(null=True, blank=True)
+    employee_number = models.CharField("شماره پرسنلی", max_length=50)
+    first_name = models.CharField("نام", max_length=150)
+    last_name = models.CharField("نام خانوادگی", max_length=150)
+    email = models.EmailField("ایمیل", blank=True)
+    phone_number = models.CharField("شماره تلفن", max_length=32, blank=True)
+    hire_date = models.DateField("تاریخ استخدام", null=True, blank=True)
+    termination_date = models.DateField("تاریخ خاتمه همکاری", null=True, blank=True)
     status = models.CharField(
+        "وضعیت اشتغال",
         max_length=20,
         choices=EmployeeStatus.choices,
         default=EmployeeStatus.ACTIVE,
         db_index=True,
     )
-    archived_at = models.DateTimeField(null=True, blank=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -304,6 +330,7 @@ class Employee(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -311,6 +338,8 @@ class Employee(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "کارمند"
+        verbose_name_plural = "کارکنان"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "employee_number"],
@@ -341,7 +370,7 @@ class Employee(UUIDModel, TimeStampedModel):
         self.last_name = self.last_name.strip()
         if not self.employee_number or not self.first_name or not self.last_name:
             raise ValidationError(
-                "Employee number, first name, and last name are required."
+                "وارد کردن شماره پرسنلی، نام و نام خانوادگی الزامی است."
             )
         relations = {}
         if self.department_id:
@@ -358,7 +387,7 @@ class Employee(UUIDModel, TimeStampedModel):
             and self.position.department_id != self.department_id
         ):
             raise ValidationError(
-                {"position": "Position must belong to the selected department."}
+                {"position": "سمت شغلی باید متعلق به واحد سازمانی انتخاب‌شده باشد."}
             )
         if (
             self.user_id
@@ -368,7 +397,7 @@ class Employee(UUIDModel, TimeStampedModel):
             ).exists()
         ):
             raise ValidationError(
-                {"user": "Employee user must be an active organization member."}
+                {"user": "حساب کاربری کارمند باید عضو فعال سازمان باشد."}
             )
         if (
             self.hire_date
@@ -376,15 +405,15 @@ class Employee(UUIDModel, TimeStampedModel):
             and self.termination_date < self.hire_date
         ):
             raise ValidationError(
-                {"termination_date": "Termination date cannot be before hire date."}
+                {"termination_date": "تاریخ خاتمه همکاری نمی‌تواند پیش از تاریخ استخدام باشد."}
             )
         if self.status == EmployeeStatus.TERMINATED and not self.termination_date:
             raise ValidationError(
-                {"termination_date": "Termination date is required when terminated."}
+                {"termination_date": "برای وضعیت خاتمه همکاری، وارد کردن تاریخ الزامی است."}
             )
         if self.status != EmployeeStatus.TERMINATED and self.termination_date:
             raise ValidationError(
-                {"termination_date": "Only terminated employees can have this date."}
+                {"termination_date": "تاریخ خاتمه همکاری فقط برای کارکنان خاتمه‌یافته مجاز است."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -400,38 +429,44 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="employee_project_assignments",
     )
     employee = models.ForeignKey(
         Employee,
+        verbose_name="کارمند",
         on_delete=models.PROTECT,
         related_name="project_assignments",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.PROTECT,
         related_name="employee_assignments",
     )
     site = models.ForeignKey(
         "projects.ProjectSite",
+        verbose_name="کارگاه",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="employee_assignments",
     )
-    role_title = models.CharField(max_length=255, blank=True)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True, blank=True)
+    role_title = models.CharField("عنوان نقش در پروژه", max_length=255, blank=True)
+    start_date = models.DateField("تاریخ شروع تخصیص")
+    end_date = models.DateField("تاریخ پایان تخصیص", null=True, blank=True)
     status = models.CharField(
+        "وضعیت تخصیص",
         max_length=20,
         choices=AssignmentStatus.choices,
         default=AssignmentStatus.ACTIVE,
         db_index=True,
     )
-    notes = models.TextField(blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -439,6 +474,7 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -446,6 +482,8 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "تخصیص کارمند به پروژه"
+        verbose_name_plural = "تخصیص کارکنان به پروژه‌ها"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["employee", "project"],
@@ -475,16 +513,16 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
             site=self.site if self.site_id else None,
         )
         if self.site_id and self.project_id and self.site.project_id != self.project_id:
-            raise ValidationError({"site": "Worksite must belong to the project."})
+            raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
         if self.end_date and self.end_date < self.start_date:
-            raise ValidationError({"end_date": "End date cannot be before start date."})
+            raise ValidationError({"end_date": "تاریخ پایان نمی‌تواند پیش از تاریخ شروع باشد."})
         if self.status == AssignmentStatus.ACTIVE and self.end_date:
             raise ValidationError(
-                {"end_date": "Active assignments cannot have an end date."}
+                {"end_date": "تخصیص فعال نمی‌تواند تاریخ پایان داشته باشد."}
             )
         if self.status != AssignmentStatus.ACTIVE and not self.end_date:
             raise ValidationError(
-                {"end_date": "Completed or cancelled assignments require an end date."}
+                {"end_date": "برای تخصیص تکمیل‌شده یا لغوشده، تاریخ پایان الزامی است."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:

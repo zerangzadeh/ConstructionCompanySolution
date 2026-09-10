@@ -48,16 +48,16 @@ def _validate_context(
     project: Project,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_payments(actor, organization):
-        raise PermissionDenied("You cannot manage payments in this organization.")
+        raise PermissionDenied("اجازه مدیریت پرداخت‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
 
 
 def _validate_contract(
@@ -71,7 +71,7 @@ def _validate_contract(
         or contract.project_id != project.pk
         or contract.deleted_at is not None
     ):
-        raise PermissionDenied("The contract does not belong to this project.")
+        raise PermissionDenied("قرارداد متعلق به این پروژه نیست.")
 
 
 def _validate_phase(
@@ -81,7 +81,7 @@ def _validate_phase(
     phase: ProjectPhase,
 ) -> None:
     if phase.organization_id != organization.pk or phase.site.project_id != project.pk:
-        raise PermissionDenied("The project phase does not belong to this project.")
+        raise PermissionDenied("فاز پروژه متعلق به این پروژه نیست.")
 
 
 @transaction.atomic
@@ -114,22 +114,22 @@ def create_payment(
     if phase is not None:
         _validate_phase(organization=organization, project=project, phase=phase)
     if not payment_number.strip() or (not counterparty_name.strip() and party is None):
-        raise ValueError("Payment number and counterparty are required.")
+        raise ValueError("وارد کردن شماره پرداخت و طرف حساب الزامی است.")
     if amount <= Decimal("0.00"):
-        raise ValueError("Payment amount must be positive.")
+        raise ValueError("مبلغ پرداخت باید مثبت باشد.")
     if direction not in PaymentDirection.values:
-        raise ValueError("Invalid payment direction.")
+        raise ValueError("جهت پرداخت معتبر نیست.")
     if method not in PaymentMethod.values:
-        raise ValueError("Invalid payment method.")
+        raise ValueError("روش پرداخت معتبر نیست.")
     if party and (party.organization_id != organization.pk or party.archived_at):
-        raise PermissionDenied("The party does not belong to this organization.")
+        raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
 
     normalized_number = canonicalize_upper_identifier(payment_number)
     if Payment.objects.filter(
         organization=organization,
         payment_number=normalized_number,
     ).exists():
-        raise ValueError("A payment with this number already exists.")
+        raise ValueError("پرداختی با این شماره از قبل وجود دارد.")
 
     payment = Payment.objects.create(
         organization=organization,
@@ -178,9 +178,9 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
         project=locked_payment.project,
     )
     if locked_payment.status != PaymentStatus.POSTED:
-        raise ValueError("Only posted payments can be voided.")
+        raise ValueError("فقط پرداخت ثبت‌شده قابل ابطال است.")
     if not reason.strip():
-        raise ValueError("A void reason is required.")
+        raise ValueError("وارد کردن دلیل ابطال الزامی است.")
 
     locked_payment.status = PaymentStatus.VOID
     locked_payment.void_reason = reason.strip()
@@ -250,9 +250,9 @@ def allocate_payment(
         contract=contract,
     )
     if locked_payment.status != PaymentStatus.POSTED:
-        raise ValueError("Only posted payments can be allocated.")
+        raise ValueError("فقط پرداخت ثبت‌شده قابل تخصیص است.")
     if amount <= Decimal("0.00"):
-        raise ValueError("Allocation amount must be positive.")
+        raise ValueError("مبلغ تخصیص باید مثبت باشد.")
     allocated = sum(
         (
             allocation.amount
@@ -263,7 +263,7 @@ def allocate_payment(
         Decimal("0.00"),
     )
     if allocated + amount > locked_payment.amount:
-        raise ValueError("Payment allocations cannot exceed the payment amount.")
+        raise ValueError("مجموع تخصیص‌ها نمی‌تواند از مبلغ پرداخت بیشتر باشد.")
     allocation = PaymentAllocation.objects.create(
         organization=locked_payment.organization,
         payment=locked_payment,
@@ -294,17 +294,17 @@ def get_organization_payments(
     """Return payments visible to an active member of the active organization."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Payment.objects.filter(
             organization=organization,

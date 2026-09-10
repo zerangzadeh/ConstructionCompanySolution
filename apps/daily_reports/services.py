@@ -36,24 +36,24 @@ from apps.projects.models import (
 
 def _get_active_role(user: User, organization: Organization) -> str:
     if not user.is_authenticated or not user.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     try:
         return organization.memberships.get(
             user=user,
             status=MembershipStatus.ACTIVE,
         ).role
     except organization.memberships.model.DoesNotExist as exc:
-        raise PermissionDenied("You do not have access to this organization.") from exc
+        raise PermissionDenied("به این سازمان دسترسی ندارید.") from exc
 
 
 def _validate_project(*, organization: Organization, project: Project) -> None:
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
 
 
 def _validate_site(
@@ -67,7 +67,7 @@ def _validate_site(
         or site.project_id != project.pk
         or not site.is_active
     ):
-        raise PermissionDenied("The worksite does not belong to this project.")
+        raise PermissionDenied("کارگاه متعلق به این پروژه نیست.")
 
 
 def _validate_phase(
@@ -81,7 +81,7 @@ def _validate_phase(
         or phase.site_id != site.pk
         or phase.status != ProjectPhaseStatus.ACTIVE
     ):
-        raise PermissionDenied("The project phase is not active for this worksite.")
+        raise PermissionDenied("فاز پروژه برای این کارگاه فعال نیست.")
 
 
 def _can_create_daily_reports(role: str) -> bool:
@@ -118,7 +118,7 @@ def _get_draft_report_for_update(
 ) -> DailyReport:
     role = _get_active_role(actor, organization)
     if not _can_create_daily_reports(role):
-        raise PermissionDenied("You cannot update daily reports in this organization.")
+        raise PermissionDenied("اجازه به‌روزرسانی گزارش‌های روزانه این سازمان را ندارید.")
     try:
         report = (
             DailyReport.objects.select_for_update()
@@ -126,7 +126,7 @@ def _get_draft_report_for_update(
             .get(pk=report_id, organization=organization)
         )
     except DailyReport.DoesNotExist as exc:
-        raise PermissionDenied("Daily report not found in this organization.") from exc
+        raise PermissionDenied("گزارش روزانه در این سازمان یافت نشد.") from exc
     _validate_project(organization=organization, project=report.project)
     _validate_site(
         organization=organization,
@@ -134,9 +134,9 @@ def _get_draft_report_for_update(
         site=report.site,
     )
     if not _can_update_daily_report(role=role, report=report, actor=actor):
-        raise PermissionDenied("You cannot update this daily report.")
+        raise PermissionDenied("اجازه به‌روزرسانی این گزارش روزانه را ندارید.")
     if report.status != DailyReportStatus.DRAFT:
-        raise ValueError("Only draft daily reports can be updated.")
+        raise ValueError("فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است.")
     return report
 
 
@@ -161,21 +161,21 @@ def create_daily_report(
 
     role = _get_active_role(actor, organization)
     if not _can_create_daily_reports(role):
-        raise PermissionDenied("You cannot create daily reports in this organization.")
+        raise PermissionDenied("اجازه ایجاد گزارش روزانه در این سازمان را ندارید.")
     _validate_project(organization=organization, project=project)
     _validate_site(organization=organization, project=project, site=site)
     if phase is not None:
         _validate_phase(organization=organization, site=site, phase=phase)
     if not work_performed.strip():
-        raise ValueError("Work performed is required.")
+        raise ValueError("وارد کردن کارهای انجام‌شده الزامی است.")
     if labor_count < 0:
-        raise ValueError("Labor count cannot be negative.")
+        raise ValueError("تعداد نیروی انسانی نمی‌تواند منفی باشد.")
     if DailyReport.objects.filter(
         organization=organization,
         site=site,
         reporting_date=reporting_date,
     ).exists():
-        raise ValueError("A daily report already exists for this worksite and date.")
+        raise ValueError("برای این کارگاه و تاریخ، گزارش روزانه از قبل وجود دارد.")
 
     report = DailyReport.objects.create(
         organization=organization,
@@ -250,7 +250,7 @@ def get_organization_daily_report(
     try:
         return reports.get(pk=report_id)
     except DailyReport.DoesNotExist as exc:
-        raise PermissionDenied("Daily report not found in this organization.") from exc
+        raise PermissionDenied("گزارش روزانه در این سازمان یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -270,7 +270,7 @@ def submit_daily_report(
             .get(pk=report_id, organization=organization)
         )
     except DailyReport.DoesNotExist as exc:
-        raise PermissionDenied("Daily report not found in this organization.") from exc
+        raise PermissionDenied("گزارش روزانه در این سازمان یافت نشد.") from exc
     _validate_project(organization=organization, project=report.project)
     _validate_site(
         organization=organization,
@@ -278,9 +278,9 @@ def submit_daily_report(
         site=report.site,
     )
     if not (_can_approve_daily_reports(role) or report.created_by_id == actor.pk):
-        raise PermissionDenied("You cannot submit this daily report.")
+        raise PermissionDenied("اجازه ارسال این گزارش روزانه را ندارید.")
     if report.status != DailyReportStatus.DRAFT:
-        raise ValueError("Only draft daily reports can be submitted.")
+        raise ValueError("فقط گزارش روزانه پیش‌نویس قابل ارسال است.")
 
     report.status = DailyReportStatus.SUBMITTED
     report.submitted_at = timezone.now()
@@ -316,11 +316,11 @@ def add_daily_report_labor_entry(
         actor=actor,
     )
     if not team_name.strip():
-        raise ValueError("Labor team name is required.")
+        raise ValueError("وارد کردن نام گروه کاری الزامی است.")
     if worker_count <= 0:
-        raise ValueError("Labor worker count must be positive.")
+        raise ValueError("تعداد نیروی انسانی باید مثبت باشد.")
     if hours_worked <= Decimal("0.00"):
-        raise ValueError("Labor hours worked must be positive.")
+        raise ValueError("ساعات کارکرد نیروی انسانی باید مثبت باشد.")
     report.updated_by = actor
     report.save(update_fields=["updated_by", "updated_at"])
     entry = DailyReportLaborEntry.objects.create(
@@ -361,9 +361,9 @@ def add_daily_report_equipment_entry(
         actor=actor,
     )
     if not equipment_name.strip():
-        raise ValueError("Equipment name is required.")
+        raise ValueError("وارد کردن نام تجهیز الزامی است.")
     if hours_used <= Decimal("0.00"):
-        raise ValueError("Equipment hours used must be positive.")
+        raise ValueError("ساعات کارکرد تجهیز باید مثبت باشد.")
     report.updated_by = actor
     report.save(update_fields=["updated_by", "updated_at"])
     entry = DailyReportEquipmentEntry.objects.create(
@@ -412,7 +412,7 @@ def add_daily_report_material_entry(
             or material.archived_at
         ):
             raise PermissionDenied(
-                "The material does not belong to this active organization."
+                "مصالح متعلق به این سازمان فعال نیست."
             )
         unit_of_measure = material.unit_of_measure
         material_name = material.name
@@ -424,13 +424,13 @@ def add_daily_report_material_entry(
             or unit_of_measure.archived_at
         ):
             raise PermissionDenied(
-                "The unit does not belong to this active organization."
+                "واحد اندازه‌گیری متعلق به این سازمان فعال نیست."
             )
         unit = unit_of_measure.symbol
     if not material_name.strip() or not unit.strip():
-        raise ValueError("Material name and unit are required.")
+        raise ValueError("وارد کردن نام مصالح و واحد الزامی است.")
     if quantity <= Decimal("0.0000"):
-        raise ValueError("Material quantity must be positive.")
+        raise ValueError("مقدار مصالح باید مثبت باشد.")
     report.updated_by = actor
     report.save(update_fields=["updated_by", "updated_at"])
     entry = DailyReportMaterialEntry.objects.create(
@@ -468,12 +468,12 @@ def _validate_daily_activity_scope(*, report: DailyReport, activity: Activity) -
         or activity.archived_at is not None
     ):
         raise PermissionDenied(
-            "The activity does not belong to this active report project."
+            "فعالیت متعلق به پروژه فعال این گزارش نیست."
         )
     if activity.site_id and activity.site_id != report.site_id:
-        raise PermissionDenied("The activity does not belong to the report worksite.")
+        raise PermissionDenied("فعالیت متعلق به کارگاه گزارش نیست.")
     if activity.phase_id and activity.phase_id != report.phase_id:
-        raise PermissionDenied("The activity does not belong to the report phase.")
+        raise PermissionDenied("فعالیت متعلق به فاز گزارش نیست.")
 
 
 @transaction.atomic
@@ -501,7 +501,7 @@ def add_daily_activity(
             and unit_of_measure
             and activity.unit_of_measure_id != unit_of_measure.id
         ):
-            raise ValueError("Unit must match the activity's canonical unit.")
+            raise ValueError("واحد باید با واحد اصلی فعالیت مطابقت داشته باشد.")
         if activity.unit_of_measure_id and unit_of_measure is None:
             unit_of_measure = activity.unit_of_measure
     if unit_of_measure is not None and (
@@ -509,7 +509,7 @@ def add_daily_activity(
         or not unit_of_measure.is_active
         or unit_of_measure.archived_at
     ):
-        raise PermissionDenied("The unit does not belong to this active organization.")
+        raise PermissionDenied("واحد اندازه‌گیری متعلق به این سازمان فعال نیست.")
     entry = DailyActivity.objects.create(
         organization=organization,
         report=report,
@@ -595,7 +595,7 @@ def approve_daily_report(
 
     role = _get_active_role(actor, organization)
     if not _can_approve_daily_reports(role):
-        raise PermissionDenied("You cannot approve daily reports in this organization.")
+        raise PermissionDenied("اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.")
     try:
         report = (
             DailyReport.objects.select_for_update()
@@ -603,7 +603,7 @@ def approve_daily_report(
             .get(pk=report_id, organization=organization)
         )
     except DailyReport.DoesNotExist as exc:
-        raise PermissionDenied("Daily report not found in this organization.") from exc
+        raise PermissionDenied("گزارش روزانه در این سازمان یافت نشد.") from exc
     _validate_project(organization=organization, project=report.project)
     _validate_site(
         organization=organization,
@@ -611,7 +611,7 @@ def approve_daily_report(
         site=report.site,
     )
     if report.status != DailyReportStatus.SUBMITTED:
-        raise ValueError("Only submitted daily reports can be approved.")
+        raise ValueError("فقط گزارش‌های روزانه ارسال‌شده قابل تأیید هستند.")
 
     now = timezone.now()
     report.status = DailyReportStatus.APPROVED

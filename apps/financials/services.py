@@ -49,17 +49,17 @@ def _money(value: Decimal) -> Decimal:
 
 def _validate_view_context(user: User, organization: Organization) -> None:
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 
 def _build_report(project: Project) -> ProjectFinancialReport:
@@ -142,7 +142,7 @@ def get_project_financial_report(
         .first()
     )
     if project is None:
-        raise PermissionDenied("Project not found in this organization.")
+        raise PermissionDenied("پروژه در این سازمان یافت نشد.")
     return _build_report(project)
 
 

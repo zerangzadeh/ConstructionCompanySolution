@@ -10,16 +10,18 @@ from core.identifiers import canonicalize_upper_identifier
 class PaymentForm(forms.ModelForm):
     """Form for recording a payment in the active organization."""
 
-    project = forms.ModelChoiceField(queryset=Project.objects.none())
+    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     contract = forms.ModelChoiceField(
+        label="قرارداد",
         queryset=Contract.objects.none(),
         required=False,
-        empty_label="No contract",
+        empty_label="بدون قرارداد",
     )
     phase = forms.ModelChoiceField(
+        label="فاز پروژه",
         queryset=ProjectPhase.objects.none(),
         required=False,
-        empty_label="No phase",
+        empty_label="بدون فاز",
     )
 
     class Meta:
@@ -73,10 +75,10 @@ class PaymentForm(forms.ModelForm):
         phase = cleaned_data.get("phase")
         if project and contract and contract.project_id != project.pk:
             self.add_error(
-                "contract", "Selected contract does not belong to the project."
+                "contract", "قرارداد انتخاب‌شده متعلق به این پروژه نیست."
             )
         if phase and project and phase.site.project_id != project.pk:
-            self.add_error("phase", "Selected phase does not belong to the project.")
+            self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data
 
     def clean_payment_number(self) -> str:
@@ -86,4 +88,4 @@ class PaymentForm(forms.ModelForm):
 class PaymentVoidForm(forms.Form):
     """Requires an explicit reason before voiding a posted payment."""
 
-    reason = forms.CharField(widget=forms.Textarea, max_length=1000)
+    reason = forms.CharField(label="دلیل ابطال", widget=forms.Textarea, max_length=1000)

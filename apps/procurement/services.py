@@ -931,6 +931,13 @@ def void_goods_receipt(
         raise ValueError("Only posted goods receipts can be voided.")
     if not reason.strip():
         raise ValueError("A void reason is required.")
+    if receipt.items.filter(
+        stock_transactions__status="posted",
+        stock_transactions__transaction_type="receipt",
+    ).exists():
+        raise ValueError(
+            "Reverse posted inventory receipts before voiding the goods receipt."
+        )
     receipt.status = GoodsReceiptStatus.VOID
     receipt.voided_at = timezone.now()
     receipt.voided_by = actor

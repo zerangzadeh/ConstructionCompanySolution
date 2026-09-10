@@ -22,7 +22,7 @@ class UserManager(BaseUserManager["User"]):
     ) -> "User":
         username = canonicalize_lower_identifier(username)
         if not username:
-            raise ValueError("The username is required.")
+            raise ValueError("وارد کردن نام کاربری الزامی است.")
 
         user = self.model(
             username=username,
@@ -50,9 +50,9 @@ class UserManager(BaseUserManager["User"]):
         extra_fields.setdefault("is_active", True)
 
         if extra_fields.get("is_staff") is not True:
-            raise ValueError("A superuser must have is_staff=True.")
+            raise ValueError("کاربر ارشد باید مقدار is_staff=True داشته باشد.")
         if extra_fields.get("is_superuser") is not True:
-            raise ValueError("A superuser must have is_superuser=True.")
+            raise ValueError("کاربر ارشد باید مقدار is_superuser=True داشته باشد.")
 
         return self.create_user(username, password, email=email, **extra_fields)
 
@@ -61,19 +61,24 @@ class User(AbstractUser):
     """Application user identified by a unique username."""
 
     id = models.UUIDField(
+        "شناسه",
         default=uuid.uuid4,
         editable=False,
         primary_key=True,
     )
-    email = models.EmailField(blank=True)
-    phone_number = models.CharField(max_length=32, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    email = models.EmailField("ایمیل", blank=True)
+    phone_number = models.CharField("شماره تلفن", max_length=32, blank=True)
+    created_at = models.DateTimeField("زمان ایجاد", auto_now_add=True)
+    updated_at = models.DateTimeField("زمان آخرین به‌روزرسانی", auto_now=True)
 
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS: list[str] = []  # noqa: RUF012
 
     objects = UserManager()
+
+    class Meta(AbstractUser.Meta):
+        verbose_name = "کاربر"
+        verbose_name_plural = "کاربران"
 
     def clean(self) -> None:
         super().clean()

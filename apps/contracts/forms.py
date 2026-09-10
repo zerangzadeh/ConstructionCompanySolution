@@ -10,8 +10,9 @@ class ContractForm(forms.ModelForm):
     """Form for creating a contract in the active organization."""
 
     project = forms.ModelChoiceField(
+        label="پروژه",
         queryset=Project.objects.none(),
-        empty_label="Select project",
+        empty_label="پروژه را انتخاب کنید",
     )
 
     class Meta:
@@ -45,7 +46,7 @@ class ContractForm(forms.ModelForm):
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ContractStatus.values:
-            raise forms.ValidationError("Invalid contract status.")
+            raise forms.ValidationError("وضعیت قرارداد معتبر نیست.")
         return status
 
     def clean_contract_number(self) -> str:
@@ -57,6 +58,6 @@ class ContractForm(forms.ModelForm):
         end_date = cleaned_data.get("end_date")
         if start_date and end_date and end_date < start_date:
             raise forms.ValidationError(
-                "Contract end date cannot be before start date."
+                "تاریخ پایان قرارداد نمی‌تواند پیش از تاریخ شروع باشد."
             )
         return cleaned_data

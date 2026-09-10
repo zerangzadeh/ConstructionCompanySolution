@@ -54,16 +54,16 @@ def _validate_context(
     project: Project,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_estimates(actor, organization):
-        raise PermissionDenied("You cannot manage estimates in this organization.")
+        raise PermissionDenied("اجازه مدیریت برآوردهای این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
 
 
 def _validate_phase(
@@ -73,7 +73,7 @@ def _validate_phase(
     phase: ProjectPhase,
 ) -> None:
     if phase.organization_id != organization.pk or phase.site.project_id != project.pk:
-        raise PermissionDenied("The project phase does not belong to this project.")
+        raise PermissionDenied("فاز پروژه متعلق به این پروژه نیست.")
 
 
 @transaction.atomic
@@ -97,19 +97,19 @@ def create_estimate(
         or contract.project_id != project.pk
         or contract.deleted_at is not None
     ):
-        raise PermissionDenied("The contract does not belong to this project.")
+        raise PermissionDenied("قرارداد متعلق به این پروژه نیست.")
     if phase is not None:
         _validate_phase(organization=organization, project=project, phase=phase)
     if not estimate_number.strip() or not title.strip():
-        raise ValueError("Estimate number and title are required.")
+        raise ValueError("وارد کردن شماره و عنوان برآورد الزامی است.")
     if status != EstimateStatus.DRAFT:
-        raise ValueError("Estimates must be created as drafts.")
+        raise ValueError("برآورد باید با وضعیت پیش‌نویس ایجاد شود.")
     normalized_number = canonicalize_upper_identifier(estimate_number)
     if Estimate.objects.filter(
         organization=organization,
         estimate_number=normalized_number,
     ).exists():
-        raise ValueError("An estimate with this number already exists.")
+        raise ValueError("برآوردی با این شماره از قبل وجود دارد.")
 
     estimate = Estimate.objects.create(
         organization=organization,
@@ -170,18 +170,18 @@ def add_estimate_item(
         project=locked_estimate.project,
     )
     if locked_estimate.deleted_at is not None:
-        raise ValueError("Cannot add items to a deleted estimate.")
+        raise ValueError("افزودن ردیف به برآورد حذف‌شده ممکن نیست.")
     if locked_estimate.status != EstimateStatus.DRAFT:
-        raise ValueError("Cannot modify an approved estimate.")
+        raise ValueError("برآورد تأییدشده قابل تغییر نیست.")
     revision = locked_estimate.current_revision
     if revision is None or revision.status != EstimateRevisionStatus.DRAFT:
-        raise ValueError("Cannot modify a finalized estimate revision.")
+        raise ValueError("بازنگری نهایی‌شده برآورد قابل تغییر نیست.")
     if not description.strip():
-        raise ValueError("Item description is required.")
+        raise ValueError("وارد کردن شرح ردیف الزامی است.")
     if quantity <= Decimal("0.0000"):
-        raise ValueError("Item quantity must be positive.")
+        raise ValueError("مقدار ردیف باید مثبت باشد.")
     if unit_price < Decimal("0.00"):
-        raise ValueError("Item unit price cannot be negative.")
+        raise ValueError("قیمت واحد ردیف نمی‌تواند منفی باشد.")
     item = EstimateItem.objects.create(
         organization=locked_estimate.organization,
         estimate=locked_estimate,
@@ -217,20 +217,20 @@ def approve_estimate(
 
     locked_estimate = Estimate.objects.select_for_update().get(pk=estimate.pk)
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if not _can_approve_estimates(actor, locked_estimate.organization):
-        raise PermissionDenied("You cannot approve estimates in this organization.")
+        raise PermissionDenied("اجازه تأیید برآوردهای این سازمان را ندارید.")
     if (
         locked_estimate.organization.status != OrganizationStatus.ACTIVE
         or locked_estimate.organization.deleted_at is not None
         or locked_estimate.project.organization_id != locked_estimate.organization_id
         or locked_estimate.project.deleted_at is not None
     ):
-        raise PermissionDenied("The estimate context is not active.")
+        raise PermissionDenied("زمینه مرتبط با برآورد فعال نیست.")
     if locked_estimate.deleted_at is not None:
-        raise ValueError("Cannot approve a deleted estimate.")
+        raise ValueError("برآورد حذف‌شده قابل تأیید نیست.")
     if locked_estimate.status != EstimateStatus.DRAFT:
-        raise ValueError("Only draft estimates can be approved.")
+        raise ValueError("فقط برآوردهای پیش‌نویس قابل تأیید هستند.")
 
     revision = locked_estimate.current_revision
     if revision is None:
@@ -248,7 +248,7 @@ def approve_estimate(
         ).update(revision=revision)
         locked_estimate.current_revision = revision
     if revision.status != EstimateRevisionStatus.DRAFT:
-        raise ValueError("Only draft estimate revisions can be approved.")
+        raise ValueError("فقط بازنگری‌های پیش‌نویس برآورد قابل تأیید هستند.")
     now = timezone.now()
     EstimateRevision.objects.filter(
         estimate=locked_estimate, status=EstimateRevisionStatus.APPROVED
@@ -317,7 +317,7 @@ def create_estimate_revision(
     )
     source = locked_estimate.current_revision
     if source is None or source.status != EstimateRevisionStatus.APPROVED:
-        raise ValueError("Only an approved current revision can be revised.")
+        raise ValueError("فقط بازنگری جاری و تأییدشده قابل بازنگری مجدد است.")
     revision = EstimateRevision.objects.create(
         organization=locked_estimate.organization,
         estimate=locked_estimate,
@@ -368,17 +368,17 @@ def get_organization_estimates(
     """Return non-deleted estimates visible in the active organization."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Estimate.objects.filter(
             organization=organization,

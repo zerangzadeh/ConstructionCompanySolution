@@ -22,7 +22,7 @@ def _validate_audit_metadata(metadata: dict[str, Any]) -> None:
     for key, value in metadata.items():
         normalized_key = str(key).lower()
         if any(part in normalized_key for part in _SENSITIVE_METADATA_KEY_PARTS):
-            raise ValueError("Audit metadata must not contain sensitive values.")
+            raise ValueError("فراداده ممیزی نباید شامل مقادیر حساس باشد.")
         if isinstance(value, dict):
             _validate_audit_metadata(value)
 
@@ -39,7 +39,7 @@ def record_audit_event(
     """Persist an audit event without exposing sensitive token values."""
 
     if action not in AuditAction.values:
-        raise ValueError("Invalid audit action.")
+        raise ValueError("عملیات ممیزی معتبر نیست.")
     normalized_metadata = metadata or {}
     _validate_audit_metadata(normalized_metadata)
     if (
@@ -50,7 +50,7 @@ def record_audit_event(
             status=MembershipStatus.ACTIVE,
         ).exists()
     ):
-        raise PermissionDenied("The audit actor does not belong to this organization.")
+        raise PermissionDenied("عامل رویداد ممیزی متعلق به این سازمان نیست.")
     return AuditEvent.objects.create(
         action=action,
         entity_type=entity_type,
@@ -69,18 +69,18 @@ def get_organization_audit_events(
     """Return audit events only for an active organization membership."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     has_membership = organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists()
     if not has_membership:
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         AuditEvent.objects.filter(organization=organization)
         .select_related("actor")

@@ -9,17 +9,17 @@ from core.tenant_validation import validate_related_organizations
 
 
 class LegacyExpenseCategory(models.TextChoices):
-    MATERIALS = "materials", "Materials"
-    LABOR = "labor", "Labor"
-    EQUIPMENT = "equipment", "Equipment"
-    SUBCONTRACTOR = "subcontractor", "Subcontractor"
-    PERMIT = "permit", "Permit"
-    OTHER = "other", "Other"
+    MATERIALS = "materials", "مصالح"
+    LABOR = "labor", "نیروی انسانی"
+    EQUIPMENT = "equipment", "تجهیزات"
+    SUBCONTRACTOR = "subcontractor", "پیمانکار جزء"
+    PERMIT = "permit", "مجوزها"
+    OTHER = "other", "سایر"
 
 
 class ExpenseStatus(models.TextChoices):
-    RECORDED = "recorded", "Recorded"
-    VOID = "void", "Void"
+    RECORDED = "recorded", "ثبت‌شده"
+    VOID = "void", "باطل‌شده"
 
 
 class ExpenseCategory(UUIDModel, TimeStampedModel):
@@ -27,15 +27,17 @@ class ExpenseCategory(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="expense_categories",
     )
-    code = models.CharField(max_length=30)
-    name = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    code = models.CharField("کد", max_length=30)
+    name = models.CharField("نام دسته هزینه", max_length=100)
+    is_active = models.BooleanField("فعال", default=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -43,6 +45,7 @@ class ExpenseCategory(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -50,6 +53,8 @@ class ExpenseCategory(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "دسته هزینه"
+        verbose_name_plural = "دسته‌های هزینه"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "code"],
@@ -69,7 +74,7 @@ class ExpenseCategory(UUIDModel, TimeStampedModel):
         self.code = self.code.strip().lower()
         self.name = self.name.strip()
         if not self.code or not self.name:
-            raise ValidationError("Expense category code and name are required.")
+            raise ValidationError("وارد کردن کد و نام دسته هزینه الزامی است.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()
@@ -81,31 +86,36 @@ class Expense(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="expenses",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.CASCADE,
         related_name="expenses",
     )
     phase = models.ForeignKey(
         "projects.ProjectPhase",
+        verbose_name="فاز پروژه",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="expenses",
     )
     category = models.CharField(
+        "دسته قدیمی هزینه",
         max_length=30,
         choices=LegacyExpenseCategory.choices,
         default=LegacyExpenseCategory.OTHER,
         db_index=True,
     )
-    description = models.CharField(max_length=255)
-    vendor_name = models.CharField(max_length=255, blank=True)
+    description = models.CharField("شرح هزینه", max_length=255)
+    vendor_name = models.CharField("نام فروشنده", max_length=255, blank=True)
     party = models.ForeignKey(
         "parties.BusinessParty",
+        verbose_name="طرف تجاری",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -113,29 +123,33 @@ class Expense(UUIDModel, TimeStampedModel):
     )
     expense_category = models.ForeignKey(
         ExpenseCategory,
+        verbose_name="دسته هزینه",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="expenses",
     )
     amount = models.DecimalField(
+        "مبلغ",
         max_digits=18,
         decimal_places=2,
         default=Decimal("0.00"),
     )
-    incurred_on = models.DateField()
+    incurred_on = models.DateField("تاریخ وقوع هزینه")
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=ExpenseStatus.choices,
         default=ExpenseStatus.RECORDED,
         db_index=True,
     )
-    void_reason = models.TextField(blank=True)
-    voided_at = models.DateTimeField(null=True, blank=True)
-    receipt_reference = models.CharField(max_length=120, blank=True)
-    notes = models.TextField(blank=True)
+    void_reason = models.TextField("دلیل ابطال", blank=True)
+    voided_at = models.DateTimeField("زمان ابطال", null=True, blank=True)
+    receipt_reference = models.CharField("مرجع رسید", max_length=120, blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -143,6 +157,7 @@ class Expense(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -150,14 +165,17 @@ class Expense(UUIDModel, TimeStampedModel):
     )
     voided_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ابطال‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="expenses_voided",
     )
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField("زمان حذف", null=True, blank=True)
 
     class Meta:
+        verbose_name = "هزینه"
+        verbose_name_plural = "هزینه‌ها"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "project", "incurred_on"],
@@ -195,16 +213,16 @@ class Expense(UUIDModel, TimeStampedModel):
         validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
             raise ValidationError(
-                {"phase": "The phase must belong to the selected project."}
+                {"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."}
             )
         if self.party_id and self.party.archived_at is not None:
-            raise ValidationError({"party": "The party must be active."})
+            raise ValidationError({"party": "طرف تجاری باید فعال باشد."})
         if self.expense_category_id and (
             self.expense_category.archived_at is not None
             or not self.expense_category.is_active
         ):
             raise ValidationError(
-                {"expense_category": "The expense category must be active."}
+                {"expense_category": "دسته هزینه باید فعال باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -229,9 +247,9 @@ class Expense(UUIDModel, TimeStampedModel):
                 for field in immutable_fields
             ):
                 raise ValidationError(
-                    "Recorded expense details are immutable; void the expense instead."
+                    "جزئیات هزینه ثبت‌شده قابل تغییر نیست؛ در صورت نیاز هزینه را باطل کنید."
                 )
             if previous.status == ExpenseStatus.VOID:
-                raise ValidationError("Voided expenses are immutable.")
+                raise ValidationError("هزینه باطل‌شده قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)

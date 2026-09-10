@@ -6,154 +6,168 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
-    ORGANIZATION_CREATED = "organization.created", "Organization created"
+    ORGANIZATION_CREATED = "organization.created", "سازمان ایجاد شد"
     ORGANIZATION_SETTINGS_UPDATED = (
         "organization_settings.updated",
-        "Organization settings updated",
+        "تنظیمات سازمان به‌روزرسانی شد",
     )
-    BUSINESS_PARTY_CREATED = "business_party.created", "Business party created"
-    BUSINESS_PARTY_UPDATED = "business_party.updated", "Business party updated"
-    BUSINESS_PARTY_ARCHIVED = "business_party.archived", "Business party archived"
-    PARTY_ROLE_ASSIGNED = "party_role.assigned", "Party role assigned"
-    PARTY_CONTACT_ADDED = "party_contact.added", "Party contact added"
-    UNIT_OF_MEASURE_CREATED = "unit_of_measure.created", "Unit of measure created"
-    UNIT_OF_MEASURE_ARCHIVED = "unit_of_measure.archived", "Unit of measure archived"
+    BUSINESS_PARTY_CREATED = "business_party.created", "طرف تجاری ایجاد شد"
+    BUSINESS_PARTY_UPDATED = "business_party.updated", "طرف تجاری به‌روزرسانی شد"
+    BUSINESS_PARTY_ARCHIVED = "business_party.archived", "طرف تجاری بایگانی شد"
+    PARTY_ROLE_ASSIGNED = "party_role.assigned", "نقش طرف تجاری تخصیص یافت"
+    PARTY_CONTACT_ADDED = "party_contact.added", "راه ارتباطی طرف تجاری افزوده شد"
+    UNIT_OF_MEASURE_CREATED = "unit_of_measure.created", "واحد اندازه‌گیری ایجاد شد"
+    UNIT_OF_MEASURE_ARCHIVED = "unit_of_measure.archived", "واحد اندازه‌گیری بایگانی شد"
     MATERIAL_CATEGORY_CREATED = (
         "material_category.created",
-        "Material category created",
+        "دسته‌بندی مصالح ایجاد شد",
     )
     MATERIAL_CATEGORY_UPDATED = (
         "material_category.updated",
-        "Material category updated",
+        "دسته‌بندی مصالح به‌روزرسانی شد",
     )
     MATERIAL_CATEGORY_ARCHIVED = (
         "material_category.archived",
-        "Material category archived",
+        "دسته‌بندی مصالح بایگانی شد",
     )
-    MATERIAL_CREATED = "material.created", "Material created"
-    MATERIAL_UPDATED = "material.updated", "Material updated"
-    MATERIAL_ARCHIVED = "material.archived", "Material archived"
-    PROJECT_CREATED = "project.created", "Project created"
-    PROJECT_ARCHIVED = "project.archived", "Project archived"
-    PROJECT_SITE_CREATED = "project_site.created", "Project site created"
-    PROJECT_PHASE_CREATED = "project_phase.created", "Project phase created"
+    MATERIAL_CREATED = "material.created", "مصالح ایجاد شد"
+    MATERIAL_UPDATED = "material.updated", "مصالح به‌روزرسانی شد"
+    MATERIAL_ARCHIVED = "material.archived", "مصالح بایگانی شد"
+    PROJECT_CREATED = "project.created", "پروژه ایجاد شد"
+    PROJECT_ARCHIVED = "project.archived", "پروژه بایگانی شد"
+    PROJECT_SITE_CREATED = "project_site.created", "کارگاه پروژه ایجاد شد"
+    PROJECT_PHASE_CREATED = "project_phase.created", "فاز پروژه ایجاد شد"
     PROJECT_PHASE_STATUS_CHANGED = (
         "project_phase.status_changed",
-        "Project phase status changed",
+        "وضعیت فاز پروژه تغییر کرد",
     )
-    WBS_NODE_CREATED = "wbs_node.created", "WBS node created"
-    WBS_NODE_UPDATED = "wbs_node.updated", "WBS node updated"
-    WBS_NODE_ARCHIVED = "wbs_node.archived", "WBS node archived"
-    ACTIVITY_CREATED = "activity.created", "Activity created"
-    ACTIVITY_STATUS_CHANGED = "activity.status_changed", "Activity status changed"
-    ACTIVITY_ARCHIVED = "activity.archived", "Activity archived"
-    CONTRACT_CREATED = "contract.created", "Contract created"
-    CONTRACT_UPDATED = "contract.updated", "Contract updated"
-    CONTRACT_STATUS_CHANGED = "contract.status_changed", "Contract status changed"
-    CONTRACT_ITEM_ADDED = "contract.item_added", "Contract item added"
+    WBS_NODE_CREATED = "wbs_node.created", "گره ساختار شکست ایجاد شد"
+    WBS_NODE_UPDATED = "wbs_node.updated", "گره ساختار شکست به‌روزرسانی شد"
+    WBS_NODE_ARCHIVED = "wbs_node.archived", "گره ساختار شکست بایگانی شد"
+    ACTIVITY_CREATED = "activity.created", "فعالیت ایجاد شد"
+    ACTIVITY_STATUS_CHANGED = "activity.status_changed", "وضعیت فعالیت تغییر کرد"
+    ACTIVITY_ARCHIVED = "activity.archived", "فعالیت بایگانی شد"
+    CONTRACT_CREATED = "contract.created", "قرارداد ایجاد شد"
+    CONTRACT_UPDATED = "contract.updated", "قرارداد به‌روزرسانی شد"
+    CONTRACT_STATUS_CHANGED = "contract.status_changed", "وضعیت قرارداد تغییر کرد"
+    CONTRACT_ITEM_ADDED = "contract.item_added", "ردیف قرارداد افزوده شد"
     CONTRACT_AMENDMENT_APPROVED = (
         "contract.amendment_approved",
-        "Contract amendment approved",
+        "الحاقیه قرارداد تأیید شد",
     )
-    ESTIMATE_CREATED = "estimate.created", "Estimate created"
-    ESTIMATE_ITEM_ADDED = "estimate.item_added", "Estimate item added"
-    ESTIMATE_APPROVED = "estimate.approved", "Estimate approved"
-    ESTIMATE_REVISION_CREATED = "estimate.revision_created", "Estimate revision created"
+    ESTIMATE_CREATED = "estimate.created", "برآورد ایجاد شد"
+    ESTIMATE_ITEM_ADDED = "estimate.item_added", "ردیف برآورد افزوده شد"
+    ESTIMATE_APPROVED = "estimate.approved", "برآورد تأیید شد"
+    ESTIMATE_REVISION_CREATED = "estimate.revision_created", "بازنگری برآورد ایجاد شد"
     ESTIMATE_REVISION_APPROVED = (
         "estimate.revision_approved",
-        "Estimate revision approved",
+        "بازنگری برآورد تأیید شد",
     )
-    EXPENSE_RECORDED = "expense.recorded", "Expense recorded"
-    EXPENSE_VOIDED = "expense.voided", "Expense voided"
-    EXPENSE_CATEGORY_CREATED = "expense_category.created", "Expense category created"
-    EXPENSE_CATEGORY_ARCHIVED = "expense_category.archived", "Expense category archived"
-    PAYMENT_RECORDED = "payment.recorded", "Payment recorded"
-    PAYMENT_VOIDED = "payment.voided", "Payment voided"
+    EXPENSE_RECORDED = "expense.recorded", "هزینه ثبت شد"
+    EXPENSE_VOIDED = "expense.voided", "هزینه باطل شد"
+    EXPENSE_CATEGORY_CREATED = "expense_category.created", "دسته هزینه ایجاد شد"
+    EXPENSE_CATEGORY_ARCHIVED = "expense_category.archived", "دسته هزینه بایگانی شد"
+    PAYMENT_RECORDED = "payment.recorded", "پرداخت ثبت شد"
+    PAYMENT_VOIDED = "payment.voided", "پرداخت باطل شد"
     PAYMENT_ALLOCATION_CREATED = (
         "payment_allocation.created",
-        "Payment allocation created",
+        "تخصیص پرداخت ایجاد شد",
     )
     PAYMENT_ALLOCATION_REVERSED = (
         "payment_allocation.reversed",
-        "Payment allocation reversed",
+        "تخصیص پرداخت برگشت داده شد",
     )
-    DOCUMENT_UPLOADED = "document.uploaded", "Document uploaded"
-    DOCUMENT_DOWNLOADED = "document.downloaded", "Document downloaded"
-    DOCUMENT_ARCHIVED = "document.archived", "Document archived"
-    DAILY_REPORT_CREATED = "daily_report.created", "Daily report created"
-    DAILY_REPORT_SUBMITTED = "daily_report.submitted", "Daily report submitted"
-    DAILY_REPORT_APPROVED = "daily_report.approved", "Daily report approved"
-    DAILY_REPORT_LABOR_ADDED = "daily_report.labor_added", "Daily report labor added"
+    DOCUMENT_UPLOADED = "document.uploaded", "سند بارگذاری شد"
+    DOCUMENT_DOWNLOADED = "document.downloaded", "سند دریافت شد"
+    DOCUMENT_ARCHIVED = "document.archived", "سند بایگانی شد"
+    DAILY_REPORT_CREATED = "daily_report.created", "گزارش روزانه ایجاد شد"
+    DAILY_REPORT_SUBMITTED = "daily_report.submitted", "گزارش روزانه ارسال شد"
+    DAILY_REPORT_APPROVED = "daily_report.approved", "گزارش روزانه تأیید شد"
+    DAILY_REPORT_LABOR_ADDED = "daily_report.labor_added", "نیروی انسانی به گزارش روزانه افزوده شد"
     DAILY_REPORT_EQUIPMENT_ADDED = (
         "daily_report.equipment_added",
-        "Daily report equipment added",
+        "تجهیزات به گزارش روزانه افزوده شد",
     )
     DAILY_REPORT_MATERIAL_ADDED = (
         "daily_report.material_added",
-        "Daily report material added",
+        "مصالح به گزارش روزانه افزوده شد",
     )
-    DAILY_ACTIVITY_ADDED = "daily_activity.added", "Daily activity added"
-    DELAY_EVENT_ADDED = "delay_event.added", "Delay event added"
-    DEPARTMENT_CREATED = "department.created", "Department created"
-    DEPARTMENT_ARCHIVED = "department.archived", "Department archived"
-    POSITION_CREATED = "position.created", "Position created"
-    POSITION_ARCHIVED = "position.archived", "Position archived"
-    WORK_TEAM_CREATED = "work_team.created", "Work team created"
-    WORK_TEAM_ARCHIVED = "work_team.archived", "Work team archived"
-    EMPLOYEE_CREATED = "employee.created", "Employee created"
-    EMPLOYEE_STATUS_CHANGED = "employee.status_changed", "Employee status changed"
-    EMPLOYEE_ARCHIVED = "employee.archived", "Employee archived"
+    DAILY_ACTIVITY_ADDED = "daily_activity.added", "فعالیت روزانه افزوده شد"
+    DELAY_EVENT_ADDED = "delay_event.added", "رویداد تأخیر افزوده شد"
+    DEPARTMENT_CREATED = "department.created", "واحد سازمانی ایجاد شد"
+    DEPARTMENT_ARCHIVED = "department.archived", "واحد سازمانی بایگانی شد"
+    POSITION_CREATED = "position.created", "سمت شغلی ایجاد شد"
+    POSITION_ARCHIVED = "position.archived", "سمت شغلی بایگانی شد"
+    WORK_TEAM_CREATED = "work_team.created", "گروه کاری ایجاد شد"
+    WORK_TEAM_ARCHIVED = "work_team.archived", "گروه کاری بایگانی شد"
+    EMPLOYEE_CREATED = "employee.created", "کارمند ایجاد شد"
+    EMPLOYEE_STATUS_CHANGED = "employee.status_changed", "وضعیت کارمند تغییر کرد"
+    EMPLOYEE_ARCHIVED = "employee.archived", "کارمند بایگانی شد"
     EMPLOYEE_PROJECT_ASSIGNED = (
         "employee_project_assignment.created",
-        "Employee assigned to project",
+        "کارمند به پروژه تخصیص یافت",
     )
     EMPLOYEE_PROJECT_ASSIGNMENT_STATUS_CHANGED = (
         "employee_project_assignment.status_changed",
-        "Employee project assignment status changed",
+        "وضعیت تخصیص کارمند به پروژه تغییر کرد",
     )
-    PURCHASE_REQUEST_CREATED = "purchase_request.created", "Purchase request created"
+    PURCHASE_REQUEST_CREATED = "purchase_request.created", "درخواست خرید ایجاد شد"
     PURCHASE_REQUEST_ITEM_ADDED = (
         "purchase_request.item_added",
-        "Purchase request item added",
+        "ردیف درخواست خرید افزوده شد",
     )
     PURCHASE_REQUEST_SUBMITTED = (
         "purchase_request.submitted",
-        "Purchase request submitted",
+        "درخواست خرید ارسال شد",
     )
-    PURCHASE_REQUEST_APPROVED = "purchase_request.approved", "Purchase request approved"
-    PURCHASE_REQUEST_REJECTED = "purchase_request.rejected", "Purchase request rejected"
+    PURCHASE_REQUEST_APPROVED = "purchase_request.approved", "درخواست خرید تأیید شد"
+    PURCHASE_REQUEST_REJECTED = "purchase_request.rejected", "درخواست خرید رد شد"
     PURCHASE_REQUEST_CANCELLED = (
         "purchase_request.cancelled",
-        "Purchase request cancelled",
+        "درخواست خرید لغو شد",
     )
-    PURCHASE_ORDER_CREATED = "purchase_order.created", "Purchase order created"
-    PURCHASE_ORDER_ITEM_ADDED = "purchase_order.item_added", "Purchase order item added"
-    PURCHASE_ORDER_ISSUED = "purchase_order.issued", "Purchase order issued"
-    PURCHASE_ORDER_COMPLETED = "purchase_order.completed", "Purchase order completed"
-    PURCHASE_ORDER_CANCELLED = "purchase_order.cancelled", "Purchase order cancelled"
-    GOODS_RECEIPT_CREATED = "goods_receipt.created", "Goods receipt created"
-    GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "Goods receipt item added"
-    GOODS_RECEIPT_POSTED = "goods_receipt.posted", "Goods receipt posted"
-    GOODS_RECEIPT_VOIDED = "goods_receipt.voided", "Goods receipt voided"
-    MEMBERSHIP_INVITED = "membership.invited", "Membership invited"
-    MEMBERSHIP_ACCEPTED = "membership.accepted", "Membership accepted"
+    PURCHASE_ORDER_CREATED = "purchase_order.created", "سفارش خرید ایجاد شد"
+    PURCHASE_ORDER_ITEM_ADDED = "purchase_order.item_added", "ردیف سفارش خرید افزوده شد"
+    PURCHASE_ORDER_ISSUED = "purchase_order.issued", "سفارش خرید صادر شد"
+    PURCHASE_ORDER_COMPLETED = "purchase_order.completed", "سفارش خرید تکمیل شد"
+    PURCHASE_ORDER_CANCELLED = "purchase_order.cancelled", "سفارش خرید لغو شد"
+    GOODS_RECEIPT_CREATED = "goods_receipt.created", "رسید کالا ایجاد شد"
+    GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "ردیف رسید کالا افزوده شد"
+    GOODS_RECEIPT_POSTED = "goods_receipt.posted", "رسید کالا ثبت شد"
+    GOODS_RECEIPT_VOIDED = "goods_receipt.voided", "رسید کالا باطل شد"
+    WAREHOUSE_CREATED = "warehouse.created", "انبار ایجاد شد"
+    WAREHOUSE_ARCHIVED = "warehouse.archived", "انبار بایگانی شد"
+    STOCK_TRANSACTION_CREATED = (
+        "stock_transaction.created",
+        "تراکنش انبار ایجاد شد",
+    )
+    STOCK_TRANSACTION_POSTED = (
+        "stock_transaction.posted",
+        "تراکنش انبار ثبت شد",
+    )
+    STOCK_TRANSACTION_REVERSED = (
+        "stock_transaction.reversed",
+        "تراکنش انبار برگشت داده شد",
+    )
+    MEMBERSHIP_INVITED = "membership.invited", "دعوت عضویت ارسال شد"
+    MEMBERSHIP_ACCEPTED = "membership.accepted", "عضویت پذیرفته شد"
 
 
 class AuditEventQuerySet(models.QuerySet):
     """Prevent bulk mutation of immutable audit evidence."""
 
     def update(self, **kwargs: object) -> int:
-        raise ValidationError("Audit events are immutable.")
+        raise ValidationError("رویدادهای ممیزی قابل تغییر نیستند.")
 
     def delete(self) -> tuple[int, dict[str, int]]:
-        raise ValidationError("Audit events are immutable.")
+        raise ValidationError("رویدادهای ممیزی قابل حذف نیستند.")
 
 
 class AuditEventManager(models.Manager.from_queryset(AuditEventQuerySet)):
     """Allow only normal single-event creation through the default manager."""
 
     def bulk_create(self, *args: object, **kwargs: object) -> list[models.Model]:
-        raise ValidationError("Audit events must be created individually.")
+        raise ValidationError("رویدادهای ممیزی باید به‌صورت جداگانه ایجاد شوند.")
 
 
 class AuditEvent(UUIDModel, CreatedAtModel):
@@ -161,6 +175,7 @@ class AuditEvent(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -168,19 +183,22 @@ class AuditEvent(UUIDModel, CreatedAtModel):
     )
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="عامل",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="audit_events",
     )
-    action = models.CharField(max_length=64, choices=AuditAction.choices)
-    entity_type = models.CharField(max_length=100)
-    entity_id = models.CharField(max_length=100, blank=True)
-    metadata = models.JSONField(default=dict, blank=True)
+    action = models.CharField("عملیات", max_length=64, choices=AuditAction.choices)
+    entity_type = models.CharField("نوع موجودیت", max_length=100)
+    entity_id = models.CharField("شناسه موجودیت", max_length=100, blank=True)
+    metadata = models.JSONField("فراداده", default=dict, blank=True)
 
     objects = AuditEventManager()
 
     class Meta:
+        verbose_name = "رویداد ممیزی"
+        verbose_name_plural = "رویدادهای ممیزی"
         ordering = ["-created_at"]  # noqa: RUF012
         indexes = [  # noqa: RUF012
             models.Index(
@@ -194,12 +212,12 @@ class AuditEvent(UUIDModel, CreatedAtModel):
         ]
 
     def __str__(self) -> str:
-        return f"{self.action} ({self.entity_type}:{self.entity_id})"
+        return f"{self.get_action_display()} ({self.entity_type}:{self.entity_id})"
 
     def save(self, *args: object, **kwargs: object) -> None:
         if not self._state.adding:
-            raise ValidationError("Audit events are immutable.")
+            raise ValidationError("رویدادهای ممیزی قابل تغییر نیستند.")
         super().save(*args, **kwargs)
 
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
-        raise ValidationError("Audit events are immutable.")
+        raise ValidationError("رویدادهای ممیزی قابل حذف نیستند.")

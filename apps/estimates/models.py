@@ -10,10 +10,10 @@ from core.tenant_validation import validate_related_organizations
 
 
 class EstimateStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    APPROVED = "approved", "Approved"
-    REVISED = "revised", "Revised"
-    ARCHIVED = "archived", "Archived"
+    DRAFT = "draft", "پیش‌نویس"
+    APPROVED = "approved", "تأییدشده"
+    REVISED = "revised", "بازنگری‌شده"
+    ARCHIVED = "archived", "بایگانی‌شده"
 
 
 class Estimate(UUIDModel, TimeStampedModel):
@@ -21,16 +21,19 @@ class Estimate(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="estimates",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.CASCADE,
         related_name="estimates",
     )
     phase = models.ForeignKey(
         "projects.ProjectPhase",
+        verbose_name="فاز پروژه",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -38,22 +41,25 @@ class Estimate(UUIDModel, TimeStampedModel):
     )
     contract = models.ForeignKey(
         "contracts.Contract",
+        verbose_name="قرارداد",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="estimates",
     )
-    estimate_number = models.CharField(max_length=80)
-    title = models.CharField(max_length=255)
+    estimate_number = models.CharField("شماره برآورد", max_length=80)
+    title = models.CharField("عنوان برآورد", max_length=255)
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=EstimateStatus.choices,
         default=EstimateStatus.DRAFT,
         db_index=True,
     )
-    notes = models.TextField(blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -61,6 +67,7 @@ class Estimate(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -68,15 +75,17 @@ class Estimate(UUIDModel, TimeStampedModel):
     )
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="تأییدکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="estimates_approved",
     )
-    approved_at = models.DateTimeField(null=True, blank=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    approved_at = models.DateTimeField("زمان تأیید", null=True, blank=True)
+    deleted_at = models.DateTimeField("زمان حذف", null=True, blank=True)
     current_revision = models.ForeignKey(
         "EstimateRevision",
+        verbose_name="بازنگری جاری",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -84,6 +93,8 @@ class Estimate(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "برآورد"
+        verbose_name_plural = "برآوردها"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "estimate_number"],
@@ -119,11 +130,11 @@ class Estimate(UUIDModel, TimeStampedModel):
         validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
             raise ValidationError(
-                {"phase": "The phase must belong to the selected project."}
+                {"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."}
             )
         if self.contract_id and self.contract.project_id != self.project_id:
             raise ValidationError(
-                {"contract": "The contract must belong to the selected project."}
+                {"contract": "قرارداد باید متعلق به پروژه انتخاب‌شده باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -145,9 +156,9 @@ class Estimate(UUIDModel, TimeStampedModel):
 
 
 class EstimateRevisionStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    APPROVED = "approved", "Approved"
-    SUPERSEDED = "superseded", "Superseded"
+    DRAFT = "draft", "پیش‌نویس"
+    APPROVED = "approved", "تأییدشده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
 
 
 class EstimateRevision(UUIDModel, TimeStampedModel):
@@ -155,29 +166,33 @@ class EstimateRevision(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="estimate_revisions",
     )
     estimate = models.ForeignKey(
-        Estimate, on_delete=models.CASCADE, related_name="revisions"
+        Estimate, verbose_name="برآورد", on_delete=models.CASCADE, related_name="revisions"
     )
-    revision_number = models.PositiveIntegerField()
+    revision_number = models.PositiveIntegerField("شماره بازنگری")
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=EstimateRevisionStatus.choices,
         default=EstimateRevisionStatus.DRAFT,
     )
-    notes = models.TextField(blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="تأییدکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="estimate_revisions_approved",
     )
-    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_at = models.DateTimeField("زمان تأیید", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -185,6 +200,7 @@ class EstimateRevision(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -192,6 +208,8 @@ class EstimateRevision(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "بازنگری برآورد"
+        verbose_name_plural = "بازنگری‌های برآورد"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["estimate", "revision_number"],
@@ -218,7 +236,7 @@ class EstimateRevision(UUIDModel, TimeStampedModel):
                 EstimateRevisionStatus.APPROVED,
                 EstimateRevisionStatus.SUPERSEDED,
             }:
-                raise ValidationError("Finalized estimate revisions are immutable.")
+                raise ValidationError("بازنگری نهایی‌شده برآورد قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -228,35 +246,41 @@ class EstimateItem(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="estimate_items",
     )
     estimate = models.ForeignKey(
         Estimate,
+        verbose_name="برآورد",
         on_delete=models.CASCADE,
         related_name="items",
     )
     revision = models.ForeignKey(
         EstimateRevision,
+        verbose_name="بازنگری",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="items",
     )
-    description = models.CharField(max_length=255)
-    quantity = models.DecimalField(max_digits=18, decimal_places=4)
-    unit = models.CharField(max_length=30, default="unit")
+    description = models.CharField("شرح ردیف", max_length=255)
+    quantity = models.DecimalField("مقدار", max_digits=18, decimal_places=4)
+    unit = models.CharField("واحد قدیمی", max_length=30, default="unit")
     unit_of_measure = models.ForeignKey(
         "materials.UnitOfMeasure",
+        verbose_name="واحد اندازه‌گیری",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="estimate_items",
     )
-    unit_price = models.DecimalField(max_digits=18, decimal_places=2)
-    sort_order = models.PositiveIntegerField(default=0)
+    unit_price = models.DecimalField("قیمت واحد", max_digits=18, decimal_places=2)
+    sort_order = models.PositiveIntegerField("ترتیب نمایش", default=0)
 
     class Meta:
+        verbose_name = "ردیف برآورد"
+        verbose_name_plural = "ردیف‌های برآورد"
         ordering = ["sort_order", "created_at"]  # noqa: RUF012
         indexes = [  # noqa: RUF012
             models.Index(
@@ -286,13 +310,13 @@ class EstimateItem(UUIDModel, TimeStampedModel):
             validate_related_organizations(self, **relations)
             if self.revision_id and self.revision.estimate_id != self.estimate_id:
                 raise ValidationError(
-                    {"revision": "Revision must belong to the estimate."}
+                    {"revision": "بازنگری باید متعلق به همین برآورد باشد."}
                 )
             if self.unit_of_measure_id and (
                 not self.unit_of_measure.is_active or self.unit_of_measure.archived_at
             ):
                 raise ValidationError(
-                    {"unit_of_measure": "Unit of measure must be active."}
+                    {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
                 )
 
     def save(self, *args: object, **kwargs: object) -> None:

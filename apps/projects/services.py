@@ -80,15 +80,15 @@ def _require_project_management_access(
     *, organization: Organization, actor: User
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
         raise PermissionDenied(
-            "You cannot manage project controls in this organization."
+            "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
         )
 
 
@@ -108,22 +108,22 @@ def create_project(
     """Create a project after validating organization scope and core rules."""
 
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
-        raise PermissionDenied("You cannot create projects in this organization.")
+        raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
     if not code.strip() or not name.strip():
-        raise ValueError("Project code and name are required.")
+        raise ValueError("وارد کردن کد و نام پروژه الزامی است.")
     if status not in ProjectStatus.values:
-        raise ValueError("Invalid project status.")
+        raise ValueError("وضعیت پروژه معتبر نیست.")
     if start_date and end_date and end_date < start_date:
-        raise ValueError("Project end date cannot be before start date.")
+        raise ValueError("تاریخ پایان پروژه نمی‌تواند پیش از تاریخ شروع باشد.")
     if budget < Decimal("0.00"):
-        raise ValueError("Project budget cannot be negative.")
+        raise ValueError("بودجه پروژه نمی‌تواند منفی باشد.")
 
     normalized_code = canonicalize_upper_identifier(code)
     project = Project.objects.create(
@@ -157,14 +157,14 @@ def get_organization_projects(
     """Return non-deleted projects for a user's active organization."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _has_active_membership(user, organization):
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Project.objects.filter(
             organization=organization,
@@ -187,7 +187,7 @@ def get_organization_project(
     try:
         return projects.get(pk=project_id)
     except Project.DoesNotExist as exc:
-        raise PermissionDenied("Project not found in this organization.") from exc
+        raise PermissionDenied("پروژه در این سازمان یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -203,25 +203,25 @@ def create_project_site(
     """Create a site after enforcing organization and project scope."""
 
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
-        raise PermissionDenied("You cannot manage project sites in this organization.")
+        raise PermissionDenied("اجازه مدیریت کارگاه‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if not code.strip() or not name.strip():
-        raise ValueError("Site code and name are required.")
+        raise ValueError("وارد کردن کد و نام کارگاه الزامی است.")
     normalized_code = canonicalize_upper_identifier(code)
     if ProjectSite.objects.filter(
         organization=organization,
         project=project,
         code=normalized_code,
     ).exists():
-        raise ValueError("A site with this code already exists for the project.")
+        raise ValueError("کارگاهی با این کد از قبل برای پروژه وجود دارد.")
 
     site = ProjectSite.objects.create(
         organization=organization,
@@ -279,7 +279,7 @@ def get_organization_project_site(
     try:
         return sites.get(pk=site_id)
     except ProjectSite.DoesNotExist as exc:
-        raise PermissionDenied("Worksite not found in this project.") from exc
+        raise PermissionDenied("کارگاه در این پروژه یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -297,37 +297,37 @@ def create_project_phase(
     """Create a phase after enforcing active tenant and site scope."""
 
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
-        raise PermissionDenied("You cannot manage project phases in this organization.")
+        raise PermissionDenied("اجازه مدیریت فازهای پروژه در این سازمان را ندارید.")
     if (
         site.organization_id != organization.pk
         or site.project.deleted_at is not None
         or not site.is_active
     ):
-        raise PermissionDenied("The worksite does not belong to this organization.")
+        raise PermissionDenied("کارگاه متعلق به این سازمان نیست.")
     if not code.strip() or not name.strip():
-        raise ValueError("Phase code and name are required.")
+        raise ValueError("وارد کردن کد و نام فاز پروژه الزامی است.")
     if status not in ProjectPhaseStatus.values:
-        raise ValueError("Invalid project phase status.")
+        raise ValueError("وضعیت فاز پروژه معتبر نیست.")
     if (
         planned_start_date
         and planned_end_date
         and planned_end_date < planned_start_date
     ):
-        raise ValueError("Phase end date cannot be before start date.")
+        raise ValueError("تاریخ پایان فاز نمی‌تواند پیش از تاریخ شروع باشد.")
     normalized_code = canonicalize_upper_identifier(code)
     if ProjectPhase.objects.filter(
         organization=organization,
         site=site,
         code=normalized_code,
     ).exists():
-        raise ValueError("A phase with this code already exists for the worksite.")
+        raise ValueError("فازی با این کد از قبل برای کارگاه وجود دارد.")
 
     phase = ProjectPhase.objects.create(
         organization=organization,
@@ -391,7 +391,7 @@ def get_organization_project_phase(
     try:
         return phases.get(pk=phase_id)
     except ProjectPhase.DoesNotExist as exc:
-        raise PermissionDenied("Project phase not found in this worksite.") from exc
+        raise PermissionDenied("فاز پروژه در این کارگاه یافت نشد.") from exc
 
 
 def get_available_phase_statuses(
@@ -418,14 +418,14 @@ def transition_project_phase_status(
     """Apply one allowed, audited phase status transition atomically."""
 
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
-        raise PermissionDenied("You cannot update project phases in this organization.")
+        raise PermissionDenied("اجازه تغییر فازهای پروژه در این سازمان را ندارید.")
     site = get_organization_project_site(
         user=actor,
         organization=organization,
@@ -433,7 +433,7 @@ def transition_project_phase_status(
         site_id=site_id,
     )
     if not site.is_active or site.project.deleted_at is not None:
-        raise PermissionDenied("The worksite is not active.")
+        raise PermissionDenied("کارگاه فعال نیست.")
     try:
         phase = (
             ProjectPhase.objects.select_for_update()
@@ -441,11 +441,11 @@ def transition_project_phase_status(
             .get(pk=phase_id, organization=organization, site=site)
         )
     except ProjectPhase.DoesNotExist as exc:
-        raise PermissionDenied("Project phase not found in this worksite.") from exc
+        raise PermissionDenied("فاز پروژه در این کارگاه یافت نشد.") from exc
     if target_status not in ProjectPhaseStatus.values:
-        raise ValueError("Invalid project phase status.")
+        raise ValueError("وضعیت فاز پروژه معتبر نیست.")
     if target_status not in _ALLOWED_PHASE_STATUS_TRANSITIONS[phase.status]:
-        raise ValueError("This project phase status transition is not allowed.")
+        raise ValueError("این تغییر وضعیت برای فاز پروژه مجاز نیست.")
 
     previous_status = phase.status
     phase.status = target_status
@@ -476,12 +476,16 @@ def archive_project(
     """Soft-delete a project after validating tenant and management scope."""
 
     if not _can_manage_projects(user, organization):
-        raise PermissionDenied("You cannot archive projects in this organization.")
+        raise PermissionDenied("اجازه بایگانی پروژه‌های این سازمان را ندارید.")
     projects = get_organization_projects(user=user, organization=organization)
     try:
         project = projects.select_related(None).select_for_update().get(pk=project_id)
     except Project.DoesNotExist as exc:
-        raise PermissionDenied("Project not found in this organization.") from exc
+        raise PermissionDenied("پروژه در این سازمان یافت نشد.") from exc
+    if project.warehouses.filter(is_active=True, archived_at__isnull=True).exists():
+        raise ValueError("ابتدا انبارهای فعال پروژه را بایگانی کنید.")
+    if project.stock_transactions.filter(status="draft").exists():
+        raise ValueError("ابتدا تراکنش‌های پیش‌نویس انبار پروژه را ثبت یا حذف کنید.")
     project.deleted_at = timezone.now()
     project.updated_by = user
     project.save(update_fields=["deleted_at", "updated_by", "updated_at"])
@@ -499,7 +503,7 @@ def _validate_wbs_parent(node: WBSNode) -> None:
     parent = node.parent
     while parent is not None:
         if parent.pk == node.pk:
-            raise ValueError("WBS hierarchy cannot contain a cycle.")
+            raise ValueError("ساختار شکست کار نمی‌تواند شامل چرخه باشد.")
         parent = parent.parent
 
 
@@ -516,11 +520,11 @@ def create_wbs_node(
 ) -> WBSNode:
     _require_project_management_access(organization=organization, actor=actor)
     if project.organization_id != organization.id or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if parent and (
         parent.organization_id != organization.id or parent.project_id != project.id
     ):
-        raise PermissionDenied("The parent WBS node does not belong to this project.")
+        raise PermissionDenied("گره والد ساختار شکست متعلق به این پروژه نیست.")
     node = WBSNode(
         organization=organization,
         project=project,
@@ -539,7 +543,7 @@ def create_wbs_node(
         raise
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(
-            "WBS node data is invalid or its code already exists."
+            "اطلاعات گره ساختار شکست معتبر نیست یا کد آن از قبل وجود دارد."
         ) from exc
     record_audit_event(
         action=AuditAction.WBS_NODE_CREATED,
@@ -568,14 +572,14 @@ def update_wbs_node(
         WBSNode.objects.select_for_update().select_related("project").get(pk=node.pk)
     )
     if locked_node.organization_id != organization.id:
-        raise PermissionDenied("The WBS node does not belong to this organization.")
+        raise PermissionDenied("گره ساختار شکست متعلق به این سازمان نیست.")
     if locked_node.archived_at:
-        raise ValueError("Archived WBS nodes cannot be updated.")
+        raise ValueError("گره ساختار شکست بایگانی‌شده قابل به‌روزرسانی نیست.")
     if parent and (
         parent.organization_id != organization.id
         or parent.project_id != locked_node.project_id
     ):
-        raise PermissionDenied("The parent WBS node does not belong to this project.")
+        raise PermissionDenied("گره والد ساختار شکست متعلق به این پروژه نیست.")
     locked_node.code, locked_node.title, locked_node.parent, locked_node.sort_order = (
         code,
         title,
@@ -591,7 +595,7 @@ def update_wbs_node(
         raise
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(
-            "WBS node data is invalid or its code already exists."
+            "اطلاعات گره ساختار شکست معتبر نیست یا کد آن از قبل وجود دارد."
         ) from exc
     record_audit_event(
         action=AuditAction.WBS_NODE_UPDATED,
@@ -622,15 +626,15 @@ def archive_wbs_node(
     _require_project_management_access(organization=organization, actor=actor)
     locked_node = WBSNode.objects.select_for_update().get(pk=node.pk)
     if locked_node.organization_id != organization.id:
-        raise PermissionDenied("The WBS node does not belong to this organization.")
+        raise PermissionDenied("گره ساختار شکست متعلق به این سازمان نیست.")
     if locked_node.archived_at:
-        raise ValueError("The WBS node is already archived.")
+        raise ValueError("گره ساختار شکست از قبل بایگانی شده است.")
     if (
         locked_node.children.filter(archived_at__isnull=True).exists()
         or locked_node.activities.filter(archived_at__isnull=True).exists()
     ):
         raise ValueError(
-            "A WBS node with active children or activities cannot be archived."
+            "گره ساختار شکست دارای زیرگره یا فعالیت فعال قابل بایگانی نیست."
         )
     locked_node.archived_at, locked_node.is_active, locked_node.updated_by = (
         timezone.now(),
@@ -670,16 +674,16 @@ def create_activity(
 ) -> Activity:
     _require_project_management_access(organization=organization, actor=actor)
     if project.organization_id != organization.id or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if (
         wbs_node.organization_id != organization.id
         or wbs_node.project_id != project.id
         or wbs_node.archived_at is not None
         or not wbs_node.is_active
     ):
-        raise PermissionDenied("The WBS node does not belong to this active project.")
+        raise PermissionDenied("گره ساختار شکست متعلق به این پروژه فعال نیست.")
     if status not in ActivityStatus.values:
-        raise ValueError("Invalid activity status.")
+        raise ValueError("وضعیت فعالیت معتبر نیست.")
     activity = Activity(
         organization=organization,
         project=project,
@@ -701,7 +705,7 @@ def create_activity(
         activity.save()
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(
-            "Activity data is invalid or its code already exists."
+            "اطلاعات فعالیت معتبر نیست یا کد آن از قبل وجود دارد."
         ) from exc
     record_audit_event(
         action=AuditAction.ACTIVITY_CREATED,
@@ -736,16 +740,16 @@ def transition_activity_status(
     _require_project_management_access(organization=organization, actor=actor)
     locked_activity = Activity.objects.select_for_update().get(pk=activity.pk)
     if locked_activity.organization_id != organization.id:
-        raise PermissionDenied("The activity does not belong to this organization.")
+        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     if locked_activity.archived_at:
-        raise ValueError("Archived activities cannot change status.")
+        raise ValueError("وضعیت فعالیت بایگانی‌شده قابل تغییر نیست.")
     if target_status not in ActivityStatus.values:
-        raise ValueError("Invalid activity status.")
+        raise ValueError("وضعیت فعالیت معتبر نیست.")
     if (
         target_status
         not in _ALLOWED_ACTIVITY_STATUS_TRANSITIONS[locked_activity.status]
     ):
-        raise ValueError("This activity status transition is not allowed.")
+        raise ValueError("این تغییر وضعیت برای فعالیت مجاز نیست.")
     previous_status = locked_activity.status
     locked_activity.status, locked_activity.updated_by = target_status, actor
     locked_activity.save(update_fields=["status", "updated_by", "updated_at"])
@@ -767,9 +771,9 @@ def archive_activity(
     _require_project_management_access(organization=organization, actor=actor)
     locked_activity = Activity.objects.select_for_update().get(pk=activity.pk)
     if locked_activity.organization_id != organization.id:
-        raise PermissionDenied("The activity does not belong to this organization.")
+        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     if locked_activity.archived_at:
-        raise ValueError("The activity is already archived.")
+        raise ValueError("فعالیت از قبل بایگانی شده است.")
     (
         locked_activity.archived_at,
         locked_activity.is_active,

@@ -7,57 +7,59 @@ from core.models import TimeStampedModel, UUIDModel
 
 
 class OrganizationStatus(models.TextChoices):
-    ACTIVE = "active", "Active"
-    SUSPENDED = "suspended", "Suspended"
-    CANCELLED = "cancelled", "Cancelled"
-    ARCHIVED = "archived", "Archived"
+    ACTIVE = "active", "فعال"
+    SUSPENDED = "suspended", "تعلیق‌شده"
+    CANCELLED = "cancelled", "لغوشده"
+    ARCHIVED = "archived", "بایگانی‌شده"
 
 
 class MembershipRole(models.TextChoices):
-    OWNER = "owner", "Owner"
-    ADMIN = "admin", "Admin"
-    MANAGER = "manager", "Manager"
-    MEMBER = "member", "Member"
-    VIEWER = "viewer", "Viewer"
+    OWNER = "owner", "مالک"
+    ADMIN = "admin", "مدیر"
+    MANAGER = "manager", "مدیر اجرایی"
+    MEMBER = "member", "عضو"
+    VIEWER = "viewer", "مشاهده‌گر"
 
 
 class MembershipStatus(models.TextChoices):
-    INVITED = "invited", "Invited"
-    ACTIVE = "active", "Active"
-    SUSPENDED = "suspended", "Suspended"
-    REVOKED = "revoked", "Revoked"
+    INVITED = "invited", "دعوت‌شده"
+    ACTIVE = "active", "فعال"
+    SUSPENDED = "suspended", "تعلیق‌شده"
+    REVOKED = "revoked", "لغوشده"
 
 
 class InvitationRole(models.TextChoices):
-    ADMIN = "admin", "Admin"
-    MANAGER = "manager", "Manager"
-    MEMBER = "member", "Member"
-    VIEWER = "viewer", "Viewer"
+    ADMIN = "admin", "مدیر"
+    MANAGER = "manager", "مدیر اجرایی"
+    MEMBER = "member", "عضو"
+    VIEWER = "viewer", "مشاهده‌گر"
 
 
 class InvitationStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    ACCEPTED = "accepted", "Accepted"
-    EXPIRED = "expired", "Expired"
-    REVOKED = "revoked", "Revoked"
+    PENDING = "pending", "در انتظار"
+    ACCEPTED = "accepted", "پذیرفته‌شده"
+    EXPIRED = "expired", "منقضی‌شده"
+    REVOKED = "revoked", "لغوشده"
 
 
 class Organization(UUIDModel, TimeStampedModel):
     """A construction company tenant."""
 
-    name = models.CharField(max_length=255)
-    legal_name = models.CharField(max_length=255, blank=True)
-    slug = models.SlugField(max_length=255, unique=True)
+    name = models.CharField("نام سازمان", max_length=255)
+    legal_name = models.CharField("نام قانونی", max_length=255, blank=True)
+    slug = models.SlugField("شناسه URL", max_length=255, unique=True)
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=OrganizationStatus.choices,
         default=OrganizationStatus.ACTIVE,
         db_index=True,
     )
-    timezone = models.CharField(max_length=64, default="UTC")
-    currency = models.CharField(max_length=3, default="USD")
+    timezone = models.CharField("منطقه زمانی", max_length=64, default="UTC")
+    currency = models.CharField("واحد پول", max_length=3, default="USD")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -65,14 +67,17 @@ class Organization(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="organizations_updated",
     )
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField("زمان حذف", null=True, blank=True)
 
     class Meta:
+        verbose_name = "سازمان"
+        verbose_name_plural = "سازمان‌ها"
         ordering = ["name"]  # noqa: RUF012
 
     def clean(self) -> None:
@@ -97,27 +102,34 @@ class OrganizationSettings(UUIDModel, TimeStampedModel):
 
     organization = models.OneToOneField(
         Organization,
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="settings",
     )
-    timezone = models.CharField(max_length=64, default="UTC")
+    timezone = models.CharField("منطقه زمانی", max_length=64, default="UTC")
     currency = models.CharField(
+        "واحد پول",
         max_length=3,
         default="USD",
         validators=[
             RegexValidator(
                 regex=r"^[A-Z]{3}$",
-                message="Currency must be a three-letter uppercase code.",
+                message="واحد پول باید یک کد سه‌حرفی با حروف بزرگ لاتین باشد.",
             )
         ],
     )
     fiscal_year_start_month = models.PositiveSmallIntegerField(
+        "ماه شروع سال مالی",
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(12)],
     )
 
+    class Meta:
+        verbose_name = "تنظیمات سازمان"
+        verbose_name_plural = "تنظیمات سازمان‌ها"
+
     def __str__(self) -> str:
-        return f"Settings for {self.organization.name}"
+        return f"تنظیمات {self.organization.name}"
 
 
 class OrganizationMembership(UUIDModel, TimeStampedModel):
@@ -125,27 +137,32 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         Organization,
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="memberships",
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="کاربر",
         on_delete=models.CASCADE,
         related_name="organization_memberships",
     )
     role = models.CharField(
+        "نقش",
         max_length=20,
         choices=MembershipRole.choices,
         default=MembershipRole.MEMBER,
     )
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=MembershipStatus.choices,
         default=MembershipStatus.INVITED,
     )
-    joined_at = models.DateTimeField(null=True, blank=True)
+    joined_at = models.DateTimeField("زمان عضویت", null=True, blank=True)
     invited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="دعوت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -153,6 +170,8 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "عضویت سازمان"
+        verbose_name_plural = "عضویت‌های سازمان"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["user", "organization"],
@@ -170,38 +189,45 @@ class OrganizationInvitation(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         Organization,
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="invitations",
     )
     invitee = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="کاربر دعوت‌شده",
         on_delete=models.CASCADE,
         related_name="organization_invitations",
     )
     invited_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="دعوت‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="organization_invitations_sent",
     )
     role = models.CharField(
+        "نقش",
         max_length=20,
         choices=InvitationRole.choices,
         default=InvitationRole.MEMBER,
     )
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=InvitationStatus.choices,
         default=InvitationStatus.PENDING,
         db_index=True,
     )
-    token_hash = models.CharField(max_length=64, unique=True)
-    expires_at = models.DateTimeField()
-    accepted_at = models.DateTimeField(null=True, blank=True)
+    token_hash = models.CharField("هش توکن", max_length=64, unique=True)
+    expires_at = models.DateTimeField("زمان انقضا")
+    accepted_at = models.DateTimeField("زمان پذیرش", null=True, blank=True)
 
     class Meta:
+        verbose_name = "دعوت‌نامه سازمان"
+        verbose_name_plural = "دعوت‌نامه‌های سازمان"
         ordering = ["-created_at"]  # noqa: RUF012
 
     def __str__(self) -> str:
-        return f"{self.organization.name} invitation for {self.invitee.username}"
+        return f"دعوت‌نامه {self.organization.name} برای {self.invitee.username}"

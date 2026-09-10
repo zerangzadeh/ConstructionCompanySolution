@@ -7,25 +7,25 @@ from core.models import TimeStampedModel, UUIDModel
 
 
 class PartyKind(models.TextChoices):
-    COMPANY = "company", "Company"
-    INDIVIDUAL = "individual", "Individual"
+    COMPANY = "company", "شخص حقوقی"
+    INDIVIDUAL = "individual", "شخص حقیقی"
 
 
 class PartyRoleType(models.TextChoices):
-    EMPLOYER = "employer", "Employer"
-    CLIENT = "client", "Client"
-    CONSULTANT = "consultant", "Consultant"
-    SUPPLIER = "supplier", "Supplier"
-    SUBCONTRACTOR = "subcontractor", "Subcontractor"
-    OTHER = "other", "Other"
+    EMPLOYER = "employer", "کارفرما"
+    CLIENT = "client", "مشتری"
+    CONSULTANT = "consultant", "مشاور"
+    SUPPLIER = "supplier", "تأمین‌کننده"
+    SUBCONTRACTOR = "subcontractor", "پیمانکار جزء"
+    OTHER = "other", "سایر"
 
 
 class ContactType(models.TextChoices):
-    EMAIL = "email", "Email"
-    PHONE = "phone", "Phone"
-    MOBILE = "mobile", "Mobile"
-    ADDRESS = "address", "Address"
-    OTHER = "other", "Other"
+    EMAIL = "email", "ایمیل"
+    PHONE = "phone", "تلفن"
+    MOBILE = "mobile", "تلفن همراه"
+    ADDRESS = "address", "نشانی"
+    OTHER = "other", "سایر"
 
 
 class BusinessParty(UUIDModel, TimeStampedModel):
@@ -33,16 +33,18 @@ class BusinessParty(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="business_parties",
     )
-    party_kind = models.CharField(max_length=20, choices=PartyKind.choices)
-    display_name = models.CharField(max_length=255)
-    legal_name = models.CharField(max_length=255, blank=True)
-    tax_identifier = models.CharField(max_length=100, blank=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    party_kind = models.CharField("نوع طرف تجاری", max_length=20, choices=PartyKind.choices)
+    display_name = models.CharField("نام نمایشی", max_length=255)
+    legal_name = models.CharField("نام قانونی", max_length=255, blank=True)
+    tax_identifier = models.CharField("شناسه مالیاتی", max_length=100, blank=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -50,6 +52,7 @@ class BusinessParty(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -57,6 +60,8 @@ class BusinessParty(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "طرف تجاری"
+        verbose_name_plural = "طرف‌های تجاری"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "tax_identifier"],
@@ -79,7 +84,7 @@ class BusinessParty(UUIDModel, TimeStampedModel):
     def clean(self) -> None:
         super().clean()
         if not self.display_name.strip():
-            raise ValidationError({"display_name": "Display name is required."})
+            raise ValidationError({"display_name": "وارد کردن نام نمایشی الزامی است."})
 
     def __str__(self) -> str:
         return self.display_name
@@ -90,18 +95,22 @@ class PartyRole(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="party_roles",
     )
     party = models.ForeignKey(
         BusinessParty,
+        verbose_name="طرف تجاری",
         on_delete=models.CASCADE,
         related_name="roles",
     )
-    role = models.CharField(max_length=20, choices=PartyRoleType.choices)
-    is_active = models.BooleanField(default=True)
+    role = models.CharField("نقش", max_length=20, choices=PartyRoleType.choices)
+    is_active = models.BooleanField("فعال", default=True)
 
     class Meta:
+        verbose_name = "نقش طرف تجاری"
+        verbose_name_plural = "نقش‌های طرف تجاری"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "party", "role"],
@@ -114,7 +123,7 @@ class PartyRole(UUIDModel, TimeStampedModel):
         super().clean()
         if self.party_id and self.organization_id != self.party.organization_id:
             raise ValidationError(
-                "Party and role must belong to the same organization."
+                "طرف تجاری و نقش باید متعلق به یک سازمان باشند."
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -122,7 +131,7 @@ class PartyRole(UUIDModel, TimeStampedModel):
         super().save(*args, **kwargs)
 
     def __str__(self) -> str:
-        return f"{self.party} - {self.role}"
+        return f"{self.party} - {self.get_role_display()}"
 
 
 class PartyContact(UUIDModel, TimeStampedModel):
@@ -130,21 +139,25 @@ class PartyContact(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="party_contacts",
     )
     party = models.ForeignKey(
         BusinessParty,
+        verbose_name="طرف تجاری",
         on_delete=models.CASCADE,
         related_name="contacts",
     )
-    contact_type = models.CharField(max_length=20, choices=ContactType.choices)
-    value = models.CharField(max_length=255)
-    label = models.CharField(max_length=100, blank=True)
-    is_primary = models.BooleanField(default=False)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    contact_type = models.CharField("نوع راه ارتباطی", max_length=20, choices=ContactType.choices)
+    value = models.CharField("مقدار", max_length=255)
+    label = models.CharField("عنوان", max_length=100, blank=True)
+    is_primary = models.BooleanField("راه ارتباطی اصلی", default=False)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
 
     class Meta:
+        verbose_name = "راه ارتباطی طرف تجاری"
+        verbose_name_plural = "راه‌های ارتباطی طرف تجاری"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "party", "contact_type", "value"],
@@ -162,10 +175,10 @@ class PartyContact(UUIDModel, TimeStampedModel):
         super().clean()
         if self.party_id and self.organization_id != self.party.organization_id:
             raise ValidationError(
-                "Party and contact must belong to the same organization."
+                "طرف تجاری و راه ارتباطی باید متعلق به یک سازمان باشند."
             )
         if not self.value.strip():
-            raise ValidationError({"value": "Contact value is required."})
+            raise ValidationError({"value": "وارد کردن مقدار راه ارتباطی الزامی است."})
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()

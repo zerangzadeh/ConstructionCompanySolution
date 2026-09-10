@@ -10,27 +10,27 @@ from core.tenant_validation import validate_related_organizations
 
 
 class ContractStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    ACTIVE = "active", "Active"
-    COMPLETED = "completed", "Completed"
-    TERMINATED = "terminated", "Terminated"
+    DRAFT = "draft", "پیش‌نویس"
+    ACTIVE = "active", "فعال"
+    COMPLETED = "completed", "تکمیل‌شده"
+    TERMINATED = "terminated", "خاتمه‌یافته"
 
 
 class ContractDirection(models.TextChoices):
-    RECEIVABLE = "receivable", "Receivable"
-    PAYABLE = "payable", "Payable"
+    RECEIVABLE = "receivable", "دریافتنی"
+    PAYABLE = "payable", "پرداختنی"
 
 
 class ContractType(models.TextChoices):
-    CLIENT = "client", "Client"
-    SUBCONTRACT = "subcontract", "Subcontract"
-    SUPPLIER = "supplier", "Supplier"
-    OTHER = "other", "Other"
+    CLIENT = "client", "قرارداد کارفرمایی"
+    SUBCONTRACT = "subcontract", "قرارداد پیمانکار جزء"
+    SUPPLIER = "supplier", "قرارداد تأمین‌کننده"
+    OTHER = "other", "سایر"
 
 
 class ContractAmendmentStatus(models.TextChoices):
-    DRAFT = "draft", "Draft"
-    APPROVED = "approved", "Approved"
+    DRAFT = "draft", "پیش‌نویس"
+    APPROVED = "approved", "تأییدشده"
 
 
 class Contract(UUIDModel, TimeStampedModel):
@@ -38,47 +38,53 @@ class Contract(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="contracts",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.CASCADE,
         related_name="contracts",
     )
-    contract_number = models.CharField(max_length=80)
-    title = models.CharField(max_length=255)
-    counterparty_name = models.CharField(max_length=255)
+    contract_number = models.CharField("شماره قرارداد", max_length=80)
+    title = models.CharField("عنوان قرارداد", max_length=255)
+    counterparty_name = models.CharField("نام طرف قرارداد", max_length=255)
     party = models.ForeignKey(
         "parties.BusinessParty",
+        verbose_name="طرف تجاری",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="contracts",
     )
     direction = models.CharField(
-        max_length=20, choices=ContractDirection.choices, null=True, blank=True
+        "جهت قرارداد", max_length=20, choices=ContractDirection.choices, null=True, blank=True
     )
     contract_type = models.CharField(
-        max_length=20, choices=ContractType.choices, null=True, blank=True
+        "نوع قرارداد", max_length=20, choices=ContractType.choices, null=True, blank=True
     )
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=ContractStatus.choices,
         default=ContractStatus.DRAFT,
         db_index=True,
     )
     contract_value = models.DecimalField(
+        "مبلغ قرارداد",
         max_digits=18,
         decimal_places=2,
         default=Decimal("0.00"),
     )
-    signed_at = models.DateField(null=True, blank=True)
-    start_date = models.DateField(null=True, blank=True)
-    end_date = models.DateField(null=True, blank=True)
-    notes = models.TextField(blank=True)
+    signed_at = models.DateField("تاریخ امضا", null=True, blank=True)
+    start_date = models.DateField("تاریخ شروع", null=True, blank=True)
+    end_date = models.DateField("تاریخ پایان", null=True, blank=True)
+    notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -86,14 +92,17 @@ class Contract(UUIDModel, TimeStampedModel):
     )
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="contracts_updated",
     )
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    deleted_at = models.DateTimeField("زمان حذف", null=True, blank=True)
 
     class Meta:
+        verbose_name = "قرارداد"
+        verbose_name_plural = "قراردادها"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "contract_number"],
@@ -143,7 +152,7 @@ class Contract(UUIDModel, TimeStampedModel):
                 )
             ):
                 raise ValidationError(
-                    "Finalized contract terms can only change by amendment."
+                    "شرایط قرارداد نهایی‌شده فقط از طریق الحاقیه قابل تغییر است."
                 )
         self.full_clean()
         super().save(*args, **kwargs)
@@ -157,33 +166,38 @@ class ContractItem(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="contract_items",
     )
     contract = models.ForeignKey(
-        Contract, on_delete=models.CASCADE, related_name="items"
+        Contract, verbose_name="قرارداد", on_delete=models.CASCADE, related_name="items"
     )
     wbs_node = models.ForeignKey(
         "projects.WBSNode",
+        verbose_name="گره ساختار شکست کار",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="contract_items",
     )
-    description = models.CharField(max_length=255)
-    quantity = models.DecimalField(max_digits=18, decimal_places=4)
-    unit = models.CharField(max_length=30, default="unit")
+    description = models.CharField("شرح ردیف", max_length=255)
+    quantity = models.DecimalField("مقدار", max_digits=18, decimal_places=4)
+    unit = models.CharField("واحد قدیمی", max_length=30, default="unit")
     unit_of_measure = models.ForeignKey(
         "materials.UnitOfMeasure",
+        verbose_name="واحد اندازه‌گیری",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
         related_name="contract_items",
     )
-    unit_price = models.DecimalField(max_digits=18, decimal_places=2)
-    sort_order = models.PositiveIntegerField(default=0)
+    unit_price = models.DecimalField("قیمت واحد", max_digits=18, decimal_places=2)
+    sort_order = models.PositiveIntegerField("ترتیب نمایش", default=0)
 
     class Meta:
+        verbose_name = "ردیف قرارداد"
+        verbose_name_plural = "ردیف‌های قرارداد"
         ordering = ["sort_order", "created_at"]  # noqa: RUF012
         indexes = [  # noqa: RUF012
             models.Index(
@@ -207,13 +221,13 @@ class ContractItem(UUIDModel, TimeStampedModel):
         validate_related_organizations(self, **relations)
         if self.wbs_node_id and self.wbs_node.project_id != self.contract.project_id:
             raise ValidationError(
-                {"wbs_node": "WBS node must belong to the contract project."}
+                {"wbs_node": "گره ساختار شکست باید متعلق به پروژه قرارداد باشد."}
             )
         if self.unit_of_measure_id and (
             not self.unit_of_measure.is_active or self.unit_of_measure.archived_at
         ):
             raise ValidationError(
-                {"unit_of_measure": "Unit of measure must be active."}
+                {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -226,33 +240,38 @@ class ContractAmendment(UUIDModel, TimeStampedModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="contract_amendments",
     )
     contract = models.ForeignKey(
-        Contract, on_delete=models.CASCADE, related_name="amendments"
+        Contract, verbose_name="قرارداد", on_delete=models.CASCADE, related_name="amendments"
     )
-    amendment_number = models.PositiveIntegerField()
-    title = models.CharField(max_length=255)
-    reason = models.TextField()
+    amendment_number = models.PositiveIntegerField("شماره الحاقیه")
+    title = models.CharField("عنوان الحاقیه", max_length=255)
+    reason = models.TextField("دلیل")
     value_change = models.DecimalField(
+        "تغییر مبلغ",
         max_digits=18, decimal_places=2, default=Decimal("0.00")
     )
     status = models.CharField(
+        "وضعیت",
         max_length=20,
         choices=ContractAmendmentStatus.choices,
         default=ContractAmendmentStatus.DRAFT,
     )
     approved_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="تأییدکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="contract_amendments_approved",
     )
-    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_at = models.DateTimeField("زمان تأیید", null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -260,6 +279,8 @@ class ContractAmendment(UUIDModel, TimeStampedModel):
     )
 
     class Meta:
+        verbose_name = "الحاقیه قرارداد"
+        verbose_name_plural = "الحاقیه‌های قرارداد"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["contract", "amendment_number"],
@@ -277,6 +298,6 @@ class ContractAmendment(UUIDModel, TimeStampedModel):
         if self.pk and not self._state.adding:
             previous = type(self).objects.get(pk=self.pk)
             if previous.status == ContractAmendmentStatus.APPROVED:
-                raise ValidationError("Approved amendments are immutable.")
+                raise ValidationError("الحاقیه تأییدشده قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)

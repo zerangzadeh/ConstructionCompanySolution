@@ -21,12 +21,13 @@ from apps.projects.models import (
 class DailyReportForm(forms.ModelForm):
     """Form for recording one project's daily operational report."""
 
-    project = forms.ModelChoiceField(queryset=Project.objects.none())
-    site = forms.ModelChoiceField(queryset=ProjectSite.objects.none())
+    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
+    site = forms.ModelChoiceField(label="کارگاه", queryset=ProjectSite.objects.none())
     phase = forms.ModelChoiceField(
+        label="فاز پروژه",
         queryset=ProjectPhase.objects.none(),
         required=False,
-        empty_label="No phase",
+        empty_label="بدون فاز",
     )
 
     class Meta:
@@ -47,11 +48,11 @@ class DailyReportForm(forms.ModelForm):
         widgets = {  # noqa: RUF012
             "reporting_date": forms.DateInput(attrs={"type": "date"}),
             "weather_conditions": forms.TextInput(
-                attrs={"placeholder": "e.g. Clear, 28°C"}
+                attrs={"placeholder": "برای نمونه: صاف، ۲۸ درجه سانتی‌گراد"}
             ),
             "labor_count": forms.NumberInput(attrs={"min": "0"}),
             "work_performed": forms.Textarea(
-                attrs={"rows": 4, "placeholder": "Completed work and activities"}
+                attrs={"rows": 4, "placeholder": "کارها و فعالیت‌های انجام‌شده"}
             ),
             "progress_summary": forms.Textarea(attrs={"rows": 3}),
             "issues_and_delays": forms.Textarea(attrs={"rows": 3}),
@@ -98,9 +99,9 @@ class DailyReportForm(forms.ModelForm):
         site = cleaned_data.get("site")
         phase = cleaned_data.get("phase")
         if project and site and site.project_id != project.pk:
-            self.add_error("site", "Selected worksite does not belong to the project.")
+            self.add_error("site", "کارگاه انتخاب‌شده متعلق به این پروژه نیست.")
         if phase and site and phase.site_id != site.pk:
-            self.add_error("phase", "Selected phase does not belong to the worksite.")
+            self.add_error("phase", "فاز انتخاب‌شده متعلق به این کارگاه نیست.")
         return cleaned_data
 
 
@@ -123,7 +124,7 @@ class DailyReportLaborEntryForm(_DailyReportEntryForm):
         model = DailyReportLaborEntry
         fields = ["team_name", "worker_count", "hours_worked", "notes"]  # noqa: RUF012
         widgets = {  # noqa: RUF012
-            "team_name": forms.TextInput(attrs={"placeholder": "Concrete crew"}),
+            "team_name": forms.TextInput(attrs={"placeholder": "گروه بتن‌ریزی"}),
             "worker_count": forms.NumberInput(attrs={"min": "1"}),
             "hours_worked": forms.NumberInput(attrs={"min": "0.01", "step": "0.01"}),
             "notes": forms.Textarea(attrs={"rows": 2}),
@@ -135,7 +136,7 @@ class DailyReportEquipmentEntryForm(_DailyReportEntryForm):
         model = DailyReportEquipmentEntry
         fields = ["equipment_name", "hours_used", "notes"]  # noqa: RUF012
         widgets = {  # noqa: RUF012
-            "equipment_name": forms.TextInput(attrs={"placeholder": "Excavator"}),
+            "equipment_name": forms.TextInput(attrs={"placeholder": "بیل مکانیکی"}),
             "hours_used": forms.NumberInput(attrs={"min": "0.01", "step": "0.01"}),
             "notes": forms.Textarea(attrs={"rows": 2}),
         }
@@ -154,7 +155,7 @@ class DailyReportMaterialEntryForm(_DailyReportEntryForm):
         ]
         widgets = {  # noqa: RUF012
             "material_name": forms.TextInput(
-                attrs={"placeholder": "Ready-mix concrete"}
+                attrs={"placeholder": "بتن آماده"}
             ),
             "quantity": forms.NumberInput(attrs={"min": "0.0001", "step": "0.0001"}),
             "unit": forms.TextInput(attrs={"placeholder": "m³"}),

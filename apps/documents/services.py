@@ -53,17 +53,17 @@ def _can_manage_documents(user: User, organization: Organization) -> bool:
 
 def _validate_access(*, user: User, organization: Organization) -> None:
     if not user.is_authenticated or not user.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 
 def _validate_upload_context(
@@ -75,15 +75,15 @@ def _validate_upload_context(
 ) -> None:
     _validate_access(user=actor, organization=organization)
     if not _can_manage_documents(actor, organization):
-        raise PermissionDenied("You cannot upload documents in this organization.")
+        raise PermissionDenied("اجازه بارگذاری سند در این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if payment and (
         payment.organization_id != organization.pk
         or payment.project_id != project.pk
         or payment.project.deleted_at is not None
     ):
-        raise PermissionDenied("The payment does not belong to this project.")
+        raise PermissionDenied("پرداخت متعلق به این پروژه نیست.")
 
 
 def _validate_uploaded_file(upload: "UploadedFile") -> tuple[str, int, str]:
@@ -91,17 +91,17 @@ def _validate_uploaded_file(upload: "UploadedFile") -> tuple[str, int, str]:
     extension = Path(file_name).suffix.lower()
     content_type = getattr(upload, "content_type", "")
     if extension not in ALLOWED_DOCUMENT_TYPES:
-        raise ValueError("Only PDF, JPEG, and PNG files are allowed.")
+        raise ValueError("فقط فایل‌های PDF، JPEG و PNG مجاز هستند.")
     if content_type not in ALLOWED_DOCUMENT_TYPES[extension]:
-        raise ValueError("The uploaded file type does not match its extension.")
+        raise ValueError("نوع فایل بارگذاری‌شده با پسوند آن مطابقت ندارد.")
     if upload.size <= 0:
-        raise ValueError("The uploaded file is empty.")
+        raise ValueError("فایل بارگذاری‌شده خالی است.")
     if upload.size > MAX_DOCUMENT_SIZE:
-        raise ValueError("Uploaded files must not exceed 10 MB.")
+        raise ValueError("حجم فایل بارگذاری‌شده نباید بیشتر از ۱۰ مگابایت باشد.")
     signature = upload.read(8)
     upload.seek(0)
     if not signature.startswith(FILE_SIGNATURES[extension]):
-        raise ValueError("The uploaded file contents are not a valid file type.")
+        raise ValueError("محتوای فایل بارگذاری‌شده معتبر نیست.")
 
     digest = hashlib.sha256()
     for chunk in upload.chunks():
@@ -130,9 +130,9 @@ def upload_project_document(
         payment=payment,
     )
     if document_type not in DocumentType.values:
-        raise ValueError("Invalid document type.")
+        raise ValueError("نوع سند معتبر نیست.")
     if not title.strip():
-        raise ValueError("Document title is required.")
+        raise ValueError("وارد کردن عنوان سند الزامی است.")
 
     original_file_name, file_size, sha256 = _validate_uploaded_file(upload)
     document = ProjectDocument.objects.create(
@@ -204,7 +204,7 @@ def get_organization_document(
         .first()
     )
     if document is None:
-        raise PermissionDenied("Document not found in this organization.")
+        raise PermissionDenied("سند در این سازمان یافت نشد.")
     return document
 
 
@@ -219,7 +219,7 @@ def record_document_download(*, document: ProjectDocument, actor: User) -> None:
         project__deleted_at__isnull=True,
     ).exists()
     if not is_available:
-        raise PermissionDenied("Document not found in this organization.")
+        raise PermissionDenied("سند در این سازمان یافت نشد.")
     record_audit_event(
         action=AuditAction.DOCUMENT_DOWNLOADED,
         entity_type="project_document",
@@ -246,13 +246,13 @@ def archive_project_document(
     )
     _validate_access(user=actor, organization=locked_document.organization)
     if not _can_manage_documents(actor, locked_document.organization):
-        raise PermissionDenied("You cannot archive documents in this organization.")
+        raise PermissionDenied("اجازه بایگانی اسناد این سازمان را ندارید.")
     if locked_document.project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if locked_document.archived_at is not None:
-        raise ValueError("This document is already archived.")
+        raise ValueError("سند از قبل بایگانی شده است.")
     if not reason.strip():
-        raise ValueError("An archive reason is required.")
+        raise ValueError("وارد کردن دلیل بایگانی الزامی است.")
 
     locked_document.archive_reason = reason.strip()
     locked_document.archived_at = timezone.now()

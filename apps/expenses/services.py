@@ -44,16 +44,16 @@ def _validate_context(
     project: Project,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_expenses(actor, organization):
-        raise PermissionDenied("You cannot manage expenses in this organization.")
+        raise PermissionDenied("اجازه مدیریت هزینه‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
 
 
 def _validate_phase(
@@ -63,7 +63,7 @@ def _validate_phase(
     phase: ProjectPhase,
 ) -> None:
     if phase.organization_id != organization.pk or phase.site.project_id != project.pk:
-        raise PermissionDenied("The project phase does not belong to this project.")
+        raise PermissionDenied("فاز پروژه متعلق به این پروژه نیست.")
 
 
 @transaction.atomic
@@ -90,24 +90,24 @@ def create_expense(
     if phase is not None:
         _validate_phase(organization=organization, project=project, phase=phase)
     if not description.strip():
-        raise ValueError("Expense description is required.")
+        raise ValueError("وارد کردن شرح هزینه الزامی است.")
     if amount < Decimal("0.00"):
-        raise ValueError("Expense amount cannot be negative.")
+        raise ValueError("مبلغ هزینه نمی‌تواند منفی باشد.")
     if category not in LegacyExpenseCategory.values:
-        raise ValueError("Invalid expense category.")
+        raise ValueError("دسته هزینه معتبر نیست.")
     if status not in ExpenseStatus.values:
-        raise ValueError("Invalid expense status.")
+        raise ValueError("وضعیت هزینه معتبر نیست.")
     if status != ExpenseStatus.RECORDED:
-        raise ValueError("Expenses must be created as recorded.")
+        raise ValueError("هزینه باید با وضعیت ثبت‌شده ایجاد شود.")
     if party and (party.organization_id != organization.pk or party.archived_at):
-        raise PermissionDenied("The party does not belong to this organization.")
+        raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
     if expense_category and (
         expense_category.organization_id != organization.pk
         or expense_category.archived_at
         or not expense_category.is_active
     ):
         raise PermissionDenied(
-            "The expense category does not belong to this organization."
+            "دسته هزینه متعلق به این سازمان نیست."
         )
     expense = Expense.objects.create(
         organization=organization,
@@ -154,17 +154,17 @@ def get_organization_expenses(
     """Return non-deleted expenses visible in the active organization."""
 
     if not user.is_authenticated:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
         organization.status != OrganizationStatus.ACTIVE
         or organization.deleted_at is not None
     ):
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
     ).exists():
-        raise PermissionDenied("You do not have access to this organization.")
+        raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Expense.objects.filter(
             organization=organization,
@@ -195,9 +195,9 @@ def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
         project=locked_expense.project,
     )
     if locked_expense.status != ExpenseStatus.RECORDED:
-        raise ValueError("Only recorded expenses can be voided.")
+        raise ValueError("فقط هزینه ثبت‌شده قابل ابطال است.")
     if not reason.strip():
-        raise ValueError("An expense void reason is required.")
+        raise ValueError("وارد کردن دلیل ابطال هزینه الزامی است.")
 
     locked_expense.status = ExpenseStatus.VOID
     locked_expense.void_reason = reason.strip()
@@ -240,7 +240,7 @@ def create_expense_category(
     try:
         category.save()
     except ValidationError as exc:
-        raise ValueError("Expense category data is invalid.") from exc
+        raise ValueError("اطلاعات دسته هزینه معتبر نیست.") from exc
     record_audit_event(
         action=AuditAction.EXPENSE_CATEGORY_CREATED,
         entity_type="expense_category",
@@ -254,11 +254,11 @@ def create_expense_category(
 
 def _validate_category_management(*, organization: Organization, actor: User) -> None:
     if not actor.is_authenticated or not actor.is_active:
-        raise PermissionDenied("Authentication is required.")
+        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if organization.status != OrganizationStatus.ACTIVE or organization.deleted_at:
-        raise PermissionDenied("The organization is not active.")
+        raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_expenses(actor, organization):
-        raise PermissionDenied("You cannot manage expenses in this organization.")
+        raise PermissionDenied("اجازه مدیریت هزینه‌های این سازمان را ندارید.")
 
 
 @transaction.atomic
@@ -269,10 +269,10 @@ def archive_expense_category(
     locked_category = ExpenseCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.pk:
         raise PermissionDenied(
-            "The expense category does not belong to this organization."
+            "دسته هزینه متعلق به این سازمان نیست."
         )
     if locked_category.archived_at is not None:
-        raise ValueError("The expense category is already archived.")
+        raise ValueError("دسته هزینه از قبل بایگانی شده است.")
     locked_category.is_active = False
     locked_category.archived_at = timezone.now()
     locked_category.updated_by = actor

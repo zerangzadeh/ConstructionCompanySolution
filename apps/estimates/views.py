@@ -56,7 +56,7 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
         pk=estimate_id,
     )
     if request.method == "POST" and estimate.status != EstimateStatus.DRAFT:
-        messages.error(request, "Cannot modify an approved estimate.")
+        messages.error(request, "برآورد تأییدشده قابل تغییر نیست.")
         return redirect("estimates:detail", estimate_id=estimate.pk)
 
     item_form = EstimateItemForm(

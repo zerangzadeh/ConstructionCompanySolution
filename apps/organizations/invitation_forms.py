@@ -8,8 +8,8 @@ from core.identifiers import canonicalize_lower_identifier
 class OrganizationInvitationForm(forms.Form):
     """Form for inviting an existing user to the active organization."""
 
-    invitee_username = forms.CharField(max_length=150)
-    role = forms.ChoiceField(choices=InvitationRole.choices)
+    invitee_username = forms.CharField(label="نام کاربری فرد مدعو", max_length=150)
+    role = forms.ChoiceField(label="نقش سازمانی", choices=InvitationRole.choices)
 
     def clean_invitee_username(self) -> User:
         username = canonicalize_lower_identifier(self.cleaned_data["invitee_username"])
@@ -17,5 +17,5 @@ class OrganizationInvitationForm(forms.Form):
             return User.objects.get(username=username, is_active=True)
         except User.DoesNotExist as exc:
             raise forms.ValidationError(
-                "No active user exists with this username."
+                "کاربر فعالی با این نام کاربری وجود ندارد."
             ) from exc

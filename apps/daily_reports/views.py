@@ -108,9 +108,9 @@ def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "Labor entry added.")
+            messages.success(request, "رکورد نیروی انسانی افزوده شد.")
     else:
-        messages.error(request, "Review the labor entry fields and try again.")
+        messages.error(request, "فیلدهای نیروی انسانی را بررسی و دوباره تلاش کنید.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -132,9 +132,9 @@ def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResp
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "Equipment entry added.")
+            messages.success(request, "رکورد تجهیز افزوده شد.")
     else:
-        messages.error(request, "Review the equipment entry fields and try again.")
+        messages.error(request, "فیلدهای تجهیز را بررسی و دوباره تلاش کنید.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -161,9 +161,9 @@ def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpRespo
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "Material entry added.")
+            messages.success(request, "رکورد مصالح افزوده شد.")
     else:
-        messages.error(request, "Review the material entry fields and try again.")
+        messages.error(request, "فیلدهای مصالح را بررسی و دوباره تلاش کنید.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -185,9 +185,9 @@ def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "Activity entry added.")
+            messages.success(request, "رکورد فعالیت افزوده شد.")
     else:
-        messages.error(request, "Review the activity entry fields and try again.")
+        messages.error(request, "فیلدهای فعالیت را بررسی و دوباره تلاش کنید.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 
@@ -209,9 +209,9 @@ def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "Delay event added.")
+            messages.success(request, "رویداد تأخیر افزوده شد.")
     else:
-        messages.error(request, "Review the delay event fields and try again.")
+        messages.error(request, "فیلدهای رویداد تأخیر را بررسی و دوباره تلاش کنید.")
     return redirect("daily_reports:detail", report_id=report_id)
 
 

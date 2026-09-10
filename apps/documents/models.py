@@ -10,12 +10,12 @@ from core.tenant_validation import validate_related_organizations
 
 
 class DocumentType(models.TextChoices):
-    GENERAL = "general", "General"
-    CONTRACT = "contract", "Contract"
-    DRAWING = "drawing", "Drawing"
-    RECEIPT = "receipt", "Receipt"
-    PHOTO = "photo", "Photo"
-    OTHER = "other", "Other"
+    GENERAL = "general", "عمومی"
+    CONTRACT = "contract", "قرارداد"
+    DRAWING = "drawing", "نقشه"
+    RECEIPT = "receipt", "رسید"
+    PHOTO = "photo", "تصویر"
+    OTHER = "other", "سایر"
 
 
 def document_upload_path(instance: "ProjectDocument", filename: str) -> str:
@@ -33,43 +33,49 @@ class ProjectDocument(UUIDModel, CreatedAtModel):
 
     organization = models.ForeignKey(
         "organizations.Organization",
+        verbose_name="سازمان",
         on_delete=models.CASCADE,
         related_name="project_documents",
     )
     project = models.ForeignKey(
         "projects.Project",
+        verbose_name="پروژه",
         on_delete=models.CASCADE,
         related_name="documents",
     )
     payment = models.ForeignKey(
         "payments.Payment",
+        verbose_name="پرداخت",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="documents",
     )
     document_type = models.CharField(
+        "نوع سند",
         max_length=20,
         choices=DocumentType.choices,
         default=DocumentType.GENERAL,
     )
-    title = models.CharField(max_length=255)
-    original_file_name = models.CharField(max_length=255)
-    file = models.FileField(upload_to=document_upload_path, max_length=255)
-    content_type = models.CharField(max_length=100)
-    file_size = models.PositiveBigIntegerField()
-    sha256 = models.CharField(max_length=64)
+    title = models.CharField("عنوان سند", max_length=255)
+    original_file_name = models.CharField("نام اصلی فایل", max_length=255)
+    file = models.FileField("فایل", upload_to=document_upload_path, max_length=255)
+    content_type = models.CharField("نوع محتوای فایل", max_length=100)
+    file_size = models.PositiveBigIntegerField("حجم فایل")
+    sha256 = models.CharField("SHA-256", max_length=64)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="بارگذاری‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="documents_created",
     )
-    archive_reason = models.TextField(blank=True)
-    archived_at = models.DateTimeField(null=True, blank=True)
+    archive_reason = models.TextField("دلیل بایگانی", blank=True)
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     archived_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
+        verbose_name="بایگانی‌کننده",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -77,6 +83,8 @@ class ProjectDocument(UUIDModel, CreatedAtModel):
     )
 
     class Meta:
+        verbose_name = "سند پروژه"
+        verbose_name_plural = "اسناد پروژه"
         indexes = [  # noqa: RUF012
             models.Index(
                 fields=["organization", "project", "created_at"],
@@ -102,7 +110,7 @@ class ProjectDocument(UUIDModel, CreatedAtModel):
         validate_related_organizations(self, **relations)
         if self.payment_id and self.payment.project_id != self.project_id:
             raise ValidationError(
-                {"payment": "The payment must belong to the selected project."}
+                {"payment": "پرداخت باید متعلق به پروژه انتخاب‌شده باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:

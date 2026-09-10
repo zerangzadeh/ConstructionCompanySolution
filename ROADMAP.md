@@ -51,7 +51,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F3 — Inventory
 
-- **Status:** NEXT
+- **Status:** IMPLEMENTED
 - **Goal:** Provide warehouse-level material control based on validated stock
   movements and procurement receipts.
 - **Main scope/entities:** `Warehouse`, `StockTransaction`, material balances,
@@ -62,7 +62,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F4 — Equipment
 
-- **Status:** PLANNED
+- **Status:** NEXT
 - **Goal:** Manage equipment ownership, deployment, usage, maintenance, and
   related operational records.
 - **Main scope/entities:** `Equipment`, `EquipmentAssignment`,

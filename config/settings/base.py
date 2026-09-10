@@ -37,6 +37,7 @@ INSTALLED_APPS: list[str] = [
     "apps.daily_reports",
     "apps.workforce",
     "apps.procurement",
+    "apps.inventory",
 ]
 
 MIDDLEWARE: list[str] = [
@@ -114,7 +115,8 @@ DATABASES: dict = {
     "default": _database_configuration(),
 }
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "fa"
+LANGUAGES = [("fa", "فارسی")]
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True

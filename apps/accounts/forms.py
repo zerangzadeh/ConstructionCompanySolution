@@ -14,20 +14,22 @@ class UserLoginForm(AuthenticationForm):
     """Username and password form styled for the login page."""
 
     username = forms.CharField(
+        label="نام کاربری",
         widget=forms.TextInput(
             attrs={
                 "class": INPUT_CLASSES,
                 "autocomplete": "username",
-                "placeholder": "Enter your username",
+                "placeholder": "نام کاربری خود را وارد کنید",
             }
         )
     )
     password = forms.CharField(
+        label="گذرواژه",
         widget=forms.PasswordInput(
             attrs={
                 "class": INPUT_CLASSES,
                 "autocomplete": "current-password",
-                "placeholder": "Enter your password",
+                "placeholder": "گذرواژه خود را وارد کنید",
             }
         )
     )

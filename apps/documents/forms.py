@@ -8,11 +8,12 @@ from apps.projects.models import Project
 class ProjectDocumentForm(forms.ModelForm):
     """Private document upload form scoped to the active organization."""
 
-    project = forms.ModelChoiceField(queryset=Project.objects.none())
+    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     payment = forms.ModelChoiceField(
+        label="پرداخت",
         queryset=Payment.objects.none(),
         required=False,
-        empty_label="No payment",
+        empty_label="بدون پرداخت مرتبط",
     )
 
     class Meta:
@@ -46,7 +47,7 @@ class ProjectDocumentForm(forms.ModelForm):
         payment = cleaned_data.get("payment")
         if payment and project and payment.project_id != project.pk:
             self.add_error(
-                "payment", "Selected payment does not belong to the project."
+                "payment", "پرداخت انتخاب‌شده متعلق به این پروژه نیست."
             )
         return cleaned_data
 
@@ -54,4 +55,4 @@ class ProjectDocumentForm(forms.ModelForm):
 class DocumentArchiveForm(forms.Form):
     """Requires a retained reason when a document is removed from active use."""
 
-    reason = forms.CharField(widget=forms.Textarea, max_length=1000)
+    reason = forms.CharField(label="دلیل بایگانی", widget=forms.Textarea, max_length=1000)

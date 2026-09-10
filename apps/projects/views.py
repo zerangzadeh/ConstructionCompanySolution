@@ -239,7 +239,7 @@ def project_phase_transition(
     except (PermissionDenied, ValueError) as exc:
         messages.error(request, str(exc))
     else:
-        messages.success(request, "Project phase status updated.")
+        messages.success(request, "وضعیت فاز پروژه به‌روزرسانی شد.")
     return redirect(
         "projects:phase_detail",
         project_id=project_id,
@@ -303,11 +303,11 @@ def wbs_node_create(request: HttpRequest, project_id: str) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-            messages.success(request, "WBS node added.")
+            messages.success(request, "گره ساختار شکست کار افزوده شد.")
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
     else:
-        messages.error(request, "Review the WBS node fields and try again.")
+        messages.error(request, "فیلدهای ساختار شکست کار را بررسی و دوباره تلاش کنید.")
     return redirect("projects:controls", project_id=project_id)
 
 
@@ -326,11 +326,11 @@ def activity_create(request: HttpRequest, project_id: str) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-            messages.success(request, "Activity added.")
+            messages.success(request, "فعالیت افزوده شد.")
         except (PermissionDenied, ValueError) as exc:
             messages.error(request, str(exc))
     else:
-        messages.error(request, "Review the activity fields and try again.")
+        messages.error(request, "فیلدهای فعالیت را بررسی و دوباره تلاش کنید.")
     return redirect("projects:controls", project_id=project_id)
 
 
@@ -347,7 +347,7 @@ def activity_transition(
         .first()
     )
     if activity is None:
-        return HttpResponse("Activity not found.", status=404)
+        return HttpResponse("فعالیت یافت نشد.", status=404)
     try:
         transition_activity_status(
             organization=request.organization,
@@ -373,7 +373,7 @@ def activity_archive_view(
         .first()
     )
     if activity is None:
-        return HttpResponse("Activity not found.", status=404)
+        return HttpResponse("فعالیت یافت نشد.", status=404)
     try:
         archive_activity(
             organization=request.organization, actor=request.user, activity=activity
@@ -396,7 +396,7 @@ def wbs_node_archive_view(
         .first()
     )
     if node is None:
-        return HttpResponse("WBS node not found.", status=404)
+        return HttpResponse("گره WBS یافت نشد.", status=404)
     try:
         archive_wbs_node(
             organization=request.organization, actor=request.user, node=node

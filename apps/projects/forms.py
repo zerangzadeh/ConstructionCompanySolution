@@ -37,14 +37,14 @@ class ProjectForm(forms.ModelForm):
             "name": forms.TextInput(
                 attrs={
                     "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
-                    "placeholder": "Project name",
+                    "placeholder": "نام پروژه",
                 }
             ),
             "description": forms.Textarea(
                 attrs={
                     "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
                     "rows": 4,
-                    "placeholder": "Optional project description",
+                    "placeholder": "شرح پروژه (اختیاری)",
                 }
             ),
             "status": forms.Select(
@@ -79,7 +79,7 @@ class ProjectForm(forms.ModelForm):
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ProjectStatus.values:
-            raise forms.ValidationError("Invalid project status.")
+            raise forms.ValidationError("وضعیت پروژه معتبر نیست.")
         return status
 
 
@@ -91,7 +91,7 @@ class ProjectSiteForm(forms.ModelForm):
         fields = ["code", "name", "address"]  # noqa: RUF012
         widgets = {  # noqa: RUF012
             "code": forms.TextInput(attrs={"placeholder": "SITE-001"}),
-            "name": forms.TextInput(attrs={"placeholder": "North worksite"}),
+            "name": forms.TextInput(attrs={"placeholder": "نام کارگاه"}),
             "address": forms.Textarea(attrs={"rows": 4}),
         }
 
@@ -123,7 +123,7 @@ class ProjectPhaseForm(forms.ModelForm):
         ]
         widgets = {  # noqa: RUF012
             "code": forms.TextInput(attrs={"placeholder": "PH-001"}),
-            "name": forms.TextInput(attrs={"placeholder": "Foundation works"}),
+            "name": forms.TextInput(attrs={"placeholder": "نام فاز اجرایی"}),
             "planned_start_date": forms.DateInput(attrs={"type": "date"}),
             "planned_end_date": forms.DateInput(attrs={"type": "date"}),
         }
@@ -144,7 +144,7 @@ class ProjectPhaseForm(forms.ModelForm):
     def clean_status(self) -> str:
         status = self.cleaned_data["status"]
         if status not in ProjectPhaseStatus.values:
-            raise forms.ValidationError("Invalid project phase status.")
+            raise forms.ValidationError("وضعیت فاز پروژه معتبر نیست.")
         return status
 
 

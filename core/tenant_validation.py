@@ -11,7 +11,7 @@ def validate_related_organizations(instance: Any, **relations: Any) -> None:
         return
 
     errors = {
-        field_name: "The related record must belong to the same organization."
+        field_name: "رکورد مرتبط باید متعلق به همین سازمان باشد."
         for field_name, related in relations.items()
         if related is not None
         and getattr(related, "organization_id", organization_id) != organization_id

@@ -464,7 +464,7 @@
         <aside class="erp-sidebar fixed inset-y-0 right-0 z-40 hidden w-64 flex-col overflow-hidden border-l border-white/10 bg-[#0b203b] text-slate-200 shadow-2xl lg:flex" aria-label="نوار کناری سامانه">
             <a class="flex h-20 shrink-0 items-center gap-3 border-b border-white/10 px-5" href="{% url 'financials:dashboard' %}">
                 <span class="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-white ring-1 ring-white/15"><svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11M12 6v2m0 3v2m0 3v2"/></svg></span>
-                <span><strong class="block text-sm font-semibold text-white">سامانه مدیریت ساخت</strong><small class="mt-0.5 block text-[10px] tracking-wide text-slate-400" dir="ltr">Construction ERP</small></span>
+                <span><strong class="block text-sm font-semibold text-white">سامانه مدیریت ساخت</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت پروژه</small></span>
             </a>
             <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
                 {% include "components/navigation_links.html" with navigation_is_authenticated=True current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token only %}

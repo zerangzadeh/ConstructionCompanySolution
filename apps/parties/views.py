@@ -56,7 +56,7 @@ def party_create(request: HttpRequest) -> HttpResponse:
 def party_detail(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
     if party is None:
-        return HttpResponseNotFound("Party not found.")
+        return HttpResponseNotFound("طرف تجاری یافت نشد.")
     form = BusinessPartyForm(request.POST or None, instance=party)
     if request.method == "POST" and form.is_valid():
         try:
@@ -87,7 +87,7 @@ def party_detail(request: HttpRequest, party_id: str) -> HttpResponse:
 def party_archive(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
     if party is None:
-        return HttpResponseNotFound("Party not found.")
+        return HttpResponseNotFound("طرف تجاری یافت نشد.")
     try:
         archive_business_party(
             organization=request.organization, actor=request.user, party=party
@@ -102,10 +102,10 @@ def party_archive(request: HttpRequest, party_id: str) -> HttpResponse:
 def party_role_create(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
     if party is None:
-        return HttpResponseNotFound("Party not found.")
+        return HttpResponseNotFound("طرف تجاری یافت نشد.")
     form = PartyRoleForm(request.POST)
     if not form.is_valid():
-        return HttpResponseForbidden("Invalid party role.")
+        return HttpResponseForbidden("نقش طرف تجاری معتبر نیست.")
     try:
         assign_party_role(
             organization=request.organization,
@@ -123,10 +123,10 @@ def party_role_create(request: HttpRequest, party_id: str) -> HttpResponse:
 def party_contact_create(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
     if party is None:
-        return HttpResponseNotFound("Party not found.")
+        return HttpResponseNotFound("طرف تجاری یافت نشد.")
     form = PartyContactForm(request.POST)
     if not form.is_valid():
-        return HttpResponseForbidden("Invalid party contact.")
+        return HttpResponseForbidden("اطلاعات تماس طرف تجاری معتبر نیست.")
     try:
         add_party_contact(
             organization=request.organization,

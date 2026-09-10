@@ -8,11 +8,12 @@ from apps.projects.models import Project, ProjectPhase
 class ExpenseForm(forms.ModelForm):
     """Form for recording an expense in the active organization."""
 
-    project = forms.ModelChoiceField(queryset=Project.objects.none())
+    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
     phase = forms.ModelChoiceField(
+        label="فاز پروژه",
         queryset=ProjectPhase.objects.none(),
         required=False,
-        empty_label="No phase",
+        empty_label="بدون فاز",
     )
 
     class Meta:
@@ -55,7 +56,7 @@ class ExpenseForm(forms.ModelForm):
     def clean_category(self) -> str:
         category = self.cleaned_data["category"]
         if category not in LegacyExpenseCategory.values:
-            raise forms.ValidationError("Invalid expense category.")
+            raise forms.ValidationError("دسته هزینه معتبر نیست.")
         return category
 
     def clean(self):
@@ -63,12 +64,13 @@ class ExpenseForm(forms.ModelForm):
         project = cleaned_data.get("project")
         phase = cleaned_data.get("phase")
         if phase and project and phase.site.project_id != project.pk:
-            self.add_error("phase", "Selected phase does not belong to the project.")
+            self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data
 
 
 class ExpenseVoidForm(forms.Form):
     reason = forms.CharField(
+        label="دلیل ابطال",
         max_length=1000,
         widget=forms.Textarea(attrs={"rows": 3}),
     )
