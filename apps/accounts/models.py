@@ -8,6 +8,12 @@ from django.db import models
 from core.identifiers import canonicalize_lower_identifier
 
 
+class AccountStatus(models.TextChoices):
+    ACTIVE = "active", "فعال"
+    INACTIVE = "inactive", "غیرفعال"
+    BLOCKED = "blocked", "مسدود"
+
+
 class UserManager(BaseUserManager["User"]):
     """Manager for creating users identified by username."""
 
@@ -68,6 +74,7 @@ class User(AbstractUser):
     )
     email = models.EmailField("ایمیل", blank=True)
     phone_number = models.CharField("شماره تلفن", max_length=32, blank=True)
+    blocked_at = models.DateTimeField("زمان مسدودسازی", null=True, blank=True)
     created_at = models.DateTimeField("زمان ایجاد", auto_now_add=True)
     updated_at = models.DateTimeField("زمان آخرین به‌روزرسانی", auto_now=True)
 
@@ -86,7 +93,26 @@ class User(AbstractUser):
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.username = canonicalize_lower_identifier(self.username)
+        if self.blocked_at is not None:
+            self.is_active = False
+            update_fields = kwargs.get("update_fields")
+            if update_fields is not None:
+                kwargs["update_fields"] = set(update_fields) | {"is_active"}
         super().save(*args, **kwargs)
+
+    @property
+    def account_status(self) -> str:
+        """Return the effective authentication status without duplicating state."""
+
+        if self.blocked_at is not None:
+            return AccountStatus.BLOCKED
+        if self.is_active:
+            return AccountStatus.ACTIVE
+        return AccountStatus.INACTIVE
+
+    @property
+    def account_status_label(self) -> str:
+        return str(AccountStatus(self.account_status).label)
 
     def __str__(self) -> str:
         return self.username

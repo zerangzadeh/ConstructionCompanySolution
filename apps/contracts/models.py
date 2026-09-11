@@ -60,10 +60,18 @@ class Contract(UUIDModel, TimeStampedModel):
         related_name="contracts",
     )
     direction = models.CharField(
-        "جهت قرارداد", max_length=20, choices=ContractDirection.choices, null=True, blank=True
+        "جهت قرارداد",
+        max_length=20,
+        choices=ContractDirection.choices,
+        null=True,
+        blank=True,
     )
     contract_type = models.CharField(
-        "نوع قرارداد", max_length=20, choices=ContractType.choices, null=True, blank=True
+        "نوع قرارداد",
+        max_length=20,
+        choices=ContractType.choices,
+        null=True,
+        blank=True,
     )
     status = models.CharField(
         "وضعیت",
@@ -245,14 +253,16 @@ class ContractAmendment(UUIDModel, TimeStampedModel):
         related_name="contract_amendments",
     )
     contract = models.ForeignKey(
-        Contract, verbose_name="قرارداد", on_delete=models.CASCADE, related_name="amendments"
+        Contract,
+        verbose_name="قرارداد",
+        on_delete=models.CASCADE,
+        related_name="amendments",
     )
     amendment_number = models.PositiveIntegerField("شماره الحاقیه")
     title = models.CharField("عنوان الحاقیه", max_length=255)
     reason = models.TextField("دلیل")
     value_change = models.DecimalField(
-        "تغییر مبلغ",
-        max_digits=18, decimal_places=2, default=Decimal("0.00")
+        "تغییر مبلغ", max_digits=18, decimal_places=2, default=Decimal("0.00")
     )
     status = models.CharField(
         "وضعیت",

@@ -83,7 +83,10 @@ class AuditAction(models.TextChoices):
     DAILY_REPORT_CREATED = "daily_report.created", "گزارش روزانه ایجاد شد"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "گزارش روزانه ارسال شد"
     DAILY_REPORT_APPROVED = "daily_report.approved", "گزارش روزانه تأیید شد"
-    DAILY_REPORT_LABOR_ADDED = "daily_report.labor_added", "نیروی انسانی به گزارش روزانه افزوده شد"
+    DAILY_REPORT_LABOR_ADDED = (
+        "daily_report.labor_added",
+        "نیروی انسانی به گزارش روزانه افزوده شد",
+    )
     DAILY_REPORT_EQUIPMENT_ADDED = (
         "daily_report.equipment_added",
         "تجهیزات به گزارش روزانه افزوده شد",
@@ -151,6 +154,26 @@ class AuditAction(models.TextChoices):
     )
     MEMBERSHIP_INVITED = "membership.invited", "دعوت عضویت ارسال شد"
     MEMBERSHIP_ACCEPTED = "membership.accepted", "عضویت پذیرفته شد"
+    MEMBERSHIP_ROLE_CHANGED = "membership.role_changed", "نقش عضویت تغییر کرد"
+    MEMBERSHIP_STATUS_CHANGED = (
+        "membership.status_changed",
+        "وضعیت عضویت تغییر کرد",
+    )
+    USER_ACCOUNT_STATUS_CHANGED = (
+        "user.account_status_changed",
+        "وضعیت حساب کاربر تغییر کرد",
+    )
+    USER_PERMISSIONS_CHANGED = (
+        "user.permissions_changed",
+        "مجوزهای ویژه کاربر تغییر کرد",
+    )
+    ROLE_CREATED = "role.created", "نقش شرکتی ایجاد شد"
+    ROLE_UPDATED = "role.updated", "نقش شرکتی به‌روزرسانی شد"
+    ROLE_DELETED = "role.deleted", "نقش شرکتی حذف شد"
+    ROLE_PERMISSIONS_CHANGED = (
+        "role.permissions_changed",
+        "مجوزهای نقش شرکتی تغییر کرد",
+    )
 
 
 class AuditEventQuerySet(models.QuerySet):

@@ -17,8 +17,9 @@ from apps.estimates.models import (
     EstimateStatus,
 )
 from apps.materials.models import UnitOfMeasure
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -28,23 +29,19 @@ from core.identifiers import canonicalize_upper_identifier
 
 
 def _can_manage_estimates(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[
-            MembershipRole.OWNER,
-            MembershipRole.ADMIN,
-            MembershipRole.MANAGER,
-        ],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.ESTIMATES_MANAGE,
+    )
 
 
 def _can_approve_estimates(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[MembershipRole.OWNER, MembershipRole.ADMIN],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.ESTIMATES_APPROVE,
+    )
 
 
 def _validate_context(
@@ -374,10 +371,14 @@ def get_organization_estimates(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not organization.memberships.filter(
-        user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Estimate.objects.filter(

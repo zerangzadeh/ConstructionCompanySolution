@@ -61,7 +61,9 @@ class Payment(UUIDModel, TimeStampedModel):
         related_name="payments",
     )
     payment_number = models.CharField("شماره پرداخت", max_length=80)
-    direction = models.CharField("جهت تراکنش", max_length=20, choices=PaymentDirection.choices)
+    direction = models.CharField(
+        "جهت تراکنش", max_length=20, choices=PaymentDirection.choices
+    )
     amount = models.DecimalField("مبلغ", max_digits=18, decimal_places=2)
     paid_on = models.DateField("تاریخ پرداخت")
     method = models.CharField(
@@ -154,9 +156,7 @@ class Payment(UUIDModel, TimeStampedModel):
                 {"contract": "قرارداد باید متعلق به پروژه انتخاب‌شده باشد."}
             )
         if self.phase_id and self.phase.site.project_id != self.project_id:
-            raise ValidationError(
-                {"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."}
-            )
+            raise ValidationError({"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."})
         if self.party_id and self.party.archived_at is not None:
             raise ValidationError({"party": "طرف تجاری باید فعال باشد."})
 
@@ -205,7 +205,10 @@ class PaymentAllocation(UUIDModel, TimeStampedModel):
         related_name="payment_allocations",
     )
     payment = models.ForeignKey(
-        Payment, verbose_name="پرداخت", on_delete=models.CASCADE, related_name="allocations"
+        Payment,
+        verbose_name="پرداخت",
+        on_delete=models.CASCADE,
+        related_name="allocations",
     )
     contract = models.ForeignKey(
         "contracts.Contract",

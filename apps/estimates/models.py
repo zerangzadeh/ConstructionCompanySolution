@@ -129,9 +129,7 @@ class Estimate(UUIDModel, TimeStampedModel):
             relations["contract"] = self.contract
         validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
-            raise ValidationError(
-                {"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."}
-            )
+            raise ValidationError({"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."})
         if self.contract_id and self.contract.project_id != self.project_id:
             raise ValidationError(
                 {"contract": "قرارداد باید متعلق به پروژه انتخاب‌شده باشد."}
@@ -171,7 +169,10 @@ class EstimateRevision(UUIDModel, TimeStampedModel):
         related_name="estimate_revisions",
     )
     estimate = models.ForeignKey(
-        Estimate, verbose_name="برآورد", on_delete=models.CASCADE, related_name="revisions"
+        Estimate,
+        verbose_name="برآورد",
+        on_delete=models.CASCADE,
+        related_name="revisions",
     )
     revision_number = models.PositiveIntegerField("شماره بازنگری")
     status = models.CharField(

@@ -1,21 +1,32 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+)
 from apps.organizations.decorators import active_organization_required
-from apps.organizations.forms import OrganizationForm, OrganizationSettingsForm
+from apps.organizations.forms import (
+    OrganizationForm,
+    OrganizationMembershipForm,
+    OrganizationSettingsForm,
+)
 from apps.organizations.invitation_forms import OrganizationInvitationForm
+from apps.organizations.models import BusinessPermissionCode, OrganizationMembership
 from apps.organizations.services import (
     accept_organization_invitation,
+    create_organization_by_system_admin,
     create_organization_invitation,
-    create_organization_with_owner,
     get_organization_members,
     get_organization_settings,
     get_valid_memberships,
     resolve_active_organization,
     set_active_organization,
+    update_organization_membership,
     update_organization_settings,
 )
 
@@ -41,7 +52,7 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
     organization_id = request.POST.get("organization_id")
     organization = resolve_active_organization(request.user, organization_id)
     if organization is None:
-        return HttpResponseForbidden("You do not have access to this organization.")
+        return HttpResponseForbidden("به این سازمان دسترسی ندارید.")
 
     set_active_organization(request.session, organization)
     return redirect("organizations:select")
@@ -49,13 +60,17 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def create_organization(request: HttpRequest) -> HttpResponse:
-    """Create an organization owned by the authenticated user."""
+    """Allow only the global system administrator to create a tenant."""
+
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.")
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            organization = create_organization_with_owner(
+            organization = create_organization_by_system_admin(
+                actor=request.user,
                 owner=request.user,
                 name=data["name"],
                 legal_name=data["legal_name"],
@@ -80,14 +95,23 @@ def create_organization(request: HttpRequest) -> HttpResponse:
 def organization_members(request: HttpRequest) -> HttpResponse:
     """List active members belonging only to the active organization."""
 
+    can_manage_members = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+    )
     memberships = get_organization_members(
         user=request.user,
         organization=request.organization,
+        include_inactive=can_manage_members,
     )
     return render(
         request,
         "organizations/members.html",
-        {"memberships": memberships},
+        {
+            "memberships": memberships,
+            "can_manage_members": can_manage_members,
+        },
     )
 
 
@@ -122,6 +146,13 @@ def organization_settings(request: HttpRequest) -> HttpResponse:
 def invite_member(request: HttpRequest) -> HttpResponse:
     """Create an invitation for an existing user."""
 
+    if not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+    ):
+        return HttpResponseForbidden("اجازه دعوت عضو به این شرکت را ندارید.")
+
     if request.method == "POST":
         form = OrganizationInvitationForm(request.POST)
         if form.is_valid():
@@ -150,6 +181,63 @@ def invite_member(request: HttpRequest) -> HttpResponse:
         request,
         "organizations/invite.html",
         {"form": form},
+    )
+
+
+@active_organization_required
+def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
+    """Update a tenant membership through the audited authorization service."""
+
+    if not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+    ):
+        return HttpResponseForbidden("اجازه مدیریت اعضای این شرکت را ندارید.")
+    try:
+        membership = OrganizationMembership.objects.select_related(
+            "user", "role_definition"
+        ).get(pk=membership_id, organization=request.organization)
+    except OrganizationMembership.DoesNotExist as exc:
+        raise PermissionDenied("عضویت موردنظر در این شرکت یافت نشد.") from exc
+
+    actor_membership = get_active_membership(
+        user=request.user,
+        organization=request.organization,
+    )
+    allow_owner_role = actor_membership.role_definition.is_owner
+    if membership.role_definition.is_owner and not allow_owner_role:
+        return HttpResponseForbidden("فقط مالک شرکت می‌تواند عضویت مالک را مدیریت کند.")
+
+    if request.method == "POST":
+        form = OrganizationMembershipForm(
+            request.POST,
+            instance=membership,
+            allow_owner_role=allow_owner_role,
+        )
+        if form.is_valid():
+            try:
+                update_organization_membership(
+                    organization=request.organization,
+                    actor=request.user,
+                    membership=membership,
+                    role=form.cleaned_data["role_definition"],
+                    status=form.cleaned_data["status"],
+                )
+            except (PermissionDenied, ValueError) as exc:
+                form.add_error(None, str(exc))
+            else:
+                messages.success(request, "عضویت کاربر با موفقیت به‌روزرسانی شد.")
+                return redirect("organizations:members")
+    else:
+        form = OrganizationMembershipForm(
+            instance=membership,
+            allow_owner_role=allow_owner_role,
+        )
+    return render(
+        request,
+        "organizations/member_form.html",
+        {"form": form, "membership": membership},
     )
 
 

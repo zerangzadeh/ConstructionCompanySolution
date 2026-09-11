@@ -50,7 +50,7 @@ class ExpenseServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -99,7 +99,7 @@ class ExpenseServiceTests(TestCase):
     def test_expense_rejects_negative_amount(self) -> None:
         with self.assertRaisesMessage(
             ValueError,
-            "Expense amount cannot be negative.",
+            "مبلغ هزینه نمی‌تواند منفی باشد.",
         ):
             create_expense(
                 organization=self.organization,

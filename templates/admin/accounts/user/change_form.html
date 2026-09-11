@@ -1,0 +1,215 @@
+{% extends "admin/change_form.html" %}
+{% load admin_urls %}
+
+{% block form_top %}
+  {{ block.super }}
+  {% if change and detail_user %}
+    <section class="erp-user-hero" aria-labelledby="user-detail-title">
+      <div class="erp-user-avatar" aria-hidden="true">
+        {{ detail_user.first_name|first|default:detail_user.username|first }}
+      </div>
+      <div class="erp-user-hero__copy">
+        <span class="erp-admin-eyebrow">پروفایل مدیریتی کاربر</span>
+        <h2 id="user-detail-title">
+          {% if detail_user.get_full_name %}{{ detail_user.get_full_name }}{% else %}نام کامل ثبت نشده است{% endif %}
+        </h2>
+        <span class="erp-technical">{{ detail_user.username }}</span>
+      </div>
+      <span class="erp-status-badge erp-status-badge--{{ account_status_class }}">
+        {{ detail_user.account_status_label }}
+      </span>
+    </section>
+
+    <div class="erp-user-detail-sections">
+      <section class="erp-user-section" aria-labelledby="basic-info-title">
+        <header class="erp-user-section__header">
+          <div>
+            <span class="erp-user-section__index">۱</span>
+            <h2 id="basic-info-title">اطلاعات پایه</h2>
+          </div>
+          <p>اطلاعات هویتی و وضعیت حساب در سامانه</p>
+        </header>
+        <dl class="erp-description-grid">
+          <div>
+            <dt>نام کامل</dt>
+            <dd>{% if detail_user.get_full_name %}{{ detail_user.get_full_name }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</dd>
+          </div>
+          <div>
+            <dt>نام کاربری</dt>
+            <dd class="erp-technical">{{ detail_user.username }}</dd>
+          </div>
+          <div>
+            <dt>ایمیل</dt>
+            <dd class="erp-technical">{% if detail_user.email %}{{ detail_user.email }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</dd>
+          </div>
+          <div>
+            <dt>شماره موبایل</dt>
+            <dd class="erp-technical">{% if detail_user.phone_number %}{{ detail_user.phone_number }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</dd>
+          </div>
+          <div>
+            <dt>وضعیت حساب</dt>
+            <dd><span class="erp-status-badge erp-status-badge--{{ account_status_class }}">{{ detail_user.account_status_label }}</span></dd>
+          </div>
+          <div>
+            <dt>تاریخ ایجاد حساب</dt>
+            <dd class="tabular-nums">{{ detail_user.created_at|date:"DATETIME_FORMAT" }}</dd>
+          </div>
+          <div>
+            <dt>آخرین ورود</dt>
+            <dd class="tabular-nums">{% if detail_user.last_login %}{{ detail_user.last_login|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">تاکنون وارد نشده است</span>{% endif %}</dd>
+          </div>
+          <div>
+            <dt>آخرین تغییر نقش یا مجوز</dt>
+            <dd class="tabular-nums">{% if last_access_change %}{{ last_access_change.created_at|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">اطلاعات قابل اتکایی ثبت نشده است</span>{% endif %}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="erp-user-section" aria-labelledby="memberships-title">
+        <header class="erp-user-section__header">
+          <div>
+            <span class="erp-user-section__index">۲</span>
+            <h2 id="memberships-title">عضویت‌ها و نقش‌های سازمانی</h2>
+          </div>
+          <p>نقش و وضعیت کاربر در هر tenant قابل مشاهده</p>
+        </header>
+        {% if membership_rows %}
+          <div class="erp-user-table-wrap">
+            <table class="erp-user-table">
+              <thead>
+                <tr>
+                  <th scope="col">سازمان</th>
+                  <th scope="col">نقش</th>
+                  <th scope="col">وضعیت عضویت</th>
+                  <th scope="col">تاریخ عضویت</th>
+                  <th scope="col">دعوت‌کننده</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in membership_rows %}
+                  <tr>
+                    <td>
+                      <strong>{{ row.membership.organization.name }}</strong>
+                      <small class="erp-technical">{{ row.membership.organization.slug }}</small>
+                    </td>
+                    <td>{{ row.role_label }}</td>
+                    <td><span class="erp-status-badge erp-status-badge--{{ row.status_class }}">{{ row.status_label }}</span></td>
+                    <td class="tabular-nums">{% if row.membership.joined_at %}{{ row.membership.joined_at|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</td>
+                    <td>{% if row.membership.invited_by %}<span class="erp-technical">{{ row.membership.invited_by.username }}</span>{% else %}<span class="erp-empty-value">دعوت مستقیم ندارد</span>{% endif %}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="erp-user-empty-state">
+            <strong>عضویت سازمانی وجود ندارد</strong>
+            <p>این کاربر در محدودهٔ سازمانی قابل مشاهده، عضویتی ندارد.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="erp-user-section" aria-labelledby="permissions-title">
+        <header class="erp-user-section__header">
+          <div>
+            <span class="erp-user-section__index">۳</span>
+            <h2 id="permissions-title">مجوزها و دسترسی‌ها</h2>
+          </div>
+          <p>مجوزهای ویژهٔ global و وضعیت دسترسی پروژه‌ای</p>
+        </header>
+        <div class="erp-access-summary-grid">
+          <div>
+            <span>دسترسی Admin</span>
+            <strong>{% if detail_user.is_staff %}دارد{% else %}ندارد{% endif %}</strong>
+          </div>
+          <div>
+            <span>Superuser</span>
+            <strong>{% if detail_user.is_superuser %}بله{% else %}خیر{% endif %}</strong>
+          </div>
+          <div>
+            <span>گروه‌های global</span>
+            <strong>{{ user_groups|length }}</strong>
+          </div>
+          <div>
+            <span>مجوزهای نمایش‌داده‌شده</span>
+            <strong>{{ permission_rows|length }}</strong>
+          </div>
+        </div>
+
+        {% if user_groups %}
+          <div class="erp-user-groups" aria-label="گروه‌های کاربر">
+            {% for group in user_groups %}<span>{{ group.name }}</span>{% endfor %}
+          </div>
+        {% endif %}
+
+        {% if permission_rows %}
+          <div class="erp-user-table-wrap">
+            <table class="erp-user-table">
+              <thead><tr><th scope="col">منبع</th><th scope="col">مجوز</th><th scope="col">کد مجوز</th></tr></thead>
+              <tbody>
+                {% for permission in permission_rows %}
+                  <tr>
+                    <td>{{ permission.source }}</td>
+                    <td>{{ permission.label }}</td>
+                    <td class="erp-technical">{{ permission.codename }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="erp-user-empty-state erp-user-empty-state--compact">
+            <strong>مجوز ویژه‌ای تخصیص نیافته است</strong>
+            <p>دسترسی اصلی این کاربر از نقش عضویت سازمانی او تعیین می‌شود.</p>
+          </div>
+        {% endif %}
+
+        {% if not project_access_supported %}
+          <div class="erp-user-notice">
+            <strong>دسترسی سطح پروژه در معماری فعلی تعریف نشده است.</strong>
+            <p><code>EmployeeProjectAssignment</code> یک تخصیص عملیاتی نیروی انسانی است و به‌عنوان مجوز دسترسی کاربر استفاده نمی‌شود.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <section class="erp-user-section" aria-labelledby="activity-title">
+        <header class="erp-user-section__header">
+          <div>
+            <span class="erp-user-section__index">۴</span>
+            <h2 id="activity-title">تاریخچهٔ فعالیت</h2>
+          </div>
+          <p>۲۵ رویداد مهم اخیر در محدودهٔ مجاز سازمانی</p>
+        </header>
+        {% if audit_events %}
+          <div class="erp-user-table-wrap">
+            <table class="erp-user-table">
+              <thead><tr><th scope="col">زمان</th><th scope="col">عملیات</th><th scope="col">سازمان</th><th scope="col">عامل</th><th scope="col">موجودیت</th></tr></thead>
+              <tbody>
+                {% for event in audit_events %}
+                  <tr>
+                    <td class="tabular-nums">{{ event.created_at|date:"DATETIME_FORMAT" }}</td>
+                    <td><strong>{{ event.get_action_display }}</strong></td>
+                    <td>{% if event.organization %}{{ event.organization.name }}{% else %}<span class="erp-empty-value">سطح سامانه</span>{% endif %}</td>
+                    <td>{% if event.actor %}<span class="erp-technical">{{ event.actor.username }}</span>{% else %}<span class="erp-empty-value">عامل سیستمی</span>{% endif %}</td>
+                    <td class="erp-technical">{{ event.entity_type }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="erp-user-empty-state">
+            <strong>فعالیت مهمی ثبت نشده است</strong>
+            <p>برای این کاربر در محدودهٔ قابل مشاهده رویداد ممیزی وجود ندارد.</p>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+
+    <div class="erp-user-edit-heading">
+      <span class="erp-admin-eyebrow">تنظیمات مدیریتی</span>
+      <h2>ویرایش اطلاعات حساب</h2>
+      <p>تغییرات این فرم در تاریخچهٔ بومی Django Admin ثبت می‌شوند؛ تغییر وضعیت و مجوزهای ویژه در ممیزی سامانه نیز ثبت خواهد شد.</p>
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,6 +1,8 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models import Q
 
 from core.identifiers import canonicalize_lower_identifier
 from core.models import TimeStampedModel, UUIDModel
@@ -14,9 +16,11 @@ class OrganizationStatus(models.TextChoices):
 
 
 class MembershipRole(models.TextChoices):
-    OWNER = "owner", "مالک"
-    ADMIN = "admin", "مدیر"
-    MANAGER = "manager", "مدیر اجرایی"
+    """Stable codes for the protected roles shipped with the product."""
+
+    COMPANY_OWNER = "company_owner", "مالک شرکت"
+    COMPANY_MANAGER = "company_manager", "مدیر شرکت"
+    OPERATIONS_MANAGER = "operations_manager", "مدیر اجرایی"
     MEMBER = "member", "عضو"
     VIEWER = "viewer", "مشاهده‌گر"
 
@@ -29,10 +33,34 @@ class MembershipStatus(models.TextChoices):
 
 
 class InvitationRole(models.TextChoices):
-    ADMIN = "admin", "مدیر"
-    MANAGER = "manager", "مدیر اجرایی"
+    COMPANY_MANAGER = "company_manager", "مدیر شرکت"
+    OPERATIONS_MANAGER = "operations_manager", "مدیر اجرایی"
     MEMBER = "member", "عضو"
     VIEWER = "viewer", "مشاهده‌گر"
+
+
+class BusinessPermissionCode(models.TextChoices):
+    """Business capabilities implemented and enforced by application services."""
+
+    MEMBERSHIP_MANAGE = "membership.manage", "مدیریت اعضای شرکت"
+    COMPANY_SETTINGS_MANAGE = "company.settings.manage", "مدیریت تنظیمات شرکت"
+    PARTIES_MANAGE = "parties.manage", "مدیریت طرف‌های تجاری"
+    MATERIALS_MANAGE = "materials.manage", "مدیریت مصالح و واحدها"
+    PROJECTS_MANAGE = "projects.manage", "مدیریت پروژه‌ها"
+    CONTRACTS_MANAGE = "contracts.manage", "مدیریت قراردادها"
+    ESTIMATES_MANAGE = "estimates.manage", "مدیریت برآوردها"
+    ESTIMATES_APPROVE = "estimates.approve", "تأیید برآوردها"
+    EXPENSES_MANAGE = "expenses.manage", "مدیریت هزینه‌ها"
+    PAYMENTS_MANAGE = "payments.manage", "مدیریت پرداخت‌ها"
+    DOCUMENTS_MANAGE = "documents.manage", "مدیریت اسناد"
+    DAILY_REPORTS_CREATE = "daily_reports.create", "ثبت گزارش روزانه"
+    DAILY_REPORTS_MANAGE = "daily_reports.manage", "مدیریت گزارش‌های روزانه"
+    WORKFORCE_MANAGE = "workforce.manage", "مدیریت نیروی انسانی"
+    PROCUREMENT_REQUEST = "procurement.request", "ثبت درخواست و دریافت خرید"
+    PROCUREMENT_MANAGE = "procurement.manage", "مدیریت و تأیید خرید"
+    INVENTORY_MOVEMENT = "inventory.movement", "ثبت گردش انبار"
+    INVENTORY_MANAGE = "inventory.manage", "مدیریت انبار"
+    AUDIT_VIEW = "audit.view", "مشاهده گزارش رویدادها"
 
 
 class InvitationStatus(models.TextChoices):
@@ -40,6 +68,81 @@ class InvitationStatus(models.TextChoices):
     ACCEPTED = "accepted", "پذیرفته‌شده"
     EXPIRED = "expired", "منقضی‌شده"
     REVOKED = "revoked", "لغوشده"
+
+
+class BusinessPermission(UUIDModel, TimeStampedModel):
+    """A code-owned business capability that can be attached to global roles."""
+
+    code = models.CharField("کد مجوز", max_length=100, unique=True)
+    name = models.CharField("عنوان فارسی", max_length=255)
+    description = models.TextField("توضیحات", blank=True)
+    is_active = models.BooleanField("فعال", default=True)
+
+    class Meta:
+        verbose_name = "مجوز کسب‌وکار"
+        verbose_name_plural = "مجوزهای کسب‌وکار"
+        ordering = ["code"]  # noqa: RUF012
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class OrganizationRole(UUIDModel, TimeStampedModel):
+    """A global role assembled by a system administrator from known capabilities."""
+
+    code = models.SlugField("کد نقش", max_length=64, unique=True)
+    name = models.CharField("عنوان فارسی", max_length=255)
+    description = models.TextField("توضیحات", blank=True)
+    permissions = models.ManyToManyField(
+        BusinessPermission,
+        verbose_name="مجوزهای کسب‌وکار",
+        related_name="roles",
+        blank=True,
+    )
+    is_active = models.BooleanField("فعال", default=True, db_index=True)
+    is_system = models.BooleanField("نقش سیستمی", default=False)
+    is_owner = models.BooleanField("نقش مالک شرکت", default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="organization_roles_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="organization_roles_updated",
+    )
+
+    class Meta:
+        verbose_name = "نقش شرکتی"
+        verbose_name_plural = "نقش‌های شرکتی"
+        ordering = ["name"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["is_owner"],
+                condition=Q(is_owner=True),
+                name="unique_company_owner_role",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        self.code = canonicalize_lower_identifier(self.code)
+        if self.is_owner and (not self.is_system or not self.is_active):
+            raise ValidationError("نقش مالک شرکت باید یک نقش سیستمی و فعال باقی بماند.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.code = canonicalize_lower_identifier(self.code)
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class Organization(UUIDModel, TimeStampedModel):
@@ -148,10 +251,16 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
         related_name="organization_memberships",
     )
     role = models.CharField(
-        "نقش",
-        max_length=20,
-        choices=MembershipRole.choices,
+        "کد نقش سازگار",
+        max_length=64,
         default=MembershipRole.MEMBER,
+        editable=False,
+    )
+    role_definition = models.ForeignKey(
+        OrganizationRole,
+        verbose_name="نقش",
+        on_delete=models.PROTECT,
+        related_name="memberships",
     )
     status = models.CharField(
         "وضعیت",
@@ -179,6 +288,19 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
             ),
         ]
         ordering = ["organization__name", "user__username"]  # noqa: RUF012
+
+    @property
+    def role_label(self) -> str:
+        return self.role_definition.name
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.role_definition_id is None:
+            self.role_definition = OrganizationRole.objects.get(code=self.role)
+        self.role = self.role_definition.code
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"role", "role_definition"}
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.user.username} - {self.organization.name}"
@@ -208,10 +330,16 @@ class OrganizationInvitation(UUIDModel, TimeStampedModel):
         related_name="organization_invitations_sent",
     )
     role = models.CharField(
-        "نقش",
-        max_length=20,
-        choices=InvitationRole.choices,
+        "کد نقش سازگار",
+        max_length=64,
         default=InvitationRole.MEMBER,
+        editable=False,
+    )
+    role_definition = models.ForeignKey(
+        OrganizationRole,
+        verbose_name="نقش",
+        on_delete=models.PROTECT,
+        related_name="invitations",
     )
     status = models.CharField(
         "وضعیت",
@@ -228,6 +356,19 @@ class OrganizationInvitation(UUIDModel, TimeStampedModel):
         verbose_name = "دعوت‌نامه سازمان"
         verbose_name_plural = "دعوت‌نامه‌های سازمان"
         ordering = ["-created_at"]  # noqa: RUF012
+
+    @property
+    def role_label(self) -> str:
+        return self.role_definition.name
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.role_definition_id is None:
+            self.role_definition = OrganizationRole.objects.get(code=self.role)
+        self.role = self.role_definition.code
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None:
+            kwargs["update_fields"] = set(update_fields) | {"role", "role_definition"}
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"دعوت‌نامه {self.organization.name} برای {self.invitee.username}"

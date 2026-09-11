@@ -195,8 +195,12 @@ class ProjectPhase(UUIDModel, TimeStampedModel):
         default=ProjectPhaseStatus.PLANNING,
         db_index=True,
     )
-    planned_start_date = models.DateField("تاریخ شروع برنامه‌ریزی‌شده", null=True, blank=True)
-    planned_end_date = models.DateField("تاریخ پایان برنامه‌ریزی‌شده", null=True, blank=True)
+    planned_start_date = models.DateField(
+        "تاریخ شروع برنامه‌ریزی‌شده", null=True, blank=True
+    )
+    planned_end_date = models.DateField(
+        "تاریخ پایان برنامه‌ریزی‌شده", null=True, blank=True
+    )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="ایجادکننده",
@@ -256,7 +260,10 @@ class WBSNode(UUIDModel, TimeStampedModel):
         related_name="wbs_nodes",
     )
     project = models.ForeignKey(
-        Project, verbose_name="پروژه", on_delete=models.CASCADE, related_name="wbs_nodes"
+        Project,
+        verbose_name="پروژه",
+        on_delete=models.CASCADE,
+        related_name="wbs_nodes",
     )
     parent = models.ForeignKey(
         "self",
@@ -355,7 +362,10 @@ class Activity(UUIDModel, TimeStampedModel):
         related_name="activities",
     )
     project = models.ForeignKey(
-        Project, verbose_name="پروژه", on_delete=models.CASCADE, related_name="activities"
+        Project,
+        verbose_name="پروژه",
+        on_delete=models.CASCADE,
+        related_name="activities",
     )
     wbs_node = models.ForeignKey(
         WBSNode,
@@ -390,11 +400,14 @@ class Activity(UUIDModel, TimeStampedModel):
     code = models.CharField("کد فعالیت", max_length=50)
     name = models.CharField("نام فعالیت", max_length=255)
     planned_quantity = models.DecimalField(
-        "مقدار برنامه‌ریزی‌شده",
-        max_digits=18, decimal_places=4, null=True, blank=True
+        "مقدار برنامه‌ریزی‌شده", max_digits=18, decimal_places=4, null=True, blank=True
     )
-    planned_start_date = models.DateField("تاریخ شروع برنامه‌ریزی‌شده", null=True, blank=True)
-    planned_end_date = models.DateField("تاریخ پایان برنامه‌ریزی‌شده", null=True, blank=True)
+    planned_start_date = models.DateField(
+        "تاریخ شروع برنامه‌ریزی‌شده", null=True, blank=True
+    )
+    planned_end_date = models.DateField(
+        "تاریخ پایان برنامه‌ریزی‌شده", null=True, blank=True
+    )
     status = models.CharField(
         "وضعیت",
         max_length=20,
@@ -457,9 +470,7 @@ class Activity(UUIDModel, TimeStampedModel):
         if self.site_id:
             validate_related_organizations(self, site=self.site)
             if self.project_id and self.site.project_id != self.project_id:
-                raise ValidationError(
-                    {"site": "کارگاه باید متعلق به همین پروژه باشد."}
-                )
+                raise ValidationError({"site": "کارگاه باید متعلق به همین پروژه باشد."})
         if self.phase_id:
             validate_related_organizations(self, phase=self.phase)
             if not self.site_id or self.phase.site_id != self.site_id:
@@ -479,11 +490,15 @@ class Activity(UUIDModel, TimeStampedModel):
                 )
             if not self.unit_of_measure_id:
                 raise ValidationError(
-                    {"unit_of_measure": "برای مقدار برنامه‌ریزی‌شده، انتخاب واحد الزامی است."}
+                    {
+                        "unit_of_measure": "برای مقدار برنامه‌ریزی‌شده، انتخاب واحد الزامی است."
+                    }
                 )
         elif self.unit_of_measure_id:
             raise ValidationError(
-                {"planned_quantity": "با انتخاب واحد، وارد کردن مقدار برنامه‌ریزی‌شده الزامی است."}
+                {
+                    "planned_quantity": "با انتخاب واحد، وارد کردن مقدار برنامه‌ریزی‌شده الزامی است."
+                }
             )
         if (
             self.planned_start_date
@@ -491,7 +506,9 @@ class Activity(UUIDModel, TimeStampedModel):
             and self.planned_end_date < self.planned_start_date
         ):
             raise ValidationError(
-                {"planned_end_date": "تاریخ پایان فعالیت نمی‌تواند پیش از تاریخ شروع باشد."}
+                {
+                    "planned_end_date": "تاریخ پایان فعالیت نمی‌تواند پیش از تاریخ شروع باشد."
+                }
             )
 
     def save(self, *args: object, **kwargs: object) -> None:

@@ -271,7 +271,9 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
     )
     order_number = models.CharField("شماره سفارش خرید", max_length=80)
     order_date = models.DateField("تاریخ سفارش")
-    expected_delivery_date = models.DateField("تاریخ تحویل موردانتظار", null=True, blank=True)
+    expected_delivery_date = models.DateField(
+        "تاریخ تحویل موردانتظار", null=True, blank=True
+    )
     status = models.CharField(
         "وضعیت",
         max_length=20,
@@ -340,7 +342,9 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
         self.notes = self.notes.strip()
         self.cancellation_reason = self.cancellation_reason.strip()
         if not self.order_number:
-            raise ValidationError({"order_number": "وارد کردن شماره سفارش خرید الزامی است."})
+            raise ValidationError(
+                {"order_number": "وارد کردن شماره سفارش خرید الزامی است."}
+            )
         relations = {
             "project": self.project if self.project_id else None,
             "supplier": self.supplier if self.supplier_id else None,
@@ -355,16 +359,16 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
             and self.purchase_request.project_id != self.project_id
         ):
             raise ValidationError(
-                {
-                    "purchase_request": "درخواست خرید باید متعلق به پروژه سفارش باشد."
-                }
+                {"purchase_request": "درخواست خرید باید متعلق به پروژه سفارش باشد."}
             )
         if (
             self.expected_delivery_date
             and self.expected_delivery_date < self.order_date
         ):
             raise ValidationError(
-                {"expected_delivery_date": "تاریخ تحویل نمی‌تواند پیش از تاریخ سفارش باشد."}
+                {
+                    "expected_delivery_date": "تاریخ تحویل نمی‌تواند پیش از تاریخ سفارش باشد."
+                }
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -497,9 +501,7 @@ class PurchaseOrderItem(UUIDModel, TimeStampedModel):
                     {"material": "مصالح سفارش باید با ردیف درخواست مطابقت داشته باشد."}
                 )
         if self.quantity <= Decimal(0) or self.unit_price < Decimal(0):
-            raise ValidationError(
-                "مقدار باید مثبت و قیمت واحد نامنفی باشد."
-            )
+            raise ValidationError("مقدار باید مثبت و قیمت واحد نامنفی باشد.")
         self.description = self.description.strip()
         if not self.description:
             raise ValidationError({"description": "وارد کردن شرح ردیف الزامی است."})
@@ -513,7 +515,9 @@ class PurchaseOrderItem(UUIDModel, TimeStampedModel):
             else None
         )
         if order_status != PurchaseOrderStatus.DRAFT:
-            raise ValidationError("فقط ردیف‌های سفارش خرید در وضعیت پیش‌نویس قابل تغییر هستند.")
+            raise ValidationError(
+                "فقط ردیف‌های سفارش خرید در وضعیت پیش‌نویس قابل تغییر هستند."
+            )
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
@@ -608,7 +612,9 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
         self.notes = self.notes.strip()
         self.void_reason = self.void_reason.strip()
         if not self.receipt_number:
-            raise ValidationError({"receipt_number": "وارد کردن شماره رسید کالا الزامی است."})
+            raise ValidationError(
+                {"receipt_number": "وارد کردن شماره رسید کالا الزامی است."}
+            )
         if self.received_at and timezone.is_naive(self.received_at):
             raise ValidationError(
                 {"received_at": "زمان دریافت باید دارای منطقه زمانی باشد."}
@@ -624,7 +630,9 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
             and self.purchase_order.project_id != self.project_id
         ):
             raise ValidationError(
-                {"project": "پروژه رسید کالا باید با پروژه سفارش خرید مطابقت داشته باشد."}
+                {
+                    "project": "پروژه رسید کالا باید با پروژه سفارش خرید مطابقت داشته باشد."
+                }
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -754,6 +762,8 @@ class GoodsReceiptItem(UUIDModel, TimeStampedModel):
             else None
         )
         if receipt_status != GoodsReceiptStatus.DRAFT:
-            raise ValidationError("فقط ردیف‌های رسید کالا در وضعیت پیش‌نویس قابل تغییر هستند.")
+            raise ValidationError(
+                "فقط ردیف‌های رسید کالا در وضعیت پیش‌نویس قابل تغییر هستند."
+            )
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)

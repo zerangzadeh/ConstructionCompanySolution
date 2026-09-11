@@ -15,8 +15,9 @@ from apps.expenses.models import (
     ExpenseStatus,
     LegacyExpenseCategory,
 )
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -26,15 +27,11 @@ from apps.projects.models import Project, ProjectPhase
 
 
 def _can_manage_expenses(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[
-            MembershipRole.OWNER,
-            MembershipRole.ADMIN,
-            MembershipRole.MANAGER,
-        ],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.EXPENSES_MANAGE,
+    )
 
 
 def _validate_context(
@@ -106,9 +103,7 @@ def create_expense(
         or expense_category.archived_at
         or not expense_category.is_active
     ):
-        raise PermissionDenied(
-            "دسته هزینه متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته هزینه متعلق به این سازمان نیست.")
     expense = Expense.objects.create(
         organization=organization,
         project=project,
@@ -160,10 +155,14 @@ def get_organization_expenses(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not organization.memberships.filter(
-        user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return (
         Expense.objects.filter(
@@ -268,9 +267,7 @@ def archive_expense_category(
     _validate_category_management(organization=organization, actor=actor)
     locked_category = ExpenseCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.pk:
-        raise PermissionDenied(
-            "دسته هزینه متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته هزینه متعلق به این سازمان نیست.")
     if locked_category.archived_at is not None:
         raise ValueError("دسته هزینه از قبل بایگانی شده است.")
     locked_category.is_active = False

@@ -36,7 +36,7 @@ class ContractServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -79,7 +79,7 @@ class ContractServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "A contract with this contract number already exists.",
+            "قراردادی با این شماره از قبل وجود دارد.",
         ):
             create_contract(
                 organization=self.organization,
@@ -111,7 +111,7 @@ class ContractServiceTests(TestCase):
     def test_contract_rejects_negative_value(self) -> None:
         with self.assertRaisesMessage(
             ValueError,
-            "Contract value cannot be negative.",
+            "مبلغ قرارداد نمی‌تواند منفی باشد.",
         ):
             create_contract(
                 organization=self.organization,

@@ -52,7 +52,7 @@ class ProjectDocumentServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -105,7 +105,7 @@ class ProjectDocumentServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "The uploaded file type does not match its extension.",
+            "نوع فایل بارگذاری‌شده با پسوند آن مطابقت ندارد.",
         ):
             upload_project_document(
                 organization=self.organization,
@@ -125,7 +125,7 @@ class ProjectDocumentServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "The uploaded file contents are not a valid file type.",
+            "محتوای فایل بارگذاری‌شده معتبر نیست.",
         ):
             upload_project_document(
                 organization=self.organization,
@@ -156,7 +156,7 @@ class ProjectDocumentServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "The payment does not belong to this project.",
+            "پرداخت متعلق به این پروژه نیست.",
         ):
             upload_project_document(
                 organization=self.organization,
@@ -304,7 +304,7 @@ class ProjectDocumentServiceTests(TestCase):
     def test_document_endpoints_reject_cross_tenant_uuid(self) -> None:
         self.other_organization.memberships.create(
             user=self.other_user,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         other_project = create_project(

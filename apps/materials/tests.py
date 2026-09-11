@@ -32,11 +32,13 @@ class UnitOfMeasureServiceTests(TestCase):
             name="Other Unit Company", slug="other-unit-company"
         )
         self.organization.memberships.create(
-            user=self.owner, role=MembershipRole.OWNER, status=MembershipStatus.ACTIVE
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
         )
         self.other_organization.memberships.create(
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -54,7 +56,7 @@ class UnitOfMeasureServiceTests(TestCase):
         )
         self.assertEqual(unit.code, "M2")
         with self.assertRaisesMessage(
-            ValueError, "A unit with this code or symbol already exists."
+            ValueError, "واحدی با این کد یا نماد از قبل وجود دارد."
         ):
             create_unit_of_measure(
                 organization=self.organization,
@@ -125,14 +127,16 @@ class MaterialMasterServiceTests(TestCase):
             name="Other Material Company", slug="other-material-company"
         )
         self.organization.memberships.create(
-            user=self.owner, role=MembershipRole.OWNER, status=MembershipStatus.ACTIVE
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
         )
         self.organization.memberships.create(
             user=self.member, role=MembershipRole.MEMBER, status=MembershipStatus.ACTIVE
         )
         self.other_organization.memberships.create(
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.unit = create_unit_of_measure(
@@ -178,7 +182,7 @@ class MaterialMasterServiceTests(TestCase):
             symbol="kg",
             category="weight",
         )
-        with self.assertRaisesMessage(ValueError, "Material data is invalid"):
+        with self.assertRaisesMessage(ValueError, "اطلاعات مصالح معتبر نیست"):
             create_material(
                 organization=self.organization,
                 actor=self.owner,
@@ -214,7 +218,7 @@ class MaterialMasterServiceTests(TestCase):
             name="Sand",
             parent=parent,
         )
-        with self.assertRaisesMessage(ValueError, "cannot contain a cycle"):
+        with self.assertRaisesMessage(ValueError, "نمی‌تواند شامل چرخه باشد"):
             update_material_category(
                 organization=self.organization,
                 actor=self.owner,
@@ -231,13 +235,11 @@ class MaterialMasterServiceTests(TestCase):
             category=child,
             unit_of_measure=self.unit,
         )
-        with self.assertRaisesMessage(
-            ValueError, "active child categories or materials"
-        ):
+        with self.assertRaisesMessage(ValueError, "زیرمجموعه یا مصالح فعال"):
             archive_material_category(
                 organization=self.organization, actor=self.owner, category=child
             )
-        with self.assertRaisesMessage(ValueError, "used by active materials"):
+        with self.assertRaisesMessage(ValueError, "مورد استفاده مصالح فعال"):
             archive_unit_of_measure(
                 organization=self.organization, actor=self.owner, unit=self.unit
             )

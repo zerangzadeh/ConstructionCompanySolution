@@ -212,18 +212,14 @@ class Expense(UUIDModel, TimeStampedModel):
             relations["expense_category"] = self.expense_category
         validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
-            raise ValidationError(
-                {"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."}
-            )
+            raise ValidationError({"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."})
         if self.party_id and self.party.archived_at is not None:
             raise ValidationError({"party": "طرف تجاری باید فعال باشد."})
         if self.expense_category_id and (
             self.expense_category.archived_at is not None
             or not self.expense_category.is_active
         ):
-            raise ValidationError(
-                {"expense_category": "دسته هزینه باید فعال باشد."}
-            )
+            raise ValidationError({"expense_category": "دسته هزینه باید فعال باشد."})
 
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:

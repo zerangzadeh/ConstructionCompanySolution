@@ -16,55 +16,39 @@ from apps.inventory.models import (
     Warehouse,
 )
 from apps.materials.models import Material, UnitOfMeasure
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+)
 from apps.organizations.models import (
-    MembershipRole,
-    MembershipStatus,
+    BusinessPermissionCode,
     Organization,
-    OrganizationStatus,
 )
 from apps.procurement.models import GoodsReceipt, GoodsReceiptItem, GoodsReceiptStatus
 from apps.projects.models import Project
 from core.identifiers import canonicalize_upper_identifier
 
-_MOVEMENT_ROLES = {
-    MembershipRole.OWNER,
-    MembershipRole.ADMIN,
-    MembershipRole.MANAGER,
-    MembershipRole.MEMBER,
-}
-_MANAGEMENT_ROLES = {
-    MembershipRole.OWNER,
-    MembershipRole.ADMIN,
-    MembershipRole.MANAGER,
-}
 _LEDGER_STATUSES = {
     StockTransactionStatus.POSTED,
     StockTransactionStatus.REVERSED,
 }
 
 
-def _get_active_role(*, organization: Organization, user: User) -> str:
-    if not user.is_authenticated or not user.is_active:
-        raise PermissionDenied("Authentication is required.")
-    if (
-        organization.status != OrganizationStatus.ACTIVE
-        or organization.deleted_at is not None
-    ):
-        raise PermissionDenied("The organization is not active.")
-    try:
-        return organization.memberships.get(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-        ).role
-    except organization.memberships.model.DoesNotExist as exc:
-        raise PermissionDenied("You do not have access to this organization.") from exc
+def _validate_active_access(*, organization: Organization, user: User) -> None:
+    if user.is_superuser and user.is_active:
+        return
+    get_active_membership(user=user, organization=organization)
 
 
 def _require_role(
-    *, organization: Organization, actor: User, allowed_roles: set[str], message: str
+    *, organization: Organization, actor: User, permission: str, message: str
 ) -> None:
-    if _get_active_role(organization=organization, user=actor) not in allowed_roles:
-        raise PermissionDenied(message)
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        message=message,
+    )
 
 
 def _validate_project(
@@ -78,11 +62,9 @@ def _validate_project(
             organization=organization,
         )
     except Project.DoesNotExist as exc:
-        raise PermissionDenied(
-            "The project does not belong to this organization."
-        ) from exc
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.") from exc
     if stored.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     return stored
 
 
@@ -99,9 +81,7 @@ def _validate_material(
             .get(pk=material.pk, organization=organization)
         )
     except Material.DoesNotExist as exc:
-        raise PermissionDenied(
-            "The material does not belong to this organization."
-        ) from exc
+        raise PermissionDenied("مصالح متعلق به این سازمان نیست.") from exc
     stored_unit = stored.unit_of_measure
     if (
         unit_of_measure.organization_id != organization.pk
@@ -112,7 +92,7 @@ def _validate_material(
         or stored_unit.archived_at is not None
     ):
         raise PermissionDenied(
-            "The material and unit must be active records in this organization."
+            "مصالح و واحد اندازه‌گیری باید رکوردهای فعال این سازمان باشند."
         )
     return stored, stored_unit
 
@@ -128,11 +108,9 @@ def _get_warehouse(
             organization=organization,
         )
     except Warehouse.DoesNotExist as exc:
-        raise PermissionDenied(
-            "The warehouse does not belong to this organization."
-        ) from exc
+        raise PermissionDenied("انبار متعلق به این سازمان نیست.") from exc
     if not stored.is_active or stored.archived_at is not None:
-        raise ValueError("The warehouse is archived or inactive.")
+        raise ValueError("انبار بایگانی‌شده یا غیرفعال است.")
     return stored
 
 
@@ -184,7 +162,7 @@ def _lock_warehouses(transaction_record: StockTransaction) -> None:
         not warehouse.is_active or warehouse.archived_at is not None
         for warehouse in locked_warehouses
     ):
-        raise ValueError("The transaction requires active tenant warehouses.")
+        raise ValueError("تراکنش به انبارهای فعال همین سازمان نیاز دارد.")
 
 
 def _ensure_available_stock(transaction_record: StockTransaction) -> None:
@@ -196,7 +174,7 @@ def _ensure_available_stock(transaction_record: StockTransaction) -> None:
         material=transaction_record.material,
     )
     if available < transaction_record.quantity:
-        raise ValueError("The transaction would create negative warehouse stock.")
+        raise ValueError("این تراکنش موجب منفی شدن موجودی انبار می‌شود.")
 
 
 @transaction.atomic
@@ -212,8 +190,8 @@ def create_warehouse(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot manage warehouses in this organization.",
+        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        message="اجازه مدیریت انبارهای این سازمان را ندارید.",
     )
     project = _validate_project(organization=organization, project=project)
     warehouse = Warehouse(
@@ -225,7 +203,7 @@ def create_warehouse(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(warehouse, "Warehouse data is invalid or its code is in use.")
+    _save_validated(warehouse, "اطلاعات انبار معتبر نیست یا کد آن تکراری است.")
     record_audit_event(
         action=AuditAction.WAREHOUSE_CREATED,
         entity_type="warehouse",
@@ -247,8 +225,8 @@ def archive_warehouse(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot manage warehouses in this organization.",
+        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        message="اجازه مدیریت انبارهای این سازمان را ندارید.",
     )
     try:
         locked = Warehouse.objects.select_for_update().get(
@@ -256,9 +234,9 @@ def archive_warehouse(
             organization=organization,
         )
     except Warehouse.DoesNotExist as exc:
-        raise PermissionDenied("Warehouse not found in this organization.") from exc
+        raise PermissionDenied("انبار در این سازمان یافت نشد.") from exc
     if not locked.is_active or locked.archived_at is not None:
-        raise ValueError("Warehouse is already archived.")
+        raise ValueError("انبار از قبل بایگانی شده است.")
     if (
         StockTransaction.objects.filter(
             organization=organization,
@@ -267,7 +245,7 @@ def archive_warehouse(
         .filter(Q(source_warehouse=locked) | Q(destination_warehouse=locked))
         .exists()
     ):
-        raise ValueError("A warehouse with draft transactions cannot be archived.")
+        raise ValueError("انبار دارای تراکنش پیش‌نویس قابل بایگانی نیست.")
     material_ids = (
         StockTransaction.objects.filter(
             organization=organization,
@@ -282,7 +260,7 @@ def archive_warehouse(
             warehouse=locked,
             material=material,
         ) != Decimal("0.0000"):
-            raise ValueError("A warehouse with non-zero stock cannot be archived.")
+            raise ValueError("انبار دارای موجودی غیرصفر قابل بایگانی نیست.")
     locked.is_active = False
     locked.archived_at = timezone.now()
     locked.updated_by = actor
@@ -321,17 +299,17 @@ def create_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MOVEMENT_ROLES,
-        message="You cannot create stock transactions in this organization.",
+        permission=BusinessPermissionCode.INVENTORY_MOVEMENT,
+        message="اجازه ایجاد تراکنش انبار در این سازمان را ندارید.",
     )
     if transaction_type not in StockTransactionType.values or (
         transaction_type == StockTransactionType.REVERSAL
     ):
-        raise ValueError("Invalid stock transaction type.")
+        raise ValueError("نوع تراکنش انبار معتبر نیست.")
     if quantity <= Decimal(0):
-        raise ValueError("Quantity must be positive.")
+        raise ValueError("مقدار باید مثبت باشد.")
     if timezone.is_naive(occurred_at):
-        raise ValueError("Transaction time must be timezone-aware.")
+        raise ValueError("زمان تراکنش باید دارای منطقه زمانی باشد.")
     project = _validate_project(organization=organization, project=project)
     material, unit_of_measure = _validate_material(
         organization=organization,
@@ -350,9 +328,7 @@ def create_stock_transaction(
                 organization=organization,
             )
         except GoodsReceiptItem.DoesNotExist as exc:
-            raise PermissionDenied(
-                "Goods receipt item not found in this organization."
-            ) from exc
+            raise PermissionDenied("ردیف رسید کالا در این سازمان یافت نشد.") from exc
         locked_receipt = GoodsReceipt.objects.select_for_update().get(
             pk=item_reference.goods_receipt_id,
             organization=organization,
@@ -368,7 +344,7 @@ def create_stock_transaction(
         )
         goods_receipt_item.goods_receipt = locked_receipt
         if locked_receipt.status != GoodsReceiptStatus.POSTED:
-            raise ValueError("Only posted goods receipts can enter inventory.")
+            raise ValueError("فقط رسیدهای کالای نهایی‌شده قابل ورود به انبار هستند.")
     transaction_record = StockTransaction(
         organization=organization,
         transaction_number=canonicalize_upper_identifier(transaction_number),
@@ -413,8 +389,8 @@ def post_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MOVEMENT_ROLES,
-        message="You cannot post stock transactions in this organization.",
+        permission=BusinessPermissionCode.INVENTORY_MOVEMENT,
+        message="اجازه نهایی‌سازی تراکنش‌های انبار این سازمان را ندارید.",
     )
     try:
         transaction_record = (
@@ -431,11 +407,9 @@ def post_stock_transaction(
             .get(pk=stock_transaction.pk, organization=organization)
         )
     except StockTransaction.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Stock transaction not found in this organization."
-        ) from exc
+        raise PermissionDenied("تراکنش انبار در این سازمان یافت نشد.") from exc
     if transaction_record.status != StockTransactionStatus.DRAFT:
-        raise ValueError("Only draft stock transactions can be posted.")
+        raise ValueError("فقط تراکنش‌های انبار پیش‌نویس قابل نهایی‌سازی هستند.")
     transaction_record.project = _validate_project(
         organization=organization,
         project=transaction_record.project,
@@ -453,7 +427,7 @@ def post_stock_transaction(
             organization=organization,
         )
         if source_receipt.status != GoodsReceiptStatus.POSTED:
-            raise ValueError("The source goods receipt is no longer posted.")
+            raise ValueError("رسید کالای مبدأ دیگر نهایی‌شده نیست.")
     _lock_warehouses(transaction_record)
     _ensure_available_stock(transaction_record)
     transaction_record.status = StockTransactionStatus.POSTED
@@ -492,8 +466,8 @@ def reverse_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot reverse stock transactions in this organization.",
+        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        message="اجازه برگشت تراکنش‌های انبار این سازمان را ندارید.",
     )
     try:
         original = (
@@ -508,15 +482,13 @@ def reverse_stock_transaction(
             .get(pk=stock_transaction.pk, organization=organization)
         )
     except StockTransaction.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Stock transaction not found in this organization."
-        ) from exc
+        raise PermissionDenied("تراکنش انبار در این سازمان یافت نشد.") from exc
     if original.status != StockTransactionStatus.POSTED:
-        raise ValueError("Only posted stock transactions can be reversed.")
+        raise ValueError("فقط تراکنش‌های انبار نهایی‌شده قابل برگشت هستند.")
     if original.transaction_type == StockTransactionType.REVERSAL:
-        raise ValueError("A reversal transaction cannot be reversed.")
+        raise ValueError("تراکنش برگشتی قابل برگشت مجدد نیست.")
     if not reason.strip():
-        raise ValueError("A reversal reason is required.")
+        raise ValueError("وارد کردن دلیل برگشت الزامی است.")
     original.material, original.unit_of_measure = _validate_material(
         organization=organization,
         material=original.material,
@@ -544,7 +516,7 @@ def reverse_stock_transaction(
         updated_by=actor,
     )
     _ensure_available_stock(reversal)
-    _save_validated(reversal, "Stock reversal data is invalid or its number is in use.")
+    _save_validated(reversal, "اطلاعات برگشت انبار معتبر نیست یا شماره آن تکراری است.")
     original.status = StockTransactionStatus.REVERSED
     original.reversed_at = timezone.now()
     original.reversed_by = actor
@@ -579,7 +551,7 @@ def reverse_stock_transaction(
 def get_organization_warehouses(
     *, user: User, organization: Organization, active_only: bool = False
 ) -> QuerySet[Warehouse]:
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     queryset = Warehouse.objects.filter(organization=organization).select_related(
         "project", "created_by", "updated_by"
     )
@@ -591,7 +563,7 @@ def get_organization_warehouses(
 def get_organization_stock_transactions(
     *, user: User, organization: Organization
 ) -> QuerySet[StockTransaction]:
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     return StockTransaction.objects.filter(organization=organization).select_related(
         "source_warehouse",
         "destination_warehouse",
@@ -615,11 +587,11 @@ def get_stock_balance(
 ) -> Decimal:
     """Derive on-hand quantity from the immutable movement ledger."""
 
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     if warehouse.organization_id != organization.pk:
-        raise PermissionDenied("Warehouse not found in this organization.")
+        raise PermissionDenied("انبار در این سازمان یافت نشد.")
     if material.organization_id != organization.pk:
-        raise PermissionDenied("Material not found in this organization.")
+        raise PermissionDenied("مصالح در این سازمان یافت نشد.")
     return _stock_balance_value(
         organization=organization,
         warehouse=warehouse,

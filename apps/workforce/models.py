@@ -405,15 +405,21 @@ class Employee(UUIDModel, TimeStampedModel):
             and self.termination_date < self.hire_date
         ):
             raise ValidationError(
-                {"termination_date": "تاریخ خاتمه همکاری نمی‌تواند پیش از تاریخ استخدام باشد."}
+                {
+                    "termination_date": "تاریخ خاتمه همکاری نمی‌تواند پیش از تاریخ استخدام باشد."
+                }
             )
         if self.status == EmployeeStatus.TERMINATED and not self.termination_date:
             raise ValidationError(
-                {"termination_date": "برای وضعیت خاتمه همکاری، وارد کردن تاریخ الزامی است."}
+                {
+                    "termination_date": "برای وضعیت خاتمه همکاری، وارد کردن تاریخ الزامی است."
+                }
             )
         if self.status != EmployeeStatus.TERMINATED and self.termination_date:
             raise ValidationError(
-                {"termination_date": "تاریخ خاتمه همکاری فقط برای کارکنان خاتمه‌یافته مجاز است."}
+                {
+                    "termination_date": "تاریخ خاتمه همکاری فقط برای کارکنان خاتمه‌یافته مجاز است."
+                }
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -515,7 +521,9 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
         if self.site_id and self.project_id and self.site.project_id != self.project_id:
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
         if self.end_date and self.end_date < self.start_date:
-            raise ValidationError({"end_date": "تاریخ پایان نمی‌تواند پیش از تاریخ شروع باشد."})
+            raise ValidationError(
+                {"end_date": "تاریخ پایان نمی‌تواند پیش از تاریخ شروع باشد."}
+            )
         if self.status == AssignmentStatus.ACTIVE and self.end_date:
             raise ValidationError(
                 {"end_date": "تخصیص فعال نمی‌تواند تاریخ پایان داشته باشد."}

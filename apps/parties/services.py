@@ -6,8 +6,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -23,11 +24,11 @@ from apps.parties.models import (
 
 
 def _can_manage_parties(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[MembershipRole.OWNER, MembershipRole.ADMIN, MembershipRole.MANAGER],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.PARTIES_MANAGE,
+    )
 
 
 def _require_active_management_access(
@@ -128,9 +129,14 @@ def get_organization_parties(
 ) -> QuerySet[BusinessParty]:
     """List only active parties after checking the tenant membership."""
 
-    if not organization.memberships.filter(
-        user=user, status=MembershipStatus.ACTIVE
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return BusinessParty.objects.filter(
         organization=organization, archived_at__isnull=True

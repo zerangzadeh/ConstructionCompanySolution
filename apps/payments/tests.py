@@ -49,7 +49,7 @@ class PaymentServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -108,7 +108,7 @@ class PaymentServiceTests(TestCase):
         self.assertEqual(event.metadata["phase_id"], str(self.phase.pk))
 
     def test_payment_rejects_non_positive_amount(self) -> None:
-        with self.assertRaisesMessage(ValueError, "Payment amount must be positive."):
+        with self.assertRaisesMessage(ValueError, "مبلغ پرداخت باید مثبت باشد."):
             self._create_payment(amount=Decimal("0.00"))
 
     def test_payment_rejects_cross_tenant_project(self) -> None:
@@ -146,7 +146,7 @@ class PaymentServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "The project phase does not belong to this project.",
+            "فاز پروژه متعلق به این پروژه نیست.",
         ):
             self._create_payment(phase=other_phase)
 
@@ -186,7 +186,7 @@ class PaymentServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "Only posted payments can be voided.",
+            "فقط پرداخت ثبت‌شده قابل ابطال است.",
         ):
             void_payment(payment=payment, actor=self.owner, reason="Repeated request")
 
@@ -202,7 +202,7 @@ class PaymentServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "Payment allocations cannot exceed the payment amount.",
+            "مجموع تخصیص‌ها نمی‌تواند از مبلغ پرداخت بیشتر باشد.",
         ):
             allocate_payment(
                 payment=payment,

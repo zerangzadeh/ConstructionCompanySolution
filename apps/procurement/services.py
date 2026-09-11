@@ -10,11 +10,15 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.materials.models import Material, UnitOfMeasure
+from apps.organizations.authorization import (
+    get_active_membership,
+    membership_has_permission,
+    require_business_permission,
+)
 from apps.organizations.models import (
-    MembershipRole,
-    MembershipStatus,
+    BusinessPermissionCode,
     Organization,
-    OrganizationStatus,
+    OrganizationMembership,
 )
 from apps.parties.models import BusinessParty, PartyRoleType
 from apps.procurement.models import (
@@ -31,47 +35,38 @@ from apps.procurement.models import (
 from apps.projects.models import Project
 from core.identifiers import canonicalize_upper_identifier
 
-_REQUEST_ROLES = {
-    MembershipRole.OWNER,
-    MembershipRole.ADMIN,
-    MembershipRole.MANAGER,
-    MembershipRole.MEMBER,
-}
-_MANAGEMENT_ROLES = {
-    MembershipRole.OWNER,
-    MembershipRole.ADMIN,
-    MembershipRole.MANAGER,
-}
 
-
-def _get_active_role(*, organization: Organization, user: User) -> str:
-    if not user.is_authenticated or not user.is_active:
-        raise PermissionDenied("Authentication is required.")
-    if (
-        organization.status != OrganizationStatus.ACTIVE
-        or organization.deleted_at is not None
-    ):
-        raise PermissionDenied("The organization is not active.")
-    try:
-        return organization.memberships.get(
-            user=user, status=MembershipStatus.ACTIVE
-        ).role
-    except organization.memberships.model.DoesNotExist as exc:
-        raise PermissionDenied("You do not have access to this organization.") from exc
+def _validate_active_access(*, organization: Organization, user: User) -> None:
+    if user.is_superuser and user.is_active:
+        return
+    get_active_membership(user=user, organization=organization)
 
 
 def _require_role(
-    *, organization: Organization, actor: User, allowed_roles: set[str], message: str
-) -> str:
-    role = _get_active_role(organization=organization, user=actor)
-    if role not in allowed_roles:
-        raise PermissionDenied(message)
-    return role
+    *, organization: Organization, actor: User, permission: str, message: str
+) -> OrganizationMembership | None:
+    return require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        message=message,
+    )
+
+
+def _has_management_access(
+    actor: User, membership: OrganizationMembership | None
+) -> bool:
+    return actor.is_superuser or bool(
+        membership
+        and membership_has_permission(
+            membership, BusinessPermissionCode.PROCUREMENT_MANAGE
+        )
+    )
 
 
 def _validate_project(*, organization: Organization, project: Project) -> None:
     if project.organization_id != organization.pk or project.deleted_at is not None:
-        raise PermissionDenied("The project does not belong to this organization.")
+        raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
 
 
 def _validate_material(
@@ -91,20 +86,20 @@ def _validate_material(
         or unit.archived_at is not None
     ):
         raise PermissionDenied(
-            "The material and unit must be active records in this organization."
+            "مصالح و واحد اندازه‌گیری باید رکوردهای فعال این سازمان باشند."
         )
     return unit
 
 
 def _validate_supplier(*, organization: Organization, supplier: BusinessParty) -> None:
     if supplier.organization_id != organization.pk or supplier.archived_at is not None:
-        raise PermissionDenied("The supplier does not belong to this organization.")
+        raise PermissionDenied("تأمین‌کننده متعلق به این سازمان نیست.")
     if not supplier.roles.filter(
         organization=organization,
         role=PartyRoleType.SUPPLIER,
         is_active=True,
     ).exists():
-        raise ValueError("The selected party must have an active supplier role.")
+        raise ValueError("طرف تجاری انتخاب‌شده باید نقش فعال تأمین‌کننده داشته باشد.")
 
 
 def _save_validated(instance: object, message: str) -> None:
@@ -123,9 +118,7 @@ def _get_locked_request(
             pk=purchase_request.pk, organization=organization
         )
     except PurchaseRequest.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Purchase request not found in this organization."
-        ) from exc
+        raise PermissionDenied("درخواست خرید در این سازمان یافت نشد.") from exc
     _validate_project(organization=organization, project=request.project)
     return request
 
@@ -140,9 +133,7 @@ def _get_locked_order(
             .get(pk=purchase_order.pk, organization=organization)
         )
     except PurchaseOrder.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Purchase order not found in this organization."
-        ) from exc
+        raise PermissionDenied("سفارش خرید در این سازمان یافت نشد.") from exc
     _validate_project(organization=organization, project=order.project)
     return order
 
@@ -157,7 +148,7 @@ def _get_locked_receipt(
             .get(pk=goods_receipt.pk, organization=organization)
         )
     except GoodsReceipt.DoesNotExist as exc:
-        raise PermissionDenied("Goods receipt not found in this organization.") from exc
+        raise PermissionDenied("رسید کالا در این سازمان یافت نشد.") from exc
     return receipt
 
 
@@ -175,13 +166,13 @@ def create_purchase_request(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot create purchase requests in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
     )
     _validate_project(organization=organization, project=project)
     normalized_number = canonicalize_upper_identifier(request_number)
     if not normalized_number or not title.strip():
-        raise ValueError("Request number and title are required.")
+        raise ValueError("وارد کردن شماره و عنوان درخواست الزامی است.")
     request = PurchaseRequest(
         organization=organization,
         project=project,
@@ -192,7 +183,7 @@ def create_purchase_request(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(request, "Purchase request data is invalid.")
+    _save_validated(request, "اطلاعات درخواست خرید معتبر نیست.")
     record_audit_event(
         action=AuditAction.PURCHASE_REQUEST_CREATED,
         entity_type="purchase_request",
@@ -219,26 +210,29 @@ def add_purchase_request_item(
     description: str = "",
     sort_order: int = 0,
 ) -> PurchaseRequestItem:
-    role = _require_role(
+    membership = _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot edit purchase requests in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه ویرایش درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
         organization=organization, purchase_request=purchase_request
     )
     if request.status != PurchaseRequestStatus.DRAFT:
-        raise ValueError("Only draft purchase requests can have items changed.")
-    if role not in _MANAGEMENT_ROLES and request.created_by_id != actor.pk:
-        raise PermissionDenied("You cannot edit this purchase request.")
+        raise ValueError("فقط ردیف‌های درخواست خرید پیش‌نویس قابل تغییر هستند.")
+    if (
+        not _has_management_access(actor, membership)
+        and request.created_by_id != actor.pk
+    ):
+        raise PermissionDenied("اجازه ویرایش این درخواست خرید را ندارید.")
     unit = _validate_material(
         organization=organization,
         material=material,
         unit_of_measure=unit_of_measure,
     )
     if quantity <= Decimal(0):
-        raise ValueError("Requested quantity must be positive.")
+        raise ValueError("مقدار درخواستی باید مثبت باشد.")
     item = PurchaseRequestItem(
         organization=organization,
         purchase_request=request,
@@ -249,7 +243,7 @@ def add_purchase_request_item(
         sort_order=sort_order,
         created_by=actor,
     )
-    _save_validated(item, "Purchase request item data is invalid.")
+    _save_validated(item, "اطلاعات ردیف درخواست خرید معتبر نیست.")
     request.updated_by = actor
     request.save(update_fields=["updated_by", "updated_at"])
     record_audit_event(
@@ -271,21 +265,24 @@ def add_purchase_request_item(
 def submit_purchase_request(
     *, organization: Organization, actor: User, purchase_request: PurchaseRequest
 ) -> PurchaseRequest:
-    role = _require_role(
+    membership = _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot submit purchase requests in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه ارسال درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
         organization=organization, purchase_request=purchase_request
     )
-    if role not in _MANAGEMENT_ROLES and request.created_by_id != actor.pk:
-        raise PermissionDenied("You cannot submit this purchase request.")
+    if (
+        not _has_management_access(actor, membership)
+        and request.created_by_id != actor.pk
+    ):
+        raise PermissionDenied("اجازه ارسال این درخواست خرید را ندارید.")
     if request.status != PurchaseRequestStatus.DRAFT:
-        raise ValueError("Only draft purchase requests can be submitted.")
+        raise ValueError("فقط درخواست‌های خرید پیش‌نویس قابل ارسال هستند.")
     if not request.items.exists():
-        raise ValueError("A purchase request must have at least one item.")
+        raise ValueError("درخواست خرید باید حداقل یک ردیف داشته باشد.")
     request.status = PurchaseRequestStatus.SUBMITTED
     request.submitted_at = timezone.now()
     request.updated_by = actor
@@ -313,16 +310,16 @@ def decide_purchase_request(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot approve purchase requests in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه تأیید درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
         organization=organization, purchase_request=purchase_request
     )
     if request.status != PurchaseRequestStatus.SUBMITTED:
-        raise ValueError("Only submitted purchase requests can be decided.")
+        raise ValueError("فقط درخواست‌های خرید ارسال‌شده قابل تعیین تکلیف هستند.")
     if not approve and not reason.strip():
-        raise ValueError("A rejection reason is required.")
+        raise ValueError("وارد کردن دلیل رد الزامی است.")
     request.status = (
         PurchaseRequestStatus.APPROVED if approve else PurchaseRequestStatus.REJECTED
     )
@@ -400,24 +397,27 @@ def cancel_purchase_request(
     purchase_request: PurchaseRequest,
     reason: str,
 ) -> PurchaseRequest:
-    role = _require_role(
+    membership = _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot cancel purchase requests in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه لغو درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
         organization=organization, purchase_request=purchase_request
     )
-    if role not in _MANAGEMENT_ROLES and request.created_by_id != actor.pk:
-        raise PermissionDenied("You cannot cancel this purchase request.")
+    if (
+        not _has_management_access(actor, membership)
+        and request.created_by_id != actor.pk
+    ):
+        raise PermissionDenied("اجازه لغو این درخواست خرید را ندارید.")
     if request.status not in {
         PurchaseRequestStatus.DRAFT,
         PurchaseRequestStatus.SUBMITTED,
     }:
-        raise ValueError("Only draft or submitted purchase requests can be cancelled.")
+        raise ValueError("فقط درخواست‌های خرید پیش‌نویس یا ارسال‌شده قابل لغو هستند.")
     if not reason.strip():
-        raise ValueError("A cancellation reason is required.")
+        raise ValueError("وارد کردن دلیل لغو الزامی است.")
     previous_status = request.status
     request.status = PurchaseRequestStatus.CANCELLED
     request.decision_reason = reason.strip()
@@ -439,7 +439,7 @@ def cancel_purchase_request(
 def get_organization_purchase_requests(
     *, user: User, organization: Organization
 ) -> QuerySet[PurchaseRequest]:
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     return PurchaseRequest.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related("project", "created_by", "approved_by", "updated_by")
@@ -455,9 +455,7 @@ def get_organization_purchase_request(
             .get(pk=purchase_request_id)
         )
     except PurchaseRequest.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Purchase request not found in this organization."
-        ) from exc
+        raise PermissionDenied("درخواست خرید در این سازمان یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -476,8 +474,8 @@ def create_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot create purchase orders in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه ایجاد سفارش خرید در این سازمان را ندارید.",
     )
     _validate_project(organization=organization, project=project)
     _validate_supplier(organization=organization, supplier=supplier)
@@ -486,12 +484,12 @@ def create_purchase_order(
             organization=organization, purchase_request=purchase_request
         )
         if request.project_id != project.pk:
-            raise PermissionDenied("Purchase request does not belong to this project.")
+            raise PermissionDenied("درخواست خرید متعلق به این پروژه نیست.")
         if request.status != PurchaseRequestStatus.APPROVED:
-            raise ValueError("Only approved purchase requests can be ordered.")
+            raise ValueError("فقط درخواست‌های خرید تأییدشده قابل سفارش هستند.")
     normalized_number = canonicalize_upper_identifier(order_number)
     if not normalized_number:
-        raise ValueError("Order number is required.")
+        raise ValueError("وارد کردن شماره سفارش الزامی است.")
     order = PurchaseOrder(
         organization=organization,
         project=project,
@@ -504,7 +502,7 @@ def create_purchase_order(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(order, "Purchase order data is invalid.")
+    _save_validated(order, "اطلاعات سفارش خرید معتبر نیست.")
     record_audit_event(
         action=AuditAction.PURCHASE_ORDER_CREATED,
         entity_type="purchase_order",
@@ -540,19 +538,19 @@ def add_purchase_order_item(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot edit purchase orders in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه ویرایش سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
     if order.status != PurchaseOrderStatus.DRAFT:
-        raise ValueError("Only draft purchase orders can have items changed.")
+        raise ValueError("فقط ردیف‌های سفارش خرید پیش‌نویس قابل تغییر هستند.")
     unit = _validate_material(
         organization=organization,
         material=material,
         unit_of_measure=unit_of_measure,
     )
     if quantity <= Decimal(0) or unit_price < Decimal(0):
-        raise ValueError("Order quantity must be positive and price non-negative.")
+        raise ValueError("مقدار سفارش باید مثبت و قیمت نباید منفی باشد.")
     if purchase_request_item is not None:
         try:
             request_item = PurchaseRequestItem.objects.select_for_update().get(
@@ -562,10 +560,10 @@ def add_purchase_order_item(
             )
         except PurchaseRequestItem.DoesNotExist as exc:
             raise PermissionDenied(
-                "Request item does not belong to the linked request."
+                "ردیف درخواست متعلق به درخواست خرید مرتبط نیست."
             ) from exc
         if request_item.material_id != material.pk:
-            raise ValueError("Order material must match the request item.")
+            raise ValueError("مصالح سفارش باید با ردیف درخواست مطابقت داشته باشد.")
         already_ordered = PurchaseOrderItem.objects.filter(
             purchase_request_item=request_item,
             purchase_order__status__in={
@@ -580,7 +578,7 @@ def add_purchase_order_item(
             purchase_request_item=request_item
         ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
         if already_ordered + current_ordered + quantity > request_item.quantity:
-            raise ValueError("Ordered quantity cannot exceed the requested quantity.")
+            raise ValueError("مقدار سفارش نمی‌تواند از مقدار درخواستی بیشتر باشد.")
     item = PurchaseOrderItem(
         organization=organization,
         purchase_order=order,
@@ -592,7 +590,7 @@ def add_purchase_order_item(
         unit_price=unit_price,
         sort_order=sort_order,
     )
-    _save_validated(item, "Purchase order item data is invalid.")
+    _save_validated(item, "اطلاعات ردیف سفارش خرید معتبر نیست.")
     order.updated_by = actor
     order.save(update_fields=["updated_by", "updated_at"])
     record_audit_event(
@@ -619,15 +617,15 @@ def issue_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot issue purchase orders in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه صدور سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
     if order.status != PurchaseOrderStatus.DRAFT:
-        raise ValueError("Only draft purchase orders can be issued.")
+        raise ValueError("فقط سفارش‌های خرید پیش‌نویس قابل صدور هستند.")
     _validate_supplier(organization=organization, supplier=order.supplier)
     if not order.items.exists():
-        raise ValueError("A purchase order must have at least one item.")
+        raise ValueError("سفارش خرید باید حداقل یک ردیف داشته باشد.")
     order.status = PurchaseOrderStatus.ISSUED
     order.issued_at = timezone.now()
     order.issued_by = actor
@@ -657,16 +655,16 @@ def cancel_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot cancel purchase orders in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه لغو سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
     if order.status not in {PurchaseOrderStatus.DRAFT, PurchaseOrderStatus.ISSUED}:
-        raise ValueError("Only draft or issued purchase orders can be cancelled.")
+        raise ValueError("فقط سفارش‌های خرید پیش‌نویس یا صادرشده قابل لغو هستند.")
     if not reason.strip():
-        raise ValueError("A cancellation reason is required.")
+        raise ValueError("وارد کردن دلیل لغو الزامی است.")
     if order.goods_receipts.filter(status=GoodsReceiptStatus.POSTED).exists():
-        raise ValueError("An order with posted receipts cannot be cancelled.")
+        raise ValueError("سفارش دارای رسید نهایی‌شده قابل لغو نیست.")
     previous_status = order.status
     order.status = PurchaseOrderStatus.CANCELLED
     order.cancelled_at = timezone.now()
@@ -695,7 +693,7 @@ def cancel_purchase_order(
 def get_organization_purchase_orders(
     *, user: User, organization: Organization
 ) -> QuerySet[PurchaseOrder]:
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     return PurchaseOrder.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related(
@@ -715,9 +713,7 @@ def get_organization_purchase_order(
             .get(pk=purchase_order_id)
         )
     except PurchaseOrder.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Purchase order not found in this organization."
-        ) from exc
+        raise PermissionDenied("سفارش خرید در این سازمان یافت نشد.") from exc
 
 
 @transaction.atomic
@@ -733,17 +729,17 @@ def create_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot receive goods in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه دریافت کالا در این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
     if order.status != PurchaseOrderStatus.ISSUED:
-        raise ValueError("Goods can only be received against an issued order.")
+        raise ValueError("دریافت کالا فقط در برابر سفارش صادرشده امکان‌پذیر است.")
     if timezone.is_naive(received_at):
-        raise ValueError("Receipt time must be timezone-aware.")
+        raise ValueError("زمان رسید باید دارای منطقه زمانی باشد.")
     normalized_number = canonicalize_upper_identifier(receipt_number)
     if not normalized_number:
-        raise ValueError("Receipt number is required.")
+        raise ValueError("وارد کردن شماره رسید الزامی است.")
     receipt = GoodsReceipt(
         organization=organization,
         purchase_order=order,
@@ -754,7 +750,7 @@ def create_goods_receipt(
         created_by=actor,
         updated_by=actor,
     )
-    _save_validated(receipt, "Goods receipt data is invalid.")
+    _save_validated(receipt, "اطلاعات رسید کالا معتبر نیست.")
     record_audit_event(
         action=AuditAction.GOODS_RECEIPT_CREATED,
         entity_type="goods_receipt",
@@ -782,14 +778,14 @@ def add_goods_receipt_item(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot edit goods receipts in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه ویرایش رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
         organization=organization, goods_receipt=goods_receipt
     )
     if receipt.status != GoodsReceiptStatus.DRAFT:
-        raise ValueError("Only draft goods receipts can have items changed.")
+        raise ValueError("فقط ردیف‌های رسید کالای پیش‌نویس قابل تغییر هستند.")
     try:
         order_item = PurchaseOrderItem.objects.select_for_update().get(
             pk=purchase_order_item.pk,
@@ -797,11 +793,9 @@ def add_goods_receipt_item(
             purchase_order=receipt.purchase_order,
         )
     except PurchaseOrderItem.DoesNotExist as exc:
-        raise PermissionDenied(
-            "Order item does not belong to the receipt order."
-        ) from exc
+        raise PermissionDenied("ردیف سفارش متعلق به سفارش این رسید نیست.") from exc
     if quantity <= Decimal(0):
-        raise ValueError("Received quantity must be positive.")
+        raise ValueError("مقدار دریافتی باید مثبت باشد.")
     item = GoodsReceiptItem(
         organization=organization,
         goods_receipt=receipt,
@@ -812,7 +806,7 @@ def add_goods_receipt_item(
         notes=notes.strip(),
         created_by=actor,
     )
-    _save_validated(item, "Goods receipt item data is invalid.")
+    _save_validated(item, "اطلاعات ردیف رسید کالا معتبر نیست.")
     receipt.updated_by = actor
     receipt.save(update_fields=["updated_by", "updated_at"])
     record_audit_event(
@@ -852,8 +846,8 @@ def post_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_REQUEST_ROLES,
-        message="You cannot post goods receipts in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        message="اجازه نهایی‌سازی رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
         organization=organization, goods_receipt=goods_receipt
@@ -862,21 +856,21 @@ def post_goods_receipt(
         organization=organization, purchase_order=receipt.purchase_order
     )
     if receipt.status != GoodsReceiptStatus.DRAFT:
-        raise ValueError("Only draft goods receipts can be posted.")
+        raise ValueError("فقط رسیدهای کالای پیش‌نویس قابل نهایی‌سازی هستند.")
     if order.status != PurchaseOrderStatus.ISSUED:
-        raise ValueError("The purchase order is not open for receipt.")
+        raise ValueError("سفارش خرید برای دریافت کالا باز نیست.")
     items = list(
         receipt.items.select_related("purchase_order_item").select_for_update()
     )
     if not items:
-        raise ValueError("A goods receipt must have at least one item.")
+        raise ValueError("رسید کالا باید حداقل یک ردیف داشته باشد.")
     for item in items:
         already_received = GoodsReceiptItem.objects.filter(
             purchase_order_item=item.purchase_order_item,
             goods_receipt__status=GoodsReceiptStatus.POSTED,
         ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
         if already_received + item.quantity > item.purchase_order_item.quantity:
-            raise ValueError("Received quantity cannot exceed ordered quantity.")
+            raise ValueError("مقدار دریافتی نمی‌تواند از مقدار سفارش بیشتر باشد.")
     receipt.status = GoodsReceiptStatus.POSTED
     receipt.posted_at = timezone.now()
     receipt.posted_by = actor
@@ -918,8 +912,8 @@ def void_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        allowed_roles=_MANAGEMENT_ROLES,
-        message="You cannot void goods receipts in this organization.",
+        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        message="اجازه ابطال رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
         organization=organization, goods_receipt=goods_receipt
@@ -928,15 +922,15 @@ def void_goods_receipt(
         organization=organization, purchase_order=receipt.purchase_order
     )
     if receipt.status != GoodsReceiptStatus.POSTED:
-        raise ValueError("Only posted goods receipts can be voided.")
+        raise ValueError("فقط رسیدهای کالای نهایی‌شده قابل ابطال هستند.")
     if not reason.strip():
-        raise ValueError("A void reason is required.")
+        raise ValueError("وارد کردن دلیل ابطال الزامی است.")
     if receipt.items.filter(
         stock_transactions__status="posted",
         stock_transactions__transaction_type="receipt",
     ).exists():
         raise ValueError(
-            "Reverse posted inventory receipts before voiding the goods receipt."
+            "پیش از ابطال رسید کالا، دریافت‌های نهایی‌شده انبار را برگشت دهید."
         )
     receipt.status = GoodsReceiptStatus.VOID
     receipt.voided_at = timezone.now()
@@ -973,7 +967,7 @@ def void_goods_receipt(
 def get_organization_goods_receipts(
     *, user: User, organization: Organization
 ) -> QuerySet[GoodsReceipt]:
-    _get_active_role(organization=organization, user=user)
+    _validate_active_access(organization=organization, user=user)
     return GoodsReceipt.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related(
@@ -995,4 +989,4 @@ def get_organization_goods_receipt(
             .get(pk=goods_receipt_id)
         )
     except GoodsReceipt.DoesNotExist as exc:
-        raise PermissionDenied("Goods receipt not found in this organization.") from exc
+        raise PermissionDenied("رسید کالا در این سازمان یافت نشد.") from exc

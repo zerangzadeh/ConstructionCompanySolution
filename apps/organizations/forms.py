@@ -1,6 +1,12 @@
 from django import forms
 
-from apps.organizations.models import Organization, OrganizationSettings
+from apps.organizations.models import (
+    MembershipStatus,
+    Organization,
+    OrganizationMembership,
+    OrganizationRole,
+    OrganizationSettings,
+)
 from core.identifiers import canonicalize_lower_identifier
 
 
@@ -78,3 +84,38 @@ class OrganizationSettingsForm(forms.ModelForm):
                 }
             ),
         }
+
+
+class OrganizationMembershipForm(forms.ModelForm):
+    """Assign an administrator-defined role within the active company."""
+
+    role_definition = forms.ModelChoiceField(
+        label="نقش شرکتی",
+        queryset=OrganizationRole.objects.none(),
+        to_field_name="code",
+        empty_label=None,
+    )
+    status = forms.ChoiceField(
+        label="وضعیت عضویت",
+        choices=[
+            (MembershipStatus.ACTIVE, "فعال"),
+            (MembershipStatus.SUSPENDED, "تعلیق‌شده"),
+            (MembershipStatus.REVOKED, "لغوشده"),
+        ],
+    )
+
+    class Meta:
+        model = OrganizationMembership
+        fields = ["role_definition", "status"]  # noqa: RUF012
+
+    def __init__(
+        self,
+        *args: object,
+        allow_owner_role: bool = False,
+        **kwargs: object,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        roles = OrganizationRole.objects.filter(is_active=True)
+        if not allow_owner_role:
+            roles = roles.filter(is_owner=False)
+        self.fields["role_definition"].queryset = roles.order_by("name")

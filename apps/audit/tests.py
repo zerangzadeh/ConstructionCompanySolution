@@ -40,12 +40,12 @@ class AuditServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.user,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.other_organization.memberships.create(
             user=self.other_user,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -66,7 +66,7 @@ class AuditServiceTests(TestCase):
     def test_record_audit_event_rejects_sensitive_metadata(self) -> None:
         with self.assertRaisesMessage(
             ValueError,
-            "Audit metadata must not contain sensitive values.",
+            "فراداده ممیزی نباید شامل مقادیر حساس باشد.",
         ):
             record_audit_event(
                 action=AuditAction.ORGANIZATION_CREATED,

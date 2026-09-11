@@ -61,7 +61,7 @@ class ProjectServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -103,7 +103,7 @@ class ProjectServiceTests(TestCase):
 
         other_membership = self.other_organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.MANAGER,
+            role=MembershipRole.OPERATIONS_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
         self.assertIsNotNone(other_membership)
@@ -130,7 +130,7 @@ class ProjectServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "The organization is not active.",
+            "سازمان فعال نیست.",
         ):
             create_project(
                 organization=self.organization,
@@ -152,7 +152,7 @@ class ProjectServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "You cannot create projects in this organization.",
+            "اجازه ایجاد پروژه در این سازمان را ندارید.",
         ):
             create_project(
                 organization=self.organization,
@@ -164,7 +164,7 @@ class ProjectServiceTests(TestCase):
     def test_project_creation_validates_dates_and_budget(self) -> None:
         with self.assertRaisesMessage(
             ValueError,
-            "Project end date cannot be before start date.",
+            "تاریخ پایان پروژه نمی‌تواند پیش از تاریخ شروع باشد.",
         ):
             create_project(
                 organization=self.organization,
@@ -177,7 +177,7 @@ class ProjectServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "Project budget cannot be negative.",
+            "بودجه پروژه نمی‌تواند منفی باشد.",
         ):
             create_project(
                 organization=self.organization,
@@ -248,7 +248,7 @@ class ProjectServiceTests(TestCase):
             response,
             reverse("projects:detail", kwargs={"project_id": project.pk}),
         )
-        self.assertContains(response, "View details")
+        self.assertContains(response, "پروژه جدید")
 
     def test_project_detail_is_tenant_scoped(self) -> None:
         project = self.organization.projects.create(
@@ -470,7 +470,7 @@ class ProjectServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "Phase end date cannot be before start date.",
+            "تاریخ پایان فاز نمی‌تواند پیش از تاریخ شروع باشد.",
         ):
             create_project_phase(
                 organization=self.organization,
@@ -553,7 +553,7 @@ class ProjectServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "This project phase status transition is not allowed.",
+            "این تغییر وضعیت برای فاز پروژه مجاز نیست.",
         ):
             transition_project_phase_status(
                 organization=self.organization,
@@ -580,11 +580,13 @@ class ProjectControlsServiceTests(TestCase):
             name="Other Controls Co", slug="other-controls-co"
         )
         self.organization.memberships.create(
-            user=self.owner, role=MembershipRole.OWNER, status=MembershipStatus.ACTIVE
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
         )
         self.other_organization.memberships.create(
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -619,7 +621,7 @@ class ProjectControlsServiceTests(TestCase):
             title="Concrete",
             parent=root,
         )
-        with self.assertRaisesMessage(ValueError, "cannot contain a cycle"):
+        with self.assertRaisesMessage(ValueError, "نمی‌تواند شامل چرخه باشد"):
             update_wbs_node(
                 organization=self.organization,
                 actor=self.owner,
@@ -645,7 +647,7 @@ class ProjectControlsServiceTests(TestCase):
             target_status=ActivityStatus.ACTIVE,
         )
         self.assertEqual(active.status, ActivityStatus.ACTIVE)
-        with self.assertRaisesMessage(ValueError, "active children or activities"):
+        with self.assertRaisesMessage(ValueError, "زیرگره یا فعالیت فعال"):
             archive_wbs_node(
                 organization=self.organization, actor=self.owner, node=child
             )

@@ -7,26 +7,33 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
+    BusinessPermission,
+    BusinessPermissionCode,
     InvitationStatus,
     MembershipRole,
     MembershipStatus,
     Organization,
     OrganizationMembership,
+    OrganizationRole,
     OrganizationSettings,
     OrganizationStatus,
 )
 from apps.organizations.services import (
     ACTIVE_ORGANIZATION_SESSION_KEY,
     accept_organization_invitation,
+    create_organization_by_system_admin,
     create_organization_invitation,
     create_organization_with_owner,
     get_organization_members,
     get_organization_settings,
     get_valid_memberships,
     resolve_active_organization,
+    update_organization_membership,
     update_organization_settings,
 )
+from apps.projects.services import create_project
 
 
 class OrganizationTenantIsolationTests(TestCase):
@@ -54,7 +61,7 @@ class OrganizationTenantIsolationTests(TestCase):
         OrganizationMembership.objects.create(
             user=self.user,
             organization=self.organization,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         OrganizationMembership.objects.create(
@@ -233,6 +240,250 @@ class OrganizationTenantIsolationTests(TestCase):
         )
 
 
+class OrganizationMembershipAccessServiceTests(TestCase):
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(
+            username="membership-owner", password="test-password"
+        )
+        self.member = User.objects.create_user(
+            username="membership-member", password="test-password"
+        )
+        self.outsider = User.objects.create_user(
+            username="membership-outsider", password="test-password"
+        )
+        self.organization = Organization.objects.create(
+            name="Membership Company",
+            slug="membership-company",
+            created_by=self.owner,
+        )
+        self.other_organization = Organization.objects.create(
+            name="Other Membership Company",
+            slug="other-membership-company",
+            created_by=self.outsider,
+        )
+        self.owner_membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.member_membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.member,
+            role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.other_membership = OrganizationMembership.objects.create(
+            organization=self.other_organization,
+            user=self.outsider,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+
+    def test_owner_can_change_member_role_and_change_is_audited(self) -> None:
+        membership = update_organization_membership(
+            organization=self.organization,
+            actor=self.owner,
+            membership=self.member_membership,
+            role=MembershipRole.OPERATIONS_MANAGER,
+            status=MembershipStatus.ACTIVE,
+        )
+
+        self.assertEqual(membership.role, MembershipRole.OPERATIONS_MANAGER)
+        event = AuditEvent.objects.get(action=AuditAction.MEMBERSHIP_ROLE_CHANGED)
+        self.assertEqual(event.organization, self.organization)
+        self.assertEqual(event.actor, self.owner)
+        self.assertEqual(event.entity_id, str(self.member_membership.pk))
+        self.assertEqual(event.metadata["previous_role"], MembershipRole.MEMBER)
+        self.assertEqual(event.metadata["new_role"], MembershipRole.OPERATIONS_MANAGER)
+
+    def test_membership_update_rejects_cross_tenant_record(self) -> None:
+        with self.assertRaisesMessage(
+            PermissionDenied, "عضویت متعلق به این سازمان نیست."
+        ):
+            update_organization_membership(
+                organization=self.organization,
+                actor=self.owner,
+                membership=self.other_membership,
+                role=MembershipRole.VIEWER,
+                status=MembershipStatus.ACTIVE,
+            )
+
+    def test_non_manager_cannot_update_membership(self) -> None:
+        with self.assertRaisesMessage(
+            PermissionDenied, "اجازه مدیریت عضویت‌های این شرکت را ندارید."
+        ):
+            update_organization_membership(
+                organization=self.organization,
+                actor=self.member,
+                membership=self.member_membership,
+                role=MembershipRole.VIEWER,
+                status=MembershipStatus.ACTIVE,
+            )
+
+    def test_last_active_owner_cannot_be_revoked(self) -> None:
+        with self.assertRaisesMessage(
+            ValueError, "سازمان باید حداقل یک مالک فعال داشته باشد."
+        ):
+            update_organization_membership(
+                organization=self.organization,
+                actor=self.owner,
+                membership=self.owner_membership,
+                role=MembershipRole.COMPANY_OWNER,
+                status=MembershipStatus.REVOKED,
+            )
+
+
+class GlobalRoleAuthorizationTests(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(username="custom-role-user")
+        self.organization = Organization.objects.create(
+            name="شرکت نقش سفارشی",
+            slug="custom-role-company",
+        )
+        self.role = OrganizationRole.objects.create(
+            code="project_coordinator",
+            name="هماهنگ‌کننده پروژه",
+        )
+        self.permission = BusinessPermission.objects.get(
+            code=BusinessPermissionCode.PROJECTS_MANAGE
+        )
+        self.role.permissions.add(self.permission)
+        self.membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.user,
+            role_definition=self.role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+    def test_permission_catalog_and_protected_roles_are_seeded(self) -> None:
+        self.assertSetEqual(
+            set(BusinessPermission.objects.values_list("code", flat=True)),
+            set(BusinessPermissionCode.values),
+        )
+        self.assertSetEqual(
+            set(
+                OrganizationRole.objects.filter(is_system=True).values_list(
+                    "code", flat=True
+                )
+            ),
+            set(MembershipRole.values),
+        )
+
+    def test_custom_role_grants_implemented_business_permission(self) -> None:
+        self.assertTrue(
+            has_business_permission(
+                user=self.user,
+                organization=self.organization,
+                permission=BusinessPermissionCode.PROJECTS_MANAGE,
+            )
+        )
+        self.assertFalse(
+            has_business_permission(
+                user=self.user,
+                organization=self.organization,
+                permission=BusinessPermissionCode.PAYMENTS_MANAGE,
+            )
+        )
+
+        project = create_project(
+            organization=self.organization,
+            actor=self.user,
+            code="CUSTOM-ROLE-01",
+            name="پروژه نقش سفارشی",
+        )
+
+        self.assertEqual(project.organization, self.organization)
+
+    def test_deactivated_role_removes_tenant_access(self) -> None:
+        self.role.is_active = False
+        self.role.save(update_fields=["is_active", "updated_at"])
+
+        self.assertFalse(
+            get_valid_memberships(self.user).filter(pk=self.membership.pk).exists()
+        )
+        self.assertFalse(
+            has_business_permission(
+                user=self.user,
+                organization=self.organization,
+                permission=BusinessPermissionCode.PROJECTS_MANAGE,
+            )
+        )
+
+    def test_membership_manager_cannot_delegate_a_more_powerful_role(self) -> None:
+        actor = User.objects.create_user(username="limited-membership-manager")
+        target = User.objects.create_user(username="delegation-target")
+        manager_role = OrganizationRole.objects.create(
+            code="limited_membership_manager",
+            name="مدیر محدود اعضا",
+        )
+        manager_role.permissions.add(
+            BusinessPermission.objects.get(
+                code=BusinessPermissionCode.MEMBERSHIP_MANAGE
+            )
+        )
+        powerful_role = OrganizationRole.objects.create(
+            code="payment_operator",
+            name="کارشناس پرداخت",
+        )
+        powerful_role.permissions.add(
+            BusinessPermission.objects.get(code=BusinessPermissionCode.PAYMENTS_MANAGE)
+        )
+        actor_membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=actor,
+            role_definition=manager_role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "نمی‌توانید نقشی با اختیارات بیشتر از نقش خود واگذار یا مدیریت کنید.",
+        ):
+            update_organization_membership(
+                organization=self.organization,
+                actor=actor,
+                membership=self.membership,
+                role=powerful_role,
+                status=MembershipStatus.ACTIVE,
+            )
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "نمی‌توانید نقشی با اختیارات بیشتر از نقش خود واگذار یا مدیریت کنید.",
+        ):
+            create_organization_invitation(
+                organization=self.organization,
+                invited_by=actor,
+                invitee=target,
+                role=powerful_role,
+            )
+
+        actor_membership.refresh_from_db()
+        self.assertEqual(actor_membership.role_definition, manager_role)
+
+    def test_system_admin_has_global_tenant_access_without_membership(self) -> None:
+        system_admin = User.objects.create_superuser(
+            username="admin",
+            email="admin@example.com",
+        )
+
+        project = create_project(
+            organization=self.organization,
+            actor=system_admin,
+            code="ADMIN-01",
+            name="پروژه ادمین سامانه",
+        )
+
+        self.assertEqual(project.created_by, system_admin)
+        self.assertFalse(
+            OrganizationMembership.objects.filter(
+                organization=self.organization,
+                user=system_admin,
+            ).exists()
+        )
+
+
 class OrganizationCreationServiceTests(TestCase):
     def test_create_organization_creates_active_owner_membership(self) -> None:
         owner = User.objects.create_user(
@@ -255,7 +506,7 @@ class OrganizationCreationServiceTests(TestCase):
         )
         self.assertEqual(organization.created_by, owner)
         self.assertEqual(organization.updated_by, owner)
-        self.assertEqual(membership.role, MembershipRole.OWNER)
+        self.assertEqual(membership.role, MembershipRole.COMPANY_OWNER)
         self.assertEqual(membership.status, MembershipStatus.ACTIVE)
         self.assertIsNotNone(membership.joined_at)
         self.assertEqual(organization.settings.timezone, "America/New_York")
@@ -266,7 +517,7 @@ class OrganizationCreationServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "An authenticated user is required.",
+            "کاربر واردشده به سامانه الزامی است.",
         ):
             create_organization_with_owner(
                 owner=owner,
@@ -275,6 +526,27 @@ class OrganizationCreationServiceTests(TestCase):
             )
 
         self.assertFalse(Organization.objects.filter(slug="invalid-company").exists())
+
+    def test_only_system_admin_can_request_organization_creation(self) -> None:
+        organization_user = User.objects.create_user(
+            username="organization-user",
+            password="test-password",
+        )
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.",
+        ):
+            create_organization_by_system_admin(
+                actor=organization_user,
+                owner=organization_user,
+                name="Unauthorized Company",
+                slug="unauthorized-company",
+            )
+
+        self.assertFalse(
+            Organization.objects.filter(slug="unauthorized-company").exists()
+        )
 
 
 class OrganizationSettingsServiceTests(TestCase):
@@ -308,7 +580,7 @@ class OrganizationSettingsServiceTests(TestCase):
         OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         OrganizationMembership.objects.create(
@@ -320,7 +592,7 @@ class OrganizationSettingsServiceTests(TestCase):
         OrganizationMembership.objects.create(
             organization=self.other_organization,
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -363,7 +635,7 @@ class OrganizationSettingsServiceTests(TestCase):
     def test_member_cannot_update_settings(self) -> None:
         with self.assertRaisesMessage(
             PermissionDenied,
-            "You cannot update settings for this organization.",
+            "اجازه به‌روزرسانی تنظیمات این شرکت را ندارید.",
         ):
             update_organization_settings(
                 organization=self.organization,
@@ -376,7 +648,7 @@ class OrganizationSettingsServiceTests(TestCase):
     def test_owner_cannot_update_another_organization_settings(self) -> None:
         with self.assertRaisesMessage(
             PermissionDenied,
-            "You cannot update settings for this organization.",
+            "به این شرکت دسترسی ندارید.",
         ):
             update_organization_settings(
                 organization=self.other_organization,
@@ -390,9 +662,7 @@ class OrganizationSettingsServiceTests(TestCase):
         self.organization.status = OrganizationStatus.SUSPENDED
         self.organization.save(update_fields=["status"])
 
-        with self.assertRaisesMessage(
-            PermissionDenied, "The organization is not active."
-        ):
+        with self.assertRaisesMessage(PermissionDenied, "سازمان فعال نیست."):
             update_organization_settings(
                 organization=self.organization,
                 updated_by=self.owner,
@@ -408,6 +678,11 @@ class OrganizationCreationViewTests(TestCase):
             username="organization-creator",
             password="test-password",
         )
+        self.system_admin = User.objects.create_superuser(
+            username="admin",
+            email="admin@example.test",
+            password="test-password",
+        )
 
     def test_create_view_requires_authentication(self) -> None:
         response = self.client.get(reverse("organizations:create"))
@@ -417,16 +692,47 @@ class OrganizationCreationViewTests(TestCase):
             f"{reverse('accounts:login')}?next={reverse('organizations:create')}",
         )
 
-    def test_create_view_renders_form_for_authenticated_user(self) -> None:
+    def test_create_view_rejects_authenticated_organization_user(self) -> None:
         self.client.force_login(self.user)
 
         response = self.client.get(reverse("organizations:create"))
 
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Create organization")
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(
+            response,
+            "فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.",
+            status_code=403,
+        )
 
-    def test_create_view_creates_organization_for_current_user(self) -> None:
+    def test_create_view_renders_form_for_system_admin(self) -> None:
+        self.client.force_login(self.system_admin)
+
+        response = self.client.get(reverse("organizations:create"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ایجاد سازمان")
+
+    def test_create_view_rejects_organization_user_post(self) -> None:
         self.client.force_login(self.user)
+
+        response = self.client.post(
+            reverse("organizations:create"),
+            {
+                "name": "Unauthorized Company",
+                "legal_name": "Unauthorized Company LLC",
+                "slug": "unauthorized-company",
+                "timezone": "UTC",
+                "currency": "USD",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(
+            Organization.objects.filter(slug="unauthorized-company").exists()
+        )
+
+    def test_create_view_creates_organization_for_system_admin(self) -> None:
+        self.client.force_login(self.system_admin)
 
         response = self.client.post(
             reverse("organizations:create"),
@@ -443,14 +749,26 @@ class OrganizationCreationViewTests(TestCase):
         organization = Organization.objects.get(slug="created-company")
         membership = OrganizationMembership.objects.get(
             organization=organization,
-            user=self.user,
+            user=self.system_admin,
         )
-        self.assertEqual(organization.created_by, self.user)
-        self.assertEqual(membership.role, MembershipRole.OWNER)
+        self.assertEqual(organization.created_by, self.system_admin)
+        self.assertEqual(membership.role, MembershipRole.COMPANY_OWNER)
         self.assertEqual(membership.status, MembershipStatus.ACTIVE)
         self.assertEqual(
             self.client.session[ACTIVE_ORGANIZATION_SESSION_KEY],
             str(organization.id),
+        )
+
+    def test_new_organization_links_are_hidden_from_organization_user(self) -> None:
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("organizations:select"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, reverse("organizations:create"))
+        self.assertContains(
+            response,
+            "از ادمین سامانه بخواهید شما را به یک شرکت اضافه کند.",
         )
 
 
@@ -473,7 +791,7 @@ class OrganizationInvitationTests(TestCase):
         OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -495,7 +813,7 @@ class OrganizationInvitationTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "The organization is not active.",
+            "سازمان فعال نیست.",
         ):
             create_organization_invitation(
                 organization=self.organization,
@@ -529,7 +847,7 @@ class OrganizationInvitationTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "This invitation belongs to another user.",
+            "این دعوت‌نامه متعلق به کاربر دیگری است.",
         ):
             accept_organization_invitation(token=raw_token, user=self.owner)
 
@@ -544,7 +862,7 @@ class OrganizationInvitationTests(TestCase):
             expires_in=timedelta(days=-1),
         )
 
-        with self.assertRaisesMessage(ValueError, "Invitation has expired."):
+        with self.assertRaisesMessage(ValueError, "دعوت‌نامه منقضی شده است."):
             accept_organization_invitation(token=raw_token, user=self.invitee)
 
         invitation.refresh_from_db()

@@ -15,8 +15,9 @@ from apps.materials.models import (
     UnitCategory,
     UnitOfMeasure,
 )
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -24,11 +25,11 @@ from apps.organizations.models import (
 
 
 def _can_manage_units(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[MembershipRole.OWNER, MembershipRole.ADMIN, MembershipRole.MANAGER],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.MATERIALS_MANAGE,
+    )
 
 
 def _require_active_management_access(
@@ -84,9 +85,14 @@ def create_unit_of_measure(
 def get_organization_units(
     *, user: User, organization: Organization
 ) -> QuerySet[UnitOfMeasure]:
-    if not organization.memberships.filter(
-        user=user, status=MembershipStatus.ACTIVE
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return UnitOfMeasure.objects.filter(
         organization=organization, archived_at__isnull=True
@@ -141,9 +147,7 @@ def create_material_category(
 ) -> MaterialCategory:
     _require_active_management_access(organization=organization, actor=actor)
     if parent and parent.organization_id != organization.id:
-        raise PermissionDenied(
-            "دسته‌بندی والد متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته‌بندی والد متعلق به این سازمان نیست.")
     category = MaterialCategory(
         organization=organization,
         code=code,
@@ -182,15 +186,11 @@ def update_material_category(
     _require_active_management_access(organization=organization, actor=actor)
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
-        raise PermissionDenied(
-            "دسته‌بندی مصالح متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته‌بندی مصالح متعلق به این سازمان نیست.")
     if locked_category.archived_at is not None:
         raise ValueError("دسته‌بندی مصالح بایگانی‌شده قابل به‌روزرسانی نیست.")
     if parent and parent.organization_id != organization.id:
-        raise PermissionDenied(
-            "دسته‌بندی والد متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته‌بندی والد متعلق به این سازمان نیست.")
     locked_category.code, locked_category.name, locked_category.parent = (
         code,
         name,
@@ -217,9 +217,14 @@ def update_material_category(
 def get_organization_material_categories(
     *, user: User, organization: Organization
 ) -> QuerySet[MaterialCategory]:
-    if not organization.memberships.filter(
-        user=user, status=MembershipStatus.ACTIVE
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     return MaterialCategory.objects.filter(
         organization=organization, archived_at__isnull=True
@@ -233,18 +238,14 @@ def archive_material_category(
     _require_active_management_access(organization=organization, actor=actor)
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
-        raise PermissionDenied(
-            "دسته‌بندی مصالح متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("دسته‌بندی مصالح متعلق به این سازمان نیست.")
     if locked_category.archived_at is not None:
         raise ValueError("دسته‌بندی مصالح از قبل بایگانی شده است.")
     if (
         locked_category.children.filter(archived_at__isnull=True).exists()
         or locked_category.materials.filter(archived_at__isnull=True).exists()
     ):
-        raise ValueError(
-            "دسته‌ای که زیرمجموعه یا مصالح فعال دارد قابل بایگانی نیست."
-        )
+        raise ValueError("دسته‌ای که زیرمجموعه یا مصالح فعال دارد قابل بایگانی نیست.")
     (
         locked_category.archived_at,
         locked_category.is_active,
@@ -290,9 +291,7 @@ def create_material(
         material.full_clean()
         material.save()
     except (IntegrityError, ValidationError) as exc:
-        raise ValueError(
-            "اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد."
-        ) from exc
+        raise ValueError("اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد.") from exc
     record_audit_event(
         action=AuditAction.MATERIAL_CREATED,
         entity_type="material",
@@ -335,9 +334,7 @@ def update_material(
         locked_material.full_clean()
         locked_material.save()
     except (IntegrityError, ValidationError) as exc:
-        raise ValueError(
-            "اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد."
-        ) from exc
+        raise ValueError("اطلاعات مصالح معتبر نیست یا کد آن از قبل وجود دارد.") from exc
     record_audit_event(
         action=AuditAction.MATERIAL_UPDATED,
         entity_type="material",
@@ -355,9 +352,14 @@ def update_material(
 def get_organization_materials(
     *, user: User, organization: Organization, search: str = ""
 ) -> QuerySet[Material]:
-    if not organization.memberships.filter(
-        user=user, status=MembershipStatus.ACTIVE
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
     queryset = Material.objects.filter(
         organization=organization, archived_at__isnull=True

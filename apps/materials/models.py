@@ -77,7 +77,9 @@ class UnitOfMeasure(UUIDModel, TimeStampedModel):
         if not self.code or not self.name.strip() or not self.symbol:
             raise ValidationError("وارد کردن کد، نام و نماد واحد الزامی است.")
         if self.decimal_places > 6:
-            raise ValidationError({"decimal_places": "تعداد رقم اعشار نمی‌تواند بیشتر از ۶ باشد."})
+            raise ValidationError(
+                {"decimal_places": "تعداد رقم اعشار نمی‌تواند بیشتر از ۶ باشد."}
+            )
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()
@@ -150,9 +152,7 @@ class MaterialCategory(UUIDModel, TimeStampedModel):
             raise ValidationError("وارد کردن کد و نام دسته‌بندی مصالح الزامی است.")
         if self.parent_id:
             if self.parent_id == self.pk:
-                raise ValidationError(
-                    {"parent": "دسته‌بندی نمی‌تواند والد خودش باشد."}
-                )
+                raise ValidationError({"parent": "دسته‌بندی نمی‌تواند والد خودش باشد."})
             if self.organization_id != self.parent.organization_id:
                 raise ValidationError(
                     {"parent": "دسته‌بندی والد باید متعلق به همین سازمان باشد."}
@@ -237,9 +237,7 @@ class Material(UUIDModel, TimeStampedModel):
             raise ValidationError("وارد کردن کد و نام مصالح الزامی است.")
         if self.organization_id != self.unit_of_measure.organization_id:
             raise ValidationError(
-                {
-                    "unit_of_measure": "واحد اندازه‌گیری باید متعلق به همین سازمان باشد."
-                }
+                {"unit_of_measure": "واحد اندازه‌گیری باید متعلق به همین سازمان باشد."}
             )
         if (
             self.unit_of_measure.archived_at is not None
@@ -251,9 +249,7 @@ class Material(UUIDModel, TimeStampedModel):
         if self.category_id:
             if self.organization_id != self.category.organization_id:
                 raise ValidationError(
-                    {
-                        "category": "دسته‌بندی مصالح باید متعلق به همین سازمان باشد."
-                    }
+                    {"category": "دسته‌بندی مصالح باید متعلق به همین سازمان باشد."}
                 )
             if self.category.archived_at is not None or not self.category.is_active:
                 raise ValidationError({"category": "دسته‌بندی مصالح باید فعال باشد."})

@@ -10,6 +10,11 @@ urlpatterns = [
     path("invite/", views.invite_member, name="invite"),
     path("accept-invitation/", views.accept_invitation, name="accept_invitation"),
     path("members/", views.organization_members, name="members"),
+    path(
+        "members/<uuid:membership_id>/edit/",
+        views.update_member,
+        name="member_update",
+    ),
     path("settings/", views.organization_settings, name="settings"),
     path("switch/", views.switch_organization, name="switch"),
 ]

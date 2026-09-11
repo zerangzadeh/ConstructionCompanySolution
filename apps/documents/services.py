@@ -11,8 +11,9 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.documents.models import DocumentType, ProjectDocument
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -40,15 +41,11 @@ FILE_SIGNATURES = {
 
 
 def _can_manage_documents(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[
-            MembershipRole.OWNER,
-            MembershipRole.ADMIN,
-            MembershipRole.MANAGER,
-        ],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.DOCUMENTS_MANAGE,
+    )
 
 
 def _validate_access(*, user: User, organization: Organization) -> None:
@@ -59,10 +56,14 @@ def _validate_access(*, user: User, organization: Organization) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not organization.memberships.filter(
-        user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists():
+    if (
+        not user.is_superuser
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 

@@ -7,7 +7,7 @@ This document describes the currently implemented logical domains and data model
 - `User` is a global authenticated identity. Access to tenant data is granted through an active `OrganizationMembership` and the user's active organization; a user identifier or organization identifier supplied by a request is never sufficient authorization.
 - `Organization` is the tenant root. Tenant-owned records carry an explicit `organization` foreign key, including child and history records, so querysets and service operations can be scoped directly.
 - Services validate that every related object belongs to the same organization and also enforce structural relationships such as project -> site -> phase and project -> WBS node -> activity. Cross-organization foreign keys are forbidden.
-- Business mutations require an active, non-deleted organization and an active membership with a permitted role. Read paths are also tenant-scoped. Important multi-step transitions are atomic and lock their primary aggregate row before rechecking state.
+- Business mutations require an active, non-deleted organization and an active membership whose role grants the required business permission. Read paths are also tenant-scoped. Important multi-step transitions are atomic and lock their primary aggregate row before rechecking state.
 - Business records use UUID identifiers and timestamp mixins. Money and measured quantities use `Decimal`; financial calculations do not use binary floating point.
 - Some legacy snapshot fields coexist with optional shared-master references. They remain part of the current schema and must not be removed without an approved, incremental schema change.
 
@@ -15,8 +15,8 @@ This document describes the currently implemented logical domains and data model
 
 | Domain | Main entities | Current responsibility |
 | --- | --- | --- |
-| Accounts | `User` | Authentication identity and account state. |
-| Organizations | `Organization`, `OrganizationSettings`, `OrganizationMembership`, `OrganizationInvitation` | Tenant lifecycle, per-tenant timezone/currency/fiscal settings, roles, membership, invitations, and active-organization access. Organization timezone/currency remain synchronized compatibility fields. |
+| Accounts | `User` | Global authentication identity and effective active/inactive/blocked account state; `blocked_at` distinguishes an administrative block from ordinary inactivity. |
+| Organizations | `Organization`, `OrganizationSettings`, `OrganizationMembership`, `OrganizationInvitation`, `OrganizationRole`, `BusinessPermission` | Tenant lifecycle, per-tenant settings, global administrator-defined company roles, code-owned business permissions, membership, invitations, and active-company access. Organization timezone/currency remain synchronized compatibility fields. |
 | Parties | `BusinessParty`, `PartyRole`, `PartyContact` | Shared tenant counterparty master. A party may have employer, client, consultant, supplier, subcontractor, or other roles and tenant-scoped contacts. |
 | Materials | `UnitOfMeasure`, `MaterialCategory`, `Material` | Tenant unit and material masters, including hierarchical categories and canonical material units. |
 | Projects | `Project`, `ProjectSite`, `ProjectPhase`, `WBSNode`, `Activity` | Project/site/phase hierarchy and optional project-control structure. WBS nodes form a tree; each activity belongs to a WBS node and may reference a site, phase, and unit. |
@@ -32,6 +32,14 @@ This document describes the currently implemented logical domains and data model
 | Audit | `AuditEvent` | Append-only evidence for important business and security actions. |
 | Financials | No persisted model | Tenant-scoped read models that aggregate contracts, approved estimates, recorded expenses, and posted payments; this domain is not a second ledger. |
 
+## Authorization model
+
+- The global system administrator role (`admin`) is represented by Django superuser capability; the deployed primary account is named `admin`. A system administrator can administer every tenant, is the only actor allowed to create new organizations, and is the only actor allowed to create or change global company-role definitions. Organization-scoped roles cannot create another tenant.
+- The protected built-in company roles are `company_owner`, `company_manager`, `operations_manager`, `member`, and `viewer`. The owner role is retained separately from company manager because ownership transfer and final-owner protection are lifecycle invariants, not ordinary permissions.
+- `BusinessPermission` contains the code-owned capabilities that application services actually enforce. It is not generated automatically from database tables or generic CRUD operations. `OrganizationRole.permissions` composes those capabilities into built-in or administrator-defined roles.
+- Companies can invite members and assign any active global role within their own tenant, subject to owner protection and delegation limits. They cannot create role definitions or permission codes. A manager cannot assign or manage a role containing capabilities that the manager does not already hold.
+- The legacy membership and invitation `role` code remains synchronized with `role_definition` during the compatibility period. Authorization reads the role definition and its active permissions.
+
 ## Logical ERD
 
 The diagram intentionally shows aggregates and important cross-domain links rather than ordinary audit, timestamp, and presentation fields. Every tenant-owned entity below also belongs directly to `Organization`, even where that repeated edge is omitted for readability.
@@ -40,6 +48,9 @@ The diagram intentionally shows aggregates and important cross-domain links rath
 erDiagram
     USER ||--o{ ORGANIZATION_MEMBERSHIP : has
     USER ||--o{ ORGANIZATION_INVITATION : receives
+    ORGANIZATION_ROLE ||--o{ ORGANIZATION_MEMBERSHIP : authorizes
+    ORGANIZATION_ROLE ||--o{ ORGANIZATION_INVITATION : assigns
+    ORGANIZATION_ROLE }o--o{ BUSINESS_PERMISSION : grants
     ORGANIZATION ||--o| ORGANIZATION_SETTINGS : configures
     ORGANIZATION ||--o{ ORGANIZATION_MEMBERSHIP : grants
     ORGANIZATION ||--o{ ORGANIZATION_INVITATION : issues
@@ -155,7 +166,8 @@ erDiagram
 
 ## Key relationships and business invariants
 
-- Organization creation and its initial owner membership are atomic. Membership is the authorization source of truth. A settings row belongs to exactly one organization and is unique for it; the database relationship permits an organization to have no settings row during migration or recovery scenarios.
+- Organization creation and its initial owner membership are atomic. Membership is the authorization source of truth. Role and membership-status changes are tenant-authorized, atomic, protect the final active owner, and emit audit evidence. A settings row belongs to exactly one organization and is unique for it; the database relationship permits an organization to have no settings row during migration or recovery scenarios.
+- Business permissions are stable capabilities implemented in application services, not automatically generated CRUD permissions for every table. Only the global system `admin` can compose, activate, deactivate, or remove unused global company roles. Companies may assign active roles but cannot define roles or permission codes. The protected company-owner role remains distinct from the company-manager role so ownership lifecycle rules do not depend on ordinary management access.
 - Parties and master data are tenant-local. Archived parties, units, categories, materials, WBS nodes, and activities cannot be selected for new work. Category and WBS parent links must remain in the same tenant and hierarchy and cannot form cycles. Masters with active dependants cannot be archived where doing so would invalidate current references.
 - A site belongs to one project and a phase to one site. Activity site/phase/WBS references must belong to the activity's project; a phase must belong to the selected site. A planned quantity requires an active unit and must be positive.
 - Workforce structures are optional. An employee may link to at most one active organization-member user per tenant, but employee personnel data remains independent of authentication identity. Department hierarchies cannot cycle; department, position, team, employee, project, and optional site links must share a tenant, and assignment sites must belong to their project.

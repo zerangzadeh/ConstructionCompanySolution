@@ -1,4 +1,5 @@
 from decimal import Decimal, InvalidOperation
+
 from django import template
 
 register = template.Library()
@@ -56,6 +57,7 @@ STATUS_LABELS = {
     "Permit": "مجوز",
 }
 
+
 @register.filter
 def erp_number(value):
     if value in (None, ""):
@@ -65,6 +67,7 @@ def erp_number(value):
     except (InvalidOperation, TypeError, ValueError):
         return value
     return text.rstrip("0").rstrip(".") if "." in text else text
+
 
 @register.filter
 def status_fa(value):

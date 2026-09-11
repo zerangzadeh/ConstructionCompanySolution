@@ -51,12 +51,12 @@ class WorkforceModelTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.other_organization.memberships.create(
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = Project.objects.create(
@@ -293,7 +293,7 @@ class WorkforceServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.organization.memberships.create(
@@ -303,7 +303,7 @@ class WorkforceServiceTests(TestCase):
         )
         self.other_organization.memberships.create(
             user=self.outsider,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = Project.objects.create(

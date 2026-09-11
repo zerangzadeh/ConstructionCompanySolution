@@ -8,8 +8,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -25,11 +26,6 @@ from apps.workforce.models import (
     WorkTeam,
 )
 
-_MANAGEMENT_ROLES = (
-    MembershipRole.OWNER,
-    MembershipRole.ADMIN,
-    MembershipRole.MANAGER,
-)
 _EMPLOYEE_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
     EmployeeStatus.ACTIVE: (EmployeeStatus.INACTIVE, EmployeeStatus.TERMINATED),
     EmployeeStatus.INACTIVE: (EmployeeStatus.ACTIVE, EmployeeStatus.TERMINATED),
@@ -53,21 +49,24 @@ def _require_active_access(*, organization: Organization, user: User) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not organization.memberships.filter(
-        user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists():
+    if (
+        not user.is_superuser
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 
 def _require_management_access(*, organization: Organization, actor: User) -> None:
-    _require_active_access(organization=organization, user=actor)
-    if not organization.memberships.filter(
+    require_business_permission(
         user=actor,
-        status=MembershipStatus.ACTIVE,
-        role__in=_MANAGEMENT_ROLES,
-    ).exists():
-        raise PermissionDenied("اجازه مدیریت نیروی انسانی این سازمان را ندارید.")
+        organization=organization,
+        permission=BusinessPermissionCode.WORKFORCE_MANAGE,
+        message="اجازه مدیریت نیروی انسانی این شرکت را ندارید.",
+    )
 
 
 def _save_validated(instance: object, error_message: str) -> None:
@@ -99,9 +98,7 @@ def _require_same_organization(
         record is not None and record.organization_id != organization.pk
         for record in records.values()
     ):
-        raise PermissionDenied(
-            "رکورد مرتبط نیروی انسانی متعلق به سازمان دیگری است."
-        )
+        raise PermissionDenied("رکورد مرتبط نیروی انسانی متعلق به سازمان دیگری است.")
 
 
 @transaction.atomic
@@ -465,9 +462,7 @@ def archive_employee(
     if locked.archived_at is not None:
         raise ValueError("کارمند از قبل بایگانی شده است.")
     if locked.project_assignments.filter(status=AssignmentStatus.ACTIVE).exists():
-        raise ValueError(
-            "کارمند دارای تخصیص فعال پروژه قابل بایگانی نیست."
-        )
+        raise ValueError("کارمند دارای تخصیص فعال پروژه قابل بایگانی نیست.")
     if locked.teams_led.filter(archived_at__isnull=True).exists():
         raise ValueError("سرپرست گروه کاری فعال قابل بایگانی نیست.")
     locked.archived_at = timezone.now()
@@ -497,9 +492,7 @@ def _archive_master(
     _require_management_access(organization=organization, actor=actor)
     locked = record.__class__.objects.select_for_update().get(pk=record.pk)
     if locked.organization_id != organization.pk:
-        raise PermissionDenied(
-            "رکورد نیروی انسانی متعلق به این سازمان نیست."
-        )
+        raise PermissionDenied("رکورد نیروی انسانی متعلق به این سازمان نیست.")
     if locked.archived_at is not None:
         raise ValueError("رکورد نیروی انسانی از قبل بایگانی شده است.")
     if isinstance(locked, Department) and (

@@ -8,9 +8,7 @@ from django.db import models
 class UUIDModel(models.Model):
     """Use a non-sequential UUID primary key for public business records."""
 
-    id = models.UUIDField(
-        "شناسه", default=uuid.uuid4, editable=False, primary_key=True
-    )
+    id = models.UUIDField("شناسه", default=uuid.uuid4, editable=False, primary_key=True)
 
     class Meta:
         abstract = True

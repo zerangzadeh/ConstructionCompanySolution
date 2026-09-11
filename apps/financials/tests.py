@@ -44,7 +44,7 @@ class FinancialReportTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -221,5 +221,5 @@ class FinancialReportTests(TestCase):
         response = self.client.get(reverse("financials:dashboard"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Organization dashboard")
+        self.assertContains(response, "داشبورد سازمان")
         self.assertContains(response, "Financial Company")

@@ -46,13 +46,13 @@ class ProjectDocumentForm(forms.ModelForm):
         project = cleaned_data.get("project")
         payment = cleaned_data.get("payment")
         if payment and project and payment.project_id != project.pk:
-            self.add_error(
-                "payment", "پرداخت انتخاب‌شده متعلق به این پروژه نیست."
-            )
+            self.add_error("payment", "پرداخت انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data
 
 
 class DocumentArchiveForm(forms.Form):
     """Requires a retained reason when a document is removed from active use."""
 
-    reason = forms.CharField(label="دلیل بایگانی", widget=forms.Textarea, max_length=1000)
+    reason = forms.CharField(
+        label="دلیل بایگانی", widget=forms.Textarea, max_length=1000
+    )

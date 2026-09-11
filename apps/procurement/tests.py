@@ -59,7 +59,7 @@ class ProcurementFixtureMixin:
             name="Other Procurement Co", slug="other-procurement-co"
         )
         for user, role in (
-            (self.owner, MembershipRole.OWNER),
+            (self.owner, MembershipRole.COMPANY_OWNER),
             (self.member, MembershipRole.MEMBER),
             (self.viewer, MembershipRole.VIEWER),
         ):
@@ -68,7 +68,7 @@ class ProcurementFixtureMixin:
             )
         self.other_organization.memberships.create(
             user=self.outsider,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = Project.objects.create(

@@ -61,12 +61,12 @@ class DailyReportServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.other_organization.memberships.create(
             user=self.other_user,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -144,7 +144,7 @@ class DailyReportServiceTests(TestCase):
         )
         """ self.other_organization.memberships.create(
             user=self.other_user,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         ) """
         other_site = create_project_site(
@@ -201,7 +201,7 @@ class DailyReportServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "Only submitted daily reports can be approved.",
+            "فقط گزارش‌های روزانه ارسال‌شده قابل تأیید هستند.",
         ):
             approve_daily_report(
                 organization=self.organization,
@@ -401,7 +401,7 @@ class DailyReportServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "Only draft daily reports can be updated.",
+            "فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است.",
         ):
             add_daily_report_material_entry(
                 organization=self.organization,
@@ -547,7 +547,7 @@ class DailyReportServiceTests(TestCase):
             organization=self.organization, report_id=str(report.pk), actor=self.owner
         )
         with self.assertRaisesMessage(
-            ValueError, "Only draft daily reports can be updated."
+            ValueError, "فقط گزارش روزانه پیش‌نویس قابل به‌روزرسانی است."
         ):
             add_delay_event(
                 organization=self.organization,

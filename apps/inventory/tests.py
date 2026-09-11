@@ -59,7 +59,7 @@ class InventoryFixtureMixin:
             slug="other-inventory-co",
         )
         for user, role in (
-            (self.owner, MembershipRole.OWNER),
+            (self.owner, MembershipRole.COMPANY_OWNER),
             (self.member, MembershipRole.MEMBER),
             (self.viewer, MembershipRole.VIEWER),
         ):
@@ -70,7 +70,7 @@ class InventoryFixtureMixin:
             )
         self.other_organization.memberships.create(
             user=self.outsider,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = Project.objects.create(
@@ -253,7 +253,7 @@ class WarehouseServiceTests(InventoryFixtureMixin, TestCase):
             quantity=Decimal("5.0000"),
             destination=self.central,
         )
-        with self.assertRaisesMessage(ValueError, "non-zero stock"):
+        with self.assertRaisesMessage(ValueError, "موجودی غیرصفر"):
             archive_warehouse(
                 organization=self.organization,
                 actor=self.owner,
@@ -427,7 +427,7 @@ class StockTransactionServiceTests(InventoryFixtureMixin, TestCase):
             quantity=Decimal("1.0000"),
             occurred_at=timezone.now(),
         )
-        with self.assertRaisesMessage(ValueError, "negative warehouse stock"):
+        with self.assertRaisesMessage(ValueError, "منفی شدن موجودی انبار"):
             post_stock_transaction(
                 organization=self.organization,
                 actor=self.member,
@@ -519,7 +519,7 @@ class StockTransactionServiceTests(InventoryFixtureMixin, TestCase):
             source=self.central,
             project=self.project,
         )
-        with self.assertRaisesMessage(ValueError, "negative warehouse stock"):
+        with self.assertRaisesMessage(ValueError, "منفی شدن موجودی انبار"):
             reverse_stock_transaction(
                 organization=self.organization,
                 actor=self.owner,
@@ -550,7 +550,7 @@ class StockTransactionServiceTests(InventoryFixtureMixin, TestCase):
             warehouse=self.central,
         )
 
-        with self.assertRaisesMessage(ValueError, "active tenant warehouses"):
+        with self.assertRaisesMessage(ValueError, "انبارهای فعال همین سازمان"):
             reverse_stock_transaction(
                 organization=self.organization,
                 actor=self.owner,
@@ -588,7 +588,9 @@ class StockTransactionServiceTests(InventoryFixtureMixin, TestCase):
                 quantity=item.quantity,
                 occurred_at=timezone.now(),
             )
-        with self.assertRaisesMessage(ValueError, "Reverse posted inventory"):
+        with self.assertRaisesMessage(
+            ValueError, "دریافت‌های نهایی‌شده انبار را برگشت دهید"
+        ):
             void_goods_receipt(
                 organization=self.organization,
                 actor=self.owner,

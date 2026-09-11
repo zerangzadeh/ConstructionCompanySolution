@@ -65,9 +65,7 @@ class EstimateForm(forms.ModelForm):
         contract = cleaned_data.get("contract")
         phase = cleaned_data.get("phase")
         if project and contract and contract.project_id != project.pk:
-            raise forms.ValidationError(
-                "قرارداد انتخاب‌شده متعلق به این پروژه نیست."
-            )
+            raise forms.ValidationError("قرارداد انتخاب‌شده متعلق به این پروژه نیست.")
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data

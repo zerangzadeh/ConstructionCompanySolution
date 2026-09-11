@@ -32,14 +32,16 @@ class BusinessPartyServiceTests(TestCase):
             name="Other Party Company", slug="other-party-company"
         )
         self.organization.memberships.create(
-            user=self.owner, role=MembershipRole.OWNER, status=MembershipStatus.ACTIVE
+            user=self.owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
         )
         self.organization.memberships.create(
             user=self.member, role=MembershipRole.MEMBER, status=MembershipStatus.ACTIVE
         )
         self.other_organization.memberships.create(
             user=self.other_owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
 
@@ -100,7 +102,7 @@ class BusinessPartyServiceTests(TestCase):
             tax_identifier="TAX-001",
         )
         with self.assertRaisesMessage(
-            ValueError, "A party with this tax identifier already exists."
+            ValueError, "طرف تجاری با این شناسه مالیاتی از قبل وجود دارد."
         ):
             create_business_party(
                 organization=self.organization,

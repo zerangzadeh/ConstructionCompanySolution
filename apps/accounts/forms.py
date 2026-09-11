@@ -21,7 +21,7 @@ class UserLoginForm(AuthenticationForm):
                 "autocomplete": "username",
                 "placeholder": "نام کاربری خود را وارد کنید",
             }
-        )
+        ),
     )
     password = forms.CharField(
         label="گذرواژه",
@@ -31,7 +31,7 @@ class UserLoginForm(AuthenticationForm):
                 "autocomplete": "current-password",
                 "placeholder": "گذرواژه خود را وارد کنید",
             }
-        )
+        ),
     )
 
     def clean_username(self) -> str:

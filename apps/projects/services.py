@@ -9,8 +9,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
-    MembershipRole,
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -58,22 +59,19 @@ _ALLOWED_ACTIVITY_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
 
 
 def _has_active_membership(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return (user.is_superuser and user.is_active) or organization.memberships.filter(
         user=user,
         status=MembershipStatus.ACTIVE,
+        role_definition__is_active=True,
     ).exists()
 
 
 def _can_manage_projects(user: User, organization: Organization) -> bool:
-    return organization.memberships.filter(
+    return has_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-        role__in=[
-            MembershipRole.OWNER,
-            MembershipRole.ADMIN,
-            MembershipRole.MANAGER,
-        ],
-    ).exists()
+        organization=organization,
+        permission=BusinessPermissionCode.PROJECTS_MANAGE,
+    )
 
 
 def _require_project_management_access(
@@ -87,9 +85,7 @@ def _require_project_management_access(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _can_manage_projects(actor, organization):
-        raise PermissionDenied(
-            "اجازه مدیریت کنترل پروژه در این سازمان را ندارید."
-        )
+        raise PermissionDenied("اجازه مدیریت کنترل پروژه در این سازمان را ندارید.")
 
 
 @transaction.atomic

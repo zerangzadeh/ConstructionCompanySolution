@@ -37,7 +37,9 @@ class BusinessParty(UUIDModel, TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="business_parties",
     )
-    party_kind = models.CharField("نوع طرف تجاری", max_length=20, choices=PartyKind.choices)
+    party_kind = models.CharField(
+        "نوع طرف تجاری", max_length=20, choices=PartyKind.choices
+    )
     display_name = models.CharField("نام نمایشی", max_length=255)
     legal_name = models.CharField("نام قانونی", max_length=255, blank=True)
     tax_identifier = models.CharField("شناسه مالیاتی", max_length=100, blank=True)
@@ -122,9 +124,7 @@ class PartyRole(UUIDModel, TimeStampedModel):
     def clean(self) -> None:
         super().clean()
         if self.party_id and self.organization_id != self.party.organization_id:
-            raise ValidationError(
-                "طرف تجاری و نقش باید متعلق به یک سازمان باشند."
-            )
+            raise ValidationError("طرف تجاری و نقش باید متعلق به یک سازمان باشند.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()
@@ -149,7 +149,9 @@ class PartyContact(UUIDModel, TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="contacts",
     )
-    contact_type = models.CharField("نوع راه ارتباطی", max_length=20, choices=ContactType.choices)
+    contact_type = models.CharField(
+        "نوع راه ارتباطی", max_length=20, choices=ContactType.choices
+    )
     value = models.CharField("مقدار", max_length=255)
     label = models.CharField("عنوان", max_length=100, blank=True)
     is_primary = models.BooleanField("راه ارتباطی اصلی", default=False)

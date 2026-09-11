@@ -74,9 +74,7 @@ class PaymentForm(forms.ModelForm):
         contract = cleaned_data.get("contract")
         phase = cleaned_data.get("phase")
         if project and contract and contract.project_id != project.pk:
-            self.add_error(
-                "contract", "قرارداد انتخاب‌شده متعلق به این پروژه نیست."
-            )
+            self.add_error("contract", "قرارداد انتخاب‌شده متعلق به این پروژه نیست.")
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
         return cleaned_data

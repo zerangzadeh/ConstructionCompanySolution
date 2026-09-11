@@ -58,7 +58,7 @@ class IdentifierCanonicalizationTests(TestCase):
         OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = Project.objects.create(
@@ -203,7 +203,7 @@ class IdentifierCanonicalizationTests(TestCase):
             ),
             site,
         )
-        with self.assertRaisesMessage(ValueError, "already exists"):
+        with self.assertRaisesMessage(ValueError, "از قبل"):
             create_project_site(
                 organization=self.organization,
                 project=project,
@@ -228,7 +228,7 @@ class IdentifierCanonicalizationTests(TestCase):
             ),
             phase,
         )
-        with self.assertRaisesMessage(ValueError, "already exists"):
+        with self.assertRaisesMessage(ValueError, "از قبل"):
             create_project_phase(
                 organization=self.organization,
                 site=site,
@@ -307,7 +307,7 @@ class IdentifierCanonicalizationTests(TestCase):
             payment,
         )
 
-        with self.assertRaisesMessage(ValueError, "already exists"):
+        with self.assertRaisesMessage(ValueError, "از قبل"):
             create_contract(
                 organization=self.organization,
                 project=self.project,
@@ -316,7 +316,7 @@ class IdentifierCanonicalizationTests(TestCase):
                 title="Duplicate contract",
                 counterparty_name="Client",
             )
-        with self.assertRaisesMessage(ValueError, "already exists"):
+        with self.assertRaisesMessage(ValueError, "از قبل"):
             create_estimate(
                 organization=self.organization,
                 project=self.project,
@@ -324,7 +324,7 @@ class IdentifierCanonicalizationTests(TestCase):
                 estimate_number=" est-MIXED ",
                 title="Duplicate estimate",
             )
-        with self.assertRaisesMessage(ValueError, "already exists"):
+        with self.assertRaisesMessage(ValueError, "از قبل"):
             create_payment(
                 organization=self.organization,
                 project=self.project,

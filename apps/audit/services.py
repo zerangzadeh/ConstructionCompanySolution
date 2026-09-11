@@ -5,10 +5,11 @@ from django.db.models import QuerySet
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
+    BusinessPermissionCode,
     MembershipStatus,
     Organization,
-    OrganizationStatus,
 )
 
 _SENSITIVE_METADATA_KEY_PARTS = frozenset(
@@ -45,9 +46,11 @@ def record_audit_event(
     if (
         organization is not None
         and actor is not None
+        and not actor.is_superuser
         and not organization.memberships.filter(
             user=actor,
             status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
         ).exists()
     ):
         raise PermissionDenied("عامل رویداد ممیزی متعلق به این سازمان نیست.")
@@ -68,19 +71,12 @@ def get_organization_audit_events(
 ) -> QuerySet[AuditEvent]:
     """Return audit events only for an active organization membership."""
 
-    if not user.is_authenticated:
-        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
-    if (
-        organization.status != OrganizationStatus.ACTIVE
-        or organization.deleted_at is not None
-    ):
-        raise PermissionDenied("سازمان فعال نیست.")
-    has_membership = organization.memberships.filter(
+    require_business_permission(
         user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists()
-    if not has_membership:
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+        organization=organization,
+        permission=BusinessPermissionCode.AUDIT_VIEW,
+        message="اجازه مشاهده گزارش رویدادهای این شرکت را ندارید.",
+    )
     return (
         AuditEvent.objects.filter(organization=organization)
         .select_related("actor")

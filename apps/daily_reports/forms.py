@@ -154,9 +154,7 @@ class DailyReportMaterialEntryForm(_DailyReportEntryForm):
             "notes",
         ]
         widgets = {  # noqa: RUF012
-            "material_name": forms.TextInput(
-                attrs={"placeholder": "بتن آماده"}
-            ),
+            "material_name": forms.TextInput(attrs={"placeholder": "بتن آماده"}),
             "quantity": forms.NumberInput(attrs={"min": "0.0001", "step": "0.0001"}),
             "unit": forms.TextInput(attrs={"placeholder": "m³"}),
             "notes": forms.Textarea(attrs={"rows": 2}),

@@ -67,7 +67,7 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
         OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.invitation, self.invitation_token = create_organization_invitation(

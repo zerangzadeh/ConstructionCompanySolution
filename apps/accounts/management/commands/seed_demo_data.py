@@ -51,6 +51,7 @@ from apps.materials.services import (
     create_unit_of_measure,
 )
 from apps.organizations.models import (
+    MembershipRole,
     Organization,
     OrganizationInvitation,
     OrganizationMembership,
@@ -131,28 +132,28 @@ PROJECTS = (
         "مجتمع مسکونی باغستان",
         "احداث مجموعه مسکونی با رویکرد کاهش مصرف انرژی و محوطه‌سازی کامل",
         "تهران، منطقه ۲۲، بلوار پژوهش",
-        Decimal("980000000000"),
+        Decimal(980000000000),
         "active",
     ),
     (
         "مرکز درمانی مهر",
         "ساخت مرکز درمانی تخصصی همراه با تأسیسات مکانیکی و برقی پیشرفته",
         "کرج، بلوار جمهوری، خیابان بهار",
-        Decimal("640000000000"),
+        Decimal(640000000000),
         "active",
     ),
     (
         "بازسازی کارخانه نوآوران",
         "مقاوم‌سازی سازه موجود و نوسازی خطوط پشتیبانی و ساختمان اداری",
         "قزوین، شهر صنعتی البرز",
-        Decimal("315000000000"),
+        Decimal(315000000000),
         "on_hold",
     ),
     (
         "ساختمان اداری آفتاب",
         "اجرای ساختمان اداری هوشمند با نمای خشک و پارکینگ طبقاتی",
         "اصفهان، خیابان هزارجریب",
-        Decimal("520000000000"),
+        Decimal(520000000000),
         "planning",
     ),
 )
@@ -328,13 +329,17 @@ class Command(BaseCommand):
             organization=organization,
             user=owner,
             defaults={
-                "role": "owner",
+                "role": MembershipRole.COMPANY_OWNER,
                 "status": "active",
                 "joined_at": organization.created_at,
             },
         )
-        self._ensure_membership(organization, owner, manager, "manager")
-        self._ensure_membership(organization, owner, accountant, "admin")
+        self._ensure_membership(
+            organization, owner, manager, MembershipRole.OPERATIONS_MANAGER
+        )
+        self._ensure_membership(
+            organization, owner, accountant, MembershipRole.COMPANY_MANAGER
+        )
 
         parties = self._seed_parties(index, organization, owner)
         units = self._seed_units(organization, owner)
@@ -392,13 +397,15 @@ class Command(BaseCommand):
             party = self._existing_or_create(
                 BusinessParty,
                 {"organization": organization, "tax_identifier": tax_identifier},
-                lambda party_name=party_name, tax_identifier=tax_identifier: create_business_party(
-                    organization=organization,
-                    actor=owner,
-                    party_kind="company",
-                    display_name=party_name,
-                    legal_name=f"{party_name} (ثبت‌شده)",
-                    tax_identifier=tax_identifier,
+                lambda party_name=party_name, tax_identifier=tax_identifier: (
+                    create_business_party(
+                        organization=organization,
+                        actor=owner,
+                        party_kind="company",
+                        display_name=party_name,
+                        legal_name=f"{party_name} (ثبت‌شده)",
+                        tax_identifier=tax_identifier,
+                    )
                 ),
             )
             if not PartyRole.objects.filter(
@@ -434,14 +441,16 @@ class Command(BaseCommand):
             unit = self._existing_or_create(
                 UnitOfMeasure,
                 {"organization": organization, "code": code},
-                lambda code=code, name=name, symbol=symbol, category=category, decimal_places=decimal_places: create_unit_of_measure(
-                    organization=organization,
-                    actor=owner,
-                    code=code,
-                    name=name,
-                    symbol=symbol,
-                    category=category,
-                    decimal_places=decimal_places,
+                lambda code=code, name=name, symbol=symbol, category=category, decimal_places=decimal_places: (
+                    create_unit_of_measure(
+                        organization=organization,
+                        actor=owner,
+                        code=code,
+                        name=name,
+                        symbol=symbol,
+                        category=category,
+                        decimal_places=decimal_places,
+                    )
                 ),
             )
             result.append(unit)
@@ -477,14 +486,16 @@ class Command(BaseCommand):
             material = self._existing_or_create(
                 Material,
                 {"organization": organization, "code": code},
-                lambda code=code, name=name, category_index=category_index, unit_index=unit_index, specifications=specifications: create_material(
-                    organization=organization,
-                    actor=owner,
-                    code=code,
-                    name=name,
-                    category=categories[category_index],
-                    unit_of_measure=units[unit_index],
-                    specifications=specifications,
+                lambda code=code, name=name, category_index=category_index, unit_index=unit_index, specifications=specifications: (
+                    create_material(
+                        organization=organization,
+                        actor=owner,
+                        code=code,
+                        name=name,
+                        category=categories[category_index],
+                        unit_of_measure=units[unit_index],
+                        specifications=specifications,
+                    )
                 ),
             )
             result.append(material)
@@ -643,15 +654,17 @@ class Command(BaseCommand):
             phase = self._existing_or_create(
                 ProjectPhase,
                 {"organization": organization, "site": site, "code": code},
-                lambda code=code, name=name, status=status, phase_start=phase_start: create_project_phase(
-                    organization=organization,
-                    site=site,
-                    actor=owner,
-                    code=code,
-                    name=name,
-                    status=status,
-                    planned_start_date=phase_start,
-                    planned_end_date=phase_start + timedelta(days=240),
+                lambda code=code, name=name, status=status, phase_start=phase_start: (
+                    create_project_phase(
+                        organization=organization,
+                        site=site,
+                        actor=owner,
+                        code=code,
+                        name=name,
+                        status=status,
+                        planned_start_date=phase_start,
+                        planned_end_date=phase_start + timedelta(days=240),
+                    )
                 ),
             )
             result.append(phase)
@@ -671,14 +684,16 @@ class Command(BaseCommand):
             node = self._existing_or_create(
                 WBSNode,
                 {"project": project, "code": code},
-                lambda code=code, title=title, parent=parent, sort_order=sort_order: create_wbs_node(
-                    organization=organization,
-                    project=project,
-                    actor=owner,
-                    code=code,
-                    title=title,
-                    parent=parent,
-                    sort_order=sort_order,
+                lambda code=code, title=title, parent=parent, sort_order=sort_order: (
+                    create_wbs_node(
+                        organization=organization,
+                        project=project,
+                        actor=owner,
+                        code=code,
+                        title=title,
+                        parent=parent,
+                        sort_order=sort_order,
+                    )
                 ),
             )
             result.append(node)
@@ -696,10 +711,10 @@ class Command(BaseCommand):
         start: date,
     ) -> list[Activity]:
         data = (
-            ("ACT-01", "تجهیز و حصارکشی کارگاه", 0, 4, Decimal("1")),
-            ("ACT-02", "خاک‌برداری و آماده‌سازی بستر", 1, 2, Decimal("2200")),
-            ("ACT-03", "آرماتوربندی و بتن‌ریزی فونداسیون", 2, 2, Decimal("780")),
-            ("ACT-04", "اجرای اسکلت و سقف طبقات", 2, 1, Decimal("6400")),
+            ("ACT-01", "تجهیز و حصارکشی کارگاه", 0, 4, Decimal(1)),
+            ("ACT-02", "خاک‌برداری و آماده‌سازی بستر", 1, 2, Decimal(2200)),
+            ("ACT-03", "آرماتوربندی و بتن‌ریزی فونداسیون", 2, 2, Decimal(780)),
+            ("ACT-04", "اجرای اسکلت و سقف طبقات", 2, 1, Decimal(6400)),
         )
         result = []
         for activity_index, (code, name, wbs_index, unit_index, quantity) in enumerate(
@@ -709,20 +724,22 @@ class Command(BaseCommand):
             activity = self._existing_or_create(
                 Activity,
                 {"project": project, "code": code},
-                lambda code=code, name=name, wbs_index=wbs_index, unit_index=unit_index, quantity=quantity, activity_index=activity_index, activity_start=activity_start: create_activity(
-                    organization=organization,
-                    project=project,
-                    wbs_node=wbs_nodes[wbs_index],
-                    actor=owner,
-                    code=code,
-                    name=name,
-                    site=site,
-                    phase=phases[0],
-                    unit_of_measure=units[unit_index],
-                    planned_quantity=quantity,
-                    planned_start_date=activity_start,
-                    planned_end_date=activity_start + timedelta(days=75),
-                    status="active" if activity_index < 3 else "planning",
+                lambda code=code, name=name, wbs_index=wbs_index, unit_index=unit_index, quantity=quantity, activity_index=activity_index, activity_start=activity_start: (
+                    create_activity(
+                        organization=organization,
+                        project=project,
+                        wbs_node=wbs_nodes[wbs_index],
+                        actor=owner,
+                        code=code,
+                        name=name,
+                        site=site,
+                        phase=phases[0],
+                        unit_of_measure=units[unit_index],
+                        planned_quantity=quantity,
+                        planned_start_date=activity_start,
+                        planned_end_date=activity_start + timedelta(days=75),
+                        status="active" if activity_index < 3 else "planning",
+                    )
                 ),
             )
             result.append(activity)
@@ -750,9 +767,9 @@ class Command(BaseCommand):
                 f"CTR-{organization_index:02d}-{project_index:02d}-{contract_index:02d}"
             )
             party = parties[party_index]
-            value = (budget * Decimal("0.62" if contract_index == 1 else "0.08")) + Decimal(
-                contract_index * 900_000_000
-            )
+            value = (
+                budget * Decimal("0.62" if contract_index == 1 else "0.08")
+            ) + Decimal(contract_index * 900_000_000)
             contract = Contract.objects.filter(
                 organization=organization, contract_number=number
             ).first()
@@ -821,7 +838,7 @@ class Command(BaseCommand):
                 amendment_number=1,
                 title="الحاقیه تعدیل برنامه تأمین مصالح",
                 reason="هماهنگی زمان تحویل مصالح با برنامه به‌روزشده اجرای پروژه",
-                value_change=Decimal("1750000000"),
+                value_change=Decimal(1750000000),
                 created_by=owner,
             )
             approve_contract_amendment(
@@ -860,9 +877,14 @@ class Command(BaseCommand):
                     notes="مقادیر بر پایه آخرین نقشه‌های اجرایی و استعلام‌های معتبر تنظیم شده است.",
                 )
             estimate_items = (
-                ("تأمین و اجرای بتن سازه‌ای", Decimal("540"), units[2], Decimal("9800000")),
-                ("تهیه و نصب فولاد تقویتی", Decimal("72000"), units[3], Decimal("940000")),
-                ("خدمات اجرایی و کنترل کیفی", Decimal("1"), units[4], Decimal("2600000000")),
+                ("تأمین و اجرای بتن سازه‌ای", Decimal(540), units[2], Decimal(9800000)),
+                ("تهیه و نصب فولاد تقویتی", Decimal(72000), units[3], Decimal(940000)),
+                (
+                    "خدمات اجرایی و کنترل کیفی",
+                    Decimal(1),
+                    units[4],
+                    Decimal(2600000000),
+                ),
             )
             for sort_order, (description, quantity, unit, price) in enumerate(
                 estimate_items, start=1
@@ -903,7 +925,9 @@ class Command(BaseCommand):
             number = (
                 f"PAY-{organization_index:02d}-{project_index:02d}-{payment_index:02d}"
             )
-            contract = contracts[0] if payment_index == 1 else contracts[payment_index - 1]
+            contract = (
+                contracts[0] if payment_index == 1 else contracts[payment_index - 1]
+            )
             party = parties[0] if payment_index == 1 else parties[min(payment_index, 5)]
             direction = "receipt" if payment_index == 1 else "disbursement"
             amount = Decimal(2_200_000_000 + payment_index * 475_000_000)
@@ -989,9 +1013,7 @@ class Command(BaseCommand):
     ) -> None:
         titles = ("صورت‌جلسه هماهنگی اجرایی", "گزارش کنترل کیفیت مصالح")
         for document_index, title in enumerate(titles, start=1):
-            file_name = (
-                f"DOC-{organization_index:02d}-{project_index:02d}-{document_index:02d}.pdf"
-            )
+            file_name = f"DOC-{organization_index:02d}-{project_index:02d}-{document_index:02d}.pdf"
             if ProjectDocument.objects.filter(
                 organization=organization,
                 project=project,

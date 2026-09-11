@@ -55,10 +55,14 @@ def _validate_view_context(user: User, organization: Organization) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not organization.memberships.filter(
-        user=user,
-        status=MembershipStatus.ACTIVE,
-    ).exists():
+    if (
+        not (user.is_superuser and user.is_active)
+        and not organization.memberships.filter(
+            user=user,
+            status=MembershipStatus.ACTIVE,
+            role_definition__is_active=True,
+        ).exists()
+    ):
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
 
 

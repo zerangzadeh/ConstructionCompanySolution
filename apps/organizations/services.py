@@ -13,7 +13,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
+    BusinessPermissionCode,
     InvitationRole,
     InvitationStatus,
     MembershipRole,
@@ -21,6 +23,7 @@ from apps.organizations.models import (
     Organization,
     OrganizationInvitation,
     OrganizationMembership,
+    OrganizationRole,
     OrganizationSettings,
     OrganizationStatus,
 )
@@ -34,13 +37,166 @@ def _hash_invitation_token(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
 
 
-def _can_manage_memberships(user: User, organization: Organization) -> bool:
-    return OrganizationMembership.objects.filter(
-        user=user,
-        organization=organization,
-        status=MembershipStatus.ACTIVE,
-        role__in=[MembershipRole.OWNER, MembershipRole.ADMIN],
-    ).exists()
+def _resolve_active_role(role: OrganizationRole | str) -> OrganizationRole:
+    if isinstance(role, OrganizationRole):
+        role_definition = role
+    else:
+        try:
+            role_definition = OrganizationRole.objects.get(code=role)
+        except OrganizationRole.DoesNotExist as exc:
+            raise ValueError("نقش انتخاب‌شده معتبر نیست.") from exc
+    if not role_definition.is_active:
+        raise ValueError("نقش انتخاب‌شده غیرفعال است.")
+    return role_definition
+
+
+def _validate_role_delegation(
+    *,
+    actor: User,
+    actor_membership: OrganizationMembership | None,
+    assigned_role: OrganizationRole,
+    current_role: OrganizationRole | None = None,
+) -> None:
+    """Prevent membership managers from delegating privileges they do not hold."""
+
+    if actor.is_superuser or (
+        actor_membership is not None and actor_membership.role_definition.is_owner
+    ):
+        return
+    if actor_membership is None:
+        raise PermissionDenied("اجازه واگذاری این نقش را ندارید.")
+    actor_permissions = set(
+        actor_membership.role_definition.permissions.filter(is_active=True).values_list(
+            "code", flat=True
+        )
+    )
+    roles_to_compare = [assigned_role]
+    if current_role is not None:
+        roles_to_compare.append(current_role)
+    for role_definition in roles_to_compare:
+        role_permissions = set(
+            role_definition.permissions.filter(is_active=True).values_list(
+                "code", flat=True
+            )
+        )
+        if not role_permissions.issubset(actor_permissions):
+            raise PermissionDenied(
+                "نمی‌توانید نقشی با اختیارات بیشتر از نقش خود واگذار یا مدیریت کنید."
+            )
+
+
+@transaction.atomic
+def update_organization_membership(
+    *,
+    organization: Organization,
+    actor: User,
+    membership: OrganizationMembership,
+    role: OrganizationRole | str,
+    status: str,
+) -> OrganizationMembership:
+    """Update tenant membership access with authorization and audit evidence."""
+
+    locked_organization = Organization.objects.select_for_update().get(
+        pk=organization.pk
+    )
+    if (
+        locked_organization.status != OrganizationStatus.ACTIVE
+        or locked_organization.deleted_at is not None
+    ):
+        raise PermissionDenied("سازمان فعال نیست.")
+
+    actor_membership = require_business_permission(
+        user=actor,
+        organization=locked_organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+        message="اجازه مدیریت عضویت‌های این شرکت را ندارید.",
+    )
+    role_definition = _resolve_active_role(role)
+    if status not in MembershipStatus.values:
+        raise ValueError("وضعیت عضویت معتبر نیست.")
+
+    locked_membership = (
+        OrganizationMembership.objects.select_for_update()
+        .select_related("user", "role_definition")
+        .get(pk=membership.pk)
+    )
+    if locked_membership.organization_id != locked_organization.pk:
+        raise PermissionDenied("عضویت متعلق به این سازمان نیست.")
+    actor_is_owner = bool(
+        actor_membership and actor_membership.role_definition.is_owner
+    )
+    if (
+        not actor.is_superuser
+        and not actor_is_owner
+        and (locked_membership.role_definition.is_owner or role_definition.is_owner)
+    ):
+        raise PermissionDenied("فقط مالک می‌تواند نقش مالک را مدیریت کند.")
+    _validate_role_delegation(
+        actor=actor,
+        actor_membership=actor_membership,
+        assigned_role=role_definition,
+        current_role=locked_membership.role_definition,
+    )
+
+    owner_access_removed = (
+        locked_membership.role_definition.is_owner
+        and locked_membership.status == MembershipStatus.ACTIVE
+        and (not role_definition.is_owner or status != MembershipStatus.ACTIVE)
+    )
+    if (
+        owner_access_removed
+        and not OrganizationMembership.objects.filter(
+            organization=locked_organization,
+            role_definition__is_owner=True,
+            status=MembershipStatus.ACTIVE,
+        )
+        .exclude(pk=locked_membership.pk)
+        .exists()
+    ):
+        raise ValueError("سازمان باید حداقل یک مالک فعال داشته باشد.")
+
+    previous_role = locked_membership.role_definition.code
+    previous_status = locked_membership.status
+    now = timezone.now()
+    if previous_role != role_definition.code:
+        record_audit_event(
+            action=AuditAction.MEMBERSHIP_ROLE_CHANGED,
+            entity_type="organization_membership",
+            entity_id=locked_membership.pk,
+            organization=locked_organization,
+            actor=actor,
+            metadata={
+                "target_user_id": str(locked_membership.user_id),
+                "target_username": locked_membership.user.username,
+                "previous_role": previous_role,
+                "new_role": role_definition.code,
+            },
+        )
+    if previous_status != status:
+        record_audit_event(
+            action=AuditAction.MEMBERSHIP_STATUS_CHANGED,
+            entity_type="organization_membership",
+            entity_id=locked_membership.pk,
+            organization=locked_organization,
+            actor=actor,
+            metadata={
+                "target_user_id": str(locked_membership.user_id),
+                "target_username": locked_membership.user.username,
+                "previous_status": previous_status,
+                "new_status": status,
+            },
+        )
+
+    locked_membership.role_definition = role_definition
+    locked_membership.role = role_definition.code
+    locked_membership.status = status
+    if status == MembershipStatus.ACTIVE and locked_membership.joined_at is None:
+        locked_membership.joined_at = now
+    update_fields = ["role", "role_definition", "status", "updated_at"]
+    if status == MembershipStatus.ACTIVE and locked_membership.joined_at == now:
+        update_fields.append("joined_at")
+    locked_membership.save(update_fields=update_fields)
+    return locked_membership
 
 
 def get_organization_settings(*, organization: Organization) -> OrganizationSettings:
@@ -75,8 +231,12 @@ def update_organization_settings(
         or locked_organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_memberships(updated_by, locked_organization):
-        raise PermissionDenied("اجازه به‌روزرسانی تنظیمات این سازمان را ندارید.")
+    require_business_permission(
+        user=updated_by,
+        organization=locked_organization,
+        permission=BusinessPermissionCode.COMPANY_SETTINGS_MANAGE,
+        message="اجازه به‌روزرسانی تنظیمات این شرکت را ندارید.",
+    )
 
     settings_record = get_organization_settings(organization=locked_organization)
     settings_record.timezone = timezone_name
@@ -118,7 +278,7 @@ def create_organization_invitation(
     organization: Organization,
     invited_by: User,
     invitee: User,
-    role: str = InvitationRole.MEMBER,
+    role: OrganizationRole | str = InvitationRole.MEMBER,
     expires_in: timedelta = INVITATION_LIFETIME,
 ) -> tuple[OrganizationInvitation, str]:
     """Create a hashed-token invitation for an existing user."""
@@ -128,12 +288,22 @@ def create_organization_invitation(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_memberships(invited_by, organization):
-        raise PermissionDenied("اجازه دعوت عضو به این سازمان را ندارید.")
+    inviter_membership = require_business_permission(
+        user=invited_by,
+        organization=organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+        message="اجازه دعوت عضو به این سازمان را ندارید.",
+    )
     if invited_by == invitee:
         raise ValueError("نمی‌توانید خودتان را دعوت کنید.")
-    if role not in InvitationRole.values:
-        raise ValueError("نقش دعوت‌نامه معتبر نیست.")
+    role_definition = _resolve_active_role(role)
+    if role_definition.is_owner:
+        raise ValueError("نقش مالک شرکت از طریق دعوت‌نامه قابل تخصیص نیست.")
+    _validate_role_delegation(
+        actor=invited_by,
+        actor_membership=inviter_membership,
+        assigned_role=role_definition,
+    )
 
     existing_membership = OrganizationMembership.objects.filter(
         organization=organization,
@@ -162,7 +332,8 @@ def create_organization_invitation(
         organization=organization,
         invitee=invitee,
         invited_by=invited_by,
-        role=role,
+        role=role_definition.code,
+        role_definition=role_definition,
         token_hash=_hash_invitation_token(raw_token),
         expires_at=now + expires_in,
     )
@@ -172,7 +343,10 @@ def create_organization_invitation(
         entity_id=invitation.pk,
         organization=organization,
         actor=invited_by,
-        metadata={"invitee_username": invitee.username, "role": role},
+        metadata={
+            "invitee_username": invitee.username,
+            "role": role_definition.code,
+        },
     )
     return invitation, raw_token
 
@@ -191,7 +365,7 @@ def accept_organization_invitation(
     with transaction.atomic():
         invitation = (
             OrganizationInvitation.objects.select_for_update()
-            .select_related("organization", "invitee")
+            .select_related("organization", "invitee", "role_definition")
             .filter(token_hash=_hash_invitation_token(token))
             .first()
         )
@@ -216,6 +390,7 @@ def accept_organization_invitation(
                 user=user,
                 defaults={
                     "role": invitation.role,
+                    "role_definition": invitation.role_definition,
                     "status": MembershipStatus.ACTIVE,
                     "joined_at": now,
                     "invited_by": invitation.invited_by,
@@ -223,12 +398,14 @@ def accept_organization_invitation(
             )
             if membership.status != MembershipStatus.ACTIVE:
                 membership.role = invitation.role
+                membership.role_definition = invitation.role_definition
                 membership.status = MembershipStatus.ACTIVE
                 membership.joined_at = now
                 membership.invited_by = invitation.invited_by
                 membership.save(
                     update_fields=[
                         "role",
+                        "role_definition",
                         "status",
                         "joined_at",
                         "invited_by",
@@ -245,7 +422,7 @@ def accept_organization_invitation(
                 entity_id=membership.pk,
                 organization=invitation.organization,
                 actor=user,
-                metadata={"role": membership.role},
+                metadata={"role": membership.role_definition.code},
             )
             return membership
 
@@ -283,10 +460,16 @@ def create_organization_with_owner(
         timezone=timezone_name,
         currency=currency,
     )
+    owner_role = OrganizationRole.objects.get(
+        code=MembershipRole.COMPANY_OWNER,
+        is_active=True,
+        is_owner=True,
+    )
     OrganizationMembership.objects.create(
         organization=organization,
         user=owner,
-        role=MembershipRole.OWNER,
+        role=MembershipRole.COMPANY_OWNER,
+        role_definition=owner_role,
         status=MembershipStatus.ACTIVE,
         joined_at=timezone.now(),
         invited_by=None,
@@ -302,6 +485,36 @@ def create_organization_with_owner(
     return organization
 
 
+def create_organization_by_system_admin(
+    *,
+    actor: User,
+    owner: User,
+    name: str,
+    slug: str,
+    legal_name: str = "",
+    timezone_name: str = "UTC",
+    currency: str = "USD",
+) -> Organization:
+    """Create a tenant only when requested by the global system administrator."""
+
+    if (
+        not actor.is_authenticated
+        or actor._state.adding
+        or not actor.is_active
+        or not actor.is_superuser
+    ):
+        raise PermissionDenied("فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.")
+
+    return create_organization_with_owner(
+        owner=owner,
+        name=name,
+        slug=slug,
+        legal_name=legal_name,
+        timezone_name=timezone_name,
+        currency=currency,
+    )
+
+
 def get_valid_memberships(user: Any) -> QuerySet[OrganizationMembership]:
     """Return active memberships for active, non-deleted organizations."""
     if not getattr(user, "is_authenticated", False):
@@ -312,8 +525,9 @@ def get_valid_memberships(user: Any) -> QuerySet[OrganizationMembership]:
             status=MembershipStatus.ACTIVE,
             organization__status=OrganizationStatus.ACTIVE,
             organization__deleted_at__isnull=True,
+            role_definition__is_active=True,
         )
-        .select_related("organization")
+        .select_related("organization", "role_definition")
         .order_by("organization__name")
     )
 
@@ -322,19 +536,18 @@ def get_organization_members(
     *,
     user: User,
     organization: Organization,
+    include_inactive: bool = False,
 ) -> QuerySet[OrganizationMembership]:
     """Return active members only after validating active tenant access."""
 
     has_access = get_valid_memberships(user).filter(organization=organization).exists()
     if not has_access:
         raise PermissionDenied("به این سازمان دسترسی ندارید.")
-    return (
-        OrganizationMembership.objects.filter(
-            organization=organization,
-            status=MembershipStatus.ACTIVE,
-        )
-        .select_related("user")
-        .order_by("user__username")
+    memberships = OrganizationMembership.objects.filter(organization=organization)
+    if not include_inactive:
+        memberships = memberships.filter(status=MembershipStatus.ACTIVE)
+    return memberships.select_related("user", "role_definition").order_by(
+        "user__username"
     )
 
 

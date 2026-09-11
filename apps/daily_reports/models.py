@@ -128,9 +128,7 @@ class DailyReport(UUIDModel, TimeStampedModel):
                 {"site": "کارگاه باید متعلق به پروژه انتخاب‌شده باشد."}
             )
         if self.phase_id and self.phase.site_id != self.site_id:
-            raise ValidationError(
-                {"phase": "فاز باید متعلق به کارگاه انتخاب‌شده باشد."}
-            )
+            raise ValidationError({"phase": "فاز باید متعلق به کارگاه انتخاب‌شده باشد."})
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()
@@ -356,8 +354,7 @@ class DailyActivity(UUIDModel, CreatedAtModel):
     )
     description = models.TextField("شرح فعالیت")
     quantity = models.DecimalField(
-        "مقدار",
-        max_digits=18, decimal_places=4, null=True, blank=True
+        "مقدار", max_digits=18, decimal_places=4, null=True, blank=True
     )
     unit_of_measure = models.ForeignKey(
         "materials.UnitOfMeasure",
@@ -368,8 +365,7 @@ class DailyActivity(UUIDModel, CreatedAtModel):
         related_name="daily_activities",
     )
     progress_percent = models.DecimalField(
-        "درصد پیشرفت",
-        max_digits=5, decimal_places=2, null=True, blank=True
+        "درصد پیشرفت", max_digits=5, decimal_places=2, null=True, blank=True
     )
     notes = models.TextField("یادداشت‌ها", blank=True)
     created_by = models.ForeignKey(
@@ -426,7 +422,9 @@ class DailyActivity(UUIDModel, CreatedAtModel):
                     {"unit_of_measure": "برای مقدار واردشده، انتخاب واحد الزامی است."}
                 )
         elif self.unit_of_measure_id:
-            raise ValidationError({"quantity": "با انتخاب واحد، وارد کردن مقدار الزامی است."})
+            raise ValidationError(
+                {"quantity": "با انتخاب واحد، وارد کردن مقدار الزامی است."}
+            )
         if self.progress_percent is not None and not Decimal(
             0
         ) <= self.progress_percent <= Decimal(100):
@@ -473,11 +471,13 @@ class DelayEvent(UUIDModel, CreatedAtModel):
     impact = models.TextField("اثر تأخیر", blank=True)
     responsible_party = models.CharField("طرف مسئول", max_length=255, blank=True)
     duration_hours = models.DecimalField(
-        "مدت تأخیر (ساعت)",
-        max_digits=8, decimal_places=2, null=True, blank=True
+        "مدت تأخیر (ساعت)", max_digits=8, decimal_places=2, null=True, blank=True
     )
     status = models.CharField(
-        "وضعیت", max_length=20, choices=DelayEventStatus.choices, default=DelayEventStatus.OPEN
+        "وضعیت",
+        max_length=20,
+        choices=DelayEventStatus.choices,
+        default=DelayEventStatus.OPEN,
     )
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -523,9 +523,7 @@ class DelayEvent(UUIDModel, CreatedAtModel):
                 {"activity": "فعالیت باید متعلق به پروژه گزارش باشد."}
             )
         if self.duration_hours is not None and self.duration_hours <= Decimal("0.00"):
-            raise ValidationError(
-                {"duration_hours": "مدت تأخیر باید مثبت باشد."}
-            )
+            raise ValidationError({"duration_hours": "مدت تأخیر باید مثبت باشد."})
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean()

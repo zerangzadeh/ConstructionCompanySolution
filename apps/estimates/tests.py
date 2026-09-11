@@ -45,7 +45,7 @@ class EstimateServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=self.owner,
-            role=MembershipRole.OWNER,
+            role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -107,7 +107,7 @@ class EstimateServiceTests(TestCase):
         )
         with self.assertRaisesMessage(
             ValueError,
-            "An estimate with this number already exists.",
+            "برآوردی با این شماره از قبل وجود دارد.",
         ):
             create_estimate(
                 organization=self.organization,
@@ -175,7 +175,7 @@ class EstimateServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             PermissionDenied,
-            "The project phase does not belong to this project.",
+            "فاز پروژه متعلق به این پروژه نیست.",
         ):
             create_estimate(
                 organization=self.organization,
@@ -197,7 +197,7 @@ class EstimateServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "Item quantity must be positive.",
+            "مقدار ردیف باید مثبت باشد.",
         ):
             add_estimate_item(
                 estimate=estimate,
@@ -255,7 +255,7 @@ class EstimateServiceTests(TestCase):
         self.assertIsNotNone(estimate.approved_at)
         with self.assertRaisesMessage(
             ValueError,
-            "Cannot modify an approved estimate.",
+            "برآورد تأییدشده قابل تغییر نیست.",
         ):
             add_estimate_item(
                 estimate=estimate,
@@ -277,7 +277,7 @@ class EstimateServiceTests(TestCase):
 
         with self.assertRaisesMessage(
             ValueError,
-            "Only draft estimates can be approved.",
+            "فقط برآوردهای پیش‌نویس قابل تأیید هستند.",
         ):
             approve_estimate(estimate=estimate, actor=self.owner)
 
@@ -288,7 +288,7 @@ class EstimateServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=manager,
-            role=MembershipRole.MANAGER,
+            role=MembershipRole.OPERATIONS_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
         estimate = create_estimate(
@@ -339,7 +339,7 @@ class EstimateServiceTests(TestCase):
         )
         self.organization.memberships.create(
             user=manager,
-            role=MembershipRole.MANAGER,
+            role=MembershipRole.OPERATIONS_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
         estimate = create_estimate(
@@ -447,8 +447,11 @@ class EstimateServiceTests(TestCase):
 
         response = self.client.get(detail_url)
 
-        self.assertContains(response, "Approved estimate — line items are locked.")
-        self.assertNotContains(response, "Add item")
+        self.assertContains(
+            response,
+            "این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.",
+        )
+        self.assertNotContains(response, "افزودن ردیف")
 
         response = self.client.post(
             detail_url,
@@ -462,7 +465,7 @@ class EstimateServiceTests(TestCase):
             follow=True,
         )
 
-        self.assertContains(response, "Cannot modify an approved estimate.")
+        self.assertContains(response, "برآورد تأییدشده قابل تغییر نیست.")
         estimate.refresh_from_db()
         self.assertEqual(estimate.items.count(), 1)
         self.assertEqual(estimate.total_amount, Decimal("200.50"))
