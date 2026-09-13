@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}تنظیمات شخصی | سازه‌یار{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl">
+    {% include "components/page_header.html" with page_eyebrow="حساب کاربری" page_title="تنظیمات شخصی" page_description="اطلاعات تماس، تصویر پروفایل و امنیت حساب خود را مدیریت کنید." only %}
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div class="space-y-6">
+            <form method="post" enctype="multipart/form-data" class="erp-surface rounded-xl p-5 sm:p-6">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="profile">
+                <div class="mb-6 flex items-center gap-4 border-b border-slate-100 pb-5">
+                    {% if request.user.profile_image %}
+                        <img class="h-16 w-16 rounded-full border border-slate-200 object-cover" src="{% url 'accounts:profile-image' %}" alt="تصویر پروفایل {{ request.user.get_full_name|default:request.user.username }}">
+                    {% else %}
+                        <span class="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-blue-700 text-xl font-bold text-white" aria-hidden="true">{{ request.user.username|first|upper }}</span>
+                    {% endif %}
+                    <div>
+                        <h2 class="font-bold text-slate-900">مشخصات شخصی</h2>
+                        <p class="mt-1 text-xs text-slate-500">این اطلاعات فقط روی حساب کاربری شما اعمال می‌شود.</p>
+                    </div>
+                </div>
+
+                {% include "components/form_errors.html" with form=profile_form only %}
+                <div class="grid gap-5 sm:grid-cols-2">
+                    {% for field in profile_form %}
+                        <div{% if field.name == "profile_image" %} class="sm:col-span-2"{% endif %}>
+                            {% include "components/form_field.html" with field=field only %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="mt-6 flex justify-end border-t border-slate-100 pt-5">
+                    <button class="erp-btn erp-btn--primary" type="submit">ذخیره تنظیمات شخصی</button>
+                </div>
+            </form>
+
+            <form method="post" class="erp-surface rounded-xl p-5 sm:p-6">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="password">
+                <div class="mb-6 border-b border-slate-100 pb-5">
+                    <h2 class="font-bold text-slate-900">تغییر گذرواژه</h2>
+                    <p class="mt-1 text-xs text-slate-500">برای امنیت حساب، ابتدا گذرواژه فعلی را وارد کنید.</p>
+                </div>
+                {% include "components/form_errors.html" with form=password_form only %}
+                <div class="space-y-5">
+                    {% for field in password_form %}
+                        {% include "components/form_field.html" with field=field only %}
+                    {% endfor %}
+                </div>
+                <div class="mt-6 flex justify-end border-t border-slate-100 pt-5">
+                    <button class="erp-btn erp-btn--primary" type="submit">تغییر گذرواژه</button>
+                </div>
+            </form>
+        </div>
+
+        <aside class="erp-surface h-fit rounded-xl p-5" aria-label="خلاصه حساب کاربری">
+            <h2 class="text-sm font-bold text-slate-900">خلاصه حساب</h2>
+            <dl class="mt-4 space-y-4 text-sm">
+                <div>
+                    <dt class="text-xs text-slate-500">نام کاربری</dt>
+                    <dd class="mt-1 font-medium text-slate-800" dir="ltr">{{ request.user.username }}</dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-500">وضعیت حساب</dt>
+                    <dd class="mt-1"><span class="erp-badge erp-badge--success">{{ request.user.account_status_label }}</span></dd>
+                </div>
+                <div>
+                    <dt class="text-xs text-slate-500">آخرین ورود</dt>
+                    <dd class="mt-1 text-slate-700">{{ request.user.last_login|date:"Y/m/d H:i"|default:"—" }}</dd>
+                </div>
+            </dl>
+            <p class="mt-5 border-t border-slate-100 pt-4 text-xs leading-6 text-slate-500">برای تغییر نام کاربری یا وضعیت حساب با مدیر سامانه تماس بگیرید.</p>
+        </aside>
+    </div>
+</div>
+{% endblock %}

@@ -1,8 +1,5 @@
-import hashlib
-import secrets
 import uuid
-from collections.abc import MutableMapping
-from datetime import timedelta
+from collections.abc import Mapping, MutableMapping
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
@@ -16,12 +13,9 @@ from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    InvitationRole,
-    InvitationStatus,
     MembershipRole,
     MembershipStatus,
     Organization,
-    OrganizationInvitation,
     OrganizationMembership,
     OrganizationRole,
     OrganizationSettings,
@@ -30,11 +24,22 @@ from apps.organizations.models import (
 from core.identifiers import canonicalize_lower_identifier
 
 ACTIVE_ORGANIZATION_SESSION_KEY = "active_organization_id"
-INVITATION_LIFETIME = timedelta(days=7)
-
-
-def _hash_invitation_token(token: str) -> str:
-    return hashlib.sha256(token.encode("utf-8")).hexdigest()
+_LOGO_UNSET = object()
+ORGANIZATION_PROFILE_FIELDS = (
+    "name",
+    "legal_name",
+    "slug",
+    "registration_number",
+    "national_id",
+    "economic_code",
+    "phone",
+    "email",
+    "website",
+    "province",
+    "city",
+    "address",
+    "postal_code",
+)
 
 
 def _resolve_active_role(role: OrganizationRole | str) -> OrganizationRole:
@@ -86,6 +91,44 @@ def _validate_role_delegation(
 
 
 @transaction.atomic
+def provision_user_for_organization(
+    *, organization: Organization, user: User, actor: User
+) -> OrganizationMembership:
+    """Assign a new account to a tenant without granting business access."""
+
+    if not actor.is_authenticated or not actor.is_active or not actor.is_superuser:
+        raise PermissionDenied("فقط ادمین سامانه می‌تواند کاربر را به شرکت تخصیص دهد.")
+    if not organization.is_active:
+        raise PermissionDenied("سازمان فعال نیست.")
+    if OrganizationMembership.objects.filter(
+        organization=organization,
+        user=user,
+    ).exists():
+        raise ValueError("این کاربر قبلاً به شرکت تخصیص داده شده است.")
+
+    membership = OrganizationMembership.objects.create(
+        organization=organization,
+        user=user,
+        role="",
+        role_definition=None,
+        status=MembershipStatus.PENDING_ROLE,
+        assigned_by=actor,
+    )
+    record_audit_event(
+        action=AuditAction.MEMBERSHIP_PROVISIONED,
+        entity_type="organization_membership",
+        entity_id=membership.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "target_user_id": str(user.pk),
+            "target_username": user.username,
+        },
+    )
+    return membership
+
+
+@transaction.atomic
 def update_organization_membership(
     *,
     organization: Organization,
@@ -99,36 +142,49 @@ def update_organization_membership(
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
     )
-    if (
-        locked_organization.status != OrganizationStatus.ACTIVE
-        or locked_organization.deleted_at is not None
-    ):
+    if not locked_organization.is_active:
         raise PermissionDenied("سازمان فعال نیست.")
 
-    actor_membership = require_business_permission(
-        user=actor,
-        organization=locked_organization,
-        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
-        message="اجازه مدیریت عضویت‌های این شرکت را ندارید.",
-    )
     role_definition = _resolve_active_role(role)
-    if status not in MembershipStatus.values:
+    if status not in MembershipStatus.values or status == MembershipStatus.PENDING_ROLE:
         raise ValueError("وضعیت عضویت معتبر نیست.")
 
     locked_membership = (
-        OrganizationMembership.objects.select_for_update()
+        OrganizationMembership.objects.select_for_update(of=("self",))
         .select_related("user", "role_definition")
         .get(pk=membership.pk)
     )
     if locked_membership.organization_id != locked_organization.pk:
         raise PermissionDenied("عضویت متعلق به این سازمان نیست.")
+    required_permissions = []
+    if locked_membership.role_definition_id != role_definition.pk:
+        required_permissions.append(BusinessPermissionCode.MEMBERSHIP_CHANGE_ROLE)
+    if locked_membership.status != status:
+        required_permissions.append(BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS)
+    if not required_permissions:
+        required_permissions.append(BusinessPermissionCode.MEMBERSHIP_VIEW)
+    actor_membership = None
+    for required_permission in required_permissions:
+        checked_membership = require_business_permission(
+            user=actor,
+            organization=locked_organization,
+            permission=required_permission,
+            message="اجازه مدیریت عضویت‌های این شرکت را ندارید.",
+        )
+        actor_membership = actor_membership or checked_membership
     actor_is_owner = bool(
         actor_membership and actor_membership.role_definition.is_owner
     )
     if (
         not actor.is_superuser
         and not actor_is_owner
-        and (locked_membership.role_definition.is_owner or role_definition.is_owner)
+        and (
+            (
+                locked_membership.role_definition_id is not None
+                and locked_membership.role_definition.is_owner
+            )
+            or role_definition.is_owner
+        )
     ):
         raise PermissionDenied("فقط مالک می‌تواند نقش مالک را مدیریت کند.")
     _validate_role_delegation(
@@ -139,7 +195,8 @@ def update_organization_membership(
     )
 
     owner_access_removed = (
-        locked_membership.role_definition.is_owner
+        locked_membership.role_definition_id is not None
+        and locked_membership.role_definition.is_owner
         and locked_membership.status == MembershipStatus.ACTIVE
         and (not role_definition.is_owner or status != MembershipStatus.ACTIVE)
     )
@@ -155,7 +212,11 @@ def update_organization_membership(
     ):
         raise ValueError("سازمان باید حداقل یک مالک فعال داشته باشد.")
 
-    previous_role = locked_membership.role_definition.code
+    previous_role = (
+        locked_membership.role_definition.code
+        if locked_membership.role_definition_id is not None
+        else None
+    )
     previous_status = locked_membership.status
     now = timezone.now()
     if previous_role != role_definition.code:
@@ -196,6 +257,27 @@ def update_organization_membership(
     if status == MembershipStatus.ACTIVE and locked_membership.joined_at == now:
         update_fields.append("joined_at")
     locked_membership.save(update_fields=update_fields)
+
+    if (
+        previous_status == MembershipStatus.PENDING_ROLE
+        and status == MembershipStatus.ACTIVE
+        and not locked_membership.user.is_active
+    ):
+        if locked_membership.user.blocked_at is not None:
+            raise PermissionDenied("حساب کاربر مسدود است و قابل فعال‌سازی نیست.")
+        locked_membership.user.is_active = True
+        locked_membership.user.save(update_fields=["is_active", "updated_at"])
+        record_audit_event(
+            action=AuditAction.USER_ACCOUNT_STATUS_CHANGED,
+            entity_type="user",
+            entity_id=locked_membership.user.pk,
+            actor=actor,
+            metadata={
+                "target_username": locked_membership.user.username,
+                "previous_status": "inactive",
+                "new_status": "active",
+            },
+        )
     return locked_membership
 
 
@@ -220,21 +302,24 @@ def update_organization_settings(
     timezone_name: str,
     currency: str,
     fiscal_year_start_month: int,
+    fiscal_year_start_day: int | None = None,
+    language: str | None = None,
+    project_code_prefix: str | None = None,
+    contract_code_prefix: str | None = None,
+    logo: object = _LOGO_UNSET,
+    profile_data: Mapping[str, str] | None = None,
 ) -> OrganizationSettings:
-    """Update tenant settings for an active owner or administrator only."""
+    """Update active-company identity and settings through one atomic boundary."""
 
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
     )
-    if (
-        locked_organization.status != OrganizationStatus.ACTIVE
-        or locked_organization.deleted_at is not None
-    ):
+    if not locked_organization.is_active:
         raise PermissionDenied("سازمان فعال نیست.")
     require_business_permission(
         user=updated_by,
         organization=locked_organization,
-        permission=BusinessPermissionCode.COMPANY_SETTINGS_MANAGE,
+        permission=BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
         message="اجازه به‌روزرسانی تنظیمات این شرکت را ندارید.",
     )
 
@@ -242,20 +327,47 @@ def update_organization_settings(
     settings_record.timezone = timezone_name
     settings_record.currency = currency
     settings_record.fiscal_year_start_month = fiscal_year_start_month
+    if fiscal_year_start_day is not None:
+        settings_record.fiscal_year_start_day = fiscal_year_start_day
+    if language is not None:
+        settings_record.language = language
+    if project_code_prefix is not None:
+        settings_record.project_code_prefix = project_code_prefix
+    if contract_code_prefix is not None:
+        settings_record.contract_code_prefix = contract_code_prefix
+    if logo is not _LOGO_UNSET:
+        settings_record.logo = logo
     settings_record.full_clean()
-    settings_record.save(
-        update_fields=[
-            "timezone",
-            "currency",
-            "fiscal_year_start_month",
-            "updated_at",
-        ]
-    )
+    settings_update_fields = [
+        "timezone",
+        "currency",
+        "fiscal_year_start_month",
+        "fiscal_year_start_day",
+        "language",
+        "project_code_prefix",
+        "contract_code_prefix",
+        "updated_at",
+    ]
+    if logo is not _LOGO_UNSET:
+        settings_update_fields.append("logo")
+    settings_record.save(update_fields=settings_update_fields)
+
+    if profile_data is not None:
+        for field_name in ORGANIZATION_PROFILE_FIELDS:
+            if field_name in profile_data:
+                setattr(locked_organization, field_name, profile_data[field_name])
     locked_organization.timezone = settings_record.timezone
     locked_organization.currency = settings_record.currency
     locked_organization.updated_by = updated_by
+    locked_organization.full_clean()
     locked_organization.save(
-        update_fields=["timezone", "currency", "updated_by", "updated_at"]
+        update_fields=[
+            *ORGANIZATION_PROFILE_FIELDS,
+            "timezone",
+            "currency",
+            "updated_by",
+            "updated_at",
+        ]
     )
     record_audit_event(
         action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
@@ -267,168 +379,13 @@ def update_organization_settings(
             "timezone": settings_record.timezone,
             "currency": settings_record.currency,
             "fiscal_year_start_month": settings_record.fiscal_year_start_month,
+            "fiscal_year_start_day": settings_record.fiscal_year_start_day,
+            "language": settings_record.language,
+            "project_code_prefix": settings_record.project_code_prefix,
+            "contract_code_prefix": settings_record.contract_code_prefix,
         },
     )
     return settings_record
-
-
-@transaction.atomic
-def create_organization_invitation(
-    *,
-    organization: Organization,
-    invited_by: User,
-    invitee: User,
-    role: OrganizationRole | str = InvitationRole.MEMBER,
-    expires_in: timedelta = INVITATION_LIFETIME,
-) -> tuple[OrganizationInvitation, str]:
-    """Create a hashed-token invitation for an existing user."""
-
-    if (
-        organization.status != OrganizationStatus.ACTIVE
-        or organization.deleted_at is not None
-    ):
-        raise PermissionDenied("سازمان فعال نیست.")
-    inviter_membership = require_business_permission(
-        user=invited_by,
-        organization=organization,
-        permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
-        message="اجازه دعوت عضو به این سازمان را ندارید.",
-    )
-    if invited_by == invitee:
-        raise ValueError("نمی‌توانید خودتان را دعوت کنید.")
-    role_definition = _resolve_active_role(role)
-    if role_definition.is_owner:
-        raise ValueError("نقش مالک شرکت از طریق دعوت‌نامه قابل تخصیص نیست.")
-    _validate_role_delegation(
-        actor=invited_by,
-        actor_membership=inviter_membership,
-        assigned_role=role_definition,
-    )
-
-    existing_membership = OrganizationMembership.objects.filter(
-        organization=organization,
-        user=invitee,
-    ).first()
-    if existing_membership and existing_membership.status == MembershipStatus.ACTIVE:
-        raise ValueError("کاربر از قبل عضو فعال سازمان است.")
-
-    now = timezone.now()
-    OrganizationInvitation.objects.filter(
-        organization=organization,
-        invitee=invitee,
-        status=InvitationStatus.PENDING,
-        expires_at__lte=now,
-    ).update(status=InvitationStatus.EXPIRED)
-
-    if OrganizationInvitation.objects.filter(
-        organization=organization,
-        invitee=invitee,
-        status=InvitationStatus.PENDING,
-    ).exists():
-        raise ValueError("یک دعوت‌نامه در انتظار از قبل وجود دارد.")
-
-    raw_token = secrets.token_urlsafe(32)
-    invitation = OrganizationInvitation.objects.create(
-        organization=organization,
-        invitee=invitee,
-        invited_by=invited_by,
-        role=role_definition.code,
-        role_definition=role_definition,
-        token_hash=_hash_invitation_token(raw_token),
-        expires_at=now + expires_in,
-    )
-    record_audit_event(
-        action=AuditAction.MEMBERSHIP_INVITED,
-        entity_type="organization_invitation",
-        entity_id=invitation.pk,
-        organization=organization,
-        actor=invited_by,
-        metadata={
-            "invitee_username": invitee.username,
-            "role": role_definition.code,
-        },
-    )
-    return invitation, raw_token
-
-
-def accept_organization_invitation(
-    *,
-    token: str,
-    user: User,
-) -> OrganizationMembership:
-    """Accept a valid invitation for its intended user."""
-
-    if not user.is_authenticated:
-        raise PermissionDenied("ورود به حساب کاربری الزامی است.")
-
-    expired = False
-    with transaction.atomic():
-        invitation = (
-            OrganizationInvitation.objects.select_for_update()
-            .select_related("organization", "invitee", "role_definition")
-            .filter(token_hash=_hash_invitation_token(token))
-            .first()
-        )
-        if invitation is None:
-            raise ValueError("دعوت‌نامه معتبر نیست.")
-        if invitation.invitee_id != user.id:
-            raise PermissionDenied("این دعوت‌نامه متعلق به کاربر دیگری است.")
-        if invitation.status != InvitationStatus.PENDING:
-            raise ValueError("دعوت‌نامه دیگر در وضعیت انتظار نیست.")
-
-        now = timezone.now()
-        if invitation.expires_at <= now:
-            invitation.status = InvitationStatus.EXPIRED
-            invitation.save(update_fields=["status", "updated_at"])
-            expired = True
-        else:
-            if invitation.organization.status != OrganizationStatus.ACTIVE:
-                raise ValueError("سازمان فعال نیست.")
-
-            membership, _ = OrganizationMembership.objects.get_or_create(
-                organization=invitation.organization,
-                user=user,
-                defaults={
-                    "role": invitation.role,
-                    "role_definition": invitation.role_definition,
-                    "status": MembershipStatus.ACTIVE,
-                    "joined_at": now,
-                    "invited_by": invitation.invited_by,
-                },
-            )
-            if membership.status != MembershipStatus.ACTIVE:
-                membership.role = invitation.role
-                membership.role_definition = invitation.role_definition
-                membership.status = MembershipStatus.ACTIVE
-                membership.joined_at = now
-                membership.invited_by = invitation.invited_by
-                membership.save(
-                    update_fields=[
-                        "role",
-                        "role_definition",
-                        "status",
-                        "joined_at",
-                        "invited_by",
-                        "updated_at",
-                    ]
-                )
-
-            invitation.status = InvitationStatus.ACCEPTED
-            invitation.accepted_at = now
-            invitation.save(update_fields=["status", "accepted_at", "updated_at"])
-            record_audit_event(
-                action=AuditAction.MEMBERSHIP_ACCEPTED,
-                entity_type="organization_membership",
-                entity_id=membership.pk,
-                organization=invitation.organization,
-                actor=user,
-                metadata={"role": membership.role_definition.code},
-            )
-            return membership
-
-    if expired:
-        raise ValueError("دعوت‌نامه منقضی شده است.")
-    raise ValueError("پذیرش دعوت‌نامه ممکن نشد.")
 
 
 @transaction.atomic
@@ -438,28 +395,64 @@ def create_organization_with_owner(
     name: str,
     slug: str,
     legal_name: str = "",
+    registration_number: str = "",
+    national_id: str = "",
+    economic_code: str = "",
+    phone: str = "",
+    email: str = "",
+    website: str = "",
+    province: str = "",
+    city: str = "",
+    address: str = "",
+    postal_code: str = "",
     timezone_name: str = "UTC",
     currency: str = "USD",
+    logo: object = None,
+    language: str = "fa",
+    fiscal_year_start_month: int = 1,
+    fiscal_year_start_day: int = 1,
+    project_code_prefix: str = "PRJ",
+    contract_code_prefix: str = "CTR",
 ) -> Organization:
     """Create an organization and its active owner membership atomically."""
 
     if not owner.is_authenticated or owner._state.adding or not owner.is_active:
         raise ValueError("کاربر واردشده به سامانه الزامی است.")
 
-    organization = Organization.objects.create(
+    organization = Organization(
         name=name,
         legal_name=legal_name,
         slug=canonicalize_lower_identifier(slug),
+        registration_number=registration_number,
+        national_id=national_id,
+        economic_code=economic_code,
+        phone=phone,
+        email=email,
+        website=website,
+        province=province,
+        city=city,
+        address=address,
+        postal_code=postal_code,
         timezone=timezone_name,
         currency=currency,
         created_by=owner,
         updated_by=owner,
     )
-    OrganizationSettings.objects.create(
+    organization.full_clean()
+    organization.save()
+    settings_record = OrganizationSettings(
         organization=organization,
+        logo=logo,
+        language=language,
         timezone=timezone_name,
         currency=currency,
+        fiscal_year_start_month=fiscal_year_start_month,
+        fiscal_year_start_day=fiscal_year_start_day,
+        project_code_prefix=project_code_prefix,
+        contract_code_prefix=contract_code_prefix,
     )
+    settings_record.full_clean()
+    settings_record.save()
     owner_role = OrganizationRole.objects.get(
         code=MembershipRole.COMPANY_OWNER,
         is_active=True,
@@ -472,7 +465,7 @@ def create_organization_with_owner(
         role_definition=owner_role,
         status=MembershipStatus.ACTIVE,
         joined_at=timezone.now(),
-        invited_by=None,
+        assigned_by=None,
     )
     record_audit_event(
         action=AuditAction.ORGANIZATION_CREATED,
@@ -492,8 +485,24 @@ def create_organization_by_system_admin(
     name: str,
     slug: str,
     legal_name: str = "",
+    registration_number: str = "",
+    national_id: str = "",
+    economic_code: str = "",
+    phone: str = "",
+    email: str = "",
+    website: str = "",
+    province: str = "",
+    city: str = "",
+    address: str = "",
+    postal_code: str = "",
     timezone_name: str = "UTC",
     currency: str = "USD",
+    logo: object = None,
+    language: str = "fa",
+    fiscal_year_start_month: int = 1,
+    fiscal_year_start_day: int = 1,
+    project_code_prefix: str = "PRJ",
+    contract_code_prefix: str = "CTR",
 ) -> Organization:
     """Create a tenant only when requested by the global system administrator."""
 
@@ -510,8 +519,24 @@ def create_organization_by_system_admin(
         name=name,
         slug=slug,
         legal_name=legal_name,
+        registration_number=registration_number,
+        national_id=national_id,
+        economic_code=economic_code,
+        phone=phone,
+        email=email,
+        website=website,
+        province=province,
+        city=city,
+        address=address,
+        postal_code=postal_code,
         timezone_name=timezone_name,
         currency=currency,
+        logo=logo,
+        language=language,
+        fiscal_year_start_month=fiscal_year_start_month,
+        fiscal_year_start_day=fiscal_year_start_day,
+        project_code_prefix=project_code_prefix,
+        contract_code_prefix=contract_code_prefix,
     )
 
 
@@ -525,6 +550,7 @@ def get_valid_memberships(user: Any) -> QuerySet[OrganizationMembership]:
             status=MembershipStatus.ACTIVE,
             organization__status=OrganizationStatus.ACTIVE,
             organization__deleted_at__isnull=True,
+            organization__archived_at__isnull=True,
             role_definition__is_active=True,
         )
         .select_related("organization", "role_definition")
@@ -540,9 +566,12 @@ def get_organization_members(
 ) -> QuerySet[OrganizationMembership]:
     """Return active members only after validating active tenant access."""
 
-    has_access = get_valid_memberships(user).filter(organization=organization).exists()
-    if not has_access:
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.MEMBERSHIP_VIEW,
+        message="اجازه مشاهده اعضای این شرکت را ندارید.",
+    )
     memberships = OrganizationMembership.objects.filter(organization=organization)
     if not include_inactive:
         memberships = memberships.filter(status=MembershipStatus.ACTIVE)

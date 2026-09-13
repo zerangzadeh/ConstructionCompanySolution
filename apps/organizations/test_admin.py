@@ -3,15 +3,23 @@ from django.test import RequestFactory, TestCase
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.organizations.admin import OrganizationAdmin, OrganizationRoleAdmin
-from apps.organizations.forms import OrganizationForm
+from apps.organizations.admin import (
+    OrganizationAdmin,
+    OrganizationRoleAdmin,
+    OrganizationRoleAdminForm,
+)
+from apps.organizations.forms import OrganizationAdminForm
 from apps.organizations.models import (
+    BusinessPermission,
+    BusinessPermissionCode,
     MembershipRole,
     MembershipStatus,
     Organization,
     OrganizationMembership,
     OrganizationRole,
+    OrganizationSettings,
 )
+from apps.organizations.services import create_organization_with_owner
 
 
 class OrganizationAdminTests(TestCase):
@@ -30,13 +38,18 @@ class OrganizationAdminTests(TestCase):
         self.assertTrue(self.model_admin.has_add_permission(request))
 
     def test_admin_creation_uses_organization_creation_service(self) -> None:
-        form = OrganizationForm(
+        form = OrganizationAdminForm(
             data={
                 "name": "شرکت سازه آزمون",
                 "legal_name": "شرکت سازه آزمون ایرانیان",
                 "slug": "test-construction-company",
-                "timezone": "Asia/Tehran",
-                "currency": "IRR",
+                "settings_timezone": "Asia/Tehran",
+                "default_currency": "IRR",
+                "language": "fa",
+                "fiscal_year_start_month": 1,
+                "fiscal_year_start_day": 1,
+                "project_code_prefix": "PRJ",
+                "contract_code_prefix": "CTR",
             }
         )
         self.assertTrue(form.is_valid())
@@ -53,6 +66,61 @@ class OrganizationAdminTests(TestCase):
         self.assertEqual(membership.role, MembershipRole.COMPANY_OWNER)
         self.assertEqual(membership.status, MembershipStatus.ACTIVE)
         self.assertEqual(organization.settings.timezone, "Asia/Tehran")
+
+    def test_settings_are_not_registered_as_a_separate_admin_section(self) -> None:
+        self.assertNotIn(OrganizationSettings, admin.site._registry)
+
+    def test_admin_change_page_loads_and_saves_company_and_settings(self) -> None:
+        organization = create_organization_with_owner(
+            owner=self.user,
+            name="شرکت اولیه",
+            slug="initial-company",
+            timezone_name="UTC",
+            currency="USD",
+        )
+        form = OrganizationAdminForm(
+            data={
+                "name": "شرکت ویرایش‌شده",
+                "legal_name": "شرکت ویرایش‌شده ایرانیان",
+                "slug": "updated-company",
+                "city": "تهران",
+                "settings_timezone": "Asia/Tehran",
+                "default_currency": "IRR",
+                "language": "fa",
+                "fiscal_year_start_month": 1,
+                "fiscal_year_start_day": 1,
+                "project_code_prefix": "SITE",
+                "contract_code_prefix": "CON",
+            },
+            instance=organization,
+        )
+        self.assertTrue(form.is_valid(), form.errors)
+        request = RequestFactory().post(
+            f"/admin/organizations/organization/{organization.pk}/change/"
+        )
+        request.user = self.user
+        changed_organization = form.save(commit=False)
+
+        self.model_admin.save_model(
+            request,
+            changed_organization,
+            form,
+            change=True,
+        )
+
+        organization.refresh_from_db()
+        self.assertEqual(organization.name, "شرکت ویرایش‌شده")
+        self.assertEqual(organization.city, "تهران")
+        self.assertEqual(organization.timezone, "Asia/Tehran")
+        self.assertEqual(organization.settings.currency, "IRR")
+        self.assertEqual(organization.settings.project_code_prefix, "SITE")
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                organization=organization,
+                actor=self.user,
+                action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
+            ).exists()
+        )
 
 
 class OrganizationRoleAdminTests(TestCase):
@@ -78,6 +146,18 @@ class OrganizationRoleAdminTests(TestCase):
         self.assertTrue(self.model_admin.has_change_permission(admin_request))
         self.assertFalse(self.model_admin.has_add_permission(staff_request))
         self.assertFalse(self.model_admin.has_change_permission(staff_request))
+
+    def test_role_form_displays_searchable_grouped_permission_catalog(self) -> None:
+        permission = BusinessPermission.objects.get(
+            code=BusinessPermissionCode.PROJECTS_CREATE
+        )
+        field = OrganizationRoleAdminForm().fields["permissions"]
+
+        self.assertEqual(
+            field.label_from_instance(permission),
+            "پروژه‌ها | ایجاد پروژه | projects.create",
+        )
+        self.assertGreaterEqual(field.queryset.count(), 100)
 
     def test_admin_can_delete_only_unused_custom_role_and_action_is_audited(
         self,

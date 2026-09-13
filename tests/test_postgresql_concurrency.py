@@ -26,16 +26,10 @@ from apps.inventory.services import (
 )
 from apps.materials.models import Material, UnitCategory, UnitOfMeasure
 from apps.organizations.models import (
-    InvitationStatus,
     MembershipRole,
     MembershipStatus,
     Organization,
-    OrganizationInvitation,
     OrganizationMembership,
-)
-from apps.organizations.services import (
-    accept_organization_invitation,
-    create_organization_invitation,
 )
 from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.payments.services import void_payment
@@ -54,10 +48,6 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
             self.skipTest("PostgreSQL row-lock semantics are required.")
 
         self.owner = User.objects.create_user(username="lock-owner", password="test")
-        self.invitee = User.objects.create_user(
-            username="lock-invitee",
-            password="test",
-        )
         self.organization = Organization.objects.create(
             name="Locking Company",
             slug="locking-company",
@@ -69,11 +59,6 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
-        )
-        self.invitation, self.invitation_token = create_organization_invitation(
-            organization=self.organization,
-            invited_by=self.owner,
-            invitee=self.invitee,
         )
         self.project = Project.objects.create(
             organization=self.organization,
@@ -217,33 +202,6 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
         failures = [result for result in results if result is not None]
         self.assertEqual(len(failures), 1, results)
         self.assertIsInstance(failures[0], ValueError)
-
-    def test_concurrent_invitation_acceptance_has_one_winner(self) -> None:
-        def accept() -> object:
-            return accept_organization_invitation(
-                token=self.invitation_token,
-                user=User.objects.get(pk=self.invitee.pk),
-            )
-
-        self._assert_one_success_and_one_state_rejection(self._run_race(accept))
-
-        invitation = OrganizationInvitation.objects.get(pk=self.invitation.pk)
-        self.assertEqual(invitation.status, InvitationStatus.ACCEPTED)
-        self.assertEqual(
-            OrganizationMembership.objects.filter(
-                organization=self.organization,
-                user=self.invitee,
-                status=MembershipStatus.ACTIVE,
-            ).count(),
-            1,
-        )
-        self.assertEqual(
-            AuditEvent.objects.filter(
-                organization=self.organization,
-                action=AuditAction.MEMBERSHIP_ACCEPTED,
-            ).count(),
-            1,
-        )
 
     def test_concurrent_estimate_approval_has_one_winner(self) -> None:
         def approve() -> object:

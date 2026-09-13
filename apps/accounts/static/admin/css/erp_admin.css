@@ -450,6 +450,42 @@ form div.help {
     font-size: 12px;
 }
 
+/* ClearableFileInput renders Persian labels alongside LTR storage paths. */
+.clearable-file-input {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    max-width: 100%;
+    direction: rtl;
+}
+
+.clearable-file-input__current,
+.clearable-file-input__clear,
+.clearable-file-input__replacement {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.clearable-file-input__current {
+    flex: 1 1 100%;
+}
+
+.clearable-file-input__filename {
+    direction: ltr;
+    unicode-bidi: plaintext;
+    overflow: hidden;
+    max-width: min(100%, 420px);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.clearable-file-input__replacement input[type="file"] {
+    max-width: 100%;
+}
+
 .selector {
     direction: rtl;
 }
@@ -519,13 +555,7 @@ input[name*="uuid"],
 .vURLField,
 .vIntegerField,
 .vBigIntegerField,
-.vDecimalField,
-.field-id,
-.field-pk,
-.field-email,
-[class*="field-code"],
-[class*="field-number"],
-[class*="field-uuid"] {
+.vDecimalField {
     direction: ltr;
     text-align: left;
     unicode-bidi: plaintext;
@@ -584,6 +614,389 @@ input[name*="uuid"],
     .object-tools {
         float: none;
     }
+}
+
+/* Admin login ------------------------------------------------------------ */
+body.login {
+    --erp-login-deep: #0b1930;
+    --erp-login-deep-muted: #172a46;
+    --erp-login-card: #ffffff;
+    --erp-login-control: #f8fafc;
+    --erp-login-shadow: 0 28px 70px rgba(15, 23, 42, 0.14);
+    min-width: 0;
+    background:
+        radial-gradient(circle at 12% 16%, rgba(37, 99, 235, 0.11), transparent 27rem),
+        linear-gradient(145deg, #f8fafc 0%, #eef4fb 100%);
+}
+
+body.login #container {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    min-height: 100vh;
+    flex-direction: column;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+}
+
+body.login #header {
+    width: min(1120px, calc(100% - 48px));
+    min-height: 72px;
+    box-sizing: border-box;
+    margin: 24px auto 0;
+    padding: 0 22px;
+    border: 1px solid rgba(203, 213, 225, 0.75);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.82);
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+    backdrop-filter: blur(14px);
+}
+
+body.login #branding {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+}
+
+body.login #branding h1 { margin: 0; }
+body.login #site-name a { align-items: center; }
+
+body.login .main {
+    display: flex;
+    min-height: 0;
+    flex: 1 0 auto;
+    align-items: center;
+}
+
+body.login #content {
+    width: min(100%, 1040px);
+    box-sizing: border-box;
+    margin: 0 auto;
+    padding: 48px 24px 64px;
+}
+
+body.login #content-main { width: 100%; }
+
+.erp-admin-login-shell {
+    display: grid;
+    min-height: 540px;
+    overflow: hidden;
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    border-radius: 20px;
+    background: var(--erp-login-card);
+    box-shadow: var(--erp-login-shadow);
+    grid-template-columns: minmax(320px, 0.92fr) minmax(400px, 1.08fr);
+}
+
+.erp-admin-login-intro {
+    display: flex;
+    position: relative;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 52px 48px 42px;
+    background:
+        radial-gradient(circle at 10% 12%, rgba(59, 130, 246, 0.34), transparent 17rem),
+        linear-gradient(150deg, var(--erp-login-deep-muted), var(--erp-login-deep));
+    color: #ffffff;
+}
+
+.erp-admin-login-intro::before,
+.erp-admin-login-intro::after {
+    position: absolute;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    border-radius: 999px;
+    content: "";
+}
+
+.erp-admin-login-intro::before {
+    width: 310px;
+    height: 310px;
+    right: -175px;
+    bottom: -128px;
+}
+
+.erp-admin-login-intro::after {
+    width: 210px;
+    height: 210px;
+    right: -125px;
+    bottom: -78px;
+}
+
+.erp-admin-login-intro > * { position: relative; z-index: 1; }
+
+.erp-admin-login-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #bfdbfe;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.erp-admin-login-kicker > span {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: #60a5fa;
+    box-shadow: 0 0 0 5px rgba(96, 165, 250, 0.12);
+}
+
+.erp-admin-login-intro h1 {
+    max-width: 390px;
+    margin: 28px 0 0;
+    color: #ffffff;
+    font-size: clamp(30px, 3.2vw, 43px);
+    font-weight: 700;
+    line-height: 1.55;
+    letter-spacing: -0.035em;
+}
+
+.erp-admin-login-intro > div > p {
+    max-width: 390px;
+    margin: 16px 0 0;
+    color: #cbd5e1;
+    font-size: 14px;
+    line-height: 2;
+}
+
+.erp-admin-login-assurance {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(148, 163, 184, 0.18);
+}
+
+.erp-admin-login-assurance svg {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    fill: none;
+    stroke: #60a5fa;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.erp-admin-login-assurance span { display: flex; min-width: 0; flex-direction: column; }
+.erp-admin-login-assurance strong { color: #f8fafc; font-size: 12px; }
+.erp-admin-login-assurance small { margin-top: 2px; color: #94a3b8; font-size: 10px; line-height: 1.7; }
+
+.erp-admin-login-form-panel {
+    display: flex;
+    min-width: 0;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
+    padding: 52px 64px;
+}
+
+.erp-admin-login-heading { display: flex; align-items: center; gap: 13px; }
+
+.erp-admin-login-icon {
+    display: grid;
+    width: 46px;
+    height: 46px;
+    flex: 0 0 46px;
+    place-items: center;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.erp-admin-login-icon svg,
+.erp-admin-login-alert svg,
+.erp-admin-login-control svg,
+.erp-admin-login-submit svg,
+.erp-admin-login-footnote svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.erp-admin-login-icon svg { width: 24px; height: 24px; }
+.erp-admin-login-heading p { margin: 0 0 2px; color: #2563eb; font-size: 11px; font-weight: 700; }
+.erp-admin-login-heading h2 { margin: 0; color: #0f172a; font-size: 22px; font-weight: 700; line-height: 1.5; }
+.erp-admin-login-lead { margin: 18px 0 28px; color: #64748b; font-size: 13px; line-height: 1.8; }
+
+.erp-admin-login-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin: 0 0 18px;
+    padding: 11px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+.erp-admin-login-alert svg { width: 18px; height: 18px; flex: 0 0 18px; margin-top: 2px; }
+body.login #login-form { margin: 0; }
+.erp-admin-login-field + .erp-admin-login-field { margin-top: 19px; }
+
+.erp-admin-login-field > label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.erp-admin-login-control { position: relative; }
+.erp-admin-login-control > svg {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    right: 14px;
+    width: 19px;
+    height: 19px;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+body.login .erp-admin-login-control input {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 11px 44px 11px 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: var(--erp-login-control);
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 14px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+body.login .erp-admin-login-control input:focus {
+    border-color: #3b82f6;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    outline: 0;
+}
+
+.erp-admin-login-field.has-error .erp-admin-login-control input { border-color: #ef4444; }
+.erp-admin-login-field .errorlist { margin: 6px 0 0; padding: 0; color: #b91c1c; font-size: 11px; list-style: none; }
+.erp-admin-login-help { margin-top: 12px; text-align: left; }
+.erp-admin-login-help a { color: #2563eb; font-size: 11px; font-weight: 700; }
+
+.erp-admin-login-submit {
+    display: flex;
+    width: 100%;
+    min-height: 48px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    box-sizing: border-box;
+    margin-top: 24px;
+    padding: 10px 18px;
+    border: 1px solid #1d4ed8;
+    border-radius: 10px;
+    background: #2563eb;
+    color: #ffffff;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.erp-admin-login-submit:hover { background: #1d4ed8; box-shadow: 0 10px 24px rgba(37, 99, 235, 0.26); transform: translateY(-1px); }
+.erp-admin-login-submit:active { transform: translateY(0); }
+.erp-admin-login-submit svg { width: 18px; height: 18px; }
+
+.erp-admin-login-footnote {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin: 26px 0 0;
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.erp-admin-login-footnote svg { width: 15px; height: 15px; }
+
+html[data-theme="dark"] body.login {
+    --erp-login-card: #111827;
+    --erp-login-control: #0f172a;
+    --erp-login-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+    background: radial-gradient(circle at 12% 16%, rgba(37, 99, 235, 0.13), transparent 27rem), #0b1220;
+}
+
+html[data-theme="dark"] body.login #header { border-color: #334155; background: rgba(17, 24, 39, 0.86); }
+html[data-theme="dark"] .erp-admin-login-shell { border-color: #334155; }
+html[data-theme="dark"] .erp-admin-login-heading h2 { color: #f8fafc; }
+html[data-theme="dark"] .erp-admin-login-lead,
+html[data-theme="dark"] .erp-admin-login-field > label { color: #cbd5e1; }
+html[data-theme="dark"] .erp-admin-login-icon { border-color: #1e3a8a; background: #172554; color: #60a5fa; }
+html[data-theme="dark"] body.login .erp-admin-login-control input { border-color: #475569; color: #f8fafc; }
+html[data-theme="dark"] body.login .erp-admin-login-control input:focus { border-color: #60a5fa; background: #111827; }
+html[data-theme="dark"] .erp-admin-login-alert { border-color: #7f1d1d; background: #2b1518; color: #fca5a5; }
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] body.login {
+        --erp-login-card: #111827;
+        --erp-login-control: #0f172a;
+        --erp-login-shadow: 0 28px 70px rgba(0, 0, 0, 0.35);
+        background: radial-gradient(circle at 12% 16%, rgba(37, 99, 235, 0.13), transparent 27rem), #0b1220;
+    }
+    html[data-theme="auto"] body.login #header { border-color: #334155; background: rgba(17, 24, 39, 0.86); }
+    html[data-theme="auto"] .erp-admin-login-shell { border-color: #334155; }
+    html[data-theme="auto"] .erp-admin-login-heading h2 { color: #f8fafc; }
+    html[data-theme="auto"] .erp-admin-login-lead,
+    html[data-theme="auto"] .erp-admin-login-field > label { color: #cbd5e1; }
+    html[data-theme="auto"] .erp-admin-login-icon { border-color: #1e3a8a; background: #172554; color: #60a5fa; }
+    html[data-theme="auto"] body.login .erp-admin-login-control input { border-color: #475569; color: #f8fafc; }
+    html[data-theme="auto"] body.login .erp-admin-login-control input:focus { border-color: #60a5fa; background: #111827; }
+    html[data-theme="auto"] .erp-admin-login-alert { border-color: #7f1d1d; background: #2b1518; color: #fca5a5; }
+}
+
+@media (max-width: 760px) {
+    body.login #header {
+        width: calc(100% - 28px);
+        min-height: 64px;
+        margin-top: 14px;
+        padding: 0 14px;
+    }
+    body.login .erp-admin-brand { font-size: 14px; }
+    body.login .erp-admin-brand-label { font-size: 10px; }
+    body.login .erp-admin-logo { width: 34px; height: 34px; }
+    body.login #content { padding: 24px 14px 36px; }
+    .erp-admin-login-shell { min-height: 0; grid-template-columns: minmax(0, 1fr); border-radius: 16px; }
+    .erp-admin-login-intro { min-height: 190px; padding: 30px 26px 26px; }
+    .erp-admin-login-intro h1 { margin-top: 18px; font-size: 26px; line-height: 1.45; }
+    .erp-admin-login-intro > div > p { margin-top: 10px; font-size: 12px; line-height: 1.8; }
+    .erp-admin-login-assurance { display: none; }
+    .erp-admin-login-form-panel { padding: 32px 26px 30px; }
+}
+
+@media (max-width: 420px) {
+    body.login #header { padding-inline: 11px; }
+    body.login .erp-admin-brand-label { display: none; }
+    .erp-admin-login-intro { min-height: 170px; padding: 25px 22px 22px; }
+    .erp-admin-login-intro h1 { font-size: 23px; }
+    .erp-admin-login-form-panel { padding: 28px 20px 26px; }
+    .erp-admin-login-heading h2 { font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .erp-admin-login-submit { transition: none; }
 }
 
 /* Approved ERP visual system ------------------------------------------------ */
@@ -1060,11 +1473,7 @@ input[type="email"],
 input[name*="username"],
 input[name*="slug"],
 input[name*="token"],
-input[name*="hash"],
-.field-username,
-.field-slug,
-.field-token_hash,
-.field-sha256 {
+input[name*="hash"] {
     direction: ltr;
     text-align: left;
     unicode-bidi: plaintext;
@@ -3022,6 +3431,500 @@ body.app-accounts.model-user.change-form #content {
 
     .erp-description-grid > div:last-child {
         border-bottom: 0;
+    }
+}
+
+/* Civil Slate final alignment -------------------------------------------- */
+html,
+body,
+#container {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+#header {
+    min-height: 60px;
+    padding-inline: 22px;
+    border-bottom-color: #e2e8f0;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: none;
+}
+
+#nav-sidebar {
+    background: #0f172a;
+    box-shadow: none;
+}
+
+.erp-admin-logo {
+    border-radius: 8px;
+    background: #1d4ed8;
+    box-shadow: none;
+}
+
+.module,
+.inline-group,
+#changelist-filter,
+.submit-row,
+#changelist .results,
+.erp-user-hero,
+.erp-user-section {
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+}
+
+#content h1 {
+    font-size: 24px;
+    line-height: 1.45;
+}
+
+#changelist .results {
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 #f1f5f9;
+}
+
+.erp-status-badge {
+    border-radius: 6px;
+}
+
+@media (max-width: 767px) {
+    #header { padding-inline: 14px; }
+    #content { padding: 18px 14px; }
+}
+
+/* Change forms: stable RTL alignment across every Admin model ------------ */
+body.change-form #content-main {
+    float: none;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+}
+
+body.change-form #content-main > form,
+body.change-form #content-main > form > div,
+body.change-form fieldset.module,
+body.change-form .inline-group {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+}
+
+body.change-form fieldset.module {
+    margin-bottom: 18px;
+}
+
+body.change-form fieldset.module > h2,
+body.change-form fieldset.module > details > summary {
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 11px 16px;
+    text-align: right;
+}
+
+body.change-form .aligned .form-row {
+    direction: rtl;
+    padding: 12px 16px;
+}
+
+body.change-form .aligned .form-row > div,
+body.change-form .aligned .form-row > div > .flex-container {
+    width: 100%;
+    min-width: 0;
+}
+
+body.change-form .aligned .form-row > div > .flex-container {
+    display: grid;
+    grid-template-columns: minmax(150px, 190px) minmax(0, 560px);
+    align-items: center;
+    justify-content: start;
+    gap: 6px 16px;
+    direction: rtl;
+}
+
+body.change-form .aligned .form-row > div > .flex-container > label {
+    float: none;
+    box-sizing: border-box;
+    width: auto;
+    min-height: 40px;
+    margin: 0;
+    padding: 8px 0;
+    direction: rtl;
+    text-align: right;
+    line-height: 1.7;
+}
+
+body.change-form .aligned .form-row :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+    select,
+    textarea
+) {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 560px;
+    margin: 0;
+}
+
+body.change-form .aligned .form-row textarea {
+    resize: vertical;
+}
+
+body.change-form .aligned .form-row .help,
+body.change-form .aligned .form-row ul.errorlist {
+    grid-column: 2;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+}
+
+body.change-form .aligned .form-row .help {
+    padding-top: 2px;
+}
+
+body.change-form .aligned .form-row .erp-password-status {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    max-width: 560px;
+    min-height: 64px;
+    box-sizing: border-box;
+    padding: 12px 14px;
+    border: 1px solid #dbe4ef;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+body.change-form .erp-password-status__copy {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+body.change-form .erp-password-status__copy strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+body.change-form .erp-password-status__copy span {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+body.change-form .erp-password-status__action {
+    display: flex;
+    align-items: center;
+}
+
+body.change-form .erp-password-status .button {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    box-sizing: border-box;
+    float: none;
+    margin: 0;
+    padding: 7px 12px;
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: nowrap;
+}
+
+body.change-form .aligned .form-row .checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+body.change-form .aligned .form-row .checkbox-row label {
+    min-height: auto;
+    padding: 0;
+}
+
+body.change-form .submit-row {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 66px;
+    justify-content: flex-start;
+    padding: 12px 14px;
+}
+
+body.change-form .submit-row :is(input, a) {
+    display: inline-flex;
+    min-width: 112px;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    text-align: center;
+}
+
+body.change-form .submit-row .deletelink {
+    min-width: auto;
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+}
+
+/* Django's dual-list permission widget needs its own two-column layout. */
+body.change-form .selector {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    align-items: stretch;
+    gap: 10px;
+    width: min(100%, 920px);
+    max-width: 100%;
+}
+
+body.change-form .aligned .form-row .selector {
+    grid-column: 1 / -1;
+    grid-row: 2;
+}
+
+body.change-form .aligned .form-row .selector + label {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+body.change-form .selector :is(label, .helptext) {
+    min-height: auto;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+}
+
+body.change-form .selector .selector-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.change-form .selector select {
+    max-width: none;
+}
+
+body.change-form .selector .selector-available,
+body.change-form .selector .selector-chosen {
+    width: auto;
+    min-width: 0;
+}
+
+body.change-form .selector .selector-chooser {
+    align-self: center;
+    width: 44px;
+    margin: 0;
+}
+
+@media (max-width: 767px) {
+    body.change-form .aligned .form-row {
+        padding: 12px 14px;
+    }
+
+    body.change-form .aligned .form-row > div > .flex-container {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+    }
+
+    body.change-form .aligned .form-row > div > .flex-container > label {
+        min-height: auto;
+        padding: 0;
+    }
+
+    body.change-form .aligned .form-row .help,
+    body.change-form .aligned .form-row ul.errorlist {
+        grid-column: 1;
+    }
+
+    body.change-form .aligned .form-row .erp-password-status {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    body.change-form .erp-password-status__action,
+    body.change-form .erp-password-status .button {
+        width: 100%;
+    }
+
+    body.change-form .erp-password-status .button {
+        justify-content: center;
+    }
+
+    body.change-form .submit-row :is(input, a) {
+        width: 100%;
+    }
+
+    body.change-form .submit-row .deletelink {
+        margin-inline-start: 0;
+    }
+
+    body.change-form .selector {
+        display: flex;
+        flex-direction: column;
+        grid-column: 1;
+        grid-row: auto;
+    }
+
+    body.change-form .aligned .form-row .selector + label {
+        grid-column: 1;
+        grid-row: auto;
+        order: -1;
+    }
+
+body.change-form .selector .selector-chooser {
+        align-self: center;
+        transform: rotate(90deg);
+    }
+}
+
+/* Keep the login composition isolated from later generic Admin rules. */
+body.login #content .erp-admin-login-intro h1 {
+    margin: 28px 0 0;
+    color: #ffffff;
+    font-size: clamp(30px, 3.2vw, 43px);
+    line-height: 1.55;
+}
+
+body.login #container {
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+body.login #content .erp-admin-login-intro h1 span {
+    display: block;
+}
+
+body.login #content .erp-admin-login-form-panel h2 {
+    color: #0f172a;
+}
+
+html[data-theme="dark"] body.login #content .erp-admin-login-form-panel h2 {
+    color: #f8fafc;
+}
+
+@media (prefers-color-scheme: dark) {
+    html[data-theme="auto"] body.login #content .erp-admin-login-form-panel h2 {
+        color: #f8fafc;
+    }
+}
+
+@media (max-width: 760px) {
+    body.login #header {
+        flex-direction: row;
+    }
+
+    body.login #branding {
+        width: 100%;
+    }
+
+    body.login #site-name a {
+        flex-direction: row;
+    }
+
+    body.login #content .erp-admin-login-intro h1 {
+        margin-top: 18px;
+        font-size: 26px;
+        line-height: 1.45;
+    }
+}
+
+@media (max-width: 420px) {
+    body.login #content .erp-admin-login-intro h1 {
+        font-size: 23px;
+    }
+}
+
+/* Keep page actions in normal flow on every Admin list/detail page. */
+body.change-list #content-main > ul.object-tools,
+body.change-form #content-main > ul.object-tools {
+    display: flex !important;
+    position: static;
+    inset: auto;
+    z-index: auto;
+    float: none;
+    clear: both;
+    width: 100%;
+    min-height: 40px;
+    height: auto;
+    box-sizing: border-box;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin: 0 0 16px;
+    padding: 0;
+    overflow: visible;
+    transform: none;
+    list-style: none;
+}
+
+body.change-list #content-main > ul.object-tools > li,
+body.change-form #content-main > ul.object-tools > li {
+    display: block;
+    float: none;
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+
+body.change-list #content-main > ul.object-tools > li > a,
+body.change-form #content-main > ul.object-tools > li > a {
+    float: none;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+/* Keep public-login image controls aligned in the custom Admin form layout. */
+body.change-form .aligned .form-row .clearable-file-input {
+    display: grid;
+    width: min(100%, 560px);
+    gap: 10px;
+    direction: rtl;
+}
+
+body.change-form .aligned .form-row .clearable-file-input__existing,
+body.change-form .aligned .form-row .clearable-file-input__replacement {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+}
+
+body.change-form .aligned .form-row .clearable-file-input__existing {
+    justify-content: space-between;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid var(--hairline-color);
+    border-radius: 6px;
+    background: var(--darkened-bg);
+}
+
+body.change-form .aligned .form-row .clearable-file-input__filename {
+    direction: rtl;
+    overflow: visible;
+    max-width: none;
+    font-weight: 700;
+    white-space: normal;
+}
+
+body.change-form .aligned .form-row .clearable-file-input__clear {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+body.change-form .aligned .form-row .clearable-file-input__replacement input[type="file"] {
+    width: min(100%, 420px);
+}
+
+@media (max-width: 640px) {
+    body.change-list #content-main > ul.object-tools > li,
+    body.change-list #content-main > ul.object-tools > li > a {
+        width: 100%;
+    }
+
+    body.change-form .aligned .form-row .clearable-file-input__existing {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 

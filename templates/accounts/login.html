@@ -3,43 +3,40 @@
 {% block title %}ورود | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
-    <div dir="rtl" class="mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center">
-        <div class="erp-surface w-full rounded-xl p-6 sm:p-8">
-            <div class="mb-6">
-                <p class="text-xs font-semibold text-blue-600">سامانه مدیریت ساخت</p>
-                <h1 class="mt-2 text-2xl font-bold tracking-tight">ورود</h1>
-                <p class="mt-2 text-sm text-slate-500">برای ادامه نام کاربری و گذرواژه خود را وارد کنید.</p>
+{% if login_page_settings.background_image %}
+    <div class="fixed inset-0 z-0 bg-cover bg-center" style="background-image: url('{% url 'accounts:login-background' %}?v={{ login_page_settings.updated_at|date:'U' }}')" aria-hidden="true"></div>
+    <div class="fixed inset-0 z-0 bg-slate-950/45" aria-hidden="true"></div>
+{% endif %}
+<div dir="rtl" class="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-5xl items-center">
+    <section class="erp-surface grid w-full overflow-hidden rounded-xl shadow-xl lg:grid-cols-[1.05fr_.95fr]" aria-labelledby="login-title">
+        <div class="order-2 p-6 sm:p-8 lg:order-1 lg:p-10">
+            <div class="mb-7">
+                <p class="text-xs font-semibold text-blue-700">ورود امن به فضای کاری</p>
+                <h1 id="login-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ورود به سازه‌یار</h1>
+                <p class="mt-2 text-sm leading-6 text-slate-500">برای ادامه، نام کاربری و گذرواژهٔ سازمانی خود را وارد کنید.</p>
             </div>
             <form method="post" class="space-y-5">
                 {% csrf_token %}
                 {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
                 {% include "components/form_errors.html" with form=form only %}
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.username.id_for_label }}">
-                        نام کاربری
-                    </label>
-                    <div dir="ltr">
-                        {{ form.username }}
-                    </div>
-                    {% if form.username.errors %}
-                        <p class="mt-1 text-sm text-red-600" role="alert">{{ form.username.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-                <div>
-                    <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.password.id_for_label }}">
-                        گذرواژه
-                    </label>
-                    <div dir="ltr">
-                        {{ form.password }}
-                    </div>
-                    {% if form.password.errors %}
-                        <p class="mt-1 text-sm text-red-600" role="alert">{{ form.password.errors|striptags }}</p>
-                    {% endif %}
-                </div>
-                <button class="w-full rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">
-                    ورود
-                </button>
+                {% include "components/form_field.html" with field=form.username only %}
+                {% include "components/form_field.html" with field=form.password only %}
+                <button class="erp-btn erp-btn--primary w-full" type="submit">ورود به سامانه</button>
             </form>
+            <p class="mt-5 border-t border-slate-100 pt-4 text-[11px] leading-5 text-slate-500">دسترسی به اطلاعات هر سازمان بر اساس عضویت فعال و سطح مجوز شما کنترل می‌شود.</p>
         </div>
-    </div>
+        <div class="order-1 flex min-h-56 flex-col bg-slate-900 p-6 text-white sm:p-8 lg:order-2 lg:min-h-[31rem] lg:p-10">
+            <div>
+                <span class="grid h-11 w-11 place-items-center rounded-lg bg-blue-600 ring-1 ring-blue-400/40"><svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11M12 6v2m0 3v2m0 3v2"/></svg></span>
+                <p class="mt-6 text-xs font-semibold text-blue-300">{{ login_page_settings.panel_label }}</p>
+                <h2 class="mt-2 text-2xl font-bold leading-10">{{ login_page_settings.panel_title }}</h2>
+                <p class="mt-3 max-w-md whitespace-pre-line text-sm leading-7 text-slate-300">{{ login_page_settings.panel_description }}</p>
+            </div>
+            {% if login_page_settings.panel_image %}
+                <img class="mt-6 min-h-48 w-full flex-1 rounded-lg border border-slate-700/70 object-cover lg:min-h-64" src="{% url 'accounts:login-panel-image' %}?v={{ login_page_settings.updated_at|date:'U' }}" alt="تصویر معرفی سامانه">
+            {% endif %}
+            <div class="mt-auto flex items-center gap-2 border-t border-slate-800 pt-5 text-[11px] text-slate-400{% if login_page_settings.panel_image %} mt-6{% else %} mt-8{% endif %}"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span><span>{{ login_page_settings.panel_footer }}</span></div>
+        </div>
+    </section>
+</div>
 {% endblock %}

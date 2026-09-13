@@ -62,19 +62,19 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F4 — Equipment
 
-- **Status:** NEXT
+- **Status:** IMPLEMENTED
 - **Goal:** Manage equipment ownership, deployment, usage, maintenance, and
   related operational records.
-- **Main scope/entities:** `Equipment`, `EquipmentAssignment`,
-  `MaintenanceRecord`, fuel/usage records, and integration with projects, sites,
-  inventory, and daily reports.
+- **Main scope/entities:** `Equipment`, `EquipmentAssignment`, and
+  `MaintenanceRecord`, with project/site integration. Structured usage, full fuel
+  management, and daily-report/cost integration remain deferred.
 - **Done When:** Equipment lifecycle and assignments are conflict-safe,
   tenant-isolated, auditable, and existing free-text daily entries remain valid
   historical snapshots.
 
 ## F5 — Billing & Progress Claims
 
-- **Status:** PLANNED
+- **Status:** NEXT
 - **Goal:** Support controlled project progress measurement and receivables from
   approved work through claim and settlement.
 - **Main scope/entities:** `ProjectBaseline`, `ProgressRecord`, `ProgressClaim`,
@@ -97,11 +97,16 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F7 — Safety & Quality
 
-- **Status:** PLANNED
+- **Status:** PARTIALLY IMPLEMENTED (Safety incidents and quality issues)
 - **Goal:** Add optional standalone incident, inspection, corrective-action, and
   non-conformity workflows for tenants that require formal controls.
-- **Main scope/entities:** `SafetyIncident`, `QualityIssue`, inspections, risks,
-  corrective actions, project/site links, and document links.
+- **Implemented scope:** Tenant-scoped `SafetyIncident` reporting, review,
+  assignment, corrective action, resolution, closure, RBAC, audit, and optional
+  project-structure/daily-report/workforce/party links; tenant-scoped
+  `QualityIssue` reporting, assignment, corrective action, verification, closure,
+  RBAC, audit, and the same optional structural/responsibility links.
+- **Remaining planned scope:** Inspections, risks, formal CAPA, and generalized
+  document links.
 - **Done When:** Workflows, permissions, severity/status rules, audit history,
   and tenant isolation are validated without making formal modules mandatory or
   replacing existing daily-report notes.

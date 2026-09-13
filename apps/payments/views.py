@@ -2,7 +2,11 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 from apps.payments.forms import PaymentForm, PaymentVoidForm
 from apps.payments.services import (
     create_payment,
@@ -12,6 +16,7 @@ from apps.payments.services import (
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PAYMENTS_VIEW)
 def payment_list(request: HttpRequest) -> HttpResponse:
     payments = get_organization_payments(
         user=request.user,
@@ -21,6 +26,7 @@ def payment_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PAYMENTS_CREATE)
 def payment_create(request: HttpRequest) -> HttpResponse:
     form = PaymentForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():
@@ -50,6 +56,7 @@ def payment_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PAYMENTS_VIEW)
 def payment_detail(request: HttpRequest, payment_id: str) -> HttpResponse:
     payment = get_object_or_404(
         get_organization_payments(
@@ -67,6 +74,7 @@ def payment_detail(request: HttpRequest, payment_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PAYMENTS_VOID)
 def payment_void(request: HttpRequest, payment_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)

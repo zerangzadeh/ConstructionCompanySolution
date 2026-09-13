@@ -23,16 +23,24 @@ from apps.materials.services import (
     update_material,
     update_material_category,
 )
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.authorization import has_business_permission
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+    require_organization_permission,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.UNITS_VIEW)
 def unit_list(request: HttpRequest) -> HttpResponse:
     units = get_organization_units(user=request.user, organization=request.organization)
     return render(request, "materials/unit_list.html", {"units": units})
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.UNITS_CREATE)
 def unit_create(request: HttpRequest) -> HttpResponse:
     form = UnitOfMeasureForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -50,6 +58,7 @@ def unit_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.UNITS_ARCHIVE)
 @require_POST
 def unit_archive(request: HttpRequest, unit_id: str) -> HttpResponse:
     unit = UnitOfMeasure.objects.filter(
@@ -81,6 +90,7 @@ def _get_active_material(request: HttpRequest, material_id: str) -> Material | N
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIAL_CATEGORIES_VIEW)
 def category_list(request: HttpRequest) -> HttpResponse:
     categories = get_organization_material_categories(
         user=request.user, organization=request.organization
@@ -89,6 +99,7 @@ def category_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIAL_CATEGORIES_CREATE)
 def category_create(request: HttpRequest) -> HttpResponse:
     form = MaterialCategoryForm(
         request.POST or None, organization_id=request.organization.id
@@ -110,13 +121,27 @@ def category_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIAL_CATEGORIES_VIEW)
 def category_detail(request: HttpRequest, category_id: str) -> HttpResponse:
+    if request.method == "POST":
+        require_organization_permission(
+            request,
+            BusinessPermissionCode.MATERIAL_CATEGORIES_CHANGE,
+            "اجازه ویرایش دسته‌بندی مصالح را ندارید.",
+        )
     category = _get_active_category(request, category_id)
     if category is None:
         return HttpResponseNotFound("دسته‌بندی مصالح یافت نشد.")
     form = MaterialCategoryForm(
         request.POST or None, instance=category, organization_id=request.organization.id
     )
+    if request.method == "GET" and not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MATERIAL_CATEGORIES_CHANGE,
+    ):
+        for field in form.fields.values():
+            field.disabled = True
     if request.method == "POST" and form.is_valid():
         try:
             category = update_material_category(
@@ -135,6 +160,7 @@ def category_detail(request: HttpRequest, category_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIAL_CATEGORIES_ARCHIVE)
 @require_POST
 def category_archive(request: HttpRequest, category_id: str) -> HttpResponse:
     category = _get_active_category(request, category_id)
@@ -150,6 +176,7 @@ def category_archive(request: HttpRequest, category_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIALS_VIEW)
 def material_list(request: HttpRequest) -> HttpResponse:
     materials = get_organization_materials(
         user=request.user,
@@ -160,6 +187,7 @@ def material_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIALS_CREATE)
 def material_create(request: HttpRequest) -> HttpResponse:
     form = MaterialForm(request.POST or None, organization_id=request.organization.id)
     if request.method == "POST" and form.is_valid():
@@ -179,13 +207,27 @@ def material_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIALS_VIEW)
 def material_detail(request: HttpRequest, material_id: str) -> HttpResponse:
+    if request.method == "POST":
+        require_organization_permission(
+            request,
+            BusinessPermissionCode.MATERIALS_CHANGE,
+            "اجازه ویرایش مصالح را ندارید.",
+        )
     material = _get_active_material(request, material_id)
     if material is None:
         return HttpResponseNotFound("مصالح یافت نشد.")
     form = MaterialForm(
         request.POST or None, instance=material, organization_id=request.organization.id
     )
+    if request.method == "GET" and not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.MATERIALS_CHANGE,
+    ):
+        for field in form.fields.values():
+            field.disabled = True
     if request.method == "POST" and form.is_valid():
         try:
             material = update_material(
@@ -204,6 +246,7 @@ def material_detail(request: HttpRequest, material_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.MATERIALS_ARCHIVE)
 @require_POST
 def material_archive(request: HttpRequest, material_id: str) -> HttpResponse:
     material = _get_active_material(request, material_id)

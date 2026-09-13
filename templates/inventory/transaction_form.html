@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block title %}تراکنش انبار جدید | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="انبار و موجودی" page_title="تراکنش انبار جدید" page_description="تراکنش ابتدا به‌صورت پیش‌نویس ایجاد می‌شود." only %}<form class="erp-surface mt-6 max-w-4xl rounded-xl p-5" method="post">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}<div class="grid gap-4 sm:grid-cols-2">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div><div class="mt-6 flex gap-3"><button class="erp-btn erp-btn--primary" type="submit">ایجاد پیش‌نویس</button><a class="erp-btn erp-btn--secondary" href="{% url 'inventory:transaction_list' %}">انصراف</a></div></form>
+{% endblock %}

@@ -8,10 +8,15 @@ from apps.expenses.services import (
     get_organization_expenses,
     void_expense,
 )
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.EXPENSES_VIEW)
 def expense_list(request: HttpRequest) -> HttpResponse:
     expenses = get_organization_expenses(
         user=request.user,
@@ -21,6 +26,7 @@ def expense_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)
 def expense_create(request: HttpRequest) -> HttpResponse:
     form = ExpenseForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():
@@ -49,6 +55,7 @@ def expense_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.EXPENSES_VOID)
 def expense_void(request: HttpRequest, expense_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)

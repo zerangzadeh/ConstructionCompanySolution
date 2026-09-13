@@ -8,7 +8,12 @@ from apps.accounts.models import User
 from apps.contracts.models import Contract
 from apps.estimates.models import Estimate, EstimateStatus
 from apps.expenses.models import Expense, ExpenseStatus
-from apps.organizations.models import MembershipStatus, Organization, OrganizationStatus
+from apps.organizations.authorization import require_business_permission
+from apps.organizations.models import (
+    BusinessPermissionCode,
+    Organization,
+    OrganizationStatus,
+)
 from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.projects.models import Project
 
@@ -55,15 +60,12 @@ def _validate_view_context(user: User, organization: Organization) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.FINANCIALS_VIEW,
+        message="اجازه مشاهده گزارش‌های مالی این سازمان را ندارید.",
+    )
 
 
 def _build_report(project: Project) -> ProjectFinancialReport:

@@ -1,33 +1,50 @@
 from apps.organizations.models import BusinessPermissionCode, MembershipRole
+from apps.organizations.permission_catalog import (
+    permission_codes,
+    permission_codes_with_suffix,
+)
+from apps.organizations.permission_registry import registered_permission_codes
+
+ALL_PERMISSIONS = registered_permission_codes()
+READ_ONLY_PERMISSIONS = permission_codes_with_suffix("view") | permission_codes(
+    BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
+)
+MEMBER_OPERATION_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.DAILY_REPORTS_CREATE,
+    BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR,
+    BusinessPermissionCode.DAILY_REPORTS_ADD_EQUIPMENT,
+    BusinessPermissionCode.DAILY_REPORTS_ADD_MATERIAL,
+    BusinessPermissionCode.DAILY_REPORTS_ADD_ACTIVITY,
+    BusinessPermissionCode.DAILY_REPORTS_ADD_DELAY,
+    BusinessPermissionCode.DAILY_REPORTS_SUBMIT,
+    BusinessPermissionCode.PURCHASE_REQUESTS_CREATE,
+    BusinessPermissionCode.PURCHASE_REQUEST_ITEMS_ADD,
+    BusinessPermissionCode.PURCHASE_REQUESTS_SUBMIT,
+    BusinessPermissionCode.PURCHASE_REQUESTS_CANCEL,
+    BusinessPermissionCode.GOODS_RECEIPTS_CREATE,
+    BusinessPermissionCode.GOODS_RECEIPT_ITEMS_ADD,
+    BusinessPermissionCode.GOODS_RECEIPTS_POST,
+    BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
+    BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
+)
+OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
+    BusinessPermissionCode.MEMBERSHIP_VIEW,
+    BusinessPermissionCode.MEMBERSHIP_CHANGE_ROLE,
+    BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS,
+    BusinessPermissionCode.COMPANY_SETTINGS_VIEW,
+    BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
+    BusinessPermissionCode.ESTIMATES_APPROVE,
+)
+
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
-    MembershipRole.COMPANY_OWNER: set(BusinessPermissionCode.values),
-    MembershipRole.COMPANY_MANAGER: set(BusinessPermissionCode.values),
-    MembershipRole.OPERATIONS_MANAGER: {
-        BusinessPermissionCode.PARTIES_MANAGE,
-        BusinessPermissionCode.MATERIALS_MANAGE,
-        BusinessPermissionCode.PROJECTS_MANAGE,
-        BusinessPermissionCode.CONTRACTS_MANAGE,
-        BusinessPermissionCode.ESTIMATES_MANAGE,
-        BusinessPermissionCode.EXPENSES_MANAGE,
-        BusinessPermissionCode.PAYMENTS_MANAGE,
-        BusinessPermissionCode.DOCUMENTS_MANAGE,
-        BusinessPermissionCode.DAILY_REPORTS_CREATE,
-        BusinessPermissionCode.DAILY_REPORTS_MANAGE,
-        BusinessPermissionCode.WORKFORCE_MANAGE,
-        BusinessPermissionCode.PROCUREMENT_REQUEST,
-        BusinessPermissionCode.PROCUREMENT_MANAGE,
-        BusinessPermissionCode.INVENTORY_MOVEMENT,
-        BusinessPermissionCode.INVENTORY_MANAGE,
-        BusinessPermissionCode.AUDIT_VIEW,
-    },
-    MembershipRole.MEMBER: {
-        BusinessPermissionCode.DAILY_REPORTS_CREATE,
-        BusinessPermissionCode.PROCUREMENT_REQUEST,
-        BusinessPermissionCode.INVENTORY_MOVEMENT,
-        BusinessPermissionCode.AUDIT_VIEW,
-    },
-    MembershipRole.VIEWER: {BusinessPermissionCode.AUDIT_VIEW},
+    MembershipRole.COMPANY_OWNER: ALL_PERMISSIONS,
+    MembershipRole.COMPANY_MANAGER: ALL_PERMISSIONS,
+    MembershipRole.OPERATIONS_MANAGER: (
+        ALL_PERMISSIONS - OPERATIONS_MANAGER_EXCLUSIONS
+    ),
+    MembershipRole.MEMBER: READ_ONLY_PERMISSIONS | MEMBER_OPERATION_PERMISSIONS,
+    MembershipRole.VIEWER: READ_ONLY_PERMISSIONS,
 }
 
 
@@ -52,7 +69,7 @@ DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
     },
     MembershipRole.MEMBER: {
         "name": "عضو",
-        "description": "انجام عملیات روزمره مجاز.",
+        "description": "مشاهده اطلاعات و انجام عملیات روزمره مجاز.",
         "is_system": True,
         "is_owner": False,
     },

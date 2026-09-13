@@ -16,10 +16,7 @@ from apps.inventory.models import (
     Warehouse,
 )
 from apps.materials.models import Material, UnitOfMeasure
-from apps.organizations.authorization import (
-    get_active_membership,
-    require_business_permission,
-)
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
     Organization,
@@ -34,10 +31,18 @@ _LEDGER_STATUSES = {
 }
 
 
-def _validate_active_access(*, organization: Organization, user: User) -> None:
-    if user.is_superuser and user.is_active:
-        return
-    get_active_membership(user=user, organization=organization)
+def _validate_active_access(
+    *,
+    organization: Organization,
+    user: User,
+    permission: BusinessPermissionCode,
+) -> None:
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=permission,
+        message="اجازه مشاهده اطلاعات انبار این سازمان را ندارید.",
+    )
 
 
 def _require_role(
@@ -190,7 +195,7 @@ def create_warehouse(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        permission=BusinessPermissionCode.WAREHOUSES_CREATE,
         message="اجازه مدیریت انبارهای این سازمان را ندارید.",
     )
     project = _validate_project(organization=organization, project=project)
@@ -225,7 +230,7 @@ def archive_warehouse(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        permission=BusinessPermissionCode.WAREHOUSES_ARCHIVE,
         message="اجازه مدیریت انبارهای این سازمان را ندارید.",
     )
     try:
@@ -299,7 +304,7 @@ def create_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.INVENTORY_MOVEMENT,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
         message="اجازه ایجاد تراکنش انبار در این سازمان را ندارید.",
     )
     if transaction_type not in StockTransactionType.values or (
@@ -389,12 +394,12 @@ def post_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.INVENTORY_MOVEMENT,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
         message="اجازه نهایی‌سازی تراکنش‌های انبار این سازمان را ندارید.",
     )
     try:
         transaction_record = (
-            StockTransaction.objects.select_for_update()
+            StockTransaction.objects.select_for_update(of=("self",))
             .select_related(
                 "organization",
                 "source_warehouse",
@@ -466,7 +471,7 @@ def reverse_stock_transaction(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.INVENTORY_MANAGE,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE,
         message="اجازه برگشت تراکنش‌های انبار این سازمان را ندارید.",
     )
     try:
@@ -551,7 +556,11 @@ def reverse_stock_transaction(
 def get_organization_warehouses(
     *, user: User, organization: Organization, active_only: bool = False
 ) -> QuerySet[Warehouse]:
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.WAREHOUSES_VIEW,
+    )
     queryset = Warehouse.objects.filter(organization=organization).select_related(
         "project", "created_by", "updated_by"
     )
@@ -563,7 +572,11 @@ def get_organization_warehouses(
 def get_organization_stock_transactions(
     *, user: User, organization: Organization
 ) -> QuerySet[StockTransaction]:
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW,
+    )
     return StockTransaction.objects.filter(organization=organization).select_related(
         "source_warehouse",
         "destination_warehouse",
@@ -587,7 +600,11 @@ def get_stock_balance(
 ) -> Decimal:
     """Derive on-hand quantity from the immutable movement ledger."""
 
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.STOCK_BALANCES_VIEW,
+    )
     if warehouse.organization_id != organization.pk:
         raise PermissionDenied("انبار در این سازمان یافت نشد.")
     if material.organization_id != organization.pk:

@@ -11,7 +11,6 @@ from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -41,7 +40,12 @@ _ASSIGNMENT_STATUS_TRANSITIONS: dict[str, tuple[str, ...]] = {
 }
 
 
-def _require_active_access(*, organization: Organization, user: User) -> None:
+def _require_active_access(
+    *,
+    organization: Organization,
+    user: User,
+    permission: BusinessPermissionCode,
+) -> None:
     if not user.is_authenticated or not user.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
@@ -49,22 +53,24 @@ def _require_active_access(*, organization: Organization, user: User) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not user.is_superuser
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=permission,
+        message="اجازه مشاهده اطلاعات نیروی انسانی این شرکت را ندارید.",
+    )
 
 
-def _require_management_access(*, organization: Organization, actor: User) -> None:
+def _require_management_access(
+    *,
+    organization: Organization,
+    actor: User,
+    permission: BusinessPermissionCode,
+) -> None:
     require_business_permission(
         user=actor,
         organization=organization,
-        permission=BusinessPermissionCode.WORKFORCE_MANAGE,
+        permission=permission,
         message="اجازه مدیریت نیروی انسانی این شرکت را ندارید.",
     )
 
@@ -111,7 +117,11 @@ def create_department(
     parent: Department | None = None,
     description: str = "",
 ) -> Department:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.DEPARTMENTS_CREATE,
+    )
     _require_same_organization(organization, parent=parent)
     if parent is not None:
         _require_active_master(parent, "parent department")
@@ -146,7 +156,11 @@ def create_position(
     department: Department | None = None,
     description: str = "",
 ) -> Position:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.POSITIONS_CREATE,
+    )
     _require_same_organization(organization, department=department)
     if department is not None:
         _require_active_master(department, "department")
@@ -182,7 +196,11 @@ def create_work_team(
     lead: Employee | None = None,
     description: str = "",
 ) -> WorkTeam:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.WORK_TEAMS_CREATE,
+    )
     _require_same_organization(organization, department=department, lead=lead)
     if department is not None:
         _require_active_master(department, "department")
@@ -228,7 +246,11 @@ def create_employee(
     phone_number: str = "",
     hire_date: date | None = None,
 ) -> Employee:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.EMPLOYEES_CREATE,
+    )
     _require_same_organization(
         organization,
         department=department,
@@ -272,7 +294,11 @@ def create_employee(
 def get_organization_employees(
     *, user: User, organization: Organization, include_archived: bool = False
 ) -> QuerySet[Employee]:
-    _require_active_access(organization=organization, user=user)
+    _require_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.EMPLOYEES_VIEW,
+    )
     employees = Employee.objects.filter(organization=organization)
     if not include_archived:
         employees = employees.filter(archived_at__isnull=True)
@@ -282,7 +308,11 @@ def get_organization_employees(
 def get_organization_departments(
     *, user: User, organization: Organization
 ) -> QuerySet[Department]:
-    _require_active_access(organization=organization, user=user)
+    _require_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.DEPARTMENTS_VIEW,
+    )
     return Department.objects.filter(
         organization=organization, archived_at__isnull=True
     ).select_related("parent")
@@ -291,7 +321,11 @@ def get_organization_departments(
 def get_organization_positions(
     *, user: User, organization: Organization
 ) -> QuerySet[Position]:
-    _require_active_access(organization=organization, user=user)
+    _require_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.POSITIONS_VIEW,
+    )
     return Position.objects.filter(
         organization=organization, archived_at__isnull=True
     ).select_related("department")
@@ -300,7 +334,11 @@ def get_organization_positions(
 def get_organization_work_teams(
     *, user: User, organization: Organization
 ) -> QuerySet[WorkTeam]:
-    _require_active_access(organization=organization, user=user)
+    _require_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.WORK_TEAMS_VIEW,
+    )
     return WorkTeam.objects.filter(
         organization=organization, archived_at__isnull=True
     ).select_related("department", "lead")
@@ -315,7 +353,11 @@ def transition_employee_status(
     target_status: str,
     effective_date: date | None = None,
 ) -> Employee:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.EMPLOYEES_CHANGE_STATUS,
+    )
     locked = Employee.objects.select_for_update().get(pk=employee.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("کارمند متعلق به این سازمان نیست.")
@@ -363,7 +405,11 @@ def assign_employee_to_project(
     role_title: str = "",
     notes: str = "",
 ) -> EmployeeProjectAssignment:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PROJECT_ASSIGNMENTS_CREATE,
+    )
     _require_same_organization(
         organization,
         employee=employee,
@@ -408,7 +454,11 @@ def get_organization_project_assignments(
     organization: Organization,
     project: Project | None = None,
 ) -> QuerySet[EmployeeProjectAssignment]:
-    _require_active_access(organization=organization, user=user)
+    _require_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.PROJECT_ASSIGNMENTS_VIEW,
+    )
     assignments = EmployeeProjectAssignment.objects.filter(organization=organization)
     if project is not None:
         if project.organization_id != organization.pk:
@@ -426,7 +476,11 @@ def transition_project_assignment_status(
     target_status: str,
     end_date: date,
 ) -> EmployeeProjectAssignment:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PROJECT_ASSIGNMENTS_CHANGE_STATUS,
+    )
     locked = EmployeeProjectAssignment.objects.select_for_update().get(pk=assignment.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("تخصیص نیرو متعلق به این سازمان نیست.")
@@ -455,7 +509,11 @@ def transition_project_assignment_status(
 def archive_employee(
     *, organization: Organization, actor: User, employee: Employee
 ) -> Employee:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.EMPLOYEES_ARCHIVE,
+    )
     locked = Employee.objects.select_for_update().get(pk=employee.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("کارمند متعلق به این سازمان نیست.")
@@ -488,8 +546,13 @@ def _archive_master(
     record: Department | Position | WorkTeam,
     action: str,
     entity_type: str,
+    permission: BusinessPermissionCode,
 ) -> Department | Position | WorkTeam:
-    _require_management_access(organization=organization, actor=actor)
+    _require_management_access(
+        organization=organization,
+        actor=actor,
+        permission=permission,
+    )
     locked = record.__class__.objects.select_for_update().get(pk=record.pk)
     if locked.organization_id != organization.pk:
         raise PermissionDenied("رکورد نیروی انسانی متعلق به این سازمان نیست.")
@@ -539,6 +602,7 @@ def archive_department(
         record=department,
         action=AuditAction.DEPARTMENT_ARCHIVED,
         entity_type="department",
+        permission=BusinessPermissionCode.DEPARTMENTS_ARCHIVE,
     )
 
 
@@ -552,6 +616,7 @@ def archive_position(
         record=position,
         action=AuditAction.POSITION_ARCHIVED,
         entity_type="position",
+        permission=BusinessPermissionCode.POSITIONS_ARCHIVE,
     )
 
 
@@ -565,4 +630,5 @@ def archive_work_team(
         record=work_team,
         action=AuditAction.WORK_TEAM_ARCHIVED,
         entity_type="work_team",
+        permission=BusinessPermissionCode.WORK_TEAMS_ARCHIVE,
     )

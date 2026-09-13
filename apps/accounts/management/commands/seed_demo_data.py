@@ -2,7 +2,7 @@
 
 import os
 from collections.abc import Callable
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from decimal import Decimal
 from typing import Any, TypeVar
 
@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import models, transaction
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditEvent
@@ -40,10 +41,22 @@ from apps.daily_reports.services import (
 )
 from apps.documents.models import ProjectDocument
 from apps.documents.services import upload_project_document
+from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
+from apps.equipment.services import (
+    assign_equipment,
+    create_equipment,
+    create_maintenance_record,
+)
 from apps.estimates.models import Estimate, EstimateItem, EstimateRevision
 from apps.estimates.services import add_estimate_item, approve_estimate, create_estimate
 from apps.expenses.models import Expense, ExpenseCategory
 from apps.expenses.services import create_expense, create_expense_category
+from apps.inventory.models import StockTransaction, Warehouse
+from apps.inventory.services import (
+    create_stock_transaction,
+    create_warehouse,
+    post_stock_transaction,
+)
 from apps.materials.models import Material, MaterialCategory, UnitOfMeasure
 from apps.materials.services import (
     create_material,
@@ -53,15 +66,10 @@ from apps.materials.services import (
 from apps.organizations.models import (
     MembershipRole,
     Organization,
-    OrganizationInvitation,
     OrganizationMembership,
     OrganizationSettings,
 )
-from apps.organizations.services import (
-    accept_organization_invitation,
-    create_organization_invitation,
-    create_organization_with_owner,
-)
+from apps.organizations.services import create_organization_with_owner
 from apps.parties.models import BusinessParty, PartyContact, PartyRole
 from apps.parties.services import (
     add_party_contact,
@@ -70,6 +78,26 @@ from apps.parties.services import (
 )
 from apps.payments.models import Payment, PaymentAllocation
 from apps.payments.services import allocate_payment, create_payment
+from apps.procurement.models import (
+    GoodsReceipt,
+    GoodsReceiptItem,
+    PurchaseOrder,
+    PurchaseOrderItem,
+    PurchaseRequest,
+    PurchaseRequestItem,
+)
+from apps.procurement.services import (
+    add_goods_receipt_item,
+    add_purchase_order_item,
+    add_purchase_request_item,
+    approve_purchase_request,
+    create_goods_receipt,
+    create_purchase_order,
+    create_purchase_request,
+    issue_purchase_order,
+    post_goods_receipt,
+    submit_purchase_request,
+)
 from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite, WBSNode
 from apps.projects.services import (
     create_activity,
@@ -77,6 +105,47 @@ from apps.projects.services import (
     create_project_phase,
     create_project_site,
     create_wbs_node,
+)
+from apps.quality.models import (
+    QualityIssue,
+    QualityIssueSeverity,
+    QualityIssueType,
+)
+from apps.quality.services import (
+    assign_quality_issue,
+    close_quality_issue,
+    create_quality_issue,
+    review_quality_issue,
+    start_quality_corrective_action,
+    submit_quality_issue_for_verification,
+    verify_quality_issue,
+)
+from apps.safety.models import (
+    SafetyIncident,
+    SafetyIncidentSeverity,
+    SafetyIncidentType,
+)
+from apps.safety.services import (
+    assign_safety_incident,
+    close_safety_incident,
+    create_safety_incident,
+    resolve_safety_incident,
+    review_safety_incident,
+    start_corrective_action,
+)
+from apps.workforce.models import (
+    Department,
+    Employee,
+    EmployeeProjectAssignment,
+    Position,
+    WorkTeam,
+)
+from apps.workforce.services import (
+    assign_employee_to_project,
+    create_department,
+    create_employee,
+    create_position,
+    create_work_team,
 )
 
 ModelType = TypeVar("ModelType", bound=models.Model)
@@ -86,13 +155,9 @@ ORGANIZATION_NAMES = (
     "گروه عمرانی افق تهران",
     "شرکت توسعه ابنیه سپهر",
     "مهندسان راه و سازه البرز",
-    "شرکت عمران پایدار کویر",
-    "گروه ساختمانی آریا بنا",
-    "شرکت طرح و اجرای زاگرس",
-    "مهندسی سازه‌های ماندگار",
-    "شرکت توسعه شهری خاوران",
-    "گروه پیمانکاری نقش جهان",
 )
+
+DEMO_PASSWORD = "Demo@1405"
 
 PERSON_NAMES = (
     ("علی", "رضایی"),
@@ -233,7 +298,6 @@ class Command(BaseCommand):
         Organization,
         OrganizationSettings,
         OrganizationMembership,
-        OrganizationInvitation,
         BusinessParty,
         PartyRole,
         PartyContact,
@@ -262,6 +326,24 @@ class Command(BaseCommand):
         DailyReportMaterialEntry,
         DailyActivity,
         DelayEvent,
+        Department,
+        Position,
+        WorkTeam,
+        Employee,
+        EmployeeProjectAssignment,
+        Equipment,
+        EquipmentAssignment,
+        MaintenanceRecord,
+        SafetyIncident,
+        QualityIssue,
+        PurchaseRequest,
+        PurchaseRequestItem,
+        PurchaseOrder,
+        PurchaseOrderItem,
+        GoodsReceipt,
+        GoodsReceiptItem,
+        Warehouse,
+        StockTransaction,
         AuditEvent,
     )
 
@@ -280,6 +362,7 @@ class Command(BaseCommand):
                 self._seed_organization(organization_index, organization_name)
 
         self.stdout.write(self.style.SUCCESS("Persian demo dataset is ready."))
+        self.stdout.write(f"Demo user password: {DEMO_PASSWORD}")
         for model in self.tracked_models:
             created = model.objects.count() - before[model]
             self.stdout.write(f"{model._meta.label}: {created} created")
@@ -300,11 +383,12 @@ class Command(BaseCommand):
         if user is None:
             user = User.objects.create_user(
                 username=username,
-                email=f"{username}@example.test",
+                password=DEMO_PASSWORD,
                 first_name=first_name,
                 last_name=last_name,
             )
-            user.set_unusable_password()
+        elif not user.check_password(DEMO_PASSWORD):
+            user.set_password(DEMO_PASSWORD)
             user.save(update_fields=["password"])
         return user
 
@@ -347,8 +431,10 @@ class Command(BaseCommand):
         materials = self._seed_materials(organization, owner, units, categories)
         expense_categories = self._seed_expense_categories(organization, owner)
 
+        first_project: Project | None = None
+        first_site: ProjectSite | None = None
         for project_index, project_data in enumerate(PROJECTS, start=1):
-            self._seed_project(
+            project, site = self._seed_project(
                 organization_index=index,
                 project_index=project_index,
                 organization=organization,
@@ -360,6 +446,110 @@ class Command(BaseCommand):
                 expense_categories=expense_categories,
                 project_data=project_data,
             )
+            if first_project is None:
+                first_project, first_site = project, site
+
+        if first_project is not None and first_site is not None:
+            self._seed_workforce(
+                organization=organization,
+                owner=owner,
+                manager=manager,
+                project=first_project,
+                site=first_site,
+            )
+            self._seed_equipment(
+                organization=organization,
+                owner=owner,
+                project=first_project,
+                site=first_site,
+                maintenance_provider=parties[6],
+                organization_index=index,
+            )
+
+    def _seed_equipment(
+        self,
+        *,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        site: ProjectSite,
+        maintenance_provider: BusinessParty,
+        organization_index: int,
+    ) -> None:
+        excavator = self._existing_or_create(
+            Equipment,
+            {"organization": organization, "code": f"EQ-{organization_index:02d}-EXC"},
+            lambda: create_equipment(
+                organization=organization,
+                actor=owner,
+                code=f"EQ-{organization_index:02d}-EXC",
+                name="بیل مکانیکی زنجیری",
+                category="ماشین‌آلات سنگین",
+                manufacturer="کوماتسو",
+                model="PC200",
+                serial_number=f"DEMO-EXC-{organization_index:02d}",
+                registration_number=f"TEH-{organization_index:02d}-381",
+                acquired_on=date(2025, 1, 15),
+                notes="تجهیز نمونه برای عملیات خاک‌برداری و بارگیری کارگاه.",
+            ),
+        )
+        self._existing_or_create(
+            Equipment,
+            {"organization": organization, "code": f"EQ-{organization_index:02d}-CRN"},
+            lambda: create_equipment(
+                organization=organization,
+                actor=owner,
+                code=f"EQ-{organization_index:02d}-CRN",
+                name="جرثقیل کارگاهی",
+                category="تجهیزات بالابری",
+                ownership_type="rented",
+                manufacturer="پتن",
+                model="ST 80",
+                registration_number=f"TEH-{organization_index:02d}-582",
+                acquired_on=date(2026, 3, 21),
+                notes="تجهیز اجاره‌ای نمونه برای جابه‌جایی مصالح در کارگاه.",
+            ),
+        )
+        self._existing_or_create(
+            EquipmentAssignment,
+            {
+                "organization": organization,
+                "equipment": excavator,
+                "project": project,
+                "start_date": date(2026, 1, 1),
+            },
+            lambda: assign_equipment(
+                organization=organization,
+                actor=owner,
+                equipment=excavator,
+                project=project,
+                site=site,
+                start_date=date(2026, 1, 1),
+                purpose="عملیات خاک‌برداری و آماده‌سازی محوطه",
+                notes="تخصیص فعال نمونه برای کارگاه اصلی پروژه.",
+            ),
+        )
+        self._existing_or_create(
+            MaintenanceRecord,
+            {
+                "organization": organization,
+                "record_number": f"MNT-{organization_index:02d}-001",
+            },
+            lambda: create_maintenance_record(
+                organization=organization,
+                actor=owner,
+                equipment=excavator,
+                record_number=f"MNT-{organization_index:02d}-001",
+                maintenance_type="preventive",
+                summary="سرویس دوره‌ای بیل مکانیکی",
+                scheduled_date=date(2026, 10, 1),
+                project=project,
+                site=site,
+                provider=maintenance_provider,
+                description="بازرسی روغن هیدرولیک، فیلترها و اتصالات بازو.",
+                notes="سرویس پیشگیرانه نمونه در تقویم نگهداری.",
+            ),
+        )
 
     def _ensure_membership(
         self,
@@ -373,20 +563,14 @@ class Command(BaseCommand):
         ).first()
         if membership is not None:
             return
-        pending = OrganizationInvitation.objects.filter(
-            organization=organization, invitee=member, status="pending"
-        ).first()
-        if pending is not None:
-            raise CommandError(
-                f"Reserved demo invitation {pending.pk} is pending without its raw token."
-            )
-        _invitation, token = create_organization_invitation(
+        OrganizationMembership.objects.create(
             organization=organization,
-            invited_by=owner,
-            invitee=member,
+            user=member,
             role=role,
+            status="active",
+            joined_at=organization.created_at,
+            assigned_by=owner,
         )
-        accept_organization_invitation(token=token, user=member)
 
     def _seed_parties(
         self, index: int, organization: Organization, owner: User
@@ -537,7 +721,7 @@ class Command(BaseCommand):
         materials: list[Material],
         expense_categories: list[ExpenseCategory],
         project_data: tuple[str, str, str, Decimal, str],
-    ) -> None:
+    ) -> tuple[Project, ProjectSite]:
         name, description, address, budget, status = project_data
         code = f"PRJ-{organization_index:02d}-{project_index:02d}"
         start = date(2025, 3, 21) + timedelta(days=project_index * 35)
@@ -635,6 +819,255 @@ class Command(BaseCommand):
             activities,
             materials,
             start,
+        )
+        self._seed_safety_incident(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            owner=owner,
+            manager=manager,
+            project=project,
+            site=site,
+            phase=phases[0],
+            activity=activities[0],
+            responsible_party=parties[4],
+            start=start,
+        )
+        self._seed_quality_issue(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            owner=owner,
+            manager=manager,
+            project=project,
+            site=site,
+            phase=phases[0],
+            activity=activities[1],
+            responsible_party=parties[4],
+            start=start,
+        )
+        self._seed_procurement_and_inventory(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            owner=owner,
+            project=project,
+            supplier=parties[2],
+            materials=materials,
+            start=start,
+            warehouse_location=address,
+        )
+        return project, site
+
+    def _seed_safety_incident(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        manager: User,
+        project: Project,
+        site: ProjectSite,
+        phase: ProjectPhase,
+        activity: Activity,
+        responsible_party: BusinessParty,
+        start: date,
+    ) -> None:
+        incident_number = f"SAF-{organization_index:02d}-{project_index:02d}-01"
+        if SafetyIncident.objects.filter(
+            organization=organization, incident_number=incident_number
+        ).exists():
+            return
+        daily_report = (
+            DailyReport.objects.filter(
+                organization=organization,
+                project=project,
+                site=site,
+            )
+            .order_by("reporting_date")
+            .first()
+        )
+        incident_types = (
+            SafetyIncidentType.NEAR_MISS,
+            SafetyIncidentType.INJURY,
+            SafetyIncidentType.PROPERTY_DAMAGE,
+            SafetyIncidentType.UNSAFE_CONDITION,
+        )
+        severities = (
+            SafetyIncidentSeverity.HIGH,
+            SafetyIncidentSeverity.MEDIUM,
+            SafetyIncidentSeverity.CRITICAL,
+            SafetyIncidentSeverity.LOW,
+        )
+        occurred_at = timezone.make_aware(
+            datetime.combine(start + timedelta(days=3), datetime.min.time())
+        )
+        incident = create_safety_incident(
+            organization=organization,
+            actor=manager,
+            project=project,
+            site=site,
+            phase=phase,
+            activity=activity,
+            daily_report=daily_report,
+            incident_number=incident_number,
+            occurred_at=occurred_at,
+            incident_type=incident_types[(project_index - 1) % len(incident_types)],
+            severity=severities[(project_index - 1) % len(severities)],
+            description="در جریان عملیات اجرایی، یک رویداد ایمنی در محدوده کارگاه ثبت و محل برای بررسی ایمن‌سازی شد.",
+            immediate_action="عملیات متوقف، محدوده محصور و جلسه توجیهی فوری برای گروه اجرایی برگزار شد.",
+        )
+        incident = review_safety_incident(
+            organization=organization,
+            actor=owner,
+            incident_id=str(incident.pk),
+        )
+        if project_index == 4:
+            return
+        incident = assign_safety_incident(
+            organization=organization,
+            actor=owner,
+            incident_id=str(incident.pk),
+            due_date=start + timedelta(days=12),
+            responsible_user=manager,
+            responsible_party=responsible_party,
+        )
+        if project_index == 3:
+            return
+        incident = start_corrective_action(
+            organization=organization,
+            actor=manager,
+            incident_id=str(incident.pk),
+            corrective_action="حفاظ فیزیکی نصب، مسیر تردد اصلاح و کنترل روزانه توسط مدیر کارگاه ثبت شود.",
+        )
+        if project_index == 2:
+            return
+        incident = resolve_safety_incident(
+            organization=organization,
+            actor=manager,
+            incident_id=str(incident.pk),
+            resolution_summary="اقدامات اصلاحی اجرا و اثربخشی آن در بازدید مشترک کارگاه تأیید شد.",
+        )
+        close_safety_incident(
+            organization=organization,
+            actor=owner,
+            incident_id=str(incident.pk),
+            closure_summary="مدارک اقدام بررسی شد و حادثه پس از تأیید کنترل‌های پایدار بسته شد.",
+        )
+
+    def _seed_quality_issue(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        manager: User,
+        project: Project,
+        site: ProjectSite,
+        phase: ProjectPhase,
+        activity: Activity,
+        responsible_party: BusinessParty,
+        start: date,
+    ) -> None:
+        issue_number = f"QLT-{organization_index:02d}-{project_index:02d}-01"
+        if QualityIssue.objects.filter(
+            organization=organization, issue_number=issue_number
+        ).exists():
+            return
+        daily_report = (
+            DailyReport.objects.filter(
+                organization=organization,
+                project=project,
+                site=site,
+            )
+            .order_by("reporting_date")
+            .first()
+        )
+        issue_types = (
+            QualityIssueType.NONCONFORMANCE,
+            QualityIssueType.WORKMANSHIP,
+            QualityIssueType.MATERIAL,
+            QualityIssueType.INSPECTION,
+        )
+        severities = (
+            QualityIssueSeverity.MAJOR,
+            QualityIssueSeverity.MINOR,
+            QualityIssueSeverity.CRITICAL,
+            QualityIssueSeverity.MAJOR,
+        )
+        identified_at = timezone.make_aware(
+            datetime.combine(start + timedelta(days=10), datetime.min.time())
+        )
+        issue = create_quality_issue(
+            organization=organization,
+            actor=manager,
+            project=project,
+            site=site,
+            phase=phase,
+            activity=activity,
+            daily_report=daily_report,
+            issue_number=issue_number,
+            identified_at=identified_at,
+            issue_type=issue_types[(project_index - 1) % len(issue_types)],
+            severity=severities[(project_index - 1) % len(severities)],
+            description=(
+                "در بازرسی اجرایی، عدم انطباقی در کیفیت سطح، ابعاد یا مصالح مصرفی "
+                "شناسایی و برای پیگیری رسمی ثبت شد."
+            ),
+            specification_reference="مشخصات فنی عمومی پیمان و نقشه اجرایی مصوب پروژه",
+        )
+        issue = review_quality_issue(
+            organization=organization,
+            actor=owner,
+            issue_id=str(issue.pk),
+        )
+        issue = assign_quality_issue(
+            organization=organization,
+            actor=owner,
+            issue_id=str(issue.pk),
+            due_date=start + timedelta(days=24),
+            responsible_user=manager,
+            responsible_party=responsible_party,
+        )
+        if project_index == 4:
+            return
+        issue = start_quality_corrective_action(
+            organization=organization,
+            actor=manager,
+            issue_id=str(issue.pk),
+            corrective_action=(
+                "بخش نامنطبق اصلاح، مصالح و روش اجرا بازبینی و نتیجه کنترل مجدد ثبت شود."
+            ),
+        )
+        issue = submit_quality_issue_for_verification(
+            organization=organization,
+            actor=manager,
+            issue_id=str(issue.pk),
+            corrective_action_result=(
+                "اصلاح مطابق روش اجرایی مصوب انجام و کنترل داخلی پیمانکار تکمیل شد."
+            ),
+        )
+        if project_index == 3:
+            return
+        issue = verify_quality_issue(
+            organization=organization,
+            actor=owner,
+            issue_id=str(issue.pk),
+            verification_summary=(
+                "بازرسی مجدد انجام شد و نتیجه اصلاح با مشخصات فنی و نقشه مصوب تطابق دارد."
+            ),
+        )
+        if project_index == 2:
+            return
+        close_quality_issue(
+            organization=organization,
+            actor=owner,
+            issue_id=str(issue.pk),
+            closure_summary=(
+                "شواهد اصلاح و راستی‌آزمایی بررسی شد و مسئله کیفیت بسته شد."
+            ),
         )
 
     def _seed_phases(
@@ -1164,4 +1597,288 @@ class Command(BaseCommand):
                 impact="ترتیب اجرای دو جبهه کاری برای حفظ بهره‌وری اصلاح شد.",
                 responsible_party="واحد تدارکات پروژه",
                 duration_hours=Decimal("0.75") + Decimal(report_index) / 10,
+            )
+
+    def _seed_workforce(
+        self,
+        *,
+        organization: Organization,
+        owner: User,
+        manager: User,
+        project: Project,
+        site: ProjectSite,
+    ) -> None:
+        technical = self._existing_or_create(
+            Department,
+            {"organization": organization, "code": "TEC"},
+            lambda: create_department(
+                organization=organization,
+                actor=owner,
+                code="TEC",
+                name="دفتر فنی و مهندسی",
+                description="کنترل نقشه‌ها، برنامه‌ریزی و هماهنگی فنی پروژه‌ها",
+            ),
+        )
+        execution = self._existing_or_create(
+            Department,
+            {"organization": organization, "code": "EXE"},
+            lambda: create_department(
+                organization=organization,
+                actor=owner,
+                code="EXE",
+                name="مدیریت اجرا",
+                description="مدیریت عملیات اجرایی و گروه‌های کارگاهی",
+            ),
+        )
+        site_manager = self._existing_or_create(
+            Position,
+            {"organization": organization, "code": "SITE-MGR"},
+            lambda: create_position(
+                organization=organization,
+                actor=owner,
+                code="SITE-MGR",
+                title="مدیر کارگاه",
+                department=execution,
+                description="مسئول برنامه‌ریزی و هماهنگی عملیات روزانه کارگاه",
+            ),
+        )
+        technical_manager = self._existing_or_create(
+            Position,
+            {"organization": organization, "code": "TECH-MGR"},
+            lambda: create_position(
+                organization=organization,
+                actor=owner,
+                code="TECH-MGR",
+                title="مدیر دفتر فنی",
+                department=technical,
+                description="مسئول کنترل فنی، متره و هماهنگی نقشه‌های اجرایی",
+            ),
+        )
+        owner_employee = self._existing_or_create(
+            Employee,
+            {"organization": organization, "employee_number": "EMP-001"},
+            lambda: create_employee(
+                organization=organization,
+                actor=owner,
+                employee_number="EMP-001",
+                first_name=owner.first_name,
+                last_name=owner.last_name,
+                user=owner,
+                department=execution,
+                position=site_manager,
+                phone_number="۰۹۱۲۱۲۳۴۵۶۷",
+                hire_date=date(2021, 3, 21),
+            ),
+        )
+        execution_team = self._existing_or_create(
+            WorkTeam,
+            {"organization": organization, "code": "CIVIL"},
+            lambda: create_work_team(
+                organization=organization,
+                actor=owner,
+                code="CIVIL",
+                name="گروه اجرای سازه",
+                department=execution,
+                lead=owner_employee,
+                description="گروه اجرایی عملیات سازه و ابنیه پروژه",
+            ),
+        )
+        manager_employee = self._existing_or_create(
+            Employee,
+            {"organization": organization, "employee_number": "EMP-002"},
+            lambda: create_employee(
+                organization=organization,
+                actor=owner,
+                employee_number="EMP-002",
+                first_name=manager.first_name,
+                last_name=manager.last_name,
+                user=manager,
+                department=technical,
+                position=technical_manager,
+                work_team=execution_team,
+                phone_number="۰۹۱۲۲۳۴۵۶۷۸",
+                hire_date=date(2022, 6, 22),
+            ),
+        )
+        for employee, role_title in (
+            (owner_employee, "مدیر کارگاه"),
+            (manager_employee, "مسئول دفتر فنی"),
+        ):
+            if not EmployeeProjectAssignment.objects.filter(
+                organization=organization,
+                employee=employee,
+                project=project,
+                site=site,
+            ).exists():
+                assign_employee_to_project(
+                    organization=organization,
+                    actor=owner,
+                    employee=employee,
+                    project=project,
+                    site=site,
+                    start_date=project.start_date,
+                    role_title=role_title,
+                    notes="تخصیص فعال نیروی انسانی به کارگاه اصلی پروژه",
+                )
+
+    def _seed_procurement_and_inventory(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        supplier: BusinessParty,
+        materials: list[Material],
+        start: date,
+        warehouse_location: str,
+    ) -> None:
+        warehouse = self._existing_or_create(
+            Warehouse,
+            {
+                "organization": organization,
+                "code": f"WH-{project_index:02d}",
+            },
+            lambda: create_warehouse(
+                organization=organization,
+                actor=owner,
+                code=f"WH-{project_index:02d}",
+                name=f"انبار کارگاه پروژه {project.name}",
+                project=project,
+                location=warehouse_location,
+            ),
+        )
+        request_number = f"PRQ-{organization_index:02d}-{project_index:02d}-01"
+        if PurchaseRequest.objects.filter(
+            organization=organization,
+            request_number=request_number,
+        ).exists():
+            return
+
+        purchase_request = create_purchase_request(
+            organization=organization,
+            actor=owner,
+            project=project,
+            request_number=request_number,
+            title="درخواست تأمین مصالح مرحله نخست اجرا",
+            required_by=start + timedelta(days=45),
+            notes="اقلام بر پایه برنامه اجرایی و موجودی کارگاه درخواست شده‌اند.",
+        )
+        requested_items = []
+        for sort_order, (material, quantity) in enumerate(
+            ((materials[0], Decimal(120)), (materials[2], Decimal(8500))),
+            start=1,
+        ):
+            requested_items.append(
+                add_purchase_request_item(
+                    organization=organization,
+                    actor=owner,
+                    purchase_request=purchase_request,
+                    material=material,
+                    unit_of_measure=material.unit_of_measure,
+                    quantity=quantity,
+                    description=f"تأمین {material.name} مورد نیاز جبهه اجرایی",
+                    sort_order=sort_order,
+                )
+            )
+        purchase_request = submit_purchase_request(
+            organization=organization,
+            actor=owner,
+            purchase_request=purchase_request,
+        )
+        purchase_request = approve_purchase_request(
+            organization=organization,
+            actor=owner,
+            purchase_request=purchase_request,
+            reason="نیاز پروژه و اعتبار بودجه بررسی و تأیید شد.",
+        )
+
+        purchase_order = create_purchase_order(
+            organization=organization,
+            actor=owner,
+            project=project,
+            supplier=supplier,
+            order_number=f"POR-{organization_index:02d}-{project_index:02d}-01",
+            order_date=start + timedelta(days=10),
+            purchase_request=purchase_request,
+            expected_delivery_date=start + timedelta(days=35),
+            notes="تحویل در انبار کارگاه و ارائه گواهی کیفیت الزامی است.",
+        )
+        order_items = []
+        prices = (Decimal(9800000), Decimal(940000))
+        for sort_order, (request_item, unit_price) in enumerate(
+            zip(requested_items, prices, strict=True),
+            start=1,
+        ):
+            order_items.append(
+                add_purchase_order_item(
+                    organization=organization,
+                    actor=owner,
+                    purchase_order=purchase_order,
+                    purchase_request_item=request_item,
+                    material=request_item.material,
+                    unit_of_measure=request_item.unit_of_measure,
+                    quantity=request_item.quantity,
+                    unit_price=unit_price,
+                    description=f"خرید {request_item.material.name} مطابق مشخصات فنی",
+                    sort_order=sort_order,
+                )
+            )
+        purchase_order = issue_purchase_order(
+            organization=organization,
+            actor=owner,
+            purchase_order=purchase_order,
+        )
+
+        received_at = timezone.make_aware(
+            datetime.combine(start + timedelta(days=32), datetime.min.time())
+        )
+        goods_receipt = create_goods_receipt(
+            organization=organization,
+            actor=owner,
+            purchase_order=purchase_order,
+            receipt_number=f"GRC-{organization_index:02d}-{project_index:02d}-01",
+            received_at=received_at,
+            notes="مقدار و کیفیت اقلام تحویلی در محل انبار کنترل شد.",
+        )
+        receipt_items = []
+        for order_item in order_items:
+            receipt_items.append(
+                add_goods_receipt_item(
+                    organization=organization,
+                    actor=owner,
+                    goods_receipt=goods_receipt,
+                    purchase_order_item=order_item,
+                    quantity=order_item.quantity,
+                    notes="کالا سالم و مطابق سفارش تحویل گرفته شد.",
+                )
+            )
+        goods_receipt = post_goods_receipt(
+            organization=organization,
+            actor=owner,
+            goods_receipt=goods_receipt,
+        )
+        for item_index, receipt_item in enumerate(receipt_items, start=1):
+            stock_transaction = create_stock_transaction(
+                organization=organization,
+                actor=owner,
+                transaction_number=(
+                    f"STK-{organization_index:02d}-{project_index:02d}-{item_index:02d}"
+                ),
+                transaction_type="receipt",
+                material=receipt_item.material,
+                unit_of_measure=receipt_item.unit_of_measure,
+                quantity=receipt_item.quantity,
+                occurred_at=received_at,
+                destination_warehouse=warehouse,
+                project=project,
+                goods_receipt_item=receipt_item,
+                reference=goods_receipt.receipt_number,
+                notes="ورود مصالح خریداری‌شده به موجودی انبار کارگاه",
+            )
+            post_stock_transaction(
+                organization=organization,
+                actor=owner,
+                stock_transaction=stock_transaction,
             )

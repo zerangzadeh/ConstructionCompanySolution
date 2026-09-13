@@ -15,32 +15,30 @@ from apps.materials.models import (
     UnitCategory,
     UnitOfMeasure,
 )
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
 
 
-def _can_manage_units(user: User, organization: Organization) -> bool:
-    return has_business_permission(
-        user=user,
-        organization=organization,
-        permission=BusinessPermissionCode.MATERIALS_MANAGE,
-    )
-
-
 def _require_active_management_access(
-    *, organization: Organization, actor: User
+    *,
+    organization: Organization,
+    actor: User,
+    permission: BusinessPermissionCode,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if organization.status != OrganizationStatus.ACTIVE or organization.deleted_at:
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_units(actor, organization):
-        raise PermissionDenied("اجازه مدیریت واحدهای اندازه‌گیری این سازمان را ندارید.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        message="اجازه انجام این عملیات روی اطلاعات مصالح را ندارید.",
+    )
 
 
 @transaction.atomic
@@ -54,7 +52,11 @@ def create_unit_of_measure(
     category: str,
     decimal_places: int = 0,
 ) -> UnitOfMeasure:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.UNITS_CREATE,
+    )
     if category not in UnitCategory.values:
         raise ValueError("دسته‌بندی واحد اندازه‌گیری معتبر نیست.")
     unit = UnitOfMeasure(
@@ -85,15 +87,12 @@ def create_unit_of_measure(
 def get_organization_units(
     *, user: User, organization: Organization
 ) -> QuerySet[UnitOfMeasure]:
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.UNITS_VIEW,
+        message="اجازه مشاهده واحدهای اندازه‌گیری این سازمان را ندارید.",
+    )
     return UnitOfMeasure.objects.filter(
         organization=organization, archived_at__isnull=True
     )
@@ -103,7 +102,11 @@ def get_organization_units(
 def archive_unit_of_measure(
     *, organization: Organization, actor: User, unit: UnitOfMeasure
 ) -> UnitOfMeasure:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.UNITS_ARCHIVE,
+    )
     locked_unit = UnitOfMeasure.objects.select_for_update().get(pk=unit.pk)
     if locked_unit.organization_id != organization.id:
         raise PermissionDenied("واحد اندازه‌گیری متعلق به این سازمان نیست.")
@@ -145,7 +148,11 @@ def create_material_category(
     name: str,
     parent: MaterialCategory | None = None,
 ) -> MaterialCategory:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIAL_CATEGORIES_CREATE,
+    )
     if parent and parent.organization_id != organization.id:
         raise PermissionDenied("دسته‌بندی والد متعلق به این سازمان نیست.")
     category = MaterialCategory(
@@ -183,7 +190,11 @@ def update_material_category(
     name: str,
     parent: MaterialCategory | None = None,
 ) -> MaterialCategory:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIAL_CATEGORIES_CHANGE,
+    )
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
         raise PermissionDenied("دسته‌بندی مصالح متعلق به این سازمان نیست.")
@@ -217,15 +228,12 @@ def update_material_category(
 def get_organization_material_categories(
     *, user: User, organization: Organization
 ) -> QuerySet[MaterialCategory]:
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.MATERIAL_CATEGORIES_VIEW,
+        message="اجازه مشاهده دسته‌بندی‌های مصالح این سازمان را ندارید.",
+    )
     return MaterialCategory.objects.filter(
         organization=organization, archived_at__isnull=True
     )
@@ -235,7 +243,11 @@ def get_organization_material_categories(
 def archive_material_category(
     *, organization: Organization, actor: User, category: MaterialCategory
 ) -> MaterialCategory:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIAL_CATEGORIES_ARCHIVE,
+    )
     locked_category = MaterialCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.id:
         raise PermissionDenied("دسته‌بندی مصالح متعلق به این سازمان نیست.")
@@ -276,7 +288,11 @@ def create_material(
     category: MaterialCategory | None = None,
     specifications: str = "",
 ) -> Material:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIALS_CREATE,
+    )
     material = Material(
         organization=organization,
         code=code,
@@ -318,7 +334,11 @@ def update_material(
     category: MaterialCategory | None = None,
     specifications: str = "",
 ) -> Material:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIALS_CHANGE,
+    )
     locked_material = Material.objects.select_for_update().get(pk=material.pk)
     if locked_material.organization_id != organization.id:
         raise PermissionDenied("مصالح متعلق به این سازمان نیست.")
@@ -352,15 +372,12 @@ def update_material(
 def get_organization_materials(
     *, user: User, organization: Organization, search: str = ""
 ) -> QuerySet[Material]:
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.MATERIALS_VIEW,
+        message="اجازه مشاهده مصالح این سازمان را ندارید.",
+    )
     queryset = Material.objects.filter(
         organization=organization, archived_at__isnull=True
     ).select_related("category", "unit_of_measure")
@@ -377,7 +394,11 @@ def get_organization_materials(
 def archive_material(
     *, organization: Organization, actor: User, material: Material
 ) -> Material:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.MATERIALS_ARCHIVE,
+    )
     locked_material = Material.objects.select_for_update().get(pk=material.pk)
     if locked_material.organization_id != organization.id:
         raise PermissionDenied("مصالح متعلق به این سازمان نیست.")

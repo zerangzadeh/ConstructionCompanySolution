@@ -11,7 +11,6 @@ from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.authorization import (
-    get_active_membership,
     membership_has_permission,
     require_business_permission,
 )
@@ -36,10 +35,18 @@ from apps.projects.models import Project
 from core.identifiers import canonicalize_upper_identifier
 
 
-def _validate_active_access(*, organization: Organization, user: User) -> None:
-    if user.is_superuser and user.is_active:
-        return
-    get_active_membership(user=user, organization=organization)
+def _validate_active_access(
+    *,
+    organization: Organization,
+    user: User,
+    permission: BusinessPermissionCode,
+) -> None:
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=permission,
+        message="اجازه مشاهده اطلاعات خرید این سازمان را ندارید.",
+    )
 
 
 def _require_role(
@@ -59,7 +66,7 @@ def _has_management_access(
     return actor.is_superuser or bool(
         membership
         and membership_has_permission(
-            membership, BusinessPermissionCode.PROCUREMENT_MANAGE
+            membership, BusinessPermissionCode.PURCHASE_REQUESTS_APPROVE
         )
     )
 
@@ -128,7 +135,7 @@ def _get_locked_order(
 ) -> PurchaseOrder:
     try:
         order = (
-            PurchaseOrder.objects.select_for_update()
+            PurchaseOrder.objects.select_for_update(of=("self",))
             .select_related("project", "supplier", "purchase_request")
             .get(pk=purchase_order.pk, organization=organization)
         )
@@ -166,7 +173,7 @@ def create_purchase_request(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.PURCHASE_REQUESTS_CREATE,
         message="اجازه ایجاد درخواست خرید در این سازمان را ندارید.",
     )
     _validate_project(organization=organization, project=project)
@@ -213,7 +220,7 @@ def add_purchase_request_item(
     membership = _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.PURCHASE_REQUEST_ITEMS_ADD,
         message="اجازه ویرایش درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
@@ -268,7 +275,7 @@ def submit_purchase_request(
     membership = _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.PURCHASE_REQUESTS_SUBMIT,
         message="اجازه ارسال درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
@@ -310,7 +317,11 @@ def decide_purchase_request(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=(
+            BusinessPermissionCode.PURCHASE_REQUESTS_APPROVE
+            if approve
+            else BusinessPermissionCode.PURCHASE_REQUESTS_REJECT
+        ),
         message="اجازه تأیید درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
@@ -400,7 +411,7 @@ def cancel_purchase_request(
     membership = _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.PURCHASE_REQUESTS_CANCEL,
         message="اجازه لغو درخواست‌های خرید این سازمان را ندارید.",
     )
     request = _get_locked_request(
@@ -439,7 +450,11 @@ def cancel_purchase_request(
 def get_organization_purchase_requests(
     *, user: User, organization: Organization
 ) -> QuerySet[PurchaseRequest]:
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.PURCHASE_REQUESTS_VIEW,
+    )
     return PurchaseRequest.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related("project", "created_by", "approved_by", "updated_by")
@@ -474,7 +489,7 @@ def create_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=BusinessPermissionCode.PURCHASE_ORDERS_CREATE,
         message="اجازه ایجاد سفارش خرید در این سازمان را ندارید.",
     )
     _validate_project(organization=organization, project=project)
@@ -538,7 +553,7 @@ def add_purchase_order_item(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=BusinessPermissionCode.PURCHASE_ORDER_ITEMS_ADD,
         message="اجازه ویرایش سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
@@ -617,7 +632,7 @@ def issue_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=BusinessPermissionCode.PURCHASE_ORDERS_ISSUE,
         message="اجازه صدور سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
@@ -655,7 +670,7 @@ def cancel_purchase_order(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=BusinessPermissionCode.PURCHASE_ORDERS_CANCEL,
         message="اجازه لغو سفارش‌های خرید این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
@@ -693,7 +708,11 @@ def cancel_purchase_order(
 def get_organization_purchase_orders(
     *, user: User, organization: Organization
 ) -> QuerySet[PurchaseOrder]:
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.PURCHASE_ORDERS_VIEW,
+    )
     return PurchaseOrder.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related(
@@ -729,7 +748,7 @@ def create_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.GOODS_RECEIPTS_CREATE,
         message="اجازه دریافت کالا در این سازمان را ندارید.",
     )
     order = _get_locked_order(organization=organization, purchase_order=purchase_order)
@@ -778,7 +797,7 @@ def add_goods_receipt_item(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.GOODS_RECEIPT_ITEMS_ADD,
         message="اجازه ویرایش رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
@@ -846,7 +865,7 @@ def post_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_REQUEST,
+        permission=BusinessPermissionCode.GOODS_RECEIPTS_POST,
         message="اجازه نهایی‌سازی رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
@@ -912,7 +931,7 @@ def void_goods_receipt(
     _require_role(
         organization=organization,
         actor=actor,
-        permission=BusinessPermissionCode.PROCUREMENT_MANAGE,
+        permission=BusinessPermissionCode.GOODS_RECEIPTS_VOID,
         message="اجازه ابطال رسیدهای کالای این سازمان را ندارید.",
     )
     receipt = _get_locked_receipt(
@@ -967,7 +986,11 @@ def void_goods_receipt(
 def get_organization_goods_receipts(
     *, user: User, organization: Organization
 ) -> QuerySet[GoodsReceipt]:
-    _validate_active_access(organization=organization, user=user)
+    _validate_active_access(
+        organization=organization,
+        user=user,
+        permission=BusinessPermissionCode.GOODS_RECEIPTS_VIEW,
+    )
     return GoodsReceipt.objects.filter(
         organization=organization, project__deleted_at__isnull=True
     ).select_related(

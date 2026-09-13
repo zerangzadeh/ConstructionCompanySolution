@@ -1,0 +1,15 @@
+<div class="space-y-3">
+    {% if widget.is_initial %}
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <p class="text-sm font-medium text-slate-700">تصویر پروفایل فعلی ثبت شده است.</p>
+            {% if not widget.required %}
+                <label class="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-red-700" for="{{ widget.checkbox_id }}">
+                    <input class="h-4 w-4 rounded border-slate-300 text-red-600 focus:ring-red-200" type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}{% if widget.attrs.checked %} checked{% endif %}>
+                    <span>{{ widget.clear_checkbox_label }}</span>
+                </label>
+            {% endif %}
+        </div>
+        <p class="text-sm text-slate-500">برای جایگزینی تصویر، فایل جدیدی انتخاب کنید.</p>
+    {% endif %}
+    <input type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+</div>

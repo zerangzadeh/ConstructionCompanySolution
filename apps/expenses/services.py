@@ -18,7 +18,6 @@ from apps.expenses.models import (
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -26,11 +25,15 @@ from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectPhase
 
 
-def _can_manage_expenses(user: User, organization: Organization) -> bool:
+def _has_expense_permission(
+    user: User,
+    organization: Organization,
+    permission: BusinessPermissionCode,
+) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
-        permission=BusinessPermissionCode.EXPENSES_MANAGE,
+        permission=permission,
     )
 
 
@@ -39,6 +42,7 @@ def _validate_context(
     actor: User,
     organization: Organization,
     project: Project,
+    permission: BusinessPermissionCode,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
@@ -47,7 +51,7 @@ def _validate_context(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_expenses(actor, organization):
+    if not _has_expense_permission(actor, organization, permission):
         raise PermissionDenied("اجازه مدیریت هزینه‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -83,7 +87,12 @@ def create_expense(
 ) -> Expense:
     """Record a non-negative expense for a project."""
 
-    _validate_context(actor=actor, organization=organization, project=project)
+    _validate_context(
+        actor=actor,
+        organization=organization,
+        project=project,
+        permission=BusinessPermissionCode.EXPENSES_CREATE,
+    )
     if phase is not None:
         _validate_phase(organization=organization, project=project, phase=phase)
     if not description.strip():
@@ -155,15 +164,10 @@ def get_organization_expenses(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
+    if not _has_expense_permission(
+        user, organization, BusinessPermissionCode.EXPENSES_VIEW
     ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+        raise PermissionDenied("اجازه مشاهده هزینه‌های این سازمان را ندارید.")
     return (
         Expense.objects.filter(
             organization=organization,
@@ -192,6 +196,7 @@ def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
         actor=actor,
         organization=locked_expense.organization,
         project=locked_expense.project,
+        permission=BusinessPermissionCode.EXPENSES_VOID,
     )
     if locked_expense.status != ExpenseStatus.RECORDED:
         raise ValueError("فقط هزینه ثبت‌شده قابل ابطال است.")
@@ -228,7 +233,11 @@ def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
 def create_expense_category(
     *, organization: Organization, actor: User, code: str, name: str
 ) -> ExpenseCategory:
-    _validate_category_management(organization=organization, actor=actor)
+    _validate_category_permission(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.EXPENSE_CATEGORIES_CREATE,
+    )
     category = ExpenseCategory(
         organization=organization,
         code=code,
@@ -251,20 +260,47 @@ def create_expense_category(
     return category
 
 
-def _validate_category_management(*, organization: Organization, actor: User) -> None:
+def _validate_category_permission(
+    *,
+    organization: Organization,
+    actor: User,
+    permission: BusinessPermissionCode,
+) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if organization.status != OrganizationStatus.ACTIVE or organization.deleted_at:
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_expenses(actor, organization):
-        raise PermissionDenied("اجازه مدیریت هزینه‌های این سازمان را ندارید.")
+    if not _has_expense_permission(actor, organization, permission):
+        raise PermissionDenied("اجازه دسترسی به دسته‌های هزینه این سازمان را ندارید.")
+
+
+def get_organization_expense_categories(
+    *, user: User, organization: Organization, active_only: bool = False
+) -> QuerySet[ExpenseCategory]:
+    """Return expense categories after enforcing tenant-aware view access."""
+
+    _validate_category_permission(
+        organization=organization,
+        actor=user,
+        permission=BusinessPermissionCode.EXPENSE_CATEGORIES_VIEW,
+    )
+    queryset = ExpenseCategory.objects.filter(organization=organization).order_by(
+        "name"
+    )
+    if active_only:
+        queryset = queryset.filter(is_active=True, archived_at__isnull=True)
+    return queryset
 
 
 @transaction.atomic
 def archive_expense_category(
     *, organization: Organization, actor: User, category: ExpenseCategory
 ) -> ExpenseCategory:
-    _validate_category_management(organization=organization, actor=actor)
+    _validate_category_permission(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.EXPENSE_CATEGORIES_ARCHIVE,
+    )
     locked_category = ExpenseCategory.objects.select_for_update().get(pk=category.pk)
     if locked_category.organization_id != organization.pk:
         raise PermissionDenied("دسته هزینه متعلق به این سازمان نیست.")

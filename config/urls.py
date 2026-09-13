@@ -20,4 +20,9 @@ urlpatterns = [
     path("documents/", include("apps.documents.urls")),
     path("financials/", include("apps.financials.urls")),
     path("daily-reports/", include("apps.daily_reports.urls")),
+    path("procurement/", include("apps.procurement.urls")),
+    path("inventory/", include("apps.inventory.urls")),
+    path("equipment/", include("apps.equipment.urls")),
+    path("safety/", include("apps.safety.urls")),
+    path("quality/", include("apps.quality.urls")),
 ]

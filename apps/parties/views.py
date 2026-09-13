@@ -8,7 +8,13 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.authorization import has_business_permission
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+    require_organization_permission,
+)
+from apps.organizations.models import BusinessPermissionCode
 from apps.parties.forms import BusinessPartyForm, PartyContactForm, PartyRoleForm
 from apps.parties.models import BusinessParty
 from apps.parties.services import (
@@ -28,6 +34,7 @@ def _get_active_party(request: HttpRequest, party_id: str) -> BusinessParty | No
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTIES_VIEW)
 def party_list(request: HttpRequest) -> HttpResponse:
     parties = get_organization_parties(
         user=request.user, organization=request.organization
@@ -36,6 +43,7 @@ def party_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTIES_CREATE)
 def party_create(request: HttpRequest) -> HttpResponse:
     form = BusinessPartyForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -53,11 +61,25 @@ def party_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTIES_VIEW)
 def party_detail(request: HttpRequest, party_id: str) -> HttpResponse:
+    if request.method == "POST":
+        require_organization_permission(
+            request,
+            BusinessPermissionCode.PARTIES_CHANGE,
+            "اجازه ویرایش طرف تجاری را ندارید.",
+        )
     party = _get_active_party(request, party_id)
     if party is None:
         return HttpResponseNotFound("طرف تجاری یافت نشد.")
     form = BusinessPartyForm(request.POST or None, instance=party)
+    if request.method == "GET" and not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.PARTIES_CHANGE,
+    ):
+        for field in form.fields.values():
+            field.disabled = True
     if request.method == "POST" and form.is_valid():
         try:
             party = update_business_party(
@@ -83,6 +105,7 @@ def party_detail(request: HttpRequest, party_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTIES_ARCHIVE)
 @require_POST
 def party_archive(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
@@ -98,6 +121,7 @@ def party_archive(request: HttpRequest, party_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTY_ROLES_ASSIGN)
 @require_POST
 def party_role_create(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)
@@ -119,6 +143,7 @@ def party_role_create(request: HttpRequest, party_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PARTY_CONTACTS_ADD)
 @require_POST
 def party_contact_create(request: HttpRequest, party_id: str) -> HttpResponse:
     party = _get_active_party(request, party_id)

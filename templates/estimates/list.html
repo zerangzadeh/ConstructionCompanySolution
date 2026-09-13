@@ -1,27 +1,35 @@
 {% extends "base.html" %}
 {% load erp_format %}
+
 {% block title %}برآوردها | سامانه مدیریت ساخت{% endblock %}
+
 {% block content %}
-<div dir="rtl">
-{% url "estimates:create" as estimate_create_url %}
-{% include "components/page_header.html" with page_eyebrow="مدیریت برآوردها" page_title="فهرست برآوردها" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="برآورد جدید" only %}
-<div class="erp-surface mt-6 overflow-x-auto rounded-xl">
-{% if estimates %}
-<div class="min-w-[58rem]">
-<div class="grid grid-cols-[minmax(18rem,1fr)_minmax(14rem,1fr)_9rem_12rem_7rem] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-semibold text-slate-500"><span>برآورد</span><span>پروژه / فاز</span><span>وضعیت</span><span class="text-left">مبلغ</span><span class="text-left">عملیات</span></div>
-<div class="divide-y divide-slate-100">
-{% for estimate in estimates %}
-<div class="grid grid-cols-[minmax(18rem,1fr)_minmax(14rem,1fr)_9rem_12rem_7rem] items-center gap-4 px-5 py-4 hover:bg-slate-50">
-<div class="min-w-0"><p class="truncate font-semibold text-slate-900"><span dir="ltr" class="inline-block text-slate-600">{{ estimate.estimate_number }}</span><span class="px-1 text-slate-400" aria-hidden="true">—</span>{{ estimate.title }}</p>{% if estimate.notes %}<p class="mt-1 truncate text-sm text-slate-500">{{ estimate.notes }}</p>{% endif %}</div>
-<div class="min-w-0 text-sm text-slate-600"><p class="truncate">{{ estimate.project.name }}</p><p class="mt-1 truncate text-xs text-slate-500">{% if estimate.phase %}{{ estimate.phase.name }}{% endif %}{% if estimate.contract %}{% if estimate.phase %} · {% endif %}<span dir="ltr">{{ estimate.contract.contract_number }}</span>{% endif %}</p></div>
-<div><span class="inline-flex rounded-full {% if estimate.status == 'approved' %}bg-emerald-50 text-emerald-700{% elif estimate.status == 'revised' %}bg-blue-50 text-blue-700{% else %}bg-slate-100 text-slate-700{% endif %} px-2.5 py-1 text-xs font-semibold">{% if estimate.status == 'draft' %}پیش‌نویس{% elif estimate.status == 'approved' %}تأییدشده{% elif estimate.status == 'revised' %}اصلاح‌شده{% elif estimate.status == 'archived' %}بایگانی‌شده{% else %}{{ estimate.status|status_fa }}{% endif %}</span></div>
-<div class="text-left text-sm text-slate-700" dir="ltr">{{ estimate.total_amount|erp_number }} <span dir="rtl">{{ request.organization.currency }}</span></div>
-<div class="text-left"><a class="text-sm font-semibold text-blue-600 hover:text-blue-700" href="{% url 'estimates:detail' estimate.id %}">مشاهده جزئیات</a></div>
-</div>
-{% endfor %}
-</div></div>
-{% else %}
-<div class="p-12 text-center"><h2 class="text-lg font-semibold text-slate-900">هنوز برآوردی ثبت نشده است</h2><p class="mt-2 text-sm text-slate-500">برای شروع، یک برآورد جدید ثبت کنید.</p><a class="mt-5 inline-flex items-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'estimates:create' %}">ایجاد برآورد</a></div>
-{% endif %}
-</div></div>
+    {% if "estimates.create" in business_permission_codes %}{% url "estimates:create" as estimate_create_url %}{% endif %}
+    {% include "components/page_header.html" with page_eyebrow="مدیریت برآوردها" page_title="فهرست برآوردها" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="برآورد جدید" only %}
+
+    <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست برآوردها">
+        {% if estimates %}
+            <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">برآوردهای پروژه</h2><p class="mt-0.5 text-[11px] text-slate-500">مبالغ و وضعیت آخرین نسخهٔ هر برآورد</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ estimates|length }} رکورد</span></div>
+            <div class="erp-table-wrap">
+                <table class="w-full min-w-[920px] text-right">
+                    <thead><tr><th class="border-b border-slate-200 px-4 py-3">شماره برآورد</th><th class="border-b border-slate-200 px-4 py-3">عنوان</th><th class="border-b border-slate-200 px-4 py-3">پروژه / فاز</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3 text-left">مبلغ</th><th class="w-24 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for estimate in estimates %}
+                            <tr>
+                                <td class="whitespace-nowrap px-4 py-3.5 font-medium text-slate-700" dir="ltr">{{ estimate.estimate_number }}</td>
+                                <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'estimates:detail' estimate.id %}">{{ estimate.title }}</a>{% if estimate.notes %}<p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500">{{ estimate.notes }}</p>{% endif %}</td>
+                                <td class="px-4 py-3.5"><p class="font-medium text-slate-700">{{ estimate.project.name }}</p><p class="mt-0.5 text-[11px] text-slate-500">{% if estimate.phase %}{{ estimate.phase.name }}{% endif %}{% if estimate.contract %}{% if estimate.phase %} · {% endif %}<span dir="ltr">{{ estimate.contract.contract_number }}</span>{% endif %}</p></td>
+                                <td class="px-4 py-3.5">{% include "components/status_badge.html" with status=estimate.status label=estimate.status|status_fa only %}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums text-slate-900" dir="ltr">{{ estimate.total_amount|erp_number }} <span class="font-normal text-slate-500" dir="rtl">{{ request.organization.currency }}</span></td>
+                                <td class="px-4 py-3.5 text-center"><a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="{% url 'estimates:detail' estimate.id %}">جزئیات</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ estimates|length }} برآورد</div>
+        {% else %}
+            {% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برای شروع، یک برآورد جدید ثبت کنید." empty_action_url=estimate_create_url empty_action_label="ایجاد برآورد" only %}
+        {% endif %}
+    </section>
 {% endblock %}

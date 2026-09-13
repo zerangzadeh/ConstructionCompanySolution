@@ -38,6 +38,9 @@ INSTALLED_APPS: list[str] = [
     "apps.workforce",
     "apps.procurement",
     "apps.inventory",
+    "apps.equipment",
+    "apps.safety",
+    "apps.quality",
 ]
 
 MIDDLEWARE: list[str] = [
@@ -71,6 +74,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.organizations.context_processors.business_permissions",
             ],
         },
     },

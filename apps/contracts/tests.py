@@ -8,7 +8,14 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.contracts.models import ContractStatus
 from apps.contracts.services import create_contract, get_organization_contracts
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.organizations.models import (
+    BusinessPermission,
+    BusinessPermissionCode,
+    MembershipRole,
+    MembershipStatus,
+    Organization,
+    OrganizationRole,
+)
 from apps.projects.services import create_project
 
 
@@ -146,6 +153,81 @@ class ContractServiceTests(TestCase):
                 user=self.other_user,
                 organization=self.organization,
             )
+
+    def test_active_member_without_view_permission_cannot_see_contracts(self) -> None:
+        restricted_user = User.objects.create_user(
+            username="restricted-contract-user",
+            password="test-password",
+        )
+        restricted_role = OrganizationRole.objects.create(
+            code="restricted_contract_role",
+            name="بدون دسترسی قرارداد",
+        )
+        self.organization.memberships.create(
+            user=restricted_user,
+            role_definition=restricted_role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "اجازه مشاهده قراردادهای این سازمان را ندارید.",
+        ):
+            get_organization_contracts(
+                user=restricted_user,
+                organization=self.organization,
+            )
+
+        self.client.force_login(restricted_user)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+        response = self.client.get(reverse("contracts:list"))
+        self.assertEqual(response.status_code, 403)
+
+    def test_view_permission_allows_read_but_not_contract_management(self) -> None:
+        viewer = User.objects.create_user(
+            username="contract-viewer",
+            password="test-password",
+        )
+        viewer_role = OrganizationRole.objects.create(
+            code="contract_view_only",
+            name="مشاهده قراردادها",
+        )
+        viewer_role.permissions.add(
+            BusinessPermission.objects.get(code=BusinessPermissionCode.CONTRACTS_VIEW)
+        )
+        self.organization.memberships.create(
+            user=viewer,
+            role_definition=viewer_role,
+            status=MembershipStatus.ACTIVE,
+        )
+        create_contract(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            contract_number="C-VIEW-ONLY",
+            title="Read-only contract",
+            counterparty_name="Client LLC",
+        )
+
+        contracts = get_organization_contracts(
+            user=viewer,
+            organization=self.organization,
+        )
+        self.assertEqual(
+            list(contracts.values_list("title", flat=True)), ["Read-only contract"]
+        )
+
+        self.client.force_login(viewer)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+        list_response = self.client.get(reverse("contracts:list"))
+        create_response = self.client.get(reverse("contracts:create"))
+        self.assertEqual(list_response.status_code, 200)
+        self.assertNotContains(list_response, "قرارداد جدید")
+        self.assertEqual(create_response.status_code, 403)
 
     def test_contract_list_requires_active_organization(self) -> None:
         self.client.force_login(self.other_user)

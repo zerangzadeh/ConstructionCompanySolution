@@ -1,0 +1,3 @@
+<span class="erp-badge {% if status == 'active' or status == 'approved' or status == 'completed' or status == 'posted' or status == 'paid' or status == 'accepted' %}erp-badge--success{% elif status == 'planning' or status == 'submitted' or status == 'revised' or status == 'in_progress' or status == 'under_review' %}erp-badge--info{% elif status == 'pending' or status == 'on_hold' or status == 'delayed' %}erp-badge--warning{% elif status == 'cancelled' or status == 'terminated' or status == 'void' or status == 'voided' or status == 'rejected' or status == 'failed' %}erp-badge--danger{% else %}erp-badge--neutral{% endif %}">
+    {{ label|default:status }}
+</span>

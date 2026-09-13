@@ -1,0 +1,100 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}{% if form.errors %}خطا | {% endif %}ورود به پنل مدیریت | سازه یار{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static 'admin/css/login.css' %}">{{ form.media }}{% endblock %}
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+<main class="erp-admin-login-shell" aria-labelledby="erp-login-title">
+    <section class="erp-admin-login-intro" aria-label="معرفی پنل مدیریت">
+        <div>
+            <span class="erp-admin-login-kicker">
+                <span aria-hidden="true"></span>
+                مدیریت یکپارچه سازمان
+            </span>
+            <h1><span>مرکز کنترل</span><span>سامانه سازه یار</span></h1>
+            <p>مدیریت کاربران، شرکت‌ها و تنظیمات سامانه در یک محیط امن و ساختاریافته.</p>
+        </div>
+        <div class="erp-admin-login-assurance">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3 5 6v5c0 4.6 2.9 8.4 7 10 4.1-1.6 7-5.4 7-10V6l-7-3Z"/>
+                <path d="m9 12 2 2 4-4"/>
+            </svg>
+            <span><strong>دسترسی کنترل‌شده</strong><small>ورود و فعالیت‌های مدیریتی ثبت و پایش می‌شوند.</small></span>
+        </div>
+    </section>
+
+    <section class="erp-admin-login-form-panel" aria-labelledby="erp-login-title">
+        <div class="erp-admin-login-heading">
+            <span class="erp-admin-login-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3M6 11h12v10H6z"/><path d="M12 15v2"/></svg>
+            </span>
+            <div>
+                <p>خوش آمدید</p>
+                <h2 id="erp-login-title">ورود به پنل مدیریت</h2>
+            </div>
+        </div>
+        <p class="erp-admin-login-lead">برای ادامه، اطلاعات حساب مدیریتی خود را وارد کنید.</p>
+
+        {% if form.errors and not form.non_field_errors %}
+            <div class="erp-admin-login-alert" role="alert">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
+                <span>لطفاً خطاهای مشخص‌شده را اصلاح کنید.</span>
+            </div>
+        {% endif %}
+
+        {% for error in form.non_field_errors %}
+            <div class="erp-admin-login-alert" role="alert">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
+                <span>{{ error }}</span>
+            </div>
+        {% endfor %}
+
+        {% if user.is_authenticated %}
+            <div class="erp-admin-login-alert" role="alert">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 4.5 2.7 18a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 4.5a2 2 0 0 0-3.4 0Z"/></svg>
+                <span>حساب «{{ username }}» اجازهٔ دسترسی به این بخش را ندارد. می‌توانید با حساب دیگری وارد شوید.</span>
+            </div>
+        {% endif %}
+
+        <form action="{{ app_path }}" method="post" id="login-form" novalidate>
+            {% csrf_token %}
+            <div class="erp-admin-login-field{% if form.username.errors %} has-error{% endif %}">
+                <label for="{{ form.username.id_for_label }}">نام کاربری</label>
+                <div class="erp-admin-login-control">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg>
+                    {{ form.username }}
+                </div>
+                {{ form.username.errors }}
+            </div>
+            <div class="erp-admin-login-field{% if form.password.errors %} has-error{% endif %}">
+                <label for="{{ form.password.id_for_label }}">گذرواژه</label>
+                <div class="erp-admin-login-control">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11V8a5 5 0 0 1 10 0v3M5 11h14v10H5z"/><path d="M12 15v2"/></svg>
+                    {{ form.password }}
+                </div>
+                {{ form.password.errors }}
+                <input type="hidden" name="next" value="{{ next }}">
+            </div>
+            {% url 'admin_password_reset' as password_reset_url %}
+            {% if password_reset_url %}
+                <div class="erp-admin-login-help"><a href="{{ password_reset_url }}">بازیابی اطلاعات ورود</a></div>
+            {% endif %}
+            <button type="submit" class="erp-admin-login-submit">
+                <span>ورود به پنل</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg>
+            </button>
+        </form>
+        <p class="erp-admin-login-footnote">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"/><path d="M12 11v6m0-10h.01"/></svg>
+            این بخش ویژهٔ مدیران مجاز سامانه است.
+        </p>
+    </section>
+</main>
+{% endblock %}

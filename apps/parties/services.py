@@ -6,10 +6,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -23,23 +22,22 @@ from apps.parties.models import (
 )
 
 
-def _can_manage_parties(user: User, organization: Organization) -> bool:
-    return has_business_permission(
-        user=user,
-        organization=organization,
-        permission=BusinessPermissionCode.PARTIES_MANAGE,
-    )
-
-
 def _require_active_management_access(
-    *, organization: Organization, actor: User
+    *,
+    organization: Organization,
+    actor: User,
+    permission: BusinessPermissionCode,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if organization.status != OrganizationStatus.ACTIVE or organization.deleted_at:
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_parties(actor, organization):
-        raise PermissionDenied("اجازه مدیریت طرف‌های تجاری این سازمان را ندارید.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+        message="اجازه انجام این عملیات روی طرف‌های تجاری را ندارید.",
+    )
 
 
 @transaction.atomic
@@ -54,7 +52,11 @@ def create_business_party(
 ) -> BusinessParty:
     """Create an independently usable tenant-owned party."""
 
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PARTIES_CREATE,
+    )
     if party_kind not in PartyKind.values:
         raise ValueError("نوع طرف تجاری معتبر نیست.")
     party = BusinessParty(
@@ -95,7 +97,11 @@ def update_business_party(
 ) -> BusinessParty:
     """Update an active tenant-owned party without changing its identity."""
 
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PARTIES_CHANGE,
+    )
     locked_party = BusinessParty.objects.select_for_update().get(pk=party.pk)
     if locked_party.organization_id != organization.id:
         raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
@@ -129,15 +135,12 @@ def get_organization_parties(
 ) -> QuerySet[BusinessParty]:
     """List only active parties after checking the tenant membership."""
 
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.PARTIES_VIEW,
+        message="اجازه مشاهده طرف‌های تجاری این سازمان را ندارید.",
+    )
     return BusinessParty.objects.filter(
         organization=organization, archived_at__isnull=True
     ).prefetch_related("roles")
@@ -147,7 +150,11 @@ def get_organization_parties(
 def archive_business_party(
     *, organization: Organization, actor: User, party: BusinessParty
 ) -> BusinessParty:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PARTIES_ARCHIVE,
+    )
     locked_party = BusinessParty.objects.select_for_update().get(pk=party.pk)
     if locked_party.organization_id != organization.id:
         raise PermissionDenied("طرف تجاری متعلق به این سازمان نیست.")
@@ -171,7 +178,11 @@ def archive_business_party(
 def assign_party_role(
     *, organization: Organization, actor: User, party: BusinessParty, role: str
 ) -> PartyRole:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PARTY_ROLES_ASSIGN,
+    )
     if role not in PartyRoleType.values:
         raise ValueError("نقش طرف تجاری معتبر نیست.")
     locked_party = BusinessParty.objects.select_for_update().get(pk=party.pk)
@@ -207,7 +218,11 @@ def add_party_contact(
     label: str = "",
     is_primary: bool = False,
 ) -> PartyContact:
-    _require_active_management_access(organization=organization, actor=actor)
+    _require_active_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PARTY_CONTACTS_ADD,
+    )
     if contact_type not in ContactType.values:
         raise ValueError("نوع راه ارتباطی معتبر نیست.")
     locked_party = BusinessParty.objects.select_for_update().get(pk=party.pk)

@@ -24,10 +24,15 @@ from apps.daily_reports.services import (
     get_organization_daily_reports,
     submit_daily_report,
 )
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_VIEW)
 @require_GET
 def daily_report_list(request: HttpRequest) -> HttpResponse:
     reports = get_organization_daily_reports(
@@ -38,6 +43,7 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_CREATE)
 def daily_report_create(request: HttpRequest) -> HttpResponse:
     form = DailyReportForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():
@@ -66,6 +72,7 @@ def daily_report_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_VIEW)
 @require_GET
 def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
     report = get_organization_daily_report(
@@ -90,6 +97,7 @@ def daily_report_detail(request: HttpRequest, report_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR)
 @require_POST
 def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse:
     form = DailyReportLaborEntryForm(request.POST)
@@ -115,6 +123,7 @@ def daily_report_labor_add(request: HttpRequest, report_id: str) -> HttpResponse
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_EQUIPMENT)
 @require_POST
 def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResponse:
     form = DailyReportEquipmentEntryForm(request.POST)
@@ -139,6 +148,7 @@ def daily_report_equipment_add(request: HttpRequest, report_id: str) -> HttpResp
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_MATERIAL)
 @require_POST
 def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpResponse:
     form = DailyReportMaterialEntryForm(
@@ -168,6 +178,7 @@ def daily_report_material_add(request: HttpRequest, report_id: str) -> HttpRespo
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_ACTIVITY)
 @require_POST
 def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
     report = get_organization_daily_report(
@@ -192,6 +203,7 @@ def daily_activity_add(request: HttpRequest, report_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_ADD_DELAY)
 @require_POST
 def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
     report = get_organization_daily_report(
@@ -216,6 +228,7 @@ def delay_event_add(request: HttpRequest, report_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_SUBMIT)
 @require_POST
 def daily_report_submit(request: HttpRequest, report_id: str) -> HttpResponse:
     try:
@@ -230,6 +243,7 @@ def daily_report_submit(request: HttpRequest, report_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DAILY_REPORTS_APPROVE)
 @require_POST
 def daily_report_approve(request: HttpRequest, report_id: str) -> HttpResponse:
     try:

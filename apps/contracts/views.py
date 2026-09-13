@@ -3,20 +3,39 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
 from apps.contracts.forms import ContractForm
-from apps.contracts.services import create_contract, get_organization_contracts
-from apps.organizations.decorators import active_organization_required
+from apps.contracts.services import (
+    can_manage_contracts,
+    create_contract,
+    get_organization_contracts,
+)
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)
 def contract_list(request: HttpRequest) -> HttpResponse:
     contracts = get_organization_contracts(
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "contracts/list.html", {"contracts": contracts})
+    return render(
+        request,
+        "contracts/list.html",
+        {
+            "contracts": contracts,
+            "can_manage_contracts": can_manage_contracts(
+                request.user, request.organization
+            ),
+        },
+    )
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.CONTRACTS_CREATE)
 def contract_create(request: HttpRequest) -> HttpResponse:
     form = ContractForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():

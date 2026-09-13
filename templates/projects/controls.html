@@ -3,10 +3,8 @@
 {% block title %}کنترل پروژه | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
-    <div>
-        <p class="text-xs font-semibold text-blue-600" dir="ltr">{{ project.code }}</p>
-        <h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">ساختار شکست و فعالیت‌ها</h1>
-    </div>
+    {% url "projects:detail" project.id as project_detail_url %}
+    {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=project_detail_url page_eyebrow=project.code page_title="ساختار شکست و فعالیت‌ها" page_description="کنترل برنامه و ساختار اجرایی پروژه" only %}
 
     <div class="mt-6 grid gap-5 lg:grid-cols-2">
         <section class="erp-surface rounded-xl p-5">
@@ -20,22 +18,22 @@
                                 {% if node.parent %}والد: <span class="inline-block" dir="ltr">{{ node.parent.code }}</span>{% else %}سطح اصلی{% endif %}
                             </p>
                         </div>
-                        <form method="post" action="{% url 'projects:wbs_archive' project.pk node.pk %}">
+                        {% if "wbs_nodes.archive" in business_permission_codes %}<form method="post" action="{% url 'projects:wbs_archive' project.pk node.pk %}">
                             {% csrf_token %}
                             <button class="text-sm font-semibold text-red-700 hover:text-red-800" type="submit">بایگانی</button>
-                        </form>
+                        </form>{% endif %}
                     </div>
                 {% empty %}
                     <p class="text-slate-500">گرهی در ساختار شکست ثبت نشده است.</p>
                 {% endfor %}
             </div>
-            <form class="mt-5 space-y-3 border-t border-slate-100 pt-5" method="post" action="{% url 'projects:wbs_create' project.pk %}">
+            {% if "wbs_nodes.create" in business_permission_codes %}<form class="mt-5 space-y-3 border-t border-slate-100 pt-5" method="post" action="{% url 'projects:wbs_create' project.pk %}">
                 {% csrf_token %}
                 {% for field in wbs_form %}
                     {% include "components/form_field.html" with field=field only %}
                 {% endfor %}
                 <button class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700" type="submit">افزودن گره</button>
-            </form>
+            </form>{% endif %}
         </section>
 
         <section class="erp-surface rounded-xl p-5">
@@ -49,41 +47,33 @@
                                 <p class="mt-1 text-sm text-slate-500">
                                     <span class="inline-block" dir="ltr">{{ activity.wbs_node.code }}</span>
                                     <span class="px-1 text-slate-300" aria-hidden="true">·</span>
-                                    {% if activity.status == "active" or activity.status == "completed" %}
-                                        <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">{{ activity.get_status_display }}</span>
-                                    {% elif activity.status == "planning" %}
-                                        <span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">{{ activity.get_status_display }}</span>
-                                    {% elif activity.status == "on_hold" %}
-                                        <span class="inline-flex rounded-full bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-700">{{ activity.get_status_display }}</span>
-                                    {% else %}
-                                        <span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">{{ activity.get_status_display }}</span>
-                                    {% endif %}
+                                    {% include "components/status_badge.html" with status=activity.status label=activity.get_status_display only %}
                                 </p>
                             </div>
-                            <form method="post" action="{% url 'projects:activity_archive' project.pk activity.pk %}">
+                            {% if "activities.archive" in business_permission_codes %}<form method="post" action="{% url 'projects:activity_archive' project.pk activity.pk %}">
                                 {% csrf_token %}
                                 <button class="text-sm font-semibold text-red-700 hover:text-red-800" type="submit">بایگانی</button>
-                            </form>
+                            </form>{% endif %}
                         </div>
-                        {% if activity.status == "planning" or activity.status == "on_hold" %}
+                        {% if "activities.transition" in business_permission_codes %}{% if activity.status == "planning" or activity.status == "on_hold" %}
                             <form class="mt-2" method="post" action="{% url 'projects:activity_transition' project.pk activity.pk %}">
                                 {% csrf_token %}
                                 <input name="status" type="hidden" value="active">
                                 <button class="text-sm font-semibold text-blue-600 hover:text-blue-700" type="submit">فعال‌کردن</button>
                             </form>
-                        {% endif %}
+                        {% endif %}{% endif %}
                     </div>
                 {% empty %}
                     <p class="text-slate-500">فعالیتی ثبت نشده است.</p>
                 {% endfor %}
             </div>
-            <form class="mt-5 space-y-3 border-t border-slate-100 pt-5" method="post" action="{% url 'projects:activity_create' project.pk %}">
+            {% if "activities.create" in business_permission_codes %}<form class="mt-5 space-y-3 border-t border-slate-100 pt-5" method="post" action="{% url 'projects:activity_create' project.pk %}">
                 {% csrf_token %}
                 {% for field in activity_form %}
                     {% include "components/form_field.html" with field=field only %}
                 {% endfor %}
                 <button class="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-700" type="submit">افزودن فعالیت</button>
-            </form>
+            </form>{% endif %}
         </section>
     </div>
 {% endblock %}

@@ -11,10 +11,9 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.documents.models import DocumentType, ProjectDocument
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -40,15 +39,12 @@ FILE_SIGNATURES = {
 }
 
 
-def _can_manage_documents(user: User, organization: Organization) -> bool:
-    return has_business_permission(
-        user=user,
-        organization=organization,
-        permission=BusinessPermissionCode.DOCUMENTS_MANAGE,
-    )
-
-
-def _validate_access(*, user: User, organization: Organization) -> None:
+def _validate_access(
+    *,
+    user: User,
+    organization: Organization,
+    permission: BusinessPermissionCode,
+) -> None:
     if not user.is_authenticated or not user.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
     if (
@@ -56,15 +52,12 @@ def _validate_access(*, user: User, organization: Organization) -> None:
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not user.is_superuser
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
-    ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=permission,
+        message="اجازه انجام این عملیات روی اسناد پروژه را ندارید.",
+    )
 
 
 def _validate_upload_context(
@@ -74,9 +67,11 @@ def _validate_upload_context(
     project: Project,
     payment: Payment | None,
 ) -> None:
-    _validate_access(user=actor, organization=organization)
-    if not _can_manage_documents(actor, organization):
-        raise PermissionDenied("اجازه بارگذاری سند در این سازمان را ندارید.")
+    _validate_access(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.DOCUMENTS_UPLOAD,
+    )
     if project.organization_id != organization.pk or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if payment and (
@@ -173,7 +168,11 @@ def get_organization_documents(
 ) -> QuerySet[ProjectDocument]:
     """Return non-archived private documents visible to an active member."""
 
-    _validate_access(user=user, organization=organization)
+    _validate_access(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.DOCUMENTS_VIEW,
+    )
     return (
         ProjectDocument.objects.filter(
             organization=organization,
@@ -193,7 +192,11 @@ def get_organization_document(
 ) -> ProjectDocument:
     """Resolve one document only after tenant and membership validation."""
 
-    _validate_access(user=user, organization=organization)
+    _validate_access(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.DOCUMENTS_VIEW,
+    )
     document = (
         ProjectDocument.objects.filter(
             pk=document_id,
@@ -212,7 +215,11 @@ def get_organization_document(
 def record_document_download(*, document: ProjectDocument, actor: User) -> None:
     """Audit an authorized private-document download."""
 
-    _validate_access(user=actor, organization=document.organization)
+    _validate_access(
+        user=actor,
+        organization=document.organization,
+        permission=BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
+    )
     is_available = ProjectDocument.objects.filter(
         pk=document.pk,
         organization=document.organization,
@@ -245,9 +252,11 @@ def archive_project_document(
         .select_related("organization", "project")
         .get(pk=document.pk)
     )
-    _validate_access(user=actor, organization=locked_document.organization)
-    if not _can_manage_documents(actor, locked_document.organization):
-        raise PermissionDenied("اجازه بایگانی اسناد این سازمان را ندارید.")
+    _validate_access(
+        user=actor,
+        organization=locked_document.organization,
+        permission=BusinessPermissionCode.DOCUMENTS_ARCHIVE,
+    )
     if locked_document.project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
     if locked_document.archived_at is not None:

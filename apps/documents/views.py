@@ -10,10 +10,15 @@ from apps.documents.services import (
     record_document_download,
     upload_project_document,
 )
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_VIEW)
 def document_list(request: HttpRequest) -> HttpResponse:
     documents = get_organization_documents(
         user=request.user,
@@ -23,6 +28,7 @@ def document_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)
 def document_upload(request: HttpRequest) -> HttpResponse:
     form = ProjectDocumentForm(
         request.POST or None,
@@ -49,6 +55,7 @@ def document_upload(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_DOWNLOAD)
 def document_download(request: HttpRequest, document_id: str) -> FileResponse:
     document = get_organization_document(
         user=request.user,
@@ -67,6 +74,7 @@ def document_download(request: HttpRequest, document_id: str) -> FileResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_VIEW)
 def document_detail(request: HttpRequest, document_id: str) -> HttpResponse:
     document = get_organization_document(
         user=request.user,
@@ -81,6 +89,7 @@ def document_detail(request: HttpRequest, document_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_ARCHIVE)
 def document_archive(request: HttpRequest, document_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)

@@ -13,7 +13,6 @@ from apps.contracts.models import Contract
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -30,11 +29,15 @@ from apps.projects.models import Project, ProjectPhase
 from core.identifiers import canonicalize_upper_identifier
 
 
-def _can_manage_payments(user: User, organization: Organization) -> bool:
+def _has_payment_permission(
+    user: User,
+    organization: Organization,
+    permission: BusinessPermissionCode,
+) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
-        permission=BusinessPermissionCode.PAYMENTS_MANAGE,
+        permission=permission,
     )
 
 
@@ -43,6 +46,7 @@ def _validate_context(
     actor: User,
     organization: Organization,
     project: Project,
+    permission: BusinessPermissionCode,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
@@ -51,7 +55,7 @@ def _validate_context(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_payments(actor, organization):
+    if not _has_payment_permission(actor, organization, permission):
         raise PermissionDenied("اجازه مدیریت پرداخت‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -101,7 +105,12 @@ def create_payment(
 ) -> Payment:
     """Post an immutable cash transaction scoped to one tenant and project."""
 
-    _validate_context(actor=actor, organization=organization, project=project)
+    _validate_context(
+        actor=actor,
+        organization=organization,
+        project=project,
+        permission=BusinessPermissionCode.PAYMENTS_CREATE,
+    )
     if contract is not None:
         _validate_contract(
             organization=organization,
@@ -173,6 +182,7 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
         actor=actor,
         organization=locked_payment.organization,
         project=locked_payment.project,
+        permission=BusinessPermissionCode.PAYMENTS_VOID,
     )
     if locked_payment.status != PaymentStatus.POSTED:
         raise ValueError("فقط پرداخت ثبت‌شده قابل ابطال است.")
@@ -240,6 +250,7 @@ def allocate_payment(
         actor=actor,
         organization=locked_payment.organization,
         project=locked_payment.project,
+        permission=BusinessPermissionCode.PAYMENTS_ALLOCATE,
     )
     _validate_contract(
         organization=locked_payment.organization,
@@ -297,15 +308,10 @@ def get_organization_payments(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
+    if not _has_payment_permission(
+        user, organization, BusinessPermissionCode.PAYMENTS_VIEW
     ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+        raise PermissionDenied("اجازه مشاهده پرداخت‌های این سازمان را ندارید.")
     return (
         Payment.objects.filter(
             organization=organization,

@@ -3,10 +3,15 @@ from django.shortcuts import render
 from django.views.decorators.http import require_GET
 
 from apps.audit.services import get_organization_audit_events
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.AUDIT_VIEW)
 @require_GET
 def audit_log(request: HttpRequest) -> HttpResponse:
     """Display audit events for the authenticated user's active organization."""

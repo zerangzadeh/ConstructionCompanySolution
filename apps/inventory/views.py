@@ -1,0 +1,204 @@
+from collections import defaultdict
+from decimal import Decimal
+
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.shortcuts import redirect, render
+from django.views.decorators.http import require_GET, require_POST
+
+from apps.inventory.forms import ReversalForm, StockTransactionForm, WarehouseForm
+from apps.inventory.models import StockTransaction, StockTransactionStatus, Warehouse
+from apps.inventory.services import (
+    archive_warehouse,
+    create_stock_transaction,
+    create_warehouse,
+    get_organization_stock_transactions,
+    get_organization_warehouses,
+    post_stock_transaction,
+    reverse_stock_transaction,
+)
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
+
+
+def _warehouse(request: HttpRequest, warehouse_id: str) -> Warehouse | None:
+    return (
+        get_organization_warehouses(
+            user=request.user, organization=request.organization
+        )
+        .filter(pk=warehouse_id)
+        .first()
+    )
+
+
+def _transaction(request: HttpRequest, transaction_id: str) -> StockTransaction | None:
+    return (
+        get_organization_stock_transactions(
+            user=request.user, organization=request.organization
+        )
+        .filter(pk=transaction_id)
+        .first()
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WAREHOUSES_VIEW)
+@require_GET
+def warehouse_list(request: HttpRequest) -> HttpResponse:
+    warehouses = get_organization_warehouses(
+        user=request.user, organization=request.organization
+    )
+    return render(request, "inventory/warehouse_list.html", {"warehouses": warehouses})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WAREHOUSES_CREATE)
+def warehouse_create(request: HttpRequest) -> HttpResponse:
+    form = WarehouseForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            warehouse = create_warehouse(
+                organization=request.organization,
+                actor=request.user,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect("inventory:warehouse_detail", warehouse_id=warehouse.pk)
+    return render(request, "inventory/warehouse_form.html", {"form": form})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WAREHOUSES_VIEW)
+@require_GET
+def warehouse_detail(request: HttpRequest, warehouse_id: str) -> HttpResponse:
+    warehouse = _warehouse(request, warehouse_id)
+    if warehouse is None:
+        return HttpResponseNotFound("انبار یافت نشد.")
+    transactions = get_organization_stock_transactions(
+        user=request.user, organization=request.organization
+    ).filter(Q(source_warehouse=warehouse) | Q(destination_warehouse=warehouse))
+    balances: dict[object, Decimal] = defaultdict(lambda: Decimal("0.0000"))
+    materials: dict[object, object] = {}
+    for record in transactions.filter(
+        status__in=[StockTransactionStatus.POSTED, StockTransactionStatus.REVERSED]
+    ):
+        materials[record.material_id] = record.material
+        if record.destination_warehouse_id == warehouse.pk:
+            balances[record.material_id] += record.quantity
+        if record.source_warehouse_id == warehouse.pk:
+            balances[record.material_id] -= record.quantity
+    balance_rows = [
+        {"material": materials[material_id], "quantity": quantity}
+        for material_id, quantity in balances.items()
+        if quantity != Decimal("0.0000")
+    ]
+    return render(
+        request,
+        "inventory/warehouse_detail.html",
+        {
+            "warehouse": warehouse,
+            "transactions": transactions[:20],
+            "balance_rows": balance_rows,
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WAREHOUSES_ARCHIVE)
+@require_POST
+def warehouse_archive(request: HttpRequest, warehouse_id: str) -> HttpResponse:
+    warehouse = _warehouse(request, warehouse_id)
+    if warehouse is None:
+        return HttpResponseNotFound("انبار یافت نشد.")
+    try:
+        archive_warehouse(
+            organization=request.organization, actor=request.user, warehouse=warehouse
+        )
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+        return redirect("inventory:warehouse_detail", warehouse_id=warehouse.pk)
+    messages.success(request, "انبار بایگانی شد.")
+    return redirect("inventory:warehouse_list")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW)
+@require_GET
+def transaction_list(request: HttpRequest) -> HttpResponse:
+    transactions = get_organization_stock_transactions(
+        user=request.user, organization=request.organization
+    )
+    return render(
+        request, "inventory/transaction_list.html", {"transactions": transactions}
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE)
+def transaction_create(request: HttpRequest) -> HttpResponse:
+    form = StockTransactionForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        try:
+            create_stock_transaction(
+                organization=request.organization,
+                actor=request.user,
+                unit_of_measure=data["material"].unit_of_measure,
+                **data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect("inventory:transaction_list")
+    return render(request, "inventory/transaction_form.html", {"form": form})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_POST)
+@require_POST
+def transaction_post(request: HttpRequest, transaction_id: str) -> HttpResponse:
+    record = _transaction(request, transaction_id)
+    if record is None:
+        return HttpResponseNotFound("تراکنش انبار یافت نشد.")
+    try:
+        post_stock_transaction(
+            organization=request.organization,
+            actor=request.user,
+            stock_transaction=record,
+        )
+        messages.success(request, "تراکنش انبار ثبت نهایی شد.")
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("inventory:transaction_list")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE)
+def transaction_reverse(request: HttpRequest, transaction_id: str) -> HttpResponse:
+    record = _transaction(request, transaction_id)
+    if record is None:
+        return HttpResponseNotFound("تراکنش انبار یافت نشد.")
+    form = ReversalForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            reverse_stock_transaction(
+                organization=request.organization,
+                actor=request.user,
+                stock_transaction=record,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "تراکنش برگشت داده شد.")
+            return redirect("inventory:transaction_list")
+    return render(
+        request, "inventory/reversal_form.html", {"form": form, "transaction": record}
+    )

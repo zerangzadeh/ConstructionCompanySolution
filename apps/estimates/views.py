@@ -11,10 +11,16 @@ from apps.estimates.services import (
     create_estimate,
     get_organization_estimates,
 )
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+    require_organization_permission,
+)
+from apps.organizations.models import BusinessPermissionCode
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ESTIMATES_VIEW)
 def estimate_list(request: HttpRequest) -> HttpResponse:
     estimates = get_organization_estimates(
         user=request.user,
@@ -24,6 +30,7 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ESTIMATES_CREATE)
 def estimate_create(request: HttpRequest) -> HttpResponse:
     form = EstimateForm(request.POST or None, organization=request.organization)
     if request.method == "POST" and form.is_valid():
@@ -47,7 +54,14 @@ def estimate_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ESTIMATES_VIEW)
 def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
+    if request.method == "POST":
+        require_organization_permission(
+            request,
+            BusinessPermissionCode.ESTIMATE_ITEMS_ADD,
+            "اجازه افزودن ردیف برآورد را ندارید.",
+        )
     estimate = get_object_or_404(
         get_organization_estimates(
             user=request.user,
@@ -91,6 +105,7 @@ def estimate_detail(request: HttpRequest, estimate_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ESTIMATES_APPROVE)
 def estimate_approve(request: HttpRequest, estimate_id: str) -> HttpResponse:
     if request.method != "POST":
         return HttpResponse(status=405)

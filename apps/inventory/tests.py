@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -31,6 +32,7 @@ from apps.organizations.models import (
     MembershipStatus,
     Organization,
 )
+from apps.organizations.services import set_active_organization
 from apps.parties.models import BusinessParty, PartyKind
 from apps.procurement.models import (
     GoodsReceipt,
@@ -671,3 +673,32 @@ class InventoryAdminTests(TestCase):
             self.assertFalse(model_admin.has_add_permission(None))
             self.assertFalse(model_admin.has_change_permission(None))
             self.assertFalse(model_admin.has_delete_permission(None))
+
+
+class InventoryPanelTests(InventoryFixtureMixin, TestCase):
+    def test_owner_can_open_scoped_warehouse_pages(self) -> None:
+        self.client.force_login(self.owner)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        self.assertEqual(
+            self.client.get(reverse("inventory:warehouse_list")).status_code, 200
+        )
+        self.assertEqual(
+            self.client.get(
+                reverse(
+                    "inventory:warehouse_detail",
+                    kwargs={"warehouse_id": self.central.pk},
+                )
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                reverse(
+                    "inventory:warehouse_detail",
+                    kwargs={"warehouse_id": self.other_warehouse.pk},
+                )
+            ).status_code,
+            404,
+        )

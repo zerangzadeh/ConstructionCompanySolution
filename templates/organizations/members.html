@@ -1,8 +1,7 @@
 {% extends "base.html" %}
 {% block title %}اعضای شرکت | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
-  {% if can_manage_members %}{% url "organizations:invite" as invite_url %}{% endif %}
-  {% include "components/page_header.html" with page_eyebrow="شرکت" page_title="اعضای شرکت" page_description=request.organization.name page_action_url=invite_url page_action_label="دعوت عضو" only %}
+  {% include "components/page_header.html" with page_eyebrow="شرکت" page_title="اعضای شرکت" page_description=request.organization.name only %}
   <section class="erp-surface mt-6 overflow-hidden rounded-xl">
     <div class="overflow-x-auto">
       {% if memberships %}
@@ -15,7 +14,7 @@
                 <td class="px-4 py-3.5 text-slate-500" dir="ltr">@{{ membership.user.username }}</td>
                 <td class="px-4 py-3.5"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700">{{ membership.role_label }}</span></td>
                 <td class="px-4 py-3.5">{{ membership.get_status_display }}</td>
-                {% if can_manage_members %}<td class="px-4 py-3.5"><a class="font-semibold text-blue-700" href="{% url 'organizations:member_update' membership.id %}">مدیریت عضویت</a></td>{% endif %}
+                {% if can_manage_members %}<td class="px-4 py-3.5"><a class="font-semibold text-blue-700" href="{% url 'organizations:member_update' membership.id %}">{% if membership.status == 'pending_role' %}تعیین نقش و فعال‌سازی{% else %}مدیریت عضویت{% endif %}</a></td>{% endif %}
               </tr>
             {% endfor %}
           </tbody>

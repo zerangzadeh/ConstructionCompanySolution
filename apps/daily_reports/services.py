@@ -87,7 +87,7 @@ def _can_approve_daily_reports(user: User, organization: Organization) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
-        permission=BusinessPermissionCode.DAILY_REPORTS_MANAGE,
+        permission=BusinessPermissionCode.DAILY_REPORTS_APPROVE,
     )
 
 
@@ -96,9 +96,15 @@ def _can_update_daily_report(
     organization: Organization,
     report: DailyReport,
     actor: User,
+    permission: BusinessPermissionCode,
 ) -> bool:
-    return _can_approve_daily_reports(actor, organization) or (
-        report.created_by_id == actor.pk
+    return has_business_permission(
+        user=actor,
+        organization=organization,
+        permission=permission,
+    ) and (
+        _can_approve_daily_reports(actor, organization)
+        or report.created_by_id == actor.pk
     )
 
 
@@ -107,9 +113,8 @@ def _get_draft_report_for_update(
     organization: Organization,
     report_id: str,
     actor: User,
+    permission: BusinessPermissionCode,
 ) -> DailyReport:
-    if not _can_create_daily_reports(actor, organization):
-        raise PermissionDenied("اجازه به‌روزرسانی گزارش‌های روزانه این سازمان را ندارید.")
     try:
         report = (
             DailyReport.objects.select_for_update()
@@ -125,7 +130,10 @@ def _get_draft_report_for_update(
         site=report.site,
     )
     if not _can_update_daily_report(
-        organization=organization, report=report, actor=actor
+        organization=organization,
+        report=report,
+        actor=actor,
+        permission=permission,
     ):
         raise PermissionDenied("اجازه به‌روزرسانی این گزارش روزانه را ندارید.")
     if report.status != DailyReportStatus.DRAFT:
@@ -209,6 +217,12 @@ def get_organization_daily_reports(
     """Return daily reports visible only to an active organization member."""
 
     _validate_active_access(user, organization)
+    if not has_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.DAILY_REPORTS_VIEW,
+    ):
+        raise PermissionDenied("اجازه مشاهده گزارش‌های روزانه این سازمان را ندارید.")
     return (
         DailyReport.objects.filter(
             organization=organization,
@@ -269,9 +283,11 @@ def submit_daily_report(
         project=report.project,
         site=report.site,
     )
-    if not (
-        _can_approve_daily_reports(actor, organization)
-        or report.created_by_id == actor.pk
+    if not _can_update_daily_report(
+        organization=organization,
+        report=report,
+        actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_SUBMIT,
     ):
         raise PermissionDenied("اجازه ارسال این گزارش روزانه را ندارید.")
     if report.status != DailyReportStatus.DRAFT:
@@ -309,6 +325,7 @@ def add_daily_report_labor_entry(
         organization=organization,
         report_id=report_id,
         actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR,
     )
     if not team_name.strip():
         raise ValueError("وارد کردن نام گروه کاری الزامی است.")
@@ -354,6 +371,7 @@ def add_daily_report_equipment_entry(
         organization=organization,
         report_id=report_id,
         actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_ADD_EQUIPMENT,
     )
     if not equipment_name.strip():
         raise ValueError("وارد کردن نام تجهیز الزامی است.")
@@ -399,6 +417,7 @@ def add_daily_report_material_entry(
         organization=organization,
         report_id=report_id,
         actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_ADD_MATERIAL,
     )
     if material is not None:
         if (
@@ -479,7 +498,10 @@ def add_daily_activity(
     notes: str = "",
 ) -> DailyActivity:
     report = _get_draft_report_for_update(
-        organization=organization, report_id=report_id, actor=actor
+        organization=organization,
+        report_id=report_id,
+        actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_ADD_ACTIVITY,
     )
     if activity is not None:
         _validate_daily_activity_scope(report=report, activity=activity)
@@ -541,7 +563,10 @@ def add_delay_event(
     duration_hours: Decimal | None = None,
 ) -> DelayEvent:
     report = _get_draft_report_for_update(
-        organization=organization, report_id=report_id, actor=actor
+        organization=organization,
+        report_id=report_id,
+        actor=actor,
+        permission=BusinessPermissionCode.DAILY_REPORTS_ADD_DELAY,
     )
     if activity is not None:
         _validate_daily_activity_scope(report=report, activity=activity)

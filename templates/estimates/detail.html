@@ -18,12 +18,12 @@
             {% elif estimate.status == "revised" %}<span class="inline-flex rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700">اصلاح‌شده</span>
             {% elif estimate.status == "archived" %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">بایگانی‌شده</span>
             {% else %}<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">پیش‌نویس</span>{% endif %}
-            {% if estimate.status == "draft" %}
+            {% if estimate.status == "draft" and "estimates.approve" in business_permission_codes %}
                 <form method="post" action="{% url 'estimates:approve' estimate.id %}">
                     {% csrf_token %}
                     <button class="inline-flex items-center justify-center rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" type="submit">تأیید برآورد</button>
                 </form>
-            {% else %}
+            {% elif estimate.status != "draft" %}
                 <p class="text-sm font-medium text-emerald-700">این برآورد تأیید شده و امکان افزودن یا ویرایش ردیف‌ها وجود ندارد.</p>
             {% endif %}
         </div>
@@ -79,7 +79,7 @@
             </div>
         </div>
 
-        {% if estimate.status == "draft" %}
+        {% if estimate.status == "draft" and "estimate_items.add" in business_permission_codes %}
             <form class="erp-surface mt-5 max-w-2xl space-y-5 rounded-xl p-5" method="post">
                 {% csrf_token %}
                 <div>

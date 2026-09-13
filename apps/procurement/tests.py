@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -14,6 +15,7 @@ from apps.organizations.models import (
     MembershipStatus,
     Organization,
 )
+from apps.organizations.services import set_active_organization
 from apps.parties.models import BusinessParty, PartyKind, PartyRole, PartyRoleType
 from apps.procurement.models import (
     GoodsReceipt,
@@ -610,3 +612,43 @@ class ProcurementAdminTests(TestCase):
                 self.assertFalse(model_admin.has_add_permission(request))
                 self.assertFalse(model_admin.has_change_permission(request))
                 self.assertFalse(model_admin.has_delete_permission(request))
+
+
+class ProcurementPanelTests(ProcurementFixtureMixin, TestCase):
+    def test_owner_can_open_scoped_procurement_pages(self) -> None:
+        request = create_purchase_request(
+            organization=self.organization,
+            actor=self.owner,
+            project=self.project,
+            request_number="PR-PANEL",
+            title="Panel request",
+        )
+        foreign_request = create_purchase_request(
+            organization=self.other_organization,
+            actor=self.outsider,
+            project=self.other_project,
+            request_number="PR-FOREIGN",
+            title="Foreign request",
+        )
+        self.client.force_login(self.owner)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        self.assertEqual(
+            self.client.get(reverse("procurement:request_list")).status_code, 200
+        )
+        self.assertEqual(
+            self.client.get(
+                reverse("procurement:request_detail", kwargs={"request_id": request.pk})
+            ).status_code,
+            200,
+        )
+        self.assertEqual(
+            self.client.get(
+                reverse(
+                    "procurement:request_detail",
+                    kwargs={"request_id": foreign_request.pk},
+                )
+            ).status_code,
+            404,
+        )

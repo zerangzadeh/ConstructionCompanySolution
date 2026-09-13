@@ -1,23 +1,37 @@
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from django import forms
 from django.apps import apps
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
-from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import (
+    AdminUserCreationForm,
+    ReadOnlyPasswordHashWidget,
+    UserChangeForm,
+)
+from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import Group, Permission
+from django.db import models
 from django.db.models import Q, QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
 
-from apps.accounts.models import AccountStatus, User
+from apps.accounts.models import AccountStatus, LoginPageSettings, User
+from apps.accounts.widgets import RtlClearableFileInput
 from apps.audit.models import AuditAction, AuditEvent
 from apps.audit.services import record_audit_event
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
     MembershipStatus,
+    Organization,
+    OrganizationRole,
+    OrganizationStatus,
+)
+from apps.organizations.services import (
+    provision_user_for_organization,
+    update_organization_membership,
 )
 
 
@@ -51,25 +65,59 @@ class PersianPermissionChoiceField(forms.ModelMultipleChoiceField):
         return f"{app_label} | {model_label} | {permission_label}"
 
 
+class PersianPasswordStatusWidget(ReadOnlyPasswordHashWidget):
+    """Show password state without exposing password-hash implementation details."""
+
+    template_name = "accounts/widgets/password_status.html"
+
+    def get_context(
+        self,
+        name: str,
+        value: str | None,
+        attrs: dict[str, Any] | None,
+    ) -> dict[str, Any]:
+        context = super().get_context(name, value, attrs)
+        password_is_usable = bool(
+            value and not value.startswith(UNUSABLE_PASSWORD_PREFIX)
+        )
+        context["password_is_usable"] = password_is_usable
+        context["button_label"] = (
+            "تغییر گذرواژه" if password_is_usable else "تنظیم گذرواژه"
+        )
+        return context
+
+
 class PersianUserChangeForm(UserChangeForm):
     account_status = forms.ChoiceField(
         choices=AccountStatus.choices,
         label="وضعیت حساب",
         help_text="کاربر مسدود یا غیرفعال امکان ورود به سامانه را ندارد.",
     )
-    user_permissions = PersianPermissionChoiceField(
-        queryset=Permission.objects.select_related("content_type"),
-        required=False,
-        label="مجوزهای کاربر",
-        help_text="مجوزهای اختصاصی این کاربر را انتخاب کنید.",
-        widget=FilteredSelectMultiple("مجوزها", is_stacked=False),
-    )
+    # Business access is granted only through an organization membership role.
+    # Explicitly shadow Django's inherited direct-permission field so it cannot
+    # be submitted to, or persisted through, this form.
+    groups = None
+    user_permissions = None
 
     class Meta(UserChangeForm.Meta):
         model = User
+        exclude = ("groups", "user_permissions")
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
+        self.fields["password"].label = "گذرواژه"
+        self.fields["password"].help_text = ""
+        self.fields["password"].widget = PersianPasswordStatusWidget()
+        self.fields["is_staff"].label = "دسترسی به پنل مدیریت سامانه"
+        self.fields["is_staff"].help_text = (
+            "اجازه ورود به پنل فنی مدیریت سامانه را می‌دهد و دسترسی عملیاتی "
+            "سازمانی ایجاد نمی‌کند."
+        )
+        self.fields["is_superuser"].label = "دسترسی کامل فنی سامانه"
+        self.fields["is_superuser"].help_text = (
+            "تمام مجوزهای پنل مدیریت سامانه را بدون نیاز به تخصیص صریح فراهم "
+            "می‌کند. فقط برای مدیران فنی مورداعتماد استفاده شود."
+        )
         if self.instance.pk:
             self.initial["account_status"] = self.instance.account_status
 
@@ -86,6 +134,44 @@ class PersianUserChangeForm(UserChangeForm):
             user.save()
             self.save_m2m()
         return user
+
+
+class PersianUserCreationForm(AdminUserCreationForm):
+    """Create an account with an initial organization role."""
+
+    organization = forms.ModelChoiceField(
+        label="شرکت",
+        queryset=Organization.objects.none(),
+        help_text=("عضویت اولیه کاربر فقط در همین شرکت ایجاد می‌شود."),
+    )
+    role_definition = forms.ModelChoiceField(
+        label="نقش سازمانی اولیه",
+        queryset=OrganizationRole.objects.none(),
+        to_field_name="code",
+        help_text="با ذخیره، عضویت کاربر فعال و این نقش به آن تخصیص داده می‌شود.",
+    )
+
+    class Meta(AdminUserCreationForm.Meta):
+        model = User
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "national_id",
+            "email",
+            "phone_number",
+        )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["organization"].queryset = Organization.objects.filter(
+            status=OrganizationStatus.ACTIVE,
+            deleted_at__isnull=True,
+            archived_at__isnull=True,
+        ).order_by("name")
+        self.fields["role_definition"].queryset = OrganizationRole.objects.filter(
+            is_active=True
+        ).order_by("name")
 
 
 class PersianGroupAdminForm(forms.ModelForm):
@@ -106,16 +192,18 @@ class CustomUserAdmin(UserAdmin):
     """Admin configuration for the custom username-based user."""
 
     form = PersianUserChangeForm
+    add_form = PersianUserCreationForm
     change_form_template = "admin/accounts/user/change_form.html"
     list_display = (
         "username",
+        "national_id",
         "email",
         "account_status_display",
         "is_staff",
         "date_joined",
     )
     list_filter = ("is_active", "blocked_at", "is_staff", "is_superuser")
-    search_fields = ("username", "email", "first_name", "last_name")
+    search_fields = ("username", "national_id", "email", "first_name", "last_name")
     readonly_fields = (
         "last_login",
         "date_joined",
@@ -129,8 +217,10 @@ class CustomUserAdmin(UserAdmin):
             {
                 "fields": (
                     "username",
+                    "password",
                     "first_name",
                     "last_name",
+                    "national_id",
                     "email",
                     "phone_number",
                     "account_status",
@@ -143,11 +233,10 @@ class CustomUserAdmin(UserAdmin):
                 "fields": (
                     "is_staff",
                     "is_superuser",
-                    "groups",
-                    "user_permissions",
                 ),
                 "description": (
-                    "این مجوزها سراسری هستند و جایگزین نقش شرکتی کاربر نیستند."
+                    "دسترسی عملیاتی کاربر فقط از نقش عضویت سازمانی او تعیین "
+                    "می‌شود. این گزینه‌ها صرفاً برای مدیریت سامانه هستند."
                 ),
             },
         ),
@@ -164,6 +253,27 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+    add_fieldsets = (
+        (
+            "اطلاعات حساب و تخصیص اولیه",
+            {
+                "classes": ("wide",),
+                "fields": (
+                    "username",
+                    "first_name",
+                    "last_name",
+                    "national_id",
+                    "email",
+                    "phone_number",
+                    "organization",
+                    "role_definition",
+                    "usable_password",
+                    "password1",
+                    "password2",
+                ),
+            },
+        ),
+    )
 
     @admin.display(description="وضعیت حساب", ordering="is_active")
     def account_status_display(self, obj: User) -> str:
@@ -176,7 +286,7 @@ class CustomUserAdmin(UserAdmin):
         return has_business_permission(
             user=request.user,
             organization=organization,
-            permission=BusinessPermissionCode.MEMBERSHIP_MANAGE,
+            permission=BusinessPermissionCode.MEMBERSHIP_VIEW,
         )
 
     def get_queryset(self, request: HttpRequest) -> QuerySet[User]:
@@ -222,20 +332,30 @@ class CustomUserAdmin(UserAdmin):
         self,
         request: HttpRequest,
         obj: User,
-        form: PersianUserChangeForm,
+        form: PersianUserChangeForm | PersianUserCreationForm,
         change: bool,
     ) -> None:
         previous_status = None
         if change:
             previous = User.objects.get(pk=obj.pk)
             previous_status = previous.account_status
-            request._erp_previous_user_permissions = set(
-                previous.user_permissions.values_list("pk", flat=True)
-            )
-            request._erp_previous_user_groups = set(
-                previous.groups.values_list("pk", flat=True)
-            )
+        if not change:
+            obj.is_active = False
         super().save_model(request, obj, form, change)
+        if not change:
+            membership = provision_user_for_organization(
+                organization=form.cleaned_data["organization"],
+                user=obj,
+                actor=request.user,
+            )
+            update_organization_membership(
+                organization=membership.organization,
+                actor=request.user,
+                membership=membership,
+                role=form.cleaned_data["role_definition"],
+                status=MembershipStatus.ACTIVE,
+            )
+            return
         if previous_status is not None and previous_status != obj.account_status:
             record_audit_event(
                 action=AuditAction.USER_ACCOUNT_STATUS_CHANGED,
@@ -248,38 +368,6 @@ class CustomUserAdmin(UserAdmin):
                     "new_status": obj.account_status,
                 },
             )
-
-    def save_related(
-        self,
-        request: HttpRequest,
-        form: PersianUserChangeForm,
-        formsets: list[forms.BaseFormSet],
-        change: bool,
-    ) -> None:
-        super().save_related(request, form, formsets, change)
-        if not change:
-            return
-        user = form.instance
-        previous_permissions = getattr(request, "_erp_previous_user_permissions", set())
-        previous_groups = getattr(request, "_erp_previous_user_groups", set())
-        current_permissions = set(user.user_permissions.values_list("pk", flat=True))
-        current_groups = set(user.groups.values_list("pk", flat=True))
-        if (
-            previous_permissions == current_permissions
-            and previous_groups == current_groups
-        ):
-            return
-        record_audit_event(
-            action=AuditAction.USER_PERMISSIONS_CHANGED,
-            entity_type="user",
-            entity_id=user.pk,
-            actor=request.user,
-            metadata={
-                "target_username": user.username,
-                "direct_permission_count": len(current_permissions),
-                "group_count": len(current_groups),
-            },
-        )
 
     def changeform_view(
         self,
@@ -299,7 +387,7 @@ class CustomUserAdmin(UserAdmin):
         self, request: HttpRequest, user: User
     ) -> dict[str, object]:
         memberships = user.organization_memberships.select_related(
-            "organization", "invited_by"
+            "organization", "assigned_by"
         )
         if not request.user.is_superuser:
             memberships = memberships.filter(organization=request.organization)
@@ -331,42 +419,13 @@ class CustomUserAdmin(UserAdmin):
             ]
         ).first()
 
-        permission_rows = []
-        permission_field = PersianPermissionChoiceField(
-            queryset=Permission.objects.none()
-        )
-        for permission in user.user_permissions.select_related("content_type"):
-            permission_rows.append(
-                {
-                    "source": "اختصاصی",
-                    "label": permission_field.label_from_instance(permission),
-                    "codename": (
-                        f"{permission.content_type.app_label}.{permission.codename}"
-                    ),
-                }
-            )
-        groups = user.groups.prefetch_related("permissions__content_type")
-        for group in groups:
-            for permission in group.permissions.all():
-                permission_rows.append(
-                    {
-                        "source": f"گروه: {group.name}",
-                        "label": permission_field.label_from_instance(permission),
-                        "codename": (
-                            f"{permission.content_type.app_label}.{permission.codename}"
-                        ),
-                    }
-                )
-
         return {
             "detail_user": user,
             "account_status_class": self._account_status_class(user.account_status),
+            "can_manage_memberships": request.user.is_superuser,
             "membership_rows": membership_rows,
-            "permission_rows": permission_rows,
-            "user_groups": groups,
             "audit_events": events[:25],
             "last_access_change": last_access_change,
-            "project_access_supported": False,
         }
 
     @staticmethod
@@ -381,7 +440,7 @@ class CustomUserAdmin(UserAdmin):
     def _membership_status_class(status: str) -> str:
         return {
             MembershipStatus.ACTIVE: "success",
-            MembershipStatus.INVITED: "warning",
+            MembershipStatus.PENDING_ROLE: "warning",
             MembershipStatus.SUSPENDED: "warning",
             MembershipStatus.REVOKED: "danger",
         }[status]
@@ -414,3 +473,58 @@ class PersianGroupAdmin(GroupAdmin):
         self, request: HttpRequest, obj: Group | None = None
     ) -> bool:
         return request.user.is_superuser
+
+
+@admin.register(LoginPageSettings)
+class LoginPageSettingsAdmin(admin.ModelAdmin):
+    """Allow system superusers to maintain the public login presentation."""
+
+    formfield_overrides: ClassVar[
+        dict[type[models.Field], dict[str, type[forms.Widget]]]
+    ] = {
+        models.FileField: {"widget": RtlClearableFileInput},
+    }
+
+    fieldsets = (
+        (
+            "پیام‌های پنل معرفی",
+            {
+                "fields": (
+                    "panel_label",
+                    "panel_title",
+                    "panel_description",
+                    "panel_footer",
+                )
+            },
+        ),
+        (
+            "تصاویر صفحه ورود",
+            {"fields": ("background_image", "panel_image")},
+        ),
+        (
+            "زمان‌ها",
+            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
+        ),
+    )
+    readonly_fields = ("created_at", "updated_at")
+
+    def has_module_permission(self, request: HttpRequest) -> bool:
+        return request.user.is_superuser
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: LoginPageSettings | None = None
+    ) -> bool:
+        return request.user.is_superuser
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return request.user.is_superuser and not LoginPageSettings.objects.exists()
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: LoginPageSettings | None = None
+    ) -> bool:
+        return request.user.is_superuser
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: LoginPageSettings | None = None
+    ) -> bool:
+        return False

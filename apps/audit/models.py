@@ -152,8 +152,54 @@ class AuditAction(models.TextChoices):
         "stock_transaction.reversed",
         "تراکنش انبار برگشت داده شد",
     )
-    MEMBERSHIP_INVITED = "membership.invited", "دعوت عضویت ارسال شد"
-    MEMBERSHIP_ACCEPTED = "membership.accepted", "عضویت پذیرفته شد"
+    EQUIPMENT_CREATED = "equipment.created", "تجهیز ایجاد شد"
+    EQUIPMENT_STATUS_CHANGED = "equipment.status_changed", "وضعیت تجهیز تغییر کرد"
+    EQUIPMENT_ARCHIVED = "equipment.archived", "تجهیز بایگانی شد"
+    EQUIPMENT_ASSIGNMENT_CREATED = (
+        "equipment_assignment.created",
+        "تجهیز به پروژه تخصیص یافت",
+    )
+    EQUIPMENT_ASSIGNMENT_STATUS_CHANGED = (
+        "equipment_assignment.status_changed",
+        "وضعیت تخصیص تجهیز تغییر کرد",
+    )
+    MAINTENANCE_RECORD_CREATED = (
+        "maintenance_record.created",
+        "سابقه سرویس یا تعمیر ایجاد شد",
+    )
+    MAINTENANCE_STATUS_CHANGED = (
+        "maintenance_record.status_changed",
+        "وضعیت سرویس یا تعمیر تغییر کرد",
+    )
+    SAFETY_INCIDENT_CREATED = "safety_incident.created", "حادثه ایمنی ثبت شد"
+    SAFETY_INCIDENT_REVIEWED = "safety_incident.reviewed", "حادثه ایمنی بررسی شد"
+    SAFETY_INCIDENT_ASSIGNED = "safety_incident.assigned", "حادثه ایمنی تخصیص یافت"
+    SAFETY_CORRECTIVE_ACTION_STARTED = (
+        "safety_incident.corrective_action_started",
+        "اقدام اصلاحی حادثه ایمنی آغاز شد",
+    )
+    SAFETY_INCIDENT_RESOLVED = "safety_incident.resolved", "حادثه ایمنی رفع شد"
+    SAFETY_INCIDENT_CLOSED = "safety_incident.closed", "حادثه ایمنی بسته شد"
+    QUALITY_ISSUE_CREATED = "quality_issue.created", "مسئله کیفیت ثبت شد"
+    QUALITY_ISSUE_REVIEWED = "quality_issue.reviewed", "مسئله کیفیت بررسی شد"
+    QUALITY_ISSUE_ASSIGNED = "quality_issue.assigned", "مسئله کیفیت تخصیص یافت"
+    QUALITY_CORRECTIVE_ACTION_STARTED = (
+        "quality_issue.corrective_action_started",
+        "اقدام اصلاحی مسئله کیفیت آغاز شد",
+    )
+    QUALITY_ISSUE_SUBMITTED_FOR_VERIFICATION = (
+        "quality_issue.submitted_for_verification",
+        "مسئله کیفیت برای راستی‌آزمایی ارسال شد",
+    )
+    QUALITY_ISSUE_VERIFIED = (
+        "quality_issue.verified",
+        "مسئله کیفیت راستی‌آزمایی شد",
+    )
+    QUALITY_ISSUE_CLOSED = "quality_issue.closed", "مسئله کیفیت بسته شد"
+    MEMBERSHIP_PROVISIONED = (
+        "membership.provisioned",
+        "کاربر در انتظار تعیین نقش به شرکت تخصیص یافت",
+    )
     MEMBERSHIP_ROLE_CHANGED = "membership.role_changed", "نقش عضویت تغییر کرد"
     MEMBERSHIP_STATUS_CHANGED = (
         "membership.status_changed",

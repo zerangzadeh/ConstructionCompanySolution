@@ -15,7 +15,6 @@ from apps.estimates.forms import EstimateForm
 from apps.estimates.models import Estimate
 from apps.estimates.services import create_estimate
 from apps.organizations.forms import OrganizationForm
-from apps.organizations.invitation_forms import OrganizationInvitationForm
 from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
@@ -104,12 +103,6 @@ class IdentifierCanonicalizationTests(TestCase):
         )
         self.assertTrue(login_form.is_valid(), login_form.errors)
         self.assertEqual(login_form.cleaned_data["username"], "mixed.user")
-
-        invitation_form = OrganizationInvitationForm(
-            data={"invitee_username": " MIXED.USER ", "role": "member"}
-        )
-        self.assertTrue(invitation_form.is_valid(), invitation_form.errors)
-        self.assertEqual(invitation_form.cleaned_data["invitee_username"], user)
 
         direct_user = User.objects.create(username="  Direct.User  ")
         self.assertEqual(direct_user.username, "direct.user")

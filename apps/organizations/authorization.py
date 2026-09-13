@@ -6,17 +6,13 @@ from apps.organizations.models import (
     MembershipStatus,
     Organization,
     OrganizationMembership,
-    OrganizationStatus,
 )
 
 
 def _validate_access_context(*, user: User, organization: Organization) -> None:
     if not user.is_authenticated or not user.is_active:
         raise PermissionDenied("ورود با حساب کاربری فعال الزامی است.")
-    if (
-        organization.status != OrganizationStatus.ACTIVE
-        or organization.deleted_at is not None
-    ):
+    if not organization.is_active:
         raise PermissionDenied("شرکت فعال نیست.")
 
 
@@ -43,6 +39,7 @@ def membership_has_permission(
 ) -> bool:
     if (
         membership.status != MembershipStatus.ACTIVE
+        or membership.role_definition_id is None
         or not membership.role_definition.is_active
     ):
         return False

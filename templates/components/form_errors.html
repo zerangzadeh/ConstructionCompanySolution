@@ -1,5 +1,6 @@
 {% if form.non_field_errors %}
-    <div class="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <p class="mb-1 text-xs font-semibold">لطفاً موارد زیر را بررسی کنید:</p>
         {{ form.non_field_errors }}
     </div>
 {% endif %}

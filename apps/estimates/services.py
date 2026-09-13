@@ -20,7 +20,6 @@ from apps.materials.models import UnitOfMeasure
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
-    MembershipStatus,
     Organization,
     OrganizationStatus,
 )
@@ -28,11 +27,15 @@ from apps.projects.models import Project, ProjectPhase
 from core.identifiers import canonicalize_upper_identifier
 
 
-def _can_manage_estimates(user: User, organization: Organization) -> bool:
+def _has_estimate_permission(
+    user: User,
+    organization: Organization,
+    permission: BusinessPermissionCode,
+) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
-        permission=BusinessPermissionCode.ESTIMATES_MANAGE,
+        permission=permission,
     )
 
 
@@ -49,6 +52,7 @@ def _validate_context(
     actor: User,
     organization: Organization,
     project: Project,
+    permission: BusinessPermissionCode,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
@@ -57,7 +61,7 @@ def _validate_context(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _can_manage_estimates(actor, organization):
+    if not _has_estimate_permission(actor, organization, permission):
         raise PermissionDenied("اجازه مدیریت برآوردهای این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -88,7 +92,12 @@ def create_estimate(
 ) -> Estimate:
     """Create an estimate scoped to an active organization and project."""
 
-    _validate_context(actor=actor, organization=organization, project=project)
+    _validate_context(
+        actor=actor,
+        organization=organization,
+        project=project,
+        permission=BusinessPermissionCode.ESTIMATES_CREATE,
+    )
     if contract and (
         contract.organization_id != organization.pk
         or contract.project_id != project.pk
@@ -165,6 +174,7 @@ def add_estimate_item(
         actor=actor,
         organization=locked_estimate.organization,
         project=locked_estimate.project,
+        permission=BusinessPermissionCode.ESTIMATE_ITEMS_ADD,
     )
     if locked_estimate.deleted_at is not None:
         raise ValueError("افزودن ردیف به برآورد حذف‌شده ممکن نیست.")
@@ -311,6 +321,7 @@ def create_estimate_revision(
         actor=actor,
         organization=locked_estimate.organization,
         project=locked_estimate.project,
+        permission=BusinessPermissionCode.ESTIMATES_REVISE,
     )
     source = locked_estimate.current_revision
     if source is None or source.status != EstimateRevisionStatus.APPROVED:
@@ -371,15 +382,10 @@ def get_organization_estimates(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if (
-        not (user.is_superuser and user.is_active)
-        and not organization.memberships.filter(
-            user=user,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-        ).exists()
+    if not _has_estimate_permission(
+        user, organization, BusinessPermissionCode.ESTIMATES_VIEW
     ):
-        raise PermissionDenied("به این سازمان دسترسی ندارید.")
+        raise PermissionDenied("اجازه مشاهده برآوردهای این سازمان را ندارید.")
     return (
         Estimate.objects.filter(
             organization=organization,

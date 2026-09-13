@@ -4,7 +4,11 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
-from apps.organizations.decorators import active_organization_required
+from apps.organizations.decorators import (
+    active_organization_required,
+    organization_permission_required,
+)
+from apps.organizations.models import BusinessPermissionCode
 from apps.projects.forms import (
     ActivityForm,
     ProjectForm,
@@ -36,6 +40,7 @@ from apps.projects.services import (
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_VIEW)
 @require_GET
 def project_list(request: HttpRequest) -> HttpResponse:
     """List non-deleted projects for the active organization."""
@@ -48,6 +53,7 @@ def project_list(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_CREATE)
 def project_create(request: HttpRequest) -> HttpResponse:
     """Create a project for the active organization."""
 
@@ -75,6 +81,7 @@ def project_create(request: HttpRequest) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_VIEW)
 @require_GET
 def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
@@ -86,6 +93,7 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_SITES_VIEW)
 @require_GET
 def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
@@ -106,6 +114,7 @@ def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_SITES_CREATE)
 def project_site_create(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
         user=request.user,
@@ -136,6 +145,7 @@ def project_site_create(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_PHASES_VIEW)
 @require_GET
 def project_phase_list(
     request: HttpRequest,
@@ -158,6 +168,7 @@ def project_phase_list(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_PHASES_CREATE)
 def project_phase_create(
     request: HttpRequest,
     project_id: str,
@@ -195,6 +206,7 @@ def project_phase_create(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_PHASES_VIEW)
 @require_GET
 def project_phase_detail(
     request: HttpRequest,
@@ -220,6 +232,7 @@ def project_phase_detail(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_PHASES_TRANSITION)
 @require_POST
 def project_phase_transition(
     request: HttpRequest,
@@ -249,6 +262,7 @@ def project_phase_transition(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_ARCHIVE)
 @require_POST
 def project_archive(request: HttpRequest, project_id: str) -> HttpResponse:
     try:
@@ -263,6 +277,7 @@ def project_archive(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_CONTROLS_VIEW)
 def project_controls(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
         user=request.user, organization=request.organization, project_id=project_id
@@ -289,6 +304,7 @@ def project_controls(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.WBS_NODES_CREATE)
 @require_POST
 def wbs_node_create(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
@@ -312,6 +328,7 @@ def wbs_node_create(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ACTIVITIES_CREATE)
 @require_POST
 def activity_create(request: HttpRequest, project_id: str) -> HttpResponse:
     project = get_organization_project(
@@ -335,6 +352,7 @@ def activity_create(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ACTIVITIES_TRANSITION)
 @require_POST
 def activity_transition(
     request: HttpRequest, project_id: str, activity_id: str
@@ -361,6 +379,7 @@ def activity_transition(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.ACTIVITIES_ARCHIVE)
 @require_POST
 def activity_archive_view(
     request: HttpRequest, project_id: str, activity_id: str
@@ -384,6 +403,7 @@ def activity_archive_view(
 
 
 @active_organization_required
+@organization_permission_required(BusinessPermissionCode.WBS_NODES_ARCHIVE)
 @require_POST
 def wbs_node_archive_view(
     request: HttpRequest, project_id: str, node_id: str
