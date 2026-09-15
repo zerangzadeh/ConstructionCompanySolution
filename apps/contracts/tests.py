@@ -325,3 +325,40 @@ class ContractServiceTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+    def test_contract_list_filters_can_be_combined_and_cleared(self) -> None:
+        matching_contract = create_contract(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            contract_number="C-FILTER-001",
+            title="Matching contract",
+            counterparty_name="Filter client",
+            status=ContractStatus.ACTIVE,
+        )
+        other_contract = create_contract(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            contract_number="C-FILTER-002",
+            title="Other contract",
+            counterparty_name="Other client",
+            status=ContractStatus.DRAFT,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        filtered = self.client.get(
+            reverse("contracts:list"),
+            {"number": "001", "status": ContractStatus.ACTIVE},
+        )
+        cleared = self.client.get(reverse("contracts:list"))
+
+        self.assertContains(filtered, matching_contract.title)
+        self.assertNotContains(filtered, other_contract.title)
+        self.assertContains(filtered, 'name="number"')
+        self.assertContains(filtered, "پاک‌سازی")
+        self.assertContains(cleared, matching_contract.title)
+        self.assertContains(cleared, other_contract.title)

@@ -118,6 +118,8 @@ class PermissionRegistryArchitectureTests(SimpleTestCase):
             {
                 "organizations.BusinessPermission",
                 "organizations.OrganizationRole",
+                "workflows.WorkflowType",
+                "workflows.WorkflowTemplate",
             },
         )
         self.assertNotIn("accounts", PERMISSION_MANAGED_APPS)

@@ -9,7 +9,12 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.inventory.forms import ReversalForm, StockTransactionForm, WarehouseForm
-from apps.inventory.models import StockTransaction, StockTransactionStatus, Warehouse
+from apps.inventory.models import (
+    StockTransaction,
+    StockTransactionStatus,
+    StockTransactionType,
+    Warehouse,
+)
 from apps.inventory.services import (
     archive_warehouse,
     create_stock_transaction,
@@ -24,6 +29,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 def _warehouse(request: HttpRequest, warehouse_id: str) -> Warehouse | None:
@@ -53,7 +63,32 @@ def warehouse_list(request: HttpRequest) -> HttpResponse:
     warehouses = get_organization_warehouses(
         user=request.user, organization=request.organization
     )
-    return render(request, "inventory/warehouse_list.html", {"warehouses": warehouses})
+    warehouses = apply_table_filters(
+        warehouses,
+        request,
+        text_fields={
+            "warehouse": ("code", "name"),
+            "project": ("project__name",),
+            "location": ("location",),
+        },
+    )
+    return render(
+        request,
+        "inventory/warehouse_list.html",
+        {
+            "warehouses": warehouses,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "warehouse", "kind": "text", "label": "کد و نام"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {"name": "location", "kind": "text", "label": "محل"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -135,9 +170,60 @@ def transaction_list(request: HttpRequest) -> HttpResponse:
     transactions = get_organization_stock_transactions(
         user=request.user, organization=request.organization
     )
-    return render(
-        request, "inventory/transaction_list.html", {"transactions": transactions}
+    transactions = apply_table_filters(
+        transactions,
+        request,
+        text_fields={
+            "number": ("transaction_number",),
+            "material": ("material__code", "material__name"),
+            "warehouse": ("source_warehouse__name", "destination_warehouse__name"),
+        },
+        choice_fields={
+            "transaction_type": ("transaction_type", StockTransactionType.values),
+            "status": ("status", StockTransactionStatus.values),
+        },
+        date_fields={"occurred_at": "occurred_at__date"},
     )
+    return render(
+        request,
+        "inventory/transaction_list.html",
+        {
+            "transactions": transactions,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره"},
+                    {
+                        "name": "transaction_type",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": StockTransactionType.choices,
+                    },
+                    {"name": "material", "kind": "text", "label": "مصالح"},
+                    {"name": "warehouse", "kind": "text", "label": "مبدأ یا مقصد"},
+                    None,
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": StockTransactionStatus.choices,
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW)
+@require_GET
+def transaction_detail(request: HttpRequest, transaction_id: str) -> HttpResponse:
+    record = _transaction(request, transaction_id)
+    if record is None:
+        return HttpResponseNotFound("تراکنش انبار یافت نشد.")
+    return render(request, "inventory/transaction_detail.html", {"transaction": record})
 
 
 @active_organization_required

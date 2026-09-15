@@ -16,6 +16,7 @@ from apps.projects.forms import (
     ProjectSiteForm,
     WBSNodeForm,
 )
+from apps.projects.models import ProjectPhaseStatus, ProjectStatus
 from apps.projects.services import (
     archive_activity,
     archive_project,
@@ -38,6 +39,11 @@ from apps.projects.services import (
     transition_activity_status,
     transition_project_phase_status,
 )
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -50,7 +56,39 @@ def project_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "projects/list.html", {"projects": projects})
+    projects = apply_table_filters(
+        projects,
+        request,
+        text_fields={"code": ("code",), "name": ("name",)},
+        choice_fields={"status": ("status", ProjectStatus.values)},
+        date_fields={"start_date": "start_date", "end_date": "end_date"},
+    )
+    return render(
+        request,
+        "projects/list.html",
+        {
+            "projects": projects,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "code", "kind": "text", "label": "کد پروژه"},
+                    {"name": "name", "kind": "text", "label": "نام پروژه"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": ProjectStatus.choices,
+                    },
+                    {"name": "start_date", "kind": "date_range", "label": "تاریخ شروع"},
+                    {"name": "end_date", "kind": "date_range", "label": "تاریخ پایان"},
+                    None,
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -71,7 +109,8 @@ def project_create(request: HttpRequest) -> HttpResponse:
                 status=data["status"],
                 start_date=data["start_date"],
                 end_date=data["end_date"],
-                budget=data["budget"],
+                estimated_budget=data["estimated_budget"],
+                actual_budget=data["actual_budget"],
             )
         except (PermissionDenied, ValueError) as exc:
             form.add_error(None, str(exc))
@@ -107,10 +146,27 @@ def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
         organization=request.organization,
         project_id=project_id,
     )
+    sites = apply_table_filters(
+        sites,
+        request,
+        text_fields={"site": ("code", "name", "address")},
+    )
     return render(
         request,
         "projects/site_list.html",
-        {"project": project, "sites": sites},
+        {
+            "project": project,
+            "sites": sites,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "site", "kind": "text", "label": "کد، نام یا نشانی"},
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
     )
 
 
@@ -124,7 +180,30 @@ def site_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "projects/all_site_list.html", {"sites": sites})
+    sites = apply_table_filters(
+        sites,
+        request,
+        text_fields={
+            "site": ("code", "name", "address"),
+            "project": ("project__name",),
+        },
+    )
+    return render(
+        request,
+        "projects/all_site_list.html",
+        {
+            "sites": sites,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "site", "kind": "text", "label": "کد، نام یا نشانی"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -178,7 +257,48 @@ def project_phase_list(
         project_id=project_id,
         site_id=site_id,
     )
-    return render(request, "projects/phase_list.html", {"site": site, "phases": phases})
+    phases = apply_table_filters(
+        phases,
+        request,
+        text_fields={"phase": ("code", "name")},
+        choice_fields={"status": ("status", ProjectPhaseStatus.values)},
+        date_fields={
+            "planned_start": "planned_start_date",
+            "planned_end": "planned_end_date",
+        },
+    )
+    return render(
+        request,
+        "projects/phase_list.html",
+        {
+            "site": site,
+            "phases": phases,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "phase", "kind": "text", "label": "کد یا نام فاز"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": ProjectPhaseStatus.choices,
+                    },
+                    {
+                        "name": "planned_start",
+                        "kind": "date_range",
+                        "label": "شروع برنامه",
+                    },
+                    {
+                        "name": "planned_end",
+                        "kind": "date_range",
+                        "label": "پایان برنامه",
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

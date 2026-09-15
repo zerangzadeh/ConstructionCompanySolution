@@ -6,6 +6,69 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    WORKFLOW_DEFINITION_CREATED = (
+        "workflow_definition.created",
+        "تعریف گردش‌کار ایجاد شد",
+    )
+    WORKFLOW_DRAFT_UPDATED = "workflow_draft.updated", "پیش‌نویس گردش‌کار ویرایش شد"
+    WORKFLOW_DEFINITION_VALIDATED = (
+        "workflow_definition.validated",
+        "تعریف گردش‌کار اعتبارسنجی شد",
+    )
+    WORKFLOW_VERSION_PUBLISHED = (
+        "workflow_version.published",
+        "نسخه گردش‌کار منتشر شد",
+    )
+    WORKFLOW_VERSION_RETIRED = (
+        "workflow_version.retired",
+        "نسخه گردش‌کار بازنشسته شد",
+    )
+    WORKFLOW_INSTANCE_STARTED = "workflow_instance.started", "اجرای گردش‌کار آغاز شد"
+    WORKFLOW_INSTANCE_ADVANCED = "workflow_instance.advanced", "گردش‌کار پیش رفت"
+    WORKFLOW_INSTANCE_SUSPENDED = (
+        "workflow_instance.suspended",
+        "اجرای گردش‌کار تعلیق شد",
+    )
+    WORKFLOW_INSTANCE_RESUMED = (
+        "workflow_instance.resumed",
+        "اجرای گردش‌کار از سر گرفته شد",
+    )
+    WORKFLOW_INSTANCE_CANCELLED = "workflow_instance.cancelled", "اجرای گردش‌کار لغو شد"
+    WORKFLOW_INSTANCE_COMPLETED = (
+        "workflow_instance.completed",
+        "اجرای گردش‌کار تکمیل شد",
+    )
+    WORKFLOW_INSTANCE_MIGRATED = (
+        "workflow_instance.migrated",
+        "نسخه اجرای گردش‌کار تغییر کرد",
+    )
+    WORKFLOW_STEP_ACTIVATED = "workflow_step.activated", "گام گردش‌کار فعال شد"
+    WORKFLOW_ROUTING_RESOLVED = "workflow_routing.resolved", "مسیریابی گردش‌کار انجام شد"
+    WORKFLOW_ROUTING_FALLBACK = (
+        "workflow_routing.fallback",
+        "مسیر جایگزین گردش‌کار استفاده شد",
+    )
+    WORKFLOW_ROUTING_UNRESOLVABLE = (
+        "workflow_routing.unresolvable",
+        "مسیریابی گردش‌کار حل‌نشدنی بود",
+    )
+    WORKFLOW_CANDIDATES_CHANGED = (
+        "workflow_candidates.changed",
+        "نامزدهای گردش‌کار تغییر کردند",
+    )
+    WORK_ITEM_CLAIMED = "work_item.claimed", "کار اخذ شد"
+    WORK_ITEM_RELEASED = "work_item.released", "کار آزاد شد"
+    WORK_ITEM_REASSIGNED = "work_item.reassigned", "کار مجدداً تخصیص یافت"
+    WORK_ITEM_COMPLETED = "work_item.completed", "کار تکمیل شد"
+    WORK_ITEM_CANCELLED = "work_item.cancelled", "کار لغو شد"
+    WORKFLOW_DELEGATION_CREATED = (
+        "workflow_delegation.created",
+        "واگذاری گردش‌کار ایجاد شد",
+    )
+    WORKFLOW_DELEGATION_REVOKED = (
+        "workflow_delegation.revoked",
+        "واگذاری گردش‌کار لغو شد",
+    )
     ORGANIZATION_CREATED = "organization.created", "سازمان ایجاد شد"
     ORGANIZATION_SETTINGS_UPDATED = (
         "organization_settings.updated",

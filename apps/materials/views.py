@@ -9,7 +9,12 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_POST
 
 from apps.materials.forms import MaterialCategoryForm, MaterialForm, UnitOfMeasureForm
-from apps.materials.models import Material, MaterialCategory, UnitOfMeasure
+from apps.materials.models import (
+    Material,
+    MaterialCategory,
+    UnitCategory,
+    UnitOfMeasure,
+)
 from apps.materials.services import (
     archive_material,
     archive_material_category,
@@ -30,13 +35,47 @@ from apps.organizations.decorators import (
     require_organization_permission,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.UNITS_VIEW)
 def unit_list(request: HttpRequest) -> HttpResponse:
     units = get_organization_units(user=request.user, organization=request.organization)
-    return render(request, "materials/unit_list.html", {"units": units})
+    units = apply_table_filters(
+        units,
+        request,
+        text_fields={"code": ("code",), "name": ("name", "symbol")},
+        choice_fields={"category": ("category", UnitCategory.values)},
+    )
+    return render(
+        request,
+        "materials/unit_list.html",
+        {
+            "units": units,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "code", "kind": "text", "label": "کد"},
+                    {"name": "name", "kind": "text", "label": "نام یا نماد"},
+                    None,
+                    {
+                        "name": "category",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": UnitCategory.choices,
+                    },
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -181,9 +220,35 @@ def material_list(request: HttpRequest) -> HttpResponse:
     materials = get_organization_materials(
         user=request.user,
         organization=request.organization,
-        search=request.GET.get("q", ""),
+        search="",
     )
-    return render(request, "materials/material_list.html", {"materials": materials})
+    materials = apply_table_filters(
+        materials,
+        request,
+        text_fields={
+            "code": ("code",),
+            "name": ("name",),
+            "category": ("category__name",),
+        },
+    )
+    return render(
+        request,
+        "materials/material_list.html",
+        {
+            "materials": materials,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "code", "kind": "text", "label": "کد"},
+                    {"name": "name", "kind": "text", "label": "نام مصالح"},
+                    None,
+                    {"name": "category", "kind": "text", "label": "دسته‌بندی"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

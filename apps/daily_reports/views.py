@@ -12,6 +12,7 @@ from apps.daily_reports.forms import (
     DailyReportMaterialEntryForm,
     DelayEventForm,
 )
+from apps.daily_reports.models import DailyReportStatus
 from apps.daily_reports.services import (
     add_daily_activity,
     add_daily_report_equipment_entry,
@@ -29,6 +30,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -39,7 +45,45 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "daily_reports/list.html", {"reports": reports})
+    reports = apply_table_filters(
+        reports,
+        request,
+        text_fields={
+            "project": ("project__name", "site__name"),
+            "phase": ("phase__name",),
+            "author": ("created_by__username",),
+        },
+        choice_fields={"status": ("status", DailyReportStatus.values)},
+        date_fields={"reporting_date": "reporting_date"},
+    )
+    return render(
+        request,
+        "daily_reports/list.html",
+        {
+            "reports": reports,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "project", "kind": "text", "label": "پروژه و کارگاه"},
+                    {"name": "phase", "kind": "text", "label": "فاز"},
+                    {
+                        "name": "reporting_date",
+                        "kind": "date_range",
+                        "label": "تاریخ گزارش",
+                    },
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": DailyReportStatus.choices,
+                    },
+                    None,
+                    {"name": "author", "kind": "text", "label": "نویسنده"},
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

@@ -16,6 +16,11 @@ urlpatterns = [
     path("transactions/", views.transaction_list, name="transaction_list"),
     path("transactions/create/", views.transaction_create, name="transaction_create"),
     path(
+        "transactions/<uuid:transaction_id>/",
+        views.transaction_detail,
+        name="transaction_detail",
+    ),
+    path(
         "transactions/<uuid:transaction_id>/post/",
         views.transaction_post,
         name="transaction_post",

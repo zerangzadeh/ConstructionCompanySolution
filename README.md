@@ -36,10 +36,14 @@ configured database. The current logical model is summarized in
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; models and migrations remain the
 schema source of truth.
 
-Billing and progress claims are the next product-domain phase. Remaining
-full-product capabilities and production-readiness work are dependency-ordered
-in `ROADMAP.md`; a planned phase records approved direction but still requires
-explicit implementation approval.
+Tenant Workflow & Work Management is the next approved cross-domain foundation.
+Its tenant-configurable definitions, runtime work items, position-aware routing,
+and centralized workbench are target architecture and are not yet implemented;
+see `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`. Billing and
+progress claims follow that foundation. Remaining full-product capabilities and
+production-readiness work are dependency-ordered in `ROADMAP.md`; a planned
+phase records approved direction but still requires explicit implementation
+approval.
 
 ## Technology stack
 

@@ -1,6 +1,6 @@
 {% load i18n %}
 <details data-filter-title="{{ title }}" open>
-  <summary>{% if title == 'Organization' %}بر اساس سازمان{% elif title == 'Is active' %}بر اساس وضعیت فعال بودن{% elif title == 'Category' %}بر اساس دسته‌بندی{% else %}بر اساس {{ title }}{% endif %}</summary>
+  <summary>{% if title == 'Organization' %}بر اساس شرکت{% elif title == 'Is active' %}بر اساس وضعیت فعال بودن{% elif title == 'Category' %}بر اساس دسته‌بندی{% else %}بر اساس {{ title }}{% endif %}</summary>
   <ul>
   {% for choice in choices %}
     <li{% if choice.selected %} class="selected"{% endif %}><a href="{{ choice.query_string|iriencode }}">{% if choice.display == 'All' %}همه{% elif choice.display == 'Yes' %}بله{% elif choice.display == 'No' %}خیر{% else %}{{ choice.display }}{% endif %}</a></li>

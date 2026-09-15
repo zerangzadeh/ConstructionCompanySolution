@@ -4,10 +4,11 @@ from apps.accounts.models import User
 from apps.organizations.models import MembershipStatus, Organization
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import Department, Employee, Position, WorkTeam
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
 
-class _StyledForm(forms.Form):
+class _StyledForm(JalaliDateMixin, forms.Form):
     """Apply the shared ERP form appearance to workforce forms."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:

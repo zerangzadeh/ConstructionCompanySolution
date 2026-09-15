@@ -20,6 +20,11 @@ from apps.quality.forms import (
     VerificationForm,
     VerificationSubmissionForm,
 )
+from apps.quality.models import (
+    QualityIssueSeverity,
+    QualityIssueStatus,
+    QualityIssueType,
+)
 from apps.quality.services import (
     assign_quality_issue,
     close_quality_issue,
@@ -31,6 +36,11 @@ from apps.quality.services import (
     submit_quality_issue_for_verification,
     verify_quality_issue,
 )
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -40,7 +50,58 @@ def issue_list(request: HttpRequest) -> HttpResponse:
     issues = get_organization_quality_issues(
         user=request.user, organization=request.organization
     )
-    return render(request, "quality/list.html", {"issues": issues})
+    issues = apply_table_filters(
+        issues,
+        request,
+        text_fields={
+            "number": ("issue_number",),
+            "project": ("project__name", "site__name"),
+        },
+        choice_fields={
+            "issue_type": ("issue_type", QualityIssueType.values),
+            "severity": ("severity", QualityIssueSeverity.values),
+            "status": ("status", QualityIssueStatus.values),
+        },
+        date_fields={"identified_at": "identified_at__date"},
+    )
+    return render(
+        request,
+        "quality/list.html",
+        {
+            "issues": issues,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "issue_type",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": QualityIssueType.choices,
+                    },
+                    {
+                        "name": "severity",
+                        "kind": "select",
+                        "label": "شدت",
+                        "choices": QualityIssueSeverity.choices,
+                    },
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": QualityIssueStatus.choices,
+                    },
+                    {
+                        "name": "identified_at",
+                        "kind": "date_range",
+                        "label": "زمان شناسایی",
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

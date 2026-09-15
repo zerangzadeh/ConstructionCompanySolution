@@ -328,7 +328,7 @@ class MaintenanceRecord(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="equipment_maintenance_records",
     )
-    record_number = models.CharField("شماره سابقه نگهداری", max_length=50)
+    record_number = models.CharField("شماره سرویس نگهداری", max_length=50)
     maintenance_type = models.CharField(
         "نوع نگهداری",
         max_length=20,
@@ -415,7 +415,7 @@ class MaintenanceRecord(UUIDModel, TimeStampedModel):
             provider=self.provider if self.provider_id else None,
         )
         if not self.record_number or not self.summary:
-            raise ValidationError("وارد کردن شماره سابقه و عنوان خدمت الزامی است.")
+            raise ValidationError("وارد کردن شماره سرویس  و عنوان سرویس الزامی است.")
         if self.site_id and (
             not self.project_id or self.site.project_id != self.project_id
         ):

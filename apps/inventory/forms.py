@@ -5,9 +5,10 @@ from apps.inventory.models import StockTransactionType, Warehouse
 from apps.materials.models import Material
 from apps.procurement.models import GoodsReceiptItem, GoodsReceiptStatus
 from apps.projects.models import Project
+from core.forms import JalaliDateMixin
 
 
-class _StyledForm(forms.Form):
+class _StyledForm(JalaliDateMixin, forms.Form):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         field_class = (

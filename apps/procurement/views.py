@@ -18,7 +18,14 @@ from apps.procurement.forms import (
     ReceiptItemForm,
     RequestItemForm,
 )
-from apps.procurement.models import GoodsReceipt, PurchaseOrder, PurchaseRequest
+from apps.procurement.models import (
+    GoodsReceipt,
+    GoodsReceiptStatus,
+    PurchaseOrder,
+    PurchaseOrderStatus,
+    PurchaseRequest,
+    PurchaseRequestStatus,
+)
 from apps.procurement.services import (
     add_goods_receipt_item,
     add_purchase_order_item,
@@ -40,6 +47,11 @@ from apps.procurement.services import (
     reject_purchase_request,
     submit_purchase_request,
     void_goods_receipt,
+)
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
 )
 
 
@@ -91,7 +103,42 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
     records = get_organization_purchase_requests(
         user=request.user, organization=request.organization
     )
-    return render(request, "procurement/request_list.html", {"requests": records})
+    records = apply_table_filters(
+        records,
+        request,
+        text_fields={
+            "request": ("request_number", "title"),
+            "project": ("project__name",),
+        },
+        choice_fields={"status": ("status", PurchaseRequestStatus.values)},
+        date_fields={"required_by": "required_by"},
+    )
+    return render(
+        request,
+        "procurement/request_list.html",
+        {
+            "requests": records,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "request", "kind": "text", "label": "شماره و عنوان"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "required_by",
+                        "kind": "date_range",
+                        "label": "تاریخ نیاز",
+                    },
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": PurchaseRequestStatus.choices,
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -254,7 +301,38 @@ def purchase_order_list(request: HttpRequest) -> HttpResponse:
     records = get_organization_purchase_orders(
         user=request.user, organization=request.organization
     )
-    return render(request, "procurement/order_list.html", {"orders": records})
+    records = apply_table_filters(
+        records,
+        request,
+        text_fields={
+            "number": ("order_number",),
+            "supplier": ("supplier__display_name",),
+            "project": ("project__name",),
+        },
+        choice_fields={"status": ("status", PurchaseOrderStatus.values)},
+    )
+    return render(
+        request,
+        "procurement/order_list.html",
+        {
+            "orders": records,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره سفارش"},
+                    {"name": "supplier", "kind": "text", "label": "تأمین‌کننده"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": PurchaseOrderStatus.choices,
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -379,7 +457,38 @@ def goods_receipt_list(request: HttpRequest) -> HttpResponse:
     records = get_organization_goods_receipts(
         user=request.user, organization=request.organization
     )
-    return render(request, "procurement/receipt_list.html", {"receipts": records})
+    records = apply_table_filters(
+        records,
+        request,
+        text_fields={
+            "number": ("receipt_number",),
+            "order": ("purchase_order__order_number",),
+            "project": ("project__name",),
+        },
+        choice_fields={"status": ("status", GoodsReceiptStatus.values)},
+    )
+    return render(
+        request,
+        "procurement/receipt_list.html",
+        {
+            "receipts": records,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره رسید"},
+                    {"name": "order", "kind": "text", "label": "سفارش خرید"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": GoodsReceiptStatus.choices,
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

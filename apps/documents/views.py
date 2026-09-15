@@ -8,6 +8,7 @@ from apps.documents.forms import (
     DocumentLinkForm,
     DocumentVersionForm,
 )
+from apps.documents.models import DocumentType
 from apps.documents.services import (
     add_document_link,
     add_document_version,
@@ -23,6 +24,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 def _detail_context(request: HttpRequest, document: object, **extra: object) -> dict:
@@ -47,7 +53,38 @@ def document_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "documents/list.html", {"documents": documents})
+    documents = apply_table_filters(
+        documents,
+        request,
+        text_fields={
+            "document": ("title", "reference"),
+            "version": ("current_version__original_file_name",),
+        },
+        choice_fields={"document_type": ("document_type", DocumentType.values)},
+    )
+    return render(
+        request,
+        "documents/list.html",
+        {
+            "documents": documents,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "document", "kind": "text", "label": "سند"},
+                    None,
+                    {
+                        "name": "document_type",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": DocumentType.choices,
+                    },
+                    {"name": "version", "kind": "text", "label": "نسخه جاری"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

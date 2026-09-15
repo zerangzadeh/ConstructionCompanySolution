@@ -40,6 +40,29 @@ the approval sequence in `ROADMAP.md`.
 | Documents | `Document`, `DocumentVersion`, `DocumentLink` | Versioned private documents linked through controlled explicit foreign keys to supported records, with context-aware RBAC, validated files, audited access, and archival. |
 | Audit | `AuditEvent` | Append-only evidence for important business and security actions. |
 | Financials | No persisted model | Tenant-scoped read models that aggregate contracts, approved estimates, recorded expenses, and posted payments; this domain is not a second ledger. |
+| Workflow foundation | `WorkflowType`, `WorkflowTemplate`, `WorkflowDefinition`, `WorkflowVersion`, `WorkflowStepDefinition`, `WorkflowTransitionDefinition`, `WorkflowCondition`, `WorkflowRoutingRule` | Code-backed platform catalog and tenant-scoped, validated, immutable-on-publication definition graphs. Runtime execution and work items are not yet implemented. |
+
+## Approved cross-domain workflow target (W1 foundation implemented)
+
+W1 provides tenant-owned, versioned workflow definitions and the code-backed
+catalog, registry, validation, publication, simulation, permission, and audit
+boundaries. W2 and later slices will add runtime instances, position- and
+membership-aware routing, persistent work items, delegation, and a centralized
+workbench. The complete target model, boundaries, migration plan, and acceptance
+gates are defined in
+`docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`.
+
+Until each domain is explicitly migrated, its current application services, permissions,
+states, and audit behavior remain authoritative. The workflow foundation will
+coordinate registered domain commands; it will not replace domain lifecycle or
+financial/operational invariants with generic state.
+
+The bounded workflow platform is tenant-configurable but code-constrained.
+Tenants may compose published platform step, condition, routing, and decision
+types; they may not run arbitrary Python, SQL, templates, network calls, or
+unvalidated expressions. Small-tenant templates must work without workforce
+structures, while larger tenants may opt into position routing, candidate pools,
+multi-stage approval, delegation, fallback, and separation-of-duties controls.
 
 ## Authorization model
 
@@ -212,7 +235,7 @@ erDiagram
 - An employee profile image is optional, private, and organization-owned. It is preferred for workforce display; the linked user's global profile image is only a display fallback and is never copied or synchronized automatically.
 - Procurement requests, orders, receipts, their lines, projects, suppliers, materials, and units must share a tenant. Suppliers require an active supplier party role, material lines use the material's active canonical unit, ordered quantities linked to a request cannot exceed the requested quantity, and cumulative posted receipts cannot exceed an issued order line. Goods receipts record purchasing evidence and do not automatically create inventory movements.
 - Request decisions, order issue/completion, and receipt posting/voiding are atomic and audited. Only draft documents accept line changes; approved requests, issued order terms, and posted receipt details are immutable. Voiding preserves receipt lines and reopens a completed order when its remaining posted receipts no longer fulfill it.
-- Procurement uses the active membership's `BusinessPermission` for each action, with one request approval decision rather than separately routed technical or financial approvals. It does not resolve approvers from workforce hierarchy, job position, department, work team, or project-assignment data, and it has no amount thresholds, delegation, or mandatory separation-of-duties policy. A member holding both the relevant create/submit and approve permissions may approve their own request; every transition remains auditable.
+- Until the F5 migration, Procurement uses the active membership's `BusinessPermission` for each action, with one request approval decision rather than separately routed technical or financial approvals. It does not resolve approvers from workforce hierarchy, job position, department, work team, or project-assignment data, and it has no amount thresholds, delegation, or mandatory separation-of-duties policy. A member holding both the relevant create/submit and approve permissions may approve their own request; every transition remains auditable. The compatibility workflow introduced by F5 must preserve this behavior before a tenant explicitly publishes a stronger policy.
 - Warehouses and stock transactions are tenant-owned; project-specific warehouses and movement projects must agree, and every movement uses the material's active canonical unit. A material cannot be archived while it has a draft movement or a nonzero derived warehouse balance, and a project cannot be archived before its project warehouses and draft movements are cleared. Receipt movements require a posted `GoodsReceiptItem`, exactly match its material, unit, project, and quantity, and must be reversed before the procurement receipt can be voided.
 - Stock movements are `draft` until atomically posted. Posting locks participating warehouses, rejects insufficient source stock, and makes movement details immutable. Transfers debit one warehouse and credit another in one ledger record. Corrections create a reasoned, equal-and-opposite posted reversal while retaining the original movement; balances include both entries and are always derived from the ledger.
 - Equipment, assignment, project, optional site, maintenance provider, and maintenance location must share a tenant; assignment sites and maintenance sites must belong to their selected project. Equipment does not store a current-project pointer. Non-cancelled assignment date ranges for one equipment cannot overlap; PostgreSQL enforces this invariant under concurrent writes. Final assignment and maintenance history cannot be deleted, and completed/cancelled records are immutable.
@@ -263,9 +286,16 @@ erDiagram
 | Safety incident | reported -> under review -> assigned -> corrective action in progress -> resolved -> closed. Assignment requires a responsible user, employee, or party; corrective action requires an action and due date; resolution and closure require summaries. Closed incidents are terminal and immutable. |
 | Quality issue | reported -> under review -> assigned -> corrective action in progress -> awaiting verification -> verified -> closed. Assignment requires a responsible user, employee, or party and due date; verification and closure require recorded actors, timestamps, and summaries. Closed issues are terminal and immutable. |
 
-## Workforce future integration
+## Workforce workflow integration target
 
 Time-entry and daily-labor integration remain deferred. Any future integration must preserve tenant scope and keep authenticated identity (`User`) distinct from personnel data (`Employee`). A future workflow that requires an organizational position must require both the actor's ordinary business permission and an effective `EmployeePositionAssignment`; the workflow decision should retain the qualifying assignment identifier so later position changes do not rewrite historical authority.
+
+The approved F5 workflow foundation applies this rule to position-based routing.
+One active `OrganizationMembership` receives one centralized workbench per active
+organization even when its linked employee holds multiple positions; work items
+may be filtered by position but are deduplicated by actionable responsibility.
+Position assignment routes work and records the actor's qualifying capacity; it
+never becomes a second authorization system.
 
 ## Equipment future integration
 
@@ -277,12 +307,13 @@ The following approved target concepts are not implemented. Their presence here 
 
 | Future domain | Approved direction |
 | --- | --- |
+| Tenant Workflow & Work Management runtime | W1 definition/catalog schema is implemented. W2 adds runtime instances, work items, candidate pools, assignment history, delegation, and runtime routing; later F5 slices add tenant administration UI and the centralized workbench. |
 | Project control extensions | `CostCenter`, `ProjectBaseline`, and `ProgressRecord`, plus optional project/site access restrictions. Existing WBS nodes, activities, and daily progress observations do not replace these concepts. |
-| Billing and progress claims | `ProgressClaim`, `ProgressClaimItem`, and `ClaimAdjustment`, including retention, tax, insurance, advance deductions, penalties, and other documented adjustments. |
+| Billing and progress claims | `ProgressClaim`, `ProgressClaimItem`, and `ClaimAdjustment`, including retention, tax, insurance, advance deductions, penalties, and other documented adjustments. Its approval and actionable work must consume the shared F5 workflow foundation. |
 | Quality and safety extensions | Inspection, risk, formal CAPA, and generalized document-link workflows remain optional future concepts. Current daily-report notes remain lightweight observations; `SafetyIncident` and `QualityIssue` are implemented standalone workflows. |
-| Procurement workflow extensions | Configurable multi-stage technical/financial approval, amount thresholds, delegation, separation of duties, and organization-chart or project-role approver routing require separately approved scope. |
+| Procurement workflow migration | F5 introduces a compatibility workflow first, then tenant-configurable multi-stage technical/financial approval, typed amount conditions, delegation, separation of duties, and approved position/project-responsibility routing without rewriting finalized procurement history. |
 | Notifications | A tenant-aware, user-facing `Notification` model for relevant system and workflow events. Audit events remain immutable evidence and are not notifications. |
 
 Optional enterprise structures must not be required for small contractors. Each future domain needs separately approved workflow, ownership, lifecycle, permissions, and an incremental migration plan before implementation.
 
-Full general-ledger accounting, payroll, CRM, generic workflow engines, microservices, and event sourcing remain outside the approved product model. DRF APIs and background-job infrastructure are deferred technical capabilities rather than implemented domains.
+Full general-ledger accounting, payroll, CRM, unbounded general-purpose BPM/BPMN engines, tenant-authored executable code, microservices, and event sourcing remain outside the approved product model. The bounded tenant workflow/work-management foundation described in its dedicated architecture document is approved. DRF APIs and background-job infrastructure are deferred technical capabilities rather than implemented domains.

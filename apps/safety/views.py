@@ -16,6 +16,11 @@ from apps.safety.forms import (
     SafetyIncidentAssignmentForm,
     SafetyIncidentForm,
 )
+from apps.safety.models import (
+    SafetyIncidentSeverity,
+    SafetyIncidentStatus,
+    SafetyIncidentType,
+)
 from apps.safety.services import (
     assign_safety_incident,
     close_safety_incident,
@@ -26,6 +31,11 @@ from apps.safety.services import (
     review_safety_incident,
     start_corrective_action,
 )
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -35,7 +45,54 @@ def incident_list(request: HttpRequest) -> HttpResponse:
     incidents = get_organization_safety_incidents(
         user=request.user, organization=request.organization
     )
-    return render(request, "safety/list.html", {"incidents": incidents})
+    incidents = apply_table_filters(
+        incidents,
+        request,
+        text_fields={
+            "number": ("incident_number",),
+            "project": ("project__name", "site__name"),
+        },
+        choice_fields={
+            "incident_type": ("incident_type", SafetyIncidentType.values),
+            "severity": ("severity", SafetyIncidentSeverity.values),
+            "status": ("status", SafetyIncidentStatus.values),
+        },
+        date_fields={"occurred_at": "occurred_at__date"},
+    )
+    return render(
+        request,
+        "safety/list.html",
+        {
+            "incidents": incidents,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "incident_type",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": SafetyIncidentType.choices,
+                    },
+                    {
+                        "name": "severity",
+                        "kind": "select",
+                        "label": "شدت",
+                        "choices": SafetyIncidentSeverity.choices,
+                    },
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": SafetyIncidentStatus.choices,
+                    },
+                    {"name": "occurred_at", "kind": "date_range", "label": "زمان وقوع"},
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

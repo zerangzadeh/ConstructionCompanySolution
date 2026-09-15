@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 {% block title %}اسناد | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
+{% table_filters filters "document-filters" %}
 {% if "documents.upload" in business_permission_codes %}{% url "documents:upload" as upload_url %}{% endif %}
-{% include "components/page_header.html" with page_eyebrow="مدیریت اسناد" page_title="اسناد سازمان" page_description=request.organization.name page_action_url=upload_url page_action_label="ایجاد سند" only %}
+{% include "components/page_header.html" with page_eyebrow="مدیریت اسناد" page_title="اسناد شرکت" page_description=request.organization.name page_action_url=upload_url page_action_label="ایجاد سند" only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست اسناد">
   {% if documents %}
   <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">مخزن اسناد خصوصی</h2><p class="mt-0.5 text-[11px] text-slate-500">نسخه‌های immutable با دسترسی مبتنی بر context</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ documents|length }} سند</span></div>
@@ -14,6 +15,6 @@
     <td class="px-4 py-3.5"><span dir="ltr">v{{ document.current_version.version_number }}</span><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500" dir="ltr">{{ document.current_version.original_file_name }}</p></td>
     <td class="px-4 py-3.5"><div class="flex gap-3"><a class="text-xs font-semibold text-blue-700" href="{% url 'documents:detail' document.id %}">جزئیات</a>{% if "documents.download" in business_permission_codes %}<a class="text-xs font-semibold text-slate-600" href="{% url 'documents:download' document.id %}">دریافت</a>{% endif %}</div></td>
   </tr>{% endfor %}</tbody></table></div>
-  {% else %}{% include "components/empty_state.html" with empty_title="هنوز سندی ثبت نشده است" empty_description="اولین سند نسخه‌بندی‌شده سازمان را ایجاد کنید." empty_action_url=upload_url empty_action_label="ایجاد سند" only %}{% endif %}
+  {% else %}{% include "components/empty_state.html" with empty_title="هنوز سندی ثبت نشده است" empty_description="اولین سند نسخه‌بندی‌شده شرکت را ایجاد کنید." empty_action_url=upload_url empty_action_label="ایجاد سند" only %}{% endif %}
 </section>
 {% endblock %}

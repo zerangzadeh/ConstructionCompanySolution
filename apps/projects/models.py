@@ -38,8 +38,14 @@ class Project(UUIDModel, TimeStampedModel):
     )
     start_date = models.DateField("تاریخ شروع", null=True, blank=True)
     end_date = models.DateField("تاریخ پایان", null=True, blank=True)
-    budget = models.DecimalField(
-        "بودجه",
+    estimated_budget = models.DecimalField(
+        "بودجه تخمینی",
+        max_digits=18,
+        decimal_places=2,
+        default=Decimal("0.00"),
+    )
+    actual_budget = models.DecimalField(
+        "بودجه واقعی",
         max_digits=18,
         decimal_places=2,
         default=Decimal("0.00"),

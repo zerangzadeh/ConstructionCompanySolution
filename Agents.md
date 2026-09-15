@@ -152,8 +152,10 @@ requests, or remote changes unless explicitly requested.
 > as an MVP. The current ERP core and multiple operational domains are
 > implemented and validated on PostgreSQL 18.6 with Psycopg 3. The existing ERP
 > and Django Admin interfaces share the approved Persian-first RTL design system.
-> Billing & Progress Claims is the next product-domain phase; other incomplete
-> capabilities retain their explicit roadmap status.
+> Tenant Workflow & Work Management is the next cross-domain foundation;
+> Billing & Progress Claims follows it and must consume that shared workflow and
+> work-item model. Other incomplete capabilities retain their explicit roadmap
+> status.
 
 The implemented core covers tenant identity/settings, parties, material masters,
 projects and project controls, workforce, procurement, inventory, equipment,
@@ -200,13 +202,19 @@ relevant checks after any code, migration, or configuration change.
 ## 14. Product Roadmap
 
 `ROADMAP.md` is the source of truth for remaining full-product delivery order and
-the parallel UI/UX workstream. Billing & Progress Claims is the **NEXT** product
-domain. **PLANNED** phases record direction but do not authorize implementation;
-decompose and implement only the current/next phase after explicit approval.
+the parallel UI/UX workstream. Tenant Workflow & Work Management is **NEXT**;
+Billing & Progress Claims is blocked on that foundation. **PLANNED** phases
+record direction but do not authorize implementation; decompose and implement
+only the current/next phase after explicit approval.
 
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md` is the concise reference for current
 entities, relationships, invariants, lifecycle states, and approved future domain
 concepts. Do not duplicate those catalogs here.
+
+`docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` is authoritative for
+the approved workflow/work-item target, execution slices, migration boundaries,
+and acceptance gates. Its target entities are not part of the current schema
+until implemented through the F5 work packages.
 
 ## 15. Product Modeling and Schema Evolution Guardrails
 
@@ -220,9 +228,11 @@ concepts. Do not duplicate those catalogs here.
   expense categories instead of creating uncontrolled duplicates.
 - Keep cross-domain dependencies explicit, avoid circular imports, and introduce
   a new app only with approved ownership, scope, lifecycle, and permissions.
-- Full general-ledger accounting, payroll, CRM, generic workflow engines,
-  microservices, and event sourcing remain out of scope unless explicitly
-  approved.
+- Full general-ledger accounting, payroll, CRM, unbounded general-purpose
+  BPM/BPMN engines, tenant-authored executable workflow code, microservices, and
+  event sourcing remain out of scope unless explicitly approved. The bounded,
+  declarative, tenant-owned workflow/work-management foundation in the approved
+  F5 architecture is in scope.
 
 For schema evolution:
 
@@ -297,9 +307,43 @@ workflow rather than silently changing historical values.
 Approval services must use transactions and re-check authorization and current
 state inside the transaction to avoid race conditions.
 
+### Approved Tenant Workflow & Work Management Target
+
+F5 introduces a bounded, declarative workflow foundation. The platform owns the
+catalog of executable step, condition, routing, and domain-command types;
+organizations own versioned configurations assembled from that catalog.
+Published versions and completed runtime history are immutable.
+
+- Domain models and services remain authoritative for lifecycle and business
+  invariants. Workflow coordination must call registered domain services rather
+  than update domain statuses generically.
+- Every workflow definition, version, instance, step, work item, candidate,
+  delegation, and assignment-history record must be tenant-scoped.
+- A position routes responsibility but never grants permission. Acting requires
+  an active membership, the required `BusinessPermission`, current assignment or
+  candidacy, and all configured separation rules.
+- The final actor is an `OrganizationMembership`. Position-based actions also
+  retain the qualifying effective `EmployeePositionAssignment` for historical
+  authority.
+- One active membership has one centralized workbench per active organization;
+  multiple positions are filters/routing evidence, not separate identities.
+- Starter workflows must support small tenants without departments, positions,
+  employees, or teams. Position and project routing remain optional.
+- Definition publication requires deterministic graph, scope, permission,
+  routing, fallback, and domain-transition validation.
+- Domain transition, work-item completion, next-step activation, and audit
+  evidence must commit atomically. Do not synchronize critical state through
+  Django signals.
+- Migrate existing domains incrementally using expand, backfill, shadow, switch,
+  validate, and explicitly approved contraction.
+
+Do not implement arbitrary tenant code, SQL, templates, network callbacks, or
+unregistered expressions as workflow behavior. Do not create a second workflow
+or work-item mechanism inside a consuming domain.
+
 ### Current Procurement Workflow Boundary
 
-The implemented procurement workflow is intentionally fixed and
+Until its F5 migration, the implemented procurement workflow remains fixed and
 permission-driven: purchase requests transition from `draft` to `submitted` to
 a single `approved` or `rejected` decision; purchase orders transition from
 `draft` to `issued` to `completed`; and goods receipts transition from `draft`
@@ -307,14 +351,15 @@ to `posted` or `void`. Authorization for each transition is enforced through
 the corresponding `BusinessPermission` on the actor's active organization
 membership.
 
-Do not introduce a generic workflow engine, approval routing by amount,
-delegation, mandatory separation of duties, or automatic approver resolution
-from `Employee`, `Department`, `Position`, `WorkTeam`, or project-assignment
-data without separately approved product scope. Workforce structures remain
-optional personnel data and are not the authorization source of truth. A user
-whose assigned company role includes multiple procurement permissions may
-perform those permitted steps, including approving a request they created; the
-existing audit trail must remain intact.
+Do not change this legacy behavior outside the approved F5 migration slices.
+F5 must first reproduce it with a tenant compatibility template and validate
+open-record backfill before enabling optional amount conditions, delegation,
+separation of duties, or workforce/project routing. Workforce structures remain
+optional and are not the authorization source of truth. A user whose assigned
+company role includes multiple procurement permissions may continue to perform
+those permitted legacy steps, including approving a request they created, until
+the tenant explicitly publishes a stronger workflow; the existing audit trail
+must remain intact.
 
 ## 19. Operational Reliability
 

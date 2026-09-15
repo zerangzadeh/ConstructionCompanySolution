@@ -3,9 +3,10 @@ from django import forms
 from apps.expenses.models import Expense, ExpenseCategory, LegacyExpenseCategory
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectPhase
+from core.forms import JalaliDateMixin
 
 
-class ExpenseForm(forms.ModelForm):
+class ExpenseForm(JalaliDateMixin, forms.ModelForm):
     """Form for recording an expense in the active organization."""
 
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())

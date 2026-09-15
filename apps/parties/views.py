@@ -16,7 +16,7 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.parties.forms import BusinessPartyForm, PartyContactForm, PartyRoleForm
-from apps.parties.models import BusinessParty
+from apps.parties.models import BusinessParty, PartyKind
 from apps.parties.services import (
     add_party_contact,
     archive_business_party,
@@ -24,6 +24,11 @@ from apps.parties.services import (
     create_business_party,
     get_organization_parties,
     update_business_party,
+)
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
 )
 
 
@@ -39,7 +44,35 @@ def party_list(request: HttpRequest) -> HttpResponse:
     parties = get_organization_parties(
         user=request.user, organization=request.organization
     )
-    return render(request, "parties/list.html", {"parties": parties})
+    parties = apply_table_filters(
+        parties,
+        request,
+        text_fields={"name": ("display_name",), "tax_id": ("tax_id",)},
+        choice_fields={"kind": ("kind", PartyKind.values)},
+    )
+    return render(
+        request,
+        "parties/list.html",
+        {
+            "parties": parties,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "name", "kind": "text", "label": "نام نمایشی"},
+                    {
+                        "name": "kind",
+                        "kind": "select",
+                        "label": "نوع",
+                        "choices": PartyKind.choices,
+                    },
+                    None,
+                    {"name": "tax_id", "kind": "text", "label": "شناسه مالیاتی"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

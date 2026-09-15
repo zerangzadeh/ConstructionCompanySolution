@@ -16,9 +16,10 @@ from apps.projects.models import (
     ProjectPhaseStatus,
     ProjectSite,
 )
+from core.forms import JalaliDateMixin
 
 
-class DailyReportForm(forms.ModelForm):
+class DailyReportForm(JalaliDateMixin, forms.ModelForm):
     """Form for recording one project's daily operational report."""
 
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
@@ -105,7 +106,7 @@ class DailyReportForm(forms.ModelForm):
         return cleaned_data
 
 
-class _DailyReportEntryForm(forms.ModelForm):
+class _DailyReportEntryForm(JalaliDateMixin, forms.ModelForm):
     """Apply the standard input style to daily report entry forms."""
 
     def __init__(self, *args, **kwargs):

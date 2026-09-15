@@ -10,9 +10,10 @@ from apps.procurement.models import (
     PurchaseRequestItem,
 )
 from apps.projects.models import Project
+from core.forms import JalaliDateMixin
 
 
-class _StyledForm(forms.Form):
+class _StyledForm(JalaliDateMixin, forms.Form):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         field_class = (
@@ -105,8 +106,8 @@ class PurchaseOrderForm(_StyledForm):
         self.fields["supplier"].queryset = (
             BusinessParty.objects.filter(
                 organization=organization,
-                is_active=True,
-                party_roles__role=PartyRoleType.SUPPLIER,
+                archived_at__isnull=True,
+                roles__role=PartyRoleType.SUPPLIER,
             )
             .distinct()
             .order_by("display_name")

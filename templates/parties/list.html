@@ -1,8 +1,9 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 
 {% block title %}طرف‌های تجاری | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "party-filters" %}
     {% if "parties.create" in business_permission_codes %}{% url "parties:create" as create_url %}{% endif %}
     {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
 

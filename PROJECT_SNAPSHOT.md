@@ -118,7 +118,15 @@ Business pages require a logged-in user with an active organization. For example
 
 ## Current full-product delivery priorities
 
-- Implement Billing & Progress Claims as the next approved product-domain phase.
+- Implement Tenant Workflow & Work Management as the next approved cross-domain
+  foundation, following
+  `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`.
+- Deliver tenant-owned immutable workflow versions, registered routing and
+  domain-command integration, persisted work items, and a centralized workbench;
+  migrate Procurement first and preserve its current behavior through a
+  compatibility template.
+- Implement Billing & Progress Claims after the workflow foundation is accepted;
+  it must reuse the shared approval, assignment, and work-item mechanisms.
 - Complete the remaining safety/quality extensions only through separately
   approved workflows.
 - Continue tenant-isolation, object-authorization, lifecycle, and concurrency

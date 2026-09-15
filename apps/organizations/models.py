@@ -362,6 +362,20 @@ class BusinessPermissionCode(models.TextChoices):
 
     FINANCIALS_VIEW = "financials.view", "مشاهده داشبورد و گزارش‌های مالی"
     AUDIT_VIEW = "audit.view", "مشاهده گزارش رویدادها"
+    WORKFLOWS_VIEW = "workflows.view", "مشاهده تعریف‌های گردش‌کار"
+    WORKFLOWS_CREATE = "workflows.create", "ایجاد تعریف گردش‌کار"
+    WORKFLOWS_CHANGE_DRAFT = "workflows.change_draft", "ویرایش پیش‌نویس گردش‌کار"
+    WORKFLOWS_PUBLISH = "workflows.publish", "انتشار نسخه گردش‌کار"
+    WORKFLOWS_RETIRE = "workflows.retire", "بازنشسته‌کردن نسخه گردش‌کار"
+    WORKFLOWS_REASSIGN = "workflows.reassign", "تخصیص مجدد کار گردش‌کار"
+    WORKFLOWS_DELEGATE = "workflows.delegate", "واگذاری مسئولیت گردش‌کار"
+    WORKFLOWS_MIGRATE_INSTANCES = (
+        "workflows.migrate_instances",
+        "مهاجرت اجرای باز گردش‌کار",
+    )
+    WORK_ITEMS_VIEW = "work_items.view", "مشاهده کارهای گردش‌کار"
+    WORK_ITEMS_CLAIM = "work_items.claim", "اخذ کار گردش‌کار"
+    WORK_ITEMS_ACT = "work_items.act", "انجام اقدام گردش‌کار"
 
 
 class BusinessPermission(UUIDModel, TimeStampedModel):

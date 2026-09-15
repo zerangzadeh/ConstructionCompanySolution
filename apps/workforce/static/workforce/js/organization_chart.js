@@ -23,7 +23,11 @@
     const normalize = (value) => value.trim().toLocaleLowerCase("fa").replaceAll("ي", "ی").replaceAll("ك", "ک");
 
     const showDetails = (departmentId) => {
-        cards.forEach((card) => card.classList.toggle("is-selected", card.closest("[data-chart-node]").dataset.departmentId === departmentId));
+        cards.forEach((card) => {
+            const owner = card.closest("[data-chart-node]");
+            const cardDepartmentId = owner?.dataset.departmentId || card.dataset.departmentId;
+            card.classList.toggle("is-selected", cardDepartmentId === departmentId);
+        });
         panels.forEach((panel) => { panel.hidden = panel.dataset.departmentId !== departmentId; });
         if (placeholder) placeholder.hidden = Boolean(departmentId);
         if (drawer && departmentId) drawer.classList.add("is-open");
@@ -113,7 +117,10 @@
     });
 
     cards.forEach((card) => {
-        const open = () => showDetails(card.closest("[data-chart-node]").dataset.departmentId);
+        const open = () => {
+            const owner = card.closest("[data-chart-node]");
+            showDetails(owner?.dataset.departmentId || card.dataset.departmentId);
+        };
         card.addEventListener("click", open);
         card.addEventListener("keydown", (event) => {
             if (event.key === "Enter" || event.key === " ") { event.preventDefault(); open(); }

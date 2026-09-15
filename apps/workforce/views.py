@@ -66,6 +66,11 @@ from apps.workforce.services import (
     update_employee_profile_image,
     update_position,
 )
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 _IMAGE_CONTENT_TYPES = {
     ".jpg": "image/jpeg",
@@ -97,7 +102,44 @@ def employee_list(request: HttpRequest) -> HttpResponse:
     employees = get_organization_employees(
         user=request.user, organization=request.organization
     )
-    return render(request, "workforce/employee_list.html", {"employees": employees})
+    employees = apply_table_filters(
+        employees,
+        request,
+        text_fields={
+            "employee": (
+                "employee_number",
+                "first_name",
+                "last_name",
+                "email",
+                "phone_number",
+            ),
+            "position": ("department__name", "position__title"),
+            "team": ("work_team__name",),
+        },
+        choice_fields={"status": ("status", EmployeeStatus.values)},
+    )
+    return render(
+        request,
+        "workforce/employee_list.html",
+        {
+            "employees": employees,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "employee", "kind": "text", "label": "کارمند"},
+                    {"name": "position", "kind": "text", "label": "واحد و سمت"},
+                    {"name": "team", "kind": "text", "label": "گروه کاری"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": EmployeeStatus.choices,
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -435,12 +477,27 @@ def employee_archive(request: HttpRequest, employee_id: str) -> HttpResponse:
 
 
 def _master_list(
-    request: HttpRequest, service, template_name: str, context_name: str
+    request: HttpRequest,
+    service,
+    template_name: str,
+    context_name: str,
+    *,
+    text_fields: dict[str, tuple[str, ...]],
+    filters: list[dict[str, object] | None],
 ) -> HttpResponse:
+    records = apply_table_filters(
+        service(user=request.user, organization=request.organization),
+        request,
+        text_fields=text_fields,
+    )
     return render(
         request,
         template_name,
-        {context_name: service(user=request.user, organization=request.organization)},
+        {
+            context_name: records,
+            "filters": build_table_filters(request, filters),
+            "has_active_filters": has_active_table_filters(request),
+        },
     )
 
 
@@ -791,7 +848,21 @@ def department_archive(request: HttpRequest, department_id: str) -> HttpResponse
 @require_GET
 def position_list(request: HttpRequest) -> HttpResponse:
     return _master_list(
-        request, get_organization_positions, "workforce/position_list.html", "positions"
+        request,
+        get_organization_positions,
+        "workforce/position_list.html",
+        "positions",
+        text_fields={
+            "position": ("code", "title"),
+            "department": ("department__name",),
+        },
+        filters=[
+            {"name": "position", "kind": "text", "label": "کد و عنوان"},
+            {"name": "department", "kind": "text", "label": "واحد شرکتی"},
+            None,
+            None,
+            None,
+        ],
     )
 
 
@@ -952,6 +1023,17 @@ def work_team_list(request: HttpRequest) -> HttpResponse:
         get_organization_work_teams,
         "workforce/work_team_list.html",
         "work_teams",
+        text_fields={
+            "team": ("code", "name"),
+            "department": ("department__name",),
+            "lead": ("lead__first_name", "lead__last_name"),
+        },
+        filters=[
+            {"name": "team", "kind": "text", "label": "کد و نام"},
+            {"name": "department", "kind": "text", "label": "واحد شرکتی"},
+            {"name": "lead", "kind": "text", "label": "سرپرست"},
+            None,
+        ],
     )
 
 
@@ -1012,8 +1094,44 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
     assignments = get_organization_project_assignments(
         user=request.user, organization=request.organization
     )
+    assignments = apply_table_filters(
+        assignments,
+        request,
+        text_fields={
+            "employee": (
+                "employee__employee_number",
+                "employee__first_name",
+                "employee__last_name",
+            ),
+            "project": ("project__name", "site__name"),
+            "role": ("role_title",),
+        },
+        choice_fields={"status": ("status", AssignmentStatus.values)},
+        date_fields={"start_date": "start_date"},
+    )
     return render(
-        request, "workforce/assignment_list.html", {"assignments": assignments}
+        request,
+        "workforce/assignment_list.html",
+        {
+            "assignments": assignments,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "employee", "kind": "text", "label": "کارمند"},
+                    {"name": "project", "kind": "text", "label": "پروژه و کارگاه"},
+                    {"name": "role", "kind": "text", "label": "مسئولیت"},
+                    {"name": "start_date", "kind": "date_range", "label": "شروع"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": AssignmentStatus.choices,
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
     )
 
 

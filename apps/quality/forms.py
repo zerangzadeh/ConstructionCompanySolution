@@ -7,9 +7,10 @@ from apps.parties.models import BusinessParty
 from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite
 from apps.quality.models import QualityIssue
 from apps.workforce.models import Employee
+from core.forms import JalaliDateMixin
 
 
-class _StyledForm:
+class _StyledForm(JalaliDateMixin):
     def _style_fields(self) -> None:
         field_class = (
             "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 "

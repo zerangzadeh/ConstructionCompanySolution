@@ -8,10 +8,16 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.payments.forms import PaymentForm, PaymentVoidForm
+from apps.payments.models import PaymentStatus
 from apps.payments.services import (
     create_payment,
     get_organization_payments,
     void_payment,
+)
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
 )
 
 
@@ -22,7 +28,42 @@ def payment_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "payments/list.html", {"payments": payments})
+    payments = apply_table_filters(
+        payments,
+        request,
+        text_fields={
+            "number": ("payment_number",),
+            "counterparty": ("counterparty_name", "party__display_name"),
+            "project": ("project__name", "phase__name"),
+        },
+        choice_fields={"status": ("status", PaymentStatus.values)},
+        date_fields={"paid_on": "paid_on"},
+    )
+    return render(
+        request,
+        "payments/list.html",
+        {
+            "payments": payments,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره پرداخت"},
+                    {"name": "counterparty", "kind": "text", "label": "طرف حساب"},
+                    {"name": "project", "kind": "text", "label": "پروژه یا فاز"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": PaymentStatus.choices,
+                    },
+                    None,
+                    {"name": "paid_on", "kind": "date_range", "label": "تاریخ"},
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

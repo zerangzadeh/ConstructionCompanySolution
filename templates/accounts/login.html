@@ -13,7 +13,7 @@
             <div class="mb-7">
                 <p class="text-xs font-semibold text-blue-700">ورود امن به فضای کاری</p>
                 <h1 id="login-title" class="mt-1 text-2xl font-bold tracking-tight text-slate-950">ورود به سازه‌یار</h1>
-                <p class="mt-2 text-sm leading-6 text-slate-500">برای ادامه، نام کاربری و گذرواژهٔ سازمانی خود را وارد کنید.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-500">برای ادامه، نام کاربری و گذرواژهٔ شرکتی خود را وارد کنید.</p>
             </div>
             <form method="post" class="space-y-5">
                 {% csrf_token %}
@@ -23,7 +23,7 @@
                 {% include "components/form_field.html" with field=form.password only %}
                 <button class="erp-btn erp-btn--primary w-full" type="submit">ورود به سامانه</button>
             </form>
-            <p class="mt-5 border-t border-slate-100 pt-4 text-[11px] leading-5 text-slate-500">دسترسی به اطلاعات هر سازمان بر اساس عضویت فعال و سطح مجوز شما کنترل می‌شود.</p>
+            <p class="mt-5 border-t border-slate-100 pt-4 text-[11px] leading-5 text-slate-500">دسترسی به اطلاعات هر شرکت بر اساس عضویت فعال و سطح مجوز شما کنترل می‌شود.</p>
         </div>
         <div class="order-1 flex min-h-56 flex-col bg-slate-900 p-6 text-white sm:p-8 lg:order-2 lg:min-h-[31rem] lg:p-10">
             <div>

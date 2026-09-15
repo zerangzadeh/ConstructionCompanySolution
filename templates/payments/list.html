@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% load erp_format %}
+{% load erp_format table_filters %}
 
 {% block title %}پرداخت‌ها | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "payment-filters" %}
     {% if "payments.create" in business_permission_codes %}{% url "payments:create" as payment_create_url %}{% endif %}
     {% include "components/page_header.html" with page_eyebrow="مدیریت پرداخت‌ها" page_title="دفتر پرداخت‌ها" page_description=request.organization.name page_action_url=payment_create_url page_action_label="ثبت پرداخت" only %}
 
     <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست پرداخت‌ها">
         {% if payments %}
             <div class="erp-panel-header">
-                <div><h2 class="text-sm font-semibold text-slate-900">تراکنش‌های پرداخت</h2><p class="mt-0.5 text-[11px] text-slate-500">سوابق مالی ثبت‌شده در سازمان فعال</p></div>
+                <div><h2 class="text-sm font-semibold text-slate-900">تراکنش‌های پرداخت</h2><p class="mt-0.5 text-[11px] text-slate-500">سوابق مالی ثبت‌شده در شرکت فعال</p></div>
                 <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ payments|length }} رکورد</span>
             </div>
             <div class="erp-table-wrap">
@@ -33,7 +34,7 @@
             </div>
             <div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ payments|length }} پرداخت</div>
         {% else %}
-            {% include "components/empty_state.html" with empty_title="هنوز پرداختی ثبت نشده است" empty_description="اولین پرداخت این سازمان را ثبت کنید." empty_action_url=payment_create_url empty_action_label="ثبت پرداخت" only %}
+            {% include "components/empty_state.html" with empty_title="هنوز پرداختی ثبت نشده است" empty_description="اولین پرداخت این شرکت را ثبت کنید." empty_action_url=payment_create_url empty_action_label="ثبت پرداخت" only %}
         {% endif %}
     </section>
 {% endblock %}

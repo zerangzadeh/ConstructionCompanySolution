@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.expenses.forms import ExpenseForm, ExpenseVoidForm
+from apps.expenses.models import LegacyExpenseCategory
 from apps.expenses.services import (
     create_expense,
     get_organization_expenses,
@@ -13,6 +14,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -22,7 +28,40 @@ def expense_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "expenses/list.html", {"expenses": expenses})
+    expenses = apply_table_filters(
+        expenses,
+        request,
+        text_fields={
+            "description": ("description", "vendor_name", "receipt_reference"),
+            "project": ("project__name", "phase__name"),
+        },
+        choice_fields={"category": ("category", LegacyExpenseCategory.values)},
+        date_fields={"incurred_on": "incurred_on"},
+    )
+    return render(
+        request,
+        "expenses/list.html",
+        {
+            "expenses": expenses,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "description", "kind": "text", "label": "شرح هزینه"},
+                    {"name": "project", "kind": "text", "label": "پروژه"},
+                    {
+                        "name": "category",
+                        "kind": "select",
+                        "label": "دسته‌بندی",
+                        "choices": LegacyExpenseCategory.choices,
+                    },
+                    {"name": "incurred_on", "kind": "date_range", "label": "تاریخ"},
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

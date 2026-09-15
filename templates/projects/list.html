@@ -1,8 +1,9 @@
-{% extends "base.html" %}{% load erp_format %}
+{% extends "base.html" %}{% load erp_format table_filters %}
 
 {% block title %}پروژه‌ها | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "project-filters" %}
     {% if "projects.create" in business_permission_codes %}{% url "projects:create" as project_create_url %}{% endif %}
     {% include "components/page_header.html" with page_eyebrow="مدیریت پروژه‌ها" page_title="پروژه‌ها" page_description=request.organization.name page_action_url=project_create_url page_action_label="پروژه جدید" only %}
 
@@ -15,7 +16,7 @@
             <div class="erp-table-wrap">
                 <table class="w-full min-w-[900px] border-collapse text-right text-sm">
                     <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
-                        <tr><th class="border-b border-slate-200 px-4 py-3">کد پروژه</th><th class="border-b border-slate-200 px-4 py-3">نام پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">تاریخ شروع</th><th class="border-b border-slate-200 px-4 py-3">تاریخ پایان</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
+                        <tr><th class="border-b border-slate-200 px-4 py-3">کد پروژه</th><th class="border-b border-slate-200 px-4 py-3">نام پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">تاریخ شروع</th><th class="border-b border-slate-200 px-4 py-3">تاریخ پایان</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه تخمینی ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه واقعی ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
                         {% for project in projects %}
@@ -27,7 +28,8 @@
                                 </td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.start_date|default:"—" }}</td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ project.end_date|default:"—" }}</td>
-                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.budget|erp_number }}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.estimated_budget|erp_number }}</td>
+                                <td class="whitespace-nowrap px-4 py-3.5 text-left font-medium tabular-nums text-slate-800" dir="ltr">{{ project.actual_budget|erp_number }}</td>
                                 <td class="px-4 py-3.5 text-center"><a class="inline-grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-blue-300 hover:text-blue-700" href="{% url 'projects:detail' project.id %}" aria-label="مشاهده {{ project.name }}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></td>
                             </tr>
                         {% endfor %}
@@ -36,7 +38,7 @@
             </div>
             <div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه</span><span>مرتب‌شده براساس نام پروژه</span></div>
         {% else %}
-            {% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="اولین پروژه این سازمان را ایجاد کنید." empty_action_url=project_create_url empty_action_label="ایجاد پروژه" only %}
+            {% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="اولین پروژه این شرکت را ایجاد کنید." empty_action_url=project_create_url empty_action_label="ایجاد پروژه" only %}
         {% endif %}
     </section>
 {% endblock %}

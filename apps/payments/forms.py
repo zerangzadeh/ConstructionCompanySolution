@@ -4,10 +4,11 @@ from apps.contracts.models import Contract
 from apps.parties.models import BusinessParty
 from apps.payments.models import Payment
 from apps.projects.models import Project, ProjectPhase
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
 
-class PaymentForm(forms.ModelForm):
+class PaymentForm(JalaliDateMixin, forms.ModelForm):
     """Form for recording a payment in the active organization."""
 
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())

@@ -82,7 +82,7 @@ class Migration(migrations.Migration):
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
                 ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='زمان آخرین به\u200cروزرسانی')),
-                ('record_number', models.CharField(max_length=50, verbose_name='شماره سابقه نگهداری')),
+                ('record_number', models.CharField(max_length=50, verbose_name='شماره سرویس نگهداری')),
                 ('maintenance_type', models.CharField(choices=[('preventive', 'سرویس پیشگیرانه'), ('corrective', 'تعمیر اصلاحی'), ('inspection', 'بازرسی فنی')], max_length=20, verbose_name='نوع نگهداری')),
                 ('status', models.CharField(choices=[('scheduled', 'برنامه\u200cریزی\u200cشده'), ('in_progress', 'در حال انجام'), ('completed', 'تکمیل\u200cشده'), ('cancelled', 'لغوشده')], db_index=True, default='scheduled', max_length=20, verbose_name='وضعیت نگهداری')),
                 ('summary', models.CharField(max_length=255, verbose_name='عنوان خدمت یا تعمیر')),

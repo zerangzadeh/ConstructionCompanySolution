@@ -3,10 +3,11 @@ from django import forms
 from apps.contracts.models import Contract, ContractStatus
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
 
-class ContractForm(forms.ModelForm):
+class ContractForm(JalaliDateMixin, forms.ModelForm):
     """Form for creating a contract in the active organization."""
 
     project = forms.ModelChoiceField(

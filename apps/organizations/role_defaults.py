@@ -9,6 +9,20 @@ ALL_PERMISSIONS = registered_permission_codes()
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
     BusinessPermissionCode.EMPLOYEES_LINK_ACCOUNT,
+    BusinessPermissionCode.WORKFLOWS_VIEW,
+    BusinessPermissionCode.WORKFLOWS_CREATE,
+    BusinessPermissionCode.WORKFLOWS_CHANGE_DRAFT,
+    BusinessPermissionCode.WORKFLOWS_PUBLISH,
+    BusinessPermissionCode.WORKFLOWS_RETIRE,
+    BusinessPermissionCode.WORKFLOWS_MIGRATE_INSTANCES,
+)
+MANAGER_EXPLICIT_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.WORKFLOWS_VIEW,
+    BusinessPermissionCode.WORKFLOWS_REASSIGN,
+    BusinessPermissionCode.WORKFLOWS_DELEGATE,
+    BusinessPermissionCode.WORK_ITEMS_VIEW,
+    BusinessPermissionCode.WORK_ITEMS_CLAIM,
+    BusinessPermissionCode.WORK_ITEMS_ACT,
 )
 READ_ONLY_PERMISSIONS = permission_codes_with_suffix("view") | permission_codes(
     BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
@@ -30,6 +44,9 @@ MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.GOODS_RECEIPTS_POST,
     BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
     BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
+    BusinessPermissionCode.WORK_ITEMS_VIEW,
+    BusinessPermissionCode.WORK_ITEMS_CLAIM,
+    BusinessPermissionCode.WORK_ITEMS_ACT,
 )
 OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
     BusinessPermissionCode.MEMBERSHIP_VIEW,
@@ -43,7 +60,9 @@ OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     MembershipRole.COMPANY_OWNER: ALL_PERMISSIONS,
-    MembershipRole.COMPANY_MANAGER: ALL_PERMISSIONS - OWNER_ONLY_PERMISSIONS,
+    MembershipRole.COMPANY_MANAGER: (
+        ALL_PERMISSIONS - OWNER_ONLY_PERMISSIONS | MANAGER_EXPLICIT_PERMISSIONS
+    ),
     MembershipRole.OPERATIONS_MANAGER: (
         ALL_PERMISSIONS - OPERATIONS_MANAGER_EXCLUSIONS - OWNER_ONLY_PERMISSIONS
     ),

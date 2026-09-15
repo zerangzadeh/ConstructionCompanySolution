@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 {% block title %}حوادث ایمنی | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
+{% table_filters filters "safety-incident-filters" %}
 {% if "safety_incidents.create" in business_permission_codes %}{% url "safety:create" as create_url %}{% endif %}
 {% include "components/page_header.html" with page_eyebrow="ایمنی کارگاه" page_title="حوادث ایمنی" page_description=request.organization.name page_action_url=create_url page_action_label="ثبت حادثه" only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست حوادث ایمنی">

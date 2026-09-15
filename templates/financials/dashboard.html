@@ -1,15 +1,15 @@
 {% extends "base.html" %}{% load erp_format %} {% block title %}داشبورد | سازه‌یار{% endblock %} {% block content %}
-<span class="sr-only">داشبورد سازمان</span>
+<span class="sr-only">داشبورد شرکت</span>
 <section class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 px-5 py-6 text-white sm:px-7" aria-labelledby="dashboard-title">
 <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
-        <p class="text-xs font-semibold text-blue-300">نمای مدیریتی سازمان</p>
+        <p class="text-xs font-semibold text-blue-300">نمای مدیریتی شرکت</p>
         <h1 id="dashboard-title" class="mt-1 text-2xl font-bold tracking-tight text-white">داشبورد عملیاتی</h1>
         <p class="mt-1 text-sm text-slate-300">نمای یکپارچهٔ وضعیت پروژه‌ها و عملکرد مالی {{ request.organization.name }}</p>
     </div>
     <div class="flex items-center gap-2 text-xs text-slate-300">
         <span class="grid h-8 w-8 place-items-center rounded-lg border border-slate-700 bg-slate-800 text-blue-300"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg></span>
-        <span>وضعیت جاری سازمان فعال</span>
+        <span>وضعیت جاری شرکت فعال</span>
     </div>
 </div>
 </section>
@@ -21,7 +21,7 @@
                 <p class="text-xs font-medium text-slate-500">پروژه‌های ثبت‌شده</p>
                 <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.project_count }}</p>
             </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-emerald-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11"/></svg></span></div>
-        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">سبد پروژه‌های سازمان</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">سبد پروژه‌های شرکت</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
     </a>{% endif %}
     {% if can_view_contracts %}<a class="erp-surface group rounded-xl border-t-2 border-t-blue-500 p-4 transition hover:border-blue-200" href="{% url 'contracts:list' %}">
         <div class="flex items-start justify-between">
@@ -53,7 +53,7 @@
     <section class="erp-surface overflow-hidden rounded-xl" aria-labelledby="financial-position-title">
         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
-                <h2 id="financial-position-title" class="font-bold text-slate-900">تصویر مالی سازمان</h2>
+                <h2 id="financial-position-title" class="font-bold text-slate-900">تصویر مالی شرکت</h2>
                 <p class="mt-1 text-xs text-slate-500">مقایسه مبالغ مصوب، هزینه و جریان نقدی</p>
             </div>
             <a class="text-xs font-semibold text-blue-600 hover:text-blue-700" href="{% url 'financials:report' %}">گزارش کامل ←</a>

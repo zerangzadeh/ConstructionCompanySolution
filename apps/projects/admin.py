@@ -6,7 +6,15 @@ from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite, W
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ("code", "name", "organization", "status", "budget", "deleted_at")
+    list_display = (
+        "code",
+        "name",
+        "organization",
+        "status",
+        "estimated_budget",
+        "actual_budget",
+        "deleted_at",
+    )
     list_filter = ("status", "organization")
     search_fields = ("code", "name", "organization__name")
     readonly_fields = ("id", "created_at", "updated_at")

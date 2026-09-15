@@ -10,10 +10,11 @@ from apps.projects.models import (
     ProjectStatus,
     WBSNode,
 )
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
 
-class ProjectForm(forms.ModelForm):
+class ProjectForm(JalaliDateMixin, forms.ModelForm):
     """Form for creating a project in the active organization."""
 
     class Meta:
@@ -25,7 +26,8 @@ class ProjectForm(forms.ModelForm):
             "status",
             "start_date",
             "end_date",
-            "budget",
+            "estimated_budget",
+            "actual_budget",
         ]
         widgets = {  # noqa: RUF012
             "code": forms.TextInput(
@@ -64,7 +66,14 @@ class ProjectForm(forms.ModelForm):
                     "type": "date",
                 }
             ),
-            "budget": forms.NumberInput(
+            "estimated_budget": forms.NumberInput(
+                attrs={
+                    "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "actual_budget": forms.NumberInput(
                 attrs={
                     "class": "block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
                     "step": "0.01",
@@ -83,7 +92,7 @@ class ProjectForm(forms.ModelForm):
         return status
 
 
-class ProjectSiteForm(forms.ModelForm):
+class ProjectSiteForm(JalaliDateMixin, forms.ModelForm):
     """Form for adding a worksite to an active project."""
 
     class Meta:
@@ -109,7 +118,7 @@ class ProjectSiteForm(forms.ModelForm):
         return canonicalize_upper_identifier(self.cleaned_data["code"])
 
 
-class ProjectPhaseForm(forms.ModelForm):
+class ProjectPhaseForm(JalaliDateMixin, forms.ModelForm):
     """Form for creating a phase within one active worksite."""
 
     class Meta:
@@ -148,7 +157,7 @@ class ProjectPhaseForm(forms.ModelForm):
         return status
 
 
-class WBSNodeForm(forms.ModelForm):
+class WBSNodeForm(JalaliDateMixin, forms.ModelForm):
     class Meta:
         model = WBSNode
         fields = ["code", "title", "parent", "sort_order"]  # noqa: RUF012
@@ -163,7 +172,7 @@ class WBSNodeForm(forms.ModelForm):
         return canonicalize_upper_identifier(self.cleaned_data["code"])
 
 
-class ActivityForm(forms.ModelForm):
+class ActivityForm(JalaliDateMixin, forms.ModelForm):
     class Meta:
         model = Activity
         fields = [  # noqa: RUF012

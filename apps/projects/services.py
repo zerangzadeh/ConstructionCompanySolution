@@ -97,7 +97,8 @@ def create_project(
     status: str = ProjectStatus.PLANNING,
     start_date: date | None = None,
     end_date: date | None = None,
-    budget: Decimal = Decimal("0.00"),
+    estimated_budget: Decimal = Decimal("0.00"),
+    actual_budget: Decimal = Decimal("0.00"),
 ) -> Project:
     """Create a project after validating organization scope and core rules."""
 
@@ -118,7 +119,7 @@ def create_project(
         raise ValueError("وضعیت پروژه معتبر نیست.")
     if start_date and end_date and end_date < start_date:
         raise ValueError("تاریخ پایان پروژه نمی‌تواند پیش از تاریخ شروع باشد.")
-    if budget < Decimal("0.00"):
+    if estimated_budget < Decimal("0.00") or actual_budget < Decimal("0.00"):
         raise ValueError("بودجه پروژه نمی‌تواند منفی باشد.")
 
     normalized_code = canonicalize_upper_identifier(code)
@@ -130,7 +131,8 @@ def create_project(
         status=status,
         start_date=start_date,
         end_date=end_date,
-        budget=budget,
+        estimated_budget=estimated_budget,
+        actual_budget=actual_budget,
         created_by=actor,
         updated_by=actor,
     )

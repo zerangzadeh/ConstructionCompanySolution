@@ -738,7 +738,7 @@ class Command(BaseCommand):
                 status=status,
                 start_date=start,
                 end_date=start + timedelta(days=540),
-                budget=budget + Decimal(organization_index * 7_500_000_000),
+                estimated_budget=budget + Decimal(organization_index * 7_500_000_000),
             ),
         )
         site = self._existing_or_create(

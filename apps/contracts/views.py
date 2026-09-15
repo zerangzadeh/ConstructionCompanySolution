@@ -3,6 +3,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.contracts.forms import ContractForm
+from apps.contracts.models import ContractStatus
 from apps.contracts.services import (
     can_manage_contracts,
     create_contract,
@@ -13,6 +14,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -22,6 +28,16 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    contracts = apply_table_filters(
+        contracts,
+        request,
+        text_fields={
+            "number": ("contract_number",),
+            "title": ("title", "project__name"),
+            "counterparty": ("counterparty_name", "party__display_name"),
+        },
+        choice_fields={"status": ("status", ContractStatus.values)},
+    )
     return render(
         request,
         "contracts/list.html",
@@ -30,6 +46,22 @@ def contract_list(request: HttpRequest) -> HttpResponse:
             "can_manage_contracts": can_manage_contracts(
                 request.user, request.organization
             ),
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره قرارداد"},
+                    {"name": "title", "kind": "text", "label": "عنوان و پروژه"},
+                    {"name": "counterparty", "kind": "text", "label": "طرف قرارداد"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": ContractStatus.choices,
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
         },
     )
 

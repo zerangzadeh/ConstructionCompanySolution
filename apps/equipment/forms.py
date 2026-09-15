@@ -8,9 +8,10 @@ from apps.equipment.models import (
 )
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
+from core.forms import JalaliDateMixin
 
 
-class _StyledForm(forms.Form):
+class _StyledForm(JalaliDateMixin, forms.Form):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)
         field_class = (
@@ -95,11 +96,11 @@ class EquipmentAssignmentForm(_StyledForm):
 
 class MaintenanceRecordForm(_StyledForm):
     equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
-    record_number = forms.CharField(label="شماره سابقه", max_length=50)
+    record_number = forms.CharField(label="شماره سرویس", max_length=50)
     maintenance_type = forms.ChoiceField(
         label="نوع نگهداری", choices=MaintenanceType.choices
     )
-    summary = forms.CharField(label="عنوان خدمت یا تعمیر", max_length=255)
+    summary = forms.CharField(label="عنوان سرویس یا تعمیر", max_length=255)
     scheduled_date = forms.DateField(
         label="تاریخ برنامه‌ریزی‌شده", widget=forms.DateInput(attrs={"type": "date"})
     )
@@ -149,7 +150,7 @@ class MaintenanceRecordForm(_StyledForm):
             .order_by("project__name", "name")
         )
         self.fields["provider"].queryset = BusinessParty.objects.filter(
-            organization=organization, is_active=True
+            organization=organization, archived_at__isnull=True
         ).order_by("display_name")
 
     def clean(self):

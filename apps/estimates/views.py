@@ -17,6 +17,11 @@ from apps.organizations.decorators import (
     require_organization_permission,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 @active_organization_required
@@ -26,7 +31,40 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "estimates/list.html", {"estimates": estimates})
+    estimates = apply_table_filters(
+        estimates,
+        request,
+        text_fields={
+            "number": ("estimate_number",),
+            "title": ("title",),
+            "project": ("project__name", "phase__name", "contract__contract_number"),
+        },
+        choice_fields={"status": ("status", EstimateStatus.values)},
+    )
+    return render(
+        request,
+        "estimates/list.html",
+        {
+            "estimates": estimates,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "number", "kind": "text", "label": "شماره برآورد"},
+                    {"name": "title", "kind": "text", "label": "عنوان"},
+                    {"name": "project", "kind": "text", "label": "پروژه یا فاز"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": EstimateStatus.choices,
+                    },
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

@@ -22,6 +22,7 @@
     };
     const digitMap = {"۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4", "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9", "٠": "0", "١": "1", "٢": "2", "٣": "3", "٤": "4", "٥": "5", "٦": "6", "٧": "7", "٨": "8", "٩": "9"};
     const normalizeDigits = (value) => String(value || "").replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
+    const toPersianDigits = (value) => String(value).replace(/[0-9]/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
     const pad = (value) => String(value).padStart(2, "0");
 
     function gregorianToJalali(gy, gm, gd) {
@@ -66,9 +67,9 @@
         return [gy, gm, remaining];
     }
 
-    const formatJalali = ([year, month, day]) => `${year}/${pad(month)}/${pad(day)}`;
+    const formatJalali = ([year, month, day]) => toPersianDigits(`${year}/${pad(month)}/${pad(day)}`);
     const parseJalali = (value) => {
-        const match = normalizeDigits(value).trim().match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})/);
+        const match = normalizeDigits(value).trim().match(/^(\d{4})\/(\d{2})\/(\d{2})/);
         if (!match) return null;
         const result = match.slice(1, 4).map(Number);
         if (result[1] < 1 || result[1] > 12 || result[2] < 1 || result[2] > daysInJalaliMonth(result[0], result[1])) return null;
@@ -156,14 +157,14 @@
         const today = gregorianToJalali(now.getFullYear(), now.getMonth() + 1, now.getDate());
         const firstGregorian = jalaliToGregorian(year, month, 1);
         const firstWeekday = (new Date(firstGregorian[0], firstGregorian[1] - 1, firstGregorian[2]).getDay() + 1) % 7;
-        popover.innerHTML = `<div class="erp-jalali-header"><button class="erp-jalali-nav" type="button" data-month="next" aria-label="ماه بعد">‹</button><strong class="erp-jalali-title">${monthNames[month - 1]} ${year}</strong><button class="erp-jalali-nav" type="button" data-month="previous" aria-label="ماه قبل">›</button></div><div class="erp-jalali-week">${weekNames.map((day) => `<span>${day}</span>`).join("")}</div><div class="erp-jalali-days"></div>`;
+        popover.innerHTML = `<div class="erp-jalali-header"><button class="erp-jalali-nav" type="button" data-month="next" aria-label="ماه بعد">‹</button><strong class="erp-jalali-title">${monthNames[month - 1]} ${toPersianDigits(year)}</strong><button class="erp-jalali-nav" type="button" data-month="previous" aria-label="ماه قبل">›</button></div><div class="erp-jalali-week">${weekNames.map((day) => `<span>${day}</span>`).join("")}</div><div class="erp-jalali-days"></div>`;
         const days = popover.querySelector(".erp-jalali-days");
         for (let index = 0; index < firstWeekday; index += 1) days.insertAdjacentHTML("beforeend", '<span class="erp-jalali-day-spacer"></span>');
         for (let day = 1; day <= daysInJalaliMonth(year, month); day += 1) {
             const button = document.createElement("button");
             button.type = "button";
             button.className = "erp-jalali-day";
-            button.textContent = String(day);
+            button.textContent = toPersianDigits(day);
             button.dataset.day = String(day);
             if (selected && selected[0] === year && selected[1] === month && selected[2] === day) button.classList.add("is-selected");
             if (today[0] === year && today[1] === month && today[2] === day) button.classList.add("is-today");
@@ -175,7 +176,7 @@
             const button = event.target.closest("[data-day]");
             if (!button) return;
             const datePart = formatJalali([year, month, Number(button.dataset.day)]);
-            const timePart = activeInput.dataset.jalaliMode === "datetime" ? ` ${normalizeDigits(activeInput.value).split(/\s+/)[1] || "00:00"}` : "";
+            const timePart = activeInput.dataset.jalaliMode === "datetime" ? ` ${toPersianDigits(normalizeDigits(activeInput.value).split(/\s+/)[1] || "00:00")}` : "";
             activeInput.value = datePart + timePart;
             activeInput.setCustomValidity("");
             popover.hidden = true;
@@ -214,21 +215,32 @@
         if (input.dataset.jalaliEnhanced || input.disabled || input.readOnly) return;
         const originalType = input.type;
         const isAdminDate = input.classList.contains("vDateField");
-        if (originalType !== "date" && originalType !== "datetime-local" && !isAdminDate) return;
+        const isJalaliDate = input.dataset.jalaliDate === "date" || input.dataset.jalaliDate === "datetime";
+        if (originalType !== "date" && originalType !== "datetime-local" && !isAdminDate && !isJalaliDate) return;
         input.dataset.jalaliEnhanced = "true";
-        input.dataset.jalaliMode = originalType === "datetime-local" ? "datetime" : "date";
+        input.dataset.jalaliMode = input.dataset.jalaliDate || (originalType === "datetime-local" ? "datetime" : "date");
+        input.dataset.inputMask = "####/##/##";
         const original = normalizeDigits(input.value);
         const gregorian = parseGregorian(original);
         if (gregorian) {
             const datePart = formatJalali(gregorianToJalali(...gregorian));
             const timeMatch = original.match(/[T\s](\d{1,2}:\d{2})/);
-            input.value = datePart + (input.dataset.jalaliMode === "datetime" ? ` ${timeMatch ? timeMatch[1] : "00:00"}` : "");
+            input.value = datePart + (input.dataset.jalaliMode === "datetime" ? ` ${toPersianDigits(timeMatch ? timeMatch[1] : "00:00")}` : "");
         }
         input.type = "text";
         input.classList.add("erp-jalali-input");
         input.placeholder = input.dataset.jalaliMode === "datetime" ? "۱۴۰۵/۰۶/۲۳ ۱۴:۳۰" : "۱۴۰۵/۰۶/۲۳";
         input.setAttribute("inputmode", "numeric");
         input.setAttribute("autocomplete", "off");
+        input.setAttribute("maxlength", input.dataset.jalaliMode === "datetime" ? "16" : "10");
+        input.addEventListener("input", () => {
+            const suffix = input.dataset.jalaliMode === "datetime" ? normalizeDigits(input.value).slice(10) : "";
+            const digits = normalizeDigits(input.value).replace(/\D/g, "").slice(0, 8);
+            const masked = digits.length <= 4 ? digits : `${digits.slice(0, 4)}/${digits.slice(4, 6)}${digits.length > 6 ? `/${digits.slice(6, 8)}` : ""}`;
+            input.value = masked + (suffix && masked.length === 10 ? suffix : "");
+            if (input.value.length >= 10 && !parseJalali(input.value)) input.setCustomValidity("تاریخ جلالی واردشده معتبر نیست.");
+            else input.setCustomValidity("");
+        });
         ensurePopover(input);
         input.addEventListener("focus", () => openPicker(input));
     }
@@ -263,8 +275,8 @@
     }
 
     function initialize(root = document) {
-        if (root.matches?.('input[type="date"], input[type="datetime-local"], input.vDateField')) enhanceInput(root);
-        root.querySelectorAll?.('input[type="date"], input[type="datetime-local"], input.vDateField').forEach(enhanceInput);
+        if (root.matches?.('input[type="date"], input[type="datetime-local"], input.vDateField, input[data-jalali-date]')) enhanceInput(root);
+        root.querySelectorAll?.('input[type="date"], input[type="datetime-local"], input.vDateField, input[data-jalali-date]').forEach(enhanceInput);
         convertVisibleDates(root === document ? document.body : root);
     }
 

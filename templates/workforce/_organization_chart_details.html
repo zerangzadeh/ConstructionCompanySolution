@@ -8,7 +8,7 @@
     </div>
 
     <dl class="org-chart-details__facts">
-        <div><dt>واحد بالادست</dt><dd>{{ node.department.parent.name|default:"سطح نخست سازمان" }}</dd></div>
+        <div><dt>واحد بالادست</dt><dd>{{ node.department.parent.name|default:"سطح نخست شرکت" }}</dd></div>
         <div><dt>وضعیت</dt><dd>{{ node.department.is_active|yesno:"فعال,غیرفعال" }}</dd></div>
         <div><dt>کارکنان مستقیم</dt><dd>{{ node.direct_employee_count }} نفر</dd></div>
         <div><dt>کل کارکنان مجموعه</dt><dd>{{ node.subtree_employee_count }} نفر</dd></div>

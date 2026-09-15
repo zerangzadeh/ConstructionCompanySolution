@@ -1,9 +1,10 @@
 {% extends "base.html" %}
-{% load erp_format %}
+{% load erp_format table_filters %}
 
 {% block title %}برآوردها | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "estimate-filters" %}
     {% if "estimates.create" in business_permission_codes %}{% url "estimates:create" as estimate_create_url %}{% endif %}
     {% include "components/page_header.html" with page_eyebrow="مدیریت برآوردها" page_title="فهرست برآوردها" page_description=request.organization.name page_action_url=estimate_create_url page_action_label="برآورد جدید" only %}
 

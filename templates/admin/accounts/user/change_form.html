@@ -73,7 +73,7 @@
         <header class="erp-user-section__header">
           <div>
             <span class="erp-user-section__index">۲</span>
-            <h2 id="memberships-title">عضویت‌ها و نقش‌های سازمانی</h2>
+            <h2 id="memberships-title">عضویت‌ها و نقش‌های شرکتی</h2>
           </div>
           <p>نقش و وضعیت کاربر در هر tenant قابل مشاهده</p>
         </header>
@@ -82,7 +82,7 @@
             <table class="erp-user-table">
               <thead>
                 <tr>
-                  <th scope="col">سازمان</th>
+                  <th scope="col">شرکت</th>
                   <th scope="col">نقش</th>
                   <th scope="col">وضعیت عضویت</th>
                   <th scope="col">تاریخ عضویت</th>
@@ -109,8 +109,8 @@
           </div>
         {% else %}
           <div class="erp-user-empty-state">
-            <strong>عضویت سازمانی وجود ندارد</strong>
-            <p>این کاربر در محدودهٔ سازمانی قابل مشاهده، عضویتی ندارد.</p>
+            <strong>عضویت شرکتی وجود ندارد</strong>
+            <p>این کاربر در محدودهٔ شرکتی قابل مشاهده، عضویتی ندارد.</p>
           </div>
         {% endif %}
       </section>
@@ -121,7 +121,7 @@
             <span class="erp-user-section__index">۳</span>
             <h2 id="permissions-title">مجوزها و دسترسی‌ها</h2>
           </div>
-          <p>دسترسی عملیاتی از نقش عضویت سازمانی کاربر تعیین می‌شود</p>
+          <p>دسترسی عملیاتی از نقش عضویت شرکتی کاربر تعیین می‌شود</p>
         </header>
         <div class="erp-access-summary-grid">
           <div>
@@ -134,13 +134,13 @@
           </div>
           <div>
             <span>منبع دسترسی عملیاتی</span>
-            <strong>نقش سازمانی</strong>
+            <strong>نقش شرکتی</strong>
           </div>
         </div>
 
         <div class="erp-user-notice">
-          <strong>برای تغییر دسترسی عملیاتی، نقش عضویت سازمانی را تغییر دهید.</strong>
-          <p>مجوزهای مستقیم و گروه‌های سراسری از فرم کاربر حذف شده‌اند تا دسترسی هر سازمان فقط از نقش همان عضویت دریافت شود.</p>
+          <strong>برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.</strong>
+          <p>مجوزهای مستقیم و گروه‌های سراسری از فرم کاربر حذف شده‌اند تا دسترسی هر شرکت فقط از نقش همان عضویت دریافت شود.</p>
         </div>
       </section>
 
@@ -150,12 +150,12 @@
             <span class="erp-user-section__index">۴</span>
             <h2 id="activity-title">تاریخچهٔ فعالیت</h2>
           </div>
-          <p>۲۵ رویداد مهم اخیر در محدودهٔ مجاز سازمانی</p>
+          <p>۲۵ رویداد مهم اخیر در محدودهٔ مجاز شرکتی</p>
         </header>
         {% if audit_events %}
           <div class="erp-user-table-wrap">
             <table class="erp-user-table">
-              <thead><tr><th scope="col">زمان</th><th scope="col">عملیات</th><th scope="col">سازمان</th><th scope="col">عامل</th><th scope="col">موجودیت</th></tr></thead>
+              <thead><tr><th scope="col">زمان</th><th scope="col">عملیات</th><th scope="col">شرکت</th><th scope="col">عامل</th><th scope="col">موجودیت</th></tr></thead>
               <tbody>
                 {% for event in audit_events %}
                   <tr>

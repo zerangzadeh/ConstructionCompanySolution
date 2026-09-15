@@ -451,6 +451,51 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (P.AUDIT_VIEW,),
         ("apps.audit.services",),
     ),
+    PermissionResource(
+        "workflows",
+        "تعریف‌های گردش‌کار",
+        (
+            "workflows.WorkflowDefinition",
+            "workflows.WorkflowVersion",
+            "workflows.WorkflowStepDefinition",
+            "workflows.WorkflowTransitionDefinition",
+            "workflows.WorkflowCondition",
+            "workflows.WorkflowRoutingRule",
+            "workflows.WorkflowInstance",
+            "workflows.WorkflowStepInstance",
+            "workflows.WorkflowDelegation",
+        ),
+        (
+            P.WORKFLOWS_VIEW,
+            P.WORKFLOWS_CREATE,
+            P.WORKFLOWS_CHANGE_DRAFT,
+            P.WORKFLOWS_PUBLISH,
+            P.WORKFLOWS_RETIRE,
+            P.WORKFLOWS_REASSIGN,
+            P.WORKFLOWS_DELEGATE,
+            P.WORKFLOWS_MIGRATE_INSTANCES,
+        ),
+        (
+            "apps.workflows.services",
+            "apps.workflows.simulation",
+            "apps.workflows.runtime",
+        ),
+    ),
+    PermissionResource(
+        "work_items",
+        "کارهای گردش‌کار",
+        (
+            "workflows.WorkItem",
+            "workflows.WorkItemCandidate",
+            "workflows.WorkItemAssignmentHistory",
+        ),
+        (
+            P.WORK_ITEMS_VIEW,
+            P.WORK_ITEMS_CLAIM,
+            P.WORK_ITEMS_ACT,
+        ),
+        ("apps.workflows.runtime", "apps.workflows.routing"),
+    ),
 )
 
 PERMISSION_MANAGED_APPS = frozenset(
@@ -472,12 +517,18 @@ PERMISSION_MANAGED_APPS = frozenset(
         "safety",
         "quality",
         "audit",
+        "workflows",
     }
 )
 
 # These models define the global catalog itself and are intentionally system-admin only.
 GLOBAL_PERMISSION_MODEL_EXCLUSIONS = frozenset(
-    {"organizations.BusinessPermission", "organizations.OrganizationRole"}
+    {
+        "organizations.BusinessPermission",
+        "organizations.OrganizationRole",
+        "workflows.WorkflowType",
+        "workflows.WorkflowTemplate",
+    }
 )
 
 

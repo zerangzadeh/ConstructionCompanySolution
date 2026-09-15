@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 {% block title %}مسائل کیفیت | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
+{% table_filters filters "quality-issue-filters" %}
 {% if "quality_issues.create" in business_permission_codes %}{% url "quality:create" as create_url %}{% endif %}
 {% include "components/page_header.html" with page_eyebrow="کنترل کیفیت" page_title="مسائل کیفیت" page_description=request.organization.name page_action_url=create_url page_action_label="ثبت مسئله" only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست مسائل کیفیت">

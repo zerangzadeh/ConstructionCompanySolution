@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 {% block title %}سمت‌های شغلی | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
+{% table_filters filters "position-filters" %}
 {% if "positions.create" in business_permission_codes %}{% url "workforce:position_create" as create_url %}{% endif %}
 {% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="سمت‌های شغلی" page_description="تعریف سمت‌های مورد استفاده در پرونده کارکنان" page_action_url=create_url page_action_label="سمت جدید" only %}
 {% include "workforce/_tabs.html" %}
@@ -8,7 +9,7 @@
     {% if positions %}
     <div class="erp-table-wrap">
         <table class="w-full min-w-[700px] text-right">
-            <thead><tr><th class="border-b border-slate-200 px-4 py-3">کد و عنوان</th><th class="border-b border-slate-200 px-4 py-3">واحد سازمانی</th><th class="border-b border-slate-200 px-4 py-3">نوع تصدی</th><th class="border-b border-slate-200 px-4 py-3">شرح</th>{% if "positions.archive" in business_permission_codes %}<th class="border-b border-slate-200 px-4 py-3">عملیات</th>{% endif %}</tr></thead>
+            <thead><tr><th class="border-b border-slate-200 px-4 py-3">کد و عنوان</th><th class="border-b border-slate-200 px-4 py-3">واحد شرکتی</th><th class="border-b border-slate-200 px-4 py-3">نوع تصدی</th><th class="border-b border-slate-200 px-4 py-3">شرح</th>{% if "positions.archive" in business_permission_codes %}<th class="border-b border-slate-200 px-4 py-3">عملیات</th>{% endif %}</tr></thead>
             <tbody class="divide-y divide-slate-100">
                 {% for position in positions %}
                 <tr class="transition hover:bg-slate-50">

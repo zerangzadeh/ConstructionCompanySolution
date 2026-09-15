@@ -3,7 +3,8 @@
 
     const monetaryNames = new Set([
         "amount",
-        "budget",
+        "estimated_budget",
+        "actual_budget",
         "contract_value",
         "cost",
         "max_amount",
@@ -16,6 +17,10 @@
     const normalizeDigits = (value) => String(value || "").replace(/[۰-۹٠-٩]/g, (digit) => digitMap[digit]);
     const stripMoney = (value) => normalizeDigits(value).replace(/ریال|IRR|USD|EUR|GBP|AED/gi, "").replace(/[،,\s]/g, "");
 
+    function toPersianDigits(value) {
+        return String(value).replace(/\d/g, (digit) => "۰۱۲۳۴۵۶۷۸۹"[Number(digit)]);
+    }
+
     function formatMoney(value) {
         const raw = stripMoney(value);
         if (!raw || raw === "-") return raw;
@@ -25,7 +30,7 @@
         const integerPart = (decimalIndex >= 0 ? unsigned.slice(0, decimalIndex) : unsigned).replace(/\D/g, "");
         const decimalPart = decimalIndex >= 0 ? unsigned.slice(decimalIndex + 1).replace(/\D/g, "") : null;
         const formattedInteger = (integerPart || "0").replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-        return `${sign}${formattedInteger}${decimalPart === null ? "" : `.${decimalPart}`}`;
+        return toPersianDigits(`${sign}${formattedInteger}${decimalPart === null ? "" : `.${decimalPart}`}`);
     }
 
     function fieldName(input) {
@@ -54,7 +59,7 @@
         let seen = 0;
         let position = input.value.length;
         for (let index = 0; index < input.value.length; index += 1) {
-            if (/[\d.]/.test(input.value[index])) seen += 1;
+            if (/[\d.]/.test(normalizeDigits(input.value[index]))) seen += 1;
             if (seen >= significantBefore) {
                 position = index + 1;
                 break;

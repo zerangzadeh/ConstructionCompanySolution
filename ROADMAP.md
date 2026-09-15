@@ -6,8 +6,9 @@ production-oriented product; it does not imply that every listed capability is
 already implemented or production-certified. Current system boundaries and
 implemented entities are documented in
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; engineering and delivery rules are
-defined in `AGENTS.md`. Django models and migrations remain the schema source of
-truth.
+defined in `AGENTS.md`. The approved cross-domain workflow target is specified in
+`docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`. Django models and
+migrations remain the schema source of truth.
 
 Phases are dependency-ordered. Only the current/next phase—the one marked
 **NEXT**—should be decomposed into detailed requirements and work packages before
@@ -80,9 +81,42 @@ permissions, tenant isolation, workflows, or financial logic.
   tenant-isolated, auditable, and existing free-text daily entries remain valid
   historical snapshots.
 
-## F5 — Billing & Progress Claims
+## F5 — Tenant Workflow & Work Management
 
 - **Status:** NEXT
+- **Goal:** Provide tenant-configurable, versioned workflows, responsibility
+  routing, persistent work items, and one centralized workbench for each active
+  organization membership, supporting both small contractors and formal
+  enterprise controls.
+- **Main scope/entities:** Platform workflow catalogs and starter templates;
+  tenant `WorkflowDefinition`/immutable versions; steps, transitions, typed
+  conditions and routing rules; runtime instances; candidate pools, claiming,
+  reassignment and delegation; position-aware routing; centralized workbench;
+  audited and atomic domain integration.
+- **Delivery order:** Foundation and runtime first, Procurement as the pilot,
+  then the centralized workbench and incremental migration of daily reports,
+  safety, quality, estimates, contract amendments, and other approved actionable
+  lifecycles.
+- **Delivery progress:** W1 architecture/schema foundation and W2 runtime,
+  routing, delegation, and persistent work items are implemented. W3 Procurement
+  pilot migration is the next F5 work package and remains an explicit switch.
+- **Boundary:** Domain models and application services remain authoritative for
+  lifecycle and financial/operational invariants. Tenant configuration is
+  declarative and limited to platform-registered commands, conditions, and
+  routing targets; arbitrary code and a general BPMN engine remain out of scope.
+- **Done When:** Published versions are immutable; small tenants can use a
+  no-workforce owner-based template; large tenants can use position routing,
+  multi-stage decisions, fallback, delegation, and separation rules; domain,
+  work-item, and audit state remain atomic and tenant-safe; concurrent decisions
+  are conflict-safe; and the centralized workbench passes permission,
+  tenant-isolation, deduplication, migration, and PostgreSQL performance tests.
+- **Architecture:**
+  `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` is authoritative for
+  the target model, migration sequence, and acceptance gates.
+
+## F6 — Billing & Progress Claims
+
+- **Status:** PLANNED — BLOCKED BY F5
 - **Goal:** Support controlled project progress measurement and receivables from
   approved work through claim and settlement.
 - **Main scope/entities:** `ProjectBaseline`, `ProgressRecord`, `ProgressClaim`,
@@ -90,9 +124,10 @@ permissions, tenant isolation, workflows, or financial logic.
   allocations, retention, tax, insurance, deductions, and penalties.
 - **Done When:** Progress and claim calculations are Decimal-precise; approval,
   revision, adjustment, and settlement preserve immutable history and reconcile
-  to existing contracts and payments.
+  to existing contracts and payments; approvals and actionable responsibilities
+  use the shared F5 workflow/work-item foundation rather than a second mechanism.
 
-## F6 — Documents v2
+## F7 — Documents v2
 
 - **Status:** IMPLEMENTED
 - **Goal:** Generalize secure project files into versioned documents attachable
@@ -106,7 +141,7 @@ permissions, tenant isolation, workflows, or financial logic.
   enforced. Organization-scoped export and formal retention policies remain
   deferred.
 
-## F7 — Safety & Quality
+## F8 — Safety & Quality
 
 - **Status:** PARTIALLY IMPLEMENTED (Safety incidents and quality issues)
 - **Goal:** Add optional standalone incident, inspection, corrective-action, and
@@ -122,15 +157,15 @@ permissions, tenant isolation, workflows, or financial logic.
   and tenant isolation are validated without making formal modules mandatory or
   replacing existing daily-report notes.
 
-## F8 — Production Readiness
+## F9 — Production Readiness
 
 - **Status:** PLANNED
 - **Goal:** Validate secure, recoverable, observable production operation of the
   complete approved product scope.
 - **Main scope/entities:** Deployment configuration, PostgreSQL TLS, migrations,
   backup/restore, monitoring, structured logging, performance/security checks,
-  retention/export operations, browser workflow verification, and tenant-aware
-  `Notification` delivery where approved.
+  retention/export operations, browser workflow/workbench verification, and
+  tenant-aware `Notification` delivery where approved.
 - **Done When:** Production deployment and rollback are repeatable, restore and
   migration procedures are proven, monitoring and security controls are active,
   and release validation passes on PostgreSQL 18.6 with Psycopg 3.

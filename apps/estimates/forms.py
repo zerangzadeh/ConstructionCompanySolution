@@ -4,10 +4,11 @@ from apps.contracts.models import Contract
 from apps.estimates.models import Estimate, EstimateItem
 from apps.materials.models import UnitOfMeasure
 from apps.projects.models import Project, ProjectPhase
+from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
 
-class EstimateForm(forms.ModelForm):
+class EstimateForm(JalaliDateMixin, forms.ModelForm):
     """Form for creating an estimate in the active organization."""
 
     project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
@@ -74,7 +75,7 @@ class EstimateForm(forms.ModelForm):
         return canonicalize_upper_identifier(self.cleaned_data["estimate_number"])
 
 
-class EstimateItemForm(forms.ModelForm):
+class EstimateItemForm(JalaliDateMixin, forms.ModelForm):
     """Form for adding a priced item to an estimate."""
 
     unit_of_measure = forms.ModelChoiceField(

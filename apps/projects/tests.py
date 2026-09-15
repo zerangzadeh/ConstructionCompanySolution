@@ -73,11 +73,13 @@ class ProjectServiceTests(TestCase):
             code="P-001",
             name="Downtown Tower",
             start_date=date(2026, 9, 1),
-            budget=Decimal("125000.00"),
+            estimated_budget=Decimal("125000.00"),
+            actual_budget=Decimal("50000.00"),
         )
 
         self.assertEqual(project.organization, self.organization)
-        self.assertEqual(project.budget, Decimal("125000.00"))
+        self.assertEqual(project.estimated_budget, Decimal("125000.00"))
+        self.assertEqual(project.actual_budget, Decimal("50000.00"))
         self.assertEqual(project.status, ProjectStatus.PLANNING)
         self.assertTrue(
             AuditEvent.objects.filter(
@@ -185,7 +187,7 @@ class ProjectServiceTests(TestCase):
                 actor=self.owner,
                 code="P-004",
                 name="Invalid budget",
-                budget=Decimal("-1.00"),
+                estimated_budget=Decimal("-1.00"),
             )
 
     def test_project_queryset_excludes_other_organization(self) -> None:

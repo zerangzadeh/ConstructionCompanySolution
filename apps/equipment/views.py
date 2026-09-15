@@ -14,7 +14,10 @@ from apps.equipment.forms import (
 from apps.equipment.models import (
     Equipment,
     EquipmentAssignmentStatus,
+    EquipmentOwnershipType,
+    EquipmentStatus,
     MaintenanceStatus,
+    MaintenanceType,
 )
 from apps.equipment.services import (
     archive_equipment,
@@ -33,6 +36,11 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import (
+    apply_table_filters,
+    build_table_filters,
+    has_active_table_filters,
+)
 
 
 def _equipment(request: HttpRequest, equipment_id: str) -> Equipment | None:
@@ -50,7 +58,42 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
     equipment = get_organization_equipment(
         user=request.user, organization=request.organization
     )
-    return render(request, "equipment/list.html", {"equipment": equipment})
+    equipment = apply_table_filters(
+        equipment,
+        request,
+        text_fields={"equipment": ("code", "name"), "category": ("category",)},
+        choice_fields={
+            "ownership": ("ownership_type", EquipmentOwnershipType.values),
+            "status": ("status", EquipmentStatus.values),
+        },
+    )
+    return render(
+        request,
+        "equipment/list.html",
+        {
+            "equipment": equipment,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "equipment", "kind": "text", "label": "کد و نام"},
+                    {"name": "category", "kind": "text", "label": "دسته"},
+                    {
+                        "name": "ownership",
+                        "kind": "select",
+                        "label": "مالکیت",
+                        "choices": EquipmentOwnershipType.choices,
+                    },
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": EquipmentStatus.choices,
+                    },
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required
@@ -149,8 +192,38 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
     assignments = get_organization_equipment_assignments(
         user=request.user, organization=request.organization
     )
+    assignments = apply_table_filters(
+        assignments,
+        request,
+        text_fields={
+            "equipment": ("equipment__code", "equipment__name"),
+            "project": ("project__name", "site__name"),
+        },
+        choice_fields={"status": ("status", EquipmentAssignmentStatus.values)},
+        date_fields={"start_date": "start_date"},
+    )
     return render(
-        request, "equipment/assignment_list.html", {"assignments": assignments}
+        request,
+        "equipment/assignment_list.html",
+        {
+            "assignments": assignments,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "equipment", "kind": "text", "label": "تجهیز"},
+                    {"name": "project", "kind": "text", "label": "پروژه یا کارگاه"},
+                    {"name": "start_date", "kind": "date_range", "label": "شروع تخصیص"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": EquipmentAssignmentStatus.choices,
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
     )
 
 
@@ -234,7 +307,42 @@ def maintenance_list(request: HttpRequest) -> HttpResponse:
     records = get_organization_maintenance_records(
         user=request.user, organization=request.organization
     )
-    return render(request, "equipment/maintenance_list.html", {"records": records})
+    records = apply_table_filters(
+        records,
+        request,
+        text_fields={
+            "record": ("record_number", "summary"),
+            "equipment": ("equipment__code", "equipment__name"),
+        },
+        choice_fields={
+            "maintenance_type": ("maintenance_type", MaintenanceType.values),
+            "status": ("status", MaintenanceStatus.values),
+        },
+        date_fields={"scheduled_date": "scheduled_date"},
+    )
+    return render(
+        request,
+        "equipment/maintenance_list.html",
+        {
+            "records": records,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "record", "kind": "text", "label": "شماره و عنوان"},
+                    {"name": "equipment", "kind": "text", "label": "تجهیز"},
+                    {"name": "scheduled_date", "kind": "date_range", "label": "تاریخ"},
+                    {
+                        "name": "status",
+                        "kind": "select",
+                        "label": "وضعیت",
+                        "choices": MaintenanceStatus.choices,
+                    },
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+        },
+    )
 
 
 @active_organization_required

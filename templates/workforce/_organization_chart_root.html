@@ -1,13 +1,13 @@
 <ul>
     <li class="org-chart__node org-chart__root" data-chart-branch>
-        <article class="org-chart-card org-chart-card--primary">
+        <article class="org-chart-card org-chart-card--primary org-chart-card--organization" data-chart-card data-department-id="organization-root" tabindex="0" role="button" aria-controls="department-details-organization-root" aria-label="نمایش خلاصه شرکت">
             <div class="org-chart-card__heading">
                 <span class="org-chart-card__icon" aria-hidden="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg>
                 </span>
                 <div class="min-w-0 text-right">
-                    <h3>{{ organization.name }}</h3>
-                    <p>ریشه ساختار سازمانی</p>
+                    <h5>{{ organization.name }}</h5>
+                    <p>ریشه ساختار شرکتی</p>
                 </div>
             </div>
 
@@ -32,15 +32,14 @@
             {% endif %}
 
             <div class="org-chart-card__footer">
-                {% if can_view_employees %}<span>{{ organization_employee_count }} نفر در سازمان</span>{% else %}<span>سازمان فعال</span>{% endif %}
-                {% if department_tree %}
-                <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن واحدهای سازمان">
+                {% if can_view_employees %}<span>{{ organization_employee_count }} نفر در شرکت</span>{% else %}<span>شرکت فعال</span>{% endif %} {% if department_tree %}
+                <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن واحدهای شرکت">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 14 5-5 5 5"/></svg>
-                </button>
-                {% endif %}
+                </button> {% endif %}
             </div>
         </article>
 
-        {% if department_tree %}<ul>{% include "workforce/_organization_chart_node.html" with nodes=department_tree only %}</ul>{% endif %}
+        {% if department_tree %}
+        <ul>{% include "workforce/_organization_chart_node.html" with nodes=department_tree only %}</ul>{% endif %}
     </li>
 </ul>

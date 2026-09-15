@@ -702,3 +702,57 @@ class InventoryPanelTests(InventoryFixtureMixin, TestCase):
             ).status_code,
             404,
         )
+
+    def test_transaction_list_links_to_scoped_transaction_detail(self) -> None:
+        transaction_record = self.create_and_post(
+            number="INV-PANEL-001",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal("12.5000"),
+            destination=self.central,
+        )
+        self.client.force_login(self.owner)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        list_response = self.client.get(reverse("inventory:transaction_list"))
+        detail_response = self.client.get(
+            reverse(
+                "inventory:transaction_detail",
+                kwargs={"transaction_id": transaction_record.pk},
+            )
+        )
+
+        self.assertEqual(list_response.status_code, 200)
+        self.assertContains(
+            list_response,
+            reverse(
+                "inventory:transaction_detail",
+                kwargs={"transaction_id": transaction_record.pk},
+            ),
+        )
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, transaction_record.transaction_number)
+
+    def test_transaction_detail_rejects_cross_tenant_uuid(self) -> None:
+        other_transaction = StockTransaction.objects.create(
+            organization=self.other_organization,
+            transaction_number="OTHER-INV-001",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            destination_warehouse=self.other_warehouse,
+            material=self.other_material,
+            unit_of_measure=self.other_unit,
+            quantity=Decimal("2.0000"),
+            occurred_at=timezone.now(),
+        )
+        self.client.force_login(self.owner)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        response = self.client.get(
+            reverse(
+                "inventory:transaction_detail",
+                kwargs={"transaction_id": other_transaction.pk},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)

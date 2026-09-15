@@ -364,7 +364,8 @@ class IdentifierCanonicalizationTests(TestCase):
                 "status": ProjectStatus.PLANNING,
                 "start_date": "",
                 "end_date": "",
-                "budget": "0.00",
+                "estimated_budget": "0.00",
+                "actual_budget": "0.00",
             }
         )
         site_form = ProjectSiteForm(

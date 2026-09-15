@@ -224,6 +224,29 @@ Recommended hierarchy:
 ### Metadata
 - 12px
 
+### Persian Numerals for Business Values
+
+Use Vazirmatn's Persian numeral feature (`ss01`) for every user-facing business
+or temporal value that contains digits, including:
+
+- monetary amounts and currency summaries
+- quantities, measurements, percentages, counts, and pagination counts
+- Jalali dates and user-facing times
+- dashboard KPIs, tables, detail metadata, messages, and form values
+
+For values that must be visually aligned for comparison, combine `ss01` with
+tabular figures (`tnum`) and use the shared numeric styles. Do not introduce a
+second font or page-specific numeral CSS.
+
+Keep technical identifiers such as project codes, contract numbers, SKUs, UUIDs,
+and account identifiers canonical and LTR/isolated. Their display formatting
+must not alter their stored value or their copy/paste behavior.
+
+For editable money fields, use the shared `erp_money` behavior: show Persian
+digits and thousands grouping to the user, then normalize the value before the
+existing server-side validation and submission flow. Never use JavaScript number
+types or floating-point arithmetic for monetary values.
+
 Typography must be centralized globally.
 
 ---
@@ -900,6 +923,9 @@ Use one consistent default format:
 
 `YYYY/MM/DD`
 
+The displayed digits in dates and times must be Persian numerals. This is a
+typographic/display rule; it must not alter the canonical stored value.
+
 Example:
 
 Stored/internal Gregorian date:
@@ -945,10 +971,16 @@ The Jalali calendar is a **presentation/input concern**, not a new domain or sto
 For user-facing `DateTime` values:
 
 - display the date portion in Jalali
+- display the time portion with Persian numerals
 - preserve the existing time semantics
 - do not change timezone behavior
 - do not alter stored timestamps
 - do not modify technical/API timestamps that are not user-facing
+
+Use the shared Jalali formatter and picker behavior (`erp_jalali`) for both
+date and datetime inputs. It must convert a visible Jalali value, including its
+time, back to Gregorian/ISO-compatible form before the existing Django
+validation and storage flow.
 
 ### Direction and Digits
 
@@ -1019,6 +1051,7 @@ Also:
 - manually verify affected pages
 - verify RTL/LTR behavior
 - verify Jalali display for user-facing dates
+- verify Persian-numeral display for business values, amounts, and times
 - verify Jalali date pickers for editable/filter date fields
 - verify Jalali input converts safely back to existing Gregorian storage behavior
 - verify existing Gregorian records render correctly without data migration
