@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}کارکنان | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% if "employees.create" in business_permission_codes %}{% url "workforce:employee_create" as create_url %}{% endif %}
+{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="کارکنان" page_description="پرونده پرسنلی، ساختار و تخصیص نیروی پروژه" page_action_url=create_url page_action_label="کارمند جدید" only %}
+{% include "workforce/_tabs.html" %}
+<section class="erp-surface mt-4 overflow-hidden rounded-xl">
+{% if employees %}
+<div class="erp-table-wrap">
+    <table class="w-full min-w-[900px] text-right">
+        <thead>
+            <tr>
+                <th class="border-b border-slate-200 px-4 py-3">کارمند</th>
+                <th class="border-b border-slate-200 px-4 py-3">واحد و سمت</th>
+                <th class="border-b border-slate-200 px-4 py-3">گروه کاری</th>
+                <th class="border-b border-slate-200 px-4 py-3">وضعیت</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+            {% for employee in employees %}
+            <tr>
+                <td class="px-4 py-3.5">
+                    <div class="flex items-center gap-3">
+                        {% if employee.profile_image or employee.user.profile_image %}
+                        <img class="h-9 w-9 shrink-0 rounded-full border border-slate-200 object-cover" src="{% url 'workforce:employee_profile_image' employee.id %}" alt="عکس {{ employee.first_name }} {{ employee.last_name }}">
+                        {% else %}
+                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-black text-blue-700" aria-label="{{ employee.first_name }} {{ employee.last_name }}">{{ employee.first_name|first }}{{ employee.last_name|first }}</span>
+                        {% endif %}
+                        <div>
+                            <a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a>
+                            <p class="text-[11px] text-slate-500" dir="ltr">{{ employee.employee_number }}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3.5">{{ employee.department.name|default:"—" }}<p class="text-xs text-slate-500">{{ employee.position.title|default:"بدون سمت" }}</p></td>
+                <td class="px-4 py-3.5">{{ employee.work_team.name|default:"—" }}</td>
+                <td class="px-4 py-3.5">{% include "components/status_badge.html" with status=employee.status label=employee.get_status_display only %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+{% include "components/empty_state.html" with empty_title="کارمندی ثبت نشده است" empty_description="برای ایجاد پرونده پرسنلی، کارمند جدید ثبت کنید." empty_action_url=create_url empty_action_label="کارمند جدید" only %}
+{% endif %}
+</section>
+{% endblock %}

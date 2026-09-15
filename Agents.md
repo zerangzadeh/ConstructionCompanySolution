@@ -6,7 +6,13 @@ This repository contains a multi-tenant SaaS platform for construction contracto
 companies. Each company is represented by an `Organization` (tenant), and strict
 data isolation between organizations is mandatory.
 
-The current product is a modular monolith. The initial user interface uses Django
+The platform is a complete-product initiative, not an MVP. Development is still
+incremental: “complete product” defines the approved product scope, engineering
+quality, and production-operability target, while `ROADMAP.md` identifies which
+domains are implemented, next, partially implemented, or planned. Do not treat
+this direction as authorization to implement unrelated roadmap phases.
+
+The current product is a modular monolith. The product interface uses Django
 templates with Tailwind CSS and HTMX where a small dynamic interaction is useful.
 REST APIs and background jobs are future extensions, not current requirements.
 
@@ -140,20 +146,22 @@ requests, or remote changes unless explicitly requested.
 
 ## 11. Project Snapshot and Implementation Status
 
-> Last Updated: 2026-09-06
+> Last Updated: 2026-09-15
 >
-> Status: **Active Product Development.** The current ERP core is implemented
-> and validated on PostgreSQL 18.6 with Psycopg 3. The existing ERP and Django
-> Admin interfaces now share the approved Persian-first RTL design system.
-> Workforce is the next planned product domain; other future product domains are
-> not yet implemented.
+> Status: **Active Full-Product Development.** The platform is no longer scoped
+> as an MVP. The current ERP core and multiple operational domains are
+> implemented and validated on PostgreSQL 18.6 with Psycopg 3. The existing ERP
+> and Django Admin interfaces share the approved Persian-first RTL design system.
+> Billing & Progress Claims is the next product-domain phase; other incomplete
+> capabilities retain their explicit roadmap status.
 
 The implemented core covers tenant identity/settings, parties, material masters,
-projects and project controls, contracts, estimates, daily reporting, expenses,
-payments and allocations, private project documents, audit, and financial read
-models. The current entity map, relationships, invariants, and lifecycle states
-are maintained in `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; Django models and
-migrations remain the schema source of truth.
+projects and project controls, workforce, procurement, inventory, equipment,
+contracts, estimates, daily reporting, safety and quality issue workflows,
+expenses, payments and allocations, versioned private documents, audit, and
+financial read models. The current entity map, relationships, invariants, and
+lifecycle states are maintained in `docs/architecture/DOMAIN_AND_DATA_MODEL.md`;
+Django models and migrations remain the schema source of truth.
 
 The current server-rendered UI uses Django templates and Tailwind CSS, with HTMX
 only where useful. It provides a responsive RTL application shell, shared page,
@@ -191,10 +199,10 @@ relevant checks after any code, migration, or configuration change.
 
 ## 14. Product Roadmap
 
-`ROADMAP.md` is the source of truth for future delivery order and the parallel
-UI/UX workstream. Workforce is the only **NEXT** product domain. **PLANNED**
-phases record direction but do not authorize implementation; decompose and
-implement only the current/next phase after explicit approval.
+`ROADMAP.md` is the source of truth for remaining full-product delivery order and
+the parallel UI/UX workstream. Billing & Progress Claims is the **NEXT** product
+domain. **PLANNED** phases record direction but do not authorize implementation;
+decompose and implement only the current/next phase after explicit approval.
 
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md` is the concise reference for current
 entities, relationships, invariants, lifecycle states, and approved future domain
@@ -260,6 +268,11 @@ Authorization must be explicit and deny by default:
   archiving, exporting, and deleting sensitive records.
 - A role check must be performed server-side in services and views; hiding a
   button is not authorization.
+- Every new access-controlled capability must add its permission to
+  `BusinessPermissionCode`, `permission_registry`, and a data migration that
+  creates the catalog entry and grants it to the appropriate default roles.
+  Its view and service boundary must enforce that permission, and its tests must
+  cover authorization and tenant isolation.
 - Privilege escalation, role changes, invitation acceptance, and membership
   removal must be audited.
 
@@ -283,6 +296,25 @@ workflow rather than silently changing historical values.
 
 Approval services must use transactions and re-check authorization and current
 state inside the transaction to avoid race conditions.
+
+### Current Procurement Workflow Boundary
+
+The implemented procurement workflow is intentionally fixed and
+permission-driven: purchase requests transition from `draft` to `submitted` to
+a single `approved` or `rejected` decision; purchase orders transition from
+`draft` to `issued` to `completed`; and goods receipts transition from `draft`
+to `posted` or `void`. Authorization for each transition is enforced through
+the corresponding `BusinessPermission` on the actor's active organization
+membership.
+
+Do not introduce a generic workflow engine, approval routing by amount,
+delegation, mandatory separation of duties, or automatic approver resolution
+from `Employee`, `Department`, `Position`, `WorkTeam`, or project-assignment
+data without separately approved product scope. Workforce structures remain
+optional personnel data and are not the authorization source of truth. A user
+whose assigned company role includes multiple procurement permissions may
+perform those permitted steps, including approving a request they created; the
+existing audit trail must remain intact.
 
 ## 19. Operational Reliability
 

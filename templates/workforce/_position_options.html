@@ -1,0 +1,2 @@
+<option value="">بدون سمت شغلی</option>
+{% for position in positions %}<option value="{{ position.pk }}">{{ position.title }} ({{ position.code }})</option>{% endfor %}

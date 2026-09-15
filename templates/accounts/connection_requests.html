@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}درخواست‌های اتصال | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+  {% include "components/page_header.html" with page_eyebrow="حساب کاربری" page_title="درخواست‌های اتصال به شرکت" page_description="پذیرش یا رد درخواست‌هایی که برای همین حساب ثبت شده‌اند" only %}
+  <div class="mt-6 space-y-4">
+    {% for item in connection_requests %}
+      <article class="erp-surface rounded-xl p-5">
+        <h2 class="font-black text-slate-900">{{ item.organization.name }}</h2>
+        <p class="mt-2 text-sm text-slate-500">نقش پیشنهادی: {{ item.role_definition.name }}</p>
+        <form class="mt-4 flex gap-3" method="post" action="{% url 'accounts:connection_request_respond' item.id %}">
+          {% csrf_token %}
+          <button class="erp-btn erp-btn--primary" name="decision" value="accept" type="submit">پذیرش</button>
+          <button class="erp-btn" name="decision" value="reject" type="submit">رد درخواست</button>
+        </form>
+      </article>
+    {% empty %}
+      {% include "components/empty_state.html" with empty_title="درخواستی وجود ندارد" empty_description="درخواست اتصال در انتظار پاسخی برای این حساب ثبت نشده است." only %}
+    {% endfor %}
+  </div>
+{% endblock %}

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.contrib import admin
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
@@ -12,7 +13,7 @@ from apps.daily_reports.models import (
     DailyReportLaborEntry,
     DailyReportMaterialEntry,
 )
-from apps.documents.models import ProjectDocument
+from apps.documents.models import Document, DocumentLink, DocumentVersion
 from apps.estimates.models import Estimate, EstimateItem
 from apps.expenses.models import Expense
 from apps.organizations.models import Organization
@@ -153,6 +154,7 @@ class TenantModelValidationTests(TestCase):
 
     def test_business_admin_mutations_are_disabled(self) -> None:
         request = RequestFactory().get("/admin/")
+        request.user = AnonymousUser()
         models = [
             Organization,
             Project,
@@ -162,7 +164,9 @@ class TenantModelValidationTests(TestCase):
             Estimate,
             Expense,
             Payment,
-            ProjectDocument,
+            Document,
+            DocumentVersion,
+            DocumentLink,
             DailyReport,
             DailyReportLaborEntry,
             DailyReportEquipmentEntry,

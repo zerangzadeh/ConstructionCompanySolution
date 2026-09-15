@@ -1,5 +1,11 @@
 # Template component conventions
 
+These conventions support the complete Construction ERP product and its
+production-oriented quality target rather than a temporary MVP interface.
+Components should therefore be durable, accessible, responsive,
+Persian/RTL-safe, and reusable across product domains without weakening
+server-side boundaries.
+
 Shared Django template fragments belong in this directory when they represent a
 stable, reusable UI pattern. Components must receive all required context
 explicitly through `{% include ... with ... only %}` so that their dependencies

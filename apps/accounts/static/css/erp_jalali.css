@@ -1,0 +1,127 @@
+.erp-jalali-wrap {
+    position: relative;
+}
+
+.erp-jalali-input {
+    direction: ltr !important;
+    padding-left: 2.75rem !important;
+    text-align: left !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.erp-jalali-trigger {
+    position: absolute;
+    inset-block: 0;
+    left: .35rem;
+    display: grid;
+    width: 2rem;
+    place-items: center;
+    border: 0;
+    background: transparent;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.erp-jalali-trigger:hover {
+    color: #1d4ed8;
+}
+
+.erp-jalali-popover {
+    position: fixed;
+    z-index: 1000;
+    width: min(19rem, calc(100vw - 2rem));
+    border: 1px solid #cbd5e1;
+    border-radius: .75rem;
+    background: #fff;
+    padding: .75rem;
+    box-shadow: 0 20px 25px -5px rgb(15 23 42 / .12), 0 8px 10px -6px rgb(15 23 42 / .08);
+    direction: rtl;
+}
+
+.erp-jalali-popover[hidden] {
+    display: none;
+}
+
+.erp-jalali-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    margin-bottom: .65rem;
+}
+
+.erp-jalali-title {
+    color: #0f172a;
+    font-size: .8125rem;
+    font-weight: 700;
+}
+
+.erp-jalali-nav {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border: 1px solid #e2e8f0;
+    border-radius: .5rem;
+    background: #fff;
+    color: #475569;
+    cursor: pointer;
+}
+
+.erp-jalali-nav:hover {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.erp-jalali-week,
+.erp-jalali-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: .2rem;
+}
+
+.erp-jalali-week span {
+    padding-block: .3rem;
+    color: #64748b;
+    text-align: center;
+    font-size: .65rem;
+    font-weight: 600;
+}
+
+.erp-jalali-day {
+    display: grid;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 0;
+    border-radius: .45rem;
+    background: transparent;
+    color: #334155;
+    font-size: .75rem;
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+}
+
+.erp-jalali-day:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.erp-jalali-day.is-selected {
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 700;
+}
+
+.erp-jalali-day.is-today:not(.is-selected) {
+    box-shadow: inset 0 0 0 1px #60a5fa;
+    color: #1d4ed8;
+}
+
+.erp-jalali-day-spacer {
+    aspect-ratio: 1;
+}
+
+.datetimeshortcuts {
+    display: none !important;
+}

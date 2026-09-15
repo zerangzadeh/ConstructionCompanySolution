@@ -206,6 +206,11 @@ class User(AbstractUser):
         blank=True,
         validators=[validate_iranian_national_id],
     )
+    must_change_password = models.BooleanField(
+        "تغییر اجباری گذرواژه",
+        default=False,
+        help_text="تا تعیین گذرواژه شخصی، دسترسی کاربر به سامانه محدود می‌شود.",
+    )
     blocked_at = models.DateTimeField("زمان مسدودسازی", null=True, blank=True)
     created_at = models.DateTimeField("زمان ایجاد", auto_now_add=True)
     updated_at = models.DateTimeField("زمان آخرین به‌روزرسانی", auto_now=True)

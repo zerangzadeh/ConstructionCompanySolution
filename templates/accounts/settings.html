@@ -5,6 +5,7 @@
 {% block content %}
 <div class="max-w-4xl">
     {% include "components/page_header.html" with page_eyebrow="حساب کاربری" page_title="تنظیمات شخصی" page_description="اطلاعات تماس، تصویر پروفایل و امنیت حساب خود را مدیریت کنید." only %}
+    <div class="mt-4 flex justify-end"><a class="erp-btn" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال به شرکت</a></div>
 
     <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div class="space-y-6">
@@ -68,7 +69,7 @@
                 </div>
                 <div>
                     <dt class="text-xs text-slate-500">آخرین ورود</dt>
-                    <dd class="mt-1 text-slate-700">{{ request.user.last_login|date:"Y/m/d H:i"|default:"—" }}</dd>
+                    <dd class="mt-1 text-slate-700" dir="ltr">{{ request.user.last_login|jalali_datetime|default:"—" }}</dd>
                 </div>
             </dl>
             <p class="mt-5 border-t border-slate-100 pt-4 text-xs leading-6 text-slate-500">برای تغییر نام کاربری یا وضعیت حساب با مدیر سامانه تماس بگیرید.</p>

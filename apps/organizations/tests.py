@@ -7,8 +7,12 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.authorization import has_business_permission
-from apps.organizations.forms import OrganizationSettingsForm
+from apps.organizations.forms import (
+    OrganizationMembershipForm,
+    OrganizationSettingsForm,
+)
 from apps.organizations.models import (
+    AccountConnectionRequestStatus,
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
@@ -21,13 +25,16 @@ from apps.organizations.models import (
 )
 from apps.organizations.services import (
     ACTIVE_ORGANIZATION_SESSION_KEY,
+    create_organization_account,
     create_organization_by_system_admin,
     create_organization_with_owner,
     get_organization_members,
     get_organization_settings,
     get_valid_memberships,
     provision_user_for_organization,
+    request_existing_account_connection,
     resolve_active_organization,
+    respond_to_account_connection_request,
     set_active_organization,
     update_organization_membership,
     update_organization_settings,
@@ -219,6 +226,21 @@ class OrganizationTenantIsolationTests(TestCase):
         self.assertContains(response, other_member.username)
         self.assertNotContains(response, self.other_organization.name)
 
+    def test_members_view_links_member_name_to_the_edit_page_for_managers(self) -> None:
+        membership = self.user.organization_memberships.get(
+            organization=self.organization,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("organizations:members"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            reverse("organizations:member_update", args=[membership.pk]),
+        )
+        self.assertNotContains(response, "مدیریت عضویت")
+
     def test_suspended_membership_is_not_valid(self) -> None:
         active_membership = self.user.organization_memberships.get(
             organization=self.organization,
@@ -407,6 +429,30 @@ class GlobalRoleAuthorizationTests(TestCase):
             BusinessPermission.objects.filter(code="projects.manage").exists()
         )
 
+    def test_builtin_roles_have_english_display_names(self) -> None:
+        self.assertDictEqual(
+            dict(
+                OrganizationRole.objects.filter(is_system=True).values_list(
+                    "code", "name"
+                )
+            ),
+            {
+                MembershipRole.COMPANY_OWNER: "Company Owner",
+                MembershipRole.COMPANY_MANAGER: "Company Manager",
+                MembershipRole.OPERATIONS_MANAGER: "Operations Manager",
+                MembershipRole.MEMBER: "Member",
+                MembershipRole.VIEWER: "Viewer",
+            },
+        )
+
+    def test_membership_role_field_explains_it_is_not_a_job_position(self) -> None:
+        form = OrganizationMembershipForm()
+
+        self.assertEqual(
+            form.fields["role_definition"].help_text,
+            "این مورد سطح دسترسی به سامانه را تعیین می‌کند و سمت شغلی فرد نیست.",
+        )
+
     def test_custom_role_grants_implemented_business_permission(self) -> None:
         self.assertTrue(
             has_business_permission(
@@ -578,6 +624,8 @@ class OrganizationProfileAndSettingsValidationTests(TestCase):
                 "fiscal_year_start_day": 1,
                 "project_code_prefix": "PRJ",
                 "contract_code_prefix": "CTR",
+                "site_code_prefix": "SITE",
+                "document_code_prefix": "DOC",
             },
             files={"logo": valid_logo},
         )
@@ -597,6 +645,8 @@ class OrganizationProfileAndSettingsValidationTests(TestCase):
                 "fiscal_year_start_day": 1,
                 "project_code_prefix": "PRJ",
                 "contract_code_prefix": "CTR",
+                "site_code_prefix": "SITE",
+                "document_code_prefix": "DOC",
             },
             files={"logo": invalid_logo},
         )
@@ -649,6 +699,8 @@ class OrganizationCreationServiceTests(TestCase):
         self.assertEqual(organization.settings.fiscal_year_start_day, 1)
         self.assertEqual(organization.settings.project_code_prefix, "PRJ")
         self.assertEqual(organization.settings.contract_code_prefix, "CTR")
+        self.assertEqual(organization.settings.site_code_prefix, "SITE")
+        self.assertEqual(organization.settings.document_code_prefix, "DOC")
 
     def test_create_organization_rejects_unauthenticated_owner(self) -> None:
         owner = User(username="inactive-owner")
@@ -758,6 +810,8 @@ class OrganizationSettingsServiceTests(TestCase):
             language="en",
             project_code_prefix="SITE",
             contract_code_prefix="CON",
+            site_code_prefix="WORK",
+            document_code_prefix="FILE",
             profile_data={
                 "name": "Updated Settings Company",
                 "slug": "updated-settings-company",
@@ -773,6 +827,8 @@ class OrganizationSettingsServiceTests(TestCase):
         self.assertEqual(settings_record.language, "en")
         self.assertEqual(settings_record.project_code_prefix, "SITE")
         self.assertEqual(settings_record.contract_code_prefix, "CON")
+        self.assertEqual(settings_record.site_code_prefix, "WORK")
+        self.assertEqual(settings_record.document_code_prefix, "FILE")
         self.assertEqual(self.organization.timezone, "UTC")
         self.assertEqual(self.organization.currency, "USD")
         self.assertEqual(self.organization.name, "Updated Settings Company")
@@ -853,6 +909,8 @@ class OrganizationSettingsServiceTests(TestCase):
                 "settings-fiscal_year_start_day": "1",
                 "settings-project_code_prefix": "PRJ",
                 "settings-contract_code_prefix": "CTR",
+                "settings-site_code_prefix": "SITE",
+                "settings-document_code_prefix": "DOC",
             },
         )
 
@@ -861,6 +919,8 @@ class OrganizationSettingsServiceTests(TestCase):
         self.assertEqual(self.organization.name, "شرکت تنظیم‌شده")
         self.assertEqual(self.organization.national_id, "NAT-4567")
         self.assertEqual(self.organization.settings.timezone, "Asia/Tehran")
+        self.assertEqual(self.organization.settings.site_code_prefix, "SITE")
+        self.assertEqual(self.organization.settings.document_code_prefix, "DOC")
 
 
 class OrganizationCreationViewTests(TestCase):
@@ -1040,4 +1100,114 @@ class OrganizationUserProvisioningTests(TestCase):
                 organization=self.organization,
                 user=self.user,
                 actor=self.owner,
+            )
+
+
+class OwnerAccountManagementTests(TestCase):
+    def setUp(self) -> None:
+        self.owner = User.objects.create_user(username="owner-account-manager")
+        self.organization = Organization.objects.create(
+            name="Owner Account Company", slug="owner-account-company"
+        )
+        self.owner_role = OrganizationRole.objects.get(
+            code=MembershipRole.COMPANY_OWNER
+        )
+        self.member_role = OrganizationRole.objects.get(code=MembershipRole.MEMBER)
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.owner,
+            role_definition=self.owner_role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+    def test_owner_creates_account_with_temporary_password_restriction(self) -> None:
+        user, membership = create_organization_account(
+            organization=self.organization,
+            actor=self.owner,
+            username="New.Worker",
+            temporary_password="Temporary-password-2026",
+            role=self.member_role,
+            first_name="کاربر",
+            last_name="جدید",
+        )
+
+        self.assertEqual(user.username, "new.worker")
+        self.assertTrue(user.must_change_password)
+        self.assertTrue(user.check_password("Temporary-password-2026"))
+        self.assertEqual(membership.organization, self.organization)
+        self.assertEqual(membership.role_definition, self.member_role)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.ORGANIZATION_ACCOUNT_CREATED,
+                organization=self.organization,
+                actor=self.owner,
+            ).exists()
+        )
+
+    def test_existing_account_requires_target_acceptance(self) -> None:
+        target = User.objects.create_user(
+            username="existing-global-user", password="existing-password"
+        )
+        connection = request_existing_account_connection(
+            organization=self.organization,
+            actor=self.owner,
+            username=target.username,
+            role=self.member_role,
+        )
+        self.assertFalse(
+            OrganizationMembership.objects.filter(
+                organization=self.organization, user=target
+            ).exists()
+        )
+
+        respond_to_account_connection_request(
+            target_user=target, request_record=connection, accept=True
+        )
+
+        connection.refresh_from_db()
+        self.assertEqual(connection.status, AccountConnectionRequestStatus.ACCEPTED)
+        self.assertTrue(
+            OrganizationMembership.objects.filter(
+                organization=self.organization,
+                user=target,
+                status=MembershipStatus.ACTIVE,
+            ).exists()
+        )
+
+    def test_non_owner_default_role_cannot_create_tenant_accounts(self) -> None:
+        manager = User.objects.create_user(username="account-company-manager")
+        manager_role = OrganizationRole.objects.get(code=MembershipRole.COMPANY_MANAGER)
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=manager,
+            role_definition=manager_role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            create_organization_account(
+                organization=self.organization,
+                actor=manager,
+                username="forbidden-created-account",
+                temporary_password="Temporary-password-2026",
+                role=self.member_role,
+            )
+
+    def test_other_user_cannot_accept_connection_request(self) -> None:
+        target = User.objects.create_user(
+            username="connection-target", password="existing-password"
+        )
+        outsider = User.objects.create_user(
+            username="connection-outsider", password="existing-password"
+        )
+        connection = request_existing_account_connection(
+            organization=self.organization,
+            actor=self.owner,
+            username=target.username,
+            role=self.member_role,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            respond_to_account_connection_request(
+                target_user=outsider, request_record=connection, accept=True
             )

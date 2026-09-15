@@ -33,6 +33,7 @@ from apps.projects.services import (
     get_organization_project_site,
     get_organization_project_sites,
     get_organization_projects,
+    get_organization_sites,
     get_organization_wbs_nodes,
     transition_activity_status,
     transition_project_phase_status,
@@ -111,6 +112,19 @@ def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
         "projects/site_list.html",
         {"project": project, "sites": sites},
     )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_SITES_VIEW)
+@require_GET
+def site_list(request: HttpRequest) -> HttpResponse:
+    """List all worksites belonging to the active organization."""
+
+    sites = get_organization_sites(
+        user=request.user,
+        organization=request.organization,
+    )
+    return render(request, "projects/all_site_list.html", {"sites": sites})
 
 
 @active_organization_required

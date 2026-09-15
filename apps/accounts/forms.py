@@ -1,5 +1,9 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordChangeForm,
+    SetPasswordForm,
+)
 
 from apps.accounts.models import User
 from core.identifiers import canonicalize_lower_identifier
@@ -82,6 +86,15 @@ class PersonalSettingsForm(forms.ModelForm):
 
 class PersonalPasswordChangeForm(PasswordChangeForm):
     """Style Django's password-change validation for the personal settings page."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = INPUT_CLASSES
+
+
+class RequiredPasswordChangeForm(SetPasswordForm):
+    """Set the permanent password after authentication with a temporary one."""
 
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, **kwargs)

@@ -1,7 +1,10 @@
 # Product Development Roadmap
 
-This roadmap covers future product development only. Current system boundaries
-and implemented entities are documented in
+Construction ERP is a complete-product initiative and is no longer governed as
+an MVP. This roadmap manages incremental delivery toward the complete,
+production-oriented product; it does not imply that every listed capability is
+already implemented or production-certified. Current system boundaries and
+implemented entities are documented in
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; engineering and delivery rules are
 defined in `AGENTS.md`. Django models and migrations remain the schema source of
 truth.
@@ -32,8 +35,8 @@ permissions, tenant isolation, workflows, or financial logic.
 - **Goal:** Establish optional tenant-scoped personnel and team management while
   keeping workforce identity separate from authenticated user identity.
 - **Main scope/entities:** `Employee`, `Department`, `Position`, `WorkTeam`,
-  `EmployeeProjectAssignment`, optional `Employee.user`, and later daily-labor
-  integration.
+  `EmployeePositionAssignment`, `EmployeeProjectAssignment`, private employee
+  images, optional `Employee.user`, and later daily-labor integration.
 - **Done When:** Workforce ownership, roles, lifecycle, project/site assignment,
   permissions, migrations, audit events, and tenant-isolation tests are accepted;
   small tenants can operate without organizational structures.
@@ -48,6 +51,11 @@ permissions, tenant isolation, workflows, or financial logic.
   such as `CostCenter`.
 - **Done When:** Request, approval, ordering, and receipt states are atomic,
   tenant-safe, auditable, Decimal-precise, and preserve finalized documents.
+- **Current workflow boundary:** Procurement uses a fixed, permission-driven
+  lifecycle with one request approval decision. It does not currently include
+  configurable multi-stage approvals, amount thresholds, delegation,
+  separation-of-duties rules, or routing from workforce/organizational-chart
+  data; these require separately approved scope.
 
 ## F3 — Inventory
 
@@ -86,14 +94,17 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F6 — Documents v2
 
-- **Status:** PLANNED
+- **Status:** IMPLEMENTED
 - **Goal:** Generalize secure project files into versioned documents attachable
   to approved business records.
-- **Main scope/entities:** `Document`, `DocumentVersion`, `DocumentLink`, access
-  controls, retention metadata, and organization-scoped export.
-- **Done When:** Version history and links are tenant-safe and auditable, private
-  storage validation remains enforced, and existing `ProjectDocument` data is
-  preserved through an incremental migration path.
+- **Implemented scope/entities:** `Document`, immutable `DocumentVersion`, and
+  explicit-FK `DocumentLink` for projects, contracts, estimates, expenses,
+  payments, and daily reports; context-aware access, secure download, audit, and
+  archival.
+- **Done:** Version history and links are tenant-safe and auditable, current
+  versions are maintained atomically, and private storage validation remains
+  enforced. Organization-scoped export and formal retention policies remain
+  deferred.
 
 ## F7 — Safety & Quality
 

@@ -1,7 +1,10 @@
 import calendar
 
 from django import forms
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
 
+from apps.accounts.models import User
 from apps.organizations.models import (
     MembershipStatus,
     Organization,
@@ -16,6 +19,10 @@ TEXT_INPUT_CLASS = (
     "text-slate-900 outline-none focus:border-blue-500 focus:ring-2 "
     "focus:ring-blue-100"
 )
+ROLE_ACCESS_HELP_TEXT = (
+    "این مورد سطح دسترسی به سامانه را تعیین می‌کند و سمت شغلی فرد نیست."
+)
+
 ORGANIZATION_PROFILE_FIELDS = [
     "name",
     "legal_name",
@@ -61,6 +68,8 @@ ORGANIZATION_ADMIN_SETTINGS_FIELD_MAP = {
     "fiscal_year_start_day": "fiscal_year_start_day",
     "project_code_prefix": "project_code_prefix",
     "contract_code_prefix": "contract_code_prefix",
+    "site_code_prefix": "site_code_prefix",
+    "document_code_prefix": "document_code_prefix",
 }
 
 
@@ -129,6 +138,8 @@ class OrganizationAdminForm(OrganizationProfileForm):
     fiscal_year_start_day = _settings_form_field("fiscal_year_start_day")
     project_code_prefix = _settings_form_field("project_code_prefix")
     contract_code_prefix = _settings_form_field("contract_code_prefix")
+    site_code_prefix = _settings_form_field("site_code_prefix")
+    document_code_prefix = _settings_form_field("document_code_prefix")
 
     class Meta(OrganizationProfileForm.Meta):
         fields = ORGANIZATION_PROFILE_FIELDS
@@ -181,6 +192,8 @@ class OrganizationSettingsForm(forms.ModelForm):
             "fiscal_year_start_day",
             "project_code_prefix",
             "contract_code_prefix",
+            "site_code_prefix",
+            "document_code_prefix",
         ]
         widgets = {  # noqa: RUF012
             "logo": forms.ClearableFileInput(attrs={"class": TEXT_INPUT_CLASS}),
@@ -210,6 +223,12 @@ class OrganizationSettingsForm(forms.ModelForm):
             "contract_code_prefix": forms.TextInput(
                 attrs={"class": f"{TEXT_INPUT_CLASS} uppercase", "dir": "ltr"}
             ),
+            "site_code_prefix": forms.TextInput(
+                attrs={"class": f"{TEXT_INPUT_CLASS} uppercase", "dir": "ltr"}
+            ),
+            "document_code_prefix": forms.TextInput(
+                attrs={"class": f"{TEXT_INPUT_CLASS} uppercase", "dir": "ltr"}
+            ),
         }
 
 
@@ -221,6 +240,7 @@ class OrganizationMembershipForm(forms.ModelForm):
         queryset=OrganizationRole.objects.none(),
         to_field_name="code",
         empty_label=None,
+        help_text=ROLE_ACCESS_HELP_TEXT,
     )
     status = forms.ChoiceField(
         label="وضعیت عضویت",
@@ -254,3 +274,85 @@ class OrganizationMembershipForm(forms.ModelForm):
             self.fields[
                 "status"
             ].help_text = "با ذخیره نقش، عضویت و حساب کاربر فعال می‌شوند."
+
+
+class OrganizationAccountCreateForm(forms.Form):
+    username = forms.CharField(label="نام کاربری", max_length=150)
+    first_name = forms.CharField(label="نام", max_length=150)
+    last_name = forms.CharField(label="نام خانوادگی", max_length=150)
+    email = forms.EmailField(label="ایمیل", required=False)
+    phone_number = forms.CharField(label="شماره تلفن", max_length=32, required=False)
+    national_id = forms.CharField(label="کد ملی", max_length=10, required=False)
+    role_definition = forms.ModelChoiceField(
+        label="نقش شرکتی",
+        queryset=OrganizationRole.objects.none(),
+        to_field_name="code",
+        empty_label=None,
+        help_text=ROLE_ACCESS_HELP_TEXT,
+    )
+    temporary_password = forms.CharField(
+        label="گذرواژه موقت",
+        widget=forms.PasswordInput(render_value=True),
+        help_text="کاربر در نخستین ورود ملزم به تعیین گذرواژه شخصی خواهد بود.",
+    )
+    temporary_password_confirm = forms.CharField(
+        label="تکرار گذرواژه موقت",
+        widget=forms.PasswordInput(render_value=True),
+    )
+
+    def __init__(self, *args: object, allow_owner_role: bool, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        roles = OrganizationRole.objects.filter(is_active=True)
+        if not allow_owner_role:
+            roles = roles.filter(is_owner=False)
+        self.fields["role_definition"].queryset = roles.order_by("name")
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
+
+    def clean_username(self) -> str:
+        return canonicalize_lower_identifier(self.cleaned_data["username"])
+
+    def clean(self) -> dict[str, object]:
+        cleaned = super().clean()
+        password = cleaned.get("temporary_password")
+        confirmation = cleaned.get("temporary_password_confirm")
+        if password and password != confirmation:
+            self.add_error("temporary_password_confirm", "تکرار گذرواژه یکسان نیست.")
+        if password:
+            candidate = User(
+                username=str(cleaned.get("username") or ""),
+                first_name=str(cleaned.get("first_name") or ""),
+                last_name=str(cleaned.get("last_name") or ""),
+            )
+            try:
+                validate_password(password, user=candidate)
+            except ValidationError as exc:
+                self.add_error("temporary_password", exc)
+        return cleaned
+
+
+class ExistingAccountConnectionForm(forms.Form):
+    username = forms.CharField(
+        label="نام کاربری دقیق حساب موجود",
+        max_length=150,
+        help_text="فهرست کاربران سراسری نمایش داده نمی‌شود.",
+    )
+    role_definition = forms.ModelChoiceField(
+        label="نقش پس از پذیرش",
+        queryset=OrganizationRole.objects.none(),
+        to_field_name="code",
+        empty_label=None,
+        help_text=ROLE_ACCESS_HELP_TEXT,
+    )
+
+    def __init__(self, *args: object, allow_owner_role: bool, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        roles = OrganizationRole.objects.filter(is_active=True)
+        if not allow_owner_role:
+            roles = roles.filter(is_owner=False)
+        self.fields["role_definition"].queryset = roles.order_by("name")
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
+
+    def clean_username(self) -> str:
+        return canonicalize_lower_identifier(self.cleaned_data["username"])

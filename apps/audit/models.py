@@ -78,6 +78,8 @@ class AuditAction(models.TextChoices):
         "تخصیص پرداخت برگشت داده شد",
     )
     DOCUMENT_UPLOADED = "document.uploaded", "سند بارگذاری شد"
+    DOCUMENT_VERSION_ADDED = "document.version_added", "نسخه سند افزوده شد"
+    DOCUMENT_LINK_ADDED = "document.link_added", "لینک سند افزوده شد"
     DOCUMENT_DOWNLOADED = "document.downloaded", "سند دریافت شد"
     DOCUMENT_ARCHIVED = "document.archived", "سند بایگانی شد"
     DAILY_REPORT_CREATED = "daily_report.created", "گزارش روزانه ایجاد شد"
@@ -98,12 +100,22 @@ class AuditAction(models.TextChoices):
     DAILY_ACTIVITY_ADDED = "daily_activity.added", "فعالیت روزانه افزوده شد"
     DELAY_EVENT_ADDED = "delay_event.added", "رویداد تأخیر افزوده شد"
     DEPARTMENT_CREATED = "department.created", "واحد سازمانی ایجاد شد"
+    DEPARTMENT_UPDATED = "department.updated", "واحد سازمانی به‌روزرسانی شد"
     DEPARTMENT_ARCHIVED = "department.archived", "واحد سازمانی بایگانی شد"
     POSITION_CREATED = "position.created", "سمت شغلی ایجاد شد"
+    POSITION_UPDATED = "position.updated", "سمت شغلی به‌روزرسانی شد"
     POSITION_ARCHIVED = "position.archived", "سمت شغلی بایگانی شد"
     WORK_TEAM_CREATED = "work_team.created", "گروه کاری ایجاد شد"
     WORK_TEAM_ARCHIVED = "work_team.archived", "گروه کاری بایگانی شد"
     EMPLOYEE_CREATED = "employee.created", "کارمند ایجاد شد"
+    EMPLOYEE_POSITION_ASSIGNED = (
+        "employee_position_assignment.created",
+        "سمت شغلی به کارمند تخصیص یافت",
+    )
+    EMPLOYEE_POSITION_ENDED = (
+        "employee_position_assignment.ended",
+        "تخصیص سمت شغلی کارمند پایان یافت",
+    )
     EMPLOYEE_STATUS_CHANGED = "employee.status_changed", "وضعیت کارمند تغییر کرد"
     EMPLOYEE_ARCHIVED = "employee.archived", "کارمند بایگانی شد"
     EMPLOYEE_PROJECT_ASSIGNED = (
@@ -204,6 +216,38 @@ class AuditAction(models.TextChoices):
     MEMBERSHIP_STATUS_CHANGED = (
         "membership.status_changed",
         "وضعیت عضویت تغییر کرد",
+    )
+    ORGANIZATION_ACCOUNT_CREATED = (
+        "organization_account.created",
+        "حساب کاربری شرکت ایجاد شد",
+    )
+    ACCOUNT_CONNECTION_REQUESTED = (
+        "account_connection.requested",
+        "درخواست اتصال حساب به شرکت ثبت شد",
+    )
+    ACCOUNT_CONNECTION_ACCEPTED = (
+        "account_connection.accepted",
+        "درخواست اتصال حساب پذیرفته شد",
+    )
+    ACCOUNT_CONNECTION_REJECTED = (
+        "account_connection.rejected",
+        "درخواست اتصال حساب رد شد",
+    )
+    EMPLOYEE_ACCOUNT_LINKED = (
+        "employee.account_linked",
+        "حساب کاربری به کارمند متصل شد",
+    )
+    EMPLOYEE_ACCOUNT_UNLINKED = (
+        "employee.account_unlinked",
+        "حساب کاربری کارمند قطع شد",
+    )
+    EMPLOYEE_PROFILE_IMAGE_UPDATED = (
+        "employee.profile_image_updated",
+        "عکس پرسنلی کارمند به‌روزرسانی شد",
+    )
+    USER_PASSWORD_INITIALIZED = (
+        "user.password_initialized",
+        "گذرواژه شخصی کاربر تعیین شد",
     )
     USER_ACCOUNT_STATUS_CHANGED = (
         "user.account_status_changed",

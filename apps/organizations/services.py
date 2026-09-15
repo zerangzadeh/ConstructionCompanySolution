@@ -2,8 +2,9 @@ import uuid
 from collections.abc import Mapping, MutableMapping
 from typing import Any
 
-from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import IntegrityError, transaction
 from django.db.models import QuerySet
 from django.utils import timezone
 
@@ -12,10 +13,12 @@ from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
+    AccountConnectionRequestStatus,
     BusinessPermissionCode,
     MembershipRole,
     MembershipStatus,
     Organization,
+    OrganizationAccountConnectionRequest,
     OrganizationMembership,
     OrganizationRole,
     OrganizationSettings,
@@ -88,6 +91,192 @@ def _validate_role_delegation(
             raise PermissionDenied(
                 "نمی‌توانید نقشی با اختیارات بیشتر از نقش خود واگذار یا مدیریت کنید."
             )
+
+
+@transaction.atomic
+def create_organization_account(
+    *,
+    organization: Organization,
+    actor: User,
+    username: str,
+    temporary_password: str,
+    role: OrganizationRole | str,
+    first_name: str = "",
+    last_name: str = "",
+    email: str = "",
+    phone_number: str = "",
+    national_id: str | None = None,
+) -> tuple[User, OrganizationMembership]:
+    """Create one tenant account with a mandatory first-login password change."""
+
+    actor_membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.ACCOUNTS_CREATE,
+        message="اجازه ایجاد حساب کاربری برای این شرکت را ندارید.",
+    )
+    role_definition = _resolve_active_role(role)
+    _validate_role_delegation(
+        actor=actor,
+        actor_membership=actor_membership,
+        assigned_role=role_definition,
+    )
+    normalized_username = canonicalize_lower_identifier(username)
+    if not normalized_username:
+        raise ValueError("وارد کردن نام کاربری الزامی است.")
+    if User.objects.filter(username=normalized_username).exists():
+        raise ValueError(
+            "این نام کاربری قابل ایجاد نیست؛ برای حساب موجود درخواست اتصال ثبت کنید."
+        )
+    user = User(
+        username=normalized_username,
+        first_name=first_name.strip(),
+        last_name=last_name.strip(),
+        email=email.strip().lower(),
+        phone_number=phone_number.strip(),
+        national_id=national_id or None,
+        is_active=True,
+        must_change_password=True,
+    )
+    try:
+        validate_password(temporary_password, user=user)
+        user.set_password(temporary_password)
+        user.full_clean()
+        user.save()
+    except (IntegrityError, ValidationError) as exc:
+        raise ValueError("اطلاعات حساب یا گذرواژه موقت معتبر نیست.") from exc
+    membership = OrganizationMembership.objects.create(
+        organization=organization,
+        user=user,
+        role=role_definition.code,
+        role_definition=role_definition,
+        status=MembershipStatus.ACTIVE,
+        joined_at=timezone.now(),
+        assigned_by=actor,
+    )
+    record_audit_event(
+        action=AuditAction.ORGANIZATION_ACCOUNT_CREATED,
+        entity_type="user",
+        entity_id=user.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"target_username": user.username, "role": role_definition.code},
+    )
+    return user, membership
+
+
+@transaction.atomic
+def request_existing_account_connection(
+    *,
+    organization: Organization,
+    actor: User,
+    username: str,
+    role: OrganizationRole | str,
+) -> OrganizationAccountConnectionRequest | None:
+    """Request consent from an exact existing identity without exposing a directory."""
+
+    actor_membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.ACCOUNTS_CREATE,
+        message="اجازه ثبت درخواست اتصال حساب را ندارید.",
+    )
+    role_definition = _resolve_active_role(role)
+    _validate_role_delegation(
+        actor=actor,
+        actor_membership=actor_membership,
+        assigned_role=role_definition,
+    )
+    normalized_username = canonicalize_lower_identifier(username)
+    try:
+        target_user = User.objects.get(
+            username=normalized_username,
+            is_active=True,
+            must_change_password=False,
+        )
+    except User.DoesNotExist:
+        return None
+    if OrganizationMembership.objects.filter(
+        organization=organization, user=target_user
+    ).exists():
+        return None
+    request_record, created = (
+        OrganizationAccountConnectionRequest.objects.get_or_create(
+            organization=organization,
+            target_user=target_user,
+            status=AccountConnectionRequestStatus.PENDING,
+            defaults={"role_definition": role_definition, "requested_by": actor},
+        )
+    )
+    if not created:
+        return None
+    record_audit_event(
+        action=AuditAction.ACCOUNT_CONNECTION_REQUESTED,
+        entity_type="organization_account_connection_request",
+        entity_id=request_record.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "target_username": target_user.username,
+            "role": role_definition.code,
+        },
+    )
+    return request_record
+
+
+@transaction.atomic
+def respond_to_account_connection_request(
+    *,
+    target_user: User,
+    request_record: OrganizationAccountConnectionRequest,
+    accept: bool,
+) -> OrganizationAccountConnectionRequest:
+    """Accept or reject a pending organization connection as its target identity."""
+
+    locked = (
+        OrganizationAccountConnectionRequest.objects.select_for_update()
+        .select_related("organization", "role_definition")
+        .get(pk=request_record.pk)
+    )
+    if locked.target_user_id != target_user.pk:
+        raise PermissionDenied("این درخواست متعلق به حساب شما نیست.")
+    if locked.status != AccountConnectionRequestStatus.PENDING:
+        raise ValueError("این درخواست قبلاً پاسخ داده شده است.")
+    if not locked.organization.is_active:
+        raise PermissionDenied("شرکت فعال نیست.")
+    if not locked.role_definition.is_active:
+        raise ValueError("نقش پیشنهادی دیگر فعال نیست.")
+    if OrganizationMembership.objects.filter(
+        organization=locked.organization, user=target_user
+    ).exists():
+        raise ValueError("این حساب قبلاً به شرکت تخصیص داده شده است.")
+    now = timezone.now()
+    if accept:
+        OrganizationMembership.objects.create(
+            organization=locked.organization,
+            user=target_user,
+            role=locked.role_definition.code,
+            role_definition=locked.role_definition,
+            status=MembershipStatus.ACTIVE,
+            joined_at=now,
+            assigned_by=locked.requested_by,
+        )
+        locked.status = AccountConnectionRequestStatus.ACCEPTED
+        action = AuditAction.ACCOUNT_CONNECTION_ACCEPTED
+    else:
+        locked.status = AccountConnectionRequestStatus.REJECTED
+        action = AuditAction.ACCOUNT_CONNECTION_REJECTED
+    locked.responded_at = now
+    locked.save(update_fields=["status", "responded_at", "updated_at"])
+    record_audit_event(
+        action=action,
+        entity_type="organization_account_connection_request",
+        entity_id=locked.pk,
+        organization=locked.organization,
+        actor=target_user,
+        metadata={"target_username": target_user.username},
+    )
+    return locked
 
 
 @transaction.atomic
@@ -306,6 +495,8 @@ def update_organization_settings(
     language: str | None = None,
     project_code_prefix: str | None = None,
     contract_code_prefix: str | None = None,
+    site_code_prefix: str | None = None,
+    document_code_prefix: str | None = None,
     logo: object = _LOGO_UNSET,
     profile_data: Mapping[str, str] | None = None,
 ) -> OrganizationSettings:
@@ -335,6 +526,10 @@ def update_organization_settings(
         settings_record.project_code_prefix = project_code_prefix
     if contract_code_prefix is not None:
         settings_record.contract_code_prefix = contract_code_prefix
+    if site_code_prefix is not None:
+        settings_record.site_code_prefix = site_code_prefix
+    if document_code_prefix is not None:
+        settings_record.document_code_prefix = document_code_prefix
     if logo is not _LOGO_UNSET:
         settings_record.logo = logo
     settings_record.full_clean()
@@ -346,6 +541,8 @@ def update_organization_settings(
         "language",
         "project_code_prefix",
         "contract_code_prefix",
+        "site_code_prefix",
+        "document_code_prefix",
         "updated_at",
     ]
     if logo is not _LOGO_UNSET:
@@ -383,6 +580,8 @@ def update_organization_settings(
             "language": settings_record.language,
             "project_code_prefix": settings_record.project_code_prefix,
             "contract_code_prefix": settings_record.contract_code_prefix,
+            "site_code_prefix": settings_record.site_code_prefix,
+            "document_code_prefix": settings_record.document_code_prefix,
         },
     )
     return settings_record
@@ -413,6 +612,8 @@ def create_organization_with_owner(
     fiscal_year_start_day: int = 1,
     project_code_prefix: str = "PRJ",
     contract_code_prefix: str = "CTR",
+    site_code_prefix: str = "SITE",
+    document_code_prefix: str = "DOC",
 ) -> Organization:
     """Create an organization and its active owner membership atomically."""
 
@@ -450,6 +651,8 @@ def create_organization_with_owner(
         fiscal_year_start_day=fiscal_year_start_day,
         project_code_prefix=project_code_prefix,
         contract_code_prefix=contract_code_prefix,
+        site_code_prefix=site_code_prefix,
+        document_code_prefix=document_code_prefix,
     )
     settings_record.full_clean()
     settings_record.save()
@@ -503,6 +706,8 @@ def create_organization_by_system_admin(
     fiscal_year_start_day: int = 1,
     project_code_prefix: str = "PRJ",
     contract_code_prefix: str = "CTR",
+    site_code_prefix: str = "SITE",
+    document_code_prefix: str = "DOC",
 ) -> Organization:
     """Create a tenant only when requested by the global system administrator."""
 
@@ -537,6 +742,8 @@ def create_organization_by_system_admin(
         fiscal_year_start_day=fiscal_year_start_day,
         project_code_prefix=project_code_prefix,
         contract_code_prefix=contract_code_prefix,
+        site_code_prefix=site_code_prefix,
+        document_code_prefix=document_code_prefix,
     )
 
 

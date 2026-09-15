@@ -39,8 +39,8 @@ from apps.daily_reports.services import (
     create_daily_report,
     submit_daily_report,
 )
-from apps.documents.models import ProjectDocument
-from apps.documents.services import upload_project_document
+from apps.documents.models import Document, DocumentLink, DocumentVersion
+from apps.documents.services import add_document_link, create_document
 from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
 from apps.equipment.services import (
     assign_equipment,
@@ -136,6 +136,7 @@ from apps.safety.services import (
 from apps.workforce.models import (
     Department,
     Employee,
+    EmployeePositionAssignment,
     EmployeeProjectAssignment,
     Position,
     WorkTeam,
@@ -319,7 +320,9 @@ class Command(BaseCommand):
         Expense,
         Payment,
         PaymentAllocation,
-        ProjectDocument,
+        Document,
+        DocumentVersion,
+        DocumentLink,
         DailyReport,
         DailyReportLaborEntry,
         DailyReportEquipmentEntry,
@@ -330,6 +333,7 @@ class Command(BaseCommand):
         Position,
         WorkTeam,
         Employee,
+        EmployeePositionAssignment,
         EmployeeProjectAssignment,
         Equipment,
         EquipmentAssignment,
@@ -387,9 +391,6 @@ class Command(BaseCommand):
                 first_name=first_name,
                 last_name=last_name,
             )
-        elif not user.check_password(DEMO_PASSWORD):
-            user.set_password(DEMO_PASSWORD)
-            user.save(update_fields=["password"])
         return user
 
     def _seed_organization(self, index: int, name: str) -> None:
@@ -1447,10 +1448,10 @@ class Command(BaseCommand):
         titles = ("صورت‌جلسه هماهنگی اجرایی", "گزارش کنترل کیفیت مصالح")
         for document_index, title in enumerate(titles, start=1):
             file_name = f"DOC-{organization_index:02d}-{project_index:02d}-{document_index:02d}.pdf"
-            if ProjectDocument.objects.filter(
+            reference = file_name.removesuffix(".pdf")
+            if Document.objects.filter(
                 organization=organization,
-                project=project,
-                original_file_name=file_name,
+                reference=reference,
             ).exists():
                 continue
             upload = SimpleUploadedFile(
@@ -1458,14 +1459,20 @@ class Command(BaseCommand):
                 b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n",
                 content_type="application/pdf",
             )
-            upload_project_document(
+            document = create_document(
                 organization=organization,
-                project=project,
                 actor=owner,
                 document_type="general" if document_index == 1 else "other",
                 title=title,
+                reference=reference,
+                description="سند نمونه نسخه‌بندی‌شده و خصوصی پروژه.",
                 upload=upload,
-                payment=payments[document_index - 1],
+                target=project,
+            )
+            add_document_link(
+                document=document,
+                actor=owner,
+                target=payments[document_index - 1],
             )
 
     def _seed_daily_reports(

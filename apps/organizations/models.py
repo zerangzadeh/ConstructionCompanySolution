@@ -98,11 +98,11 @@ class OrganizationStatus(models.TextChoices):
 class MembershipRole(models.TextChoices):
     """Stable codes for the protected roles shipped with the product."""
 
-    COMPANY_OWNER = "company_owner", "مالک شرکت"
-    COMPANY_MANAGER = "company_manager", "مدیر شرکت"
-    OPERATIONS_MANAGER = "operations_manager", "مدیر اجرایی"
-    MEMBER = "member", "عضو"
-    VIEWER = "viewer", "مشاهده‌گر"
+    COMPANY_OWNER = "company_owner", "Company Owner"
+    COMPANY_MANAGER = "company_manager", "Company Manager"
+    OPERATIONS_MANAGER = "operations_manager", "Operations Manager"
+    MEMBER = "member", "Member"
+    VIEWER = "viewer", "Viewer"
 
 
 class MembershipStatus(models.TextChoices):
@@ -112,12 +112,19 @@ class MembershipStatus(models.TextChoices):
     REVOKED = "revoked", "لغوشده"
 
 
+class AccountConnectionRequestStatus(models.TextChoices):
+    PENDING = "pending", "در انتظار پاسخ"
+    ACCEPTED = "accepted", "پذیرفته‌شده"
+    REJECTED = "rejected", "ردشده"
+
+
 class BusinessPermissionCode(models.TextChoices):
     """Business capabilities implemented and enforced by application services."""
 
     MEMBERSHIP_VIEW = "membership.view", "مشاهده اعضای شرکت"
     MEMBERSHIP_CHANGE_ROLE = "membership.change_role", "تغییر نقش اعضای شرکت"
     MEMBERSHIP_CHANGE_STATUS = "membership.change_status", "تغییر وضعیت اعضای شرکت"
+    ACCOUNTS_CREATE = "accounts.create", "ایجاد حساب کاربری شرکت"
     COMPANY_SETTINGS_VIEW = "company.settings.view", "مشاهده تنظیمات شرکت"
     COMPANY_SETTINGS_CHANGE = "company.settings.change", "ویرایش تنظیمات شرکت"
 
@@ -204,10 +211,10 @@ class BusinessPermissionCode(models.TextChoices):
     PAYMENTS_VOID = "payments.void", "ابطال پرداخت"
     PAYMENTS_ALLOCATE = "payments.allocate", "تخصیص پرداخت"
 
-    DOCUMENTS_VIEW = "documents.view", "مشاهده اسناد پروژه"
-    DOCUMENTS_UPLOAD = "documents.upload", "بارگذاری سند پروژه"
-    DOCUMENTS_DOWNLOAD = "documents.download", "دانلود سند پروژه"
-    DOCUMENTS_ARCHIVE = "documents.archive", "بایگانی سند پروژه"
+    DOCUMENTS_VIEW = "documents.view", "مشاهده اسناد"
+    DOCUMENTS_UPLOAD = "documents.upload", "بارگذاری و نسخه‌بندی اسناد"
+    DOCUMENTS_DOWNLOAD = "documents.download", "دانلود اسناد"
+    DOCUMENTS_ARCHIVE = "documents.archive", "بایگانی اسناد"
 
     DAILY_REPORTS_VIEW = "daily_reports.view", "مشاهده گزارش‌های روزانه"
     DAILY_REPORTS_CREATE = "daily_reports.create", "ثبت گزارش روزانه"
@@ -236,17 +243,35 @@ class BusinessPermissionCode(models.TextChoices):
 
     DEPARTMENTS_VIEW = "departments.view", "مشاهده دپارتمان‌ها"
     DEPARTMENTS_CREATE = "departments.create", "ایجاد دپارتمان"
+    DEPARTMENTS_CHANGE = "departments.change", "ویرایش دپارتمان"
     DEPARTMENTS_ARCHIVE = "departments.archive", "بایگانی دپارتمان"
     POSITIONS_VIEW = "positions.view", "مشاهده سمت‌های شغلی"
     POSITIONS_CREATE = "positions.create", "ایجاد سمت شغلی"
+    POSITIONS_CHANGE = "positions.change", "ویرایش سمت شغلی"
     POSITIONS_ARCHIVE = "positions.archive", "بایگانی سمت شغلی"
     WORK_TEAMS_VIEW = "work_teams.view", "مشاهده تیم‌های کاری"
     WORK_TEAMS_CREATE = "work_teams.create", "ایجاد تیم کاری"
     WORK_TEAMS_ARCHIVE = "work_teams.archive", "بایگانی تیم کاری"
     EMPLOYEES_VIEW = "employees.view", "مشاهده کارکنان"
     EMPLOYEES_CREATE = "employees.create", "ایجاد پرونده کارمند"
+    EMPLOYEES_CHANGE_PROFILE_IMAGE = (
+        "employees.change_profile_image",
+        "تغییر عکس پرسنلی کارمند",
+    )
+    EMPLOYEE_POSITIONS_ASSIGN = (
+        "employee_positions.assign",
+        "تخصیص سمت شغلی به کارمند",
+    )
+    EMPLOYEE_POSITIONS_END = (
+        "employee_positions.end",
+        "پایان تخصیص سمت شغلی کارمند",
+    )
     EMPLOYEES_CHANGE_STATUS = "employees.change_status", "تغییر وضعیت کارمند"
     EMPLOYEES_ARCHIVE = "employees.archive", "بایگانی کارمند"
+    EMPLOYEES_LINK_ACCOUNT = (
+        "employees.link_account",
+        "اتصال یا قطع حساب کاربری کارمند",
+    )
     PROJECT_ASSIGNMENTS_VIEW = (
         "project_assignments.view",
         "مشاهده تخصیص نیروی پروژه",
@@ -360,7 +385,7 @@ class OrganizationRole(UUIDModel, TimeStampedModel):
     """A global role assembled by a system administrator from known capabilities."""
 
     code = models.SlugField("کد نقش", max_length=64, unique=True)
-    name = models.CharField("عنوان فارسی", max_length=255)
+    name = models.CharField("عنوان نقش", max_length=255)
     description = models.TextField("توضیحات", blank=True)
     permissions = models.ManyToManyField(
         BusinessPermission,
@@ -631,6 +656,28 @@ class OrganizationSettings(UUIDModel, TimeStampedModel):
             )
         ],
     )
+    site_code_prefix = models.CharField(
+        "پیشوند کد کارگاه",
+        max_length=16,
+        default="SITE",
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z0-9][A-Z0-9-]{0,15}$",
+                message="پیشوند کارگاه فقط می‌تواند شامل حروف بزرگ لاتین، عدد و - باشد.",
+            )
+        ],
+    )
+    document_code_prefix = models.CharField(
+        "پیشوند کد اسناد",
+        max_length=16,
+        default="DOC",
+        validators=[
+            RegexValidator(
+                regex=r"^[A-Z0-9][A-Z0-9-]{0,15}$",
+                message="پیشوند اسناد فقط می‌تواند شامل حروف بزرگ لاتین، عدد و - باشد.",
+            )
+        ],
+    )
 
     class Meta:
         verbose_name = "تنظیمات شرکت"
@@ -645,6 +692,10 @@ class OrganizationSettings(UUIDModel, TimeStampedModel):
         self.contract_code_prefix = canonicalize_upper_identifier(
             self.contract_code_prefix
         )
+        self.site_code_prefix = canonicalize_upper_identifier(self.site_code_prefix)
+        self.document_code_prefix = canonicalize_upper_identifier(
+            self.document_code_prefix
+        )
         max_day = calendar.monthrange(2001, self.fiscal_year_start_month)[1]
         if self.fiscal_year_start_day > max_day:
             raise ValidationError(
@@ -658,6 +709,10 @@ class OrganizationSettings(UUIDModel, TimeStampedModel):
         )
         self.contract_code_prefix = canonicalize_upper_identifier(
             self.contract_code_prefix
+        )
+        self.site_code_prefix = canonicalize_upper_identifier(self.site_code_prefix)
+        self.document_code_prefix = canonicalize_upper_identifier(
+            self.document_code_prefix
         )
         super().save(*args, **kwargs)
 
@@ -766,3 +821,69 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.user.username} - {self.organization.name}"
+
+
+class OrganizationAccountConnectionRequest(UUIDModel, TimeStampedModel):
+    """An owner request that an existing global identity join one tenant."""
+
+    organization = models.ForeignKey(
+        Organization,
+        verbose_name="سازمان",
+        on_delete=models.CASCADE,
+        related_name="account_connection_requests",
+    )
+    target_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="کاربر مقصد",
+        on_delete=models.CASCADE,
+        related_name="organization_connection_requests",
+    )
+    role_definition = models.ForeignKey(
+        OrganizationRole,
+        verbose_name="نقش پیشنهادی",
+        on_delete=models.PROTECT,
+        related_name="account_connection_requests",
+    )
+    status = models.CharField(
+        "وضعیت",
+        max_length=20,
+        choices=AccountConnectionRequestStatus.choices,
+        default=AccountConnectionRequestStatus.PENDING,
+        db_index=True,
+    )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="درخواست‌کننده",
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="organization_connection_requests_created",
+    )
+    responded_at = models.DateTimeField("زمان پاسخ", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "درخواست اتصال حساب به شرکت"
+        verbose_name_plural = "درخواست‌های اتصال حساب به شرکت"
+        ordering = ["-created_at"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "target_user"],
+                condition=Q(status=AccountConnectionRequestStatus.PENDING),
+                name="unique_pending_account_connection_request",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        status=AccountConnectionRequestStatus.PENDING,
+                        responded_at__isnull=True,
+                    )
+                    | (
+                        ~Q(status=AccountConnectionRequestStatus.PENDING)
+                        & Q(responded_at__isnull=False)
+                    )
+                ),
+                name="account_connection_response_state_consistent",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.target_user.username} - {self.organization.name}"

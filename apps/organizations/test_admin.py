@@ -50,6 +50,8 @@ class OrganizationAdminTests(TestCase):
                 "fiscal_year_start_day": 1,
                 "project_code_prefix": "PRJ",
                 "contract_code_prefix": "CTR",
+                "site_code_prefix": "SITE",
+                "document_code_prefix": "DOC",
             }
         )
         self.assertTrue(form.is_valid())
@@ -91,6 +93,8 @@ class OrganizationAdminTests(TestCase):
                 "fiscal_year_start_day": 1,
                 "project_code_prefix": "SITE",
                 "contract_code_prefix": "CON",
+                "site_code_prefix": "WORK",
+                "document_code_prefix": "FILE",
             },
             instance=organization,
         )
@@ -114,6 +118,8 @@ class OrganizationAdminTests(TestCase):
         self.assertEqual(organization.timezone, "Asia/Tehran")
         self.assertEqual(organization.settings.currency, "IRR")
         self.assertEqual(organization.settings.project_code_prefix, "SITE")
+        self.assertEqual(organization.settings.site_code_prefix, "WORK")
+        self.assertEqual(organization.settings.document_code_prefix, "FILE")
         self.assertTrue(
             AuditEvent.objects.filter(
                 organization=organization,

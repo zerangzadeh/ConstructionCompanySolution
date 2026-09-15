@@ -1,8 +1,15 @@
 # Construction ERP — Project Snapshot
 
-**Snapshot date:** 2026-09-04
-**Status:** Active MVP development; PostgreSQL baseline frozen (P0 complete)
+**Snapshot date:** 2026-09-15
+**Status:** Active full-product development; the product is no longer scoped as
+an MVP
 **Architecture:** Multi-tenant Django modular monolith with PostgreSQL 18.6 and Psycopg 3
+
+Construction ERP is being built as a complete, production-oriented SaaS product
+for construction contractors. “Full product” defines the product scope and
+quality target; it does not mean every roadmap capability is already implemented
+or that production readiness has been certified. Delivery is incremental and
+the status of each remaining capability is maintained in `ROADMAP.md`.
 
 ## Implemented capabilities
 
@@ -10,9 +17,20 @@ The application currently provides the following tenant-scoped modules:
 
 - **Accounts:** custom user model and username/password authentication.
 - **Organizations:** organization lifecycle, active membership selection,
-  invitations, role checks, and active-tenant session handling.
+  account provisioning and connection requests, configurable company roles,
+  business permissions, organization settings, and active-tenant session handling.
+- **Parties and materials:** reusable tenant-scoped counterparties, contacts,
+  units of measure, material categories, and materials.
 - **Projects:** projects, worksites, phases, soft archival, and role-limited
-  project administration.
+  project administration, plus WBS nodes and activities.
+- **Workforce:** employees, departments, positions and dated position
+  assignments, teams, project/site assignments, and private employee images.
+- **Procurement:** purchase requests, permission-driven approval, supplier
+  orders, and quantity-controlled goods receipts.
+- **Inventory:** warehouses and an immutable movement ledger for receipts,
+  issues, adjustments, transfers, reversals, and derived balances.
+- **Equipment:** equipment masters, conflict-safe assignments, and maintenance
+  history.
 - **Daily reports:** daily worksite reporting with labor, equipment, material,
   progress, safety, and quality information.
 - **Contracts:** organization-scoped project contracts and contract values.
@@ -22,8 +40,10 @@ The application currently provides the following tenant-scoped modules:
   void workflow that preserves original financial values.
 - **Payments:** posted receipts/disbursements, project/contract/phase links,
   void workflow, and financial reporting integration.
-- **Documents:** validated private PDF/JPEG/PNG uploads, secure downloads,
-  SHA-256 file metadata, archival, and receipt/payment association.
+- **Documents:** validated private PDF/JPEG/PNG uploads, immutable versions,
+  explicit links to supported business records, secure downloads, and archival.
+- **Safety and quality:** standalone, permission-controlled incident and quality
+  issue lifecycles with project and responsibility context.
 - **Financials:** organization and project financial reporting using approved
   estimates, recorded expenses, and posted payments.
 - **Audit:** append-only audit events for important security and business
@@ -47,12 +67,13 @@ The application currently provides the following tenant-scoped modules:
 
 ## UI status
 
-- Django Templates and Tailwind CSS provide the initial interface.
-- Shared navigation is responsive for desktop and mobile layouts.
-- Reusable components now include form fields/errors, messages, navigation, and
-  a `page_header` component used by the core list pages.
-- The expense void control includes a screen-reader label and server-side input
-  validation.
+- Django Templates and Tailwind CSS provide the product interface, with HTMX
+  reserved for focused interactions that preserve server-side semantics.
+- The ERP and Django Admin share a Persian-first, responsive RTL design system.
+- Reusable page, form, feedback, navigation, table, and detail patterns support
+  consistent implementation across current and future domains.
+- Accessibility, technical-value direction, Jalali presentation, and financial
+  formatting rules are defined in `docs/ui-guidelines.md`.
 
 ## Database baseline and migrations
 
@@ -60,30 +81,31 @@ PostgreSQL 18.6 is the authoritative database baseline. Django connects through
 Psycopg 3; legacy database backends and drivers are not supported runtime
 dependencies.
 
-Apply the repository's rebaselined migrations to each configured PostgreSQL
-database before use:
+Apply all checked-in migrations to each configured PostgreSQL database before
+use:
 
 ```powershell
 .\.venv\Scripts\python.exe manage.py migrate
 ```
 
-Each first-party app has a rebaselined `0001_initial` migration. The documents
-app additionally has `0002_alter_projectdocument_file`.
+Migration files and Django models are the schema source of truth. Environments
+must not assume their database is current; run `migrate` for each deployment.
 
 No secrets or database credentials are stored in this repository. Local database
 settings are read from `.env`; use `.env.example` as the safe template.
 
 ## Validation status
 
-The final P0 PostgreSQL validation baseline passed:
+The latest documented PostgreSQL validation baseline is:
 
 - `python manage.py check`
 - `python -m ruff check .`
 - `python -m ruff format --check .`
-- Full PostgreSQL test suite: **142 passed** (P0.6 accepted).
+- Full PostgreSQL test suite: **167 passed**.
+- Additional subtests: **26 passed**.
 
-P0 is complete. Subsequent work starts only with the separately approved Domain
-Model v1.0 refactor sequence.
+These figures are a recorded baseline, not the result of every later working-tree
+change. Relevant checks must be rerun after implementation changes.
 
 ## Current local URL
 
@@ -94,18 +116,22 @@ The development login screen is available at:
 Business pages require a logged-in user with an active organization. For example,
 `/payments/` redirects to login until that context exists.
 
-## Remaining MVP work
+## Current full-product delivery priorities
 
-- Create a real user and organization for browser-based workflow verification.
-- Continue tenant-isolation and authorization tests for each new endpoint.
-- Complete production deployment configuration, PostgreSQL TLS verification, and
-  operational monitoring.
-- Add future approved domains only after their workflows and ownership are
-  defined: procurement, inventory, equipment, workforce, billing, and safety.
+- Implement Billing & Progress Claims as the next approved product-domain phase.
+- Complete the remaining safety/quality extensions only through separately
+  approved workflows.
+- Continue tenant-isolation, object-authorization, lifecycle, and concurrency
+  coverage for every new capability.
+- Complete production deployment, PostgreSQL TLS, backup/restore, observability,
+  retention/export, and browser workflow verification before certifying a
+  production-ready release.
 
 ## Domain diagram
 
-The diagram below represents the broader product-domain plan. Some entities in
-it are future modules and are not part of the current Django schema yet.
+The diagram below represents the broader complete-product domain direction.
+Some entities remain planned concepts and are not part of the current Django
+schema; `docs/architecture/DOMAIN_AND_DATA_MODEL.md` identifies the current
+implemented boundary.
 
 ![Construction ERP domain ERD](ERD_Diagram.png)

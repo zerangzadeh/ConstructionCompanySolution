@@ -132,6 +132,11 @@ spacing:
 
 These design documents define visual presentation only.
 
+The visual system targets the complete Construction ERP product and its
+production-oriented quality standard; it is not an MVP design. Coverage may
+expand incrementally with the roadmap, but every implemented surface must follow
+the same enterprise-quality standard.
+
 The existing ERP application remains authoritative for:
 - models
 - database schema

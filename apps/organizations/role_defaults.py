@@ -6,6 +6,10 @@ from apps.organizations.permission_catalog import (
 from apps.organizations.permission_registry import registered_permission_codes
 
 ALL_PERMISSIONS = registered_permission_codes()
+OWNER_ONLY_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.ACCOUNTS_CREATE,
+    BusinessPermissionCode.EMPLOYEES_LINK_ACCOUNT,
+)
 READ_ONLY_PERMISSIONS = permission_codes_with_suffix("view") | permission_codes(
     BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
 )
@@ -39,9 +43,9 @@ OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     MembershipRole.COMPANY_OWNER: ALL_PERMISSIONS,
-    MembershipRole.COMPANY_MANAGER: ALL_PERMISSIONS,
+    MembershipRole.COMPANY_MANAGER: ALL_PERMISSIONS - OWNER_ONLY_PERMISSIONS,
     MembershipRole.OPERATIONS_MANAGER: (
-        ALL_PERMISSIONS - OPERATIONS_MANAGER_EXCLUSIONS
+        ALL_PERMISSIONS - OPERATIONS_MANAGER_EXCLUSIONS - OWNER_ONLY_PERMISSIONS
     ),
     MembershipRole.MEMBER: READ_ONLY_PERMISSIONS | MEMBER_OPERATION_PERMISSIONS,
     MembershipRole.VIEWER: READ_ONLY_PERMISSIONS,
@@ -50,31 +54,31 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
 
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
     MembershipRole.COMPANY_OWNER: {
-        "name": "مالک شرکت",
+        "name": "Company Owner",
         "description": "مالک نهایی شرکت و مسئول انتقال مالکیت.",
         "is_system": True,
         "is_owner": True,
     },
     MembershipRole.COMPANY_MANAGER: {
-        "name": "مدیر شرکت",
+        "name": "Company Manager",
         "description": "مدیریت اعضا، تنظیمات و عملیات شرکت بدون اختیار مالکیت.",
         "is_system": True,
         "is_owner": False,
     },
     MembershipRole.OPERATIONS_MANAGER: {
-        "name": "مدیر اجرایی",
+        "name": "Operations Manager",
         "description": "مدیریت عملیات اجرایی و مالی شرکت.",
         "is_system": True,
         "is_owner": False,
     },
     MembershipRole.MEMBER: {
-        "name": "عضو",
+        "name": "Member",
         "description": "مشاهده اطلاعات و انجام عملیات روزمره مجاز.",
         "is_system": True,
         "is_owner": False,
     },
     MembershipRole.VIEWER: {
-        "name": "مشاهده‌گر",
+        "name": "Viewer",
         "description": "مشاهده اطلاعات شرکت بدون امکان تغییر.",
         "is_system": True,
         "is_owner": False,

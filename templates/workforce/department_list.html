@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}چارت سازمانی | سامانه مدیریت ساخت{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'workforce/css/organization_chart.css' %}?v=4">{% endblock %}
+{% block content %}
+{% if "departments.create" in business_permission_codes %}{% url "workforce:department_create" as create_url %}{% endif %}
+{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="چارت سازمانی" page_description="ساختار سازمان، واحدها، سمت‌ها و کارکنان" page_action_url=create_url page_action_label="واحد جدید" only %}
+{% include "workforce/_tabs.html" %}
+
+<section class="org-chart-shell mt-4" data-org-chart>
+    <div class="org-chart-toolbar">
+        <div class="org-chart-view-switch" role="group" aria-label="نوع نمایش">
+            <button type="button" data-view="tree" class="is-active" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M12 8v8"/></svg>نمای درختی</button>
+            <button type="button" data-view="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>نمای لیستی</button>
+        </div>
+        <label class="org-chart-search"><span class="sr-only">جستجو در چارت سازمانی</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" data-chart-search placeholder="جستجو در واحدها، سمت‌ها یا کارکنان…" autocomplete="off"></label>
+        <label class="org-chart-select"><span class="sr-only">فیلتر واحد</span><select data-department-filter><option value="">همه واحدها</option>{% for department in departments %}<option value="{{ department.id }}">{{ department.name }}</option>{% endfor %}</select></label>
+        <label class="org-chart-select"><span class="sr-only">فیلتر وضعیت</span><select data-status-filter><option value="">همه وضعیت‌ها</option><option value="true">فعال</option><option value="false">غیرفعال</option></select></label>
+    </div>
+
+    <div class="org-chart-workspace" data-tree-view>
+        <div class="org-chart-canvas-wrap">
+            <div class="org-chart-canvas-tools" role="group" aria-label="کنترل اندازه چارت">
+                <button type="button" data-zoom-in aria-label="بزرگ‌نمایی">+</button><button type="button" data-zoom-out aria-label="کوچک‌نمایی">−</button>
+                <button type="button" data-fullscreen aria-label="نمایش تمام‌صفحه"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M8 3H3v5m13-5h5v5M8 21H3v-5m13 5h5v-5"/></svg></button>
+            </div>
+            <div class="org-chart-scroll" data-chart-scroll>
+                <div class="org-chart-tree" data-chart-tree>{% include "workforce/_organization_chart_root.html" %}</div>
+                <div class="org-chart-no-results" data-no-results hidden>واحدی مطابق فیلتر انتخاب‌شده پیدا نشد.</div>
+                {% if not department_tree %}<div class="org-chart-empty org-chart-empty--compact"><p>هنوز واحد سازمانی تعریف نشده است.</p>{% if create_url %}<a class="erp-btn erp-btn--primary" href="{{ create_url }}">ایجاد واحد سازمانی</a>{% endif %}</div>{% endif %}
+            </div>
+            <div class="org-chart-legend" aria-label="راهنمای رنگ‌ها">
+                <span>راهنما:</span>
+                <span><i class="bg-blue-600"></i>ریشه سازمانی</span>
+                <span><i class="bg-emerald-400"></i>سطح ۱</span>
+                <span><i class="bg-amber-400"></i>سطح ۲</span>
+                <span><i class="bg-blue-400"></i>سطح ۳</span>
+                <span><i class="bg-violet-400"></i>سطح ۴</span>
+                <span><i class="bg-rose-400"></i>سطح ۵ و بعدی</span>
+            </div>
+        </div>
+
+        <aside class="org-chart-details" data-details-drawer aria-live="polite">
+            <header><div><p>اطلاعات ساختار</p><h2>جزئیات واحد</h2></div><button type="button" data-close-details aria-label="بستن جزئیات">×</button></header>
+            {% if department_tree %}{% include "workforce/_organization_chart_details.html" with nodes=department_tree only %}{% endif %}
+            <div class="org-chart-details__placeholder" data-details-placeholder><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg><p>برای مشاهده اطلاعات، یک واحد را از چارت انتخاب کنید.</p></div>
+        </aside>
+    </div>
+
+    <div class="org-chart-list" data-list-view hidden>
+        {% if departments %}<div class="erp-table-wrap"><table class="w-full min-w-[760px] text-right"><thead><tr><th>کد و نام واحد</th><th>واحد بالادست</th><th>وضعیت</th><th>شرح</th>{% if "departments.archive" in business_permission_codes %}<th>عملیات</th>{% endif %}</tr></thead><tbody>{% for department in departments %}<tr data-list-row data-department-id="{{ department.id }}" data-active="{{ department.is_active|yesno:'true,false' }}"><td><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="{% url 'workforce:department_detail' department.id %}">{{ department.name }}</a><a class="block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr" href="{% url 'workforce:department_detail' department.id %}">{{ department.code }}</a></td><td>{{ department.parent.name|default:"—" }}</td><td>{{ department.is_active|yesno:"فعال,غیرفعال" }}</td><td>{{ department.description|default:"—" }}</td>{% if "departments.archive" in business_permission_codes %}<td><form method="post" action="{% url 'workforce:department_archive' department.id %}">{% csrf_token %}<button type="submit">بایگانی</button></form></td>{% endif %}</tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="واحدی ثبت نشده است" empty_description="ساختار سازمانی شرکت را ایجاد کنید." empty_action_url=create_url empty_action_label="واحد جدید" only %}{% endif %}
+    </div>
+</section>
+
+{% if unassigned_employees %}<section class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4"><h2 class="text-sm font-bold text-amber-900">کارکنان بدون واحد سازمانی</h2><div class="mt-3 flex flex-wrap gap-2">{% for employee in unassigned_employees %}<a class="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900 hover:border-amber-400" href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a>{% endfor %}</div></section>{% endif %}
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'workforce/js/organization_chart.js' %}?v=3" defer></script>{% endblock %}

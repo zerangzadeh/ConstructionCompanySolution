@@ -9,6 +9,10 @@
 
 These design documents define visual presentation only.
 
+این سامانه دیگر MVP نیست و این راهنما برای رابط یک محصول کامل، حرفه‌ای و قابل
+بهره‌برداری تدوین شده است. گسترش پوشش صفحات مرحله‌ای و تابع `ROADMAP.md` است و
+این هدف کیفی مجوز ایجاد رفتار یا قابلیت بک‌اندِ تصویب‌نشده نیست.
+
 The existing ERP application remains authoritative for:
 - models
 - database schema

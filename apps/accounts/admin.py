@@ -148,7 +148,10 @@ class PersianUserCreationForm(AdminUserCreationForm):
         label="نقش سازمانی اولیه",
         queryset=OrganizationRole.objects.none(),
         to_field_name="code",
-        help_text="با ذخیره، عضویت کاربر فعال و این نقش به آن تخصیص داده می‌شود.",
+        help_text=(
+            "این مورد سطح دسترسی به سامانه را تعیین می‌کند و سمت شغلی فرد نیست. "
+            "با ذخیره، عضویت کاربر فعال و این نقش به آن تخصیص داده می‌شود."
+        ),
     )
 
     class Meta(AdminUserCreationForm.Meta):

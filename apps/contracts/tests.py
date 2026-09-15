@@ -202,7 +202,7 @@ class ContractServiceTests(TestCase):
             role_definition=viewer_role,
             status=MembershipStatus.ACTIVE,
         )
-        create_contract(
+        contract = create_contract(
             organization=self.organization,
             project=self.project,
             actor=self.owner,
@@ -225,8 +225,12 @@ class ContractServiceTests(TestCase):
         session.save()
         list_response = self.client.get(reverse("contracts:list"))
         create_response = self.client.get(reverse("contracts:create"))
+        detail_response = self.client.get(
+            reverse("contracts:detail", args=[contract.pk])
+        )
         self.assertEqual(list_response.status_code, 200)
         self.assertNotContains(list_response, "قرارداد جدید")
+        self.assertEqual(detail_response.status_code, 200)
         self.assertEqual(create_response.status_code, 403)
 
     def test_contract_list_requires_active_organization(self) -> None:
@@ -273,3 +277,51 @@ class ContractServiceTests(TestCase):
         self.assertTrue(
             self.organization.contracts.filter(contract_number="C-VIEW-001").exists()
         )
+
+    def test_contract_list_links_to_tenant_scoped_detail(self) -> None:
+        contract = create_contract(
+            organization=self.organization,
+            project=self.project,
+            actor=self.owner,
+            contract_number="C-DETAIL-001",
+            title="Detail contract",
+            counterparty_name="Client LLC",
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        detail_url = reverse("contracts:detail", args=[contract.pk])
+        list_response = self.client.get(reverse("contracts:list"))
+        detail_response = self.client.get(detail_url)
+
+        self.assertContains(list_response, detail_url)
+        self.assertContains(detail_response, contract.contract_number)
+        self.assertContains(detail_response, contract.title)
+
+    def test_contract_detail_returns_not_found_for_another_organization(self) -> None:
+        other_project = self.other_organization.projects.create(
+            code="P-DETAIL-OTHER",
+            name="Other project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        other_contract = create_contract(
+            organization=self.other_organization,
+            project=other_project,
+            actor=self.other_user,
+            contract_number="C-DETAIL-OTHER",
+            title="Other contract",
+            counterparty_name="Other client",
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.get(
+            reverse("contracts:detail", args=[other_contract.pk])
+        )
+
+        self.assertEqual(response.status_code, 404)

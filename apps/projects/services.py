@@ -266,6 +266,22 @@ def get_organization_project_sites(
     ).select_related("project")
 
 
+def get_organization_sites(
+    *,
+    user: User,
+    organization: Organization,
+) -> QuerySet[ProjectSite]:
+    """Return every worksite in the active organization."""
+
+    if not _has_project_permission(
+        user, organization, BusinessPermissionCode.PROJECT_SITES_VIEW
+    ):
+        raise PermissionDenied("اجازه مشاهده کارگاه‌های این سازمان را ندارید.")
+    return ProjectSite.objects.filter(organization=organization).select_related(
+        "project"
+    )
+
+
 def get_organization_project_site(
     *,
     user: User,

@@ -61,31 +61,28 @@
         <div class="grid gap-px bg-slate-100 sm:grid-cols-3">
             <div class="bg-white px-5 py-5">
                 <p class="text-xs text-slate-500">برآورد مصوب</p>
-                <p class="mt-2 text-xl font-bold tabular-nums text-slate-950" dir="ltr">{{ summary.approved_estimate_total|erp_number }}</p>
-                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+                <p class="mt-2 text-xl font-bold tabular-nums text-slate-950" dir="ltr">{{ summary.approved_estimate_total|rial }}</p>
             </div>
             <div class="bg-white px-5 py-5">
                 <p class="text-xs text-slate-500">هزینه ثبت‌شده</p>
-                <p class="mt-2 text-xl font-bold tabular-nums text-slate-950" dir="ltr">{{ summary.recorded_expense_total|erp_number }}</p>
-                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+                <p class="mt-2 text-xl font-bold tabular-nums text-slate-950" dir="ltr">{{ summary.recorded_expense_total|rial }}</p>
             </div>
             <div class="bg-white px-5 py-5">
                 <p class="text-xs text-slate-500">مانده برآورد</p>
-                <p class="mt-2 text-xl font-bold tabular-nums {% if summary.variance < 0 %}text-red-600{% else %}text-emerald-600{% endif %}" dir="ltr">{{ summary.variance|erp_number }}</p>
-                <p class="mt-1 text-[11px] text-slate-400">{{ request.organization.currency }}</p>
+                <p class="mt-2 text-xl font-bold tabular-nums {% if summary.variance < 0 %}text-red-600{% else %}text-emerald-600{% endif %}" dir="ltr">{{ summary.variance|rial }}</p>
             </div>
         </div>
         <div class="border-t border-slate-100 bg-slate-50/60 p-5">
             <div class="mb-4 flex items-center justify-between">
-                <p class="text-xs font-semibold text-slate-700">گردش وجوه نقد</p><span class="erp-badge {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|erp_number }}</span></div>
+                <p class="text-xs font-semibold text-slate-700">گردش وجوه نقد</p><span class="erp-badge {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|rial }}</span></div>
             <div class="grid gap-3 sm:grid-cols-2">
                 <div class="rounded-lg border border-emerald-100 bg-white p-3">
                     <div class="flex items-center justify-between"><span class="text-xs text-slate-500">دریافت‌ها</span><span class="h-2 w-2 rounded-full bg-emerald-500"></span></div>
-                    <p class="mt-2 font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.receipt_total|erp_number }}</p>
+                    <p class="mt-2 font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.receipt_total|rial }}</p>
                 </div>
                 <div class="rounded-lg border border-rose-100 bg-white p-3">
                     <div class="flex items-center justify-between"><span class="text-xs text-slate-500">پرداخت‌ها</span><span class="h-2 w-2 rounded-full bg-rose-500"></span></div>
-                    <p class="mt-2 font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.disbursement_total|erp_number }}</p>
+                    <p class="mt-2 font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.disbursement_total|rial }}</p>
                 </div>
             </div>
         </div>

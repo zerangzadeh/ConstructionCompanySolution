@@ -1,0 +1,46 @@
+<ul>
+    <li class="org-chart__node org-chart__root" data-chart-branch>
+        <article class="org-chart-card org-chart-card--primary">
+            <div class="org-chart-card__heading">
+                <span class="org-chart-card__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg>
+                </span>
+                <div class="min-w-0 text-right">
+                    <h3>{{ organization.name }}</h3>
+                    <p>ریشه ساختار سازمانی</p>
+                </div>
+            </div>
+
+            {% if chief_executive %}
+            <div class="org-chart-card__person">
+                <span class="org-chart-avatar">
+                    {% if chief_executive.profile_image or chief_executive.user.profile_image %}
+                    <img src="{% url 'workforce:employee_profile_image' chief_executive.id %}" alt="عکس {{ chief_executive.first_name }} {{ chief_executive.last_name }}">
+                    {% else %}
+                    {{ chief_executive.first_name|first }}{{ chief_executive.last_name|first }}
+                    {% endif %}
+                </span>
+                <span class="min-w-0 text-right">
+                    <strong>{{ chief_executive.first_name }} {{ chief_executive.last_name }}</strong>
+                    <small>{{ chief_executive.position.title|default:"مدیرعامل" }}</small>
+                </span>
+            </div>
+            {% elif can_view_chief_executive %}
+            <div class="org-chart-card__empty">مدیرعامل تعیین نشده است</div>
+            {% else %}
+            <div class="org-chart-card__empty">اطلاعات مدیرعامل قابل مشاهده نیست</div>
+            {% endif %}
+
+            <div class="org-chart-card__footer">
+                {% if can_view_employees %}<span>{{ organization_employee_count }} نفر در سازمان</span>{% else %}<span>سازمان فعال</span>{% endif %}
+                {% if department_tree %}
+                <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن واحدهای سازمان">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 14 5-5 5 5"/></svg>
+                </button>
+                {% endif %}
+            </div>
+        </article>
+
+        {% if department_tree %}<ul>{% include "workforce/_organization_chart_node.html" with nodes=department_tree only %}</ul>{% endif %}
+    </li>
+</ul>

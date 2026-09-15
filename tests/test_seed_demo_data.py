@@ -7,6 +7,7 @@ from django.core.management import call_command
 
 from apps.accounts.management.commands.seed_demo_data import DEMO_PASSWORD
 from apps.accounts.models import User
+from apps.documents.models import Document, DocumentLink, DocumentVersion
 from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
 from apps.inventory.models import StockTransaction, Warehouse
 from apps.organizations.models import Organization, OrganizationMembership
@@ -24,6 +25,7 @@ from apps.safety.models import SafetyIncident
 from apps.workforce.models import (
     Department,
     Employee,
+    EmployeePositionAssignment,
     EmployeeProjectAssignment,
     Position,
     WorkTeam,
@@ -35,6 +37,7 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     settings: Any, tmp_path: Path
 ) -> None:
     settings.MEDIA_ROOT = tmp_path
+    settings.DEBUG = True
 
     call_command("seed_demo_data", stdout=StringIO())
 
@@ -65,6 +68,14 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     assert WorkTeam.objects.filter(organization__in=organizations).count() == 4
     assert Employee.objects.filter(organization__in=organizations).count() == 8
     assert (
+        EmployeePositionAssignment.objects.filter(
+            organization__in=organizations,
+            status="active",
+            is_primary=True,
+        ).count()
+        == 8
+    )
+    assert (
         EmployeeProjectAssignment.objects.filter(organization__in=organizations).count()
         == 8
     )
@@ -87,6 +98,9 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     assert MaintenanceRecord.objects.filter(organization__in=organizations).count() == 4
     assert SafetyIncident.objects.filter(organization__in=organizations).count() == 16
     assert QualityIssue.objects.filter(organization__in=organizations).count() == 16
+    assert Document.objects.filter(organization__in=organizations).count() == 32
+    assert DocumentVersion.objects.filter(organization__in=organizations).count() == 32
+    assert DocumentLink.objects.filter(organization__in=organizations).count() == 64
 
     counts_before = {
         model: model.objects.count()
@@ -98,6 +112,7 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
             Position,
             WorkTeam,
             Employee,
+            EmployeePositionAssignment,
             EmployeeProjectAssignment,
             PurchaseRequest,
             PurchaseRequestItem,
@@ -112,9 +127,17 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
             MaintenanceRecord,
             SafetyIncident,
             QualityIssue,
+            Document,
+            DocumentVersion,
+            DocumentLink,
         )
     }
+    owner = User.objects.get(username="demo.o01.owner")
+    owner.set_password("owner-selected-password-1405")
+    owner.save(update_fields=["password"])
 
     call_command("seed_demo_data", stdout=StringIO())
 
     assert {model: model.objects.count() for model in counts_before} == counts_before
+    owner.refresh_from_db()
+    assert owner.check_password("owner-selected-password-1405")

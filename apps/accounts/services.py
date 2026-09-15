@@ -4,6 +4,8 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from apps.accounts.models import User
+from apps.audit.models import AuditAction
+from apps.audit.services import record_audit_event
 
 
 @transaction.atomic
@@ -47,4 +49,24 @@ def change_personal_password(
         )
     locked_user.set_password(new_password)
     locked_user.save(update_fields=["password", "updated_at"])
+    return locked_user
+
+
+@transaction.atomic
+def initialize_personal_password(*, user: User, new_password: str) -> User:
+    """Replace a temporary password and release the first-login restriction."""
+
+    locked_user = User.objects.select_for_update().get(pk=user.pk)
+    if not locked_user.must_change_password:
+        raise ValidationError("تغییر اجباری گذرواژه برای این حساب فعال نیست.")
+    locked_user.set_password(new_password)
+    locked_user.must_change_password = False
+    locked_user.save(update_fields=["password", "must_change_password", "updated_at"])
+    record_audit_event(
+        action=AuditAction.USER_PASSWORD_INITIALIZED,
+        entity_type="user",
+        entity_id=locked_user.pk,
+        actor=locked_user,
+        metadata={"target_username": locked_user.username},
+    )
     return locked_user

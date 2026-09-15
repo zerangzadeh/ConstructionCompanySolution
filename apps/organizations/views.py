@@ -15,17 +15,26 @@ from apps.organizations.decorators import (
     require_organization_permission,
 )
 from apps.organizations.forms import (
+    ExistingAccountConnectionForm,
+    OrganizationAccountCreateForm,
     OrganizationForm,
     OrganizationMembershipForm,
     OrganizationProfileForm,
     OrganizationSettingsForm,
 )
-from apps.organizations.models import BusinessPermissionCode, OrganizationMembership
+from apps.organizations.models import (
+    AccountConnectionRequestStatus,
+    BusinessPermissionCode,
+    OrganizationAccountConnectionRequest,
+    OrganizationMembership,
+)
 from apps.organizations.services import (
+    create_organization_account,
     create_organization_by_system_admin,
     get_organization_members,
     get_organization_settings,
     get_valid_memberships,
+    request_existing_account_connection,
     resolve_active_organization,
     set_active_organization,
     update_organization_membership,
@@ -39,10 +48,17 @@ def select_organization(request: HttpRequest) -> HttpResponse:
     """Render organizations available to the authenticated user."""
 
     memberships = get_valid_memberships(request.user)
+    pending_connection_count = OrganizationAccountConnectionRequest.objects.filter(
+        target_user=request.user,
+        status=AccountConnectionRequestStatus.PENDING,
+    ).count()
     return render(
         request,
         "organizations/select.html",
-        {"memberships": memberships},
+        {
+            "memberships": memberships,
+            "pending_connection_count": pending_connection_count,
+        },
     )
 
 
@@ -118,6 +134,11 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
         permission=BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS,
     )
+    can_create_accounts = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.ACCOUNTS_CREATE,
+    )
     memberships = get_organization_members(
         user=request.user,
         organization=request.organization,
@@ -129,7 +150,75 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         {
             "memberships": memberships,
             "can_manage_members": can_change_roles or can_change_statuses,
+            "can_create_accounts": can_create_accounts,
         },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.ACCOUNTS_CREATE)
+def organization_account_create(request: HttpRequest) -> HttpResponse:
+    """Create a tenant account or request consent from an existing identity."""
+
+    actor_membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    allow_owner_role = actor_membership.role_definition.is_owner
+    action = request.POST.get("action") if request.method == "POST" else None
+    create_form = OrganizationAccountCreateForm(
+        request.POST if action == "create" else None,
+        allow_owner_role=allow_owner_role,
+        prefix="create",
+    )
+    connection_form = ExistingAccountConnectionForm(
+        request.POST if action == "connect" else None,
+        allow_owner_role=allow_owner_role,
+        prefix="connect",
+    )
+    if action == "create" and create_form.is_valid():
+        data = create_form.cleaned_data
+        try:
+            create_organization_account(
+                organization=request.organization,
+                actor=request.user,
+                username=data["username"],
+                temporary_password=data["temporary_password"],
+                role=data["role_definition"],
+                first_name=data["first_name"],
+                last_name=data["last_name"],
+                email=data["email"],
+                phone_number=data["phone_number"],
+                national_id=data["national_id"],
+            )
+        except (PermissionDenied, ValueError) as exc:
+            create_form.add_error(None, str(exc))
+        else:
+            messages.success(
+                request,
+                "حساب ساخته شد؛ کاربر در نخستین ورود باید گذرواژه خود را تغییر دهد.",
+            )
+            return redirect("organizations:members")
+    elif action == "connect" and connection_form.is_valid():
+        data = connection_form.cleaned_data
+        try:
+            request_existing_account_connection(
+                organization=request.organization,
+                actor=request.user,
+                username=data["username"],
+                role=data["role_definition"],
+            )
+        except (PermissionDenied, ValueError) as exc:
+            connection_form.add_error(None, str(exc))
+        else:
+            messages.success(
+                request,
+                "اگر حساب واردشده واجد شرایط باشد، درخواست اتصال برای صاحب آن ثبت می‌شود.",
+            )
+            return redirect("organizations:members")
+    return render(
+        request,
+        "organizations/account_create.html",
+        {"create_form": create_form, "connection_form": connection_form},
     )
 
 
@@ -182,6 +271,10 @@ def organization_settings(request: HttpRequest) -> HttpResponse:
                     ],
                     contract_code_prefix=settings_form.cleaned_data[
                         "contract_code_prefix"
+                    ],
+                    site_code_prefix=settings_form.cleaned_data["site_code_prefix"],
+                    document_code_prefix=settings_form.cleaned_data[
+                        "document_code_prefix"
                     ],
                     logo=settings_form.cleaned_data["logo"],
                     profile_data=profile_form.cleaned_data,

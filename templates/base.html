@@ -7,6 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}سازه یار{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/erp_jalali.css' %}">
+    <link rel="stylesheet" href="{% static 'css/erp_money.css' %}">
+    <script src="{% static 'js/erp_jalali.js' %}" defer></script>
+    <script src="{% static 'js/erp_money.js' %}" defer></script>
     <style>
         :root {
             --erp-canvas: #f8fafc;
@@ -172,6 +176,14 @@
             border-color: rgb(148 163 184);
             background: var(--erp-surface-subtle);
             color: var(--erp-text);
+        }
+
+        .erp-btn--active,
+        .erp-btn--active:hover {
+            border-color: var(--erp-primary);
+            background: var(--erp-primary);
+            color: white;
+            box-shadow: 0 1px 2px rgb(15 23 42 / .08);
         }
 
         .erp-btn--danger {
@@ -595,6 +607,7 @@
             *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
         }
     </style>
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
@@ -663,6 +676,7 @@
             else localize();
         })();
     </script>
+    {% block extra_scripts %}{% endblock %}
 </body>
 
 </html>

@@ -25,6 +25,13 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("apps.organizations.services", "apps.organizations.views"),
     ),
     PermissionResource(
+        "accounts",
+        "حساب‌های کاربری شرکت",
+        ("organizations.OrganizationAccountConnectionRequest",),
+        (P.ACCOUNTS_CREATE,),
+        ("apps.organizations.services", "apps.organizations.views"),
+    ),
+    PermissionResource(
         "company",
         "تنظیمات شرکت",
         ("organizations.Organization", "organizations.OrganizationSettings"),
@@ -192,8 +199,8 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     ),
     PermissionResource(
         "documents",
-        "اسناد پروژه",
-        ("documents.ProjectDocument",),
+        "اسناد",
+        ("documents.Document", "documents.DocumentVersion", "documents.DocumentLink"),
         (
             P.DOCUMENTS_VIEW,
             P.DOCUMENTS_UPLOAD,
@@ -230,14 +237,19 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         "departments",
         "دپارتمان‌ها",
         ("workforce.Department",),
-        (P.DEPARTMENTS_VIEW, P.DEPARTMENTS_CREATE, P.DEPARTMENTS_ARCHIVE),
+        (
+            P.DEPARTMENTS_VIEW,
+            P.DEPARTMENTS_CREATE,
+            P.DEPARTMENTS_CHANGE,
+            P.DEPARTMENTS_ARCHIVE,
+        ),
         ("apps.workforce.services",),
     ),
     PermissionResource(
         "positions",
         "سمت‌های شغلی",
         ("workforce.Position",),
-        (P.POSITIONS_VIEW, P.POSITIONS_CREATE, P.POSITIONS_ARCHIVE),
+        (P.POSITIONS_VIEW, P.POSITIONS_CREATE, P.POSITIONS_CHANGE, P.POSITIONS_ARCHIVE),
         ("apps.workforce.services",),
     ),
     PermissionResource(
@@ -254,9 +266,18 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             P.EMPLOYEES_VIEW,
             P.EMPLOYEES_CREATE,
+            P.EMPLOYEES_CHANGE_PROFILE_IMAGE,
             P.EMPLOYEES_CHANGE_STATUS,
             P.EMPLOYEES_ARCHIVE,
+            P.EMPLOYEES_LINK_ACCOUNT,
         ),
+        ("apps.workforce.services",),
+    ),
+    PermissionResource(
+        "employee_positions",
+        "سمت‌های کارکنان",
+        ("workforce.EmployeePositionAssignment",),
+        (P.EMPLOYEE_POSITIONS_ASSIGN, P.EMPLOYEE_POSITIONS_END),
         ("apps.workforce.services",),
     ),
     PermissionResource(

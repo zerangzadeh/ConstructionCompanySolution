@@ -97,7 +97,14 @@ class OrganizationAdmin(admin.ModelAdmin):
         ),
         (
             "شماره‌گذاری",
-            {"fields": ("project_code_prefix", "contract_code_prefix")},
+            {
+                "fields": (
+                    "project_code_prefix",
+                    "contract_code_prefix",
+                    "site_code_prefix",
+                    "document_code_prefix",
+                )
+            },
         ),
         (
             "وضعیت و تاریخچه",
@@ -139,6 +146,8 @@ class OrganizationAdmin(admin.ModelAdmin):
                 language=form.cleaned_data["language"],
                 project_code_prefix=form.cleaned_data["project_code_prefix"],
                 contract_code_prefix=form.cleaned_data["contract_code_prefix"],
+                site_code_prefix=form.cleaned_data["site_code_prefix"],
+                document_code_prefix=form.cleaned_data["document_code_prefix"],
                 logo=form.cleaned_data["logo"],
                 profile_data={
                     field_name: form.cleaned_data[field_name]
@@ -172,6 +181,8 @@ class OrganizationAdmin(admin.ModelAdmin):
             fiscal_year_start_day=form.cleaned_data["fiscal_year_start_day"],
             project_code_prefix=form.cleaned_data["project_code_prefix"],
             contract_code_prefix=form.cleaned_data["contract_code_prefix"],
+            site_code_prefix=form.cleaned_data["site_code_prefix"],
+            document_code_prefix=form.cleaned_data["document_code_prefix"],
         )
         obj.pk = organization.pk
         obj._state.adding = False

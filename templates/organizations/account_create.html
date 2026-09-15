@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}مدیریت حساب شرکت | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+  {% include "components/page_header.html" with page_eyebrow="شرکت" page_title="ایجاد یا اتصال حساب" page_description=request.organization.name only %}
+  <div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <section class="erp-surface rounded-xl p-5">
+      <h2 class="text-base font-black text-slate-900">ساخت حساب جدید</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-500">گذرواژه واردشده موقت است و کاربر پیش از هر اقدام باید آن را تغییر دهد.</p>
+      <form class="mt-5 space-y-4" method="post">
+        {% csrf_token %}<input type="hidden" name="action" value="create">
+        {% include "components/form_errors.html" with form=create_form only %}
+        {% for field in create_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+        <button class="erp-btn erp-btn--primary w-full" type="submit">ساخت حساب</button>
+      </form>
+    </section>
+    <section class="erp-surface rounded-xl p-5">
+      <h2 class="text-base font-black text-slate-900">حساب موجود</h2>
+      <p class="mt-2 text-sm leading-6 text-slate-500">نام کاربری دقیق را وارد کنید. اتصال تنها پس از پذیرش صاحب حساب انجام می‌شود و فهرست کاربران سامانه نمایش داده نمی‌شود.</p>
+      <form class="mt-5 space-y-4" method="post">
+        {% csrf_token %}<input type="hidden" name="action" value="connect">
+        {% include "components/form_errors.html" with form=connection_form only %}
+        {% for field in connection_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+        <button class="erp-btn erp-btn--primary w-full" type="submit">ثبت درخواست اتصال</button>
+      </form>
+    </section>
+  </div>
+{% endblock %}

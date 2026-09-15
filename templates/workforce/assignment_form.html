@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}تخصیص کارمند به پروژه | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="تخصیص کارمند به پروژه" page_description="ابتدا پروژه را انتخاب کنید تا کارگاه‌های همان پروژه نمایش داده شوند." only %}
+<form class="erp-surface mt-6 max-w-4xl rounded-xl p-5" method="post">
+    {% csrf_token %}
+    {% include "components/form_errors.html" with form=form only %}
+    <div class="grid gap-4 sm:grid-cols-2">
+        {% for field in form %}
+            <div id="{% if field.name == 'site' %}assignment-site-field{% endif %}">{% include "components/form_field.html" with field=field only %}</div>
+        {% endfor %}
+    </div>
+    <div class="mt-6 flex gap-3"><button class="erp-btn erp-btn--primary" type="submit">ثبت</button><a class="erp-btn erp-btn--secondary" href="{% url 'workforce:assignment_list' %}">انصراف</a></div>
+</form>
+<script>
+(() => {
+    const project = document.getElementById("id_project");
+    const site = document.getElementById("id_site");
+    if (!project || !site) return;
+    const endpoint = "{% url 'workforce:assignment_sites' %}";
+    project.addEventListener("change", async () => {
+        const projectId = project.value;
+        site.innerHTML = '<option value="">در حال دریافت کارگاه‌ها…</option>';
+        site.disabled = true;
+        if (!projectId) {
+            site.innerHTML = '<option value="">ابتدا پروژه را انتخاب کنید</option>';
+            return;
+        }
+        try {
+            const response = await fetch(`${endpoint}?project=${encodeURIComponent(projectId)}`, {credentials: "same-origin"});
+            if (!response.ok) throw new Error("Unable to load project sites.");
+            site.innerHTML = await response.text();
+            site.disabled = false;
+        } catch (_) {
+            site.innerHTML = '<option value="">دریافت کارگاه‌ها ناموفق بود</option>';
+        }
+    });
+})();
+</script>
+{% endblock %}

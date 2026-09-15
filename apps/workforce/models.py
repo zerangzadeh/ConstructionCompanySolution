@@ -1,11 +1,25 @@
+import uuid
+from pathlib import Path
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
+from apps.accounts.models import validate_profile_image
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+def employee_profile_image_upload_path(instance: "Employee", filename: str) -> str:
+    """Store employee images under opaque tenant-scoped names."""
+
+    extension = Path(filename).suffix.lower()
+    return (
+        f"organizations/{instance.organization_id}/employees/{instance.pk}/"
+        f"profile/{uuid.uuid4()}{extension}"
+    )
 
 
 class EmployeeStatus(models.TextChoices):
@@ -16,8 +30,13 @@ class EmployeeStatus(models.TextChoices):
 
 class AssignmentStatus(models.TextChoices):
     ACTIVE = "active", "فعال"
-    COMPLETED = "completed", "تکمیل‌شده"
+    COMPLETED = "completed", "پایان تخصیص"
     CANCELLED = "cancelled", "لغوشده"
+
+
+class PositionAssignmentStatus(models.TextChoices):
+    ACTIVE = "active", "فعال"
+    ENDED = "ended", "پایان‌یافته"
 
 
 class Department(UUIDModel, TimeStampedModel):
@@ -126,6 +145,11 @@ class Position(UUIDModel, TimeStampedModel):
     code = models.CharField("کد سمت", max_length=50)
     title = models.CharField("عنوان سمت", max_length=255)
     description = models.TextField("شرح", blank=True)
+    is_single_holder = models.BooleanField(
+        "سمت تک‌متصدی",
+        default=False,
+        help_text="برای سمت‌هایی مانند مدیرعامل که فقط یک متصدی فعال دارند.",
+    )
     is_active = models.BooleanField("فعال", default=True, db_index=True)
     archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
     created_by = models.ForeignKey(
@@ -310,6 +334,14 @@ class Employee(UUIDModel, TimeStampedModel):
     last_name = models.CharField("نام خانوادگی", max_length=150)
     email = models.EmailField("ایمیل", blank=True)
     phone_number = models.CharField("شماره تلفن", max_length=32, blank=True)
+    profile_image = models.FileField(
+        "عکس پرسنلی",
+        upload_to=employee_profile_image_upload_path,
+        validators=[validate_profile_image],
+        max_length=255,
+        blank=True,
+        help_text="فرمت PNG، JPEG یا WebP با حداکثر حجم ۲ مگابایت.",
+    )
     hire_date = models.DateField("تاریخ استخدام", null=True, blank=True)
     termination_date = models.DateField("تاریخ خاتمه همکاری", null=True, blank=True)
     status = models.CharField(
@@ -430,6 +462,144 @@ class Employee(UUIDModel, TimeStampedModel):
         return f"{self.employee_number} - {self.first_name} {self.last_name}"
 
 
+class EmployeePositionAssignment(UUIDModel, TimeStampedModel):
+    """A dated, tenant-safe job-position assignment for an employee."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        verbose_name="سازمان",
+        on_delete=models.CASCADE,
+        related_name="employee_position_assignments",
+    )
+    employee = models.ForeignKey(
+        Employee,
+        verbose_name="کارمند",
+        on_delete=models.PROTECT,
+        related_name="position_assignments",
+    )
+    position = models.ForeignKey(
+        Position,
+        verbose_name="سمت شغلی",
+        on_delete=models.PROTECT,
+        related_name="employee_assignments",
+    )
+    start_date = models.DateField("تاریخ شروع")
+    end_date = models.DateField("تاریخ پایان", null=True, blank=True)
+    status = models.CharField(
+        "وضعیت تخصیص سمت",
+        max_length=20,
+        choices=PositionAssignmentStatus.choices,
+        default=PositionAssignmentStatus.ACTIVE,
+        db_index=True,
+    )
+    is_primary = models.BooleanField("سمت اصلی", default=False)
+    notes = models.TextField("یادداشت‌ها", blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="ایجادکننده",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="employee_position_assignments_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="آخرین ویرایش‌کننده",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="employee_position_assignments_updated",
+    )
+
+    class Meta:
+        verbose_name = "تخصیص سمت شغلی کارمند"
+        verbose_name_plural = "تخصیص‌های سمت شغلی کارکنان"
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["employee", "position"],
+                condition=Q(status=PositionAssignmentStatus.ACTIVE),
+                name="unique_active_employee_position",
+            ),
+            models.UniqueConstraint(
+                fields=["employee"],
+                condition=Q(
+                    status=PositionAssignmentStatus.ACTIVE,
+                    is_primary=True,
+                ),
+                name="unique_active_primary_position",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(status=PositionAssignmentStatus.ACTIVE, end_date__isnull=True)
+                    | Q(status=PositionAssignmentStatus.ENDED, end_date__isnull=False)
+                ),
+                name="employee_position_status_dates",
+            ),
+            models.CheckConstraint(
+                condition=Q(end_date__isnull=True)
+                | Q(end_date__gte=models.F("start_date")),
+                name="employee_position_date_order",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "employee", "status"],
+                name="employee_pos_org_emp_idx",
+            ),
+            models.Index(
+                fields=["organization", "position", "status"],
+                name="employee_pos_org_role_idx",
+            ),
+        ]
+        ordering = ["-is_primary", "-start_date", "position__title"]  # noqa: RUF012
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            employee=self.employee if self.employee_id else None,
+            position=self.position if self.position_id else None,
+        )
+        if self.end_date and self.end_date < self.start_date:
+            raise ValidationError(
+                {"end_date": "تاریخ پایان نمی‌تواند پیش از تاریخ شروع باشد."}
+            )
+        if self.status == PositionAssignmentStatus.ACTIVE and self.end_date:
+            raise ValidationError(
+                {"end_date": "تخصیص فعال سمت نمی‌تواند تاریخ پایان داشته باشد."}
+            )
+        if self.status == PositionAssignmentStatus.ENDED and not self.end_date:
+            raise ValidationError(
+                {"end_date": "برای تخصیص پایان‌یافته، تاریخ پایان الزامی است."}
+            )
+        if self.status == PositionAssignmentStatus.ENDED and self.is_primary:
+            raise ValidationError(
+                {"is_primary": "تخصیص پایان‌یافته نمی‌تواند سمت اصلی باشد."}
+            )
+        if (
+            self.status == PositionAssignmentStatus.ACTIVE
+            and self.position_id
+            and self.position.is_single_holder
+            and EmployeePositionAssignment.objects.filter(
+                organization_id=self.organization_id,
+                position_id=self.position_id,
+                status=PositionAssignmentStatus.ACTIVE,
+            )
+            .exclude(pk=self.pk)
+            .exists()
+        ):
+            raise ValidationError(
+                {"position": "این سمت تک‌متصدی در حال حاضر متصدی فعال دارد."}
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.employee} · {self.position}"
+
+
 class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
     """An employee's tenant-safe assignment to a project and optional worksite."""
 
@@ -459,7 +629,7 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="employee_assignments",
     )
-    role_title = models.CharField("عنوان نقش در پروژه", max_length=255, blank=True)
+    role_title = models.CharField("مسئولیت در پروژه", max_length=255, blank=True)
     start_date = models.DateField("تاریخ شروع تخصیص")
     end_date = models.DateField("تاریخ پایان تخصیص", null=True, blank=True)
     status = models.CharField(
@@ -530,7 +700,7 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
             )
         if self.status != AssignmentStatus.ACTIVE and not self.end_date:
             raise ValidationError(
-                {"end_date": "برای تخصیص تکمیل‌شده یا لغوشده، تاریخ پایان الزامی است."}
+                {"end_date": "برای تخصیص پایان‌یافته یا لغوشده، تاریخ پایان الزامی است."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:

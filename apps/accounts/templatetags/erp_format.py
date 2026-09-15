@@ -2,6 +2,8 @@ from decimal import Decimal, InvalidOperation
 
 from django import template
 
+from core.jalali import format_jalali
+
 register = template.Library()
 STATUS_LABELS = {
     "draft": "پیش‌نویس",
@@ -70,5 +72,21 @@ def erp_number(value):
 
 
 @register.filter
+def rial(value):
+    formatted = erp_number(value)
+    return f"{formatted} ریال" if formatted not in (None, "") else formatted
+
+
+@register.filter
 def status_fa(value):
     return STATUS_LABELS.get(str(value), value)
+
+
+@register.filter
+def jalali_date(value):
+    return format_jalali(value)
+
+
+@register.filter
+def jalali_datetime(value):
+    return format_jalali(value, include_time=True)

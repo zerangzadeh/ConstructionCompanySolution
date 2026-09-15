@@ -1,0 +1,36 @@
+{% for node in nodes %}
+<li class="relative">
+    <article class="erp-surface rounded-xl p-4">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <h3 class="font-bold text-slate-900">{{ node.department.name }}</h3>
+                <p class="mt-1 text-[11px] text-slate-500" dir="ltr">{{ node.department.code }}</p>
+            </div>
+            <span class="rounded-md bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-700">{{ node.children|length }} زیرواحد</span>
+        </div>
+        {% if node.department.description %}<p class="mt-3 text-xs leading-6 text-slate-500">{{ node.department.description }}</p>{% endif %}
+
+        {% if node.positions or node.work_teams %}
+        <div class="mt-3 flex flex-wrap gap-2">
+            {% for position in node.positions %}<span class="rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] text-slate-600">سمت: {{ position.title }}</span>{% endfor %}
+            {% for team in node.work_teams %}<span class="rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] text-emerald-700">گروه: {{ team.name }}</span>{% endfor %}
+        </div>
+        {% endif %}
+
+        {% if node.employees %}
+        <div class="mt-4 border-t border-slate-100 pt-3">
+            <p class="text-[11px] font-semibold text-slate-500">کارکنان این واحد</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+                {% for employee in node.employees %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:border-blue-300 hover:text-blue-700" href="{% url 'workforce:employee_detail' employee.id %}"><span class="font-semibold">{{ employee.first_name }} {{ employee.last_name }}</span>{% if employee.position %}<span class="mr-1 text-slate-400">· {{ employee.position.title }}</span>{% endif %}</a>{% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </article>
+
+    {% if node.children %}
+    <ul class="mr-5 mt-3 space-y-3 border-r-2 border-slate-200 pr-5 sm:mr-8 sm:pr-8">
+        {% include "workforce/_department_tree.html" with nodes=node.children only %}
+    </ul>
+    {% endif %}
+</li>
+{% endfor %}

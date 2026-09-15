@@ -4,6 +4,12 @@
 
 This document defines the approved UI/UX standard for the Persian RTL ERP application.
 
+The interface is designed for the complete Construction ERP product, with a
+production-oriented standard rather than an MVP or temporary prototype. This is
+a product-quality target applied incrementally to implemented and future
+domains; it does not authorize UI work to invent backend capabilities that are
+absent from the roadmap or schema.
+
 It is the authoritative reference for all future UI work across:
 
 - operational ERP pages
@@ -34,6 +40,7 @@ UI/UX work may include:
 - responsive behavior
 - accessibility improvements
 - UI-only JavaScript
+- Jalali/Shamsi date presentation and date-picker behavior at the UI boundary
 - HTMX only where business semantics remain unchanged
 - Django Admin template/style overrides
 
@@ -855,19 +862,126 @@ Do NOT:
 - change tenant isolation
 - move domain logic into templates
 - duplicate financial logic in templates/JavaScript
-- implement Jalali conversion unless separately approved
+- store Jalali dates in the database
+- change model/database date field types for localization
+- change API or internal date semantics merely for Jalali presentation
+- bypass existing Django validation when converting user-entered Jalali dates
+
+Jalali conversion is explicitly approved only at the user-interface boundary.
 
 Presentation changes must remain presentation-only.
 
 ---
 
-## 32. Dates
+## 32. Dates and Jalali Calendar
 
-Do not change stored dates.
+The ERP is Persian-first, therefore all **user-facing dates** must use the Persian Jalali (Shamsi) calendar.
 
-Do not introduce Jalali calendar behavior unless explicitly approved as a separate task.
+### Display Rules
 
-Keep date presentation visually consistent with the Persian interface while preserving original values.
+Wherever a date is shown to a user, display it in Jalali format.
+
+This includes, where applicable:
+
+- page content
+- tables and list pages
+- detail pages
+- dashboards and KPI/supporting text
+- forms showing existing values
+- breadcrumbs or contextual metadata
+- search/filter summaries
+- date-range filters
+- reports
+- notifications/messages
+- Django Admin changelists and change forms
+- other user-visible date fields
+
+Use one consistent default format:
+
+`YYYY/MM/DD`
+
+Example:
+
+Stored/internal Gregorian date:
+
+`2026-09-14`
+
+User-facing Jalali display:
+
+`1405/06/23`
+
+### Date Input Rules
+
+Wherever a user creates, edits, filters, or selects a date:
+
+- provide a Persian Jalali date picker
+- the visible/selectable date must be Jalali
+- required/optional behavior must remain unchanged
+- existing min/max and business validation must remain unchanged
+- date-range controls must also use Jalali date selection
+- use the same date-picker pattern across the application
+
+Do not force users to manually enter Gregorian dates in Persian-facing forms.
+
+### Storage and Conversion Boundary
+
+Internal storage and backend processing must remain Gregorian/ISO-compatible.
+
+Rules:
+
+- do not change existing model field types
+- do not change database schema
+- do not migrate stored Gregorian dates to Jalali values
+- do not change existing API/internal date semantics
+- convert Gregorian → Jalali only for user-facing display
+- convert Jalali user input → Gregorian before existing Django validation/storage
+- existing saved Gregorian dates must continue to work without data migration
+- preserve existing form binding, validation, permissions, workflows, and tenant isolation
+
+The Jalali calendar is a **presentation/input concern**, not a new domain or storage model.
+
+### DateTime Rules
+
+For user-facing `DateTime` values:
+
+- display the date portion in Jalali
+- preserve the existing time semantics
+- do not change timezone behavior
+- do not alter stored timestamps
+- do not modify technical/API timestamps that are not user-facing
+
+### Direction and Digits
+
+Dates should integrate naturally with the Persian RTL interface.
+
+Use explicit direction/isolation where necessary so mixed RTL/LTR content does not become visually reordered.
+
+Do not change canonical technical values merely for appearance.
+
+### Implementation Rules
+
+Prefer one shared, reusable Jalali date formatting/input solution.
+
+Before adding a dependency:
+
+1. inspect the project for an existing Jalali/date-picker library or helper
+2. reuse it if suitable
+3. do not introduce duplicate date libraries
+4. do not introduce a new frontend framework only for date selection
+
+Any added UI dependency must remain compatible with the existing Django Templates + Tailwind architecture.
+
+### Django Admin
+
+Apply the same Jalali rules to Django Admin where safely possible:
+
+- displayed dates should be Jalali
+- editable date fields should use the approved Jalali picker
+- native Admin permissions, validation, widgets, save behavior, and workflows must remain intact
+
+### Safety Rule
+
+If Jalali UI conversion cannot be implemented for a specific field without changing business logic, model semantics, database schema, API contracts, or permissions, preserve the existing backend behavior and document the blocker rather than altering the domain layer.
 
 ---
 
@@ -904,6 +1018,10 @@ Also:
 - confirm no unintended backend/domain changes
 - manually verify affected pages
 - verify RTL/LTR behavior
+- verify Jalali display for user-facing dates
+- verify Jalali date pickers for editable/filter date fields
+- verify Jalali input converts safely back to existing Gregorian storage behavior
+- verify existing Gregorian records render correctly without data migration
 - verify desktop/mobile behavior
 - verify no corrupted Persian literals remain
 
@@ -942,6 +1060,10 @@ In the same session, do not repeat the entire UI specification. Keep prompts tas
 **Technical values stay canonical and LTR.**
 
 **Database values remain unchanged.**
+
+**User-facing dates are Jalali; stored/internal dates remain Gregorian/ISO-compatible.**
+
+**All user date entry/filter controls use the approved Jalali date picker.**
 
 **Admin keeps native behavior while matching the ERP design language.**
 

@@ -13,7 +13,7 @@
         {% for field in profile_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
       </section>
       <section class="space-y-5 border-t border-slate-100 pt-6">
-        <div><h2 class="font-bold text-slate-900">تنظیمات شرکت</h2><p class="mt-1 text-xs text-slate-500">زبان، منطقه زمانی، سال مالی و پیشوند کدها</p></div>
+        <div><h2 class="font-bold text-slate-900">تنظیمات شرکت</h2><p class="mt-1 text-xs text-slate-500">زبان، منطقه زمانی، سال مالی و پیشوند کدهای پروژه، قرارداد، کارگاه و اسناد</p></div>
         {% include "components/form_errors.html" with form=settings_form only %}
         {% for field in settings_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
       </section>

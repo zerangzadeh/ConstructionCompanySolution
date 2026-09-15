@@ -30,6 +30,7 @@ from apps.projects.services import (
     get_organization_project_phases,
     get_organization_project_sites,
     get_organization_projects,
+    get_organization_sites,
     get_organization_wbs_nodes,
     transition_activity_status,
     transition_project_phase_status,
@@ -249,6 +250,52 @@ class ProjectServiceTests(TestCase):
             reverse("projects:detail", kwargs={"project_id": project.pk}),
         )
         self.assertContains(response, "پروژه جدید")
+        self.assertContains(response, reverse("projects:all_site_list"))
+
+    def test_all_site_list_is_tenant_scoped(self) -> None:
+        project = self.organization.projects.create(
+            code="P-SITES",
+            name="Visible project",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        visible_site = self.organization.project_sites.create(
+            project=project,
+            code="SITE-VISIBLE",
+            name="Visible worksite",
+            created_by=self.owner,
+            updated_by=self.owner,
+        )
+        other_project = self.other_organization.projects.create(
+            code="P-SITES",
+            name="Hidden project",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.other_organization.project_sites.create(
+            project=other_project,
+            code="SITE-HIDDEN",
+            name="Hidden worksite",
+            created_by=self.other_user,
+            updated_by=self.other_user,
+        )
+        self.client.force_login(self.owner)
+        session = self.client.session
+        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.get(reverse("projects:all_site_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Visible worksite")
+        self.assertNotContains(response, "Hidden worksite")
+        self.assertContains(
+            response,
+            reverse(
+                "projects:site_list",
+                kwargs={"project_id": visible_site.project_id},
+            ),
+        )
 
     def test_project_detail_is_tenant_scoped(self) -> None:
         project = self.organization.projects.create(
@@ -384,6 +431,15 @@ class ProjectServiceTests(TestCase):
                     user=self.owner,
                     organization=self.organization,
                     project_id=str(project.pk),
+                )
+            ),
+            [site],
+        )
+        self.assertEqual(
+            list(
+                get_organization_sites(
+                    user=self.owner,
+                    organization=self.organization,
                 )
             ),
             [site],

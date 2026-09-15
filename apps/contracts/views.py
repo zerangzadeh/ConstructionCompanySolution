@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from apps.contracts.forms import ContractForm
 from apps.contracts.services import (
@@ -63,3 +63,18 @@ def contract_create(request: HttpRequest) -> HttpResponse:
         else:
             return redirect("contracts:list")
     return render(request, "contracts/create.html", {"form": form})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.CONTRACTS_VIEW)
+def contract_detail(request: HttpRequest, contract_id: str) -> HttpResponse:
+    """Render one contract from the active organization only."""
+
+    contract = get_object_or_404(
+        get_organization_contracts(
+            user=request.user,
+            organization=request.organization,
+        ).prefetch_related("items__unit_of_measure", "amendments"),
+        pk=contract_id,
+    )
+    return render(request, "contracts/detail.html", {"contract": contract})

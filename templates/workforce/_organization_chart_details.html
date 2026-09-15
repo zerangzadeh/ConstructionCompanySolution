@@ -1,0 +1,70 @@
+{% for node in nodes %}
+<section id="department-details-{{ node.department.id }}" class="org-chart-details__panel" data-details-panel data-department-id="{{ node.department.id }}" hidden>
+    <div class="org-chart-details__title">
+        <span class="org-chart-card__icon org-chart-card__icon--{{ node.theme }}" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+        </span>
+        <div><h3>{{ node.department.name }}</h3><p dir="ltr">{{ node.department.code }}</p></div>
+    </div>
+
+    <dl class="org-chart-details__facts">
+        <div><dt>واحد بالادست</dt><dd>{{ node.department.parent.name|default:"سطح نخست سازمان" }}</dd></div>
+        <div><dt>وضعیت</dt><dd>{{ node.department.is_active|yesno:"فعال,غیرفعال" }}</dd></div>
+        <div><dt>کارکنان مستقیم</dt><dd>{{ node.direct_employee_count }} نفر</dd></div>
+        <div><dt>کل کارکنان مجموعه</dt><dd>{{ node.subtree_employee_count }} نفر</dd></div>
+    </dl>
+
+    <div class="org-chart-details__section">
+        <h4>شرح واحد</h4>
+        <p>{{ node.department.description|default:"برای این واحد شرحی ثبت نشده است." }}</p>
+    </div>
+
+    <div class="org-chart-details__section">
+        <h4>سمت‌های این واحد</h4>
+        {% if node.positions %}<div class="org-chart-details__tags">{% for position in node.positions %}<span>{{ position.title }}</span>{% endfor %}</div>{% else %}<p>سمتی برای این واحد تعریف نشده است.</p>{% endif %}
+    </div>
+
+    <div class="org-chart-details__section">
+        <h4>متصدیان سمت‌های فعال این واحد</h4>
+        {% if node.position_holders %}
+        <div class="org-chart-details__people">
+            {% for holder in node.position_holders %}
+            <a href="{% url 'workforce:employee_detail' holder.employee.id %}">
+                <span class="org-chart-avatar">
+                    {% if holder.employee.profile_image or holder.employee.user.profile_image %}
+                    <img src="{% url 'workforce:employee_profile_image' holder.employee.id %}" alt="عکس {{ holder.employee.first_name }} {{ holder.employee.last_name }}">
+                    {% else %}
+                    {{ holder.employee.first_name|first }}{{ holder.employee.last_name|first }}
+                    {% endif %}
+                </span>
+                <span><strong>{{ holder.employee.first_name }} {{ holder.employee.last_name }}</strong><small>{% for position in holder.positions %}{{ position.title }}{% if not forloop.last %}، {% endif %}{% endfor %}</small></span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}<p>متصدی فعالی برای سمت‌های این واحد ثبت نشده است.</p>{% endif %}
+    </div>
+
+    {% if node.employees_without_unit_position %}
+    <div class="org-chart-details__section">
+        <h4>کارکنان بدون سمت فعال در این واحد</h4>
+        <div class="org-chart-details__people">
+            {% for employee in node.employees_without_unit_position %}
+            <a href="{% url 'workforce:employee_detail' employee.id %}">
+                <span class="org-chart-avatar">
+                    {% if employee.profile_image or employee.user.profile_image %}
+                    <img src="{% url 'workforce:employee_profile_image' employee.id %}" alt="عکس {{ employee.first_name }} {{ employee.last_name }}">
+                    {% else %}
+                    {{ employee.first_name|first }}{{ employee.last_name|first }}
+                    {% endif %}
+                </span>
+                <span><strong>{{ employee.first_name }} {{ employee.last_name }}</strong><small>بدون سمت فعال در این واحد</small></span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m14 7-5 5 5 5"/></svg>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</section>
+{% if node.children %}{% include "workforce/_organization_chart_details.html" with nodes=node.children only %}{% endif %}
+{% endfor %}

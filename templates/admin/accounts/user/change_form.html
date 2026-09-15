@@ -56,15 +56,15 @@
           </div>
           <div>
             <dt>تاریخ ایجاد حساب</dt>
-            <dd class="tabular-nums">{{ detail_user.created_at|date:"DATETIME_FORMAT" }}</dd>
+            <dd class="tabular-nums" dir="ltr">{{ detail_user.created_at|jalali_datetime }}</dd>
           </div>
           <div>
             <dt>آخرین ورود</dt>
-            <dd class="tabular-nums">{% if detail_user.last_login %}{{ detail_user.last_login|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">تاکنون وارد نشده است</span>{% endif %}</dd>
+            <dd class="tabular-nums" dir="ltr">{% if detail_user.last_login %}{{ detail_user.last_login|jalali_datetime }}{% else %}<span class="erp-empty-value">تاکنون وارد نشده است</span>{% endif %}</dd>
           </div>
           <div>
             <dt>آخرین تغییر نقش یا مجوز</dt>
-            <dd class="tabular-nums">{% if last_access_change %}{{ last_access_change.created_at|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">اطلاعات قابل اتکایی ثبت نشده است</span>{% endif %}</dd>
+            <dd class="tabular-nums" dir="ltr">{% if last_access_change %}{{ last_access_change.created_at|jalali_datetime }}{% else %}<span class="erp-empty-value">اطلاعات قابل اتکایی ثبت نشده است</span>{% endif %}</dd>
           </div>
         </dl>
       </section>
@@ -99,7 +99,7 @@
                     </td>
                     <td>{{ row.role_label }}</td>
                     <td><span class="erp-status-badge erp-status-badge--{{ row.status_class }}">{{ row.status_label }}</span></td>
-                    <td class="tabular-nums">{% if row.membership.joined_at %}{{ row.membership.joined_at|date:"DATETIME_FORMAT" }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</td>
+                    <td class="tabular-nums" dir="ltr">{% if row.membership.joined_at %}{{ row.membership.joined_at|jalali_datetime }}{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</td>
                     <td>{% if row.membership.assigned_by %}<span class="erp-technical">{{ row.membership.assigned_by.username }}</span>{% else %}<span class="erp-empty-value">ثبت نشده</span>{% endif %}</td>
                     {% if can_manage_memberships %}<td><a href="{% url 'admin:organizations_organizationmembership_change' row.membership.pk %}">تعیین نقش یا وضعیت</a></td>{% endif %}
                   </tr>
@@ -159,7 +159,7 @@
               <tbody>
                 {% for event in audit_events %}
                   <tr>
-                    <td class="tabular-nums">{{ event.created_at|date:"DATETIME_FORMAT" }}</td>
+                    <td class="tabular-nums" dir="ltr">{{ event.created_at|jalali_datetime }}</td>
                     <td><strong>{{ event.get_action_display }}</strong></td>
                     <td>{% if event.organization %}{{ event.organization.name }}{% else %}<span class="erp-empty-value">سطح سامانه</span>{% endif %}</td>
                     <td>{% if event.actor %}<span class="erp-technical">{{ event.actor.username }}</span>{% else %}<span class="erp-empty-value">عامل سیستمی</span>{% endif %}</td>

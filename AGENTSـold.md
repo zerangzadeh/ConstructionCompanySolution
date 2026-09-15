@@ -1,5 +1,10 @@
 # Construction ERP — Agent Instructions
 
+> **Archived reference:** This file is retained only as historical context and
+> is not an active instruction or product-status source. Construction ERP is now
+> a complete-product initiative, not an MVP. Use `AGENTS.md`, `ROADMAP.md`, and
+> `docs/architecture/DOMAIN_AND_DATA_MODEL.md` for current scope and status.
+
 ## 1. Product and Scope
 
 This repository contains a multi-tenant SaaS platform for construction contractor
@@ -142,9 +147,8 @@ requests, or remote changes unless explicitly requested.
 
 > Last Updated: 2026-09-03
 >
-> Status: Active Development — the multi-tenant MVP foundation, daily reporting,
-> payments, documents, and core financial workflows are implemented. Production
-> deployment verification and several planned product domains remain in progress.
+> Historical status: This 2026-09-03 snapshot predates the full-product decision
+> and later domain implementations. It must not be used as current status.
 
 ### 11.1 Completed Project Foundation
 

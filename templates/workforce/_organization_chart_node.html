@@ -1,0 +1,53 @@
+{% for node in nodes %}
+<li class="org-chart__node" data-chart-branch data-chart-node data-department-id="{{ node.department.id }}" data-active="{{ node.department.is_active|yesno:'true,false' }}">
+    <article class="org-chart-card org-chart-card--{{ node.theme }}" data-chart-card tabindex="0" role="button" aria-controls="department-details-{{ node.department.id }}" aria-label="نمایش جزئیات {{ node.department.name }}">
+        <div class="org-chart-card__heading">
+            <span class="org-chart-card__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 21h16M6 21V8h12v13M9 12h2m2 0h2m-6 4h2m2 0h2M9 8V4h6v4"/></svg>
+            </span>
+            <div class="min-w-0 text-right">
+                <h3>{{ node.department.name }}</h3>
+                <p dir="ltr">{{ node.department.code }}</p>
+            </div>
+        </div>
+
+        {% if node.position_holders %}
+        <div class="org-chart-card__holders">
+            {% for holder in node.position_holders|slice:":2" %}
+            <div class="org-chart-card__person">
+                <span class="org-chart-avatar">
+                    {% if holder.employee.profile_image or holder.employee.user.profile_image %}
+                    <img src="{% url 'workforce:employee_profile_image' holder.employee.id %}" alt="عکس {{ holder.employee.first_name }} {{ holder.employee.last_name }}">
+                    {% else %}
+                    {{ holder.employee.first_name|first }}{{ holder.employee.last_name|first }}
+                    {% endif %}
+                </span>
+                <span class="min-w-0 text-right">
+                    <strong>{{ holder.employee.first_name }} {{ holder.employee.last_name }}</strong>
+                    <small>{% for position in holder.positions %}{{ position.title }}{% if not forloop.last %}، {% endif %}{% endfor %}</small>
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+        {% if node.position_holders|length > 2 %}<p class="org-chart-card__more">+{{ node.position_holders|length|add:"-2" }} متصدی دیگر</p>{% endif %}
+        {% else %}
+        <div class="org-chart-card__empty">سمت فعالی در این واحد تخصیص نیافته است</div>
+        {% endif %}
+
+        <div class="org-chart-card__footer">
+            <span>{{ node.subtree_employee_count }} نفر در مجموعه</span>
+            {% if node.children %}
+            <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن زیرواحدهای {{ node.department.name }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m7 14 5-5 5 5"/></svg>
+            </button>
+            {% else %}
+            <span class="org-chart-card__leaf">{{ node.direct_employee_count }} نفر مستقیم</span>
+            {% endif %}
+        </div>
+    </article>
+
+    {% if node.children %}
+    <ul>{% include "workforce/_organization_chart_node.html" with nodes=node.children only %}</ul>
+    {% endif %}
+</li>
+{% endfor %}

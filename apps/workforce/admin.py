@@ -4,6 +4,7 @@ from django.http import HttpRequest
 from apps.workforce.models import (
     Department,
     Employee,
+    EmployeePositionAssignment,
     EmployeeProjectAssignment,
     Position,
     WorkTeam,
@@ -37,8 +38,15 @@ class DepartmentAdmin(ReadOnlyWorkforceAdmin):
 
 @admin.register(Position)
 class PositionAdmin(ReadOnlyWorkforceAdmin):
-    list_display = ("code", "title", "department", "organization", "is_active")
-    list_filter = ("organization", "department", "is_active")
+    list_display = (
+        "code",
+        "title",
+        "department",
+        "is_single_holder",
+        "organization",
+        "is_active",
+    )
+    list_filter = ("organization", "department", "is_single_holder", "is_active")
     search_fields = ("code", "title", "organization__name")
     list_select_related = ("department", "organization")
 
@@ -72,6 +80,28 @@ class EmployeeAdmin(ReadOnlyWorkforceAdmin):
         "work_team",
         "organization",
     )
+
+
+@admin.register(EmployeePositionAssignment)
+class EmployeePositionAssignmentAdmin(ReadOnlyWorkforceAdmin):
+    list_display = (
+        "employee",
+        "position",
+        "start_date",
+        "end_date",
+        "status",
+        "is_primary",
+        "organization",
+    )
+    list_filter = ("organization", "position", "status", "is_primary")
+    search_fields = (
+        "employee__employee_number",
+        "employee__first_name",
+        "employee__last_name",
+        "position__code",
+        "position__title",
+    )
+    list_select_related = ("employee", "position", "organization")
 
 
 @admin.register(EmployeeProjectAssignment)

@@ -1,0 +1,54 @@
+.erp-money-wrap {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    direction: rtl;
+}
+
+.erp-money-wrap > .erp-money-input {
+    min-width: 0;
+    flex: 1 1 auto;
+    border-radius: 0 .625rem .625rem 0 !important;
+    direction: ltr !important;
+    text-align: left !important;
+    font-variant-numeric: tabular-nums;
+}
+
+.erp-money-unit {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #cbd5e1;
+    border-right: 0;
+    border-radius: .625rem 0 0 .625rem;
+    background: #f8fafc;
+    padding-inline: .75rem;
+    color: #475569;
+    direction: rtl;
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.erp-money-wrap:focus-within .erp-money-unit {
+    border-color: #2563eb;
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.erp-money-display {
+    direction: ltr;
+    unicode-bidi: isolate;
+    font-variant-numeric: tabular-nums;
+}
+
+input[type="number"].erp-money-input::-webkit-inner-spin-button,
+input[type="number"].erp-money-input::-webkit-outer-spin-button {
+    margin: 0;
+    appearance: none;
+}
+
+input[type="number"].erp-money-input {
+    appearance: textfield;
+}

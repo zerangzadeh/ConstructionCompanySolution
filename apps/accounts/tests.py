@@ -358,3 +358,29 @@ class LoginPageSettingsTests(TestCase):
 
         self.assertEqual(settings.pk, 1)
         self.assertEqual(LoginPageSettings.objects.count(), 1)
+
+
+class RequiredPasswordChangeTests(TestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="temporary-password-user",
+            password="Temporary-password-2026",
+            must_change_password=True,
+        )
+
+    def test_user_is_confined_until_personal_password_is_set(self) -> None:
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("accounts:settings"))
+        self.assertRedirects(response, reverse("accounts:required_password_change"))
+
+        response = self.client.post(
+            reverse("accounts:required_password_change"),
+            {
+                "new_password1": "Personal-password-2026",
+                "new_password2": "Personal-password-2026",
+            },
+        )
+        self.assertRedirects(response, reverse("organizations:select"))
+        self.user.refresh_from_db()
+        self.assertFalse(self.user.must_change_password)
+        self.assertTrue(self.user.check_password("Personal-password-2026"))

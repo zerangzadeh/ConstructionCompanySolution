@@ -17,7 +17,7 @@
             <div class="divide-y divide-slate-100">
                 {% for event in events %}
                     <div class="grid gap-2 px-6 py-4 sm:grid-cols-[12rem_1fr_auto] sm:items-center">
-                        <div class="text-sm text-slate-500">{{ event.created_at|date:"Y-m-d H:i" }}</div>
+                        <div class="text-sm text-slate-500" dir="ltr">{{ event.created_at|jalali_datetime }}</div>
                         <div>
                             <p class="font-medium text-slate-900">{{ event.get_action_display }}</p>
                             <p class="text-sm text-slate-500">
