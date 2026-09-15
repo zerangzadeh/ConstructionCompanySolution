@@ -1476,6 +1476,98 @@ def cancel_workflow_instance(
 
 
 @transaction.atomic
+def cancel_workflow_for_domain(
+    *,
+    actor: User,
+    organization: Organization,
+    instance_id: object,
+    command_key: str,
+    reason: str,
+    idempotency_key: str,
+    command_context: dict[str, Any] | None = None,
+) -> WorkflowInstance:
+    """Cancel a subject through its registered domain service, then close runtime."""
+
+    actor_membership = _require_membership(actor=actor, organization=organization)
+    if not reason.strip():
+        raise ValidationError("دلیل لغو الزامی است.")
+    snapshot, instance, step = _lock_instance_runtime(
+        actor=actor, organization=organization, instance_id=instance_id
+    )
+    actor_membership = _require_membership(actor=actor, organization=organization)
+    action = f"domain_cancel:{command_key}"
+    if _operation_already_processed(
+        instance=instance, idempotency_key=idempotency_key, action=action
+    ):
+        return instance
+    if instance.status not in (
+        WorkflowInstanceStatus.ACTIVE,
+        WorkflowInstanceStatus.SUSPENDED,
+    ):
+        raise WorkflowConflict("اجرای نهایی‌شده قابل لغو نیست.")
+    command = registry.domain_commands.get(command_key)
+    if (
+        command is None
+        or command.executor is None
+        or command.workflow_type != instance.definition.workflow_type.code
+    ):
+        raise ValidationError("فرمان لغو دامنه برای این گردش‌کار ثبت نشده است.")
+    subject_state = str(snapshot.attributes.get("status", ""))
+    if command.from_states and subject_state not in command.from_states:
+        raise WorkflowConflict("وضعیت موضوع با فرمان لغو سازگار نیست.")
+    command.executor(
+        subject=snapshot.subject,
+        actor=actor,
+        organization=organization,
+        outcome="cancelled",
+        context={"reason": reason.strip(), **(command_context or {})},
+        idempotency_key=idempotency_key,
+    )
+    previous_state = instance.status
+    if step:
+        _cancel_open_items(
+            step=step,
+            actor=actor,
+            actor_membership=actor_membership,
+            reason=reason.strip(),
+        )
+        now = timezone.now()
+        _raw_update(
+            WorkflowStepInstance.objects.filter(pk=step.pk),
+            status=WorkflowStepInstanceStatus.CANCELLED,
+            cancelled_at=now,
+            updated_at=now,
+        )
+    now = timezone.now()
+    _raw_update(
+        WorkflowInstance.objects.filter(pk=instance.pk),
+        status=WorkflowInstanceStatus.CANCELLED,
+        cancelled_at=now,
+        cancellation_reason=reason.strip(),
+        processed_operations=_processed_operations(
+            instance=instance, idempotency_key=idempotency_key, action=action
+        ),
+        updated_at=now,
+    )
+    _audit(
+        action=AuditAction.WORKFLOW_INSTANCE_CANCELLED,
+        entity_type="workflows.WorkflowInstance",
+        entity_id=instance.pk,
+        organization=organization,
+        actor=actor,
+        actor_membership=actor_membership,
+        metadata={
+            "previous_state": previous_state,
+            "new_state": "cancelled",
+            "reason": reason.strip(),
+            "domain_command": command_key,
+        },
+    )
+    instance.refresh_from_db()
+    return instance
+
+
+@transaction.atomic
 def migrate_workflow_instance(
     *,
     actor: User,

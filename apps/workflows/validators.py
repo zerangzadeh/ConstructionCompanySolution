@@ -175,6 +175,19 @@ def _has_invalid_cycle(adjacency: dict[str, set[str]]) -> bool:
 
 def _routing_target_issue(rule: Any) -> ValidationIssue | None:
     configuration = rule.configuration
+    if rule.resolver_type == "business_permission":
+        permission = configuration.get("permission")
+        if permission not in set(
+            BusinessPermission.objects.filter(is_active=True).values_list(
+                "code", flat=True
+            )
+        ):
+            return ValidationIssue(
+                "routing_permission_missing",
+                "مجوز مسیریابی وجود ندارد یا غیرفعال است.",
+                f"routing.{rule.pk}",
+            )
+        return None
     lookup: tuple[str, str, str] | None = None
     if rule.resolver_type == "explicit_membership":
         lookup = ("organizations", "OrganizationMembership", "membership_id")
@@ -421,6 +434,15 @@ def validate_workflow_version(version: Any) -> list[ValidationIssue]:
                     ValidationIssue(
                         "subject_attribute_unregistered",
                         f"ویژگی {attribute} ثبت نشده است.",
+                    )
+                )
+            if condition.condition_type == "amount_threshold" and (
+                adapter is None or "amount" not in adapter.exposed_attributes
+            ):
+                issues.append(
+                    ValidationIssue(
+                        "subject_amount_unavailable",
+                        "موضوع مبلغ canonical برای شرط مبلغ ندارد.",
                     )
                 )
 

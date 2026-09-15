@@ -269,7 +269,7 @@ def add_purchase_request_item(
 
 
 @transaction.atomic
-def submit_purchase_request(
+def _submit_purchase_request_domain(
     *, organization: Organization, actor: User, purchase_request: PurchaseRequest
 ) -> PurchaseRequest:
     membership = _require_role(
@@ -306,7 +306,7 @@ def submit_purchase_request(
 
 
 @transaction.atomic
-def decide_purchase_request(
+def _decide_purchase_request_domain(
     *,
     organization: Organization,
     actor: User,
@@ -375,11 +375,13 @@ def approve_purchase_request(
     purchase_request: PurchaseRequest,
     reason: str = "",
 ) -> PurchaseRequest:
-    return decide_purchase_request(
+    from .workflow import decide_purchase_request_with_workflow
+
+    return decide_purchase_request_with_workflow(
         organization=organization,
         actor=actor,
         purchase_request=purchase_request,
-        approve=True,
+        outcome="approved",
         reason=reason,
     )
 
@@ -391,17 +393,19 @@ def reject_purchase_request(
     purchase_request: PurchaseRequest,
     reason: str = "",
 ) -> PurchaseRequest:
-    return decide_purchase_request(
+    from .workflow import decide_purchase_request_with_workflow
+
+    return decide_purchase_request_with_workflow(
         organization=organization,
         actor=actor,
         purchase_request=purchase_request,
-        approve=False,
+        outcome="rejected",
         reason=reason,
     )
 
 
 @transaction.atomic
-def cancel_purchase_request(
+def _cancel_purchase_request_domain(
     *,
     organization: Organization,
     actor: User,
@@ -445,6 +449,54 @@ def cancel_purchase_request(
         metadata={"previous_status": previous_status, "reason": reason.strip()},
     )
     return request
+
+
+def submit_purchase_request(
+    *, organization: Organization, actor: User, purchase_request: PurchaseRequest
+) -> PurchaseRequest:
+    from .workflow import submit_purchase_request_with_workflow
+
+    return submit_purchase_request_with_workflow(
+        organization=organization,
+        actor=actor,
+        purchase_request=purchase_request,
+    )
+
+
+def decide_purchase_request(
+    *,
+    organization: Organization,
+    actor: User,
+    purchase_request: PurchaseRequest,
+    approve: bool,
+    reason: str = "",
+) -> PurchaseRequest:
+    from .workflow import decide_purchase_request_with_workflow
+
+    return decide_purchase_request_with_workflow(
+        organization=organization,
+        actor=actor,
+        purchase_request=purchase_request,
+        outcome="approved" if approve else "rejected",
+        reason=reason,
+    )
+
+
+def cancel_purchase_request(
+    *,
+    organization: Organization,
+    actor: User,
+    purchase_request: PurchaseRequest,
+    reason: str,
+) -> PurchaseRequest:
+    from .workflow import cancel_purchase_request_with_workflow
+
+    return cancel_purchase_request_with_workflow(
+        organization=organization,
+        actor=actor,
+        purchase_request=purchase_request,
+        reason=reason,
+    )
 
 
 def get_organization_purchase_requests(

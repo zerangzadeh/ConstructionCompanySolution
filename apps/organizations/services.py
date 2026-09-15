@@ -678,6 +678,16 @@ def create_organization_with_owner(
         actor=owner,
         metadata={"name": organization.name},
     )
+    from apps.procurement.workflow import (
+        ensure_purchase_request_compatibility_workflow,
+    )
+
+    transaction.on_commit(
+        lambda: ensure_purchase_request_compatibility_workflow(
+            organization=organization,
+            actor=owner,
+        )
+    )
     return organization
 
 

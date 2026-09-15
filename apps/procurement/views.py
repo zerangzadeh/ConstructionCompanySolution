@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
@@ -225,7 +225,7 @@ def purchase_request_submit(request: HttpRequest, request_id: str) -> HttpRespon
             purchase_request=record,
         )
         messages.success(request, "درخواست خرید ارسال شد.")
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("procurement:request_detail", request_id=request_id)
 
@@ -249,7 +249,7 @@ def _request_decision(
             messages.success(
                 request, "درخواست خرید تأیید شد." if approve else "درخواست خرید رد شد."
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             messages.error(request, str(exc))
     else:
         messages.error(request, "دلیل را وارد کنید.")
@@ -287,7 +287,7 @@ def purchase_request_cancel(request: HttpRequest, request_id: str) -> HttpRespon
                 **form.cleaned_data,
             )
             messages.success(request, "درخواست خرید لغو شد.")
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, ValueError) as exc:
             messages.error(request, str(exc))
     else:
         messages.error(request, "دلیل لغو را وارد کنید.")

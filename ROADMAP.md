@@ -97,9 +97,11 @@ permissions, tenant isolation, workflows, or financial logic.
   then the centralized workbench and incremental migration of daily reports,
   safety, quality, estimates, contract amendments, and other approved actionable
   lifecycles.
-- **Delivery progress:** W1 architecture/schema foundation and W2 runtime,
-  routing, delegation, and persistent work items are implemented. W3 Procurement
-  pilot migration is the next F5 work package and remains an explicit switch.
+- **Delivery progress:** W1 architecture/schema foundation, W2 runtime/routing,
+  and W3 PurchaseRequest pilot migration are implemented. W3 preserves the
+  legacy single-decision policy by default while allowing published tenant
+  policies to consume W2 routing and separation controls. W4 centralized
+  workbench is the next F5 work package; F5 remains in progress.
 - **Boundary:** Domain models and application services remain authoritative for
   lifecycle and financial/operational invariants. Tenant configuration is
   declarative and limited to platform-registered commands, conditions, and

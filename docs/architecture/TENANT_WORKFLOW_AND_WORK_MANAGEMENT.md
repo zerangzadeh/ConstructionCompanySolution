@@ -427,7 +427,8 @@ the workbench or workflow state and may be delivered in a later production phase
 - run shadow comparisons between legacy eligibility and workflow routing;
 - switch request submit/approve/reject/cancel through the new coordinator while
   preserving procurement services as domain authority;
-- add optional multi-stage, amount, position, delegation, and separation rules;
+- add optional multi-stage, position, delegation, and separation rules; enable
+  amount routing only after Procurement owns a canonical request amount;
 - preserve all existing finalized request/order/receipt history.
 
 ### W4 — Centralized workbench
@@ -569,3 +570,26 @@ second approval or assignment mechanism.
   command completion are idempotent. PostgreSQL guards tenant links, finalized
   state, candidate evidence, delegation evidence, and append-only assignment
   history independently of ORM validation.
+
+## 20. W3 implementation decisions (ADR-007)
+
+- `procurement.purchase_request_approval` binds a tenant-scoped subject adapter
+  and registered submit, approve, reject, and cancel commands. Those commands
+  call Procurement application services; workflow runtime never writes
+  `PurchaseRequest.status` directly.
+- Every tenant receives a published default compatibility definition. Its
+  permission-based candidate pool preserves the former single-decision and
+  self-approval behavior, with owner fallback for a small tenant. More-specific
+  published project policies may use W2 position, role, owner, delegation,
+  multi-stage, fallback, and separation controls.
+- Submit changes the domain state and creates the instance, active step, and
+  work item in one transaction. Decisions require active membership, the
+  transition's Procurement permission, active candidacy/assignment, and an
+  active work item. Cancellation retains and closes runtime history.
+- The W3 migration and management service backfill only open `submitted`
+  requests and are idempotent. Finalized requests are not rewritten. The shadow
+  comparison reports membership-set differences without mutating either model.
+- The adapter exposes only canonical request fields used by W3 (`project_id`,
+  `status`, and creator identity). An amount threshold is not activated because
+  `PurchaseRequest` has no canonical monetary amount; no estimate is derived
+  from quantity or downstream order prices.

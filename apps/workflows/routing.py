@@ -74,6 +74,15 @@ def _resolve_rule(
             ResolvedCandidate(item, [basis])
             for item in memberships.filter(role_definition__is_owner=True)
         ]
+    if rule.resolver_type == "business_permission":
+        permission = configuration["permission"]
+        return [
+            ResolvedCandidate(item, [basis])
+            for item in memberships.filter(
+                role_definition__permissions__code=permission,
+                role_definition__permissions__is_active=True,
+            ).distinct()
+        ]
     if rule.resolver_type == "explicit_membership":
         item = memberships.filter(pk=configuration["membership_id"]).first()
         return [ResolvedCandidate(item, [basis])] if item else []

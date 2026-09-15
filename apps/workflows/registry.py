@@ -180,9 +180,8 @@ registry.register_subject_adapter(
     SubjectAdapterSpec(
         key="procurement.purchase_request",
         subject_type="procurement.purchase_request",
-        exposed_attributes=frozenset(
-            {"amount", "project_id", "status", "created_by_id"}
-        ),
+        exposed_attributes=frozenset({"project_id", "status", "created_by_id"}),
+        start_permission="purchase_requests.submit",
     )
 )
 registry.register_workflow_type(
@@ -190,24 +189,40 @@ registry.register_workflow_type(
         code="procurement.purchase_request_approval",
         subject_type="procurement.purchase_request",
         subject_adapter="procurement.purchase_request",
-        allowed_scope_fields=frozenset({"project_id", "amount_band", "classification"}),
+        allowed_scope_fields=frozenset({"project_id"}),
         domain_commands=frozenset(
             {
+                "procurement.purchase_request.submit",
                 "procurement.purchase_request.approve",
                 "procurement.purchase_request.reject",
+                "procurement.purchase_request.cancel",
             }
         ),
     )
 )
-for command_key, to_state in (
-    ("procurement.purchase_request.approve", "approved"),
-    ("procurement.purchase_request.reject", "rejected"),
+for command_key, from_states, to_state in (
+    ("procurement.purchase_request.submit", frozenset({"draft"}), "submitted"),
+    (
+        "procurement.purchase_request.approve",
+        frozenset({"submitted"}),
+        "approved",
+    ),
+    (
+        "procurement.purchase_request.reject",
+        frozenset({"submitted"}),
+        "rejected",
+    ),
+    (
+        "procurement.purchase_request.cancel",
+        frozenset({"draft", "submitted"}),
+        "cancelled",
+    ),
 ):
     registry.register_domain_command(
         DomainCommandSpec(
             key=command_key,
             workflow_type="procurement.purchase_request_approval",
-            from_states=frozenset({"submitted"}),
+            from_states=from_states,
             to_state=to_state,
         )
     )
@@ -266,6 +281,13 @@ registry.register_condition_type(
 
 registry.register_routing_resolver(
     RoutingResolverSpec(key="organization_owner", schema=ConfigSchema())
+)
+registry.register_routing_resolver(
+    RoutingResolverSpec(
+        key="business_permission",
+        schema=ConfigSchema(fields={"permission": ConfigField(str, required=True)}),
+        requires_fallback=True,
+    )
 )
 registry.register_routing_resolver(
     RoutingResolverSpec(

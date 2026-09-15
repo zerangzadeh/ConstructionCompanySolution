@@ -245,21 +245,11 @@ class WorkflowFoundationTests(TestCase):
                 version_number=2,
             )
 
-    def test_graph_validation_reports_unreachable_cycle_and_scope_ambiguity(
-        self,
-    ) -> None:
+    def test_graph_validation_reports_unreachable_cycle(self) -> None:
         first = self.create_draft(code="project-route", scope={"project_id": "p-1"})
         publish_workflow_version(
             actor=self.owner, organization=self.organization, version_id=first.pk
         )
-        second = self.create_draft(
-            code="class-route", scope={"classification": "urgent"}
-        )
-        report = validate_workflow_draft(
-            actor=self.owner, organization=self.organization, version_id=second.pk
-        )
-        self.assertIn("scope_ambiguity", {item["code"] for item in report})
-
         broken = self.create_draft(code="broken", scope={"project_id": "p-2"})
         orphan = WorkflowStepDefinition.objects.create(
             organization=self.organization,

@@ -92,7 +92,6 @@ def _test_subject_loader(
         subject_id=str(subject.pk),
         organization_id=str(organization.pk),
         attributes={
-            "amount": "100.00",
             "project_id": "project-1",
             "status": "submitted",
             "created_by_id": str(owner.user_id) if owner else "",
@@ -245,7 +244,7 @@ class RuntimeTestBase(RuntimeRegistryMixin):
             workflow_type_code=self.workflow_type.code,
             code=f"{code}-{self._testMethodName}"[:100],
             name="Runtime workflow",
-            scope={"classification": code} if code != "runtime" else {},
+            scope={"project_id": code},
         )
         version = edit_workflow_draft(
             actor=self.owner,
