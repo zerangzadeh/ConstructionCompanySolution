@@ -1,0 +1,23 @@
+<section class="erp-surface min-w-0 overflow-hidden rounded-xl" aria-label="فهرست کارها">
+    {% if work_items %}
+        <div class="erp-table-wrap">
+            <table class="w-full table-fixed text-right lg:table-auto">
+                <thead>
+                    <tr>
+                        <th class="border-b border-slate-200 px-3 py-3 text-center sm:px-4">موضوع کار</th>
+                        <th class="w-20 border-b border-slate-200 px-2 py-3 text-center sm:w-auto sm:px-4">وضعیت</th>
+                        <th class="hidden border-b border-slate-200 px-4 py-3 text-center lg:table-cell">دلیل دریافت</th>
+                        <th class="hidden border-b border-slate-200 px-4 py-3 text-center sm:table-cell">اولویت</th>
+                        <th class="hidden border-b border-slate-200 px-4 py-3 text-center sm:table-cell">مهلت</th>
+                        <th class="w-24 border-b border-slate-200 px-2 py-3 text-center sm:w-auto sm:px-4">اقدام</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for item in work_items %}{% include "workflows/_work_item_row.html" with item=item only %}{% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {% include "components/empty_state.html" with empty_title="کاری در این نما وجود ندارد" empty_description="فیلترها را تغییر دهید یا بعداً دوباره بررسی کنید." only %}
+    {% endif %}
+</section>

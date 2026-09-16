@@ -1,0 +1,26 @@
+<tr id="work-item-{{ item.pk }}" class="align-top even:bg-slate-100 hover:bg-slate-200/70">
+    <td class="break-words px-3 py-3.5 sm:px-4">
+        {% if item.source_url %}<a class="font-semibold text-slate-900 hover:text-blue-700" href="{{ item.source_url }}">{{ item.subject_title }}</a>{% else %}<span class="font-semibold text-slate-900">{{ item.subject_title }}</span>{% endif %}
+        <p class="mt-1 text-[11px] text-slate-500">{{ item.instance.definition.workflow_type.name }} · {{ item.step_instance.step_definition.name }}</p>
+        <p class="mt-1 text-[11px] text-slate-500 lg:hidden"><span class="font-semibold">دلیل دریافت:</span> {% for reason in item.workbench_reasons %}{{ reason }}{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+        <p class="mt-1 text-[11px] text-slate-500 sm:hidden">اولویت {{ item.workbench_priority_label }}{% if item.due_at %} · مهلت <span dir="ltr">{{ item.due_at|date:"Y-m-d H:i" }}</span>{% endif %}</p>
+    </td>
+    <td class="px-2 py-3.5 sm:px-4">
+        <div class="flex flex-wrap gap-1">
+            {% for state, label in item.workbench_states %}{% include "components/status_badge.html" with status=state label=label only %}{% endfor %}
+        </div>
+    </td>
+    <td class="hidden px-4 py-3.5 text-[11px] text-slate-500 lg:table-cell">{% for reason in item.workbench_reasons %}{{ reason }}{% if not forloop.last %}، {% endif %}{% endfor %}</td>
+    <td class="hidden px-4 py-3.5 sm:table-cell">{{ item.workbench_priority_label }}</td>
+    <td class="hidden px-4 py-3.5 whitespace-nowrap sm:table-cell" dir="ltr">
+        {% if item.due_at %}<span class="{% if item.is_overdue %}font-semibold text-red-700{% else %}text-slate-700{% endif %}">{{ item.due_at|date:"Y-m-d H:i" }}</span>{% else %}<span class="text-slate-400">—</span>{% endif %}
+    </td>
+    <td class="px-2 py-3.5 sm:px-4">
+        <div class="flex flex-wrap gap-1">
+            {% if item.can_claim_from_workbench %}<form method="post" action="{% url 'workflows:work_item_claim' item.pk %}" hx-post="{% url 'workflows:work_item_claim' item.pk %}" hx-target="closest tr" hx-swap="outerHTML">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ item.operation_tokens.claim }}"><button class="erp-btn erp-btn--compact erp-btn--primary" type="submit">قبول کار</button></form>{% endif %}
+            {% if item.can_release_from_workbench %}<form method="post" action="{% url 'workflows:work_item_release' item.pk %}" hx-post="{% url 'workflows:work_item_release' item.pk %}" hx-target="closest tr" hx-swap="outerHTML">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ item.operation_tokens.release }}"><button class="erp-btn erp-btn--compact erp-btn--secondary" type="submit">واگذاری کار</button></form>{% endif %}
+            {% for outcome in item.workbench_outcomes %}<form method="post" action="{% url 'workflows:work_item_action' item.pk %}" hx-post="{% url 'workflows:work_item_action' item.pk %}" hx-target="closest tr" hx-swap="outerHTML">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ outcome.token }}"><input type="hidden" name="outcome" value="{{ outcome.value }}"><button class="erp-btn erp-btn--compact {% if outcome.value == 'rejected' %}erp-btn--danger{% else %}erp-btn--primary{% endif %}" type="submit">{{ outcome.label }}</button></form>{% endfor %}
+        </div>
+        {% if item.workbench_history %}<details class="mt-2 text-[11px] text-slate-500"><summary class="cursor-pointer font-semibold text-slate-600">تاریخچه تخصیص</summary><ul class="mt-1 space-y-1">{% for entry in item.workbench_history %}<li>{{ entry.workbench_action_label }} · {{ entry.actor_membership.user.get_full_name|default:entry.actor_membership.user.username }} · <span dir="ltr">{{ entry.occurred_at|date:"Y-m-d H:i" }}</span></li>{% endfor %}</ul></details>{% endif %}
+    </td>
+</tr>

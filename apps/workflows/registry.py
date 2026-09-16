@@ -96,6 +96,9 @@ class SubjectAdapterSpec:
     exposed_attributes: frozenset[str]
     loader: SubjectLoader | None = None
     start_permission: str = ""
+    view_permission: str = ""
+    detail_url_name: str = ""
+    detail_url_kwarg: str = "subject_id"
 
 
 @dataclass(frozen=True, slots=True)
@@ -182,6 +185,9 @@ registry.register_subject_adapter(
         subject_type="procurement.purchase_request",
         exposed_attributes=frozenset({"project_id", "status", "created_by_id"}),
         start_permission="purchase_requests.submit",
+        view_permission="purchase_requests.view",
+        detail_url_name="procurement:request_detail",
+        detail_url_kwarg="request_id",
     )
 )
 registry.register_workflow_type(

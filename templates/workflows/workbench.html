@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}کارتابل متمرکز | سازه یار{% endblock %}
+
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="گردش‌کار" page_title="کارتابل متمرکز" page_description=request.organization.name only %}
+
+<div id="workbench-feedback" class="mt-4" aria-live="polite"></div>
+
+<nav class="mt-5 flex flex-wrap gap-2" aria-label="نماهای سمت">
+    <a class="erp-btn {% if not selected_filters.position %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="{% url 'workflows:workbench' %}">همه کارها <span class="tabular-nums">{{ counts.all_items }}</span></a>
+    {% for position in counts.positions %}<a class="erp-btn {% if selected_filters.position == position.id|stringformat:'s' %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="?position={{ position.id|urlencode }}">{{ position.label }} <span class="tabular-nums">{{ position.count }}</span></a>{% endfor %}
+</nav>
+
+<div class="mt-4 grid min-w-0 gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <aside class="erp-surface h-fit rounded-xl p-4" aria-label="فیلترهای کارتابل">
+        <form method="get" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="workflow-filter">گردش‌کار</label><select id="workflow-filter" name="workflow"><option value="">همه</option>{% for value, label in filter_choices.workflow %}<option value="{{ value }}"{% if selected_filters.workflow == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="project-filter">پروژه</label><select id="project-filter" name="project"><option value="">همه</option>{% for value, label in filter_choices.project %}<option value="{{ value }}"{% if selected_filters.project == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="site-filter">کارگاه</label><select id="site-filter" name="site"><option value="">همه</option>{% for value, label in filter_choices.site %}<option value="{{ value }}"{% if selected_filters.site == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="position-filter">سمت</label><select id="position-filter" name="position"><option value="">همه</option>{% for value, label in filter_choices.position %}<option value="{{ value }}"{% if selected_filters.position == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="priority-filter">اولویت</label><select id="priority-filter" name="priority"><option value="">همه</option>{% for value, label in filter_choices.priority %}<option value="{{ value }}"{% if selected_filters.priority == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="due-filter">مهلت</label><select id="due-filter" name="due"><option value="">همه</option>{% for value, label in filter_choices.due %}<option value="{{ value }}"{% if selected_filters.due == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="assignment-filter">وضعیت تخصیص</label><select id="assignment-filter" name="assignment"><option value="">همه</option>{% for value, label in filter_choices.assignment %}<option value="{{ value }}"{% if selected_filters.assignment == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+            <div class="flex items-center gap-2 sm:col-span-2 lg:col-span-1"><button class="erp-btn erp-btn--primary" type="submit">اعمال فیلتر</button>{% if selected_filters %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:workbench' %}">پاک‌سازی</a>{% endif %}</div>
+        </form>
+    </aside>
+
+    <div class="min-w-0">
+        {% include "workflows/_work_item_table.html" %}
+        {% if page_obj.paginator.num_pages > 1 %}<nav class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm" aria-label="صفحه‌بندی"><span class="text-slate-500">صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }}</span><div class="flex gap-2">{% if page_obj.has_previous %}<a class="erp-btn erp-btn--secondary" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}{% if page_obj.has_next %}<a class="erp-btn erp-btn--secondary" href="?{% if pagination_query %}{{ pagination_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}</div></nav>{% endif %}
+    </div>
+</div>
+
+<script src="https://unpkg.com/htmx.org@2.0.4" defer></script>
+<script>
+document.addEventListener("htmx:beforeSwap", (event) => {
+    if (event.detail.xhr.status === 409) {
+        event.detail.shouldSwap = true;
+        event.detail.isError = false;
+    }
+});
+</script>
+{% endblock %}

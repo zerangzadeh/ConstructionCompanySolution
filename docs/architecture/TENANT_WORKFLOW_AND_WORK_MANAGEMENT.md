@@ -440,6 +440,14 @@ the workbench or workflow state and may be delivered in a later production phase
 - test mobile/RTL behavior, query counts, tenant isolation, object permissions,
   stale actions, and duplicate suppression.
 
+**Implemented boundary (2026-09-16):** The server-rendered Persian RTL workbench
+now reads persisted `WorkItem` records for the active membership, deduplicates
+multi-route eligibility, exposes tenant-scoped counts and filters, and delegates
+claim, release, and completion to the W2/W3 runtime services. Code-owned subject
+adapters provide permission-gated detail links. Notifications, background
+escalation execution, and adoption beyond the Procurement pilot remain outside
+W4; F5 remains in progress and W5 is still required.
+
 ### W5 — Incremental domain adoption
 
 Migrate in this order unless a separately approved dependency changes it:
