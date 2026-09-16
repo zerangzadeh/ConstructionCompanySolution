@@ -204,6 +204,47 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         )
         self.assertEqual(len(excluded.context["work_items"]), 0)
 
+    def test_work_reserved_by_another_member_is_excluded(self) -> None:
+        purchase_request = self._submitted_request("WB-RESERVED")
+        item = self._item(purchase_request)
+        member_membership = self.organization.memberships.get(user=self.member)
+        member_role = member_membership.role_definition
+        member_role.permissions.add(
+            *BusinessPermission.objects.filter(
+                code__in=(
+                    BusinessPermissionCode.PURCHASE_REQUESTS_VIEW,
+                    BusinessPermissionCode.WORK_ITEMS_VIEW,
+                    BusinessPermissionCode.WORK_ITEMS_CLAIM,
+                )
+            )
+        )
+        item.candidates.create(
+            organization=self.organization,
+            membership=member_membership,
+            routing_basis=[{"resolver": "explicit_membership"}],
+        )
+        item.current_assignee = self.organization.memberships.get(user=self.owner)
+        item.save(update_fields=["current_assignee", "updated_at"])
+
+        self.client.force_login(self.member)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        response = self.client.get(reverse("workflows:workbench"))
+
+        self.assertNotContains(response, purchase_request.title)
+        self.assertNotContains(response, "قبول کار")
+        for assignment in ("candidate", "assigned", "claimed"):
+            filtered = self.client.get(
+                reverse("workflows:workbench"), {"assignment": assignment}
+            )
+            self.assertEqual(len(filtered.context["work_items"]), 0)
+
+        item.status = WorkItemStatus.CLAIMED
+        item.save(update_fields=["status", "updated_at"])
+        response = self.client.get(reverse("workflows:workbench"))
+        self.assertNotContains(response, purchase_request.title)
+
     def test_pagination_responsive_context_and_query_bound(self) -> None:
         for index in range(26):
             self._submitted_request(f"WB-PAGE-{index:02d}")
@@ -235,6 +276,7 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         item.refresh_from_db()
         self.assertEqual(item.status, WorkItemStatus.CLAIMED)
+        self.assertEqual(response.headers["HX-Trigger"], "workbenchActionSucceeded")
         self.assertContains(response, "قبول کار")
         self.assertContains(response, "واگذاری کار")
 
@@ -254,7 +296,9 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["HX-Trigger"], "workbenchUpdated")
+        self.assertEqual(
+            response.headers["HX-Redirect"], reverse("workflows:workbench")
+        )
         purchase_request.refresh_from_db()
         self.assertEqual(purchase_request.status, PurchaseRequestStatus.APPROVED)
 
@@ -272,6 +316,7 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         csrf_client.session.save()
         page = csrf_client.get(reverse("workflows:workbench"))
         self.assertEqual(page.status_code, 200)
+        self.assertContains(page, 'name="csrfmiddlewaretoken"')
         fresh_request = self._submitted_request("WB-CSRF")
         fresh_item = self._item(fresh_request)
         protected = csrf_client.post(

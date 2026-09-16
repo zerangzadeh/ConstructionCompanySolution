@@ -156,7 +156,13 @@ def _base_queryset(
             organization=organization,
             instance__subject_type__in=subject_types,
         )
-        .filter(Q(current_assignee=membership) | Exists(candidates))
+        .filter(
+            Q(current_assignee=membership)
+            | (
+                Q(status=WorkItemStatus.OPEN, current_assignee__isnull=True)
+                & Exists(candidates)
+            )
+        )
         .annotate(
             is_candidate=Exists(candidates),
             is_delegated=Exists(
@@ -258,13 +264,17 @@ def _apply_filters(
 
     assignment = str(params.get("assignment", "")).strip()
     if assignment == "assigned":
-        queryset = queryset.filter(current_assignee=membership)
-    elif assignment == "candidate":
-        queryset = queryset.filter(is_candidate=True)
-    elif assignment == "claimed":
         queryset = queryset.filter(
-            status=WorkItemStatus.CLAIMED, current_assignee=membership
+            status=WorkItemStatus.OPEN, current_assignee__isnull=False
         )
+    elif assignment == "candidate":
+        queryset = queryset.filter(
+            is_candidate=True,
+            status=WorkItemStatus.OPEN,
+            current_assignee__isnull=True,
+        )
+    elif assignment == "claimed":
+        queryset = queryset.filter(status=WorkItemStatus.CLAIMED)
     elif assignment == "delegated":
         queryset = queryset.filter(is_delegated=True)
     elif assignment == "escalated":
@@ -493,13 +503,20 @@ def decorate_work_items(
     can_act_globally = BusinessPermissionCode.WORK_ITEMS_ACT in permission_codes
     for item in items:
         candidate = bool(item.is_candidate)
-        if (
-            item.status == WorkItemStatus.CLAIMED
-            and item.current_assignee_id == membership.pk
-        ):
-            state = ("claimed", ASSIGNMENT_STATES["claimed"])
-        elif item.current_assignee_id == membership.pk:
-            state = ("assigned", ASSIGNMENT_STATES["assigned"])
+        if item.status == WorkItemStatus.CLAIMED:
+            state_label = ASSIGNMENT_STATES["claimed"]
+            if item.current_assignee_id != membership.pk and item.current_assignee:
+                assignee_user = item.current_assignee.user
+                assignee_name = assignee_user.get_full_name() or assignee_user.username
+                state_label = f"{state_label} توسط {assignee_name}"
+            state = ("claimed", state_label)
+        elif item.current_assignee:
+            state_label = ASSIGNMENT_STATES["assigned"]
+            if item.current_assignee_id != membership.pk:
+                assignee_user = item.current_assignee.user
+                assignee_name = assignee_user.get_full_name() or assignee_user.username
+                state_label = f"{state_label} به {assignee_name}"
+            state = ("assigned", state_label)
         else:
             state = ("candidate", ASSIGNMENT_STATES["candidate"])
         item.workbench_states = (state,)

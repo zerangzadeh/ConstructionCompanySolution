@@ -8,6 +8,7 @@ from apps.organizations.permission_registry import registered_permission_codes
 ALL_PERMISSIONS = registered_permission_codes()
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
+    BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
     BusinessPermissionCode.EMPLOYEES_LINK_ACCOUNT,
     BusinessPermissionCode.WORKFLOWS_VIEW,
     BusinessPermissionCode.WORKFLOWS_CREATE,

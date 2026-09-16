@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from apps.organizations.decorators import (
@@ -82,10 +83,12 @@ def _action_response(
                     work_item_id=work_item_id,
                 )
             except PermissionDenied:
-                response = HttpResponse("")
-                response["HX-Trigger"] = "workbenchUpdated"
+                response = HttpResponse()
+                response["HX-Redirect"] = reverse("workflows:workbench")
                 return response
-            return render(request, "workflows/_work_item_row.html", {"item": item})
+            response = render(request, "workflows/_work_item_row.html", {"item": item})
+            response["HX-Trigger"] = "workbenchActionSucceeded"
+            return response
     except (PermissionDenied, ValidationError, WorkflowConflict, ValueError) as exc:
         if is_htmx:
             response = render(

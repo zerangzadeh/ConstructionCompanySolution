@@ -199,6 +199,8 @@ class CustomUserAdmin(UserAdmin):
     change_form_template = "admin/accounts/user/change_form.html"
     list_display = (
         "username",
+        "first_name",
+        "last_name",
         "national_id",
         "email",
         "account_status_display",

@@ -13,7 +13,7 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
-                    {% for item in work_items %}{% include "workflows/_work_item_row.html" with item=item only %}{% endfor %}
+                    {% for item in work_items %}{% include "workflows/_work_item_row.html" with item=item csrf_token=csrf_token only %}{% endfor %}
                 </tbody>
             </table>
         </div>

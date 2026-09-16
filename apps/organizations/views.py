@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.organizations.authorization import (
     get_active_membership,
@@ -18,6 +18,7 @@ from apps.organizations.forms import (
     ExistingAccountConnectionForm,
     OrganizationAccountCreateForm,
     OrganizationForm,
+    OrganizationMemberPasswordResetForm,
     OrganizationMembershipForm,
     OrganizationProfileForm,
     OrganizationSettingsForm,
@@ -35,6 +36,7 @@ from apps.organizations.services import (
     get_organization_settings,
     get_valid_memberships,
     request_existing_account_connection,
+    reset_organization_member_password,
     resolve_active_organization,
     set_active_organization,
     update_organization_membership,
@@ -385,5 +387,53 @@ def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
     return render(
         request,
         "organizations/member_form.html",
+        {
+            "form": form,
+            "membership": membership,
+            "can_reset_member_password": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
+            ),
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD)
+@require_http_methods(["GET", "POST"])
+def reset_member_password(request: HttpRequest, membership_id: str) -> HttpResponse:
+    """Let an authorized tenant owner issue a member's temporary password."""
+
+    try:
+        membership = OrganizationMembership.objects.select_related("user").get(
+            pk=membership_id,
+            organization=request.organization,
+        )
+    except OrganizationMembership.DoesNotExist as exc:
+        raise PermissionDenied("عضویت موردنظر در این شرکت یافت نشد.") from exc
+
+    form = OrganizationMemberPasswordResetForm(
+        user=membership.user,
+        data=request.POST or None,
+    )
+    if request.method == "POST" and form.is_valid():
+        try:
+            reset_organization_member_password(
+                organization=request.organization,
+                actor=request.user,
+                membership=membership,
+                temporary_password=form.cleaned_data["new_password1"],
+            )
+        except PermissionDenied as exc:
+            return HttpResponseForbidden(str(exc))
+        messages.success(
+            request,
+            "گذرواژه موقت عضو تنظیم شد؛ او در ورود بعدی باید آن را تغییر دهد.",
+        )
+        return redirect("organizations:members")
+    return render(
+        request,
+        "organizations/member_password_reset.html",
         {"form": form, "membership": membership},
     )

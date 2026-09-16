@@ -166,6 +166,49 @@ def create_organization_account(
 
 
 @transaction.atomic
+def reset_organization_member_password(
+    *,
+    organization: Organization,
+    actor: User,
+    membership: OrganizationMembership,
+    temporary_password: str,
+) -> User:
+    """Set a member's temporary password within one authorized tenant boundary."""
+
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
+        message="اجازه بازنشانی گذرواژه اعضای این شرکت را ندارید.",
+    )
+    locked_membership = (
+        OrganizationMembership.objects.select_for_update(of=("self",))
+        .select_related("user")
+        .filter(pk=membership.pk, organization=organization)
+        .first()
+    )
+    if locked_membership is None:
+        raise PermissionDenied("عضویت موردنظر در این شرکت یافت نشد.")
+    validate_password(temporary_password, user=locked_membership.user)
+    locked_user = User.objects.select_for_update().get(pk=locked_membership.user_id)
+    locked_user.set_password(temporary_password)
+    locked_user.must_change_password = True
+    locked_user.save(update_fields=["password", "must_change_password", "updated_at"])
+    record_audit_event(
+        action=AuditAction.ORGANIZATION_MEMBER_PASSWORD_RESET,
+        entity_type="organization_membership",
+        entity_id=locked_membership.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "target_user_id": str(locked_user.pk),
+            "target_username": locked_user.username,
+        },
+    )
+    return locked_user
+
+
+@transaction.atomic
 def request_existing_account_connection(
     *,
     organization: Organization,

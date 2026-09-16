@@ -284,6 +284,10 @@ class AuditAction(models.TextChoices):
         "organization_account.created",
         "حساب کاربری شرکت ایجاد شد",
     )
+    ORGANIZATION_MEMBER_PASSWORD_RESET = (
+        "organization_member.password_reset",
+        "گذرواژه عضو شرکت بازنشانی شد",
+    )
     ACCOUNT_CONNECTION_REQUESTED = (
         "account_connection.requested",
         "درخواست اتصال حساب به شرکت ثبت شد",

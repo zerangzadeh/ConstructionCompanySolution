@@ -18,6 +18,11 @@ urlpatterns = [
         views.update_member,
         name="member_update",
     ),
+    path(
+        "members/<uuid:membership_id>/reset-password/",
+        views.reset_member_password,
+        name="member_password_reset",
+    ),
     path("settings/", views.organization_settings, name="settings"),
     path("switch/", views.switch_organization, name="switch"),
 ]

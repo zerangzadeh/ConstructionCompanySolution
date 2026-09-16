@@ -33,6 +33,7 @@ from apps.organizations.services import (
     get_valid_memberships,
     provision_user_for_organization,
     request_existing_account_connection,
+    reset_organization_member_password,
     resolve_active_organization,
     respond_to_account_connection_request,
     set_active_organization,
@@ -240,6 +241,32 @@ class OrganizationTenantIsolationTests(TestCase):
             reverse("organizations:member_update", args=[membership.pk]),
         )
         self.assertNotContains(response, "مدیریت عضویت")
+
+    def test_member_management_page_displays_user_profile_details(self) -> None:
+        membership = self.user.organization_memberships.get(
+            organization=self.organization,
+        )
+        self.user.first_name = "سارا"
+        self.user.last_name = "احمدی"
+        self.user.email = "sara@example.com"
+        self.user.phone_number = "09120000000"
+        self.user.save(
+            update_fields=["first_name", "last_name", "email", "phone_number"]
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse("organizations:member_update", args=[membership.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "مشخصات کاربر")
+        self.assertContains(response, "سارا")
+        self.assertContains(response, "احمدی")
+        self.assertContains(response, "sara@example.com")
+        self.assertContains(response, "09120000000")
+        self.assertContains(response, "وضعیت حساب")
+        self.assertContains(response, "آخرین ورود")
 
     def test_suspended_membership_is_not_valid(self) -> None:
         active_membership = self.user.organization_memberships.get(
@@ -1119,6 +1146,15 @@ class OwnerAccountManagementTests(TestCase):
             role_definition=self.owner_role,
             status=MembershipStatus.ACTIVE,
         )
+        self.member = User.objects.create_user(
+            username="password-reset-member", password="original-password"
+        )
+        self.member_membership = OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=self.member,
+            role_definition=self.member_role,
+            status=MembershipStatus.ACTIVE,
+        )
 
     def test_owner_creates_account_with_temporary_password_restriction(self) -> None:
         user, membership = create_organization_account(
@@ -1191,6 +1227,75 @@ class OwnerAccountManagementTests(TestCase):
                 username="forbidden-created-account",
                 temporary_password="Temporary-password-2026",
                 role=self.member_role,
+            )
+
+    def test_owner_can_reset_only_its_member_password_and_reset_is_audited(
+        self,
+    ) -> None:
+        updated_user = reset_organization_member_password(
+            organization=self.organization,
+            actor=self.owner,
+            membership=self.member_membership,
+            temporary_password="Replacement-password-2026",
+        )
+
+        self.assertEqual(updated_user, self.member)
+        self.member.refresh_from_db()
+        self.assertTrue(self.member.check_password("Replacement-password-2026"))
+        self.assertTrue(self.member.must_change_password)
+        event = AuditEvent.objects.get(
+            action=AuditAction.ORGANIZATION_MEMBER_PASSWORD_RESET,
+        )
+        self.assertEqual(event.organization, self.organization)
+        self.assertEqual(event.actor, self.owner)
+        self.assertEqual(event.entity_id, str(self.member_membership.pk))
+        self.assertEqual(event.metadata["target_username"], self.member.username)
+        self.assertNotIn("password", event.metadata)
+
+    def test_reset_password_view_is_scoped_to_active_organization(self) -> None:
+        other_owner = User.objects.create_user(username="password-reset-outsider")
+        other_organization = Organization.objects.create(
+            name="Other Password Company",
+            slug="other-password-company",
+        )
+        other_membership = OrganizationMembership.objects.create(
+            organization=other_organization,
+            user=other_owner,
+            role_definition=self.owner_role,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.client.force_login(self.owner)
+        set_active_organization(self.client.session, self.organization)
+        self.client.session.save()
+
+        response = self.client.post(
+            reverse("organizations:member_password_reset", args=[other_membership.pk]),
+            {
+                "new_password1": "Replacement-password-2026",
+                "new_password2": "Replacement-password-2026",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        other_owner.refresh_from_db()
+        self.assertFalse(other_owner.check_password("Replacement-password-2026"))
+
+    def test_non_owner_cannot_reset_member_password(self) -> None:
+        manager = User.objects.create_user(username="password-reset-manager")
+        manager_role = OrganizationRole.objects.get(code=MembershipRole.COMPANY_MANAGER)
+        OrganizationMembership.objects.create(
+            organization=self.organization,
+            user=manager,
+            role_definition=manager_role,
+            status=MembershipStatus.ACTIVE,
+        )
+
+        with self.assertRaises(PermissionDenied):
+            reset_organization_member_password(
+                organization=self.organization,
+                actor=manager,
+                membership=self.member_membership,
+                temporary_password="Replacement-password-2026",
             )
 
     def test_other_user_cannot_accept_connection_request(self) -> None:

@@ -1,6 +1,7 @@
 import calendar
 
 from django import forms
+from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
@@ -274,6 +275,18 @@ class OrganizationMembershipForm(forms.ModelForm):
             self.fields[
                 "status"
             ].help_text = "با ذخیره نقش، عضویت و حساب کاربر فعال می‌شوند."
+
+
+class OrganizationMemberPasswordResetForm(SetPasswordForm):
+    """Set a temporary password for a member without exposing their current one."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = TEXT_INPUT_CLASS
+        self.fields[
+            "new_password1"
+        ].help_text = "عضو در ورود بعدی باید گذرواژه شخصی خود را تعیین کند."
 
 
 class OrganizationAccountCreateForm(forms.Form):

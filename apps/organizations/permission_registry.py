@@ -28,7 +28,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         "accounts",
         "حساب‌های کاربری شرکت",
         ("organizations.OrganizationAccountConnectionRequest",),
-        (P.ACCOUNTS_CREATE,),
+        (P.ACCOUNTS_CREATE, P.ACCOUNTS_RESET_PASSWORD),
         ("apps.organizations.services", "apps.organizations.views"),
     ),
     PermissionResource(

@@ -182,6 +182,17 @@ class UserDetailAdminTests(TestCase):
         self.assertNotContains(response, 'name="groups"')
         self.assertNotContains(response, self.user.password)
 
+    def test_user_list_displays_first_and_last_names(self) -> None:
+        self.client.force_login(self.admin)
+
+        response = self.client.get(reverse("admin:accounts_user_changelist"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "نام")
+        self.assertContains(response, "نام خانوادگی")
+        self.assertContains(response, self.user.first_name)
+        self.assertContains(response, self.user.last_name)
+
     def test_detail_uses_empty_states_for_missing_optional_data(self) -> None:
         user = User.objects.create_user(username="empty-user", password="test-password")
         self.client.force_login(self.admin)

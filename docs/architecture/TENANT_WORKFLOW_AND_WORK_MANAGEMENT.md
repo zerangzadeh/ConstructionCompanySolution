@@ -448,6 +448,14 @@ adapters provide permission-gated detail links. Notifications, background
 escalation execution, and adoption beyond the Procurement pilot remain outside
 W4; F5 remains in progress and W5 is still required.
 
+The W4 workbench is a personal actionable queue, not a supervisory queue. It
+shows only work assigned to the active membership, work claimed by that
+membership, or an open and unassigned item for which that membership is an
+active candidate. Assigning or claiming an item removes it from every other
+candidate's personal workbench without deleting its routing evidence. A future
+supervisory queue, if approved, must be a separately authorized view rather
+than reusing this personal queue.
+
 ### W5 — Incremental domain adoption
 
 Migrate in this order unless a separately approved dependency changes it:

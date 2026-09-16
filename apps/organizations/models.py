@@ -125,6 +125,10 @@ class BusinessPermissionCode(models.TextChoices):
     MEMBERSHIP_CHANGE_ROLE = "membership.change_role", "تغییر نقش اعضای شرکت"
     MEMBERSHIP_CHANGE_STATUS = "membership.change_status", "تغییر وضعیت اعضای شرکت"
     ACCOUNTS_CREATE = "accounts.create", "ایجاد حساب کاربری شرکت"
+    ACCOUNTS_RESET_PASSWORD = (
+        "accounts.reset_password",
+        "بازنشانی گذرواژه اعضای شرکت",
+    )
     COMPANY_SETTINGS_VIEW = "company.settings.view", "مشاهده تنظیمات شرکت"
     COMPANY_SETTINGS_CHANGE = "company.settings.change", "ویرایش تنظیمات شرکت"
 
