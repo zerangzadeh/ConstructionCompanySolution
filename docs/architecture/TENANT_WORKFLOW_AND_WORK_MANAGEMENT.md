@@ -464,13 +464,61 @@ Migrate in this order unless a separately approved dependency changes it:
 2. safety review/action/resolution/closure;
 3. quality review/action/verification/closure;
 4. estimate and contract-amendment approvals;
-5. account-connection and membership-administration requests;
+5. account-connection target consent and the direct membership-administration boundary;
 6. inventory posting and reversal where assignment is required;
 7. maintenance and other scheduled operational work.
 
 Lifecycle-only archive, void, and status operations are not forced into the
 workflow runtime unless a real waiting party, routing rule, or approval policy is
 approved for that operation.
+
+**W5.4 implemented boundary (2026-09-17):** `estimates.estimate_approval` and
+`contracts.contract_amendment_approval` use the shared runtime and personal
+workbench. A draft becomes actionable only through an explicit approval request;
+backfill never treats every draft as pending. The compatibility templates route
+by the existing approval permission with organization-owner fallback, while the
+runtime rechecks active membership, business permission, candidacy and any
+position evidence. Completion calls the existing domain approval services in the
+same transaction, preserving estimate-revision locking/supersession and approved
+amendment immutability. Legacy direct approvals remain available only when no
+active W5.4 instance exists. Backfill is reconciliation-only for already active
+instances; shadow commands compare candidate sets without mutating history.
+
+**W5.5 implementation decision (2026-09-17):** This product has no membership
+request lifecycle. An Owner creates a tenant account directly, and Django Admin
+may provision an account; direct management of an existing membership (including
+role-delegation and at-least-one-active-owner checks) also remains direct. An
+existing global account can only be connected after that account's authenticated
+consent; because it has no active membership before consent, it is not a
+`WorkItem` candidate or actor. No account-connection or membership-management
+workflow/backfill/shadow migration is created for this boundary. The existing
+atomic, tenant-scoped consent service and its audit evidence remain authoritative.
+
+**W5.6 implemented boundary (2026-09-17):** Only manually-created
+`StockTransaction` posting and reversal requests that are explicitly sent for
+assignment use the shared runtime and personal workbench. A draft or posted
+movement is not a queue state: direct posting/reversal remains the compatibility
+path while no active instance exists. Goods-receipt-backed receipt movements
+remain direct and are outside this slice. Completion invokes the existing
+inventory domain services in the same transaction, retaining warehouse locks,
+negative-stock protection, immutable equal-and-opposite reversals, tenant and
+permission checks, candidate/assignment checks, audit evidence, and idempotent
+work-item history. Backfill only reconciles candidates on already active W5.6
+instances; shadow comparisons never change movement or runtime history.
+
+**W5.7 implemented boundary (2026-09-17):** Only open
+`MaintenanceRecord` rows (`scheduled` and `in_progress`) are adopted by the
+shared runtime and personal workbench. Its compatibility graph preserves the
+maintenance domain service as authority for start, completion, and cancellation;
+an active instance requires the existing transition permission plus active
+membership, candidacy/assignment, and runtime permissions. The open work item's
+deadline is derived from `scheduled_date` in the organization timezone. Domain
+and runtime locks, equipment-status synchronization, one-in-progress repair,
+terminal immutability, audit evidence, and idempotent work history commit
+atomically. Direct transition remains the compatibility path only when no active
+instance exists. Backfill/shadow touches only real open maintenance records;
+equipment assignments and the general equipment lifecycle are explicitly out of
+scope.
 
 ### W6 — Stabilization and handoff to dependent phases
 
@@ -480,6 +528,45 @@ approved for that operation.
 - update demo data and user/admin guidance;
 - declare the workflow foundation ready for Billing & Progress Claims only after
   the acceptance gates below pass.
+
+**W6 validation record (2026-09-17):** On an isolated PostgreSQL 18.6 cluster,
+all migrations applied, workflow migrations reversed from 0017 to 0006, and
+0017 reapplied. The runtime table and its guards disappeared on reversal and
+returned with 12 runtime triggers on reapplication. The W6 tests exercise 250
+resolved candidates with at most 12 routing queries, 2,000 additional open
+WorkItems with a 25-row page and at most 25 Workbench queries, direct PostgreSQL
+cross-tenant trigger rejection, unresolved-route recovery, and rejection of an
+invalid instance version target. Existing runtime tests cover starter routing,
+multi-position deduplication, delegation, separation, immutable history,
+atomic failure rollback, retries, concurrent claims/decisions, and successful
+version migration. The operational procedure and owner/admin/user guidance are
+in `docs/architecture/WORKFLOW_OPERATIONS.md`.
+
+W6 is **not yet a handoff**: the full pytest and repository-wide Ruff gates are
+not green. Keep F6 blocked until the failures are resolved and the complete
+suite is rerun on PostgreSQL. W5 catalog data migrations have no-op reverse
+functions; their rollback requires the backup and compatible-code procedure in
+the runbook, not an assumption that catalog data was removed.
+
+| Acceptance gate | W6 result and evidence |
+| --- | --- |
+| Two-person starter without workforce | PASS: `test_two_person_starter_completes_without_workforce_structures`. |
+| Large multi-stage routing, pools, fallback, delegation, separation | PASS: `test_large_tenant_publishes_multi_stage_position_and_separation_flow`, the 250-candidate pool test, and delegation/routing runtime tests. |
+| Tenant scope and cross-tenant rejection | PASS: foundation/runtime/Workbench tests and direct PostgreSQL runtime-trigger rejection. |
+| Published version and completed history immutability | PASS: foundation and runtime immutability tests. |
+| One deduplicated multi-position Workbench | PASS: Workbench position-filter and routing-evidence tests. |
+| Permission plus candidacy | PASS: runtime permission/candidacy test and Workbench authorization tests. |
+| Atomic domain, item, workflow, audit changes | PASS: rollback-on-domain-failure test and W5 domain workflow tests. |
+| Concurrency and retry | PASS: runtime race/idempotency tests, W5 race tests, and PostgreSQL row-lock tests. |
+| Priority-domain adoption | PASS: the 48 W5 consumer-workflow tests across Procurement, daily reports, safety, quality, estimates, contracts, inventory, and equipment. |
+| PostgreSQL migration, checks, tests, performance, Ruff | **FAIL as a combined gate**: migrations/rollback, Django check, 2,000-item and 250-candidate query budgets, and targeted Ruff passed. A broad pytest run excluding the two long seed tests still had 14 failures (450 passed, 69 subtests passed); repository-wide Ruff check and format check also failed in files outside W6. |
+| Recovery, unresolved route, version migration | PASS: recovery and invalid-target tests plus `WORKFLOW_OPERATIONS.md`. |
+
+The complete `apps/workflows` test package passed (39 tests). The independent
+`seed_demo_data` and `seed_account_data` tests each passed after
+the W6 demo update. The full pytest run before the in-scope fixes recorded 434
+passed and 30 failed; the latest broad run above excludes those two seed tests
+and does not replace a final green full-suite run.
 
 ## 14. Migration strategy
 

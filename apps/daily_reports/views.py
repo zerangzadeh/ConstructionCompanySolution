@@ -34,6 +34,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -56,11 +58,26 @@ def daily_report_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", DailyReportStatus.values)},
         date_fields={"reporting_date": "reporting_date"},
     )
+    page = paginate_table(
+        reports,
+        request,
+        sort_fields={
+            "project": "project__name",
+            "phase": "phase__name",
+            "reporting_date": "reporting_date",
+            "status": "status",
+            "labor_count": "labor_count",
+            "author": "created_by__username",
+        },
+        default_ordering=("-reporting_date", "-created_at", "pk"),
+    )
     return render(
         request,
         "daily_reports/list.html",
         {
-            "reports": reports,
+            "reports": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

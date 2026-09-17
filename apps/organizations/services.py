@@ -284,6 +284,10 @@ def respond_to_account_connection_request(
     if locked.target_user_id != target_user.pk:
         raise PermissionDenied("این درخواست متعلق به حساب شما نیست.")
     if locked.status != AccountConnectionRequestStatus.PENDING:
+        if accept and locked.status == AccountConnectionRequestStatus.ACCEPTED:
+            return locked
+        if not accept and locked.status == AccountConnectionRequestStatus.REJECTED:
+            return locked
         raise ValueError("این درخواست قبلاً پاسخ داده شده است.")
     if not locked.organization.is_active:
         raise PermissionDenied("شرکت فعال نیست.")
@@ -316,8 +320,14 @@ def respond_to_account_connection_request(
         entity_type="organization_account_connection_request",
         entity_id=locked.pk,
         organization=locked.organization,
-        actor=target_user,
-        metadata={"target_username": target_user.username},
+        # A rejecting target is not a tenant actor; its authenticated identity
+        # remains immutable evidence in metadata without bypassing tenant audit
+        # authorization. Accepted targets already have the new membership.
+        actor=target_user if accept else None,
+        metadata={
+            "target_user_id": str(target_user.pk),
+            "target_username": target_user.username,
+        },
     )
     return locked
 
@@ -729,6 +739,13 @@ def create_organization_with_owner(
         lambda: ensure_purchase_request_compatibility_workflow(
             organization=organization,
             actor=owner,
+        )
+    )
+    from apps.daily_reports.workflow import ensure_daily_report_compatibility_workflow
+
+    transaction.on_commit(
+        lambda: ensure_daily_report_compatibility_workflow(
+            organization=organization, actor=owner
         )
     )
     return organization

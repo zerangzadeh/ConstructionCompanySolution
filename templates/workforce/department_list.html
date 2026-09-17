@@ -1,5 +1,5 @@
-{% extends "base.html" %} {% load static %} {% block title %}چارت شرکتی | سامانه مدیریت ساخت{% endblock %} {% block extra_head %}
-<link rel="stylesheet" href="{% static 'workforce/css/organization_chart.css' %}?v=4">{% endblock %} {% block content %} {% if "departments.create" in business_permission_codes %}{% url "workforce:department_create" as create_url %}{% endif %} {% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="چارت شرکتی" page_description="ساختار شرکت، واحدها، سمت‌ها و کارکنان" page_action_url=create_url page_action_label="واحد جدید" only %} {% include "workforce/_tabs.html" %}
+{% extends "base.html" %} {% load static %} {% block title %}واحدهای سازمانی | سامانه مدیریت ساخت{% endblock %} {% block extra_head %}
+<link rel="stylesheet" href="{% static 'workforce/css/organization_chart.css' %}?v=8">{% endblock %} {% block content %} {% if "departments.create" in business_permission_codes %}{% url "workforce:department_create" as create_url %}{% endif %} {% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="واحدهای سازمانی" page_description="ساختار دپارتمان‌ها و واحدهای شرکت" page_action_url=create_url page_action_label="واحد جدید" only %} {% include "workforce/_tabs.html" %}
 
 <section class="org-chart-shell mt-4" data-org-chart>
     <div class="org-chart-toolbar">
@@ -7,7 +7,7 @@
             <button type="button" data-view="tree" class="is-active" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M12 8v8"/></svg>نمای درختی</button>
             <button type="button" data-view="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>نمای لیستی</button>
         </div>
-        <label class="org-chart-search"><span class="sr-only">جستجو در چارت شرکتی</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" data-chart-search placeholder="جستجو در واحدها، سمت‌ها یا کارکنان…" autocomplete="off"></label>
+        <label class="org-chart-search"><span class="sr-only">جستجو در چارت واحدها</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input type="search" data-chart-search placeholder="جستجو در واحدها…" autocomplete="off"></label>
         <label class="org-chart-select"><span class="sr-only">فیلتر واحد</span><select data-department-filter><option value="">همه واحدها</option>{% for department in departments %}<option value="{{ department.id }}">{{ department.name }}</option>{% endfor %}</select></label>
         <label class="org-chart-select"><span class="sr-only">فیلتر وضعیت</span><select data-status-filter><option value="">همه وضعیت‌ها</option><option value="true">فعال</option><option value="false">غیرفعال</option></select></label>
     </div>
@@ -72,7 +72,7 @@
         </aside>
     </div>
 
-    <div class="org-chart-list" data-list-view hidden>
+    <div class="org-chart-list" data-list-view data-table-filter-controls hidden>
         {% if departments %}
         <div class="erp-table-wrap">
             <table class="w-full min-w-[760px] text-right">
@@ -98,10 +98,5 @@
         </div>{% else %}{% include "components/empty_state.html" with empty_title="واحدی ثبت نشده است" empty_description="ساختار شرکتی شرکت را ایجاد کنید." empty_action_url=create_url empty_action_label="واحد جدید" only %}{% endif %}
     </div>
 </section>
-
-{% if unassigned_employees %}
-<section class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4">
-    <h2 class="text-sm font-bold text-amber-900">کارکنان بدون واحد شرکتی</h2>
-    <div class="mt-3 flex flex-wrap gap-2">{% for employee in unassigned_employees %}<a class="rounded-lg border border-amber-200 bg-white px-3 py-2 text-xs text-amber-900 hover:border-amber-400" href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a>{% endfor %}</div>
-</section>{% endif %} {% endblock %} {% block extra_scripts %}
+{% endblock %} {% block extra_scripts %}
 <script src="{% static 'workforce/js/organization_chart.js' %}?v=4" defer></script>{% endblock %}

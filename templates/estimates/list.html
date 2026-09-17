@@ -13,7 +13,7 @@
             <div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">برآوردهای پروژه</h2><p class="mt-0.5 text-[11px] text-slate-500">مبالغ و وضعیت آخرین نسخهٔ هر برآورد</p></div><span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{{ estimates|length }} رکورد</span></div>
             <div class="erp-table-wrap">
                 <table class="w-full min-w-[920px] text-right">
-                    <thead><tr><th class="border-b border-slate-200 px-4 py-3">شماره برآورد</th><th class="border-b border-slate-200 px-4 py-3">عنوان</th><th class="border-b border-slate-200 px-4 py-3">پروژه / فاز</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3 text-left">مبلغ</th><th class="w-24 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr></thead>
+                    <thead><tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "number" "شماره برآورد" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "title" "عنوان" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "project" "پروژه / فاز" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "status" "وضعیت" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "amount" "مبلغ" %}</th><th class="w-24 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr></thead>
                     <tbody class="divide-y divide-slate-100">
                         {% for estimate in estimates %}
                             <tr>
@@ -28,7 +28,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ estimates|length }} برآورد</div>
+            {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ estimates|length }} برآورد</div>
         {% else %}
             {% include "components/empty_state.html" with empty_title="هنوز برآوردی ثبت نشده است" empty_description="برای شروع، یک برآورد جدید ثبت کنید." empty_action_url=estimate_create_url empty_action_label="ایجاد برآورد" only %}
         {% endif %}

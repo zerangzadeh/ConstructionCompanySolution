@@ -260,7 +260,7 @@ def get_organization_daily_report(
 
 
 @transaction.atomic
-def submit_daily_report(
+def _submit_daily_report_domain(
     *,
     organization: Organization,
     report_id: str,
@@ -599,7 +599,7 @@ def add_delay_event(
 
 
 @transaction.atomic
-def approve_daily_report(
+def _approve_daily_report_domain(
     *,
     organization: Organization,
     report_id: str,
@@ -649,3 +649,23 @@ def approve_daily_report(
         metadata={"project_id": str(report.project_id), "site_id": str(report.site_id)},
     )
     return report
+
+
+def submit_daily_report(
+    *, organization: Organization, report_id: str, actor: User
+) -> DailyReport:
+    from .workflow import submit_daily_report_with_workflow
+
+    return submit_daily_report_with_workflow(
+        organization=organization, report_id=report_id, actor=actor
+    )
+
+
+def approve_daily_report(
+    *, organization: Organization, report_id: str, actor: User
+) -> DailyReport:
+    from .workflow import approve_daily_report_with_workflow
+
+    return approve_daily_report_with_workflow(
+        organization=organization, report_id=report_id, actor=actor
+    )

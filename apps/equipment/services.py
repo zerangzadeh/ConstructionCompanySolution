@@ -423,6 +423,10 @@ def create_maintenance_record(
     cost: Decimal | None = None,
     notes: str = "",
 ) -> MaintenanceRecord:
+    from apps.workflows.runtime import WorkflowConflict
+
+    from .workflow import start_maintenance_workflow
+
     _require_permission(
         organization=organization,
         user=actor,
@@ -474,6 +478,13 @@ def create_maintenance_record(
             "maintenance_type": maintenance_type,
         },
     )
+    try:
+        start_maintenance_workflow(
+            organization=organization, record=record, actor=actor
+        )
+    except (PermissionDenied, WorkflowConflict):
+        # An unroutable scheduled record retains the legacy direct path.
+        pass
     return record
 
 
@@ -496,7 +507,7 @@ def get_organization_maintenance_records(
 
 
 @transaction.atomic
-def transition_maintenance_status(
+def _transition_maintenance_status_domain(
     *,
     organization: Organization,
     actor: User,
@@ -543,3 +554,26 @@ def transition_maintenance_status(
         metadata={"previous_status": previous_status, "new_status": target_status},
     )
     return locked
+
+
+def transition_maintenance_status(
+    *,
+    organization: Organization,
+    actor: User,
+    record: MaintenanceRecord,
+    target_status: str,
+    effective_date: date,
+    cost: Decimal | None = None,
+) -> MaintenanceRecord:
+    """Use the shared work runtime when the record has an active instance."""
+
+    from .workflow import perform_maintenance_transition
+
+    return perform_maintenance_transition(
+        organization=organization,
+        actor=actor,
+        record=record,
+        target_status=target_status,
+        effective_date=effective_date,
+        cost=cost,
+    )

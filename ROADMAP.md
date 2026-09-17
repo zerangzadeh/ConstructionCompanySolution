@@ -83,7 +83,7 @@ permissions, tenant isolation, workflows, or financial logic.
 
 ## F5 — Tenant Workflow & Work Management
 
-- **Status:** NEXT
+- **Status:** IN PROGRESS — W6 ACCEPTANCE GATES NOT YET PASSED
 - **Goal:** Provide tenant-configurable, versioned workflows, responsibility
   routing, persistent work items, and one centralized workbench for each active
   organization membership, supporting both small contractors and formal
@@ -101,7 +101,14 @@ permissions, tenant isolation, workflows, or financial logic.
   W3 PurchaseRequest pilot migration, and W4 centralized workbench are
   implemented. W3 preserves the legacy single-decision policy by default while
   allowing published tenant policies to consume W2 routing and separation
-  controls. W5 incremental domain adoption is next; F5 remains in progress.
+  controls. W5.1–W5.7 incremental domain-adoption slices are implemented; F5
+  stabilization remains in progress. W6 PostgreSQL migration/rollback,
+  2,000-item/250-candidate volume checks, and 48 consumer-workflow tests passed
+  on an isolated cluster; the recovery runbook and demo data are updated. A
+  broad pytest run excluding two independently passing seed tests still has 14
+  failures, and repository-wide Ruff is not green. F5 is not ready for Billing
+  & Progress Claims. Any separately approved operational scheduling adoption
+  remains outside this W6 scope.
 - **Boundary:** Domain models and application services remain authoritative for
   lifecycle and financial/operational invariants. Tenant configuration is
   declarative and limited to platform-registered commands, conditions, and

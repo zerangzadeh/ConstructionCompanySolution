@@ -5,3 +5,8 @@ class InventoryConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "apps.inventory"
     verbose_name = "انبار و موجودی"
+
+    def ready(self) -> None:
+        from .workflow import register_stock_transaction_workflow
+
+        register_stock_transaction_workflow()

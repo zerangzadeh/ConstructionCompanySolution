@@ -21,6 +21,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -41,11 +43,26 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"status": ("status", EstimateStatus.values)},
     )
+    page = paginate_table(
+        estimates,
+        request,
+        sort_fields={
+            "number": "estimate_number",
+            "title": "title",
+            "project": "project__name",
+            "status": "status",
+            "amount": "total_amount",
+        },
+        default_ordering=("title", "pk"),
+    )
     return render(
         request,
         "estimates/list.html",
         {
-            "estimates": estimates,
+            "estimates": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "pagination_rendered": True,
             "filters": build_table_filters(
                 request,
                 [

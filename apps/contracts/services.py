@@ -319,7 +319,7 @@ def add_contract_item(
 
 
 @transaction.atomic
-def approve_contract_amendment(
+def _approve_contract_amendment_domain(
     *, organization: Organization, actor: User, amendment: ContractAmendment
 ) -> ContractAmendment:
     """Approve a single immutable amendment without changing the legacy header value."""
@@ -356,3 +356,14 @@ def approve_contract_amendment(
         },
     )
     return locked
+
+
+def approve_contract_amendment(
+    *, organization: Organization, actor: User, amendment: ContractAmendment
+) -> ContractAmendment:
+    """Approve through W5.4 when the amendment has an active work item."""
+    from .workflow import approve_contract_amendment_with_workflow
+
+    return approve_contract_amendment_with_workflow(
+        organization=organization, actor=actor, amendment=amendment
+    )

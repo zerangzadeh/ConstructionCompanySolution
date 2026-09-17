@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
@@ -31,10 +31,13 @@ from apps.safety.services import (
     review_safety_incident,
     start_corrective_action,
 )
+from apps.workflows.runtime import WorkflowConflict
 from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -59,11 +62,26 @@ def incident_list(request: HttpRequest) -> HttpResponse:
         },
         date_fields={"occurred_at": "occurred_at__date"},
     )
+    page = paginate_table(
+        incidents,
+        request,
+        sort_fields={
+            "number": "incident_number",
+            "project": "project__name",
+            "incident_type": "incident_type",
+            "severity": "severity",
+            "status": "status",
+            "occurred_at": "occurred_at",
+        },
+        default_ordering=("-occurred_at", "-created_at", "pk"),
+    )
     return render(
         request,
         "safety/list.html",
         {
-            "incidents": incidents,
+            "incidents": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -106,7 +124,7 @@ def incident_create(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 **form.cleaned_data,
             )
-        except (PermissionDenied, ValueError) as exc:
+        except (PermissionDenied, ValidationError, WorkflowConflict, ValueError) as exc:
             form.add_error(None, str(exc))
         else:
             return redirect("safety:detail", incident_id=incident.pk)
@@ -155,7 +173,7 @@ def _transition_response(
             incident_id=incident_id,
             **kwargs,
         )
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, WorkflowConflict, ValueError) as exc:
         messages.error(request, str(exc))
     else:
         messages.success(request, "وضعیت حادثه ایمنی به‌روزرسانی شد.")

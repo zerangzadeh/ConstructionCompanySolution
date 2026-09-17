@@ -43,6 +43,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -63,11 +65,28 @@ def project_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", ProjectStatus.values)},
         date_fields={"start_date": "start_date", "end_date": "end_date"},
     )
+    page = paginate_table(
+        projects,
+        request,
+        sort_fields={
+            "code": "code",
+            "name": "name",
+            "status": "status",
+            "start_date": "start_date",
+            "end_date": "end_date",
+            "estimated_budget": "estimated_budget",
+            "actual_budget": "actual_budget",
+        },
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "projects/list.html",
         {
-            "projects": projects,
+            "projects": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "pagination_rendered": True,
             "filters": build_table_filters(
                 request,
                 [
@@ -151,16 +170,25 @@ def project_site_list(request: HttpRequest, project_id: str) -> HttpResponse:
         request,
         text_fields={"site": ("code", "name", "address")},
     )
+    page = paginate_table(
+        sites,
+        request,
+        sort_fields={"code": "code", "name": "name", "address": "address"},
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "projects/site_list.html",
         {
             "project": project,
-            "sites": sites,
+            "sites": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
                     {"name": "site", "kind": "text", "label": "کد، نام یا نشانی"},
+                    None,
                     None,
                     None,
                 ],
@@ -188,11 +216,26 @@ def site_list(request: HttpRequest) -> HttpResponse:
             "project": ("project__name",),
         },
     )
+    page = paginate_table(
+        sites,
+        request,
+        sort_fields={
+            "code": "code",
+            "name": "name",
+            "project": "project__name",
+            "active": "is_active",
+            "status": "is_active",
+            "address": "address",
+        },
+        default_ordering=("project__name", "name", "pk"),
+    )
     return render(
         request,
         "projects/all_site_list.html",
         {
-            "sites": sites,
+            "sites": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -267,12 +310,26 @@ def project_phase_list(
             "planned_end": "planned_end_date",
         },
     )
+    page = paginate_table(
+        phases,
+        request,
+        sort_fields={
+            "code": "code",
+            "name": "name",
+            "status": "status",
+            "planned_start": "planned_start_date",
+            "planned_end": "planned_end_date",
+        },
+        default_ordering=("planned_start_date", "name", "pk"),
+    )
     return render(
         request,
         "projects/phase_list.html",
         {
             "site": site,
-            "phases": phases,
+            "phases": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

@@ -11,29 +11,6 @@
             </div>
         </div>
 
-        {% if node.position_holders %}
-        <div class="org-chart-card__holders">
-            {% for holder in node.position_holders|slice:":2" %}
-            <div class="org-chart-card__person">
-                <span class="org-chart-avatar">
-                    {% if holder.employee.profile_image or holder.employee.user.profile_image %}
-                    <img src="{% url 'workforce:employee_profile_image' holder.employee.id %}" alt="عکس {{ holder.employee.first_name }} {{ holder.employee.last_name }}">
-                    {% else %}
-                    {{ holder.employee.first_name|first }}{{ holder.employee.last_name|first }}
-                    {% endif %}
-                </span>
-                <span class="min-w-0 text-right">
-                    <strong>{{ holder.employee.first_name }} {{ holder.employee.last_name }}</strong>
-                    <small>{% for position in holder.positions %}{{ position.title }}{% if not forloop.last %}، {% endif %}{% endfor %}</small>
-                </span>
-            </div>
-            {% endfor %}
-        </div>
-        {% if node.position_holders|length > 2 %}<p class="org-chart-card__more">+{{ node.position_holders|length|add:"-2" }} متصدی دیگر</p>{% endif %}
-        {% else %}
-        <div class="org-chart-card__empty">سمت فعالی در این واحد تخصیص نیافته است</div>
-        {% endif %}
-
         <div class="org-chart-card__footer">
             <span>{{ node.subtree_employee_count }} نفر در مجموعه</span>
             {% if node.children %}

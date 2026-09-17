@@ -1,0 +1,59 @@
+{% extends "base.html" %}{% load static table_filters %}
+{% block title %}چارت سمت‌ها | سامانه مدیریت ساخت{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="{% static 'workforce/css/organization_chart.css' %}?v=12">{% endblock %}
+{% block content %}
+{% if "positions.create" in business_permission_codes %}{% url "workforce:position_create" as create_url %}{% endif %}
+{% include "components/page_header.html" with page_eyebrow="منابع انسانی" page_title="چارت سمت‌ها" page_description="سلسله‌مراتب گزارش‌دهی سمت‌ها" page_action_url=create_url page_action_label="سمت جدید" only %}
+{% include "workforce/_tabs.html" %}
+
+<section class="position-chart-primary erp-surface mt-4 rounded-2xl p-5 sm:p-6">
+    <div class="position-chart-primary__toolbar">
+        <div class="position-chart-primary__view-switch" role="group" aria-label="نوع نمایش چارت سمت‌ها">
+            <button type="button" data-position-chart-view="tree"{% if not show_list_view %} class="is-active" aria-pressed="true"{% else %} aria-pressed="false"{% endif %}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="12" cy="19" r="2"/><path d="M7 5h10M12 7v10"/></svg>نمای درختی</button>
+            <button type="button" data-position-chart-view="list"{% if show_list_view %} class="is-active" aria-pressed="true"{% else %} aria-pressed="false"{% endif %}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4 6h.01M4 12h.01M4 18h.01"/></svg>نمای لیستی</button>
+        </div>
+        <label class="position-chart-primary__filter">
+            <span>واحد سازمانی</span>
+            <select data-position-chart-filter>
+                <option value="">همه واحدها</option>
+                {% for department in position_departments %}<option value="{{ department.id }}">{{ department.name }}</option>{% endfor %}
+                <option value="unassigned">بدون واحد</option>
+            </select>
+        </label>
+        <p>هر کارت یک سمت است؛ رنگ نوار کارت، سطح سلسله‌مراتب را نشان می‌دهد.</p>
+    </div>
+    <div class="position-hierarchy-scroll position-chart-primary__scroll" data-position-chart-tree{% if show_list_view %} hidden{% endif %}>
+        {% if position_tree %}
+        <ul class="position-hierarchy">{% include "workforce/_position_chart_node.html" with nodes=position_tree can_view_employees=can_view_employees only %}</ul>
+        {% else %}
+        <p class="text-center text-sm text-slate-500">هنوز سمت فعال تعریف نشده است.</p>
+        {% endif %}
+    </div>
+    <div class="position-chart-list" data-position-chart-list{% if not show_list_view %} hidden{% endif %}>
+        {% table_filters filters "position-chart-list-filters" %}
+        {% if position_rows %}
+        <div class="erp-table-wrap">
+            <table class="w-full min-w-[800px] text-right">
+                <thead><tr><th class="border-b border-slate-200 px-4 py-3">کد و عنوان</th><th class="border-b border-slate-200 px-4 py-3">واحد شرکتی</th><th class="border-b border-slate-200 px-4 py-3">سمت والد</th><th class="border-b border-slate-200 px-4 py-3">نوع تصدی</th><th class="border-b border-slate-200 px-4 py-3">شرح</th>{% if "positions.archive" in business_permission_codes %}<th class="border-b border-slate-200 px-4 py-3">عملیات</th>{% endif %}</tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for row in position_rows %}
+                    <tr class="transition hover:bg-slate-50" data-position-list-row data-department-id="{{ row.position.department_id|default:'unassigned' }}">
+                        <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 transition hover:text-blue-700" href="{% url 'workforce:position_detail' row.position.id %}">{{ row.position.title }}</a><a class="mt-0.5 block text-[11px] text-slate-500 hover:text-blue-700" dir="ltr" href="{% url 'workforce:position_detail' row.position.id %}">{{ row.position.code }}</a></td>
+                        <td class="px-4 py-3.5">{{ row.position.department.name|default:"—" }}</td>
+                        <td class="px-4 py-3.5">{% if row.position.parent_position %}<a class="font-semibold text-slate-700 transition hover:text-blue-700" href="{% url 'workforce:position_detail' row.position.parent_position.id %}">{{ row.position.parent_position.title }}</a><span class="mt-0.5 block font-mono text-[11px] text-slate-500" dir="ltr">{{ row.position.parent_position.code }}</span>{% else %}—{% endif %}</td>
+                        <td class="px-4 py-3.5">{% if row.position.is_single_holder %}تک‌متصدی{% else %}چندمتصدی{% endif %}</td>
+                        <td class="px-4 py-3.5">{{ row.position.description|default:"—" }}</td>
+                        {% if "positions.archive" in business_permission_codes %}<td class="px-4 py-3.5"><form method="post" action="{% url 'workforce:position_archive' row.position.id %}">{% csrf_token %}<button class="text-xs font-semibold text-red-700" type="submit">بایگانی</button></form></td>{% endif %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "components/table_pagination.html" %}
+        {% else %}
+        {% include "components/empty_state.html" with empty_title="سمتی ثبت نشده است" empty_description="سمت‌های مورد استفاده برای کارکنان را ثبت کنید." empty_action_url=create_url empty_action_label="سمت جدید" only %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+{% block extra_scripts %}<script src="{% static 'workforce/js/position_chart.js' %}?v=3" defer></script>{% endblock %}

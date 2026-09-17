@@ -54,6 +54,9 @@ class PositionForm(_StyledForm):
     department = forms.ModelChoiceField(
         label="واحد سازمانی", queryset=Department.objects.none(), required=False
     )
+    parent_position = forms.ModelChoiceField(
+        label="سمت بالادست", queryset=Position.objects.none(), required=False
+    )
     description = forms.CharField(
         label="شرح", required=False, widget=forms.Textarea(attrs={"rows": 3})
     )
@@ -67,10 +70,17 @@ class PositionForm(_StyledForm):
     def __init__(
         self, *args: object, organization: Organization, **kwargs: object
     ) -> None:
+        exclude_position = kwargs.pop("exclude_position", None)
         super().__init__(*args, **kwargs)
         self.fields["department"].queryset = Department.objects.filter(
             organization=organization, archived_at__isnull=True, is_active=True
         )
+        parents = Position.objects.filter(
+            organization=organization, archived_at__isnull=True, is_active=True
+        )
+        if exclude_position is not None:
+            parents = parents.exclude(pk=exclude_position.pk)
+        self.fields["parent_position"].queryset = parents
 
     def clean_code(self) -> str:
         return canonicalize_upper_identifier(self.cleaned_data["code"])

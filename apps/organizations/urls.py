@@ -9,6 +9,11 @@ urlpatterns = [
     path("create/", views.create_organization, name="create"),
     path("members/", views.organization_members, name="members"),
     path(
+        "members/<uuid:membership_id>/profile-image/",
+        views.member_profile_image,
+        name="member_profile_image",
+    ),
+    path(
         "members/accounts/create/",
         views.organization_account_create,
         name="account_create",

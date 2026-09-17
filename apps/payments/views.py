@@ -18,6 +18,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -39,15 +41,35 @@ def payment_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", PaymentStatus.values)},
         date_fields={"paid_on": "paid_on"},
     )
+    page = paginate_table(
+        payments,
+        request,
+        sort_fields={
+            "number": "payment_number",
+            "counterparty": "counterparty_name",
+            "project": "project__name",
+            "status": "status",
+            "amount": "amount",
+            "paid_on": "paid_on",
+        },
+        default_ordering=("-paid_on", "-created_at", "pk"),
+    )
     return render(
         request,
         "payments/list.html",
         {
-            "payments": payments,
+            "payments": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "pagination_rendered": True,
             "filters": build_table_filters(
                 request,
                 [
-                    {"name": "number", "kind": "text", "label": "شماره پرداخت"},
+                    {
+                        "name": "number",
+                        "kind": "text",
+                        "label": "شماره دریافت/ پرداخت",
+                    },
                     {"name": "counterparty", "kind": "text", "label": "طرف حساب"},
                     {"name": "project", "kind": "text", "label": "پروژه یا فاز"},
                     {

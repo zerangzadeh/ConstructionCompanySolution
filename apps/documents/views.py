@@ -28,6 +28,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -62,11 +64,24 @@ def document_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"document_type": ("document_type", DocumentType.values)},
     )
+    page = paginate_table(
+        documents,
+        request,
+        sort_fields={
+            "document": "title",
+            "document_type": "document_type",
+            "version": "current_version__version_number",
+            "created_at": "created_at",
+        },
+        default_ordering=("-created_at", "pk"),
+    )
     return render(
         request,
         "documents/list.html",
         {
-            "documents": documents,
+            "documents": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

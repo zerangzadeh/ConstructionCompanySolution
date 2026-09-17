@@ -50,7 +50,6 @@ from apps.workforce.services import (
     create_position,
     create_work_team,
     end_employee_position,
-    get_active_chief_executive,
     get_active_department_position_assignments,
     get_employee_position_assignments,
     get_organization_departments,
@@ -68,8 +67,11 @@ from apps.workforce.services import (
 )
 from core.list_filters import (
     apply_table_filters,
+    apply_table_sorting,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 _IMAGE_CONTENT_TYPES = {
@@ -118,11 +120,24 @@ def employee_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"status": ("status", EmployeeStatus.values)},
     )
+    page = paginate_table(
+        employees,
+        request,
+        sort_fields={
+            "employee": ("last_name", "first_name"),
+            "position": ("department__name", "position__title"),
+            "team": "work_team__name",
+            "status": "status",
+        },
+        default_ordering=("last_name", "first_name", "pk"),
+    )
     return render(
         request,
         "workforce/employee_list.html",
         {
-            "employees": employees,
+            "employees": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -484,17 +499,27 @@ def _master_list(
     *,
     text_fields: dict[str, tuple[str, ...]],
     filters: list[dict[str, object] | None],
+    sort_fields: dict[str, str | tuple[str, ...]],
+    default_ordering: tuple[str, ...],
 ) -> HttpResponse:
     records = apply_table_filters(
         service(user=request.user, organization=request.organization),
         request,
         text_fields=text_fields,
     )
+    page = paginate_table(
+        records,
+        request,
+        sort_fields=sort_fields,
+        default_ordering=default_ordering,
+    )
     return render(
         request,
         template_name,
         {
-            context_name: records,
+            context_name: page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(request, filters),
             "has_active_filters": has_active_table_filters(request),
         },
@@ -506,11 +531,8 @@ def _build_department_tree(departments) -> list[dict[str, object]]:
         department.pk: {
             "department": department,
             "children": [],
-            "positions": [],
             "work_teams": [],
             "employees": [],
-            "position_holders": [],
-            "employees_without_unit_position": [],
         }
         for department in departments
     }
@@ -523,6 +545,120 @@ def _build_department_tree(departments) -> list[dict[str, object]]:
         else:
             parent["children"].append(node)
     return roots
+
+
+def _build_position_tree(positions, assignments) -> list[dict[str, object]]:
+    """Build a hierarchy using only tenant-scoped, prefetched chart records."""
+    nodes = {
+        position.pk: {"position": position, "children": [], "holders": []}
+        for position in positions
+    }
+    for position in positions:
+        parent = nodes.get(position.parent_position_id)
+        if parent is not None:
+            parent["children"].append(nodes[position.pk])
+    for assignment in assignments:
+        node = nodes.get(assignment.position_id)
+        if node is not None:
+            node["holders"].append(assignment.employee)
+    return [
+        node
+        for node in nodes.values()
+        if node["position"].parent_position_id not in nodes
+    ]
+
+
+def _annotate_position_tree(nodes: list[dict[str, object]], *, depth: int = 0) -> None:
+    """Attach a presentation depth without changing position authority."""
+    for node in nodes:
+        node["depth"] = depth
+        _annotate_position_tree(node["children"], depth=depth + 1)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.POSITIONS_VIEW)
+@require_GET
+def position_list(request: HttpRequest) -> HttpResponse:
+    """Render the primary, position-centric organization chart."""
+    all_positions = get_organization_positions(
+        user=request.user,
+        organization=request.organization,
+    )
+    chart_positions = list(all_positions.filter(is_active=True))
+    filtered_positions = apply_table_filters(
+        all_positions,
+        request,
+        text_fields={
+            "position": ("code", "title"),
+            "department": ("department__name",),
+        },
+    )
+    page = paginate_table(
+        filtered_positions,
+        request,
+        sort_fields={
+            "position": ("title", "code"),
+            "department": "department__name",
+            "holder_type": "is_single_holder",
+            "description": "description",
+        },
+        default_ordering=("title", "pk"),
+    )
+    list_positions = page.object_list
+    can_view_employees = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.EMPLOYEES_VIEW,
+    )
+    active_assignments = []
+    if can_view_employees:
+        active_assignments = list(
+            get_active_department_position_assignments(
+                user=request.user,
+                organization=request.organization,
+            )
+        )
+    holders_by_position: dict[object, list[object]] = {
+        position.pk: [] for position in list_positions
+    }
+    for assignment in active_assignments:
+        holders_by_position.setdefault(assignment.position_id, []).append(
+            assignment.employee
+        )
+    position_tree = _build_position_tree(chart_positions, active_assignments)
+    _annotate_position_tree(position_tree)
+    position_departments = sorted(
+        {position.department for position in chart_positions if position.department_id},
+        key=lambda department: (department.name, department.pk),
+    )
+    return render(
+        request,
+        "workforce/position_chart.html",
+        {
+            "organization": request.organization,
+            "position_tree": position_tree,
+            "position_rows": [
+                {"position": position, "holders": holders_by_position[position.pk]}
+                for position in list_positions
+            ],
+            "position_departments": position_departments,
+            "can_view_employees": can_view_employees,
+            "filters": build_table_filters(
+                request,
+                [
+                    {"name": "position", "kind": "text", "label": "کد و عنوان"},
+                    {"name": "department", "kind": "text", "label": "واحد شرکتی"},
+                    None,
+                    None,
+                    None,
+                ],
+            ),
+            "has_active_filters": has_active_table_filters(request),
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
+            "show_list_view": request.GET.get("view") == "list",
+        },
+    )
 
 
 def _annotate_department_tree(nodes: list[dict[str, object]], *, depth: int = 0) -> int:
@@ -551,25 +687,22 @@ def _annotate_department_tree(nodes: list[dict[str, object]], *, depth: int = 0)
 @organization_permission_required(BusinessPermissionCode.DEPARTMENTS_VIEW)
 @require_GET
 def department_list(request: HttpRequest) -> HttpResponse:
-    departments = list(
+    departments = apply_table_sorting(
         get_organization_departments(
             user=request.user, organization=request.organization
-        )
+        ),
+        request,
+        sort_fields={
+            "name": ("name", "code"),
+            "parent": "parent__name",
+            "status": "is_active",
+        },
+        default_ordering=("name", "pk"),
     )
+    departments = list(departments)
     tree = _build_department_tree(departments)
     nodes = {node["department"].pk: node for node in _walk_department_tree(tree)}
 
-    can_view_positions = has_business_permission(
-        user=request.user,
-        organization=request.organization,
-        permission=BusinessPermissionCode.POSITIONS_VIEW,
-    )
-    if can_view_positions:
-        for position in get_organization_positions(
-            user=request.user, organization=request.organization
-        ):
-            if position.department_id in nodes:
-                nodes[position.department_id]["positions"].append(position)
     if has_business_permission(
         user=request.user,
         organization=request.organization,
@@ -580,7 +713,6 @@ def department_list(request: HttpRequest) -> HttpResponse:
         ):
             if work_team.department_id in nodes:
                 nodes[work_team.department_id]["work_teams"].append(work_team)
-    unassigned_employees = []
     employees = []
     can_view_employees = has_business_permission(
         user=request.user,
@@ -596,42 +728,6 @@ def department_list(request: HttpRequest) -> HttpResponse:
         for employee in employees:
             if employee.department_id in nodes:
                 nodes[employee.department_id]["employees"].append(employee)
-            elif employee.department_id is None:
-                unassigned_employees.append(employee)
-
-    for node in nodes.values():
-        node["employees_without_unit_position"] = list(node["employees"])
-
-    chief_executive = None
-    if can_view_employees and can_view_positions:
-        chief_executive = get_active_chief_executive(
-            user=request.user, organization=request.organization
-        )
-        if chief_executive in unassigned_employees:
-            unassigned_employees.remove(chief_executive)
-        holders_by_department: dict[object, dict[object, dict[str, object]]] = {}
-        for assignment in get_active_department_position_assignments(
-            user=request.user, organization=request.organization
-        ):
-            department_id = assignment.position.department_id
-            if department_id not in nodes:
-                continue
-            department_holders = holders_by_department.setdefault(department_id, {})
-            holder = department_holders.setdefault(
-                assignment.employee_id,
-                {"employee": assignment.employee, "positions": []},
-            )
-            holder["positions"].append(assignment.position)
-
-        for department_id, department_holders in holders_by_department.items():
-            node = nodes[department_id]
-            node["position_holders"] = list(department_holders.values())
-            holder_ids = set(department_holders)
-            node["employees_without_unit_position"] = [
-                employee
-                for employee in node["employees"]
-                if employee.pk not in holder_ids
-            ]
 
     _annotate_department_tree(tree, depth=1)
 
@@ -642,11 +738,8 @@ def department_list(request: HttpRequest) -> HttpResponse:
             "organization": request.organization,
             "departments": departments,
             "department_tree": tree,
-            "chief_executive": chief_executive,
             "organization_employee_count": len(employees),
             "can_view_employees": can_view_employees,
-            "can_view_chief_executive": can_view_employees and can_view_positions,
-            "unassigned_employees": unassigned_employees,
         },
     )
 
@@ -843,34 +936,12 @@ def department_archive(request: HttpRequest, department_id: str) -> HttpResponse
     return redirect("workforce:department_list")
 
 
-@active_organization_required
-@organization_permission_required(BusinessPermissionCode.POSITIONS_VIEW)
-@require_GET
-def position_list(request: HttpRequest) -> HttpResponse:
-    return _master_list(
-        request,
-        get_organization_positions,
-        "workforce/position_list.html",
-        "positions",
-        text_fields={
-            "position": ("code", "title"),
-            "department": ("department__name",),
-        },
-        filters=[
-            {"name": "position", "kind": "text", "label": "کد و عنوان"},
-            {"name": "department", "kind": "text", "label": "واحد شرکتی"},
-            None,
-            None,
-            None,
-        ],
-    )
-
-
 def _position_form_initial(position: Position) -> dict[str, object]:
     return {
         "code": position.code,
         "title": position.title,
         "department": position.department_id,
+        "parent_position": position.parent_position_id,
         "description": position.description,
         "is_single_holder": position.is_single_holder,
     }
@@ -934,6 +1005,7 @@ def position_detail(request: HttpRequest, position_id: str) -> HttpResponse:
         position_form=PositionForm(
             initial=_position_form_initial(position),
             organization=request.organization,
+            exclude_position=position,
         ),
     )
 
@@ -949,7 +1021,9 @@ def position_update(request: HttpRequest, position_id: str) -> HttpResponse:
     ).first()
     if position is None:
         return HttpResponseNotFound("سمت شغلی یافت نشد.")
-    form = PositionForm(request.POST, organization=request.organization)
+    form = PositionForm(
+        request.POST, organization=request.organization, exclude_position=position
+    )
     if form.is_valid():
         try:
             position = update_position(
@@ -1028,6 +1102,12 @@ def work_team_list(request: HttpRequest) -> HttpResponse:
             "department": ("department__name",),
             "lead": ("lead__first_name", "lead__last_name"),
         },
+        sort_fields={
+            "team": ("name", "code"),
+            "department": "department__name",
+            "lead": ("lead__last_name", "lead__first_name"),
+        },
+        default_ordering=("name", "pk"),
         filters=[
             {"name": "team", "kind": "text", "label": "کد و نام"},
             {"name": "department", "kind": "text", "label": "واحد شرکتی"},
@@ -1109,11 +1189,25 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", AssignmentStatus.values)},
         date_fields={"start_date": "start_date"},
     )
+    page = paginate_table(
+        assignments,
+        request,
+        sort_fields={
+            "employee": ("employee__last_name", "employee__first_name"),
+            "project": "project__name",
+            "role": "role_title",
+            "start_date": "start_date",
+            "status": "status",
+        },
+        default_ordering=("-start_date", "pk"),
+    )
     return render(
         request,
         "workforce/assignment_list.html",
         {
-            "assignments": assignments,
+            "assignments": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

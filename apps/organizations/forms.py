@@ -290,7 +290,11 @@ class OrganizationMemberPasswordResetForm(SetPasswordForm):
 
 
 class OrganizationAccountCreateForm(forms.Form):
-    username = forms.CharField(label="نام کاربری", max_length=150)
+    username = forms.CharField(
+        label="نام کاربری",
+        max_length=150,
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
+    )
     first_name = forms.CharField(label="نام", max_length=150)
     last_name = forms.CharField(label="نام خانوادگی", max_length=150)
     email = forms.EmailField(label="ایمیل", required=False)
@@ -349,6 +353,7 @@ class ExistingAccountConnectionForm(forms.Form):
         label="نام کاربری دقیق حساب موجود",
         max_length=150,
         help_text="فهرست کاربران سراسری نمایش داده نمی‌شود.",
+        widget=forms.TextInput(attrs={"autocomplete": "off"}),
     )
     role_definition = forms.ModelChoiceField(
         label="نقش پس از پذیرش",

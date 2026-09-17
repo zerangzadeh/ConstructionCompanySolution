@@ -170,7 +170,7 @@ def _record_transition(
 
 
 @transaction.atomic
-def create_safety_incident(
+def _create_safety_incident_domain(
     *,
     organization: Organization,
     actor: User,
@@ -273,7 +273,7 @@ def get_organization_safety_incident(
 
 
 @transaction.atomic
-def review_safety_incident(
+def _review_safety_incident_domain(
     *, organization: Organization, actor: User, incident_id: str
 ) -> SafetyIncident:
     _require_permission(
@@ -304,7 +304,7 @@ def review_safety_incident(
 
 
 @transaction.atomic
-def assign_safety_incident(
+def _assign_safety_incident_domain(
     *,
     organization: Organization,
     actor: User,
@@ -358,7 +358,7 @@ def assign_safety_incident(
 
 
 @transaction.atomic
-def start_corrective_action(
+def _start_corrective_action_domain(
     *,
     organization: Organization,
     actor: User,
@@ -395,7 +395,7 @@ def start_corrective_action(
 
 
 @transaction.atomic
-def resolve_safety_incident(
+def _resolve_safety_incident_domain(
     *,
     organization: Organization,
     actor: User,
@@ -431,7 +431,7 @@ def resolve_safety_incident(
 
 
 @transaction.atomic
-def close_safety_incident(
+def _close_safety_incident_domain(
     *,
     organization: Organization,
     actor: User,
@@ -464,3 +464,149 @@ def close_safety_incident(
         previous_status=previous_status,
     )
     return incident
+
+
+@transaction.atomic
+def create_safety_incident(
+    *,
+    organization: Organization,
+    actor: User,
+    project: Project,
+    incident_number: str,
+    occurred_at: datetime,
+    incident_type: str,
+    severity: str,
+    description: str,
+    immediate_action: str = "",
+    site: ProjectSite | None = None,
+    phase: ProjectPhase | None = None,
+    activity: Activity | None = None,
+    daily_report: DailyReport | None = None,
+) -> SafetyIncident:
+    from .workflow import start_safety_workflow
+
+    incident = _create_safety_incident_domain(
+        organization=organization,
+        actor=actor,
+        project=project,
+        incident_number=incident_number,
+        occurred_at=occurred_at,
+        incident_type=incident_type,
+        severity=severity,
+        description=description,
+        immediate_action=immediate_action,
+        site=site,
+        phase=phase,
+        activity=activity,
+        daily_report=daily_report,
+    )
+    from apps.workflows.runtime import WorkflowConflict
+
+    try:
+        with transaction.atomic():
+            start_safety_workflow(
+                organization=organization, incident=incident, actor=actor
+            )
+    except WorkflowConflict:
+        # Leave an unroutable new incident on its existing domain path.
+        pass
+    return incident
+
+
+def review_safety_incident(
+    *, organization: Organization, actor: User, incident_id: str
+) -> SafetyIncident:
+    from .workflow import perform_safety_transition
+
+    return perform_safety_transition(
+        organization=organization,
+        actor=actor,
+        incident_id=incident_id,
+        expected_status=SafetyIncidentStatus.REPORTED,
+        outcome=SafetyIncidentStatus.UNDER_REVIEW,
+        context={},
+    )
+
+
+def assign_safety_incident(
+    *,
+    organization: Organization,
+    actor: User,
+    incident_id: str,
+    due_date: date,
+    responsible_user: User | None = None,
+    responsible_employee: Employee | None = None,
+    responsible_party: BusinessParty | None = None,
+) -> SafetyIncident:
+    from .workflow import perform_safety_transition
+
+    return perform_safety_transition(
+        organization=organization,
+        actor=actor,
+        incident_id=incident_id,
+        expected_status=SafetyIncidentStatus.UNDER_REVIEW,
+        outcome=SafetyIncidentStatus.ASSIGNED,
+        context={
+            "due_date": due_date,
+            "responsible_user": responsible_user,
+            "responsible_employee": responsible_employee,
+            "responsible_party": responsible_party,
+        },
+    )
+
+
+def start_corrective_action(
+    *,
+    organization: Organization,
+    actor: User,
+    incident_id: str,
+    corrective_action: str,
+) -> SafetyIncident:
+    from .workflow import perform_safety_transition
+
+    return perform_safety_transition(
+        organization=organization,
+        actor=actor,
+        incident_id=incident_id,
+        expected_status=SafetyIncidentStatus.ASSIGNED,
+        outcome=SafetyIncidentStatus.ACTION_IN_PROGRESS,
+        context={"corrective_action": corrective_action},
+    )
+
+
+def resolve_safety_incident(
+    *,
+    organization: Organization,
+    actor: User,
+    incident_id: str,
+    resolution_summary: str,
+) -> SafetyIncident:
+    from .workflow import perform_safety_transition
+
+    return perform_safety_transition(
+        organization=organization,
+        actor=actor,
+        incident_id=incident_id,
+        expected_status=SafetyIncidentStatus.ACTION_IN_PROGRESS,
+        outcome=SafetyIncidentStatus.RESOLVED,
+        context={"resolution_summary": resolution_summary},
+    )
+
+
+def close_safety_incident(
+    *,
+    organization: Organization,
+    actor: User,
+    incident_id: str,
+    closure_summary: str,
+) -> SafetyIncident:
+    from .workflow import perform_safety_transition
+
+    return perform_safety_transition(
+        organization=organization,
+        actor=actor,
+        incident_id=incident_id,
+        expected_status=SafetyIncidentStatus.RESOLVED,
+        outcome=SafetyIncidentStatus.CLOSED,
+        context={"closure_summary": closure_summary},
+    )

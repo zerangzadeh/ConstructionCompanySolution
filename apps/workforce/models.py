@@ -142,6 +142,14 @@ class Position(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="positions",
     )
+    parent_position = models.ForeignKey(
+        "self",
+        verbose_name="سمت بالادست",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="child_positions",
+    )
     code = models.CharField("کد سمت", max_length=50)
     title = models.CharField("عنوان سمت", max_length=255)
     description = models.TextField("شرح", blank=True)
@@ -194,6 +202,28 @@ class Position(UUIDModel, TimeStampedModel):
             raise ValidationError("وارد کردن کد و عنوان سمت شغلی الزامی است.")
         if self.department_id:
             validate_related_organizations(self, department=self.department)
+        if self.parent_position_id:
+            validate_related_organizations(self, parent_position=self.parent_position)
+            if self.parent_position_id == self.pk:
+                raise ValidationError(
+                    {"parent_position": "سمت شغلی نمی‌تواند والد خودش باشد."}
+                )
+            if (
+                not self.parent_position.is_active
+                or self.parent_position.archived_at is not None
+            ):
+                raise ValidationError(
+                    {"parent_position": "سمت بالادست باید فعال و بایگانی‌نشده باشد."}
+                )
+            ancestor = self.parent_position
+            visited: set[object] = {self.pk}
+            while ancestor is not None:
+                if ancestor.pk in visited:
+                    raise ValidationError(
+                        {"parent_position": "ساختار سمت‌ها نمی‌تواند شامل چرخه باشد."}
+                    )
+                visited.add(ancestor.pk)
+                ancestor = ancestor.parent_position
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean(validate_constraints=False)

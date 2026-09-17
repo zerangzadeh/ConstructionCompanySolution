@@ -178,7 +178,7 @@ def _record_transition(
 
 
 @transaction.atomic
-def create_quality_issue(
+def _create_quality_issue_domain(
     *,
     organization: Organization,
     actor: User,
@@ -281,7 +281,7 @@ def get_organization_quality_issue(
 
 
 @transaction.atomic
-def review_quality_issue(
+def _review_quality_issue_domain(
     *, organization: Organization, actor: User, issue_id: str
 ) -> QualityIssue:
     _require_permission(
@@ -310,7 +310,7 @@ def review_quality_issue(
 
 
 @transaction.atomic
-def assign_quality_issue(
+def _assign_quality_issue_domain(
     *,
     organization: Organization,
     actor: User,
@@ -362,7 +362,7 @@ def assign_quality_issue(
 
 
 @transaction.atomic
-def start_quality_corrective_action(
+def _start_quality_corrective_action_domain(
     *,
     organization: Organization,
     actor: User,
@@ -395,7 +395,7 @@ def start_quality_corrective_action(
 
 
 @transaction.atomic
-def submit_quality_issue_for_verification(
+def _submit_quality_issue_for_verification_domain(
     *,
     organization: Organization,
     actor: User,
@@ -436,7 +436,7 @@ def submit_quality_issue_for_verification(
 
 
 @transaction.atomic
-def verify_quality_issue(
+def _verify_quality_issue_domain(
     *,
     organization: Organization,
     actor: User,
@@ -470,7 +470,7 @@ def verify_quality_issue(
 
 
 @transaction.atomic
-def close_quality_issue(
+def _close_quality_issue_domain(
     *,
     organization: Organization,
     actor: User,
@@ -499,3 +499,165 @@ def close_quality_issue(
         previous_status=previous_status,
     )
     return issue
+
+
+@transaction.atomic
+def create_quality_issue(
+    *,
+    organization: Organization,
+    actor: User,
+    project: Project,
+    issue_number: str,
+    identified_at: datetime,
+    issue_type: str,
+    severity: str,
+    description: str,
+    specification_reference: str = "",
+    site: ProjectSite | None = None,
+    phase: ProjectPhase | None = None,
+    activity: Activity | None = None,
+    daily_report: DailyReport | None = None,
+) -> QualityIssue:
+    from apps.workflows.runtime import WorkflowConflict
+
+    from .workflow import start_quality_workflow
+
+    issue = _create_quality_issue_domain(
+        organization=organization,
+        actor=actor,
+        project=project,
+        issue_number=issue_number,
+        identified_at=identified_at,
+        issue_type=issue_type,
+        severity=severity,
+        description=description,
+        specification_reference=specification_reference,
+        site=site,
+        phase=phase,
+        activity=activity,
+        daily_report=daily_report,
+    )
+    try:
+        start_quality_workflow(organization=organization, issue=issue, actor=actor)
+    except WorkflowConflict:
+        # An unroutable record retains its approved legacy domain path.
+        pass
+    return issue
+
+
+def review_quality_issue(
+    *, organization: Organization, actor: User, issue_id: str
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.REPORTED,
+        outcome=QualityIssueStatus.UNDER_REVIEW,
+        context={},
+    )
+
+
+def assign_quality_issue(
+    *,
+    organization: Organization,
+    actor: User,
+    issue_id: str,
+    due_date: date,
+    responsible_user: User | None = None,
+    responsible_employee: Employee | None = None,
+    responsible_party: BusinessParty | None = None,
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.UNDER_REVIEW,
+        outcome=QualityIssueStatus.ASSIGNED,
+        context={
+            "due_date": due_date,
+            "responsible_user": responsible_user,
+            "responsible_employee": responsible_employee,
+            "responsible_party": responsible_party,
+        },
+    )
+
+
+def start_quality_corrective_action(
+    *,
+    organization: Organization,
+    actor: User,
+    issue_id: str,
+    corrective_action: str,
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.ASSIGNED,
+        outcome=QualityIssueStatus.ACTION_IN_PROGRESS,
+        context={"corrective_action": corrective_action},
+    )
+
+
+def submit_quality_issue_for_verification(
+    *,
+    organization: Organization,
+    actor: User,
+    issue_id: str,
+    corrective_action_result: str,
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.ACTION_IN_PROGRESS,
+        outcome=QualityIssueStatus.AWAITING_VERIFICATION,
+        context={"corrective_action_result": corrective_action_result},
+    )
+
+
+def verify_quality_issue(
+    *,
+    organization: Organization,
+    actor: User,
+    issue_id: str,
+    verification_summary: str,
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.AWAITING_VERIFICATION,
+        outcome=QualityIssueStatus.VERIFIED,
+        context={"verification_summary": verification_summary},
+    )
+
+
+def close_quality_issue(
+    *,
+    organization: Organization,
+    actor: User,
+    issue_id: str,
+    closure_summary: str,
+) -> QualityIssue:
+    from .workflow import perform_quality_transition
+
+    return perform_quality_transition(
+        organization=organization,
+        actor=actor,
+        issue_id=issue_id,
+        expected_status=QualityIssueStatus.VERIFIED,
+        outcome=QualityIssueStatus.CLOSED,
+        context={"closure_summary": closure_summary},
+    )

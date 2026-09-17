@@ -21,7 +21,7 @@ from apps.procurement.tests import ProcurementFixtureMixin
 from apps.projects.models import ProjectSite
 from apps.workforce.models import Employee, EmployeePositionAssignment, Position
 
-from .models import WorkItem, WorkItemStatus
+from .models import WorkItem, WorkItemCandidate, WorkItemStatus
 
 
 @override_settings(PASSWORD_HASHERS=["django.contrib.auth.hashers.MD5PasswordHasher"])
@@ -163,6 +163,7 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         response = self.client.get(reverse("workflows:workbench"))
 
         self.assertEqual(response.context["counts"].all_items, 1)
+        self.assertEqual(response.context["counts"].role_permission_items, 0)
         self.assertEqual(
             {entry["count"] for entry in response.context["counts"].positions}, {1}
         )
@@ -203,6 +204,25 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
             reverse("workflows:workbench"), {"priority": "urgent"}
         )
         self.assertEqual(len(excluded.context["work_items"]), 0)
+
+    def test_role_permission_count_and_tab_use_routing_evidence(self) -> None:
+        purchase_request = self._submitted_request("WB-ROLE-PERMISSION")
+
+        response = self.client.get(reverse("workflows:workbench"))
+
+        self.assertEqual(response.context["counts"].all_items, 1)
+        self.assertEqual(response.context["counts"].role_permission_items, 1)
+        self.assertContains(response, "نقش و مجوز")
+        self.assertContains(response, "routing=role_permission")
+
+        filtered = self.client.get(
+            reverse("workflows:workbench"), {"routing": "role_permission"}
+        )
+
+        self.assertEqual(filtered.status_code, 200)
+        self.assertEqual(len(filtered.context["work_items"]), 1)
+        self.assertContains(filtered, purchase_request.title)
+        self.assertContains(filtered, 'name="routing" value="role_permission"')
 
     def test_work_reserved_by_another_member_is_excluded(self) -> None:
         purchase_request = self._submitted_request("WB-RESERVED")
@@ -259,6 +279,47 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         self.assertTrue(response.context["responsive_table"])
         self.assertContains(response, 'dir="rtl"')
         self.assertContains(response, 'class="erp-table-wrap"')
+        self.assertLessEqual(len(queries), 25)
+
+    def test_high_open_item_volume_keeps_page_and_query_count_bounded(self) -> None:
+        base = self._item(self._submitted_request("WB-W6-VOLUME"))
+        member = base.candidates.get().membership
+        items = WorkItem.objects.bulk_create(
+            [
+                WorkItem(
+                    organization=self.organization,
+                    instance=base.instance,
+                    step_instance=base.step_instance,
+                    action_key=f"w6-volume-{index}",
+                    idempotency_key=f"w6-volume-{index}",
+                    required_permission=base.required_permission,
+                    priority=index % 100,
+                )
+                for index in range(2000)
+            ],
+            batch_size=500,
+        )
+        WorkItemCandidate.objects.bulk_create(
+            [
+                WorkItemCandidate(
+                    organization=self.organization,
+                    work_item=item,
+                    membership=member,
+                    routing_basis=[{"resolver": "organization_owner"}],
+                    is_active=True,
+                )
+                for item in items
+            ],
+            batch_size=500,
+        )
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("workflows:workbench"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["counts"].all_items, 2001)
+        self.assertEqual(len(response.context["work_items"]), 25)
+        self.assertTrue(response.context["page_obj"].has_next())
         self.assertLessEqual(len(queries), 25)
 
     def test_claim_release_action_stale_and_htmx_csrf(self) -> None:

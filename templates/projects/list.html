@@ -16,7 +16,7 @@
             <div class="erp-table-wrap">
                 <table class="w-full min-w-[900px] border-collapse text-right text-sm">
                     <thead class="bg-slate-50 text-[11px] font-semibold text-slate-500">
-                        <tr><th class="border-b border-slate-200 px-4 py-3">کد پروژه</th><th class="border-b border-slate-200 px-4 py-3">نام پروژه</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">تاریخ شروع</th><th class="border-b border-slate-200 px-4 py-3">تاریخ پایان</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه تخمینی ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">بودجه واقعی ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
+                        <tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "code" "کد پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "name" "نام پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "status" "وضعیت" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "start_date" "تاریخ شروع" %}</th><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "end_date" "تاریخ پایان" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "estimated_budget" "بودجه تخمینی" %} ({{ request.organization.currency }})</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "actual_budget" "بودجه واقعی" %} ({{ request.organization.currency }})</th><th class="w-16 border-b border-slate-200 px-4 py-3 text-center">عملیات</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
                         {% for project in projects %}
@@ -36,7 +36,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه</span><span>مرتب‌شده براساس نام پروژه</span></div>
+            {% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}<div class="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500"><span>نمایش {{ projects|length }} پروژه</span><span>مرتب‌شده براساس نام پروژه</span></div>
         {% else %}
             {% include "components/empty_state.html" with empty_title="هنوز پروژه‌ای ثبت نشده است" empty_description="اولین پروژه این شرکت را ایجاد کنید." empty_action_url=project_create_url empty_action_label="ایجاد پروژه" only %}
         {% endif %}

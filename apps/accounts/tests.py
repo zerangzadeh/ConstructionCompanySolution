@@ -1,8 +1,10 @@
 import tempfile
+from io import StringIO
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.management import call_command
 from django.shortcuts import resolve_url
 from django.test import TestCase, override_settings
 from django.urls import reverse
@@ -324,6 +326,43 @@ class PersonalSettingsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password(self.password))
+
+
+class PopulateUserProfileImagesCommandTests(TestCase):
+    def test_population_reaches_the_requested_percentage_idempotently(self) -> None:
+        for index in range(5):
+            User.objects.create_user(
+                username=f"avatar-user-{index}", password="test-password"
+            )
+
+        with (
+            tempfile.TemporaryDirectory() as media_root,
+            override_settings(MEDIA_ROOT=media_root),
+        ):
+            call_command(
+                "populate_user_profile_images", percentage=80, stdout=StringIO()
+            )
+
+            self.assertEqual(User.objects.exclude(profile_image="").count(), 4)
+            image_names_before = list(
+                User.objects.exclude(profile_image="")
+                .order_by("pk")
+                .values_list("profile_image", flat=True)
+            )
+
+            call_command(
+                "populate_user_profile_images", percentage=80, stdout=StringIO()
+            )
+
+            self.assertEqual(User.objects.exclude(profile_image="").count(), 4)
+            self.assertEqual(
+                list(
+                    User.objects.exclude(profile_image="")
+                    .order_by("pk")
+                    .values_list("profile_image", flat=True)
+                ),
+                image_names_before,
+            )
 
 
 class LoginPageSettingsTests(TestCase):

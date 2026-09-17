@@ -388,7 +388,7 @@ def create_stock_transaction(
 
 
 @transaction.atomic
-def post_stock_transaction(
+def _post_stock_transaction_domain(
     *, organization: Organization, actor: User, stock_transaction: StockTransaction
 ) -> StockTransaction:
     _require_role(
@@ -458,7 +458,7 @@ def post_stock_transaction(
 
 
 @transaction.atomic
-def reverse_stock_transaction(
+def _reverse_stock_transaction_domain(
     *,
     organization: Organization,
     actor: User,
@@ -476,7 +476,7 @@ def reverse_stock_transaction(
     )
     try:
         original = (
-            StockTransaction.objects.select_for_update()
+            StockTransaction.objects.select_for_update(of=("self",))
             .select_related(
                 "source_warehouse",
                 "destination_warehouse",
@@ -551,6 +551,41 @@ def reverse_stock_transaction(
         },
     )
     return reversal
+
+
+def post_stock_transaction(
+    *, organization: Organization, actor: User, stock_transaction: StockTransaction
+) -> StockTransaction:
+    """Post directly unless an explicitly requested inventory workflow is active."""
+
+    from .workflow import post_stock_transaction_with_workflow
+
+    return post_stock_transaction_with_workflow(
+        organization=organization,
+        actor=actor,
+        stock_transaction=stock_transaction,
+    )
+
+
+def reverse_stock_transaction(
+    *,
+    organization: Organization,
+    actor: User,
+    stock_transaction: StockTransaction,
+    reversal_number: str,
+    reason: str,
+) -> StockTransaction:
+    """Reverse directly unless an explicitly requested inventory workflow is active."""
+
+    from .workflow import reverse_stock_transaction_with_workflow
+
+    return reverse_stock_transaction_with_workflow(
+        organization=organization,
+        actor=actor,
+        stock_transaction=stock_transaction,
+        reversal_number=reversal_number,
+        reason=reason,
+    )
 
 
 def get_organization_warehouses(

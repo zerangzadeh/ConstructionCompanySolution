@@ -8,13 +8,15 @@
 <div id="workbench-feedback" class="mt-4" aria-live="polite"></div>
 
 <nav class="mt-5 flex flex-wrap gap-2" aria-label="نماهای سمت">
-    <a class="erp-btn {% if not selected_filters.position %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="{% url 'workflows:workbench' %}">همه کارها <span class="tabular-nums">{{ counts.all_items }}</span></a>
-    {% for position in counts.positions %}<a class="erp-btn {% if selected_filters.position == position.id|stringformat:'s' %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="?position={{ position.id|urlencode }}">{{ position.label }} <span class="tabular-nums">{{ position.count }}</span></a>{% endfor %}
+    <a class="erp-btn {% if not selected_filters.position and not selected_filters.routing %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="{{ all_positions_url }}">همه کارها <span class="tabular-nums">{{ counts.all_items }}</span></a>
+    <a class="erp-btn {% if selected_filters.routing == 'role_permission' %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="{{ role_permission_url }}">نقش و مجوز <span class="tabular-nums">{{ counts.role_permission_items }}</span></a>
+    {% for position in position_links %}<a class="erp-btn {% if selected_filters.position == position.id|stringformat:'s' %}erp-btn--active{% else %}erp-btn--secondary{% endif %}" href="{{ position.url }}">{{ position.label }} <span class="tabular-nums">{{ position.count }}</span></a>{% endfor %}
 </nav>
 
 <div class="mt-4 grid min-w-0 gap-4 lg:grid-cols-[14rem_minmax(0,1fr)]">
-    <aside class="erp-surface h-fit rounded-xl p-4" aria-label="فیلترهای کارتابل">
-        <form method="get" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+    <aside class="erp-surface h-fit rounded-xl p-4" aria-label="فیلترهای کارتابل" data-table-filter-controls>
+        <form method="get" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1" data-table-filter-form>
+            {% if selected_filters.routing == 'role_permission' %}<input type="hidden" name="routing" value="role_permission">{% endif %}
             <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="workflow-filter">گردش‌کار</label><select id="workflow-filter" name="workflow"><option value="">همه</option>{% for value, label in filter_choices.workflow %}<option value="{{ value }}"{% if selected_filters.workflow == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
             <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="project-filter">پروژه</label><select id="project-filter" name="project"><option value="">همه</option>{% for value, label in filter_choices.project %}<option value="{{ value }}"{% if selected_filters.project == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
             <div><label class="mb-1 block text-xs font-semibold text-slate-700" for="site-filter">کارگاه</label><select id="site-filter" name="site"><option value="">همه</option>{% for value, label in filter_choices.site %}<option value="{{ value }}"{% if selected_filters.site == value %} selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>

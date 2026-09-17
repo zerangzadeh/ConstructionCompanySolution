@@ -40,6 +40,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -67,11 +69,24 @@ def equipment_list(request: HttpRequest) -> HttpResponse:
             "status": ("status", EquipmentStatus.values),
         },
     )
+    page = paginate_table(
+        equipment,
+        request,
+        sort_fields={
+            "equipment": ("name", "code"),
+            "category": "category",
+            "ownership": "ownership_type",
+            "status": "status",
+        },
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "equipment/list.html",
         {
-            "equipment": equipment,
+            "equipment": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -202,11 +217,24 @@ def assignment_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", EquipmentAssignmentStatus.values)},
         date_fields={"start_date": "start_date"},
     )
+    page = paginate_table(
+        assignments,
+        request,
+        sort_fields={
+            "equipment": "equipment__name",
+            "project": "project__name",
+            "start_date": "start_date",
+            "status": "status",
+        },
+        default_ordering=("-start_date", "pk"),
+    )
     return render(
         request,
         "equipment/assignment_list.html",
         {
-            "assignments": assignments,
+            "assignments": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -320,11 +348,24 @@ def maintenance_list(request: HttpRequest) -> HttpResponse:
         },
         date_fields={"scheduled_date": "scheduled_date"},
     )
+    page = paginate_table(
+        records,
+        request,
+        sort_fields={
+            "record": ("record_number", "summary"),
+            "equipment": "equipment__name",
+            "scheduled_date": "scheduled_date",
+            "status": "status",
+        },
+        default_ordering=("-scheduled_date", "pk"),
+    )
     return render(
         request,
         "equipment/maintenance_list.html",
         {
-            "records": records,
+            "records": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

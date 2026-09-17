@@ -29,6 +29,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -50,11 +52,19 @@ def party_list(request: HttpRequest) -> HttpResponse:
         text_fields={"name": ("display_name",), "tax_id": ("tax_id",)},
         choice_fields={"kind": ("kind", PartyKind.values)},
     )
+    page = paginate_table(
+        parties,
+        request,
+        sort_fields={"name": "display_name", "kind": "kind", "tax_id": "tax_id"},
+        default_ordering=("display_name", "pk"),
+    )
     return render(
         request,
         "parties/list.html",
         {
-            "parties": parties,
+            "parties": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

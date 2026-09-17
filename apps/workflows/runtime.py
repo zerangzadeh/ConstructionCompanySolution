@@ -542,6 +542,7 @@ def start_workflow(
     version_id: object,
     subject_id: str | UUID,
     idempotency_key: str,
+    initial_step_key: str | None = None,
 ) -> WorkflowInstance:
     """Start under lock order: domain subject, instance, active step, work item."""
     actor_membership = _require_membership(actor=actor, organization=organization)
@@ -620,6 +621,25 @@ def start_workflow(
     start_step = version.steps.filter(is_start=True).first()
     if start_step is None:
         raise ValidationError("نسخه منتشرشده گام شروع ندارد.")
+    if initial_step_key is not None:
+        resume_step = version.steps.filter(
+            key=initial_step_key, step_type="approval", is_terminal=False
+        ).first()
+        if resume_step is None:
+            raise ValidationError("گام آغاز بازپُرکنی معتبر نیست.")
+        state = snapshot.attributes.get("status")
+        commands = [
+            registry.domain_commands.get(transition.domain_command)
+            for transition in resume_step.outgoing_transitions.all()
+        ]
+        if not commands or not all(
+            command is not None
+            and command.workflow_type == version.definition.workflow_type.code
+            and state in command.from_states
+            for command in commands
+        ):
+            raise ValidationError("وضعیت موضوع با گام بازپُرکنی سازگار نیست.")
+        start_step = resume_step
     _activate_step(
         instance=instance,
         step=start_step,
@@ -1119,6 +1139,18 @@ def complete_work_item(
             context=command_context or {},
             idempotency_key=idempotency_key,
         )
+        refreshed = _load_subject(
+            organization=organization,
+            version=instance.version,
+            subject_id=instance.subject_id,
+            actor=actor,
+            for_update=False,
+        )
+        context = instance.subject_context | refreshed.attributes
+        _raw_update(
+            WorkflowInstance.objects.filter(pk=instance.pk), subject_context=context
+        )
+        instance.subject_context = context
     now = timezone.now()
     _raw_update(
         WorkItem.objects.filter(pk=item.pk),

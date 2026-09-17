@@ -1,0 +1,29 @@
+{% for node in nodes %}
+<li class="position-hierarchy__node position-hierarchy__node--level-{{ node.depth }}" data-position-chart-node data-department-id="{{ node.position.department_id|default:'unassigned' }}">
+    <article class="position-hierarchy__card">
+        <div class="position-hierarchy__heading">
+            {% if node.holders %}
+            {% with holder=node.holders.0 %}
+            <a class="position-hierarchy__badge" href="{% url 'workforce:employee_detail' holder.id %}" aria-label="متصدی فعال: {{ holder.first_name }} {{ holder.last_name }}">
+                {% if holder.profile_image or holder.user.profile_image %}
+                <img src="{% url 'workforce:employee_profile_image' holder.id %}" alt="">
+                {% else %}{{ holder.first_name|first }}{{ holder.last_name|first }}{% endif %}
+            </a>
+            {% endwith %}
+            {% else %}
+            <span class="position-hierarchy__badge position-hierarchy__badge--empty" aria-label="بدون متصدی فعال">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.5 3.1-5.5 6.5-5.5s5.8 2 6.5 5.5"/></svg>
+            </span>
+            {% endif %}
+            <div class="min-w-0">
+                <a class="position-hierarchy__title" href="{% url 'workforce:position_detail' node.position.id %}">{{ node.position.title }}</a>
+                {% if can_view_employees %}
+                <span class="position-hierarchy__holder">{% for employee in node.holders %}{{ employee.first_name }} {{ employee.last_name }}{% if not forloop.last %}، {% endif %}{% empty %}بدون متصدی فعال{% endfor %}</span>
+                {% endif %}
+            </div>
+        </div>
+        <p class="position-hierarchy__department">{{ node.position.department.name|default:"بدون واحد سازمانی" }}</p>
+    </article>
+    {% if node.children %}<ul class="position-hierarchy__children">{% include "workforce/_position_chart_node.html" with nodes=node.children can_view_employees=can_view_employees only %}</ul>{% endif %}
+</li>
+{% endfor %}

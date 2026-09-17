@@ -181,6 +181,116 @@ registry = WorkflowRegistry()
 
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="estimates.estimate",
+        subject_type="estimates.estimate",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "phase_id",
+                "contract_id",
+                "status",
+                "current_revision_id",
+                "created_by_id",
+            }
+        ),
+        start_permission="estimates.revise",
+        view_permission="estimates.view",
+        detail_url_name="estimates:detail",
+        detail_url_kwarg="estimate_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="estimates.estimate_approval",
+        subject_type="estimates.estimate",
+        subject_adapter="estimates.estimate",
+        allowed_scope_fields=frozenset({"project_id", "phase_id", "contract_id"}),
+        domain_commands=frozenset({"estimates.estimate.approve"}),
+    )
+)
+registry.register_domain_command(
+    DomainCommandSpec(
+        key="estimates.estimate.approve",
+        workflow_type="estimates.estimate_approval",
+        from_states=frozenset({"draft"}),
+        to_state="approved",
+    )
+)
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="contracts.contract_amendment",
+        subject_type="contracts.contract_amendment",
+        exposed_attributes=frozenset(
+            {"project_id", "contract_id", "status", "created_by_id"}
+        ),
+        start_permission="contracts.change",
+        view_permission="contracts.view",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="contracts.contract_amendment_approval",
+        subject_type="contracts.contract_amendment",
+        subject_adapter="contracts.contract_amendment",
+        allowed_scope_fields=frozenset({"project_id", "contract_id"}),
+        domain_commands=frozenset({"contracts.contract_amendment.approve"}),
+    )
+)
+registry.register_domain_command(
+    DomainCommandSpec(
+        key="contracts.contract_amendment.approve",
+        workflow_type="contracts.contract_amendment_approval",
+        from_states=frozenset({"draft"}),
+        to_state="approved",
+    )
+)
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="inventory.stock_transaction",
+        subject_type="inventory.stock_transaction",
+        exposed_attributes=frozenset(
+            {"project_id", "transaction_type", "status", "created_by_id"}
+        ),
+        # Posting and reversal have distinct service-bound start permissions.
+        start_permission="",
+        view_permission="stock_transactions.view",
+        detail_url_name="inventory:transaction_detail",
+        detail_url_kwarg="transaction_id",
+    )
+)
+for workflow_code, command_key, from_state, to_state in (
+    (
+        "inventory.stock_transaction_posting",
+        "inventory.stock_transaction.post",
+        "draft",
+        "posted",
+    ),
+    (
+        "inventory.stock_transaction_reversal",
+        "inventory.stock_transaction.reverse",
+        "posted",
+        "reversed",
+    ),
+):
+    registry.register_workflow_type(
+        WorkflowTypeSpec(
+            code=workflow_code,
+            subject_type="inventory.stock_transaction",
+            subject_adapter="inventory.stock_transaction",
+            allowed_scope_fields=frozenset({"project_id", "transaction_type"}),
+            domain_commands=frozenset({command_key}),
+        )
+    )
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type=workflow_code,
+            from_states=frozenset({from_state}),
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="procurement.purchase_request",
         subject_type="procurement.purchase_request",
         exposed_attributes=frozenset({"project_id", "status", "created_by_id"}),
@@ -190,6 +300,207 @@ registry.register_subject_adapter(
         detail_url_kwarg="request_id",
     )
 )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="equipment.maintenance_record",
+        subject_type="equipment.maintenance_record",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "site_id",
+                "maintenance_type",
+                "status",
+                "scheduled_date",
+                "created_by_id",
+            }
+        ),
+        # Starting an assignment does not itself perform a maintenance state
+        # change; the domain command rechecks the transition permission later.
+        start_permission="maintenance_records.view",
+        view_permission="maintenance_records.view",
+        detail_url_name="equipment:maintenance_status_change",
+        detail_url_kwarg="record_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="equipment.maintenance_record_lifecycle",
+        subject_type="equipment.maintenance_record",
+        subject_adapter="equipment.maintenance_record",
+        allowed_scope_fields=frozenset({"project_id", "site_id", "maintenance_type"}),
+        domain_commands=frozenset(
+            {
+                "equipment.maintenance_record.start",
+                "equipment.maintenance_record.complete",
+                "equipment.maintenance_record.cancel",
+            }
+        ),
+    )
+)
+for command_key, from_states, to_state in (
+    (
+        "equipment.maintenance_record.start",
+        frozenset({"scheduled"}),
+        "in_progress",
+    ),
+    (
+        "equipment.maintenance_record.complete",
+        frozenset({"scheduled", "in_progress"}),
+        "completed",
+    ),
+    (
+        "equipment.maintenance_record.cancel",
+        frozenset({"scheduled", "in_progress"}),
+        "cancelled",
+    ),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="equipment.maintenance_record_lifecycle",
+            from_states=from_states,
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="daily_reports.daily_report",
+        subject_type="daily_reports.daily_report",
+        exposed_attributes=frozenset(
+            {"project_id", "site_id", "status", "created_by_id"}
+        ),
+        start_permission="daily_reports.submit",
+        view_permission="daily_reports.view",
+        detail_url_name="daily_reports:detail",
+        detail_url_kwarg="report_id",
+    )
+)
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="safety.safety_incident",
+        subject_type="safety.safety_incident",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "site_id",
+                "status",
+                "created_by_id",
+                "responsible_display",
+            }
+        ),
+        start_permission="safety_incidents.view",
+        view_permission="safety_incidents.view",
+        detail_url_name="safety:detail",
+        detail_url_kwarg="incident_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="safety.safety_incident_lifecycle",
+        subject_type="safety.safety_incident",
+        subject_adapter="safety.safety_incident",
+        allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset(
+            f"safety.safety_incident.{action}"
+            for action in ("review", "assign", "start_action", "resolve", "close")
+        ),
+    )
+)
+for action, from_state, to_state in (
+    ("review", "reported", "under_review"),
+    ("assign", "under_review", "assigned"),
+    ("start_action", "assigned", "action_in_progress"),
+    ("resolve", "action_in_progress", "resolved"),
+    ("close", "resolved", "closed"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=f"safety.safety_incident.{action}",
+            workflow_type="safety.safety_incident_lifecycle",
+            from_states=frozenset({from_state}),
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="quality.quality_issue",
+        subject_type="quality.quality_issue",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "site_id",
+                "status",
+                "created_by_id",
+                "responsible_display",
+            }
+        ),
+        start_permission="quality_issues.view",
+        view_permission="quality_issues.view",
+        detail_url_name="quality:detail",
+        detail_url_kwarg="issue_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="quality.quality_issue_lifecycle",
+        subject_type="quality.quality_issue",
+        subject_adapter="quality.quality_issue",
+        allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset(
+            f"quality.quality_issue.{action}"
+            for action in (
+                "review",
+                "assign",
+                "start_action",
+                "submit_for_verification",
+                "verify",
+                "close",
+            )
+        ),
+    )
+)
+for action, from_state, to_state in (
+    ("review", "reported", "under_review"),
+    ("assign", "under_review", "assigned"),
+    ("start_action", "assigned", "action_in_progress"),
+    ("submit_for_verification", "action_in_progress", "awaiting_verification"),
+    ("verify", "awaiting_verification", "verified"),
+    ("close", "verified", "closed"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=f"quality.quality_issue.{action}",
+            workflow_type="quality.quality_issue_lifecycle",
+            from_states=frozenset({from_state}),
+            to_state=to_state,
+        )
+    )
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="daily_reports.daily_report_approval",
+        subject_type="daily_reports.daily_report",
+        subject_adapter="daily_reports.daily_report",
+        allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset(
+            {
+                "daily_reports.daily_report.submit",
+                "daily_reports.daily_report.approve",
+            }
+        ),
+    )
+)
+for command_key, from_state, to_state in (
+    ("daily_reports.daily_report.submit", "draft", "submitted"),
+    ("daily_reports.daily_report.approve", "submitted", "approved"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="daily_reports.daily_report_approval",
+            from_states=frozenset({from_state}),
+            to_state=to_state,
+        )
+    )
 registry.register_workflow_type(
     WorkflowTypeSpec(
         code="procurement.purchase_request_approval",

@@ -1,25 +1,25 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 
 {% block title %}کارگاه‌ها | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "project-site-filters" %}
 {% url "projects:detail" project.id as project_detail_url %}
 {% if "project_sites.create" in business_permission_codes %}{% url "projects:site_create" project.id as site_create_url %}{% endif %}
 {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=project_detail_url page_eyebrow=project.code page_title="کارگاه‌ها" page_description="کارگاه‌های فعال و تاریخی این پروژه" page_action_url=site_create_url page_action_label="افزودن کارگاه" only %}
 
-<div class="erp-surface mt-6 overflow-hidden rounded-xl">
+<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست کارگاه‌ها">
 {% if sites %}
-    {% for site in sites %}
-    <div class="border-b border-slate-100 px-5 py-4">
-        <div class="flex items-center justify-between gap-4">
-            <p class="font-semibold text-slate-900"><span class="inline-block" dir="ltr">{{ site.code }}</span> · {{ site.name }}</p>
-            {% if "project_phases.view" in business_permission_codes %}<a class="text-sm font-semibold text-blue-600 hover:text-blue-700" href="{% url 'projects:phase_list' project.id site.id %}">مشاهده فازها</a>{% endif %}
-        </div>
-        <p class="mt-1 whitespace-pre-line text-sm text-slate-500">{{ site.address|default:"نشانی ثبت نشده است." }}</p>
+    <div class="erp-table-wrap">
+        <table class="w-full min-w-[720px] text-right">
+            <thead><tr><th class="border-b border-slate-200 px-4 py-3">کد کارگاه</th><th class="border-b border-slate-200 px-4 py-3">نام کارگاه</th><th class="border-b border-slate-200 px-4 py-3">نشانی</th><th class="border-b border-slate-200 px-4 py-3">عملیات</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for site in sites %}
+                <tr class="transition hover:bg-blue-50/40"><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr">{{ site.code }}</td><td class="px-4 py-3.5"><span class="font-semibold text-slate-900">{{ site.name }}</span></td><td class="px-4 py-3.5 text-slate-500">{{ site.address|default:"نشانی ثبت نشده است." }}</td><td class="px-4 py-3.5">{% if "project_phases.view" in business_permission_codes %}<a class="text-xs font-semibold text-blue-700 hover:text-blue-900" href="{% url 'projects:phase_list' project.id site.id %}">مشاهده فازها</a>{% else %}—{% endif %}</td></tr>
+            {% endfor %}</tbody>
+        </table>
     </div>
-    {% endfor %}
 {% else %}
     {% include "components/empty_state.html" with empty_title="هنوز کارگاهی اضافه نشده است" empty_description="نخستین کارگاه این پروژه را ثبت کنید." empty_action_url=site_create_url empty_action_label="افزودن کارگاه" only %}
 {% endif %}
-</div>
+</section>
 {% endblock %}

@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import models, transaction
 from django.utils import timezone
 
-from apps.accounts.models import User
+from apps.accounts.models import LoginPageSettings, User
 from apps.audit.models import AuditEvent
 from apps.contracts.models import Contract, ContractAmendment, ContractItem
 from apps.contracts.services import (
@@ -21,12 +21,14 @@ from apps.contracts.services import (
     create_contract,
     transition_contract_status,
 )
+from apps.contracts.workflow import request_contract_amendment_approval
 from apps.daily_reports.models import (
     DailyActivity,
     DailyReport,
     DailyReportEquipmentEntry,
     DailyReportLaborEntry,
     DailyReportMaterialEntry,
+    DailyReportStatus,
     DelayEvent,
 )
 from apps.daily_reports.services import (
@@ -49,14 +51,16 @@ from apps.equipment.services import (
 )
 from apps.estimates.models import Estimate, EstimateItem, EstimateRevision
 from apps.estimates.services import add_estimate_item, approve_estimate, create_estimate
+from apps.estimates.workflow import request_estimate_approval
 from apps.expenses.models import Expense, ExpenseCategory
 from apps.expenses.services import create_expense, create_expense_category
-from apps.inventory.models import StockTransaction, Warehouse
+from apps.inventory.models import StockTransaction, StockTransactionStatus, Warehouse
 from apps.inventory.services import (
     create_stock_transaction,
     create_warehouse,
     post_stock_transaction,
 )
+from apps.inventory.workflow import request_stock_transaction_posting
 from apps.materials.models import Material, MaterialCategory, UnitOfMeasure
 from apps.materials.services import (
     create_material,
@@ -64,10 +68,18 @@ from apps.materials.services import (
     create_unit_of_measure,
 )
 from apps.organizations.models import (
+    BusinessPermission,
+    BusinessPermissionCode,
     MembershipRole,
     Organization,
+    OrganizationAccountConnectionRequest,
     OrganizationMembership,
+    OrganizationRole,
     OrganizationSettings,
+)
+from apps.organizations.role_defaults import (
+    DEFAULT_ROLE_METADATA,
+    DEFAULT_ROLE_PERMISSIONS,
 )
 from apps.organizations.services import create_organization_with_owner
 from apps.parties.models import BusinessParty, PartyContact, PartyRole
@@ -85,6 +97,7 @@ from apps.procurement.models import (
     PurchaseOrderItem,
     PurchaseRequest,
     PurchaseRequestItem,
+    PurchaseRequestStatus,
 )
 from apps.procurement.services import (
     add_goods_receipt_item,
@@ -133,6 +146,24 @@ from apps.safety.services import (
     review_safety_incident,
     start_corrective_action,
 )
+from apps.workflows.models import (
+    WorkflowCondition,
+    WorkflowDefinition,
+    WorkflowDelegation,
+    WorkflowInstance,
+    WorkflowRoutingRule,
+    WorkflowStepDefinition,
+    WorkflowStepInstance,
+    WorkflowTemplate,
+    WorkflowTransitionDefinition,
+    WorkflowType,
+    WorkflowVersion,
+    WorkItem,
+    WorkItemAssignmentHistory,
+    WorkItemCandidate,
+)
+from apps.workflows.registry import registry
+from apps.workflows.services import create_workflow_draft, edit_workflow_draft
 from apps.workforce.models import (
     Department,
     Employee,
@@ -158,7 +189,8 @@ ORGANIZATION_NAMES = (
     "مهندسان راه و سازه البرز",
 )
 
-DEMO_PASSWORD = "Demo@1405"
+DEMO_ADMIN_USERNAME = "admin"
+DEMO_PASSWORD = "admin"
 
 PERSON_NAMES = (
     ("علی", "رضایی"),
@@ -296,9 +328,15 @@ class Command(BaseCommand):
 
     tracked_models = (
         User,
+        LoginPageSettings,
+        # System-owned business catalog records are restored only when absent;
+        # Django's own auth/session/content-type records are never seeded here.
+        BusinessPermission,
+        OrganizationRole,
         Organization,
         OrganizationSettings,
         OrganizationMembership,
+        OrganizationAccountConnectionRequest,
         BusinessParty,
         PartyRole,
         PartyContact,
@@ -349,6 +387,20 @@ class Command(BaseCommand):
         Warehouse,
         StockTransaction,
         AuditEvent,
+        WorkflowType,
+        WorkflowTemplate,
+        WorkflowDefinition,
+        WorkflowVersion,
+        WorkflowStepDefinition,
+        WorkflowTransitionDefinition,
+        WorkflowCondition,
+        WorkflowRoutingRule,
+        WorkflowInstance,
+        WorkflowStepInstance,
+        WorkItem,
+        WorkItemCandidate,
+        WorkItemAssignmentHistory,
+        WorkflowDelegation,
     )
 
     def handle(self, *args: object, **options: object) -> None:
@@ -360,13 +412,16 @@ class Command(BaseCommand):
 
         before = {model: model.objects.count() for model in self.tracked_models}
         with transaction.atomic():
+            self._ensure_system_catalog()
+            admin = self._admin_user()
             for organization_index, organization_name in enumerate(
                 ORGANIZATION_NAMES, start=1
             ):
-                self._seed_organization(organization_index, organization_name)
+                self._seed_organization(organization_index, organization_name, admin)
 
         self.stdout.write(self.style.SUCCESS("Persian demo dataset is ready."))
-        self.stdout.write(f"Demo user password: {DEMO_PASSWORD}")
+        self.stdout.write(f"Admin username: {DEMO_ADMIN_USERNAME}")
+        self.stdout.write(f"Admin password: {DEMO_PASSWORD}")
         for model in self.tracked_models:
             created = model.objects.count() - before[model]
             self.stdout.write(f"{model._meta.label}: {created} created")
@@ -380,23 +435,183 @@ class Command(BaseCommand):
         existing = model.objects.filter(**lookup).first()
         return existing if existing is not None else creator()
 
-    def _user(self, index: int, role: str, name_index: int) -> User:
-        first_name, last_name = PERSON_NAMES[name_index % len(PERSON_NAMES)]
-        username = f"demo.o{index:02d}.{role}"
-        user = User.objects.filter(username=username).first()
-        if user is None:
-            user = User.objects.create_user(
-                username=username,
-                password=DEMO_PASSWORD,
-                first_name=first_name,
-                last_name=last_name,
-            )
-        return user
+    def _ensure_system_catalog(self) -> None:
+        """Restore only missing migration-owned business catalog records.
 
-    def _seed_organization(self, index: int, name: str) -> None:
-        owner = self._user(index, "owner", (index - 1) * 3)
-        manager = self._user(index, "manager", (index - 1) * 3 + 1)
-        accountant = self._user(index, "accountant", (index - 1) * 3 + 2)
+        A development database can have migration history without its data
+        migrations (for example after a restored schema-only dump).  Creating
+        an organization through the approved service requires these global
+        roles and permissions.  Existing catalog records and role grants are
+        intentionally left untouched.
+        """
+
+        permissions: dict[str, BusinessPermission] = {}
+        for code in BusinessPermissionCode.values:
+            permission, _ = BusinessPermission.objects.get_or_create(
+                code=code,
+                defaults={
+                    "name": BusinessPermissionCode(code).label,
+                    "description": "مجوز سیستمی موردنیاز سامانه ساخت.",
+                    "is_active": True,
+                },
+            )
+            permissions[code] = permission
+
+        for code, metadata in DEFAULT_ROLE_METADATA.items():
+            role, created = OrganizationRole.objects.get_or_create(
+                code=code,
+                defaults=metadata,
+            )
+            if created:
+                role.permissions.add(
+                    *(
+                        permissions[permission]
+                        for permission in DEFAULT_ROLE_PERMISSIONS[code]
+                    )
+                )
+
+        workflow_catalog = (
+            (
+                "procurement.purchase_request_approval",
+                "درخواست خرید",
+                "گردش‌کار تأیید درخواست خرید سازگار با فرآیند تدارکات.",
+                "purchase_request_legacy_compatibility",
+                "سازگاری تأیید درخواست خرید",
+                "رفتار تأیید یا رد تک‌مرحله‌ای درخواست خرید.",
+                "apps.procurement.workflow",
+            ),
+            (
+                "daily_reports.daily_report_approval",
+                "تأیید گزارش روزانه",
+                "گردش‌کار مرحله‌ای ارسال و تأیید گزارش روزانه.",
+                "daily_report_legacy_compatibility",
+                "سازگاری تأیید گزارش روزانه",
+                "رفتار ارسال و تأیید گزارش روزانه.",
+                "apps.daily_reports.workflow",
+            ),
+            (
+                "safety.safety_incident_lifecycle",
+                "چرخه حادثه ایمنی",
+                "گردش‌کار بررسی، اقدام اصلاحی و بستن حادثه ایمنی.",
+                "safety_incident_legacy_compatibility",
+                "سازگاری چرخه حادثه ایمنی",
+                "رفتار چرخه وضعیت فعلی حادثه ایمنی.",
+                "apps.safety.workflow",
+            ),
+            (
+                "estimates.estimate_approval",
+                "تأیید برآورد",
+                "گردش‌کار تأیید برآورد و بازنگری جاری.",
+                "estimate_legacy_compatibility",
+                "سازگاری تأیید برآورد",
+                "رفتار تأیید تک‌مرحله‌ای برآورد.",
+                "apps.estimates.workflow",
+            ),
+            (
+                "contracts.contract_amendment_approval",
+                "تأیید الحاقیه قرارداد",
+                "گردش‌کار تأیید الحاقیه قرارداد.",
+                "contract_amendment_legacy_compatibility",
+                "سازگاری تأیید الحاقیه",
+                "رفتار تأیید تک‌مرحله‌ای الحاقیه قرارداد.",
+                "apps.contracts.workflow",
+            ),
+            (
+                "quality.quality_issue_lifecycle",
+                "چرخه مسئله کیفیت",
+                "بررسی، تخصیص، اقدام، راستی‌آزمایی و بستن مسئله کیفیت.",
+                "quality_issue_legacy_compatibility",
+                "سازگاری چرخه مسئله کیفیت",
+                "چرخه فعلی مسئله کیفیت.",
+                "apps.quality.workflow",
+            ),
+            (
+                "equipment.maintenance_record_lifecycle",
+                "چرخه سرویس و تعمیر تجهیز",
+                "چرخه اقدام‌پذیر سرویس، تعمیر و بازرسی تجهیزات.",
+                "maintenance_record_lifecycle_legacy_compatibility",
+                "سازگاری چرخه سرویس و تعمیر تجهیز",
+                "چرخه فعلی سرویس و تعمیر تجهیز.",
+                "apps.equipment.workflow",
+            ),
+        )
+        for (
+            code,
+            name,
+            description,
+            template_code,
+            template_name,
+            template_description,
+            module_path,
+        ) in workflow_catalog:
+            specification = registry.workflow_types[code]
+            workflow_type, _ = WorkflowType.objects.get_or_create(
+                code=code,
+                defaults={
+                    "name": name,
+                    "description": description,
+                    "subject_type": specification.subject_type,
+                    "subject_adapter": specification.subject_adapter,
+                    "allowed_scope_fields": sorted(specification.allowed_scope_fields),
+                    "is_active": True,
+                },
+            )
+            module = __import__(module_path, fromlist=["COMPATIBILITY_CONFIGURATION"])
+            WorkflowTemplate.objects.get_or_create(
+                workflow_type=workflow_type,
+                code=template_code,
+                defaults={
+                    "name": template_name,
+                    "description": template_description,
+                    "configuration": module.COMPATIBILITY_CONFIGURATION,
+                    "is_active": True,
+                },
+            )
+        inventory_workflow = __import__(
+            "apps.inventory.workflow", fromlist=["POSTING", "REVERSAL"]
+        )
+        for action in (inventory_workflow.POSTING, inventory_workflow.REVERSAL):
+            specification = registry.workflow_types[action.workflow_type]
+            workflow_type, _ = WorkflowType.objects.get_or_create(
+                code=action.workflow_type,
+                defaults={
+                    "name": action.name,
+                    "description": action.description,
+                    "subject_type": specification.subject_type,
+                    "subject_adapter": specification.subject_adapter,
+                    "allowed_scope_fields": sorted(specification.allowed_scope_fields),
+                    "is_active": True,
+                },
+            )
+            WorkflowTemplate.objects.get_or_create(
+                workflow_type=workflow_type,
+                code=action.template_code,
+                defaults={
+                    "name": f"سازگاری {action.name}",
+                    "description": action.description,
+                    "configuration": inventory_workflow._configuration(action),
+                    "is_active": True,
+                },
+            )
+
+    def _admin_user(self) -> User:
+        """Create the single development administrator without changing it later."""
+
+        admin = User.objects.filter(username=DEMO_ADMIN_USERNAME).first()
+        if admin is None:
+            return User.objects.create_superuser(
+                username=DEMO_ADMIN_USERNAME,
+                password=DEMO_PASSWORD,
+                first_name="مدیر",
+                last_name="سامانه",
+            )
+        if not admin.is_staff or not admin.is_superuser:
+            raise CommandError(
+                f"The existing '{DEMO_ADMIN_USERNAME}' user is not a superuser."
+            )
+        return admin
+
+    def _seed_organization(self, index: int, name: str, owner: User) -> None:
         slug = f"demo-construction-{index:02d}"
         organization = self._existing_or_create(
             Organization,
@@ -410,20 +625,12 @@ class Command(BaseCommand):
                 currency="IRR",
             ),
         )
+        # The organization service creates the initial active owner membership.
+        # This command deliberately creates no other demo authentication users.
         OrganizationMembership.objects.get_or_create(
             organization=organization,
             user=owner,
-            defaults={
-                "role": MembershipRole.COMPANY_OWNER,
-                "status": "active",
-                "joined_at": organization.created_at,
-            },
-        )
-        self._ensure_membership(
-            organization, owner, manager, MembershipRole.OPERATIONS_MANAGER
-        )
-        self._ensure_membership(
-            organization, owner, accountant, MembershipRole.COMPANY_MANAGER
+            defaults={"role": MembershipRole.COMPANY_OWNER, "status": "active"},
         )
 
         parties = self._seed_parties(index, organization, owner)
@@ -440,7 +647,7 @@ class Command(BaseCommand):
                 project_index=project_index,
                 organization=organization,
                 owner=owner,
-                manager=manager,
+                manager=owner,
                 parties=parties,
                 units=units,
                 materials=materials,
@@ -454,7 +661,7 @@ class Command(BaseCommand):
             self._seed_workforce(
                 organization=organization,
                 owner=owner,
-                manager=manager,
+                manager=owner,
                 project=first_project,
                 site=first_site,
             )
@@ -466,6 +673,103 @@ class Command(BaseCommand):
                 maintenance_provider=parties[6],
                 organization_index=index,
             )
+            self._seed_workflow_condition_example(
+                organization=organization,
+                owner=owner,
+                project=first_project,
+            )
+
+    def _seed_workflow_condition_example(
+        self,
+        *,
+        organization: Organization,
+        owner: User,
+        project: Project,
+    ) -> None:
+        """Add one valid, unpublished condition example per tenant.
+
+        Published compatibility workflows are immutable, so this demonstration
+        stays a draft and cannot change live routing or domain transitions.
+        """
+
+        code = "demo-purchase-request-condition"
+        if WorkflowDefinition.objects.filter(
+            organization=organization,
+            code=code,
+        ).exists():
+            return
+        version = create_workflow_draft(
+            actor=owner,
+            organization=organization,
+            workflow_type_code="procurement.purchase_request_approval",
+            code=code,
+            name="نمونه شرط تأیید درخواست خرید",
+            description="پیش‌نویس آموزشی برای بررسی شرط‌های مجاز گردش‌کار.",
+            scope={"project_id": str(project.pk)},
+            change_summary="نمونه داده توسعه‌ای",
+        )
+        edit_workflow_draft(
+            actor=owner,
+            organization=organization,
+            version_id=version.pk,
+            configuration={
+                "steps": [
+                    {
+                        "key": "start",
+                        "name": "شروع",
+                        "step_type": "start",
+                        "is_start": True,
+                    },
+                    {
+                        "key": "decision",
+                        "name": "تصمیم مالک",
+                        "step_type": "approval",
+                        "configuration": {"decision_policy": "any"},
+                        "routing": [
+                            {
+                                "resolver_type": "organization_owner",
+                                "configuration": {},
+                            }
+                        ],
+                    },
+                    {
+                        "key": "approved",
+                        "name": "تأییدشده",
+                        "step_type": "end",
+                        "is_terminal": True,
+                    },
+                    {
+                        "key": "rejected",
+                        "name": "ردشده",
+                        "step_type": "end",
+                        "is_terminal": True,
+                    },
+                ],
+                "transitions": [
+                    {
+                        "source": "start",
+                        "target": "decision",
+                        "outcome": "submitted",
+                        "is_default": True,
+                    },
+                    {
+                        "source": "decision",
+                        "target": "approved",
+                        "outcome": "approved",
+                        "domain_command": "procurement.purchase_request.approve",
+                        "required_permission": "purchase_requests.approve",
+                        "conditions": [{"condition_type": "always"}],
+                    },
+                    {
+                        "source": "decision",
+                        "target": "rejected",
+                        "outcome": "rejected",
+                        "domain_command": "procurement.purchase_request.reject",
+                        "required_permission": "purchase_requests.reject",
+                    },
+                ],
+            },
+        )
 
     def _seed_equipment(
         self,
@@ -550,27 +854,6 @@ class Command(BaseCommand):
                 description="بازرسی روغن هیدرولیک، فیلترها و اتصالات بازو.",
                 notes="سرویس پیشگیرانه نمونه در تقویم نگهداری.",
             ),
-        )
-
-    def _ensure_membership(
-        self,
-        organization: Organization,
-        owner: User,
-        member: User,
-        role: str,
-    ) -> None:
-        membership = OrganizationMembership.objects.filter(
-            organization=organization, user=member, status="active"
-        ).first()
-        if membership is not None:
-            return
-        OrganizationMembership.objects.create(
-            organization=organization,
-            user=member,
-            role=role,
-            status="active",
-            joined_at=organization.created_at,
-            assigned_by=owner,
         )
 
     def _seed_parties(
@@ -780,6 +1063,13 @@ class Command(BaseCommand):
             contracts,
             units,
         )
+        self._seed_w54_open_workflow_examples(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            actor=owner,
+            contracts=contracts,
+        )
         payments = self._seed_payments(
             organization_index,
             project_index,
@@ -858,7 +1148,167 @@ class Command(BaseCommand):
             start=start,
             warehouse_location=address,
         )
+        if project_index == 1:
+            self._seed_open_inventory_workflow(
+                organization_index=organization_index,
+                organization=organization,
+                actor=owner,
+                project=project,
+                material=materials[0],
+                start=start,
+            )
+        self._seed_open_workflow_examples(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            actor=owner,
+            project=project,
+            site=site,
+            phase=phases[0],
+            activities=activities,
+            materials=materials,
+            start=start,
+        )
         return project, site
+
+    def _seed_open_inventory_workflow(
+        self,
+        *,
+        organization_index: int,
+        organization: Organization,
+        actor: User,
+        project: Project,
+        material: Material,
+        start: date,
+    ) -> None:
+        """Keep one explicit, actionable W5.6 posting example per tenant."""
+
+        transaction_number = f"STK-{organization_index:02d}-WF"
+        stock_transaction = StockTransaction.objects.filter(
+            organization=organization,
+            transaction_number=transaction_number,
+        ).first()
+        if stock_transaction is None:
+            warehouse = Warehouse.objects.get(
+                organization=organization, project=project
+            )
+            stock_transaction = create_stock_transaction(
+                organization=organization,
+                actor=actor,
+                transaction_number=transaction_number,
+                transaction_type="adjustment_in",
+                material=material,
+                unit_of_measure=material.unit_of_measure,
+                quantity=Decimal(10),
+                occurred_at=timezone.make_aware(
+                    datetime.combine(start + timedelta(days=35), datetime.min.time())
+                ),
+                destination_warehouse=warehouse,
+                project=project,
+                notes="نمونه باز درخواست تأیید ورود اصلاحی انبار.",
+            )
+        if stock_transaction.status == StockTransactionStatus.DRAFT:
+            request_stock_transaction_posting(
+                organization=organization,
+                actor=actor,
+                stock_transaction=stock_transaction,
+            )
+
+    def _seed_open_workflow_examples(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        actor: User,
+        project: Project,
+        site: ProjectSite,
+        phase: ProjectPhase,
+        activities: list[Activity],
+        materials: list[Material],
+        start: date,
+    ) -> None:
+        """Create deterministic actionable examples for the central workbench."""
+
+        request_number = f"PRQ-{organization_index:02d}-{project_index:02d}-WF"
+        purchase_request = PurchaseRequest.objects.filter(
+            organization=organization,
+            request_number=request_number,
+        ).first()
+        if purchase_request is None:
+            purchase_request = create_purchase_request(
+                organization=organization,
+                actor=actor,
+                project=project,
+                request_number=request_number,
+                title="درخواست خرید در انتظار بررسی کارتابل",
+                required_by=start + timedelta(days=75),
+                notes="نمونه باز برای نمایش گردش تأیید درخواست خرید در کارتابل متمرکز.",
+            )
+        if (
+            purchase_request.status == PurchaseRequestStatus.DRAFT
+            and not purchase_request.items.exists()
+        ):
+            material = materials[(project_index - 1) % len(materials)]
+            add_purchase_request_item(
+                organization=organization,
+                actor=actor,
+                purchase_request=purchase_request,
+                material=material,
+                unit_of_measure=material.unit_of_measure,
+                quantity=Decimal(25 + project_index * 5),
+                description=f"تأمین {material.name} برای نمونه گردش‌کار باز",
+                sort_order=1,
+            )
+        if purchase_request.status == PurchaseRequestStatus.DRAFT:
+            submit_purchase_request(
+                organization=organization,
+                actor=actor,
+                purchase_request=purchase_request,
+            )
+
+        reporting_date = start + timedelta(days=30 + project_index)
+        report = DailyReport.objects.filter(
+            organization=organization,
+            site=site,
+            reporting_date=reporting_date,
+        ).first()
+        if report is None:
+            report = create_daily_report(
+                organization=organization,
+                project=project,
+                site=site,
+                phase=phase,
+                actor=actor,
+                reporting_date=reporting_date,
+                work_performed="عملیات اجرایی روزانه برای نمونه گردش تأیید ثبت شد.",
+                weather_conditions="صاف",
+                labor_count=12 + project_index,
+                progress_summary="نمونه باز برای نمایش تأیید گزارش روزانه در کارتابل متمرکز.",
+                safety_notes="کنترل‌های ایمنی ابتدای شیفت انجام شد.",
+                quality_notes="کنترل کیفیت عملیات اجراشده ثبت شد.",
+            )
+        if report.status == DailyReportStatus.DRAFT:
+            self._seed_report_entries(
+                organization,
+                actor,
+                report,
+                project_index,
+                activities,
+                materials,
+                ("بیل مکانیکی", "جرثقیل برجی", "پمپ بتن", "بالابر کارگاهی"),
+                (
+                    "گروه اجرایی یک",
+                    "گروه اجرایی دو",
+                    "گروه اجرایی سه",
+                    "گروه اجرایی چهار",
+                ),
+            )
+            submit_daily_report(
+                organization=organization,
+                report_id=str(report.pk),
+                actor=actor,
+            )
 
     def _seed_safety_incident(
         self,
@@ -1341,6 +1791,51 @@ class Command(BaseCommand):
             if estimate_index == 1 and estimate.status == "draft":
                 approve_estimate(estimate=estimate, actor=owner)
 
+    def _seed_w54_open_workflow_examples(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        actor: User,
+        contracts: list[Contract],
+    ) -> None:
+        """Create one explicit, pending W5.4 item for each approval flow."""
+        estimate_number = f"EST-{organization_index:02d}-{project_index:02d}-02"
+        estimate = (
+            Estimate.objects.filter(
+                organization=organization,
+                estimate_number=estimate_number,
+                status="draft",
+            )
+            .select_related("current_revision")
+            .first()
+        )
+        if estimate and estimate.current_revision_id:
+            request_estimate_approval(estimate=estimate, actor=actor)
+
+        amendment = ContractAmendment.objects.filter(
+            organization=organization,
+            contract=contracts[0],
+            amendment_number=2,
+        ).first()
+        if amendment is None:
+            amendment = ContractAmendment.objects.create(
+                organization=organization,
+                contract=contracts[0],
+                amendment_number=2,
+                title="الحاقیه باز برای کارتابل تأیید",
+                reason="نمونه صریحِ در انتظار تأیید برای نمایش در کارتابل متمرکز.",
+                value_change=Decimal(250000000),
+                created_by=actor,
+            )
+        if amendment.status == "draft":
+            request_contract_amendment_approval(
+                organization=organization,
+                actor=actor,
+                amendment=amendment,
+            )
+
     def _seed_payments(
         self,
         organization_index: int,
@@ -1697,9 +2192,8 @@ class Command(BaseCommand):
                 organization=organization,
                 actor=owner,
                 employee_number="EMP-002",
-                first_name=manager.first_name,
-                last_name=manager.last_name,
-                user=manager,
+                first_name="مریم",
+                last_name="کاظمی",
                 department=technical,
                 position=technical_manager,
                 work_team=execution_team,

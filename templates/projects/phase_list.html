@@ -1,25 +1,25 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load table_filters %}
 
 {% block title %}فازهای پروژه | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% table_filters filters "phase-filters" %}
 {% url "projects:site_list" site.project.id as site_list_url %}
 {% if "project_phases.create" in business_permission_codes %}{% url "projects:phase_create" site.project.id site.id as phase_create_url %}{% endif %}
 {% include "components/page_header.html" with page_breadcrumb_label=site.name page_breadcrumb_url=site_list_url page_eyebrow=site.code page_title="فازهای پروژه" page_description="فازهای برنامه‌ریزی‌شده و فعال این کارگاه" page_action_url=phase_create_url page_action_label="افزودن فاز" only %}
 
-<div class="erp-surface mt-6 overflow-hidden rounded-xl">
+<section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست فازهای پروژه">
 {% if phases %}
-    {% for phase in phases %}
-    <a class="flex flex-col gap-2 border-b border-slate-100 px-5 py-4 hover:bg-slate-50 sm:flex-row sm:items-center sm:justify-between" href="{% url 'projects:phase_detail' site.project.id site.id phase.id %}">
-        <div>
-            <p class="font-semibold text-slate-900"><span class="inline-block" dir="ltr">{{ phase.code }}</span> · {{ phase.name }}</p>
-            <p class="mt-1 text-sm text-slate-500"><span dir="ltr">{{ phase.planned_start_date|default:"—" }}</span> تا <span dir="ltr">{{ phase.planned_end_date|default:"—" }}</span></p>
-        </div>
-        {% include "components/status_badge.html" with status=phase.status label=phase.get_status_display only %}
-    </a>
-    {% endfor %}
+    <div class="erp-table-wrap">
+        <table class="w-full min-w-[760px] text-right">
+            <thead><tr><th class="border-b border-slate-200 px-4 py-3">کد فاز</th><th class="border-b border-slate-200 px-4 py-3">نام فاز</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th><th class="border-b border-slate-200 px-4 py-3">شروع برنامه</th><th class="border-b border-slate-200 px-4 py-3">پایان برنامه</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">{% for phase in phases %}
+                <tr class="transition hover:bg-blue-50/40"><td class="whitespace-nowrap px-4 py-3.5 font-medium" dir="ltr"><a class="text-blue-700 hover:text-blue-900" href="{% url 'projects:phase_detail' site.project.id site.id phase.id %}">{{ phase.code }}</a></td><td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'projects:phase_detail' site.project.id site.id phase.id %}">{{ phase.name }}</a></td><td class="px-4 py-3.5">{% include "components/status_badge.html" with status=phase.status label=phase.get_status_display only %}</td><td class="px-4 py-3.5" dir="ltr">{{ phase.planned_start_date|default:"—" }}</td><td class="px-4 py-3.5" dir="ltr">{{ phase.planned_end_date|default:"—" }}</td></tr>
+            {% endfor %}</tbody>
+        </table>
+    </div>
 {% else %}
     {% include "components/empty_state.html" with empty_title="هنوز فازی اضافه نشده است" empty_description="نخستین فاز این کارگاه را ثبت کنید." empty_action_url=phase_create_url empty_action_label="افزودن فاز" only %}
 {% endif %}
-</div>
+</section>
 {% endblock %}

@@ -1,24 +1,9 @@
 {% if filters %}
 <div class="mb-3 flex items-center justify-end gap-2" data-table-filter-controls="{{ form_id }}">
-    <form id="{{ form_id }}" method="get" class="flex items-center gap-2" aria-label="Filters">
+    <form id="{{ form_id }}" method="get" class="flex items-center gap-2" aria-label="فیلترهای جدول" data-table-filter-form>
         <button class="h-8 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-700" type="submit">&#1575;&#1593;&#1605;&#1575;&#1604; &#1601;&#1740;&#1604;&#1578;&#1585;</button>
-        {% if has_active_filters %}<a class="text-[11px] font-semibold text-slate-500 transition hover:text-red-700" href="{{ request.path }}">&#1662;&#1575;&#1705;&#8204;&#1587;&#1575;&#1586;&#1740;</a>{% endif %}
+        {% if has_active_filters %}<a class="text-[11px] font-semibold text-slate-500 transition hover:text-red-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" href="{{ request.path }}" data-table-filter-clear>&#1662;&#1575;&#1705;&#8204;&#1587;&#1575;&#1586;&#1740;</a>{% endif %}
     </form>
 </div>
 <template id="{{ form_id }}-row">{% include "components/table_filter_row_v2.html" with filters=filters form_id=form_id only %}</template>
-<script>
-(() => {
-    const mount = () => {
-        const template = document.getElementById("{{ form_id }}-row");
-        const table = document.querySelector("main table");
-        const head = table?.querySelector("thead");
-        if (!template || !head || head.querySelector("[data-table-filter-row='{{ form_id }}']")) return;
-        const fragment = template.content.cloneNode(true);
-        fragment.querySelector("tr")?.setAttribute("data-table-filter-row", "{{ form_id }}");
-        head.appendChild(fragment);
-    };
-    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount, {once: true});
-    else mount();
-})();
-</script>
 {% endif %}

@@ -1,0 +1,10 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<nav class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-600" aria-label="صفحه‌بندی">
+    <span>نمایش صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} رکورد)</span>
+    <div class="flex items-center gap-1">
+        {% if page_obj.has_previous %}<a class="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 font-semibold transition hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" href="{% if pagination_query %}?{{ pagination_query }}&amp;page={{ page_obj.previous_page_number }}{% else %}?page={{ page_obj.previous_page_number }}{% endif %}">قبلی</a>{% endif %}
+        {% for number in page_obj.paginator.page_range %}<a class="rounded-md px-2 py-1.5 font-semibold transition focus:outline-none focus:ring-2 focus:ring-blue-500 {% if number == page_obj.number %}bg-blue-600 text-white{% else %}border border-slate-200 bg-white hover:border-blue-300 hover:text-blue-700{% endif %}" href="{% if pagination_query %}?{{ pagination_query }}&amp;page={{ number }}{% else %}?page={{ number }}{% endif %}"{% if number == page_obj.number %} aria-current="page"{% endif %}>{{ number }}</a>{% endfor %}
+        {% if page_obj.has_next %}<a class="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 font-semibold transition hover:border-blue-300 hover:text-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" href="{% if pagination_query %}?{{ pagination_query }}&amp;page={{ page_obj.next_page_number }}{% else %}?page={{ page_obj.next_page_number }}{% endif %}">بعدی</a>{% endif %}
+    </div>
+</nav>
+{% endif %}

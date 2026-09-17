@@ -44,6 +44,9 @@ class PaymentForm(JalaliDateMixin, forms.ModelForm):
 
     def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["payment_number"].label = "شماره دریافت/ پرداخت"
+        self.fields["paid_on"].label = "تاریخ دریافت/ پرداخت"
+        self.fields["method"].label = "روش دریافت/ پرداخت"
         self.fields["project"].queryset = Project.objects.filter(
             organization=organization,
             deleted_at__isnull=True,

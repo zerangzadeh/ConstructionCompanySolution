@@ -75,6 +75,7 @@
             path.setAttribute("d", `M ${parentX} ${parentBottom} V ${lineY} M ${horizontalStart} ${lineY} H ${horizontalEnd} ${verticals}`);
             connectors.append(path);
         });
+
     };
 
     const scheduleConnectorRender = () => window.requestAnimationFrame(renderConnectors);
@@ -164,5 +165,9 @@
     if (tree && "ResizeObserver" in window) {
         new ResizeObserver(scheduleConnectorRender).observe(tree);
     }
+    shell.querySelector("[data-organization-chart-details]")?.addEventListener(
+        "toggle",
+        scheduleConnectorRender,
+    );
     scheduleConnectorRender();
 })();

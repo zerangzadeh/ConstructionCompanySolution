@@ -5,7 +5,7 @@ from collections.abc import Callable
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
@@ -15,6 +15,8 @@ from apps.organizations.decorators import (
     require_organization_permission,
 )
 from apps.organizations.models import BusinessPermissionCode
+from apps.workflows.models import WorkItem
+from core.list_filters import table_pagination_query
 
 from .runtime import (
     WorkflowConflict,
@@ -39,8 +41,25 @@ def workbench(request: HttpRequest) -> HttpResponse:
         membership=data.membership,
         permission_codes=data.permission_codes,
     )
-    query = request.GET.copy()
-    query.pop("page", None)
+    pagination_query = table_pagination_query(request)
+    query = QueryDict(pagination_query, mutable=True)
+    all_positions_query = query.copy()
+    all_positions_query.pop("position", None)
+    all_positions_query.pop("routing", None)
+    role_permission_query = query.copy()
+    role_permission_query.pop("position", None)
+    role_permission_query["routing"] = "role_permission"
+    position_links = []
+    for position in data.counts.positions:
+        position_query = query.copy()
+        position_query.pop("routing", None)
+        position_query["position"] = str(position["id"])
+        position_links.append(
+            {
+                **position,
+                "url": f"{request.path}?{position_query.urlencode()}",
+            }
+        )
     return render(
         request,
         "workflows/workbench.html",
@@ -50,7 +69,15 @@ def workbench(request: HttpRequest) -> HttpResponse:
             "counts": data.counts,
             "filter_choices": data.filters,
             "selected_filters": request.GET,
-            "pagination_query": query.urlencode(),
+            "pagination_query": pagination_query,
+            "all_positions_url": f"{request.path}?{all_positions_query.urlencode()}"
+            if all_positions_query
+            else request.path,
+            "role_permission_url": (
+                f"{request.path}?{role_permission_query.urlencode()}"
+            ),
+            "position_links": position_links,
+            "pagination_rendered": True,
             "is_rtl": True,
             "responsive_table": True,
         },
@@ -148,6 +175,12 @@ def work_item_release(request: HttpRequest, work_item_id: object) -> HttpRespons
 def work_item_action(request: HttpRequest, work_item_id: object) -> HttpResponse:
     def operation() -> object:
         require_organization_permission(request, BusinessPermissionCode.WORK_ITEMS_ACT)
+        if WorkItem.objects.filter(
+            pk=work_item_id,
+            organization=request.organization,
+            instance__subject_type="safety.safety_incident",
+        ).exists():
+            raise PermissionDenied("اقدام ایمنی باید از فرم کامل حادثه ثبت شود.")
         outcome = request.POST.get("outcome", "").strip()
         if not outcome or len(outcome) > 100:
             raise ValidationError("نتیجه اقدام معتبر نیست.")

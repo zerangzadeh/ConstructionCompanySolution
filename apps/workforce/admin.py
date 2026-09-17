@@ -42,13 +42,14 @@ class PositionAdmin(ReadOnlyWorkforceAdmin):
         "code",
         "title",
         "department",
+        "parent_position",
         "is_single_holder",
         "organization",
         "is_active",
     )
     list_filter = ("organization", "department", "is_single_holder", "is_active")
     search_fields = ("code", "title", "organization__name")
-    list_select_related = ("department", "organization")
+    list_select_related = ("department", "parent_position", "organization")
 
 
 @admin.register(WorkTeam)

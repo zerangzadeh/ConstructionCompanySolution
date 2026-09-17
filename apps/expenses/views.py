@@ -18,6 +18,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -38,11 +40,25 @@ def expense_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"category": ("category", LegacyExpenseCategory.values)},
         date_fields={"incurred_on": "incurred_on"},
     )
+    page = paginate_table(
+        expenses,
+        request,
+        sort_fields={
+            "description": "description",
+            "project": "project__name",
+            "category": "category",
+            "incurred_on": "incurred_on",
+            "amount": "amount",
+        },
+        default_ordering=("-incurred_on", "-created_at", "pk"),
+    )
     return render(
         request,
         "expenses/list.html",
         {
-            "expenses": expenses,
+            "expenses": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

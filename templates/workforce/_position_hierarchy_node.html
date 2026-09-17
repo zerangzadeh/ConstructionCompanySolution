@@ -1,0 +1,22 @@
+{% for node in nodes %}
+<li class="position-hierarchy__node position-hierarchy__node--level-{{ node.depth }}">
+    <article class="position-hierarchy__card">
+        <div class="position-hierarchy__heading">
+            <span class="position-hierarchy__badge" aria-hidden="true">{{ node.depth|add:"1" }}</span>
+            <div class="min-w-0">
+                <a class="position-hierarchy__title" href="{% url 'workforce:position_detail' node.position.id %}">{{ node.position.title }}</a>
+                <span class="position-hierarchy__code" dir="ltr">{{ node.position.code }}</span>
+            </div>
+        </div>
+        {% if node.holders %}
+        <div class="position-hierarchy__holders">
+            <span>متصدی فعال</span>
+            <p>{% for employee in node.holders %}<a href="{% url 'workforce:employee_detail' employee.id %}">{{ employee.first_name }} {{ employee.last_name }}</a>{% if not forloop.last %}، {% endif %}{% endfor %}</p>
+        </div>
+        {% else %}
+        <p class="position-hierarchy__empty">بدون متصدی فعال</p>
+        {% endif %}
+    </article>
+    {% if node.children %}<ul class="position-hierarchy__children">{% include "workforce/_position_hierarchy_node.html" with nodes=node.children only %}</ul>{% endif %}
+</li>
+{% endfor %}

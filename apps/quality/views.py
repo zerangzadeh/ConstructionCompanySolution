@@ -40,6 +40,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -64,11 +66,26 @@ def issue_list(request: HttpRequest) -> HttpResponse:
         },
         date_fields={"identified_at": "identified_at__date"},
     )
+    page = paginate_table(
+        issues,
+        request,
+        sort_fields={
+            "number": "issue_number",
+            "project": "project__name",
+            "issue_type": "issue_type",
+            "severity": "severity",
+            "status": "status",
+            "identified_at": "identified_at",
+        },
+        default_ordering=("-identified_at", "-created_at", "pk"),
+    )
     return render(
         request,
         "quality/list.html",
         {
-            "issues": issues,
+            "issues": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

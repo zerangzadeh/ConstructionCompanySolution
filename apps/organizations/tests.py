@@ -1,6 +1,8 @@
+import tempfile
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -8,6 +10,8 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.forms import (
+    ExistingAccountConnectionForm,
+    OrganizationAccountCreateForm,
     OrganizationMembershipForm,
     OrganizationSettingsForm,
 )
@@ -143,10 +147,22 @@ class OrganizationTenantIsolationTests(TestCase):
             {"organization_id": str(self.organization.id)},
         )
 
-        self.assertRedirects(response, reverse("organizations:select"))
+        self.assertRedirects(response, reverse("financials:dashboard"))
         self.assertEqual(
             self.client.session[ACTIVE_ORGANIZATION_SESSION_KEY],
             str(self.organization.id),
+        )
+
+    def test_account_forms_disable_username_autocomplete(self) -> None:
+        create_form = OrganizationAccountCreateForm(allow_owner_role=True)
+        connection_form = ExistingAccountConnectionForm(allow_owner_role=True)
+
+        self.assertEqual(
+            create_form.fields["username"].widget.attrs["autocomplete"], "off"
+        )
+        self.assertEqual(
+            connection_form.fields["username"].widget.attrs["autocomplete"],
+            "off",
         )
 
     def test_selection_view_is_available_to_authenticated_user(self) -> None:
@@ -241,6 +257,59 @@ class OrganizationTenantIsolationTests(TestCase):
             reverse("organizations:member_update", args=[membership.pk]),
         )
         self.assertNotContains(response, "مدیریت عضویت")
+
+    def test_members_view_displays_a_scoped_member_avatar(self) -> None:
+        membership = self.user.organization_memberships.get(
+            organization=self.organization,
+        )
+        with (
+            tempfile.TemporaryDirectory() as media_root,
+            override_settings(MEDIA_ROOT=media_root),
+        ):
+            self.user.profile_image.save(
+                "avatar.png",
+                SimpleUploadedFile(
+                    "avatar.png",
+                    b"\x89PNG\r\n\x1a\nmember-avatar",
+                    content_type="image/png",
+                ),
+            )
+            self.client.force_login(self.user)
+
+            response = self.client.get(reverse("organizations:members"))
+
+            image_url = reverse(
+                "organizations:member_profile_image",
+                args=[membership.pk],
+            )
+            self.assertContains(response, image_url)
+
+            image_response = self.client.get(image_url)
+
+            self.assertEqual(image_response.status_code, 200)
+            self.assertEqual(image_response["Content-Type"], "image/png")
+            self.assertEqual(image_response["X-Content-Type-Options"], "nosniff")
+            self.assertTrue(
+                b"".join(image_response.streaming_content).startswith(b"\x89PNG")
+            )
+
+    def test_member_avatar_endpoint_is_scoped_to_the_active_organization(self) -> None:
+        other_membership = OrganizationMembership.objects.create(
+            user=self.other_user,
+            organization=self.other_organization,
+            role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            reverse(
+                "organizations:member_profile_image",
+                args=[other_membership.pk],
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
 
     def test_member_management_page_displays_user_profile_details(self) -> None:
         membership = self.user.organization_memberships.get(
@@ -1209,6 +1278,50 @@ class OwnerAccountManagementTests(TestCase):
                 status=MembershipStatus.ACTIVE,
             ).exists()
         )
+
+        # A duplicate POST is a safe retry, not a second membership operation.
+        self.assertEqual(
+            respond_to_account_connection_request(
+                target_user=target, request_record=connection, accept=True
+            ).pk,
+            connection.pk,
+        )
+        self.assertEqual(
+            OrganizationMembership.objects.filter(
+                organization=self.organization, user=target
+            ).count(),
+            1,
+        )
+
+    def test_target_rejection_is_audited_without_creating_membership(self) -> None:
+        target = User.objects.create_user(
+            username="rejecting-global-user", password="existing-password"
+        )
+        connection = request_existing_account_connection(
+            organization=self.organization,
+            actor=self.owner,
+            username=target.username,
+            role=self.member_role,
+        )
+
+        respond_to_account_connection_request(
+            target_user=target, request_record=connection, accept=False
+        )
+
+        connection.refresh_from_db()
+        self.assertEqual(connection.status, AccountConnectionRequestStatus.REJECTED)
+        self.assertFalse(
+            OrganizationMembership.objects.filter(
+                organization=self.organization, user=target
+            ).exists()
+        )
+        event = AuditEvent.objects.get(
+            action=AuditAction.ACCOUNT_CONNECTION_REJECTED,
+            entity_id=str(connection.pk),
+        )
+        self.assertIsNone(event.actor)
+        self.assertEqual(event.organization, self.organization)
+        self.assertEqual(event.metadata["target_user_id"], str(target.pk))
 
     def test_non_owner_default_role_cannot_create_tenant_accounts(self) -> None:
         manager = User.objects.create_user(username="account-company-manager")

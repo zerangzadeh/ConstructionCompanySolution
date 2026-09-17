@@ -18,6 +18,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -38,11 +40,25 @@ def contract_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"status": ("status", ContractStatus.values)},
     )
+    page = paginate_table(
+        contracts,
+        request,
+        sort_fields={
+            "number": "contract_number",
+            "title": "title",
+            "counterparty": "counterparty_name",
+            "status": "status",
+            "value": "contract_value",
+        },
+        default_ordering=("title", "pk"),
+    )
     return render(
         request,
         "contracts/list.html",
         {
-            "contracts": contracts,
+            "contracts": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "can_manage_contracts": can_manage_contracts(
                 request.user, request.organization
             ),

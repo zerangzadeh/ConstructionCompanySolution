@@ -204,6 +204,7 @@ def create_position(
     code: str,
     title: str,
     department: Department | None = None,
+    parent_position: Position | None = None,
     description: str = "",
     is_single_holder: bool = False,
 ) -> Position:
@@ -212,12 +213,20 @@ def create_position(
         actor=actor,
         permission=BusinessPermissionCode.POSITIONS_CREATE,
     )
-    _require_same_organization(organization, department=department)
+    _require_same_organization(
+        organization, department=department, parent_position=parent_position
+    )
     if department is not None:
         _require_active_master(department, "department")
+    locked_parent = None
+    if parent_position is not None:
+        locked_parent = Position.objects.select_for_update().get(pk=parent_position.pk)
+        _require_same_organization(organization, parent_position=locked_parent)
+        _require_active_master(locked_parent, "parent position")
     position = Position(
         organization=organization,
         department=department,
+        parent_position=locked_parent,
         code=code,
         title=title,
         description=description.strip(),
@@ -246,6 +255,7 @@ def update_position(
     code: str,
     title: str,
     department: Department | None = None,
+    parent_position: Position | None = None,
     description: str = "",
     is_single_holder: bool = False,
 ) -> Position:
@@ -254,12 +264,22 @@ def update_position(
         actor=actor,
         permission=BusinessPermissionCode.POSITIONS_CHANGE,
     )
-    _require_same_organization(organization, position=position, department=department)
+    _require_same_organization(
+        organization,
+        position=position,
+        department=department,
+        parent_position=parent_position,
+    )
     locked = Position.objects.select_for_update().get(pk=position.pk)
     if locked.archived_at is not None:
         raise ValueError("سمت شغلی بایگانی‌شده قابل ویرایش نیست.")
     if department is not None:
         _require_active_master(department, "department")
+    locked_parent = None
+    if parent_position is not None:
+        locked_parent = Position.objects.select_for_update().get(pk=parent_position.pk)
+        _require_same_organization(organization, parent_position=locked_parent)
+        _require_active_master(locked_parent, "parent position")
 
     active_assignments = EmployeePositionAssignment.objects.filter(
         organization=organization,
@@ -282,6 +302,7 @@ def update_position(
     locked.code = code
     locked.title = title
     locked.department = department
+    locked.parent_position = locked_parent
     locked.description = description.strip()
     locked.is_single_holder = is_single_holder
     locked.updated_by = actor
@@ -778,7 +799,7 @@ def get_active_chief_executive(
 def get_active_department_position_assignments(
     *, user: User, organization: Organization
 ) -> QuerySet[EmployeePositionAssignment]:
-    """Return active position holders for department-scoped chart cards."""
+    """Return active position holders for the tenant-scoped organization chart."""
     _require_active_access(
         organization=organization,
         user=user,
@@ -795,11 +816,16 @@ def get_active_department_position_assignments(
             status=PositionAssignmentStatus.ACTIVE,
             employee__status=EmployeeStatus.ACTIVE,
             employee__archived_at__isnull=True,
-            position__department__isnull=False,
             position__is_active=True,
             position__archived_at__isnull=True,
         )
-        .select_related("employee", "position", "position__department")
+        .select_related(
+            "employee",
+            "employee__user",
+            "position",
+            "position__department",
+            "position__parent_position",
+        )
         .order_by(
             "position__department__name",
             "employee__last_name",
@@ -929,7 +955,7 @@ def get_organization_positions(
     )
     return Position.objects.filter(
         organization=organization, archived_at__isnull=True
-    ).select_related("department")
+    ).select_related("department", "parent_position")
 
 
 def get_organization_work_teams(
@@ -1169,12 +1195,15 @@ def _archive_master(
             "واحد سازمانی دارای رکورد فعال نیروی انسانی قابل بایگانی نیست."
         )
     if isinstance(locked, Position) and (
-        locked.employees.filter(archived_at__isnull=True).exists()
+        locked.child_positions.filter(archived_at__isnull=True, is_active=True).exists()
+        or locked.employees.filter(archived_at__isnull=True).exists()
         or locked.employee_assignments.filter(
             status=PositionAssignmentStatus.ACTIVE
         ).exists()
     ):
-        raise ValueError("سمت شغلی تخصیص‌یافته به کارکنان فعال قابل بایگانی نیست.")
+        raise ValueError(
+            "سمت شغلی دارای زیرسمت فعال یا تخصیص کارکنان فعال قابل بایگانی نیست."
+        )
     if (
         isinstance(locked, WorkTeam)
         and locked.members.filter(archived_at__isnull=True).exists()

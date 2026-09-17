@@ -39,6 +39,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -52,11 +54,26 @@ def unit_list(request: HttpRequest) -> HttpResponse:
         text_fields={"code": ("code",), "name": ("name", "symbol")},
         choice_fields={"category": ("category", UnitCategory.values)},
     )
+    page = paginate_table(
+        units,
+        request,
+        sort_fields={
+            "code": "code",
+            "name": "name",
+            "symbol": "symbol",
+            "category": "category",
+            "type": "category",
+            "decimal_places": "decimal_places",
+        },
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "materials/unit_list.html",
         {
-            "units": units,
+            "units": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -226,16 +243,30 @@ def material_list(request: HttpRequest) -> HttpResponse:
         materials,
         request,
         text_fields={
+            "q": ("code", "name"),
             "code": ("code",),
             "name": ("name",),
             "category": ("category__name",),
         },
     )
+    page = paginate_table(
+        materials,
+        request,
+        sort_fields={
+            "code": "code",
+            "name": "name",
+            "category": "category__name",
+            "unit": "unit_of_measure__name",
+        },
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "materials/material_list.html",
         {
-            "materials": materials,
+            "materials": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

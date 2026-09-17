@@ -30,7 +30,8 @@ The application currently provides the following tenant-scoped modules:
 - **Inventory:** warehouses and an immutable movement ledger for receipts,
   issues, adjustments, transfers, reversals, and derived balances.
 - **Equipment:** equipment masters, conflict-safe assignments, and maintenance
-  history.
+  history; open maintenance work is routed through the shared workflow workbench
+  without changing assignment or general-equipment lifecycles.
 - **Daily reports:** daily worksite reporting with labor, equipment, material,
   progress, safety, and quality information.
 - **Contracts:** organization-scoped project contracts and contract values.

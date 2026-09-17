@@ -26,8 +26,18 @@ urlpatterns = [
         name="transaction_post",
     ),
     path(
+        "transactions/<uuid:transaction_id>/request-posting/",
+        views.transaction_request_posting,
+        name="transaction_request_posting",
+    ),
+    path(
         "transactions/<uuid:transaction_id>/reverse/",
         views.transaction_reverse,
         name="transaction_reverse",
+    ),
+    path(
+        "transactions/<uuid:transaction_id>/request-reversal/",
+        views.transaction_request_reversal,
+        name="transaction_request_reversal",
     ),
 ]

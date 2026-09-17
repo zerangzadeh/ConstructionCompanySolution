@@ -2,7 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from django.contrib import messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
@@ -24,6 +24,10 @@ from apps.inventory.services import (
     post_stock_transaction,
     reverse_stock_transaction,
 )
+from apps.inventory.workflow import (
+    request_stock_transaction_posting,
+    request_stock_transaction_reversal,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -33,6 +37,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -72,11 +78,24 @@ def warehouse_list(request: HttpRequest) -> HttpResponse:
             "location": ("location",),
         },
     )
+    page = paginate_table(
+        warehouses,
+        request,
+        sort_fields={
+            "warehouse": ("name", "code"),
+            "project": "project__name",
+            "location": "location",
+            "status": "is_active",
+        },
+        default_ordering=("name", "pk"),
+    )
     return render(
         request,
         "inventory/warehouse_list.html",
         {
-            "warehouses": warehouses,
+            "warehouses": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -184,11 +203,27 @@ def transaction_list(request: HttpRequest) -> HttpResponse:
         },
         date_fields={"occurred_at": "occurred_at__date"},
     )
+    page = paginate_table(
+        transactions,
+        request,
+        sort_fields={
+            "number": "transaction_number",
+            "material": "material__name",
+            "warehouse": "source_warehouse__name",
+            "type": "transaction_type",
+            "quantity": "quantity",
+            "occurred_at": "occurred_at",
+            "status": "status",
+        },
+        default_ordering=("-occurred_at", "-created_at", "pk"),
+    )
     return render(
         request,
         "inventory/transaction_list.html",
         {
-            "transactions": transactions,
+            "transactions": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -260,9 +295,30 @@ def transaction_post(request: HttpRequest, transaction_id: str) -> HttpResponse:
             stock_transaction=record,
         )
         messages.success(request, "تراکنش انبار ثبت نهایی شد.")
-    except (PermissionDenied, ValueError) as exc:
+    except (PermissionDenied, ValidationError, ValueError) as exc:
         messages.error(request, str(exc))
     return redirect("inventory:transaction_list")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_POST)
+@require_POST
+def transaction_request_posting(
+    request: HttpRequest, transaction_id: str
+) -> HttpResponse:
+    record = _transaction(request, transaction_id)
+    if record is None:
+        return HttpResponseNotFound("تراکنش انبار یافت نشد.")
+    try:
+        request_stock_transaction_posting(
+            organization=request.organization,
+            actor=request.user,
+            stock_transaction=record,
+        )
+        messages.success(request, "درخواست ثبت نهایی برای تخصیص به کارتابل ارسال شد.")
+    except (PermissionDenied, ValidationError, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("inventory:transaction_detail", transaction_id=record.pk)
 
 
 @active_organization_required
@@ -288,3 +344,24 @@ def transaction_reverse(request: HttpRequest, transaction_id: str) -> HttpRespon
     return render(
         request, "inventory/reversal_form.html", {"form": form, "transaction": record}
     )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE)
+@require_POST
+def transaction_request_reversal(
+    request: HttpRequest, transaction_id: str
+) -> HttpResponse:
+    record = _transaction(request, transaction_id)
+    if record is None:
+        return HttpResponseNotFound("تراکنش انبار یافت نشد.")
+    try:
+        request_stock_transaction_reversal(
+            organization=request.organization,
+            actor=request.user,
+            stock_transaction=record,
+        )
+        messages.success(request, "درخواست برگشت برای تخصیص به کارتابل ارسال شد.")
+    except (PermissionDenied, ValidationError, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("inventory:transaction_detail", transaction_id=record.pk)

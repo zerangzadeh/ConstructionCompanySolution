@@ -11,26 +11,6 @@
                 </div>
             </div>
 
-            {% if chief_executive %}
-            <div class="org-chart-card__person">
-                <span class="org-chart-avatar">
-                    {% if chief_executive.profile_image or chief_executive.user.profile_image %}
-                    <img src="{% url 'workforce:employee_profile_image' chief_executive.id %}" alt="عکس {{ chief_executive.first_name }} {{ chief_executive.last_name }}">
-                    {% else %}
-                    {{ chief_executive.first_name|first }}{{ chief_executive.last_name|first }}
-                    {% endif %}
-                </span>
-                <span class="min-w-0 text-right">
-                    <strong>{{ chief_executive.first_name }} {{ chief_executive.last_name }}</strong>
-                    <small>{{ chief_executive.position.title|default:"مدیرعامل" }}</small>
-                </span>
-            </div>
-            {% elif can_view_chief_executive %}
-            <div class="org-chart-card__empty">مدیرعامل تعیین نشده است</div>
-            {% else %}
-            <div class="org-chart-card__empty">اطلاعات مدیرعامل قابل مشاهده نیست</div>
-            {% endif %}
-
             <div class="org-chart-card__footer">
                 {% if can_view_employees %}<span>{{ organization_employee_count }} نفر در شرکت</span>{% else %}<span>شرکت فعال</span>{% endif %} {% if department_tree %}
                 <button type="button" data-collapse-branch aria-expanded="true" aria-label="جمع کردن واحدهای شرکت">

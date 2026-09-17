@@ -215,7 +215,7 @@ def add_estimate_item(
 
 
 @transaction.atomic
-def approve_estimate(
+def _approve_estimate_domain(
     *,
     estimate: Estimate,
     actor: User,
@@ -309,6 +309,13 @@ def approve_estimate(
         },
     )
     return locked_estimate
+
+
+def approve_estimate(*, estimate: Estimate, actor: User) -> Estimate:
+    """Approve through an active W5.4 work item, retaining legacy direct approval."""
+    from .workflow import approve_estimate_with_workflow
+
+    return approve_estimate_with_workflow(estimate=estimate, actor=actor)
 
 
 @transaction.atomic

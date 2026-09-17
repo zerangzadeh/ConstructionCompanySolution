@@ -36,6 +36,7 @@ from apps.workforce.models import (
 from apps.workforce.services import (
     archive_department,
     archive_employee,
+    archive_position,
     assign_employee_position,
     assign_employee_to_project,
     create_department,
@@ -281,6 +282,81 @@ class WorkforceModelTests(TestCase):
                 employee_number="EMP-004",
                 first_name="Wrong",
                 last_name="Department",
+            )
+
+    def test_position_parent_rejects_cross_tenant_self_and_cycles(self) -> None:
+        parent = Position.objects.create(
+            organization=self.organization, code="DIRECTOR", title="Director"
+        )
+        child = Position.objects.create(
+            organization=self.organization,
+            parent_position=parent,
+            code="MANAGER",
+            title="Manager",
+        )
+        self_parent = Position.objects.create(
+            organization=self.organization, code="SELF", title="Self"
+        )
+        self_parent.parent_position = self_parent
+        with self.assertRaises(ValidationError):
+            self_parent.save()
+
+        parent.parent_position = child
+        with self.assertRaises(ValidationError):
+            parent.save()
+
+        foreign_parent = Position.objects.create(
+            organization=self.other_organization,
+            code="FOREIGN-DIRECTOR",
+            title="Foreign Director",
+        )
+        with self.assertRaises(ValidationError):
+            Position.objects.create(
+                organization=self.organization,
+                parent_position=foreign_parent,
+                code="FOREIGN-CHILD",
+                title="Foreign Child",
+            ).save()
+
+    def test_position_parent_must_be_active_and_position_with_active_child_cannot_archive(
+        self,
+    ) -> None:
+        parent = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="PARENT",
+            title="Parent",
+        )
+        child = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="CHILD",
+            title="Child",
+            parent_position=parent,
+        )
+        with self.assertRaises(ValueError):
+            archive_position(
+                organization=self.organization, actor=self.owner, position=parent
+            )
+
+        child.is_active = False
+        child.save()
+        archive_position(
+            organization=self.organization, actor=self.owner, position=parent
+        )
+        inactive_parent = Position.objects.create(
+            organization=self.organization,
+            code="INACTIVE-PARENT",
+            title="Inactive Parent",
+            is_active=False,
+        )
+        with self.assertRaises(ValueError):
+            create_position(
+                organization=self.organization,
+                actor=self.owner,
+                code="INVALID-CHILD",
+                title="Invalid Child",
+                parent_position=inactive_parent,
             )
 
     def test_employee_and_assignment_lifecycle_dates_are_validated(self) -> None:
@@ -1094,6 +1170,156 @@ class WorkforcePanelTests(TestCase):
             ).exists()
         )
 
+    def test_position_parent_form_and_update_are_tenant_scoped(self) -> None:
+        parent = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="PARENT-FORM",
+            title="Parent Form",
+        )
+        child = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="CHILD-FORM",
+            title="Child Form",
+        )
+        foreign_parent = create_position(
+            organization=self.other_organization,
+            actor=self.outsider,
+            code="FOREIGN-FORM",
+            title="Foreign Form",
+        )
+        self._login_owner()
+
+        response = self.client.get(
+            reverse("workforce:position_detail", kwargs={"position_id": child.pk})
+        )
+        parent_field = response.context["position_form"].fields["parent_position"]
+        self.assertIn(parent, parent_field.queryset)
+        self.assertNotIn(child, parent_field.queryset)
+        self.assertNotIn(foreign_parent, parent_field.queryset)
+
+        response = self.client.post(
+            reverse("workforce:position_update", kwargs={"position_id": child.pk}),
+            {
+                "code": child.code,
+                "title": child.title,
+                "department": "",
+                "parent_position": parent.pk,
+                "description": "",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        child.refresh_from_db()
+        self.assertEqual(child.parent_position, parent)
+
+    def test_department_chart_excludes_positions_and_is_tenant_scoped(self) -> None:
+        parent = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="CHART-DIRECTOR",
+            title="Chart Director",
+        )
+        child = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="CHART-ENGINEER",
+            title="Chart Engineer",
+            parent_position=parent,
+        )
+        employee = create_employee(
+            organization=self.organization,
+            actor=self.owner,
+            employee_number="CHART-HOLDER",
+            first_name="Chart",
+            last_name="Holder",
+        )
+        assign_employee_position(
+            organization=self.organization,
+            actor=self.owner,
+            employee=employee,
+            position=child,
+            start_date=date(2026, 9, 1),
+        )
+        foreign_position = create_position(
+            organization=self.other_organization,
+            actor=self.outsider,
+            code="FOREIGN-CHART",
+            title="Foreign Chart Position",
+        )
+        self._login_owner()
+
+        response = self.client.get(reverse("workforce:department_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["department_tree"], [])
+        self.assertNotIn("position_tree", response.context)
+        self.assertNotContains(response, "Chart Director")
+        self.assertNotContains(response, "Chart Engineer")
+        self.assertNotContains(response, "Chart Holder")
+        self.assertNotContains(response, foreign_position.title)
+
+    def test_position_list_renders_chart_and_is_tenant_scoped(self) -> None:
+        parent = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="POSITION-CHART-PARENT",
+            title="Position Chart Parent",
+        )
+        child = create_position(
+            organization=self.organization,
+            actor=self.owner,
+            code="POSITION-CHART-CHILD",
+            title="Position Chart Child",
+            parent_position=parent,
+        )
+        employee = create_employee(
+            organization=self.organization,
+            actor=self.owner,
+            employee_number="POSITION-CHART-HOLDER",
+            first_name="Position",
+            last_name="Holder",
+        )
+        assign_employee_position(
+            organization=self.organization,
+            actor=self.owner,
+            employee=employee,
+            position=child,
+            start_date=date(2026, 9, 1),
+        )
+        foreign_position = create_position(
+            organization=self.other_organization,
+            actor=self.outsider,
+            code="FOREIGN-POSITION-CHART",
+            title="Foreign Position Chart",
+        )
+        self._login_owner()
+
+        response = self.client.get(reverse("workforce:position_list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(reverse("workforce:position_list"), "/workforce/positions/")
+        self.assertEqual(self.client.get("/workforce/chart/").status_code, 404)
+        self.assertEqual(response.context["position_tree"][0]["position"], parent)
+        self.assertEqual(
+            response.context["position_tree"][0]["children"][0]["position"],
+            child,
+        )
+        self.assertContains(response, "چارت سمت‌ها")
+        self.assertContains(response, "Position Chart Parent")
+        self.assertContains(response, "Position Chart Child")
+        self.assertContains(response, "Position Holder")
+        self.assertContains(response, "متصدی فعال")
+        self.assertContains(response, 'aria-label="متصدی فعال: Position Holder"')
+        self.assertContains(response, 'data-position-chart-view="tree"')
+        self.assertContains(response, 'data-position-chart-view="list"')
+        self.assertContains(response, "کد و عنوان")
+        self.assertContains(response, "سمت والد")
+        self.assertContains(response, "واحد شرکتی")
+        self.assertContains(response, "نوع تصدی")
+        self.assertContains(response, "بایگانی")
+        self.assertNotContains(response, foreign_position.title)
+
     def test_department_list_links_to_editable_tenant_scoped_detail(self) -> None:
         department = create_department(
             organization=self.organization,
@@ -1248,27 +1474,13 @@ class WorkforcePanelTests(TestCase):
         self.assertEqual(root["theme"], "emerald")
         self.assertEqual(root["children"][0]["theme"], "amber")
         self.assertEqual(root["children"][0]["primary_employee"], employee)
-        self.assertEqual(root["position_holders"][0]["employee"], chief_executive)
-        self.assertEqual(root["position_holders"][0]["positions"], [execution_manager])
-        self.assertEqual(response.context["chief_executive"], chief_executive)
         self.assertEqual(response.context["organization_employee_count"], 2)
-        self.assertNotIn(chief_executive, response.context["unassigned_employees"])
         self.assertContains(response, self.organization.name)
-        self.assertContains(response, "ریشه ساختار سازمانی")
-        self.assertContains(response, "Chief Executive")
-        self.assertContains(response, "Execution Manager")
-        self.assertContains(
-            response,
-            reverse(
-                "workforce:employee_profile_image",
-                kwargs={"employee_id": chief_executive.pk},
-            ),
-        )
-        self.assertContains(response, "Execution")
+        self.assertContains(response, "ریشه ساختار شرکتی")
         self.assertContains(response, "Site Operations")
-        self.assertContains(response, "Tree Employee")
         self.assertContains(response, "data-org-chart")
         self.assertContains(response, "نمای درختی")
+        self.assertNotContains(response, "Execution Manager")
         self.assertNotContains(response, "Foreign Department")
         self.assertNotContains(response, "Foreign Tree")
         self.assertNotContains(response, "Foreign Chief")

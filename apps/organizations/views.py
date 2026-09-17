@@ -1,7 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest, HttpResponse, HttpResponseForbidden
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseForbidden,
+)
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
@@ -42,6 +48,7 @@ from apps.organizations.services import (
     update_organization_membership,
     update_organization_settings,
 )
+from core.list_filters import apply_table_sorting
 
 
 @login_required
@@ -75,7 +82,7 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
         return HttpResponseForbidden("به این سازمان دسترسی ندارید.")
 
     set_active_organization(request.session, organization)
-    return redirect("organizations:select")
+    return redirect("financials:dashboard")
 
 
 @login_required
@@ -146,6 +153,17 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
         include_inactive=can_change_statuses,
     )
+    memberships = apply_table_sorting(
+        memberships,
+        request,
+        sort_fields={
+            "user": ("user__last_name", "user__first_name"),
+            "username": "user__username",
+            "role": "role_definition__name",
+            "status": "status",
+        },
+        default_ordering=("user__username", "pk"),
+    )
     return render(
         request,
         "organizations/members.html",
@@ -155,6 +173,44 @@ def organization_members(request: HttpRequest) -> HttpResponse:
             "can_create_accounts": can_create_accounts,
         },
     )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.MEMBERSHIP_VIEW)
+@require_GET
+def member_profile_image(request: HttpRequest, membership_id: str) -> FileResponse:
+    """Serve a member avatar only within the viewer's active organization."""
+
+    try:
+        membership = OrganizationMembership.objects.select_related("user").get(
+            pk=membership_id,
+            organization=request.organization,
+        )
+    except OrganizationMembership.DoesNotExist as exc:
+        raise Http404 from exc
+
+    if not membership.user.profile_image:
+        raise Http404
+    try:
+        image = membership.user.profile_image.open("rb")
+    except (FileNotFoundError, OSError) as exc:
+        raise Http404 from exc
+
+    extension = "." + membership.user.profile_image.name.lower().rsplit(".", 1)[-1]
+    content_type = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+    }.get(extension)
+    if content_type is None:
+        image.close()
+        raise Http404
+
+    response = FileResponse(image, content_type=content_type)
+    response["Cache-Control"] = "private, max-age=300"
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
 
 
 @active_organization_required

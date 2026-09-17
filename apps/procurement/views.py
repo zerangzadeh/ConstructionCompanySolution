@@ -52,6 +52,8 @@ from core.list_filters import (
     apply_table_filters,
     build_table_filters,
     has_active_table_filters,
+    paginate_table,
+    table_pagination_query,
 )
 
 
@@ -113,11 +115,26 @@ def purchase_request_list(request: HttpRequest) -> HttpResponse:
         choice_fields={"status": ("status", PurchaseRequestStatus.values)},
         date_fields={"required_by": "required_by"},
     )
+    page = paginate_table(
+        records,
+        request,
+        sort_fields={
+            "number": "request_number",
+            "title": "title",
+            "record": "title",
+            "project": "project__name",
+            "required_by": "required_by",
+            "status": "status",
+        },
+        default_ordering=("-created_at", "pk"),
+    )
     return render(
         request,
         "procurement/request_list.html",
         {
-            "requests": records,
+            "requests": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -311,11 +328,24 @@ def purchase_order_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"status": ("status", PurchaseOrderStatus.values)},
     )
+    page = paginate_table(
+        records,
+        request,
+        sort_fields={
+            "number": "order_number",
+            "supplier": "supplier__display_name",
+            "project": "project__name",
+            "status": "status",
+        },
+        default_ordering=("-created_at", "pk"),
+    )
     return render(
         request,
         "procurement/order_list.html",
         {
-            "orders": records,
+            "orders": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [
@@ -467,11 +497,24 @@ def goods_receipt_list(request: HttpRequest) -> HttpResponse:
         },
         choice_fields={"status": ("status", GoodsReceiptStatus.values)},
     )
+    page = paginate_table(
+        records,
+        request,
+        sort_fields={
+            "number": "receipt_number",
+            "order": "purchase_order__order_number",
+            "project": "project__name",
+            "status": "status",
+        },
+        default_ordering=("-created_at", "pk"),
+    )
     return render(
         request,
         "procurement/receipt_list.html",
         {
-            "receipts": records,
+            "receipts": page.object_list,
+            "page_obj": page,
+            "pagination_query": table_pagination_query(request),
             "filters": build_table_filters(
                 request,
                 [

@@ -92,6 +92,7 @@ HISTORY_ACTION_LABELS = {
 @dataclass(frozen=True, slots=True)
 class WorkbenchCounts:
     all_items: int
+    role_permission_items: int
     positions: tuple[dict[str, object], ...]
 
 
@@ -220,6 +221,20 @@ def _apply_filters(
     if site_id:
         queryset = queryset.filter(instance__subject_context__site_id=str(site_id))
 
+    routing = str(params.get("routing", "")).strip()
+    if routing == "role_permission":
+        role_permission_candidate = WorkItemCandidate.objects.filter(
+            organization_id=OuterRef("organization_id"),
+            work_item_id=OuterRef("pk"),
+            membership=membership,
+            is_active=True,
+        ).filter(
+            Q(routing_basis__contains=[{"resolver": "business_permission"}])
+            | Q(routing_basis__contains=[{"resolver": "organization_role"}])
+            | Q(routing_basis__contains=[{"resolver": "organization_owner"}])
+        )
+        queryset = queryset.filter(Exists(role_permission_candidate))
+
     position_id = _parse_uuid(str(params.get("position", "")).strip())
     if position_id:
         position_candidate = WorkItemCandidate.objects.filter(
@@ -282,7 +297,21 @@ def _apply_filters(
     return queryset
 
 
-def _ordered(queryset: models.QuerySet[WorkItem]) -> models.QuerySet[WorkItem]:
+def _ordered(
+    queryset: models.QuerySet[WorkItem], params: Mapping[str, Any] | None = None
+) -> models.QuerySet[WorkItem]:
+    sort_fields = {
+        "status": "status",
+        "priority": "priority",
+        "due_at": "due_at",
+        "created_at": "created_at",
+    }
+    sort_key = str((params or {}).get("sort", "")).strip()
+    if sort_key in sort_fields:
+        direction = (
+            "-" if str((params or {}).get("direction", "asc")).lower() == "desc" else ""
+        )
+        return queryset.order_by(f"{direction}{sort_fields[sort_key]}", "pk")
     now = timezone.now()
     return queryset.annotate(
         urgency_rank=Case(
@@ -420,6 +449,11 @@ def build_workbench(
         membership=membership,
         subject_types=subject_types,
     )
+    role_permission_items = _apply_filters(
+        base,
+        membership=membership,
+        params={"routing": "role_permission"},
+    ).count()
     positions = _position_counts(
         organization=organization,
         membership=membership,
@@ -438,7 +472,7 @@ def build_workbench(
         organization=organization
     ).order_by("priority", "pk")
     queryset = (
-        _ordered(filtered)
+        _ordered(filtered, params)
         .select_related(
             "instance__definition__workflow_type",
             "step_instance__step_definition",
@@ -459,7 +493,11 @@ def build_workbench(
         queryset=queryset,
         membership=membership,
         permission_codes=permission_codes,
-        counts=WorkbenchCounts(all_items=base.count(), positions=positions),
+        counts=WorkbenchCounts(
+            all_items=base.count(),
+            role_permission_items=role_permission_items,
+            positions=positions,
+        ),
         filters=_filter_choices(
             organization=organization, base=base, positions=positions
         ),
@@ -528,6 +566,12 @@ def decorate_work_items(
         )
         adapter = adapters.get(item.instance.subject_type)
         item.source_url = _source_url(item, adapter) if adapter else ""
+        is_safety = item.instance.subject_type == "safety.safety_incident"
+        item.safety_responsible = (
+            item.instance.subject_context.get("responsible_display", "")
+            if is_safety
+            else ""
+        )
         item.can_claim_from_workbench = bool(
             can_claim_globally
             and candidate
@@ -540,8 +584,30 @@ def decorate_work_items(
             and item.current_assignee_id == membership.pk
         )
         item.workbench_outcomes = []
+        is_inventory_reversal = (
+            item.instance.definition.workflow_type.code
+            == "inventory.stock_transaction_reversal"
+        )
+        item.inventory_reversal_action_url = (
+            item.source_url
+            if is_inventory_reversal
+            and can_act_globally
+            and item.status == WorkItemStatus.CLAIMED
+            and item.current_assignee_id == membership.pk
+            else ""
+        )
+        item.safety_action_url = (
+            item.source_url
+            if is_safety
+            and can_act_globally
+            and item.status == WorkItemStatus.CLAIMED
+            and item.current_assignee_id == membership.pk
+            else ""
+        )
         if (
-            can_act_globally
+            not is_safety
+            and not is_inventory_reversal
+            and can_act_globally
             and item.status == WorkItemStatus.CLAIMED
             and item.current_assignee_id == membership.pk
         ):

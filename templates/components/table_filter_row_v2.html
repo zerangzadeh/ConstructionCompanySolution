@@ -4,7 +4,7 @@
     <th class="border-b border-slate-200 px-3 pb-3 pt-1 font-normal">
         {% if filter %}
             {% if filter.kind == "select" %}
-                <select id="{{ form_id }}-{{ filter.name }}" name="{{ filter.name }}" form="{{ form_id }}" aria-label="Filter" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100" onchange="this.form.requestSubmit()">
+                <select id="{{ form_id }}-{{ filter.name }}" name="{{ filter.name }}" form="{{ form_id }}" aria-label="Filter" class="h-8 w-full min-w-24 rounded-md border border-slate-200 bg-white px-2 text-[11px] font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100">
                     <option value="">&#1607;&#1605;&#1607;</option>
                     {% for value, label in filter.choices %}<option value="{{ value }}"{% if filter.value == value %} selected{% endif %}>{{ label }}</option>{% endfor %}
                 </select>

@@ -39,6 +39,7 @@ from .models import (
     WorkflowInstanceStatus,
     WorkflowStepInstanceStatus,
     WorkflowType,
+    WorkItem,
     WorkItemAssignmentHistory,
     WorkItemStatus,
 )
@@ -321,6 +322,33 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             Employee.objects.filter(organization=self.organization).count(), 0
         )
 
+    def test_two_person_starter_completes_without_workforce_structures(self) -> None:
+        self.add_member("plain-member")
+        instance = self.start(self.create_version(code="two-person-starter"))
+        self.assertFalse(Position.objects.filter(organization=self.organization))
+        self.assertFalse(Employee.objects.filter(organization=self.organization))
+        item = instance.work_items.get()
+        self.assertEqual(
+            list(item.candidates.values_list("membership_id", flat=True)),
+            [self.owner_membership.pk],
+        )
+        claim_work_item(
+            actor=self.owner,
+            organization=self.organization,
+            work_item_id=item.pk,
+            idempotency_key="two-person-starter-claim",
+        )
+        completed = complete_work_item(
+            actor=self.owner,
+            organization=self.organization,
+            work_item_id=item.pk,
+            outcome="approved",
+            idempotency_key="two-person-starter-decision",
+        )
+        self.assertEqual(completed.status, WorkItemStatus.COMPLETED)
+        instance.refresh_from_db()
+        self.assertEqual(instance.status, WorkflowInstanceStatus.COMPLETED)
+
     def test_membership_role_team_and_record_context_resolvers(self) -> None:
         user, membership = self.add_member("resolver")
         team = WorkTeam.objects.create(
@@ -473,6 +501,53 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             ).step_definition.key,
             "decision",
         )
+
+    def test_unresolved_route_recovers_after_position_assignment(self) -> None:
+        position = Position.objects.create(
+            organization=self.organization, code="RECOVER", title="Recovery holder"
+        )
+        team = WorkTeam.objects.create(
+            organization=self.organization, code="RECOVER", name="Recovery team"
+        )
+        version = self.create_version(
+            [
+                {
+                    "resolver_type": "position",
+                    "configuration": {"position_id": str(position.pk)},
+                },
+                {
+                    "resolver_type": "work_team",
+                    "configuration": {"work_team_id": str(team.pk), "mode": "members"},
+                    "is_fallback": True,
+                },
+            ],
+            code="recover",
+        )
+        instance = self.start(version)
+        self.assertEqual(instance.status, WorkflowInstanceStatus.SUSPENDED)
+        _, member, assignment = self.add_position_holder(
+            suffix="recover", position=position
+        )
+        resumed = resume_workflow_instance(
+            actor=self.owner,
+            organization=self.organization,
+            instance_id=instance.pk,
+            reason="Position assigned",
+            idempotency_key="resume-recovered-route",
+        )
+        retried = resume_workflow_instance(
+            actor=self.owner,
+            organization=self.organization,
+            instance_id=instance.pk,
+            reason="Position assigned",
+            idempotency_key="resume-recovered-route",
+        )
+        self.assertEqual(resumed.status, WorkflowInstanceStatus.ACTIVE)
+        self.assertEqual(retried.pk, resumed.pk)
+        item = resumed.work_items.get(status=WorkItemStatus.OPEN)
+        candidate = item.candidates.get(membership=member)
+        self.assertEqual(candidate.qualifying_position_assignment, assignment)
+        self.assertEqual(resumed.work_items.count(), 1)
 
     def test_permission_and_candidacy_are_both_required(self) -> None:
         position = Position.objects.create(
@@ -785,6 +860,30 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             migrated.work_items.filter(status=WorkItemStatus.OPEN).count(), 1
         )
 
+    def test_instance_migration_rejects_another_definition_without_changes(
+        self,
+    ) -> None:
+        original = self.create_version(code="migration-source")
+        target = self.create_version(code="migration-other")
+        instance = self.start(original)
+        with self.assertRaises(ValidationError):
+            migrate_workflow_instance(
+                actor=self.owner,
+                organization=self.organization,
+                instance_id=instance.pk,
+                target_version_id=target.pk,
+                reason="Invalid target check",
+                idempotency_key="invalid-target",
+            )
+        instance.refresh_from_db()
+        self.assertEqual(instance.version_id, original.pk)
+        self.assertEqual(
+            instance.work_items.filter(status=WorkItemStatus.OPEN).count(), 1
+        )
+        self.assertFalse(
+            instance.work_items.filter(status=WorkItemStatus.CANCELLED).exists()
+        )
+
     def test_cross_tenant_rejection_and_routing_query_bound(self) -> None:
         version = self.create_version()
         other_owner = User.objects.create_user(
@@ -820,6 +919,227 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
                 idempotency_key="query-count-claim",
             )
         self.assertLessEqual(len(claim_queries), 30)
+
+    def test_large_role_candidate_pool_is_deduplicated_with_bounded_queries(
+        self,
+    ) -> None:
+        users = User.objects.bulk_create(
+            [
+                User(username=f"pool-{index}-{self._testMethodName}")
+                for index in range(250)
+            ]
+        )
+        role = OrganizationRole.objects.get(code=MembershipRole.MEMBER)
+        OrganizationMembership.objects.bulk_create(
+            [
+                OrganizationMembership(
+                    organization=self.organization,
+                    user=user,
+                    role=MembershipRole.MEMBER,
+                    role_definition=role,
+                    status=MembershipStatus.ACTIVE,
+                    joined_at=timezone.now(),
+                )
+                for user in users
+            ]
+        )
+        route = {
+            "resolver_type": "organization_role",
+            "configuration": {"role_code": MembershipRole.MEMBER},
+        }
+        fallback = {
+            "resolver_type": "organization_owner",
+            "configuration": {},
+            "is_fallback": True,
+        }
+        instance = self.start(self.create_version([route, fallback], code="large-pool"))
+        item = instance.work_items.get()
+        self.assertEqual(item.candidates.count(), 250)
+        step = instance.step_instances.get(status=WorkflowStepInstanceStatus.ACTIVE)
+        with CaptureQueriesContext(connection) as queries:
+            result = resolve_step_candidates(
+                instance=instance,
+                step_id=step.step_definition_id,
+                required_permission="",
+            )
+        self.assertEqual(len(result.candidates), 250)
+        self.assertEqual(
+            len({candidate.membership_id for candidate in item.candidates.all()}),
+            250,
+        )
+        self.assertLessEqual(len(queries), 12)
+
+    def test_large_tenant_publishes_multi_stage_position_and_separation_flow(
+        self,
+    ) -> None:
+        users = User.objects.bulk_create(
+            [
+                User(username=f"stage-{index}-{self._testMethodName}")
+                for index in range(100)
+            ]
+        )
+        role = OrganizationRole.objects.get(code=MembershipRole.MEMBER)
+        OrganizationMembership.objects.bulk_create(
+            [
+                OrganizationMembership(
+                    organization=self.organization,
+                    user=user,
+                    role=MembershipRole.MEMBER,
+                    role_definition=role,
+                    status=MembershipStatus.ACTIVE,
+                    joined_at=timezone.now(),
+                )
+                for user in users
+            ]
+        )
+        position = Position.objects.create(
+            organization=self.organization, code="SIGNOFF", title="Signoff"
+        )
+        self.add_position_holder(
+            suffix="owner-signoff", position=position, user=self.owner
+        )
+        holder_user, holder, _ = self.add_position_holder(
+            suffix="member-signoff", position=position
+        )
+        fallback = {
+            "resolver_type": "organization_owner",
+            "configuration": {},
+            "is_fallback": True,
+        }
+        configuration = {
+            "steps": [
+                {"key": "start", "step_type": "start", "is_start": True},
+                {
+                    "key": "triage",
+                    "step_type": "approval",
+                    "configuration": {"decision_policy": "any"},
+                    "routing": [
+                        {
+                            "resolver_type": "organization_role",
+                            "configuration": {"role_code": MembershipRole.MEMBER},
+                        },
+                        fallback,
+                    ],
+                },
+                {
+                    "key": "signoff",
+                    "step_type": "approval",
+                    "configuration": {
+                        "decision_policy": "any",
+                        "exclude_starter": True,
+                    },
+                    "routing": [
+                        {
+                            "resolver_type": "position",
+                            "configuration": {"position_id": str(position.pk)},
+                        },
+                        fallback,
+                    ],
+                },
+                {"key": "approved", "step_type": "end", "is_terminal": True},
+            ],
+            "transitions": [
+                {
+                    "source": "start",
+                    "target": "triage",
+                    "outcome": "submitted",
+                    "is_default": True,
+                },
+                {"source": "triage", "target": "signoff", "outcome": "reviewed"},
+                {
+                    "source": "signoff",
+                    "target": "approved",
+                    "outcome": "approved",
+                    "domain_command": "procurement.purchase_request.approve",
+                },
+            ],
+        }
+        draft = create_workflow_draft(
+            actor=self.owner,
+            organization=self.organization,
+            workflow_type_code=self.workflow_type.code,
+            code=f"enterprise-{self._testMethodName}"[:100],
+            name="Enterprise approval",
+            scope={"project_id": "enterprise"},
+        )
+        edit_workflow_draft(
+            actor=self.owner,
+            organization=self.organization,
+            version_id=draft.pk,
+            configuration=configuration,
+        )
+        version = publish_workflow_version(
+            actor=self.owner, organization=self.organization, version_id=draft.pk
+        )
+        instance = self.start(version)
+        triage = instance.work_items.get(action_key="triage")
+        self.assertEqual(triage.candidates.count(), 101)
+        claim_work_item(
+            actor=holder_user,
+            organization=self.organization,
+            work_item_id=triage.pk,
+            idempotency_key="enterprise-triage-claim",
+        )
+        complete_work_item(
+            actor=holder_user,
+            organization=self.organization,
+            work_item_id=triage.pk,
+            outcome="reviewed",
+            idempotency_key="enterprise-triage",
+        )
+        signoff = instance.work_items.get(action_key="signoff")
+        self.assertEqual(signoff.candidates.count(), 2)
+        with self.assertRaises(PermissionDenied):
+            claim_work_item(
+                actor=self.owner,
+                organization=self.organization,
+                work_item_id=signoff.pk,
+                idempotency_key="starter-signoff-denied",
+            )
+        claim_work_item(
+            actor=holder_user,
+            organization=self.organization,
+            work_item_id=signoff.pk,
+            idempotency_key="enterprise-signoff-claim",
+        )
+        complete_work_item(
+            actor=holder_user,
+            organization=self.organization,
+            work_item_id=signoff.pk,
+            outcome="approved",
+            idempotency_key="enterprise-signoff",
+        )
+        instance.refresh_from_db()
+        self.assertEqual(instance.status, WorkflowInstanceStatus.COMPLETED)
+        self.assertEqual(signoff.candidates.get(membership=holder).membership, holder)
+
+    def test_postgresql_runtime_tenant_guards_reject_bulk_cross_tenant_writes(
+        self,
+    ) -> None:
+        if connection.vendor != "postgresql":
+            self.skipTest("PostgreSQL trigger guards are required.")
+        other_owner = User.objects.create_user(
+            username="runtime-guard-other", password="password"
+        )
+        other = create_organization_with_owner(
+            name="Other guard tenant", slug="runtime-guard-other", owner=other_owner
+        )
+        item = self.start(self.create_version()).work_items.get()
+        candidate = item.candidates.get()
+        with self.assertRaises(DatabaseError), transaction.atomic():
+            models.QuerySet.update(
+                item.candidates.filter(pk=candidate.pk), organization=other
+            )
+        with self.assertRaises(DatabaseError), transaction.atomic():
+            models.QuerySet.update(
+                WorkItem.objects.filter(pk=item.pk), organization=other
+            )
+        self.assertEqual(
+            item.candidates.get(pk=candidate.pk).organization_id, self.organization.pk
+        )
+        self.assertEqual(
+            WorkItem.objects.get(pk=item.pk).organization_id, self.organization.pk
+        )
 
 
 class WorkflowRuntimeConcurrencyTests(RuntimeTestBase, TransactionTestCase):
