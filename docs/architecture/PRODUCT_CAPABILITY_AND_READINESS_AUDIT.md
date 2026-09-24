@@ -424,7 +424,12 @@ Current corrective themes:
 | Document | Finding | Action |
 | --- | --- | --- |
 | `AGENTS.md` | Concise durable engineering rules; aligned with current product | Keep; do not turn into product backlog |
-| `ROADMAP.md` | Current through F9 but too coarse and missing dependencies/target domains | Replace with dependency-based portfolio roadmap |
+| `ROADMAP.md` | Dependency-based P0-P10 portfolio roadmap, reconciled against accepted capability scope | Keep dispositions explicit as scheduled, deferred with trigger, or rejected with reason |
+| `DOMAIN_MODEL.md` | Target domain ownership and bounded-context reference | Keep target-only; current implementation stays in code and `DOMAIN_AND_DATA_MODEL.md` |
+| `DATA_MODEL.md` | Target source-of-truth, lineage and conceptual-data rules | Keep conceptual; do not treat as a physical schema or migration instruction |
+| `BUSINESS_MODEL.md` | Product/customer/value/packaging/operating-model reference | Keep commercial decisions explicit and separate from implementation status |
+| `USER_CAPABILITY_MAP.md` | User groups, goals and capability coverage | Keep separate from exact permission grants and service authorization |
+| `WORKFLOW_AND_PERMISSION_MATRIX.md` | Cross-domain lifecycle, permission, scope and SoD policy | Keep exact current codes/transitions subordinate to code/tests |
 | `DOMAIN_AND_DATA_MODEL.md` | Stale workflow/billing status and obsolete exclusion of Accounting/Payroll | Correct current/target boundary and link this audit |
 | `BILLING_AND_PROGRESS_CLAIMS.md` | Delivered architecture record still contains pre-implementation wording | Mark delivered scope and current known debt |
 | `TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` | Detailed and current acceptance evidence | Keep as domain authority |

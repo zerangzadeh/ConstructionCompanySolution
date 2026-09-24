@@ -12,6 +12,8 @@ The repository-wide current/target capability assessment, data-ownership map,
 pre-production correction register, and production gates are maintained in
 `docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. This document
 stays intentionally focused on implemented domain boundaries and invariants.
+The target domain boundaries and conceptual data/source-of-truth rules are in
+`DOMAIN_MODEL.md` and `DATA_MODEL.md`; they do not override current schema.
 
 ## Model conventions and tenant boundary
 

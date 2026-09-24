@@ -10,6 +10,18 @@ approved scope. A planned roadmap item is not implementation authorization.
 Use references progressively; read only those relevant to the task:
 
 - `ROADMAP.md`: delivery order, implementation status, and approved next scope.
+- `docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`: repository-wide
+  current/target capability assessment, ownership gaps, pre-production correction
+  register, and production-readiness gates.
+- `docs/architecture/DOMAIN_MODEL.md`: target domain ownership and boundaries.
+- `docs/architecture/DATA_MODEL.md`: target source-of-truth, history, relationship,
+  lineage, and conceptual-data rules.
+- `docs/architecture/BUSINESS_MODEL.md`: product positioning, customer value,
+  packaging direction, operating model, success measures, and non-goals.
+- `docs/architecture/USER_CAPABILITY_MAP.md`: user groups, goals, capability
+  coverage, and access-layer expectations; not an authorization grant source.
+- `docs/architecture/WORKFLOW_AND_PERMISSION_MATRIX.md`: cross-domain lifecycle,
+  permission, object-scope, responsibility, and separation policy.
 - `docs/architecture/DOMAIN_AND_DATA_MODEL.md`: domain ownership, relationships,
   invariants, lifecycle states, and approved future concepts. Models and migrations
   remain the schema source of truth.
@@ -19,6 +31,9 @@ Use references progressively; read only those relevant to the task:
   architecture and delivery decisions.
 - `docs/architecture/WORKFLOW_OPERATIONS.md`: workflow operations, recovery, and
   deployment checks.
+- `docs/ROADMAP_EXECUTION_PLAYBOOK.md`: rolling session decomposition and
+  model/reasoning guidance for approved roadmap work; it is not a scope or status
+  authority and must be recalibrated at phase boundaries.
 - `docs/ui-guidelines.md`: Persian-first RTL UI and Django Admin rules.
 - `docs/architecture/web_stack_specification.md`: detailed stack and layer
   responsibilities.
@@ -58,9 +73,10 @@ Use references progressively; read only those relevant to the task:
   permission.
 - Support small and large contractors with one model; departments, positions,
   employees, teams, and other enterprise structures must remain optional.
-- Full general-ledger accounting, payroll, CRM, general-purpose BPM/BPMN,
-  tenant-authored executable workflow code, microservices, and event sourcing are
-  out of scope unless explicitly approved.
+- General-ledger accounting and payroll are approved target roadmap domains but
+  are not implementation-authorized until their work packages are approved. CRM,
+  general-purpose BPM/BPMN, tenant-authored executable workflow code,
+  microservices, and event sourcing remain out of scope unless explicitly approved.
 
 ## 4. Tenant isolation, lifecycle, and authorization
 
@@ -201,7 +217,13 @@ Before implementing a feature:
 5. Run the smallest relevant checks, expanding when risk or failures require it:
    `python manage.py check` after Django/config changes, relevant
    `python -m pytest`, and Ruff check/format when available.
-6. Report changed files, test results, assumptions, and follow-up work.
+6. Complete documentation closeout: identify which authoritative active documents
+   are affected by the task and update them in the same change. Reconcile current
+   implementation status, target direction, roadmap disposition, lifecycle,
+   permissions, data ownership, operations, and UI standards only where the task
+   materially changes them. Do not create duplicate status/snapshot documents.
+7. Report changed files, test results, documentation updates (or explicitly state
+   that none were required), assumptions, and follow-up work.
 
 Preserve unrelated user changes in a dirty worktree. Do not rewrite unrelated
 files or create branches, commits, pushes, pull requests, or remote changes unless
@@ -220,6 +242,10 @@ thoroughness.
 - Use progressive disclosure: start with `rg`, file lists, headings, diffs, and
   narrow line ranges. Do not dump large files, test collections, logs, or command
   output when a filtered summary answers the question.
+- For roadmap execution sessions, follow the C0/C1/C2 minimum-sufficient-context
+  policy in `docs/ROADMAP_EXECUTION_PLAYBOOK.md`: load the session contract and
+  direct implementation evidence first, expand only for a recorded material-risk
+  trigger, and never trade away an invariant or acceptance criterion to save tokens.
 - Inspect only relevant code and references. Do not restate the full prompt,
   duplicate the same analysis across documents, or repeat evidence already
   established. Keep one authoritative explanation and link to it elsewhere.
@@ -256,3 +282,29 @@ For large repository-wide requests, briefly establish a resource-aware execution
 plan before acting: required deliverables, authoritative sources, minimum sufficient
 inspection, proportionate validation, and explicit stop conditions. Revise that
 plan if actual cost grows substantially beyond the initial expectation.
+
+Documentation closeout is the final work step of every task, before the final
+response. It does not authorize unrelated documentation rewrites: inspect and
+update only affected authoritative documents, preserve current-vs-target labels,
+and keep models/migrations/tests authoritative for implemented behavior.
+
+## 12. Build-vs-Reuse and engineering Skills
+
+- Reuse commodity technical capability; own strategic construction-ERP business
+  logic. Before custom implementation, consider in order: Python standard library,
+  Django/PostgreSQL built-ins, an existing repository dependency, a mature secure
+  maintained third-party library, then custom code only with documented need.
+- For a significant dependency, evaluate maintenance and security history,
+  adoption/trust, documentation, version compatibility, commercial-SaaS license,
+  transitive burden, architecture fit, operational ownership, and exit risk. A
+  roadmap mention does not approve installation.
+- Never custom-build cryptographic/password primitives or OAuth/OIDC/SAML and
+  similar security protocols when trusted implementations exist. Do not replace
+  good custom workflow, costing, posting, compliance-application, reconciliation,
+  or other strategic domain logic merely because a generic package exists.
+- Appropriate Skills may be used when they materially improve analysis, testing,
+  security review, browser/UI/accessibility validation, documentation, or another
+  repeatable engineering task. Skills are optional aids: they do not replace
+  repository understanding, do not define product architecture, and do not create
+  roadmap scope. Verify material Skill output against code, tests, sources, or
+  actual behavior as appropriate.
