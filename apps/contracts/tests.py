@@ -301,6 +301,11 @@ class ContractServiceTests(TestCase):
         self.assertContains(detail_response, contract.title)
 
     def test_contract_detail_returns_not_found_for_another_organization(self) -> None:
+        self.other_organization.memberships.create(
+            user=self.other_user,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
         other_project = self.other_organization.projects.create(
             code="P-DETAIL-OTHER",
             name="Other project",

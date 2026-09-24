@@ -108,16 +108,18 @@ class PersianUserChangeForm(UserChangeForm):
         self.fields["password"].label = "گذرواژه"
         self.fields["password"].help_text = ""
         self.fields["password"].widget = PersianPasswordStatusWidget()
-        self.fields["is_staff"].label = "دسترسی به پنل مدیریت سامانه"
-        self.fields["is_staff"].help_text = (
-            "اجازه ورود به پنل فنی مدیریت سامانه را می‌دهد و دسترسی عملیاتی "
-            "سازمانی ایجاد نمی‌کند."
-        )
-        self.fields["is_superuser"].label = "دسترسی کامل فنی سامانه"
-        self.fields["is_superuser"].help_text = (
-            "تمام مجوزهای پنل مدیریت سامانه را بدون نیاز به تخصیص صریح فراهم "
-            "می‌کند. فقط برای مدیران فنی مورداعتماد استفاده شود."
-        )
+        if "is_staff" in self.fields:
+            self.fields["is_staff"].label = "دسترسی به پنل مدیریت سامانه"
+            self.fields["is_staff"].help_text = (
+                "اجازه ورود به پنل فنی مدیریت سامانه را می‌دهد و دسترسی عملیاتی "
+                "سازمانی ایجاد نمی‌کند."
+            )
+        if "is_superuser" in self.fields:
+            self.fields["is_superuser"].label = "دسترسی کامل فنی سامانه"
+            self.fields["is_superuser"].help_text = (
+                "تمام مجوزهای پنل مدیریت سامانه را بدون نیاز به تخصیص صریح فراهم "
+                "می‌کند. فقط برای مدیران فنی مورداعتماد استفاده شود."
+            )
         if self.instance.pk:
             self.initial["account_status"] = self.instance.account_status
 

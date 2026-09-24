@@ -10,6 +10,13 @@ from apps.accounts.management.commands.seed_demo_data import (
     DEMO_PASSWORD,
 )
 from apps.accounts.models import User
+from apps.billing.models import (
+    BaselineItem,
+    ClaimSettlementAllocation,
+    ProgressClaim,
+    ProgressRecord,
+    ProjectBaseline,
+)
 from apps.daily_reports.models import DailyReport, DailyReportStatus
 from apps.documents.models import Document, DocumentLink, DocumentVersion
 from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
@@ -72,6 +79,26 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     )
 
     assert Project.objects.filter(organization__in=organizations).count() == 16
+    assert ProjectBaseline.objects.filter(organization__in=organizations).count() == 16
+    assert BaselineItem.objects.filter(organization__in=organizations).count() == 16
+    assert (
+        ProgressRecord.objects.filter(
+            organization__in=organizations, status="verified"
+        ).count()
+        == 16
+    )
+    assert (
+        ProgressClaim.objects.filter(
+            organization__in=organizations, status="approved"
+        ).count()
+        == 16
+    )
+    assert (
+        ClaimSettlementAllocation.objects.filter(
+            organization__in=organizations, status="active"
+        ).count()
+        == 16
+    )
     assert Department.objects.filter(organization__in=organizations).count() == 8
     assert Position.objects.filter(organization__in=organizations).count() == 8
     assert WorkTeam.objects.filter(organization__in=organizations).count() == 4
@@ -182,6 +209,11 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
             User,
             Organization,
             Project,
+            ProjectBaseline,
+            BaselineItem,
+            ProgressRecord,
+            ProgressClaim,
+            ClaimSettlementAllocation,
             DailyReport,
             Department,
             Position,

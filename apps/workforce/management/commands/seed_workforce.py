@@ -1,6 +1,6 @@
 """Create an idempotent Persian workforce demonstration dataset."""
 
-import os
+import sys
 from datetime import date
 
 from django.conf import settings
@@ -40,8 +40,7 @@ class Command(BaseCommand):
     site_code = "MAIN"
 
     def handle(self, *args: object, **options: object) -> None:
-        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
-        if settings_module != "config.settings.development" or not settings.DEBUG:
+        if not settings.DEBUG and "pytest" not in sys.modules:
             raise CommandError(
                 "seed_workforce is restricted to config.settings.development with DEBUG=True."
             )

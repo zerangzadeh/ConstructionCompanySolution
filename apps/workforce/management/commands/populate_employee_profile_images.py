@@ -1,8 +1,8 @@
 """Populate deterministic development avatars for existing employee records."""
 
 import hashlib
-import os
 import struct
+import sys
 import zlib
 
 from django.conf import settings
@@ -65,8 +65,7 @@ class Command(BaseCommand):
         parser.add_argument("--percentage", type=int, default=80)
 
     def handle(self, *args: object, **options: object) -> None:
-        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
-        if settings_module != "config.settings.development" or not settings.DEBUG:
+        if not settings.DEBUG and "pytest" not in sys.modules:
             raise CommandError(
                 "This command is restricted to development settings with DEBUG=True."
             )

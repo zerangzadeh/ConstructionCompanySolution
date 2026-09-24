@@ -221,5 +221,5 @@ class FinancialReportTests(TestCase):
         response = self.client.get(reverse("financials:dashboard"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "داشبورد سازمان")
+        self.assertContains(response, "داشبورد شرکت")
         self.assertContains(response, "Financial Company")

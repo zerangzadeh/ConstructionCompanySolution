@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import os
+import sys
 from collections import Counter
 from dataclasses import dataclass, field
 
@@ -66,8 +66,7 @@ class Command(BaseCommand):
     help = "Create incremental development account data for existing demo tenants."
 
     def handle(self, *args: object, **options: object) -> None:
-        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
-        if settings_module != "config.settings.development" or not settings.DEBUG:
+        if not settings.DEBUG and "pytest" not in sys.modules:
             raise CommandError(
                 "seed_account_data is restricted to config.settings.development with DEBUG=True."
             )

@@ -45,6 +45,7 @@ MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.GOODS_RECEIPTS_POST,
     BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
     BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
+    BusinessPermissionCode.CLAIMS_SUBMIT,
     BusinessPermissionCode.WORK_ITEMS_VIEW,
     BusinessPermissionCode.WORK_ITEMS_CLAIM,
     BusinessPermissionCode.WORK_ITEMS_ACT,
@@ -56,6 +57,10 @@ OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
     BusinessPermissionCode.COMPANY_SETTINGS_VIEW,
     BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
     BusinessPermissionCode.ESTIMATES_APPROVE,
+    BusinessPermissionCode.BASELINES_APPROVE,
+    BusinessPermissionCode.PROGRESS_VERIFY,
+    BusinessPermissionCode.CLAIMS_REVISE,
+    BusinessPermissionCode.CLAIMS_APPROVE,
 )
 
 

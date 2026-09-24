@@ -224,6 +224,7 @@ class PaymentAllocation(UUIDModel, TimeStampedModel):
         default=PaymentAllocationStatus.ACTIVE,
     )
     reversed_at = models.DateTimeField("زمان برگشت", null=True, blank=True)
+    reversal_reason = models.TextField("دلیل برگشت", blank=True)
     reversed_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         verbose_name="برگشت‌دهنده",
@@ -269,6 +270,10 @@ class PaymentAllocation(UUIDModel, TimeStampedModel):
             )
         if self.amount <= 0:
             raise ValidationError({"amount": "مبلغ تخصیص باید مثبت باشد."})
+        if self.status == PaymentAllocationStatus.REVERSED and (
+            not self.reversed_at or not self.reversed_by_id or not self.reversal_reason
+        ):
+            raise ValidationError("برگشت تخصیص باید شواهد کامل داشته باشد.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:

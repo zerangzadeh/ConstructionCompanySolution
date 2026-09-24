@@ -194,6 +194,27 @@ class BusinessPermissionCode(models.TextChoices):
         "تأیید الحاقیه قرارداد",
     )
 
+    BASELINES_VIEW = "baselines.view", "مشاهده مبناهای تجاری"
+    BASELINES_MANAGE = "baselines.manage", "مدیریت مبناهای تجاری"
+    BASELINES_APPROVE = "baselines.approve", "تأیید مبناهای تجاری"
+    PROGRESS_VIEW = "progress.view", "مشاهده پیشرفت"
+    PROGRESS_RECORD = "progress.record", "ثبت پیشرفت"
+    PROGRESS_VERIFY = "progress.verify", "راستی‌آزمایی پیشرفت"
+    CLAIMS_VIEW = "claims.view", "مشاهده صورت‌وضعیت‌ها"
+    CLAIMS_CREATE = "claims.create", "ایجاد صورت‌وضعیت پیش‌نویس"
+    CLAIMS_REVISE = "claims.revise", "بازنگری صورت‌وضعیت پیش‌نویس"
+    CLAIMS_SUBMIT = "claims.submit", "ارسال صورت‌وضعیت"
+    CLAIMS_APPROVE = "claims.approve", "تأیید یا بازگردانی صورت‌وضعیت"
+    CLAIM_SETTLEMENTS_VIEW = "claim_settlements.view", "مشاهده تسویه صورت‌وضعیت"
+    CLAIM_SETTLEMENTS_ALLOCATE = (
+        "claim_settlements.allocate",
+        "تخصیص دریافت به صورت‌وضعیت",
+    )
+    CLAIM_SETTLEMENTS_REVERSE = (
+        "claim_settlements.reverse",
+        "برگشت تسویه صورت‌وضعیت",
+    )
+
     ESTIMATES_VIEW = "estimates.view", "مشاهده برآوردها"
     ESTIMATES_CREATE = "estimates.create", "ایجاد برآورد"
     ESTIMATE_ITEMS_ADD = "estimate_items.add", "افزودن ردیف برآورد"

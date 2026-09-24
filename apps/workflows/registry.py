@@ -246,6 +246,120 @@ registry.register_domain_command(
 )
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="billing.project_baseline",
+        subject_type="billing.project_baseline",
+        exposed_attributes=frozenset(
+            {"project_id", "contract_id", "status", "version", "created_by_id"}
+        ),
+        start_permission="baselines.manage",
+        view_permission="baselines.view",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="billing.project_baseline_approval",
+        subject_type="billing.project_baseline",
+        subject_adapter="billing.project_baseline",
+        allowed_scope_fields=frozenset({"project_id", "contract_id"}),
+        domain_commands=frozenset({"billing.project_baseline.approve"}),
+    )
+)
+registry.register_domain_command(
+    DomainCommandSpec(
+        key="billing.project_baseline.approve",
+        workflow_type="billing.project_baseline_approval",
+        from_states=frozenset({"draft"}),
+        to_state="approved",
+    )
+)
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="billing.progress_record",
+        subject_type="billing.progress_record",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "contract_id",
+                "baseline_id",
+                "baseline_item_id",
+                "status",
+                "created_by_id",
+            }
+        ),
+        start_permission="progress.record",
+        view_permission="progress.view",
+        detail_url_name="billing:progress_detail",
+        detail_url_kwarg="record_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="billing.progress_verification",
+        subject_type="billing.progress_record",
+        subject_adapter="billing.progress_record",
+        allowed_scope_fields=frozenset({"project_id", "contract_id", "baseline_id"}),
+        domain_commands=frozenset(
+            {"billing.progress.verify", "billing.progress.reject"}
+        ),
+    )
+)
+for command_key, to_state in (
+    ("billing.progress.verify", "verified"),
+    ("billing.progress.reject", "rejected"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="billing.progress_verification",
+            from_states=frozenset({"submitted"}),
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="billing.progress_claim",
+        subject_type="billing.progress_claim",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "contract_id",
+                "baseline_id",
+                "status",
+                "claim_number",
+                "revision_number",
+                "created_by_id",
+                "submitted_by_id",
+            }
+        ),
+        start_permission="claims.submit",
+        view_permission="claims.view",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="billing.progress_claim_approval",
+        subject_type="billing.progress_claim",
+        subject_adapter="billing.progress_claim",
+        allowed_scope_fields=frozenset({"project_id", "contract_id", "baseline_id"}),
+        domain_commands=frozenset(
+            {"billing.progress_claim.approve", "billing.progress_claim.return"}
+        ),
+    )
+)
+for command_key, to_state in (
+    ("billing.progress_claim.approve", "approved"),
+    ("billing.progress_claim.return", "returned"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="billing.progress_claim_approval",
+            from_states=frozenset({"submitted"}),
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="inventory.stock_transaction",
         subject_type="inventory.stock_transaction",
         exposed_attributes=frozenset(
@@ -560,6 +674,7 @@ registry.register_step_type(
                 "exclude_creator": ConfigField(bool),
                 "exclude_submitter": ConfigField(bool),
                 "exclude_starter": ConfigField(bool),
+                "allow_submitter_if_no_other_candidate": ConfigField(bool),
             }
         ),
         requires_routing=True,
@@ -602,6 +717,18 @@ registry.register_routing_resolver(
 registry.register_routing_resolver(
     RoutingResolverSpec(
         key="business_permission",
+        schema=ConfigSchema(
+            fields={
+                "permission": ConfigField(str, required=True),
+                "exclude_submitter_unless_no_other": ConfigField(bool),
+            }
+        ),
+        requires_fallback=True,
+    )
+)
+registry.register_routing_resolver(
+    RoutingResolverSpec(
+        key="submitter_primary_position_manager",
         schema=ConfigSchema(fields={"permission": ConfigField(str, required=True)}),
         requires_fallback=True,
     )

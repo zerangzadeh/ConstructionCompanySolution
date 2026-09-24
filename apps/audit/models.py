@@ -118,6 +118,42 @@ class AuditAction(models.TextChoices):
         "contract.amendment_approved",
         "الحاقیه قرارداد تأیید شد",
     )
+    PROJECT_BASELINE_CREATED = "project_baseline.created", "مبنای تجاری پروژه ایجاد شد"
+    PROJECT_BASELINE_UPDATED = "project_baseline.updated", "مبنای تجاری پروژه ویرایش شد"
+    PROJECT_BASELINE_ITEM_ADDED = (
+        "project_baseline.item_added",
+        "ردیف مبنای تجاری پروژه افزوده شد",
+    )
+    PROJECT_BASELINE_APPROVED = (
+        "project_baseline.approved",
+        "مبنای تجاری پروژه تأیید شد",
+    )
+    PROJECT_BASELINE_WITHDRAWN = (
+        "project_baseline.withdrawn",
+        "مبنای تجاری پروژه مسترد شد",
+    )
+    PROGRESS_RECORDED = "progress.recorded", "پیشرفت ثبت شد"
+    PROGRESS_CORRECTION_RECORDED = "progress.correction_recorded", "اصلاح پیشرفت ثبت شد"
+    PROGRESS_VERIFIED = "progress.verified", "پیشرفت راستی‌آزمایی شد"
+    PROGRESS_REJECTED = "progress.rejected", "پیشرفت رد شد"
+    PROGRESS_CLAIM_SUBMITTED = "progress_claim.submitted", "صورت‌وضعیت ارسال شد"
+    PROGRESS_CLAIM_APPROVED = "progress_claim.approved", "صورت‌وضعیت تأیید شد"
+    PROGRESS_CLAIM_RETURNED = (
+        "progress_claim.returned",
+        "صورت‌وضعیت برای اصلاح بازگردانده شد",
+    )
+    PROGRESS_CLAIM_REVISION_CREATED = (
+        "progress_claim.revision_created",
+        "revision صورت‌وضعیت ایجاد شد",
+    )
+    CLAIM_SETTLEMENT_ALLOCATED = (
+        "claim_settlement.allocated",
+        "دریافت به صورت‌وضعیت تخصیص یافت",
+    )
+    CLAIM_SETTLEMENT_REVERSED = (
+        "claim_settlement.reversed",
+        "تسویه صورت‌وضعیت برگشت داده شد",
+    )
     ESTIMATE_CREATED = "estimate.created", "برآورد ایجاد شد"
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "ردیف برآورد افزوده شد"
     ESTIMATE_APPROVED = "estimate.approved", "برآورد تأیید شد"

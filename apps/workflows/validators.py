@@ -175,7 +175,10 @@ def _has_invalid_cycle(adjacency: dict[str, set[str]]) -> bool:
 
 def _routing_target_issue(rule: Any) -> ValidationIssue | None:
     configuration = rule.configuration
-    if rule.resolver_type == "business_permission":
+    if rule.resolver_type in {
+        "business_permission",
+        "submitter_primary_position_manager",
+    }:
         permission = configuration.get("permission")
         if permission not in set(
             BusinessPermission.objects.filter(is_active=True).values_list(

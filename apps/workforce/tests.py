@@ -764,6 +764,7 @@ class WorkforceServiceTests(TestCase):
             first_name="Primary",
             last_name="Holder",
             position=primary,
+            hire_date=date(2026, 9, 1),
         )
         primary_assignment = employee.position_assignments.get(position=primary)
         secondary_assignment = assign_employee_position(
@@ -1411,11 +1412,12 @@ class WorkforcePanelTests(TestCase):
             position=execution_manager,
             start_date=date(2026, 9, 1),
         )
-        chief_executive.profile_image.name = (
-            f"organizations/{self.organization.pk}/employees/{chief_executive.pk}/"
-            "profile/chart-avatar.png"
+        Employee.objects.filter(pk=chief_executive.pk).update(
+            profile_image=(
+                f"organizations/{self.organization.pk}/employees/{chief_executive.pk}/"
+                "profile/chart-avatar.png"
+            )
         )
-        chief_executive.save(update_fields=["profile_image"])
         child = create_department(
             organization=self.organization,
             actor=self.owner,
@@ -1670,10 +1672,6 @@ class WorkforcePanelTests(TestCase):
             )
             self.assertContains(detail, image_url)
             self.assertNotContains(detail, employee.profile_image.name)
-            image_response = self.client.get(image_url)
-            self.assertEqual(image_response.status_code, 200)
-            self.assertEqual(image_response["Content-Type"], "image/png")
-            self.assertEqual(image_response["X-Content-Type-Options"], "nosniff")
             self.assertEqual(
                 self.client.get(
                     reverse(
@@ -1683,6 +1681,11 @@ class WorkforcePanelTests(TestCase):
                 ).status_code,
                 404,
             )
+            image_response = self.client.get(image_url)
+            self.assertEqual(image_response.status_code, 200)
+            self.assertEqual(image_response["Content-Type"], "image/png")
+            self.assertEqual(image_response["X-Content-Type-Options"], "nosniff")
+            b"".join(image_response.streaming_content)
 
     def test_employee_form_filters_positions_by_selected_department(self) -> None:
         first_department = create_department(

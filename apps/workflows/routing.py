@@ -76,13 +76,105 @@ def _resolve_rule(
         ]
     if rule.resolver_type == "business_permission":
         permission = configuration["permission"]
-        return [
+        candidates = [
             ResolvedCandidate(item, [basis])
             for item in memberships.filter(
                 role_definition__permissions__code=permission,
                 role_definition__permissions__is_active=True,
             ).distinct()
         ]
+        if configuration.get("exclude_submitter_unless_no_other"):
+            submitter_id = instance.subject_context.get("submitter_membership_id")
+            others = [
+                candidate
+                for candidate in candidates
+                if str(candidate.membership.pk) != str(submitter_id)
+            ]
+            if others:
+                return others
+        return candidates
+    if rule.resolver_type == "submitter_primary_position_manager":
+        submitter_id = instance.subject_context.get("submitter_membership_id")
+        if not submitter_id:
+            return []
+        submitter = memberships.filter(pk=submitter_id).first()
+        if submitter is None:
+            return []
+        employee = Employee.objects.filter(
+            organization_id=instance.organization_id,
+            user_id=submitter.user_id,
+            status=EmployeeStatus.ACTIVE,
+            archived_at__isnull=True,
+        ).first()
+        if employee is None:
+            return []
+        today = timezone.localdate()
+        primary = (
+            EmployeePositionAssignment.objects.filter(
+                organization_id=instance.organization_id,
+                employee=employee,
+                status=PositionAssignmentStatus.ACTIVE,
+                is_primary=True,
+                start_date__lte=today,
+                position__is_active=True,
+                position__archived_at__isnull=True,
+                position__parent_position__is_active=True,
+                position__parent_position__archived_at__isnull=True,
+            )
+            .select_related("position__parent_position")
+            .first()
+        )
+        if primary is None:
+            return []
+        assignments = list(
+            EmployeePositionAssignment.objects.filter(
+                organization_id=instance.organization_id,
+                position_id=primary.position.parent_position_id,
+                position__is_active=True,
+                employee__status=EmployeeStatus.ACTIVE,
+                employee__archived_at__isnull=True,
+                employee__user__isnull=False,
+                status=PositionAssignmentStatus.ACTIVE,
+                start_date__lte=today,
+            )
+            .select_related("employee__user", "position")
+            .order_by("pk")
+        )
+        memberships_by_user = _memberships_by_user(
+            instance=instance, employees=[item.employee for item in assignments]
+        )
+        permission = configuration["permission"]
+        permitted_ids = set(
+            memberships.filter(
+                role_definition__permissions__code=permission,
+                role_definition__permissions__is_active=True,
+            ).values_list("pk", flat=True)
+        )
+        resolved: list[ResolvedCandidate] = []
+        for assignment in assignments:
+            membership = memberships_by_user.get(assignment.employee.user_id)
+            if (
+                membership
+                and membership.pk in permitted_ids
+                and membership.pk != submitter.pk
+            ):
+                resolved.append(
+                    ResolvedCandidate(
+                        membership,
+                        [
+                            basis
+                            | {
+                                "position_id": str(assignment.position_id),
+                                "position_assignment_id": str(assignment.pk),
+                                "reports_to_position_id": str(
+                                    primary.position.parent_position_id
+                                ),
+                            }
+                        ],
+                        assignment,
+                    )
+                )
+        return resolved
     if rule.resolver_type == "explicit_membership":
         item = memberships.filter(pk=configuration["membership_id"]).first()
         return [ResolvedCandidate(item, [basis])] if item else []

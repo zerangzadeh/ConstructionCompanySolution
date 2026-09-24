@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}راهنمای اصلاح صورت‌وضعیت | سازه‌یار{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_breadcrumb_label="صورت‌وضعیت‌ها" page_breadcrumb_url="/billing/claims/" page_eyebrow="کنترل مالی" page_title="راهنمای اصلاح و بازیابی" page_description="تاریخچهٔ تأیید و تسویه قابل بازنویسی نیست؛ اصلاح از مسیرهای کنترل‌شده انجام می‌شود." only %}
+<div class="mt-6 grid gap-5 lg:grid-cols-3"><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">پیش‌نویس و بازگشت</h2><p class="mt-3 text-sm leading-7 text-slate-600">کسور فقط با ClaimAdjustment در پیش‌نویس ثبت می‌شوند. صورت‌وضعیت ارسال‌شده را برای اصلاح بازگردانید و نسخهٔ بازگشتی را پیگیری کنید.</p></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">تأیید و تسویه</h2><p class="mt-3 text-sm leading-7 text-slate-600">پس از تأیید، مبلغ خالص و تاریخچه قابل ویرایش نیست. تسویهٔ جدید فقط از تخصیص دریافتِ فعال، هم‌ساز با سازمان، پروژه، قرارداد و طرف‌حساب ثبت می‌شود.</p></section><section class="erp-surface rounded-xl p-5"><h2 class="font-semibold">ابطال و ردیابی</h2><p class="mt-3 text-sm leading-7 text-slate-600">ابطال دریافت یا برگشت تخصیص، تسویه‌های وابسته را اتمی برگشت می‌دهد. دلیل، عامل و زمان در تاریخچه باقی می‌ماند؛ برای مراحل تأیید از کارتابل استفاده کنید.</p></section></div>
+{% endblock %}

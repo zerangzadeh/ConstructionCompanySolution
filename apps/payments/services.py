@@ -204,7 +204,11 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
             "updated_at",
         ]
     )
-    _reverse_active_allocations(payment=locked_payment, actor=actor)
+    _reverse_active_allocations(
+        payment=locked_payment,
+        actor=actor,
+        reason=f"ابطال پرداخت: {locked_payment.void_reason}",
+    )
     record_audit_event(
         action=AuditAction.PAYMENT_VOIDED,
         entity_type="payment",
@@ -219,25 +223,95 @@ def void_payment(*, payment: Payment, actor: User, reason: str) -> Payment:
     return locked_payment
 
 
-def _reverse_active_allocations(*, payment: Payment, actor: User) -> None:
+def _reverse_active_allocations(*, payment: Payment, actor: User, reason: str) -> None:
     """Keep allocation history while excluding it when its payment is voided."""
-    for allocation in PaymentAllocation.objects.filter(
-        payment=payment, status=PaymentAllocationStatus.ACTIVE
+    for allocation in (
+        PaymentAllocation.objects.select_for_update()
+        .filter(payment=payment, status=PaymentAllocationStatus.ACTIVE)
+        .order_by("pk")
     ):
-        allocation.status = PaymentAllocationStatus.REVERSED
-        allocation.reversed_at = timezone.now()
-        allocation.reversed_by = actor
-        allocation.save(
-            update_fields=["status", "reversed_at", "reversed_by", "updated_at"]
-        )
-        record_audit_event(
-            action=AuditAction.PAYMENT_ALLOCATION_REVERSED,
-            entity_type="payment_allocation",
-            entity_id=allocation.pk,
-            organization=payment.organization,
+        _reverse_locked_payment_allocation(
+            payment=payment,
+            allocation=allocation,
             actor=actor,
-            metadata={"payment_id": str(payment.pk), "amount": str(allocation.amount)},
+            reason=reason,
         )
+
+
+def _reverse_locked_payment_allocation(
+    *, payment: Payment, allocation: PaymentAllocation, actor: User, reason: str
+) -> PaymentAllocation:
+    """Reverse an allocation and dependent claim settlements in the same transaction."""
+
+    if allocation.status != PaymentAllocationStatus.ACTIVE:
+        raise ValueError("فقط تخصیص پرداخت فعال قابل برگشت است.")
+    if not reason.strip():
+        raise ValueError("وارد کردن دلیل برگشت تخصیص الزامی است.")
+
+    from apps.billing.services import reverse_claim_settlements_for_payment_allocation
+
+    reverse_claim_settlements_for_payment_allocation(
+        payment_allocation=allocation,
+        actor=actor,
+        reason=f"برگشت تخصیص پرداخت: {reason.strip()}",
+    )
+    allocation.status = PaymentAllocationStatus.REVERSED
+    allocation.reversed_at = timezone.now()
+    allocation.reversed_by = actor
+    allocation.reversal_reason = reason.strip()
+    allocation.save(
+        update_fields=[
+            "status",
+            "reversed_at",
+            "reversed_by",
+            "reversal_reason",
+            "updated_at",
+        ]
+    )
+    record_audit_event(
+        action=AuditAction.PAYMENT_ALLOCATION_REVERSED,
+        entity_type="payment_allocation",
+        entity_id=allocation.pk,
+        organization=payment.organization,
+        actor=actor,
+        metadata={
+            "payment_id": str(payment.pk),
+            "amount": str(allocation.amount),
+            "reason": allocation.reversal_reason,
+        },
+    )
+    return allocation
+
+
+@transaction.atomic
+def reverse_payment_allocation(
+    *, allocation: PaymentAllocation, actor: User, reason: str
+) -> PaymentAllocation:
+    """Explicitly reverse one active contract allocation without mutating cash."""
+
+    try:
+        preliminary = PaymentAllocation.objects.select_related("payment").get(
+            pk=allocation.pk
+        )
+    except PaymentAllocation.DoesNotExist as exc:
+        raise PermissionDenied("تخصیص پرداخت یافت نشد.") from exc
+    payment = Payment.objects.select_for_update().get(pk=preliminary.payment_id)
+    _validate_context(
+        actor=actor,
+        organization=payment.organization,
+        project=payment.project,
+        permission=BusinessPermissionCode.PAYMENTS_ALLOCATE,
+    )
+    locked_allocation = PaymentAllocation.objects.select_for_update().get(
+        pk=preliminary.pk,
+        organization=payment.organization,
+    )
+    return _reverse_locked_payment_allocation(
+        payment=payment,
+        allocation=locked_allocation,
+        actor=actor,
+        reason=reason,
+    )
 
 
 @transaction.atomic

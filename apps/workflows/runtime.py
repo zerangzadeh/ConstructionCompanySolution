@@ -747,6 +747,19 @@ def _check_sod(
         if step.configuration.get(flag) and str(
             instance.subject_context.get(context_key)
         ) == str(membership_id):
+            if (
+                context_key == "submitter_membership_id"
+                and step.configuration.get("allow_submitter_if_no_other_candidate")
+                and not WorkItemCandidate.objects.filter(
+                    work_item__step_instance__instance=instance,
+                    work_item__step_instance__step_definition=step,
+                    work_item__status__in=(WorkItemStatus.OPEN, WorkItemStatus.CLAIMED),
+                    is_active=True,
+                )
+                .exclude(membership_id=membership_id)
+                .exists()
+            ):
+                continue
             raise PermissionDenied("قاعده تفکیک وظایف این اقدام را منع می‌کند.")
 
 

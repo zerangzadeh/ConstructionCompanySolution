@@ -1,8 +1,8 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from django import forms
 
-from core.forms import JalaliDateMixin, JalaliDateInput, JalaliDateTimeInput
+from core.forms import JalaliDateInput, JalaliDateMixin, JalaliDateTimeInput
 
 
 class SampleDateForm(JalaliDateMixin, forms.Form):
@@ -25,7 +25,9 @@ def test_jalali_values_are_converted_and_validated() -> None:
 
     assert valid.is_valid()
     assert valid.cleaned_data["business_date"] == date(2026, 3, 21)
-    assert valid.cleaned_data["recorded_at"].replace(tzinfo=None) == datetime(2026, 3, 21, 12, 30)
+    assert valid.cleaned_data["recorded_at"] == datetime(
+        2026, 3, 21, 12, 30, tzinfo=timezone.utc
+    )
 
     invalid = SampleDateForm(
         data={"business_date": "۱۴۰۵/۰۱/۳۲", "recorded_at": "۱۴۰۵/۱۳/۰۱ ۱۲:۳۰"}

@@ -144,17 +144,17 @@ class UserDetailAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "اطلاعات پایه")
-        self.assertContains(response, "عضویت‌ها و نقش‌های سازمانی")
+        self.assertContains(response, "عضویت‌ها و نقش‌های شرکتی")
         self.assertContains(response, "مجوزها و دسترسی‌ها")
         self.assertContains(response, "تاریخچهٔ فعالیت")
         self.assertContains(response, "سارا احمدی")
         self.assertContains(response, "شرکت سازه شمال")
-        self.assertContains(response, "مدیر اجرایی")
+        self.assertContains(response, "Operations Manager")
         self.assertContains(response, "تعیین نقش یا وضعیت")
         self.assertContains(response, "پروژه ایجاد شد")
         self.assertContains(
             response,
-            "برای تغییر دسترسی عملیاتی، نقش عضویت سازمانی را تغییر دهید.",
+            "برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.",
         )
         self.assertContains(response, "دسترسی به پنل مدیریت سامانه")
         self.assertContains(response, "دسترسی کامل فنی سامانه")
@@ -203,10 +203,10 @@ class UserDetailAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "نام کامل ثبت نشده است")
-        self.assertContains(response, "عضویت سازمانی وجود ندارد")
+        self.assertContains(response, "عضویت شرکتی وجود ندارد")
         self.assertContains(
             response,
-            "برای تغییر دسترسی عملیاتی، نقش عضویت سازمانی را تغییر دهید.",
+            "برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.",
         )
         self.assertContains(response, "فعالیت مهمی ثبت نشده است")
 

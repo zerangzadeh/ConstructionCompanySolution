@@ -1105,3 +1105,338 @@ In the same session, do not repeat the entire UI specification. Keep prompts tas
 **Usability before decoration.**
 
 **Read backend if necessary; do not modify backend for presentation-only work.**
+
+---
+
+## 37. Tenant, Project, and Site Context
+
+Every business page must make the effective context visible. Context is part of
+orientation, not authorization.
+
+- Show the active organization in the shell. On project-owned pages, show the
+  project and, when relevant, site/phase in the page header or context bar.
+- A context switch must be explicit, preserve only safe filters, and never infer
+  access from a URL, hidden field, cookie, or previously selected project.
+- Do not render organization IDs as editable business fields. The server resolves
+  the organization from the authenticated active membership.
+- When a context is unavailable because of permission, tenant state, or archive
+  state, render a safe explanation and permitted recovery action. Do not reveal
+  names or counts from inaccessible contexts.
+- Breadcrumbs describe navigation hierarchy; they do not need to reproduce every
+  organization/project label when the context bar already does so.
+- Switching project/site must refresh dependent filters and choices. Stale child
+  selections are cleared and announced accessibly.
+
+The expected visual order is:
+
+```text
+Application shell
+  -> organization/project/site context
+  -> breadcrumb
+  -> page title, status, key actions
+  -> alerts/KPIs/tabs
+  -> primary content
+```
+
+## 38. Context-Aware and Cascading Selection Standard
+
+Use cascading fields whenever one choice constrains another, including:
+
+- organization -> project -> site -> phase
+- project -> WBS node -> activity
+- party -> role/contact/bank account/contract
+- contract -> amendment/item/claim
+- warehouse -> available material/bin/lot
+- project -> CBS/cost center -> source document
+- employee -> effective assignment/project/site
+
+Rules:
+
+1. The server remains authoritative. Client-side filtering improves usability but
+   never grants access or replaces cross-tenant/project validation.
+2. Initially disable a dependent field until its parent is valid. Its helper text
+   must explain what to choose first.
+3. On parent change, clear incompatible descendants, cached labels, validation
+   errors, and derived values. Never submit an invisible stale identifier.
+4. Loading, empty, error, and retry states must be distinct. An empty authorized
+   set is not a transport failure.
+5. Display only valid and authorized options for the current effective date and
+   lifecycle state. Archived items may appear only when required to render
+   historical selections, clearly marked as archived/read-only.
+6. Preserve the selected label in validation responses. Never leave a raw UUID as
+   the only visible value.
+7. For HTMX endpoints, apply the same login, CSRF, tenant, permission, object
+   scope, and relationship checks as a normal page.
+8. Dependent URLs accept the minimum opaque parent identifier. Do not expose a
+   general tenant-wide search endpoint when a scoped endpoint is sufficient.
+9. Keyboard focus remains predictable after refresh; the result count/change is
+   announced through an `aria-live` region when materially useful.
+10. Add tests for forged parent/child combinations, cross-tenant IDs, stale
+    selection, no-result, permission, and archived-record behavior.
+
+## 39. Searchable Selectors and Large Master Data
+
+Native selects are acceptable for small stable sets. Use a searchable selector
+when option count, duplicate names, or remote filtering makes a native select
+error-prone.
+
+- Search by the identifiers users know: code/number, title/name, and approved
+  alternate identifier. Show code plus name, not a name-only ambiguous list.
+- Debounce remote requests, enforce a minimum query length where appropriate,
+  paginate results, and show total/remaining state without downloading an entire
+  master table.
+- Scope results before search. Search never broadens tenant/project permission.
+- Avoid implicit creation from a selector. “Create new” is a separate authorized
+  flow with clear return behavior.
+- Preserve selected historical items even if they become inactive, but prevent
+  new use when business rules disallow it.
+- Do not invent a bespoke JavaScript combobox without full keyboard, focus,
+  screen-reader, and RTL validation. Evaluate a maintained accessible component
+  before custom implementation and keep dependencies deliberate.
+
+## 40. Inline Item Grids and Transaction Forms
+
+Line-item documents—estimates, orders, receipts, claims, journals, timesheets,
+invoices, and similar records—use a reusable grid pattern rather than unrelated
+page-specific tables.
+
+- Keep document header/context outside the grid. Freeze or repeat meaningful
+  column headers for long lists.
+- Every row has a stable client/form identifier. Error messages point to the row
+  and field and a summary links to the first error.
+- Support keyboard movement and row addition without trapping focus. Never make
+  drag-only ordering the sole interaction.
+- Numeric cells use `inputmode="decimal"` where useful, canonical submitted
+  values, LTR number flow, explicit unit/currency, and server Decimal validation.
+- Derived totals are visibly read-only and labelled as provisional until the
+  server confirms them. Client calculations do not become authoritative.
+- Adding from a master copies only approved snapshot fields; the source link is
+  retained when the domain supports it.
+- Removing a new draft row may be immediate. Removing a persisted or referenced
+  row follows lifecycle rules and may require void/reversal rather than deletion.
+- Bulk paste/import requires preview, row-level validation, duplicate detection,
+  all-or-nothing vs partial-result disclosure, and a downloadable error report for
+  large jobs.
+- On mobile, use a row-summary/card editor or horizontal containment with a clear
+  primary column. Do not shrink a 12-column grid until it becomes unreadable.
+
+## 41. Enterprise List, Filter, Sort, and Pagination Contract
+
+The list page is a work surface, not just a database dump.
+
+- Store filter, search, sort, page, and page-size state in the URL so permitted
+  views can be bookmarked and returned to. Remove empty/default noise.
+- Only whitelist server-side sort fields. Use a stable secondary ordering to
+  prevent duplicate/missing rows between pages.
+- Show active filters as removable chips or a concise summary, a clear-all action,
+  and the result count. Do not hide active constraints inside a closed panel.
+- Date ranges use the approved Jalali input contract while submitting canonical
+  values. Amount/quantity filters always label unit/currency.
+- Table headers communicate sort direction and remain usable by keyboard and
+  screen reader.
+- Bulk actions require an explicit selection model and eligible-count preview.
+  Rows the user cannot act on remain excluded; a visible checkbox is never the
+  authorization check.
+- Use pagination for operational lists. Infinite scroll is unsuitable when users
+  must compare rows, select batches, retain position, or cite a result.
+- Saved views are a future capability and must preserve permission-safe filter
+  definitions, not captured results.
+- Consolidate shared filter components; do not create parallel “v2/v3” patterns
+  for each domain.
+
+## 42. Detail Pages, Tabs, Source Links, and History
+
+- The header shows title/number, semantic status, primary context, and only the
+  actions relevant to the current lifecycle.
+- Put summary and exceptions first; use sections for related attributes. Avoid a
+  single unstructured key/value wall.
+- Tabs are appropriate for substantial, independently addressable sections such
+  as items, documents, approvals, settlements, audit, or related costs. Tabs must
+  be links with URLs and must not hide validation errors silently.
+- Keep the overview light. Large related tables are paginated and permission
+  checked independently.
+- Show source lineage as human labels and links: “generated from Goods Receipt
+  GR-…”, “posted by Journal …”, “based on Rule Version …”. Raw model names and
+  UUIDs are secondary diagnostic data, not the main UI.
+- Historical records retain the snapshot that was true at finalization. If the
+  current master differs, distinguish “recorded value” from “current master”.
+- Activity/audit sections show actor, capacity where material, timestamp in tenant
+  timezone, action, previous/new status, reason, and source. Sensitive metadata is
+  permission filtered.
+
+## 43. Workflow Actions and My Cartable
+
+The workbench (“کارتابل من”) is the authoritative user action queue; it is not a
+copy of Notifications or Audit.
+
+- Each item shows business type/number/title, project/site, current step, why the
+  user can act (assignment/candidate/delegation), received/due time, priority, and
+  safe preview.
+- Group and filter by actionable state, overdue, delegated, project, workflow
+  type, and assignment source. Deduplicate multiple candidacies for the same work.
+- Claim/release/approve/reject/request-change/reassign actions display current
+  state and required reason/evidence. Re-read and authorize inside the transaction.
+- A user holding multiple positions remains one identity and one workbench. Show
+  the qualifying position as evidence; do not create separate personas.
+- After an action, remove or update the item only after server confirmation and
+  announce the result. Concurrency conflicts explain that state changed and offer
+  a safe refresh; never overwrite another decision.
+- High-impact or batch decisions show count, amount/currency, affected project,
+  separation-of-duties warning, and a final confirmation.
+- Notifications may link to a work item but must not duplicate its lifecycle.
+
+## 44. Financial Values, Calculations, and Reconciliation UX
+
+- Always label currency and distinguish **IRR (ریال)** from **تومان**. Do not use
+  an unlabeled “amount”. Conversion for display must be deterministic and must not
+  alter stored/accounting values.
+- Keep canonical numeric values LTR; localize display separators/digits according
+  to the approved convention. Negative amounts need a minus sign plus semantic
+  context; color alone is insufficient.
+- Quantity shows unit; rate shows its denominator; percentages show the basis.
+- Separate budget, commitment, accrued, actual, paid, forecast, and variance.
+  Never use one generic “cost” label where meanings differ.
+- Calculation panels show formula components, rounding, cap, applied contract-term
+  version, applied regulatory-rule version, and source lines when consequential.
+- “Draft/proposed/unposted/uncleared/unreconciled” states must be unmistakable.
+  Dashboard totals include the statuses and refresh timestamp used.
+- Reconciliation views place the two sides, difference, aging, evidence, owner,
+  and resolution history together. Resolution never edits source evidence silently.
+- Closed-period, posted, paid, or finalized records expose reversal/adjustment/
+  replacement actions—not editable fields.
+
+## 45. Attachments, Documents, Imports, and Exports
+
+- File controls state accepted type, maximum size, confidentiality, and whether
+  scanning/processing is pending. Client checks improve feedback; server checks
+  remain authoritative.
+- Show upload progress, retry/cancel where safe, version number, uploader, time,
+  size, checksum/status, links, and classification. Failed uploads are not shown
+  as completed documents.
+- Preview is permission checked. Download uses a protected endpoint or short-lived
+  signed access and is audited where the domain requires it.
+- Replacing a finalized file creates a version; it never overwrites evidence.
+- Imports use upload -> mapping/options -> validation preview -> explicit commit
+  -> result/report. Large imports expose job state and idempotency.
+- Exports show scope, active filters, record count when known, sensitivity, format,
+  generated-at, expiry, and audit status. Export permission is distinct from view
+  permission where data sensitivity requires it.
+- OCR/AI extraction displays original evidence, proposed value, confidence or
+  warning, reviewer correction, and confirmation. Extraction does not finalize a
+  legal or financial record.
+
+## 46. Empty, Loading, Error, Validation, and Disabled States
+
+Every dynamic surface needs all relevant states:
+
+| State | Required behavior |
+| --- | --- |
+| First-use empty | Explain value and show one permitted next action. |
+| Filtered empty | State that no result matches and offer clear filters; do not advertise create unless appropriate. |
+| Unauthorized | Safe denial without object existence/detail leakage; give navigation/recovery if permitted. |
+| Loading | Preserve layout where possible; announce material asynchronous loading; prevent duplicate submit. |
+| Recoverable error | Plain-language cause, retained safe input, retry path, and correlation/reference ID when available. |
+| Validation error | Summary plus field/row errors; focus summary; do not discard input or attachments already accepted. |
+| Concurrency conflict | Explain that state changed, show current safe state, and require review before retry. |
+| Disabled action | Visibly disabled only when the user may know the action exists; explain the exact safe reason and prerequisite. |
+
+Do not disable an action solely to conceal missing permission; omit it when its
+existence would leak information. Never rely on disabled HTML controls as a
+security control. Server errors must not expose stack traces, SQL, secrets,
+internal paths, or other tenants' identifiers.
+
+## 47. Confirmations, Destructive Actions, Archive, Void, and Reversal
+
+- Routine reversible actions do not need confirmation. Ask only when consequence,
+  scope, financial/legal effect, or recovery cost justifies interruption.
+- A confirmation names the record, action, consequence, related records, and
+  recovery mechanism. Do not use a generic “Are you sure?”.
+- `Archive` removes a reusable record from new selection while retaining history.
+  `Void` declares a transaction invalid with actor/time/reason. `Reverse` creates
+  equal-and-opposite evidence. `Delete` is limited to truly disposable drafts or
+  approved retention operations.
+- Finalized history is never silently edited or deleted. The UI shows the original,
+  void/reversal link, replacement if any, reason, actor, and time.
+- Typed name/number confirmation is reserved for unusually high-impact actions
+  such as tenant cancellation or bulk irreversible operations—not ordinary forms.
+- Consequential actions require a reason when the domain requires audit evidence.
+  Validate the reason server-side; placeholder text is not evidence.
+- Success messages state what changed and what did not, especially when a reversal
+  does not itself refund/pay/move cash.
+
+## 48. Mobile and Site Workflow Standard
+
+- Design field workflows for sunlight, gloves, intermittent connectivity, one-hand
+  use, camera capture, and short attention—not merely a narrower desktop page.
+- Prioritize context, task, primary facts, evidence, exceptions, and submit. Hide
+  secondary metadata behind progressive disclosure without hiding required rules.
+- Touch targets are at least 44 by 44 CSS pixels where practical. Do not place
+  destructive and primary actions adjacent without spacing.
+- Preserve drafts explicitly. If offline capability is approved, show offline,
+  queued, syncing, conflict, failed, and synced states; store the minimum sensitive
+  data and define logout/device-loss behavior.
+- GPS, camera, QR/barcode, and device data require a clear purpose, permission,
+  manual fallback, provenance, and validation. Device data never proves tenant or
+  project authorization.
+- Provide compressed/resumable upload only after the storage design supports it;
+  never silently discard the original required evidence.
+
+## 49. Accessibility, Keyboard, Focus, and Motion
+
+- Meet WCAG 2.2 AA as the product target unless a documented exception is approved.
+- All actions, menus, tabs, dialogs, grids, selectors, date pickers, and workbench
+  items must be keyboard operable with visible focus. DOM order follows visual RTL
+  reading order; do not use positive `tabindex` to patch a broken structure.
+- Dialog focus moves to the heading/first meaningful control, is trapped while
+  open, and returns to the triggering element on close. Escape closes only when
+  cancellation is safe.
+- Field errors use programmatic associations; required status is not communicated
+  by color/asterisk alone. Status badges have text, not color alone.
+- Tables have correct headers/captions and responsive alternatives. Charts include
+  a textual summary and accessible data table for decision-critical values.
+- Use `aria-live` sparingly for asynchronous validation, list counts, upload and
+  workflow results. Avoid repeated noisy announcements.
+- Respect reduced-motion preferences. Animation communicates transition/progress;
+  it never delays work or becomes the only status cue.
+- Mixed Persian/English/numeric content uses appropriate `dir`/`bdi` boundaries.
+
+## 50. Permission-Aware, AI-Assisted, and Audit-Visible Actions
+
+- Navigation and actions reflect permissions to reduce confusion, but every read
+  and mutation is re-authorized server-side against tenant, object scope, state,
+  assignment/candidacy, separation rule, and tenant lifecycle.
+- For a visible-but-unavailable action, explain whether the blocker is state,
+  missing required data, closed period, assignment, tenant suspension, or another
+  safe prerequisite. Do not expose names of unauthorized approvers or records.
+- AI output is labelled as assistance, includes sources/evidence where possible,
+  distinguishes extracted fact from generated suggestion, and supports correction.
+- Before an AI-assisted consequential action, show the exact structured changes,
+  validation results, affected objects and permissions. The user explicitly
+  confirms; the ordinary domain service performs the action.
+- Record model/provider/version as permitted, prompt/template version, source
+  references, reviewer, accepted/rejected result, and resulting domain audit event
+  without storing unnecessary sensitive prompt content.
+- Audit/history links appear on security, financial, contractual, workflow, master
+  governance, import/export, and support-access surfaces when the viewer has the
+  dedicated permission. Audit evidence is not editable.
+
+## 51. Pattern Acceptance Checklist
+
+Before a new or materially changed screen is accepted, verify:
+
+- active tenant/project/site context and server authorization;
+- Persian copy, RTL layout, mixed-direction values, Jalali display/input, and
+  explicit Rial/Toman/unit behavior;
+- desktop, tablet, small mobile, long Persian text, empty, dense, loading, error,
+  disabled, unauthorized, archived and finalized states;
+- keyboard-only operation, focus order/return, screen-reader names, error summary,
+  contrast, reduced motion, and touch targets;
+- cascading selectors against forged/stale/cross-tenant choices;
+- URL-stable list filters/sort/pagination and stable ordering;
+- duplicate-submit and concurrency behavior;
+- audit/source lineage, document evidence, reversal/void wording, and calculation
+  explanation where relevant;
+- template reuse and absence of page-local inline styles or duplicated components;
+  and
+- representative browser verification plus applicable Django/template/tests and
+  Ruff checks.

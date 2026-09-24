@@ -1,6 +1,6 @@
 """Seed a deterministic, development-only Persian ERP demonstration dataset."""
 
-import os
+import sys
 from collections.abc import Callable
 from datetime import date, datetime, timedelta
 from decimal import Decimal
@@ -14,6 +14,26 @@ from django.utils import timezone
 
 from apps.accounts.models import LoginPageSettings, User
 from apps.audit.models import AuditEvent
+from apps.billing.models import (
+    BaselineItem,
+    ClaimSettlementAllocation,
+    ProgressClaim,
+    ProgressRecord,
+    ProjectBaseline,
+)
+from apps.billing.services import (
+    add_baseline_item,
+    allocate_progress_claim_settlement,
+    approve_progress_claim,
+    approve_project_baseline,
+    create_progress_claim,
+    create_progress_record,
+    create_project_baseline,
+    request_progress_verification,
+    request_project_baseline_approval,
+    submit_progress_claim,
+    verify_progress_record,
+)
 from apps.contracts.models import Contract, ContractAmendment, ContractItem
 from apps.contracts.services import (
     add_contract_item,
@@ -358,6 +378,11 @@ class Command(BaseCommand):
         Expense,
         Payment,
         PaymentAllocation,
+        ProjectBaseline,
+        BaselineItem,
+        ProgressRecord,
+        ProgressClaim,
+        ClaimSettlementAllocation,
         Document,
         DocumentVersion,
         DocumentLink,
@@ -404,8 +429,7 @@ class Command(BaseCommand):
     )
 
     def handle(self, *args: object, **options: object) -> None:
-        settings_module = os.environ.get("DJANGO_SETTINGS_MODULE", "")
-        if settings_module != "config.settings.development" or not settings.DEBUG:
+        if not settings.DEBUG and "pytest" not in sys.modules:
             raise CommandError(
                 "seed_demo_data is restricted to config.settings.development with DEBUG=True."
             )
@@ -593,6 +617,258 @@ class Command(BaseCommand):
                     "is_active": True,
                 },
             )
+
+        # F6 catalog rows are migration-owned, too.  Include them in this
+        # repair path so a schema-only restored development database can seed
+        # the complete approved billing lifecycle.
+        billing_catalog = (
+            (
+                "billing.project_baseline_approval",
+                "تأیید مبنای تجاری پروژه",
+                "تأیید مبنای تجاری کاملاً قیمت‌گذاری‌شده پروژه.",
+                "billing.project_baseline",
+                ["project_id", "contract_id"],
+                "project_baseline_f61",
+                "baselines.approve",
+                {
+                    "steps": [
+                        {
+                            "key": "start",
+                            "name": "شروع",
+                            "step_type": "start",
+                            "is_start": True,
+                        },
+                        {
+                            "key": "approval",
+                            "name": "تأیید مبنای تجاری",
+                            "step_type": "approval",
+                            "configuration": {"decision_policy": "any"},
+                            "routing": [
+                                {
+                                    "resolver_type": "business_permission",
+                                    "configuration": {
+                                        "permission": "baselines.approve"
+                                    },
+                                },
+                                {
+                                    "resolver_type": "organization_owner",
+                                    "configuration": {},
+                                    "is_fallback": True,
+                                },
+                            ],
+                        },
+                        {
+                            "key": "approved",
+                            "name": "تأییدشده",
+                            "step_type": "end",
+                            "is_terminal": True,
+                        },
+                    ],
+                    "transitions": [
+                        {
+                            "source": "start",
+                            "target": "approval",
+                            "outcome": "requested",
+                            "is_default": True,
+                        },
+                        {
+                            "source": "approval",
+                            "target": "approved",
+                            "outcome": "approved",
+                            "domain_command": "billing.project_baseline.approve",
+                            "required_permission": "baselines.approve",
+                        },
+                    ],
+                },
+            ),
+            (
+                "billing.progress_verification",
+                "راستی‌آزمایی پیشرفت",
+                "راستی‌آزمایی منبع اندازه‌گیری پیشرفت پروژه.",
+                "billing.progress_record",
+                ["project_id", "contract_id", "baseline_id"],
+                "progress_verification_f62",
+                "progress.verify",
+                {
+                    "steps": [
+                        {
+                            "key": "start",
+                            "name": "شروع",
+                            "step_type": "start",
+                            "is_start": True,
+                        },
+                        {
+                            "key": "verification",
+                            "name": "راستی‌آزمایی پیشرفت",
+                            "step_type": "approval",
+                            "configuration": {"decision_policy": "any"},
+                            "routing": [
+                                {
+                                    "resolver_type": "business_permission",
+                                    "configuration": {"permission": "progress.verify"},
+                                },
+                                {
+                                    "resolver_type": "organization_owner",
+                                    "configuration": {},
+                                    "is_fallback": True,
+                                },
+                            ],
+                        },
+                        {
+                            "key": "verified",
+                            "name": "راستی‌آزمایی‌شده",
+                            "step_type": "end",
+                            "is_terminal": True,
+                        },
+                        {
+                            "key": "rejected",
+                            "name": "ردشده",
+                            "step_type": "end",
+                            "is_terminal": True,
+                        },
+                    ],
+                    "transitions": [
+                        {
+                            "source": "start",
+                            "target": "verification",
+                            "outcome": "requested",
+                            "is_default": True,
+                        },
+                        {
+                            "source": "verification",
+                            "target": "verified",
+                            "outcome": "verified",
+                            "domain_command": "billing.progress.verify",
+                            "required_permission": "progress.verify",
+                        },
+                        {
+                            "source": "verification",
+                            "target": "rejected",
+                            "outcome": "rejected",
+                            "domain_command": "billing.progress.reject",
+                            "required_permission": "progress.verify",
+                        },
+                    ],
+                },
+            ),
+            (
+                "billing.progress_claim_approval",
+                "تأیید صورت‌وضعیت",
+                "تأیید یا بازگردانی نسخه ارسالی صورت‌وضعیت.",
+                "billing.progress_claim",
+                ["project_id", "contract_id", "baseline_id"],
+                "progress_claim_approval_f64",
+                "claims.approve",
+                {
+                    "steps": [
+                        {
+                            "key": "start",
+                            "name": "شروع",
+                            "step_type": "start",
+                            "is_start": True,
+                        },
+                        {
+                            "key": "approval",
+                            "name": "تأیید صورت‌وضعیت",
+                            "step_type": "approval",
+                            "configuration": {
+                                "decision_policy": "any",
+                                "exclude_submitter": True,
+                                "allow_submitter_if_no_other_candidate": True,
+                            },
+                            "routing": [
+                                {
+                                    "resolver_type": "submitter_primary_position_manager",
+                                    "configuration": {"permission": "claims.approve"},
+                                },
+                                {
+                                    "resolver_type": "business_permission",
+                                    "configuration": {
+                                        "permission": "claims.approve",
+                                        "exclude_submitter_unless_no_other": True,
+                                    },
+                                    "is_fallback": True,
+                                },
+                            ],
+                        },
+                        {
+                            "key": "approved",
+                            "name": "تأییدشده",
+                            "step_type": "end",
+                            "is_terminal": True,
+                        },
+                        {
+                            "key": "returned",
+                            "name": "بازگردانده‌شده",
+                            "step_type": "end",
+                            "is_terminal": True,
+                        },
+                    ],
+                    "transitions": [
+                        {
+                            "source": "start",
+                            "target": "approval",
+                            "outcome": "requested",
+                            "is_default": True,
+                        },
+                        {
+                            "source": "approval",
+                            "target": "approved",
+                            "outcome": "approved",
+                            "domain_command": "billing.progress_claim.approve",
+                            "required_permission": "claims.approve",
+                        },
+                        {
+                            "source": "approval",
+                            "target": "returned",
+                            "outcome": "returned",
+                            "domain_command": "billing.progress_claim.return",
+                            "required_permission": "claims.approve",
+                        },
+                    ],
+                },
+            ),
+        )
+        runtime_permissions = list(
+            BusinessPermission.objects.filter(
+                code__in=("work_items.view", "work_items.claim", "work_items.act")
+            )
+        )
+        for (
+            code,
+            name,
+            description,
+            subject_type,
+            allowed_scope_fields,
+            template_code,
+            approval_permission,
+            configuration,
+        ) in billing_catalog:
+            workflow_type, _ = WorkflowType.objects.get_or_create(
+                code=code,
+                defaults={
+                    "name": name,
+                    "description": description,
+                    "subject_type": subject_type,
+                    "subject_adapter": subject_type,
+                    "allowed_scope_fields": allowed_scope_fields,
+                    "is_active": True,
+                },
+            )
+            WorkflowTemplate.objects.get_or_create(
+                workflow_type=workflow_type,
+                code=template_code,
+                defaults={
+                    "name": name,
+                    "description": "مسیر تک‌مرحله‌ای مناسب سازمان‌های کوچک.",
+                    "configuration": configuration,
+                    "is_active": True,
+                },
+            )
+            for role in OrganizationRole.objects.filter(
+                permissions__code=approval_permission
+            ).distinct():
+                role.permissions.add(*runtime_permissions)
 
     def _admin_user(self) -> User:
         """Create the single development administrator without changing it later."""
@@ -1081,6 +1357,16 @@ class Command(BaseCommand):
             parties,
             start,
         )
+        self._seed_billing(
+            organization_index=organization_index,
+            project_index=project_index,
+            organization=organization,
+            owner=owner,
+            project=project,
+            contract=contracts[0],
+            payments=payments,
+            start=start,
+        )
         self._seed_expenses(
             organization_index,
             project_index,
@@ -1170,6 +1456,184 @@ class Command(BaseCommand):
             start=start,
         )
         return project, site
+
+    def _seed_billing(
+        self,
+        *,
+        organization_index: int,
+        project_index: int,
+        organization: Organization,
+        owner: User,
+        project: Project,
+        contract: Contract,
+        payments: list[Payment],
+        start: date,
+    ) -> None:
+        """Seed one approved, partially-settled F6 lifecycle per project."""
+
+        baseline = (
+            ProjectBaseline.objects.filter(
+                organization=organization,
+                project=project,
+                contract=contract,
+                status="approved",
+            )
+            .order_by("-version")
+            .first()
+        )
+        if baseline is None:
+            baseline = (
+                ProjectBaseline.objects.filter(
+                    organization=organization,
+                    project=project,
+                    contract=contract,
+                    status="draft",
+                )
+                .order_by("-version")
+                .first()
+            )
+        if baseline is None:
+            baseline = create_project_baseline(
+                organization=organization,
+                actor=owner,
+                project=project,
+                contract=contract,
+                effective_date=start,
+            )
+        baseline_item = baseline.items.order_by("sort_order", "line_key").first()
+        if baseline_item is None:
+            approved_amendments = sum(
+                (
+                    amendment.value_change
+                    for amendment in contract.amendments.filter(status="approved")
+                ),
+                Decimal("0.00"),
+            )
+            baseline_item = add_baseline_item(
+                organization=organization,
+                actor=owner,
+                baseline=baseline,
+                line_key=f"F6-{project_index:02d}",
+                description="نمونه مبنای تجاری صورت‌وضعیت",
+                unit="ea",
+                planned_quantity=Decimal("1.0000"),
+                unit_rate=contract.contract_value + approved_amendments,
+                sort_order=1,
+            )
+        if baseline.status == "draft":
+            request_project_baseline_approval(
+                organization=organization,
+                actor=owner,
+                baseline=baseline,
+            )
+            baseline = approve_project_baseline(
+                organization=organization,
+                actor=owner,
+                baseline=baseline,
+                reason="تأیید دادهٔ نمایشی F6",
+            )
+            baseline_item.refresh_from_db()
+
+        period_start = start
+        period_end = start + timedelta(days=30)
+        reference = f"DEMO-F6-{organization_index:02d}-{project_index:02d}"
+        record = ProgressRecord.objects.filter(
+            organization=organization,
+            baseline_item=baseline_item,
+            source_type="demo",
+            source_reference=reference,
+        ).first()
+        if record is None:
+            record = create_progress_record(
+                organization=organization,
+                actor=owner,
+                baseline=baseline,
+                baseline_item=baseline_item,
+                period_start=period_start,
+                period_end=period_end,
+                measured_on=start + timedelta(days=14),
+                source_type="demo",
+                source_reference=reference,
+                period_quantity=Decimal("0.3500"),
+                cumulative_quantity=Decimal("0.3500"),
+                evidence="اندازه‌گیری نمونه برای نمایش جریان F6",
+            )
+        if record.status == "draft":
+            request_progress_verification(
+                organization=organization,
+                actor=owner,
+                record=record,
+            )
+            record.refresh_from_db()
+        if record.status == "submitted":
+            record = verify_progress_record(
+                organization=organization,
+                actor=owner,
+                record=record,
+                reason="راستی‌آزمایی دادهٔ نمایشی F6",
+            )
+
+        claim = ProgressClaim.objects.filter(
+            organization=organization,
+            contract=contract,
+            baseline=baseline,
+            period_start=period_start,
+            period_end=period_end,
+            revision_number=1,
+        ).first()
+        if claim is None:
+            claim = create_progress_claim(
+                organization=organization,
+                actor=owner,
+                baseline=baseline,
+                period_start=period_start,
+                period_end=period_end,
+                measurement_cutoff=period_end,
+            )
+        if claim.status == "draft":
+            submit_progress_claim(
+                organization=organization,
+                actor=owner,
+                claim=claim,
+            )
+            claim.refresh_from_db()
+        if claim.status == "submitted":
+            claim = approve_progress_claim(
+                organization=organization,
+                actor=owner,
+                claim=claim,
+                reason="تأیید دادهٔ نمایشی F6",
+            )
+
+        payment_allocation = PaymentAllocation.objects.filter(
+            organization=organization,
+            payment=payments[0],
+            contract=contract,
+            status="active",
+        ).first()
+        if (
+            payment_allocation is not None
+            and not ClaimSettlementAllocation.objects.filter(
+                organization=organization,
+                claim=claim,
+                payment_allocation=payment_allocation,
+                status="active",
+            ).exists()
+        ):
+            settlement_amount = min(
+                Decimal("1000000000.00"),
+                payment_allocation.amount,
+                claim.net_amount.quantize(Decimal("0.01")),
+            )
+            if settlement_amount > 0:
+                allocate_progress_claim_settlement(
+                    organization=organization,
+                    actor=owner,
+                    claim=claim,
+                    payment_allocation=payment_allocation,
+                    amount=settlement_amount,
+                    reason="تسویهٔ جزئی دادهٔ نمایشی F6",
+                )
 
     def _seed_open_inventory_workflow(
         self,

@@ -34,9 +34,17 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "company",
         "تنظیمات شرکت",
-        ("organizations.Organization", "organizations.OrganizationSettings"),
+        (
+            "organizations.Organization",
+            "organizations.OrganizationSettings",
+            "billing.BillingPolicy",
+        ),
         (P.COMPANY_SETTINGS_VIEW, P.COMPANY_SETTINGS_CHANGE),
-        ("apps.organizations.services", "apps.organizations.views"),
+        (
+            "apps.organizations.services",
+            "apps.organizations.views",
+            "apps.billing.services",
+        ),
     ),
     PermissionResource(
         "parties",
@@ -157,6 +165,49 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("contracts.ContractAmendment",),
         (P.CONTRACT_AMENDMENTS_APPROVE,),
         ("apps.contracts.services",),
+    ),
+    PermissionResource(
+        "baselines",
+        "مبناهای تجاری پروژه",
+        ("billing.ProjectBaseline", "billing.BaselineItem"),
+        (P.BASELINES_VIEW, P.BASELINES_MANAGE, P.BASELINES_APPROVE),
+        ("apps.billing.services",),
+    ),
+    PermissionResource(
+        "progress",
+        "پیشرفت",
+        ("billing.ProgressRecord",),
+        (P.PROGRESS_VIEW, P.PROGRESS_RECORD, P.PROGRESS_VERIFY),
+        ("apps.billing.services", "apps.billing.views"),
+    ),
+    PermissionResource(
+        "claims",
+        "صورت‌وضعیت‌ها",
+        (
+            "billing.ProgressClaim",
+            "billing.ProgressClaimItem",
+            "billing.ProgressClaimSource",
+            "billing.ClaimAdjustment",
+        ),
+        (
+            P.CLAIMS_VIEW,
+            P.CLAIMS_CREATE,
+            P.CLAIMS_REVISE,
+            P.CLAIMS_SUBMIT,
+            P.CLAIMS_APPROVE,
+        ),
+        ("apps.billing.services", "apps.billing.workflow"),
+    ),
+    PermissionResource(
+        "claim_settlements",
+        "تسویه صورت‌وضعیت‌ها",
+        ("billing.ClaimSettlementAllocation",),
+        (
+            P.CLAIM_SETTLEMENTS_VIEW,
+            P.CLAIM_SETTLEMENTS_ALLOCATE,
+            P.CLAIM_SETTLEMENTS_REVERSE,
+        ),
+        ("apps.billing.services", "apps.payments.services"),
     ),
     PermissionResource(
         "estimates",
@@ -505,6 +556,7 @@ PERMISSION_MANAGED_APPS = frozenset(
         "materials",
         "projects",
         "contracts",
+        "billing",
         "estimates",
         "expenses",
         "payments",

@@ -8,6 +8,11 @@ implemented model from deferred product direction: complete-product scope does
 not make an unimplemented entity part of the current schema and does not bypass
 the approval sequence in `ROADMAP.md`.
 
+The repository-wide current/target capability assessment, data-ownership map,
+pre-production correction register, and production gates are maintained in
+`docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. This document
+stays intentionally focused on implemented domain boundaries and invariants.
+
 ## Model conventions and tenant boundary
 
 - `User` is a global authenticated identity and may carry an optional unique Iranian national ID. Access to tenant data is granted through an active `OrganizationMembership` and the user's active organization; a user identifier or organization identifier supplied by a request is never sufficient authorization.
@@ -40,16 +45,17 @@ the approval sequence in `ROADMAP.md`.
 | Documents | `Document`, `DocumentVersion`, `DocumentLink` | Versioned private documents linked through controlled explicit foreign keys to supported records, with context-aware RBAC, validated files, audited access, and archival. |
 | Audit | `AuditEvent` | Append-only evidence for important business and security actions. |
 | Financials | No persisted model | Tenant-scoped read models that aggregate contracts, approved estimates, recorded expenses, and posted payments; this domain is not a second ledger. |
-| Workflow foundation | `WorkflowType`, `WorkflowTemplate`, `WorkflowDefinition`, `WorkflowVersion`, `WorkflowStepDefinition`, `WorkflowTransitionDefinition`, `WorkflowCondition`, `WorkflowRoutingRule` | Code-backed platform catalog and tenant-scoped, validated, immutable-on-publication definition graphs. Runtime execution and work items are not yet implemented. |
+| Billing | `ProjectBaseline`, `BaselineItem`, `ProgressRecord`, `BillingPolicy`, `ProgressClaim`, `ProgressClaimItem`, `ProgressClaimSource`, `ClaimAdjustment`, `ClaimSettlementAllocation` | Project baselines and approved progress feed receivable claims, typed adjustments, immutable submission snapshots, workflow decisions, and payment-backed settlement allocations. The current organization-wide mutable policy is an implemented compatibility boundary, not the target authority for contract terms or effective-dated regulation. |
+| Workflow and work management | `WorkflowType`, `WorkflowTemplate`, `WorkflowDefinition`, `WorkflowVersion`, `WorkflowStepDefinition`, `WorkflowTransitionDefinition`, `WorkflowCondition`, `WorkflowRoutingRule`, `WorkflowInstance`, `WorkflowStepInstance`, `WorkItem`, `WorkItemCandidate`, `WorkItemAssignmentHistory`, `WorkflowDelegation` | Code-backed platform catalog; tenant-scoped immutable published graphs; runtime execution; candidate/assignment/delegation history; persistent work items and centralized workbench. Adopted domains invoke registered services and keep their invariants authoritative. |
 
-## Approved cross-domain workflow target (W1 foundation implemented)
+## Implemented cross-domain workflow boundary (F5 complete)
 
-W1 provides tenant-owned, versioned workflow definitions and the code-backed
-catalog, registry, validation, publication, simulation, permission, and audit
-boundaries. W2 and later slices will add runtime instances, position- and
-membership-aware routing, persistent work items, delegation, and a centralized
-workbench. The complete target model, boundaries, migration plan, and acceptance
-gates are defined in
+F5 provides tenant-owned, versioned workflow definitions and the code-backed
+catalog, registry, validation, publication, simulation, runtime instances,
+position- and membership-aware routing, persistent work items, candidate pools,
+assignment history, delegation, centralized workbench, permission, and audit
+boundaries. The delivered model, migration slices, and acceptance evidence are
+defined in
 `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`.
 
 Until each domain is explicitly migrated, its current application services, permissions,
@@ -63,6 +69,36 @@ types; they may not run arbitrary Python, SQL, templates, network calls, or
 unvalidated expressions. Small-tenant templates must work without workforce
 structures, while larger tenants may opt into position routing, candidate pools,
 multi-stage approval, delegation, fallback, and separation-of-duties controls.
+
+Billing and workflow runtime relationships added after the original core ERD are
+summarized here. Domain services enforce the tenant/project and lifecycle
+invariants that an ERD cannot express:
+
+```mermaid
+erDiagram
+    PROJECT ||--o{ PROJECT_BASELINE : owns
+    PROJECT_BASELINE ||--o{ BASELINE_ITEM : contains
+    PROJECT ||--o{ PROGRESS_RECORD : measures
+    BASELINE_ITEM ||--o{ PROGRESS_RECORD : reported_against
+    CONTRACT ||--o{ PROGRESS_CLAIM : bills
+    PROJECT ||--o{ PROGRESS_CLAIM : receives
+    PROGRESS_CLAIM ||--o{ PROGRESS_CLAIM_ITEM : contains
+    PROGRESS_CLAIM_ITEM ||--o{ PROGRESS_CLAIM_SOURCE : traces
+    PROGRESS_RECORD ||--o{ PROGRESS_CLAIM_SOURCE : supports
+    PROGRESS_CLAIM ||--o{ CLAIM_ADJUSTMENT : adjusts
+    PROGRESS_CLAIM ||--o{ CLAIM_SETTLEMENT_ALLOCATION : settles
+    PAYMENT ||--o{ CLAIM_SETTLEMENT_ALLOCATION : funds
+
+    WORKFLOW_DEFINITION ||--o{ WORKFLOW_VERSION : versions
+    WORKFLOW_VERSION ||--o{ WORKFLOW_STEP_DEFINITION : defines
+    WORKFLOW_VERSION ||--o{ WORKFLOW_TRANSITION_DEFINITION : connects
+    WORKFLOW_VERSION ||--o{ WORKFLOW_INSTANCE : executes
+    WORKFLOW_INSTANCE ||--o{ WORKFLOW_STEP_INSTANCE : activates
+    WORKFLOW_STEP_INSTANCE ||--o{ WORK_ITEM : creates
+    WORK_ITEM ||--o{ WORK_ITEM_CANDIDATE : offers
+    WORK_ITEM ||--o{ WORK_ITEM_ASSIGNMENT_HISTORY : records
+    ORGANIZATION_MEMBERSHIP ||--o{ WORKFLOW_DELEGATION : delegates
+```
 
 ## Authorization model
 
@@ -301,19 +337,32 @@ never becomes a second authorization system.
 
 Daily-report equipment rows remain immutable descriptive snapshots and expenses remain general financial records; neither currently references the equipment master. Structured daily usage, fuel, and equipment-cost integration require separately approved workflows and must preserve existing historical rows.
 
-## Deferred / Future Product Domains
+## Approved future product domains
 
 The following approved target concepts are not implemented. Their presence here records product direction only and does not authorize schema or application changes.
 
 | Future domain | Approved direction |
 | --- | --- |
-| Tenant Workflow & Work Management runtime | W1 definition/catalog schema is implemented. W2 adds runtime instances, work items, candidate pools, assignment history, delegation, and runtime routing; later F5 slices add tenant administration UI and the centralized workbench. |
-| Project control extensions | `CostCenter`, `ProjectBaseline`, and `ProgressRecord`, plus optional project/site access restrictions. Existing WBS nodes, activities, and daily progress observations do not replace these concepts. |
-| Billing and progress claims | `ProgressClaim`, `ProgressClaimItem`, and `ClaimAdjustment`, including retention, tax, insurance, advance deductions, penalties, and other documented adjustments. Its approval and actionable work must consume the shared F5 workflow foundation. |
+| Identity, tenant commercial controls, and object scope | MFA, optional SSO, subscription/feature entitlements, quotas, export/offboarding, time-limited support access, and explicit project/site authorization intersecting tenant permissions. |
+| Accounting and Treasury | Chart of accounts, fiscal periods, immutable balanced journals, posting rules, reversal/close, AP/AR, bank/cash/cheques, and bank reconciliation. Existing `Payment` and financial read models are not a ledger. |
+| Regulatory configuration | Effective-dated and approved tax, payroll, social-insurance, invoice-schema, calendar, and rounding rules with source provenance and applied-version snapshots. Contract commercial terms remain separately versioned. |
+| Project control and costing | `CostCenter`/CBS, accepted budget baselines, commitments, accruals, actuals, forecast, schedule/risk/change controls, and source-traceable KPI projections. `ProjectBaseline` and `ProgressRecord` already implement the Billing measurement baseline, not the complete cost-control model. |
+| Billing and commercial extensions | Correct ownership of contract terms and regulation, party/currency snapshots, Accounting/AR/e-invoice integration, subcontract/payable certificates, guarantees, releases, and Article 38 evidence. Current receivable Billing remains the delivered baseline. |
+| Source-to-pay | RFQ, quote comparison, sourcing award, supplier invoice, two/three-way match, commitment, AP, payment proposal, and supplier-performance evidence. |
+| Attendance, payroll, and employee insurance | Attendance/timesheets/leave, labor distribution, effective payroll components, employee insurance-list and payroll-tax output, payslip, liabilities, posting, payment, and reconciliation. |
+| Inventory, equipment, and fixed assets | Inventory valuation/reservations/counts; equipment usage/fuel/operator/cost; fixed-asset capitalization/depreciation/disposal and reconciled Accounting/Project Cost integration. |
 | Quality and safety extensions | Inspection, risk, formal CAPA, and generalized document-link workflows remain optional future concepts. Current daily-report notes remain lightweight observations; `SafetyIncident` and `QualityIssue` are implemented standalone workflows. |
-| Procurement workflow migration | F5 introduces a compatibility workflow first, then tenant-configurable multi-stage technical/financial approval, typed amount conditions, delegation, separation of duties, and approved position/project-responsibility routing without rewriting finalized procurement history. |
 | Notifications | A tenant-aware, user-facing `Notification` model for relevant system and workflow events. Audit events remain immutable evidence and are not notifications. |
+| Knowledge, partner performance, support, and AI | Reviewed HSE/Quality lessons, partner qualification/performance, support tickets and controlled support access, plus cited assistive AI with human confirmation and ordinary authorization. |
+| Controlled business network | Explicit opt-in discovery/recommendation and verified shared claims only after tenant-local governance and privacy controls are mature; private tenant transactions and evaluations never become shared by default. |
 
 Optional enterprise structures must not be required for small contractors. Each future domain needs separately approved workflow, ownership, lifecycle, permissions, and an incremental migration plan before implementation.
 
-Full general-ledger accounting, payroll, CRM, unbounded general-purpose BPM/BPMN engines, tenant-authored executable code, microservices, and event sourcing remain outside the approved product model. The bounded tenant workflow/work-management foundation described in its dedicated architecture document is approved. DRF APIs and background-job infrastructure are deferred technical capabilities rather than implemented domains.
+General-purpose CRM, unbounded BPM/BPMN, tenant-authored executable code,
+microservices, event sourcing, and BIM authoring remain outside the approved
+product model unless a separately evidenced decision changes that boundary.
+General-ledger Accounting, Treasury, Payroll, employee insurance lists, Project
+Costing, and Fixed Assets are approved target domains but remain unimplemented.
+DRF APIs and background-job infrastructure are deferred technical capabilities;
+they should be introduced only for approved consumers and concrete asynchronous
+workloads.

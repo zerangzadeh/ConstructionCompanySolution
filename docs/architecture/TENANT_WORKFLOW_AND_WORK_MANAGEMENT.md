@@ -542,11 +542,18 @@ atomic failure rollback, retries, concurrent claims/decisions, and successful
 version migration. The operational procedure and owner/admin/user guidance are
 in `docs/architecture/WORKFLOW_OPERATIONS.md`.
 
-W6 is **not yet a handoff**: the full pytest and repository-wide Ruff gates are
-not green. Keep F6 blocked until the failures are resolved and the complete
-suite is rerun on PostgreSQL. W5 catalog data migrations have no-op reverse
-functions; their rollback requires the backup and compatible-code procedure in
-the runbook, not an assumption that catalog data was removed.
+W6 is a **completed handoff**: the final full PostgreSQL pytest gate is green.
+F6 may proceed from the completed F5 foundation. W5 catalog data migrations
+have no-op reverse functions; their
+rollback requires the backup and compatible-code procedure in the runbook, not
+an assumption that catalog data was removed.
+
+**Final validation record (2026-09-19):** The configured role provisioned a
+fresh `test_construction_erp`; the complete PostgreSQL suite, including seed
+tests, passed with **469 tests and 69 subtests**. Repository-wide Ruff check and
+format check also passed. The repaired regressions covered stale UI assertions,
+tenant Admin form field availability, tenant fixture validity, a date-dependent
+workforce fixture, and Windows streaming-file cleanup.
 
 | Acceptance gate | W6 result and evidence |
 | --- | --- |
@@ -559,14 +566,12 @@ the runbook, not an assumption that catalog data was removed.
 | Atomic domain, item, workflow, audit changes | PASS: rollback-on-domain-failure test and W5 domain workflow tests. |
 | Concurrency and retry | PASS: runtime race/idempotency tests, W5 race tests, and PostgreSQL row-lock tests. |
 | Priority-domain adoption | PASS: the 48 W5 consumer-workflow tests across Procurement, daily reports, safety, quality, estimates, contracts, inventory, and equipment. |
-| PostgreSQL migration, checks, tests, performance, Ruff | **FAIL as a combined gate**: migrations/rollback, Django check, 2,000-item and 250-candidate query budgets, and targeted Ruff passed. A broad pytest run excluding the two long seed tests still had 14 failures (450 passed, 69 subtests passed); repository-wide Ruff check and format check also failed in files outside W6. |
+| PostgreSQL migration, checks, tests, performance, Ruff | **PASS**: migrations/rollback, Django check, 2,000-item and 250-candidate query budgets, seed tests, the fresh full PostgreSQL suite (469 passed, 69 subtests passed), and repository-wide Ruff check/format all passed. |
 | Recovery, unresolved route, version migration | PASS: recovery and invalid-target tests plus `WORKFLOW_OPERATIONS.md`. |
 
 The complete `apps/workflows` test package passed (39 tests). The independent
-`seed_demo_data` and `seed_account_data` tests each passed after
-the W6 demo update. The full pytest run before the in-scope fixes recorded 434
-passed and 30 failed; the latest broad run above excludes those two seed tests
-and does not replace a final green full-suite run.
+`seed_demo_data` and `seed_account_data` tests passed after the W6 demo update;
+the final fresh full-suite validation above includes both.
 
 ## 14. Migration strategy
 

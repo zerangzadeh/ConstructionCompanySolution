@@ -334,7 +334,7 @@ class OrganizationTenantIsolationTests(TestCase):
         self.assertContains(response, "احمدی")
         self.assertContains(response, "sara@example.com")
         self.assertContains(response, "09120000000")
-        self.assertContains(response, "وضعیت حساب")
+        self.assertContains(response, membership.user.account_status_label)
         self.assertContains(response, "آخرین ورود")
 
     def test_suspended_membership_is_not_valid(self) -> None:

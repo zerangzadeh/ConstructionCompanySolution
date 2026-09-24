@@ -1,406 +1,258 @@
 # Construction ERP — Agent Instructions
 
-## 1. Product and Scope
+## 1. Scope and authoritative references
 
-This repository contains a multi-tenant SaaS platform for construction contractor
-companies. Each company is represented by an `Organization` (tenant), and strict
-data isolation between organizations is mandatory.
+This repository is a complete-product, multi-tenant SaaS platform for construction
+contractors. Each `Organization` is a tenant; strict tenant isolation is
+non-negotiable. Development is incremental: implement only the requested and
+approved scope. A planned roadmap item is not implementation authorization.
 
-The platform is a complete-product initiative, not an MVP. Development is still
-incremental: “complete product” defines the approved product scope, engineering
-quality, and production-operability target, while `ROADMAP.md` identifies which
-domains are implemented, next, partially implemented, or planned. Do not treat
-this direction as authorization to implement unrelated roadmap phases.
+Use references progressively; read only those relevant to the task:
 
-The current product is a modular monolith. The product interface uses Django
-templates with Tailwind CSS and HTMX where a small dynamic interaction is useful.
-REST APIs and background jobs are future extensions, not current requirements.
+- `ROADMAP.md`: delivery order, implementation status, and approved next scope.
+- `docs/architecture/DOMAIN_AND_DATA_MODEL.md`: domain ownership, relationships,
+  invariants, lifecycle states, and approved future concepts. Models and migrations
+  remain the schema source of truth.
+- `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`: workflow/work-item
+  architecture, migration slices, and acceptance gates.
+- `docs/architecture/BILLING_AND_PROGRESS_CLAIMS.md`: billing and progress-claim
+  architecture and delivery decisions.
+- `docs/architecture/WORKFLOW_OPERATIONS.md`: workflow operations, recovery, and
+  deployment checks.
+- `docs/ui-guidelines.md`: Persian-first RTL UI and Django Admin rules.
+- `docs/architecture/web_stack_specification.md`: detailed stack and layer
+  responsibilities.
+- `docs/PROJECT_STATUS.md`: dated snapshots and historical validation records;
+  never use it instead of current code, migrations, tests, or `ROADMAP.md`.
 
-## 2. Technology Stack
+## 2. Stack and repository conventions
 
-- Backend: Python and Django
-- Database: PostgreSQL 18.6 through Django's PostgreSQL backend and Psycopg 3
-- Frontend: Django Templates, Tailwind CSS, and optional HTMX
-- Future API layer: Django REST Framework
-- Future background jobs: Celery and Redis
-- Architecture: Modular Monolith with lightweight Clean Architecture
-- Testing: `pytest`/`pytest-django`
-- Quality tooling: Ruff
+- Python/Django modular monolith with lightweight Clean Architecture.
+- PostgreSQL 18.6 via Django's PostgreSQL backend and Psycopg 3.
+- Django templates, Tailwind CSS, and HTMX only for useful small interactions.
+- `pytest`/`pytest-django` and Ruff.
+- DRF, Celery, and Redis are future capabilities unless explicitly approved.
+- Do not add packages without a clear purpose and explicit approval.
+- Django apps live in `apps/`; shared code in `core/`; project configuration in
+  `config/`; environment settings in `config/settings/{base,development,production}.py`.
+- Keep app templates with their app and shared components in
+  `templates/components/`.
+- Use English for code, files, classes, variables, URL names, and database fields.
 
-Do not add a new package unless it has a clear purpose and is explicitly approved.
+## 3. Architecture and domain boundaries
 
-## 3. Repository Structure
+- Keep views thin. Put business workflows and multi-step operations in small,
+  focused, type-hinted application services/use cases.
+- Domain rules must not depend on HTTP, templates, or external services. Keep
+  calculations and complex business logic out of templates.
+- Prefer the Django ORM. Add repository abstractions only for a demonstrated need.
+- Do not hide critical business logic in Django signals.
+- Validate authorization and tenant scope at service boundaries and, where
+  appropriate, at view boundaries.
+- Keep cross-domain dependencies explicit and avoid circular imports. Introduce a
+  new app only with approved ownership, scope, lifecycle, and permissions.
+- Reuse shared masters (`BusinessParty`, materials, units, equipment, expense
+  categories) instead of creating uncontrolled duplicates.
+- `User` is authentication identity; `Employee` is workforce data and
+  `Employee.user` may be null. Positions route responsibility but never grant
+  permission.
+- Support small and large contractors with one model; departments, positions,
+  employees, teams, and other enterprise structures must remain optional.
+- Full general-ledger accounting, payroll, CRM, general-purpose BPM/BPMN,
+  tenant-authored executable workflow code, microservices, and event sourcing are
+  out of scope unless explicitly approved.
 
-- Django applications are under `apps/`.
-- Shared business and technical code belongs under `core/`.
-- Settings are split into `config/settings/base.py`,
-  `config/settings/development.py`, and `config/settings/production.py`.
-- Project-level configuration is under `config/`.
-- Tests may be under `tests/` and/or each app's test directory.
-- Per-app templates are kept with their app; shared UI components belong under
-  `templates/components/` when that directory is introduced.
+## 4. Tenant isolation, lifecycle, and authorization
 
-Use English naming for code, files, classes, variables, URL names, and database
-fields.
+- Almost every business entity must belong to an `Organization`.
+- Never trust an organization identifier from a user, form, URL, or request body.
+  Resolve the active organization through authenticated membership and session
+  state.
+- Scope every queryset, form, view, service, future API, relationship validation,
+  and uniqueness constraint to the active organization where applicable.
+- Check membership status, tenant status, role, and required business permission
+  before reads and mutations. Prevent and test cross-tenant reads and writes.
+- Organization creation and its initial owner membership must be atomic.
+- Tenant lifecycle is controlled: `active` permits normal access; `suspended`
+  blocks business mutations; `cancelled` blocks normal access while retention and
+  export policies continue to apply.
+- Enforce tenant status, plan limits, feature flags, and quotas server-side.
+  Organization deletion/export/suspension must be audited and transactional.
+- Tenant timezone, currency, fiscal settings, and numbering schemes come from the
+  organization after configuration, not global defaults.
+- Authorization denies by default. Organization roles include `OWNER`, `ADMIN`,
+  `MANAGER`, `ACCOUNTANT`, `SUPERVISOR`, and `VIEWER`; project/site roles may only
+  further restrict access.
+- Enforce object-level permissions for sensitive view, edit, approval, archive,
+  export, and delete actions. UI visibility is never authorization.
+- For every new access-controlled capability, add a `BusinessPermissionCode`,
+  register it in `permission_registry`, add a data migration for the catalog and
+  default-role grants, enforce it in views and services, and test authorization
+  and tenant isolation.
+- Audit privilege escalation, role changes, invitation acceptance, and membership
+  removal. Use existing membership and active-organization services; do not create
+  a second permission model.
 
-## 4. Architecture Rules
+## 5. Data, finance, and schema evolution
 
-1. Keep Django views thin.
-2. Put business workflows and multi-step operations in application services or
-   use cases.
-3. Do not put complex business logic or financial calculations in templates.
-4. Domain rules must not depend on HTTP, templates, or external services.
-5. Prefer the Django ORM. Introduce a repository abstraction only when it has a
-   clear, demonstrated benefit.
-6. Avoid unnecessary abstractions and over-engineering.
-7. Keep services small, focused, and type-hinted.
-8. Do not hide critical business logic in Django signals.
-9. Validate authorization and tenant scope at the service boundary as well as at
-   the view boundary where appropriate.
+- Important records should use UUID public identifiers, timestamps, actor fields
+  where applicable, archival/soft deletion where retention is required, and audit
+  logging for important actions.
+- Use `Decimal`, never `float`, for money. Use explicit units for material, labor,
+  and equipment quantities and timezone-aware datetimes.
+- Enforce atomic invariants with database constraints and transactions. Use
+  organization-scoped uniqueness and `select_related`/`prefetch_related` where
+  needed.
+- Separate budget, committed cost, actual cost, forecast, and variance. Aggregates
+  must identify their source records and organization scope.
+- Preserve organization/project/site/phase/contract/cost-center hierarchy where
+  required. Validate that related records share both tenant and project context.
+- Store document and estimate revisions; do not overwrite approved history.
+- Preserve approved, posted, paid, and other finalized history through revision,
+  reversal, adjustment, void, or supersession—not silent edits or deletion.
+- Preserve working behavior unless an approved product change replaces it. For
+  schema replacement, prefer expand → migrate/backfill → switch → validate →
+  explicitly approved contract.
+- Keep legacy compatibility fields until replacement deployment, data migration or
+  retention, dependency removal, invariant/tenant revalidation, and passing tests
+  are complete; removal still requires explicit approval.
+- Every environment must run migrations against its configured database; never
+  assume a database is current.
 
-## 5. Multi-Tenancy Rules
+## 6. Workflow and approvals
 
-1. Almost every business entity must belong to an `Organization`.
-2. Never trust an `organization_id` supplied by a user, form, URL, or request
-   body.
-3. Resolve the current organization from the authenticated user's active
-   membership and session state.
-4. Every queryset, form, view, service, and future API endpoint must be scoped to
-   the active organization.
-5. Membership status and role must be checked before accessing or mutating tenant
-   data.
-6. Prevent cross-tenant reads and writes, and add integration tests for tenant
-   isolation.
-7. Organization creation must create the initial owner membership atomically.
+- Every lifecycle defines states, valid transitions, authorized roles/permissions,
+  required fields, reversibility, and audit evidence (actor, time, previous/new
+  state, and reason).
+- Approval services must use transactions, lock/re-read relevant state, and
+  re-check authorization inside the transaction to avoid races.
+- Domain models/services remain authoritative for business invariants. Workflow
+  coordination calls registered domain services; it must not mutate domain status
+  generically or synchronize critical state through signals.
+- The platform owns registered step, condition, routing, and domain-command
+  catalogs; tenants own versioned configurations assembled from that catalog.
+- Workflow definitions, versions, instances, steps, work items, candidates,
+  delegations, and assignment history are tenant-scoped. Published definitions and
+  completed runtime history are immutable.
+- Acting requires an active `OrganizationMembership`, the required
+  `BusinessPermission`, current assignment/candidacy, and configured separation
+  rules. Position-based actions must retain the qualifying effective assignment as
+  historical evidence.
+- One active membership has one workbench per active organization. Multiple
+  positions are routing/filter evidence, not separate identities.
+- Starter workflows must work without workforce structures. Position and project
+  routing remain optional.
+- Domain transition, work-item completion, next-step activation, and audit evidence
+  must commit atomically. Publication validates graph, scope, permission, routing,
+  fallback, and domain transitions deterministically.
+- Workflow behavior is bounded and declarative: no arbitrary tenant Python, SQL,
+  templates, network callbacks, or unregistered expressions. Consuming domains
+  must not create a second workflow/work-item mechanism.
+- For procurement compatibility and migration behavior, consult the current
+  services/tests plus the workflow architecture and roadmap; preserve existing
+  audit history and finalized records.
 
-## 6. Data and Financial Rules
+## 7. Security, privacy, and governance
 
-Important business entities should support:
+- Never hardcode secrets, credentials, tokens, or database connection strings;
+  read environment-specific values from environment variables.
+- Production settings must reject insecure database or TLS configuration.
+- Keep authentication, authorization, organization scope, and CSRF protection on
+  every endpoint, including HTMX endpoints. Validate all input server-side.
+- Treat uploads as untrusted. Validate file type and size and retain tenant,
+  uploader, type, size, and version metadata.
+- Do not expose internal identifiers or tenant data across boundaries.
+- Audit records for security and financial actions are append-only at the
+  application layer. Define retention/archival before hard deletion and support
+  organization-scoped export when required.
+- Keep logs, fixtures, screenshots, and errors free of secrets and unnecessary
+  personal/sensitive data.
 
-- UUID public identifiers
-- `created_at` and `updated_at`
-- `created_by` and `updated_by` where applicable
-- Soft deletion or archival where business records must be retained
-- Audit logging for important actions
+## 8. Reliability and integrations
 
-Additional rules:
+- Wrap multi-step and externally visible workflows in `transaction.atomic()`.
+- Make retryable operations idempotent, define unique business keys, handle
+  concurrency explicitly, and prevent lost updates.
+- External integrations must fail safely and never bypass tenant checks. Keep
+  structured logs free of secrets; add correlation/request identifiers when
+  introducing integrations or background jobs.
+- Queues and scheduled jobs remain deferred until approved, but services should
+  not assume every operation will always be synchronous.
 
-- Use `Decimal` for all money and never use `float` for financial values.
-- Use timezone-aware datetimes.
-- Enforce organization-scoped uniqueness in database constraints where needed.
-- Prefer database constraints and transactions for invariants that must be
-  atomic.
-- Use `select_related` and `prefetch_related` when needed to prevent N+1 queries.
+## 9. Frontend
 
-## 7. Security Rules
+- Follow `docs/ui-guidelines.md` for UI/Admin work. Use Tailwind utilities,
+  reusable template components, responsive mobile-first layouts, and the approved
+  Persian-first RTL design system; avoid scattered custom CSS and inline styles.
+- Use HTMX only for small interactions that benefit from partial refreshes and
+  enforce the same auth, CSRF, permissions, and tenant isolation as normal views.
+- Keep presentation logic out of Python services and business logic out of
+  templates.
 
-- Never hardcode secrets, credentials, tokens, or database connection strings.
-- Read environment-specific values from environment variables.
-- Keep authentication, authorization, and organization scope enabled for every
-  endpoint.
-- Keep CSRF protection enabled.
-- Validate all user input server-side.
-- Validate uploaded file type and size before accepting files.
-- Do not expose internal identifiers or tenant data across organization
-  boundaries.
-
-## 8. Frontend Rules
-
-- Use Tailwind utility classes and avoid scattered custom CSS or inline styles.
-- Build responsive, mobile-first pages suitable for site engineers.
-- Use HTMX only for small dynamic interactions that benefit from avoiding a full
-  page refresh.
-- HTMX endpoints must enforce the same authentication, authorization, CSRF, and
-  tenant-isolation rules as regular views.
-- Reuse template components and keep presentation logic out of Python services.
-
-## 9. Code Quality and Testing
-
-- Add unit tests for business rules and service behavior.
-- Add integration tests for permissions, organization scope, and tenant
-  isolation.
-- Run `python manage.py check` after configuration or Django changes.
-- Run `python -m pytest` for the relevant test scope.
-- Run `python -m ruff check .` and `python -m ruff format --check .` before
-  handoff when the tooling is available.
-- Keep functions and classes small and focused.
-- Preserve unrelated user changes in a dirty worktree.
-
-## 10. Required Working Process
+## 10. Working process and validation
 
 Before implementing a feature:
 
-1. Inspect the existing project structure and relevant code.
-2. Explain the proposed implementation plan briefly.
-3. List the files to create or modify.
-4. Implement only the requested scope.
-5. Run relevant tests, formatting, and checks.
+1. Inspect the relevant project structure and code.
+2. Briefly state the plan and files to create or modify.
+3. Implement only the requested scope; do not combine unrelated roadmap work.
+4. Add unit tests for business/service rules and integration tests for permissions,
+   organization scope, and tenant isolation as applicable.
+5. Run the smallest relevant checks, expanding when risk or failures require it:
+   `python manage.py check` after Django/config changes, relevant
+   `python -m pytest`, and Ruff check/format when available.
 6. Report changed files, test results, assumptions, and follow-up work.
 
-When the user requests a multi-step implementation, complete only the agreed
-scope and report each completed step clearly. Do not combine unrelated feature
-work into one step.
+Preserve unrelated user changes in a dirty worktree. Do not rewrite unrelated
+files or create branches, commits, pushes, pull requests, or remote changes unless
+explicitly requested.
 
-Do not rewrite unrelated files. Do not create branches, commits, pushes, pull
-requests, or remote changes unless explicitly requested.
+## 11. Token, time, and execution efficiency
 
-## 11. Project Snapshot and Implementation Status
+Treat the user's token allowance and elapsed time as finite project resources.
+Accuracy and safety remain mandatory, but unnecessary work is not evidence of
+thoroughness.
 
-> Last Updated: 2026-09-15
->
-> Status: **Active Full-Product Development.** The platform is no longer scoped
-> as an MVP. The current ERP core and multiple operational domains are
-> implemented and validated on PostgreSQL 18.6 with Psycopg 3. The existing ERP
-> and Django Admin interfaces share the approved Persian-first RTL design system.
-> Tenant Workflow & Work Management is the next cross-domain foundation;
-> Billing & Progress Claims follows it and must consume that shared workflow and
-> work-item model. Other incomplete capabilities retain their explicit roadmap
-> status.
+- Every read, search, tool call, test, status update, and generated document must
+  have a concrete purpose tied to the requested outcome or a material risk. Skip
+  actions whose expected information or assurance does not justify their token,
+  time, or compute cost.
+- Use progressive disclosure: start with `rg`, file lists, headings, diffs, and
+  narrow line ranges. Do not dump large files, test collections, logs, or command
+  output when a filtered summary answers the question.
+- Inspect only relevant code and references. Do not restate the full prompt,
+  duplicate the same analysis across documents, or repeat evidence already
+  established. Keep one authoritative explanation and link to it elsewhere.
+- Choose the smallest validation proportional to the change. Documentation-only
+  work normally needs link/reference checks, stale-claim searches, whitespace or
+  formatting checks, and review of the changed documents. Do not run the full
+  application test suite for documentation-only changes unless the user explicitly
+  requests it or a concrete executable/configuration risk justifies it.
+- For code changes, begin with targeted tests and expand only when affected
+  boundaries, failures, or release risk require it. Do not run both broad and
+  overlapping validations without a stated reason.
+- Before a materially expensive action—such as broad web research, repository-wide
+  analysis, full test suites, large rendering/generation jobs, or long-running seed
+  tests—state its purpose and expected cost. If a lower-token or faster action can
+  provide adequate confidence, inform the user and use/recommend that option.
+- Whenever a meaningful token-saving approach is available, tell the user
+  concisely, including any quality or coverage tradeoff. If it has no material
+  downside, take the efficient approach without blocking for confirmation; if it
+  reduces required quality or safety, request the user's decision.
+- Avoid frequent polling and repetitive progress messages. Use the longest safe
+  wait supported by the tool, report only meaningful state changes, and keep tool
+  output capped. Waiting itself may be cheap, but repeated model/tool cycles are
+  not.
+- If a command takes materially longer than expected or stops producing useful
+  signals, reassess once: identify the slow operation, decide whether it is still
+  necessary, and either continue with justification or stop and report the exact
+  incomplete validation. Do not keep polling merely to obtain a green result.
+- Stop when the acceptance criteria are met. Do not broaden the audit, research,
+  implementation, documentation, or validation scope for theoretical completeness.
+- Keep final responses concise and link to repository artifacts instead of copying
+  their contents. Report honestly what was and was not validated.
 
-The implemented core covers tenant identity/settings, parties, material masters,
-projects and project controls, workforce, procurement, inventory, equipment,
-contracts, estimates, daily reporting, safety and quality issue workflows,
-expenses, payments and allocations, versioned private documents, audit, and
-financial read models. The current entity map, relationships, invariants, and
-lifecycle states are maintained in `docs/architecture/DOMAIN_AND_DATA_MODEL.md`;
-Django models and migrations remain the schema source of truth.
-
-The current server-rendered UI uses Django templates and Tailwind CSS, with HTMX
-only where useful. It provides a responsive RTL application shell, shared page,
-form, table, and feedback patterns, and Django Admin template/style overrides
-that preserve native Admin behavior. Configuration remains split by environment,
-production settings reject insecure database/TLS configuration, and shared
-model/template conventions live under `core/` and `templates/components/`.
-
-A development-only, idempotent `seed_demo_data` management command populates all
-existing first-party business models with realistic Persian demo content through
-the Django ORM and existing application services. Its current deterministic
-dataset contains 10 organizations, 40 projects, 200 contracts, 80 estimates, 200
-payments, 200 expenses, 320 daily reports, their supported related records, and
-generated audit history; Django internal/system tables are intentionally excluded.
-
-## 12. Database and Migration Status
-
-Checked-in migrations cover every persisted first-party app. Exact schema,
-migration order, and dependencies are defined by those files. The application
-uses PostgreSQL 18.6 through Django's ORM and Psycopg 3. Every environment must
-run `python manage.py migrate` against its configured database; the repository
-must not assume that a local or deployed database is current.
-
-Do not place database credentials or connection strings in source control.
-
-## 13. Current Validation Baseline
-
-- Full PostgreSQL suite: **167 passed**.
-- **26 subtests passed**.
-- Django check: **PASS**.
-- Ruff check/format: **PASS**.
-
-PostgreSQL 18.6 with Psycopg 3 is the authoritative database baseline. Rerun the
-relevant checks after any code, migration, or configuration change.
-
-## 14. Product Roadmap
-
-`ROADMAP.md` is the source of truth for remaining full-product delivery order and
-the parallel UI/UX workstream. Tenant Workflow & Work Management is **NEXT**;
-Billing & Progress Claims is blocked on that foundation. **PLANNED** phases
-record direction but do not authorize implementation; decompose and implement
-only the current/next phase after explicit approval.
-
-`docs/architecture/DOMAIN_AND_DATA_MODEL.md` is the concise reference for current
-entities, relationships, invariants, lifecycle states, and approved future domain
-concepts. Do not duplicate those catalogs here.
-
-`docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` is authoritative for
-the approved workflow/work-item target, execution slices, migration boundaries,
-and acceptance gates. Its target entities are not part of the current schema
-until implemented through the F5 work packages.
-
-## 15. Product Modeling and Schema Evolution Guardrails
-
-- The approved Domain Model v1.0 and Target ERD v1.0 guide evolution but do not
-  authorize broad rewrites or future modules.
-- Support small and large contractors with one core model; enterprise structures
-  must remain optional.
-- `User` is authentication identity and `Employee` is workforce data;
-  `Employee.user` may be nullable.
-- Reuse shared masters such as `BusinessParty`, materials, units, equipment, and
-  expense categories instead of creating uncontrolled duplicates.
-- Keep cross-domain dependencies explicit, avoid circular imports, and introduce
-  a new app only with approved ownership, scope, lifecycle, and permissions.
-- Full general-ledger accounting, payroll, CRM, unbounded general-purpose
-  BPM/BPMN engines, tenant-authored executable workflow code, microservices, and
-  event sourcing remain out of scope unless explicitly approved. The bounded,
-  declarative, tenant-owned workflow/work-management foundation in the approved
-  F5 architecture is in scope.
-
-For schema evolution:
-
-1. Preserve working behavior unless an approved product change replaces it.
-2. Use **expand → migrate/backfill → switch → validate → contract** where
-   practical; add nullable shared-master references before switching consumers.
-3. Preserve legacy compatibility fields until the replacement is deployed,
-   historical data is migrated or retained, application dependencies are
-   removed, invariants and tenant isolation are revalidated, tests/migrations
-   pass, and removal is explicitly approved.
-4. Preserve approved, posted, and other finalized history through revision,
-   reversal, adjustment, void, or supersession workflows rather than overwrite.
-
-
-## 16. SaaS Tenant Lifecycle
-
-The tenant model must support a controlled lifecycle, even if subscription
-billing is introduced later:
-
-- `active`: normal access is allowed
-- `suspended`: sign-in may be allowed for administrators, but business
-  mutations are blocked
-- `cancelled`: normal access is blocked; retention and export policies still
-  apply
-
-Tenant status, plan limits, feature flags, and quotas must be checked on the
-server. Never rely on frontend visibility to enforce subscription or quota
-rules. Organization deletion, export, and suspension operations must be
-audited and transactional.
-
-Tenant configuration such as timezone, currency, fiscal settings, and numbering
-schemes belongs to the organization and must not be inferred from global
-defaults after the organization has configured it.
-
-## 17. Authorization and RBAC
-
-Authorization must be explicit and deny by default:
-
-- Organization roles define broad capabilities such as `OWNER`, `ADMIN`,
-  `MANAGER`, `ACCOUNTANT`, `SUPERVISOR`, and `VIEWER`.
-- Project or site roles may further restrict access within an organization.
-- Object-level permission checks are required for viewing, editing, approving,
-  archiving, exporting, and deleting sensitive records.
-- A role check must be performed server-side in services and views; hiding a
-  button is not authorization.
-- Every new access-controlled capability must add its permission to
-  `BusinessPermissionCode`, `permission_registry`, and a data migration that
-  creates the catalog entry and grants it to the appropriate default roles.
-  Its view and service boundary must enforce that permission, and its tests must
-  cover authorization and tenant isolation.
-- Privilege escalation, role changes, invitation acceptance, and membership
-  removal must be audited.
-
-Use the existing membership and active-organization services as the source of
-truth. Do not introduce a second independent permission model without documenting
-its relationship to organization membership.
-
-## 18. Workflow and Approval Rules
-
-Business records with lifecycle states must define:
-
-- Allowed states and valid transitions
-- The role allowed to perform each transition
-- Required fields and validations for each transition
-- Whether a transition is reversible
-- Audit data for actor, timestamp, previous state, new state, and reason
-
-Approved, posted, paid, or otherwise finalized financial records should be
-immutable. Corrections must use a documented revision, reversal, or adjustment
-workflow rather than silently changing historical values.
-
-Approval services must use transactions and re-check authorization and current
-state inside the transaction to avoid race conditions.
-
-### Approved Tenant Workflow & Work Management Target
-
-F5 introduces a bounded, declarative workflow foundation. The platform owns the
-catalog of executable step, condition, routing, and domain-command types;
-organizations own versioned configurations assembled from that catalog.
-Published versions and completed runtime history are immutable.
-
-- Domain models and services remain authoritative for lifecycle and business
-  invariants. Workflow coordination must call registered domain services rather
-  than update domain statuses generically.
-- Every workflow definition, version, instance, step, work item, candidate,
-  delegation, and assignment-history record must be tenant-scoped.
-- A position routes responsibility but never grants permission. Acting requires
-  an active membership, the required `BusinessPermission`, current assignment or
-  candidacy, and all configured separation rules.
-- The final actor is an `OrganizationMembership`. Position-based actions also
-  retain the qualifying effective `EmployeePositionAssignment` for historical
-  authority.
-- One active membership has one centralized workbench per active organization;
-  multiple positions are filters/routing evidence, not separate identities.
-- Starter workflows must support small tenants without departments, positions,
-  employees, or teams. Position and project routing remain optional.
-- Definition publication requires deterministic graph, scope, permission,
-  routing, fallback, and domain-transition validation.
-- Domain transition, work-item completion, next-step activation, and audit
-  evidence must commit atomically. Do not synchronize critical state through
-  Django signals.
-- Migrate existing domains incrementally using expand, backfill, shadow, switch,
-  validate, and explicitly approved contraction.
-
-Do not implement arbitrary tenant code, SQL, templates, network callbacks, or
-unregistered expressions as workflow behavior. Do not create a second workflow
-or work-item mechanism inside a consuming domain.
-
-### Current Procurement Workflow Boundary
-
-Until its F5 migration, the implemented procurement workflow remains fixed and
-permission-driven: purchase requests transition from `draft` to `submitted` to
-a single `approved` or `rejected` decision; purchase orders transition from
-`draft` to `issued` to `completed`; and goods receipts transition from `draft`
-to `posted` or `void`. Authorization for each transition is enforced through
-the corresponding `BusinessPermission` on the actor's active organization
-membership.
-
-Do not change this legacy behavior outside the approved F5 migration slices.
-F5 must first reproduce it with a tenant compatibility template and validate
-open-record backfill before enabling optional amount conditions, delegation,
-separation of duties, or workforce/project routing. Workforce structures remain
-optional and are not the authorization source of truth. A user whose assigned
-company role includes multiple procurement permissions may continue to perform
-those permitted legacy steps, including approving a request they created, until
-the tenant explicitly publishes a stronger workflow; the existing audit trail
-must remain intact.
-
-## 19. Operational Reliability
-
-For multi-step or externally visible operations:
-
-- Use `transaction.atomic()` for all-or-nothing business workflows.
-- Make retryable operations idempotent where duplicate requests are possible.
-- Define unique business keys for important external or user-facing actions.
-- Handle concurrent updates explicitly and avoid lost updates.
-- Keep structured logs free of passwords, tokens, and unnecessary personal data.
-- Record correlation or request identifiers when introducing background jobs or
-  integrations.
-- External integrations must fail safely and must not bypass tenant checks.
-
-Background processing, queues, and scheduled jobs remain deferred until approved,
-but new services should not assume that every operation is synchronous forever.
-
-## 20. Construction-Specific Data Rules
-
-- Preserve the hierarchy between organization, project, site, phase, contract,
-  and cost center where the business process requires it.
-- Separate budget, committed cost, actual cost, forecast, and variance; do not
-  overload one amount field with multiple meanings.
-- Use explicit units of measure and quantities for materials, labor, and
-  equipment usage.
-- Store document and estimate revisions instead of overwriting approved history.
-- Daily site reports should record their reporting date, site, author, approval
-  state, and relevant labor, equipment, material, progress, safety, and quality
-  data.
-- Financial and operational aggregates must state their source records and
-  organization scope.
-
-## 21. Data Governance and Compliance
-
-- Audit records for security and financial actions must be append-only from the
-  application layer.
-- Define retention and archival behavior before implementing hard deletion.
-- Support organization-scoped data export when the product requires it.
-- Treat uploaded documents as untrusted input and retain metadata about type,
-  size, uploader, tenant, and version.
-- Use the organization's configured timezone and currency in presentation and
-  reporting, while storing canonical values consistently.
-- Sensitive data must not appear in logs, test fixtures, screenshots, or error
-  messages.
+For large repository-wide requests, briefly establish a resource-aware execution
+plan before acting: required deliverables, authoritative sources, minimum sufficient
+inspection, proportionate validation, and explicit stop conditions. Revise that
+plan if actual cost grows substantially beyond the initial expectation.

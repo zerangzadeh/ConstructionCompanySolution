@@ -111,7 +111,7 @@ class AuthenticationTests(TestCase):
             self.assertEqual(response["X-Content-Type-Options"], "nosniff")
             self.assertTrue(b"".join(response.streaming_content).startswith(b"\x89PNG"))
 
-    def test_valid_login_redirects_to_organization_selection(self) -> None:
+    def test_valid_login_redirects_to_configured_destination(self) -> None:
         response = self.client.post(
             reverse("accounts:login"),
             {
@@ -120,7 +120,11 @@ class AuthenticationTests(TestCase):
             },
         )
 
-        self.assertRedirects(response, reverse("organizations:select"))
+        self.assertRedirects(
+            response,
+            resolve_url(settings.LOGIN_REDIRECT_URL),
+            fetch_redirect_response=False,
+        )
         self.assertTrue(response.wsgi_request.user.is_authenticated)
 
     def test_invalid_login_does_not_authenticate_user(self) -> None:

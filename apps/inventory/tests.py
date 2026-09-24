@@ -743,6 +743,7 @@ class InventoryPanelTests(InventoryFixtureMixin, TestCase):
             unit_of_measure=self.other_unit,
             quantity=Decimal("2.0000"),
             occurred_at=timezone.now(),
+            project=self.other_project,
         )
         self.client.force_login(self.owner)
         set_active_organization(self.client.session, self.organization)

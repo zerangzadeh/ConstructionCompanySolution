@@ -28,6 +28,12 @@ domain capabilities on PostgreSQL 18.6:
   quality-issue workflows with explicit tenant ownership and permissions.
 - Versioned estimates, contracts/amendments, expenses, payments/allocations,
   daily reports, versioned private documents, and financial read models.
+- Tenant-configurable bounded workflow definitions and runtime, persistent work
+  items/candidates/delegation history, position-aware routing, and a centralized
+  workbench adopted by the approved domain lifecycles.
+- Project baselines and progress records, receivable progress claims and
+  adjustments, immutable submission evidence, workflow decisions, and
+  payment-backed claim settlement allocations.
 - Service-layer tenant validation, Decimal financial handling, row-locked
   transitions, and immutable finalized financial history.
 
@@ -36,14 +42,16 @@ configured database. The current logical model is summarized in
 `docs/architecture/DOMAIN_AND_DATA_MODEL.md`; models and migrations remain the
 schema source of truth.
 
-Tenant Workflow & Work Management is the next approved cross-domain foundation.
-Its tenant-configurable definitions, runtime work items, position-aware routing,
-and centralized workbench are target architecture and are not yet implemented;
-see `docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md`. Billing and
-progress claims follow that foundation. Remaining full-product capabilities and
-production-readiness work are dependency-ordered in `ROADMAP.md`; a planned
-phase records approved direction but still requires explicit implementation
-approval.
+Tenant Workflow & Work Management and the receivable Billing & Progress Claims
+baseline are implemented; their architecture records are in
+`docs/architecture/TENANT_WORKFLOW_AND_WORK_MANAGEMENT.md` and
+`docs/architecture/BILLING_AND_PROGRESS_CLAIMS.md`. The repository-wide
+current/target assessment, pre-production correction register, regulatory and
+competitor research, and release gates are in
+`docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. Remaining product
+capabilities and production-readiness work are dependency-ordered in
+`ROADMAP.md`; a planned item records direction and still requires explicit
+implementation approval.
 
 ## Technology stack
 
