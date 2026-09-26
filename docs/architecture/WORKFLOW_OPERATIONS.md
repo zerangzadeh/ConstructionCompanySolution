@@ -5,7 +5,7 @@ must be scoped to one organization. Use the application services with an active
 membership and the required business permission; never edit runtime status,
 candidate rows, or audit rows directly in SQL or Django Admin.
 
-## Owner and organization admin
+## Tenant Owner and authorized Tenant operator
 
 - Select the correct active organization, then open **Workbench**. It shows one
   queue for the membership; position tabs are filters, not separate accounts.
@@ -21,8 +21,9 @@ candidate rows, or audit rows directly in SQL or Django Admin.
 - Definition publication, suspension recovery, and open-instance version
   migration currently have service boundaries but no owner-facing page. An
   authorized operator must perform those actions through the documented
-  services. Owners should provide the tenant, record, intended outcome, and
-  reason to that operator.
+  services. Tenant Owners should provide the Tenant, record, intended outcome,
+  and reason to that operator. Tenant Owner status does not itself grant the
+  operator permission or imply Tenant Admin / Local Admin assignment.
 
 ## Workbench user
 

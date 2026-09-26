@@ -42,7 +42,7 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 | Domain | Classification | Repository evidence and boundary |
 | --- | --- | --- |
 | Identity and tenant core | **PARTIALLY IMPLEMENTED** | Custom `User`, `Organization`, settings, memberships, invitations/connection requests, active-tenant session resolution, lifecycle checks, permission catalogue, and audit exist. MFA, SSO, subscription/entitlements, quota enforcement, tenant export/offboarding, and mature invitation governance do not. |
-| Authorization | **PARTIALLY IMPLEMENTED** | Deny-by-default tenant permission checks exist and are well tested. There is no first-class project/site access scope. Current role codes also do not map cleanly to the target owner/admin/manager/accountant/supervisor/viewer vocabulary. |
+| Authorization | **PARTIALLY IMPLEMENTED** | Deny-by-default tenant permission checks exist and are well tested. There is no first-class project/site access scope. Each current Membership references one role definition, while the authoritative target requires independent many-to-many Membership role assignments, different role sets per Tenant and auditable assignment/revocation. Current role codes also do not map cleanly to the independent target Tenant Owner, Tenant Admin / Local Admin, Tenant Manager, Accountant, Supervisor and Viewer vocabulary; the distinct target Platform Admin role is not implemented, and current Superuser compatibility paths must not be treated as that role. |
 | Parties and shared masters | **IMPLEMENTED / PARTIAL** | `BusinessParty`, roles/contacts, materials, categories, and UOM exist. Bank accounts, regulatory profiles, qualification facts, effective relationships, UOM conversions, merge/deduplication, and governance workflows are absent. |
 | Projects and controls | **PARTIALLY IMPLEMENTED** | Projects, sites, phases, WBS, activities, baselines, and progress exist. Formal schedule baselines, CBS/cost centers, risk/change controls, resource planning, earned-value controls, and integrated forecasting are absent. |
 | Workforce | **PARTIALLY IMPLEMENTED** | Employees, optional login link, departments, positions, teams, effective assignments, and project/site assignments exist. Skills, qualifications, labor rates, attendance, time capture, leave, payroll, and insurance lists do not. |
@@ -132,7 +132,7 @@ These capabilities were not consistently represented in the previous roadmap but
 | --- | --- | --- |
 | Tenant identity/settings | Organizations | One settings authority; effective history where fiscal/localization facts affect history |
 | User identity | Accounts | Global identity; no business employment facts |
-| Membership/role/project scope | Organizations/Authorization | Effective-dated grants; positions never replace grants |
+| Membership/role/project scope | Organizations/Authorization | Independent Tenant-scoped Membership role assignments, effective-dated grants and audited assignment/revocation; positions never replace grants |
 | Employee/position/team | Workforce | Optional `User` link; effective assignment history |
 | Party/contact/tax/bank profile | Parties | Deduplication, verification status, effective role and sensitive-field permissions |
 | Material/category/UOM/conversion | Materials | Versioned conversion where commercial precision requires it; transaction snapshot retained |
@@ -376,7 +376,7 @@ not leak complexity into the default journey.
 
 | Gate | Required evidence before first production tenant |
 | --- | --- |
-| Tenant isolation | Automated cross-tenant and project/site-scope tests for every capability; object-scope threat model; admin/support-access controls |
+| Tenant isolation | Automated cross-tenant and project/site-scope tests for every capability; object-scope threat model; Tenant Admin and support-access controls |
 | Identity | MFA for privileged roles, password/reset/session policy, optional future SSO boundary, recovery process, privilege-change alert/audit |
 | Data protection | Private object storage, encryption/key ownership, signed short-lived download, malware/content scanning decision, backup encryption, sensitive logging review |
 | Supply chain | Reproducible lock with hashes, CI checks, dependency/SBOM and vulnerability policy, license review, patch ownership |
@@ -388,13 +388,22 @@ not leak complexity into the default journey.
 | Finance/compliance | Accounting sign-off, regulatory-source register, opening/close/reversal tests, reconciliation controls, statutory export validation |
 | Operations | Runbooks, incident severity/escalation, support-access grants, status/communication plan, responsible on-call ownership |
 
+The [P0-S21 readiness and unresolved-risk review](P0_S21_READINESS_AND_UNRESOLVED_RISK_REVIEW.md)
+verifies the current gate state against these requirements. P0 is not ready for
+integrated acceptance: all Q04 accountable reviews and S04-S12 dispositions,
+P1.1 authorization, D03-D05/Q03 parameters, P0.2/P0.3 prerequisites and P0.4
+remediation evidence remain OPEN. The recorded single-reviewer concentration and
+external-independence risks remain release constraints rather than accepted risk
+closure. The [P0-S22 documentation closeout and conditional P1 handoff](P0_S22_DOCUMENTATION_CLOSEOUT_AND_P1_HANDOFF.md)
+preserves that state and does not authorize P1 entry.
+
 ## 16. Dependency and library reuse assessment
 
 No package is approved or added by this audit. Each candidate needs a proof of compatibility, license/security review, maintenance check, operational ownership, and an ADR or delivery decision.
 
 | Need | Candidate/evaluation | Recommendation |
 | --- | --- | --- |
-| MFA/social/OIDC/SAML identity | `django-allauth` | Evaluate rather than build security protocols. Confirm exact edition/extras, threat model, migration, admin UX, and Django compatibility. |
+| MFA/social/OIDC/SAML identity | `django-allauth` | Evaluate rather than build security protocols. Confirm exact edition/extras, threat model, migration, administration UX, and Django compatibility. |
 | Object storage | `django-storages` plus provider SDK | Evaluate as adapter; verify Django 5.2 support, private-default behavior, signed URL and metadata controls. Do not move files before retention/export design. |
 | Background jobs | Celery when concrete async work exists | Mature candidate for e-invoice transmission, OCR/scanning, reports, notifications. Do not introduce Redis/Celery for synchronous CRUD alone. |
 | Dependency audit | `pip-audit` in CI | Prefer PyPA tooling and a documented triage/SLA; pair with a reproducible lock/SBOM. |
@@ -410,6 +419,14 @@ The current five declared requirements are intentionally small. Do not retain un
 ## 17. UI/UX consistency audit
 
 The UI has a strong Persian-first RTL foundation, shared shell, status and table patterns, and increasingly consistent list behavior. Coverage remains uneven across domains. Key gaps are now standardized in `docs/ui-guidelines.md`: explicit tenant/project/site context; cascading selectors; scalable search selectors; line-item grids; URL-stable filters; workbench actions; financial unit/currency display; document/evidence UX; disabled-action reasons; archive/void/reversal confirmation; AI review; audit/source lineage; responsive site workflows; and accessibility.
+
+The [P0-S20 workbench assessment](P0_S20_UI_ACCESSIBILITY_ASSESSMENT.md) confirms
+the centralized personal workbench as the highest-value first remediation journey,
+but defers actual changes that depend on multi-role membership, Tenant-role
+separation, project/site grants, Q04-G Self-Approval/Protected Operations or Q04-H
+unresolved-work semantics. Generic semantic, focus, touch, responsive, empty-state
+and feedback improvements remain a safe backlog; the assessment implements none
+of them and makes no accessibility-conformance claim.
 
 Current corrective themes:
 
@@ -449,7 +466,7 @@ Current corrective themes:
 | PPC-05 | **MUST** | Production security/operations gates | Avoid deploying without MFA, storage, dependency, backup/restore, observability, retention/export, support controls. |
 | PPC-06 | **MUST** | Effective-dated regulatory registry and professional review | Annual/changing rules must not live in constants or mutable policy. Required before taxpayer/payroll/insurance features. |
 | PPC-07 | **SHOULD** | Consolidate organization settings authority | Avoid permanent dual-write ambiguity before integrations consume locale/currency/fiscal settings. |
-| PPC-08 | **SHOULD** | Canonical role vocabulary and separation-of-duties policy | Clarify accountant/supervisor/admin duties while preserving owner invariants; migrate grants explicitly. |
+| PPC-08 | **SHOULD** | Canonical role vocabulary, membership-scoped multi-role assignments and separation-of-duties policy | Preserve independent Superuser, Platform Admin, Tenant Owner, Tenant Admin / Local Admin and Tenant Manager boundaries; support different role sets per Tenant without composite roles; audit assignment/revocation; clarify Accountant/Supervisor duties and migrate grants explicitly. |
 | PPC-09 | **SHOULD** | Master-backed daily labor/equipment links | Unlock payroll/equipment costing while preserving snapshot text for history. |
 | PPC-10 | **SHOULD** | Extensible explicit DMS link ownership | Avoid continually widening one nullable-FK table; decide before many new domains adopt DMS. |
 | PPC-11 | **SHOULD** | Party regulatory/bank/qualification profiles and UOM conversions | Required for tax, Treasury, sourcing, claims, and reliable quantity conversion. |

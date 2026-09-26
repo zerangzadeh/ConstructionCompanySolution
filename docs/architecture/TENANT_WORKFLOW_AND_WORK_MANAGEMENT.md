@@ -1,7 +1,7 @@
 # Tenant Workflow & Work Management Architecture
 
-> Status: **APPROVED TARGET ARCHITECTURE — NOT YET IMPLEMENTED**  
-> Approved: 2026-09-15  
+> Status: **APPROVED TARGET ARCHITECTURE — NOT YET IMPLEMENTED**
+> Approved: 2026-09-15
 > Delivery phase: `F5 — Tenant Workflow & Work Management` in `ROADMAP.md`
 
 ## 1. Purpose
@@ -32,7 +32,7 @@ expressions.
 
 Workflow configuration is tenant-owned. The platform owns the catalog of
 supported workflow types, step types, conditions, routing target types, domain
-commands, and starter templates. An organization owner, or another active
+commands, and starter templates. A Tenant Owner, or another active
 membership with explicit workflow-management permissions, may create, validate,
 publish, retire, and supersede versions for that organization.
 
@@ -86,7 +86,7 @@ flowchart LR
 4. **Routing and authorization are cumulative.** Being a candidate or assignee
    is not permission; holding permission is not assignment.
 5. **Small-company operation requires no workforce hierarchy.** Every platform
-   starter template has an owner- or membership-based fallback.
+   starter template has a Tenant Owner- or membership-based fallback.
 6. **Enterprise controls are opt-in but enforceable.** Multi-stage approvals,
    amount conditions, parallel decisions, delegation, and separation of duties
    are available only when explicitly configured.
@@ -105,7 +105,10 @@ flowchart LR
 
 ### 4.1 Platform-owned catalog
 
-The system administrator manages code-backed catalogs and starter templates:
+Current code-backed catalogs and starter templates use the Superuser compatibility
+path. In the target model, Platform Admin manages permitted operational catalogs
+and global configuration, while Superuser is reserved for exceptional Protected
+Operations; neither role implies the other or Tenant business-data access:
 
 - workflow type, such as `procurement.purchase_request_approval`;
 - supported domain events and commands;
@@ -235,7 +238,7 @@ completed or cancelled work item is immutable.
 Supported routing targets are introduced incrementally through registered
 resolvers:
 
-- organization owner;
+- Tenant Owner;
 - explicit `OrganizationMembership`;
 - tenant `Position` through effective `EmployeePositionAssignment` records;
 - organization role and its active memberships;
@@ -268,17 +271,21 @@ for one action, the item is deduplicated while retaining both routing bases.
 - Changes to position holders may refresh open, unclaimed candidate pools under
   an explicit policy. Claimed work is never silently moved.
 
-### 7.3 Small-tenant fallback
+### 7.3 Starter routing and operation-level Self-Approval
 
-The mandatory small-company starter pattern is:
+The starter pattern remains usable without workforce structures:
 
 ```text
-submit -> organization owner decision
+submit -> Tenant Owner decision
 ```
 
-It does not require `Employee`, `Department`, `Position`, or `WorkTeam` data.
-Where self-approval is unavoidable, the tenant must choose an explicit permitted
-policy; the system must never infer permission to bypass separation rules.
+It does not require `Employee`, `Department`, `Position`, or `WorkTeam` data and
+does not create a special single-user-tenant mode or classification. Under the
+[final G3 — Revised with Protected Operations Product Owner decision](P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md#q04-g-maker-checker-separation-and-small-tenant-fallback),
+Protected Operations never permit Self-Approval. Non-protected business operations
+are explicit per operation at platform level and, where permitted, at tenant level.
+Role or tenant size never implies it; every configuration change and use is
+audited. All other authorization factors remain required.
 
 ## 8. Authorization and administration
 
@@ -310,11 +317,24 @@ Final names are fixed during implementation and must be added to
 `BusinessPermissionCode`, the permission registry, data migrations, default-role
 grants, service checks, and tests in one change.
 
-The organization owner receives tenant workflow-administration capabilities by
-default. Other tenant administrators receive only explicitly granted
-capabilities. The system administrator owns platform catalogs and templates; a
-support intervention in tenant runtime state requires an explicit reason and
-append-only audit evidence.
+The target model does not infer workflow-administration capability from Tenant
+Owner status. Tenant Admin / Local Admin is a separate explicit role, and any
+Tenant Owner who also administers workflows must receive that role or the dedicated
+capability explicitly. Current default grants remain code-authoritative until an
+approved migration. Platform Admin owns permitted operational catalogs/templates;
+Superuser remains a distinct exceptional technical role for Protected Operations.
+The same user may explicitly hold both platform roles, but neither implies the
+other. A support intervention in Tenant runtime state requires explicit authority,
+reason and append-only audit evidence.
+
+Target Tenant/business roles are independent assignments on the active Membership.
+Workflow authorization unions permissions from all active applicable role
+assignments, but role union does not create candidacy, assignment, delegation,
+project/site scope or a separation-policy exception. The same User may have a
+different role set in another Tenant. Adding or revoking one role leaves every
+other assignment intact and auditable; common role combinations must not be
+collapsed into a composite workflow role. Current single-role membership behavior
+remains compatibility evidence until a separately approved migration/cutover.
 
 ## 9. Definition validation and publication
 
@@ -407,7 +427,7 @@ the workbench or workflow state and may be delivered in a later production phase
 - create the dedicated workflow/work-management app after approving app
   ownership and dependency direction;
 - add catalogs, tenant definitions, immutable versions, normalized graph
-  configuration, permissions, admin boundaries, and audit actions;
+  configuration, permissions, administrative boundaries, and audit actions;
 - provide starter templates and a validator/simulator;
 - add tenant isolation, database constraints, and definition-version tests.
 
@@ -476,7 +496,7 @@ approved for that operation.
 `contracts.contract_amendment_approval` use the shared runtime and personal
 workbench. A draft becomes actionable only through an explicit approval request;
 backfill never treats every draft as pending. The compatibility templates route
-by the existing approval permission with organization-owner fallback, while the
+by the existing approval permission with Tenant Owner fallback, while the
 runtime rechecks active membership, business permission, candidacy and any
 position evidence. Completion calls the existing domain approval services in the
 same transaction, preserving estimate-revision locking/supersession and approved
@@ -485,9 +505,9 @@ active W5.4 instance exists. Backfill is reconciliation-only for already active
 instances; shadow commands compare candidate sets without mutating history.
 
 **W5.5 implementation decision (2026-09-17):** This product has no membership
-request lifecycle. An Owner creates a tenant account directly, and Django Admin
+request lifecycle. A Tenant Owner creates a Tenant account directly, and Django Admin
 may provision an account; direct management of an existing membership (including
-role-delegation and at-least-one-active-owner checks) also remains direct. An
+role delegation and checks that at least one active Tenant Owner remains) also remains direct. An
 existing global account can only be connected after that account's authenticated
 consent; because it has no active membership before consent, it is not a
 `WorkItem` candidate or actor. No account-connection or membership-management
@@ -525,7 +545,7 @@ scope.
 - validate migration and rollback procedures on PostgreSQL;
 - test large candidate pools and high open-item volumes;
 - document operational recovery for suspended/unresolvable instances;
-- update demo data and user/admin guidance;
+- update demo data and user/Tenant Admin guidance;
 - declare the workflow foundation ready for Billing & Progress Claims only after
   the acceptance gates below pass.
 
@@ -539,7 +559,7 @@ cross-tenant trigger rejection, unresolved-route recovery, and rejection of an
 invalid instance version target. Existing runtime tests cover starter routing,
 multi-position deduplication, delegation, separation, immutable history,
 atomic failure rollback, retries, concurrent claims/decisions, and successful
-version migration. The operational procedure and owner/admin/user guidance are
+version migration. The operational procedure and Tenant Owner/Tenant Admin/user guidance are
 in `docs/architecture/WORKFLOW_OPERATIONS.md`.
 
 W6 is a **completed handoff**: the final full PostgreSQL pytest gate is green.
@@ -552,7 +572,7 @@ an assumption that catalog data was removed.
 fresh `test_construction_erp`; the complete PostgreSQL suite, including seed
 tests, passed with **469 tests and 69 subtests**. Repository-wide Ruff check and
 format check also passed. The repaired regressions covered stale UI assertions,
-tenant Admin form field availability, tenant fixture validity, a date-dependent
+Tenant-related Django Admin form-field availability, Tenant fixture validity, a date-dependent
 workforce fixture, and Windows streaming-file cleanup.
 
 | Acceptance gate | W6 result and evidence |
@@ -653,9 +673,13 @@ second approval or assignment mechanism.
 - W1 persists normalized definition graphs but no runtime records. All tenant
   graph rows carry an explicit organization key and service writes verify every
   referenced row against it.
-- Platform catalogs and templates are system-admin-only. Tenant administration
-  is service-only in W1: owners receive all five workflow permissions, company
-  managers receive view-only access, and other built-in roles receive none.
+- Platform catalogs and templates are current-Superuser-only compatibility paths.
+  Target ordinary catalog/template operations belong to explicit Platform Admin,
+  while Protected Operations remain Superuser-controlled. Tenant administration
+  is service-only in W1: current `company_owner` receives all five workflow
+  permissions, current `company_manager` receives view-only access, and other
+  built-in roles receive none. These legacy grants do not merge target Tenant
+  Owner, Tenant Admin and Tenant Manager roles.
 - Cycles are rejected in W1. A future registered loop-capable step may relax this
   only with bounded runtime semantics. Candidate resolution and deadline or
   escalation execution remain W2 concerns.
@@ -687,8 +711,8 @@ second approval or assignment mechanism.
   `PurchaseRequest.status` directly.
 - Every tenant receives a published default compatibility definition. Its
   permission-based candidate pool preserves the former single-decision and
-  self-approval behavior, with owner fallback for a small tenant. More-specific
-  published project policies may use W2 position, role, owner, delegation,
+  self-approval behavior, with Tenant Owner fallback for a small Tenant. More-specific
+  published project policies may use W2 position, role, Tenant Owner, delegation,
   multi-stage, fallback, and separation controls.
 - Submit changes the domain state and creates the instance, active step, and
   work item in one transaction. Decisions require active membership, the

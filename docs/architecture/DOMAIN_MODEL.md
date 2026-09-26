@@ -76,7 +76,7 @@ acceptance criteria.
 | Aggregate/root | Owns | Must not own |
 | --- | --- | --- |
 | `Organization` | Tenant state, settings authority, entitlements and lifecycle evidence | Project transactions or global user identity |
-| `OrganizationMembership` | Tenant access relationship and effective grants | Employment facts or workflow position |
+| `OrganizationMembership` | Tenant access relationship, independent membership-scoped role assignments and effective grants | Employment facts, workflow position or a global User role set |
 | `BusinessParty` | Counterparty identity and tenant-local roles/profile | Contract, invoice, evaluation or cash balances |
 | `Project` | Project hierarchy/context and approved control structures | Editable authoritative actual-cost total |
 | `Estimate`/revision | Versioned assumptions, lines and calculated estimate | Approved budget or contract value without explicit handoff |
@@ -90,6 +90,16 @@ acceptance criteria.
 | Document/version | Immutable file and metadata history | Owning business record lifecycle |
 | Workflow instance/work item | Coordination, responsibility and decision evidence | Generic mutation of domain status |
 | Knowledge publication | Reviewed reusable content/version | Rewriting source incident, NCR or project history |
+
+The target authorization relation is many-to-many within Tenant context:
+`User -> OrganizationMembership -> MembershipRoleAssignment -> Role`. One
+Membership may hold multiple independent roles, while the same User may hold a
+different set in another Tenant. Common combinations such as Tenant Owner plus
+Tenant Admin plus Project Manager do not justify composite roles. Each assignment
+and revocation is independent and auditable. Permissions from all active applicable
+role assignments are unioned within that Membership, then intersected with every
+other authorization factor, including active Membership and Tenant, explicit
+grants, object scope, delegation, workflow eligibility and policy constraints.
 
 ## 5. Cross-domain value streams
 
@@ -116,6 +126,9 @@ evidence and reconciliation control.
 - **Deferred:** cross-tenant network/intelligence, shared catalogue overlay,
   broad offline sync, governed ERP Assistant, GIS platform, predictive AI,
   public API platform, and architecture distribution wait for roadmap triggers.
+  The [P0-S12 privacy proposal](ADR_P0_S12_FUTURE_NETWORK_PRIVACY.md) keeps
+  tenant-private data outside that future boundary unless an explicitly authorized,
+  purpose-specific publication is later accepted; it does not activate the network.
 - **Rejected/not recommended:** parallel ledgers/workflows/masters/file stores,
   custom security protocols/cryptography, unrestricted SQL AI, tenant executable
   workflow code, general-purpose CRM/BPMN and BIM authoring.

@@ -222,12 +222,28 @@ Before implementing a feature:
    implementation status, target direction, roadmap disposition, lifecycle,
    permissions, data ownership, operations, and UI standards only where the task
    materially changes them. Do not create duplicate status/snapshot documents.
+   For every roadmap session, explicitly reconcile `ROADMAP.md` with verified
+   progress, approval evidence, dependencies and open decisions before finishing.
+   Update affected entries in the same change; if none changed, report that the
+   roadmap was checked and remains current. Session completion alone does not
+   complete its parent work package or grant Product Owner approval.
 7. Report changed files, test results, documentation updates (or explicitly state
    that none were required), assumptions, and follow-up work.
 
 Preserve unrelated user changes in a dirty worktree. Do not rewrite unrelated
 files or create branches, commits, pushes, pull requests, or remote changes unless
 explicitly requested.
+
+## Git workflow
+
+- Use read-only Git commands only when they are necessary to inspect repository
+  state or verify a change. Keep inspection targeted; do not repeatedly run or
+  display large diffs without a verification need.
+- Do not create commits, commit messages, branches, branch switches, pushes, or
+  pull requests unless the user explicitly requests the specific action.
+- Do not include full Git diffs in progress updates or final reports unless asked.
+  Final reports summarize changed files and significant modifications only.
+- The user reviews completed work, creates commits, and pushes remote changes.
 
 ## 11. Token, time, and execution efficiency
 
@@ -277,6 +293,16 @@ thoroughness.
   implementation, documentation, or validation scope for theoretical completeness.
 - Keep final responses concise and link to repository artifacts instead of copying
   their contents. Report honestly what was and was not validated.
+- **Execution communication preference (Product Owner, 2026-09-25):** write
+  responses, progress updates, handoffs, and execution reports in concise English
+  unless the user asks otherwise. Lead with the outcome; include only decisions,
+  changed artifacts, validation, blockers, and next action needed to assess the
+  work. Do not narrate routine reads, searches, tests, edits, or other ordinary
+  execution. Send an intermediate update only for a blocker, an important decision,
+  a significant architecture/domain finding, or a material change in approach; keep
+  it to one or two short sentences. Do not repeat prior context, tool output,
+  generic caveats, or restate unchanged scope. This preference never omits material
+  risk, approval state, failed validation, or a required user decision.
 
 For large repository-wide requests, briefly establish a resource-aware execution
 plan before acting: required deliverables, authoritative sources, minimum sufficient

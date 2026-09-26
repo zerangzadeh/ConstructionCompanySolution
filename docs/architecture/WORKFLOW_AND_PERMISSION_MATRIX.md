@@ -22,9 +22,10 @@ An action is permitted only when all applicable conditions pass:
 ```text
 authenticated and effective User
 + active OrganizationMembership
++ all active independent role assignments for that Membership [target]
 + active/non-blocking Organization state
 + entitled capability/quota [target]
-+ required BusinessPermission
++ required BusinessPermission resulting from all applicable assigned roles
 + project/site/object scope [target]
 + valid domain state and required data
 + current WorkItem assignment/candidacy/delegation [workflow action]
@@ -34,16 +35,43 @@ authenticated and effective User
 
 The domain service re-reads and re-authorizes inside the transaction. UI
 visibility, possession of an ID, `Employee`, `Position`, department/team,
-candidate membership or superuser convenience is not ordinary business authority.
+candidate membership or Superuser convenience is not ordinary business authority.
 
 ## 3. Permission ownership
 
 - `BusinessPermissionCode` and `permission_registry` define application
   capabilities; default-role grants are data-migrated and tested.
-- Organization roles compose permissions. Current protected role codes remain
-  code-authoritative until the approved canonical role migration.
-- Target responsibility profiles are Owner, Admin, Manager, Accountant,
-  Supervisor and Viewer. These are default-policy concepts, not hard-coded checks.
+- Each `OrganizationRole` maps to a permission set. Current protected role codes
+  remain code-authoritative until the approved canonical role migration.
+- Tenant/business roles are assigned to `OrganizationMembership`, not globally to
+  `User`. One User may therefore hold a different independent role set in each
+  Tenant. The target relationship is conceptually
+  `User -> Membership -> MembershipRoleAssignment -> Role` (or an equivalent
+  Tenant-preserving model).
+- A Membership may hold multiple roles simultaneously. Effective role-derived
+  permissions are the union of permissions from all active applicable role
+  assignments, then remain intersected with every other factor in the authorization
+  equation. Role union never creates project/site scope, delegation, workflow
+  eligibility or a policy exception.
+- Do not create composite roles merely because assignments commonly co-occur.
+  Assigning or revoking Tenant Owner, Tenant Admin, Tenant Manager, Project Manager
+  or another role affects only that assignment and never implicitly changes another.
+  Assignment and revocation evidence retains actor, Tenant, role, timestamp and
+  relevant reason/context.
+- Platform roles are **Superuser** and **Platform Admin**. Superuser is the highest
+  exceptional technical/system authority; Platform Admin is the operational
+  platform-administration role. They are independent, may be explicitly co-assigned to
+  one user, and neither implies the other. Neither role alone grants Tenant
+  business-data access.
+- Tenant roles are **Tenant Owner**, **Tenant Admin** (also called **Local Admin**)
+  and **Tenant Manager**, plus domain profiles such as Accountant, Supervisor and
+  Viewer. Tenant Owner owns high-level Tenant policy; Tenant Admin operates Tenant
+  administration within delegated boundaries; Tenant Manager owns business/
+  operational management. These roles are independent, may be explicitly
+  co-assigned, and do not inherit one another implicitly.
+- Current protected role codes remain code-authoritative until an approved role
+  migration. The implemented membership currently references one role definition;
+  multi-role Membership assignments are target documentation, not implementation.
 - Project/site grants can only restrict/intersect tenant permission. They do not
   create a second permission catalogue.
 - Workflow position routing records who was responsible. It never grants the
@@ -56,10 +84,10 @@ candidate membership or superuser convenience is not ordinary business authority
 This matrix guides future default grants; it does not override the current role
 catalogue or eliminate per-capability/SoD design.
 
-| Capability family | Owner | Admin | Manager | Accountant | Supervisor | Viewer |
+| Capability family | Tenant Owner | Tenant Admin / Local Admin | Tenant Manager | Accountant | Supervisor | Viewer |
 | --- | --- | --- | --- | --- | --- | --- |
 | Tenant lifecycle/ownership/plan/export | Govern | Configure limited | No default | No default | No default | Read own context |
-| Membership/role/object scope | Govern/protect owner | Administer delegated grants | Scoped delegation | No default | No default | No |
+| Membership/role/object scope | Govern/protect Tenant Owner | Administer delegated grants | Scoped business delegation only | No default | No default | No |
 | Shared masters | Govern | Manage | Manage scoped | Read/use; sensitive party/bank as granted | Read/use scoped | Read scoped |
 | Projects/operations | Govern | Configure | Manage/approve scoped | Read financial context | Record/review assigned site | Read scoped |
 | Contracts/claims/procurement | Govern exceptional | Configure | Manage/approve configured | Financial review/posting, not automatic technical approval | Request/record assigned operations | Read scoped |
@@ -68,9 +96,13 @@ catalogue or eliminate per-capability/SoD design.
 | Workflow administration | Publish only with dedicated permission | Configure delegated | Domain policy as granted | Financial workflow as granted | Act on assigned items | No action |
 | Audit/export/support access | Oversight with dedicated permission | Operational limited | Scoped evidence | Financial evidence | Own/scoped evidence | Read only if granted |
 
-An Owner cannot bypass statutory, close-period, maker-checker or independent
-verification rules merely because ownership is broad. Emergency override, if ever
-approved, needs a separate permission, reason, alert and audit.
+Tenant Owner status alone supplies no Tenant Admin privilege, bypass or
+Self-Approval authority. Under the
+[final G3 — Revised with Protected Operations decision](P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md#q04-g-maker-checker-separation-and-small-tenant-fallback),
+Protected Operations prohibit Self-Approval; non-protected business operations may
+be made configurable by platform policy and enabled by an authorized tenant actor
+where permitted. Every policy change and use requires audit; reviewer evidence and
+implementation remain open.
 
 ## 5. Delivered lifecycle matrix
 
@@ -79,8 +111,8 @@ implementation work.
 
 | Domain aggregate | Delivered lifecycle/action | Required authority pattern | Finality/correction |
 | --- | --- | --- | --- |
-| Organization | active/suspend/cancel/archive and settings/membership operations | System/owner or dedicated tenant-governance permission; owner protection | Lifecycle and export/retention evidence audited |
-| Membership/role | provision/connect, assign/change, suspend/revoke | Membership-management permission; cannot grant capabilities actor lacks; elevation audited | Effective history; final owner protected |
+| Organization | active/suspend/cancel/archive and settings/membership operations | Platform Admin/control-plane or dedicated Tenant-governance permission; Tenant Owner protection | Lifecycle and export/retention evidence audited |
+| Membership/role | provision/connect, independently assign/revoke roles, suspend/revoke membership | Membership-management permission; cannot grant capabilities actor lacks; changing one assignment changes no other | Actor/Tenant/role/time/reason history; final active Tenant Owner assignment protected |
 | Project/phase/activity | create/update/transition/archive | Domain permission + tenant/project hierarchy | Completed/cancelled/archive restrictions; no cross-tenant hierarchy |
 | Contract | draft -> active/completed/terminated | Contract view/manage/transition permission | Non-draft terms immutable; change through amendment |
 | Contract amendment | draft -> approved | Amendment approval permission and valid contract context | Approved amendment immutable |
@@ -94,21 +126,21 @@ implementation work.
 | Maintenance | scheduled -> in-progress -> completed/cancelled | Maintenance permission and workflow where actionable | Completed/cancelled immutable |
 | Expense | recorded -> void | Expense record/void permission | Original amount immutable; reasoned void |
 | Payment/allocation | posted -> void; allocation active -> reversed | Payment/allocation/void/reverse permission | Cash evidence and allocation reversals retained |
-| Document/version/link | add version/link, archive, view/download | Document permission plus view access to every linked context | Versions/links immutable; archive instead of destructive delete |
+| Document/version/link | add version/link, archive, view/download | Document permission plus view access to every linked context | Version instance guards and archival; links retained by services/Django Admin, with a model update gap recorded in [S09](ADR_P0_S09_DMS_DOMAIN_LINKS.md#1-verified-current-link-contract) |
 | Safety incident | report -> review -> assign -> corrective action -> resolve -> close | HSE permission + work-item responsibility + responsible-party checks | Closed immutable; audit/reopen only if separately designed |
 | Quality issue | report -> review -> assign -> corrective action -> verify -> close | QA permission + work-item responsibility; verifier evidence | Closed immutable; verification/closure evidence retained |
 | Baseline | draft -> approved/superseded | Baseline permission + workflow assignment/candidacy | Approved baseline immutable |
 | Progress record | draft -> submitted -> verified/rejected/corrected | Record/verify permission + distinct work item | Verified source immutable; correction links replacement |
 | Progress claim | draft -> submitted -> approved/returned revision | Claim permission + eligible approver/candidacy + separation | Submitted snapshot frozen; approved/returned revision immutable |
 | Claim settlement | allocate -> reverse | Settlement permission; approved claim and compatible payment allocation | Append/reverse; never synthesizes cash |
-| Workflow definition/version | draft configuration -> publish | Dedicated workflow-admin/publish permission | Published version immutable |
+| Workflow definition/version | draft configuration -> publish | Dedicated workflow-administration/publish permission | Published version immutable |
 | Work item | offer/claim/release/act/reassign/delegate/complete | Underlying domain permission + candidacy/assignment + separation | Assignment/decision history append-only |
 
 ## 6. Target workflow matrix
 
 | Roadmap capability | Principal states/decisions to design | Permission/SoD requirements | Roadmap |
 | --- | --- | --- | --- |
-| Tenant plans/offboarding | entitlement change, grace/suspend/cancel, export/hold/delete decision | Owner/platform split; export and destructive retention separate; no support bypass | P0.3 |
+| Tenant plans/offboarding | entitlement change, grace/suspend/cancel, export/hold/delete decision | Tenant Owner/Platform Admin split; protected Superuser operations remain separate; export and destructive retention separate; no support bypass | P0.3 |
 | Object-scope grants | propose/grant/change/revoke/emergency access | Cannot self-elevate; grantor must hold delegated authority; full audit | P1.1 |
 | Regulatory rules | draft/review/activate/supersede | Legal/accounting reviewer; maker cannot be sole activator where required | P1.2 |
 | Material/technical approval | draft/review/approve/reject/archive/substitute | Master-data vs technical/quality approval separation | P1.4 |
@@ -131,10 +163,35 @@ implementation work.
 | Knowledge | author/review/publish/revise/retract/promote/review expiry | Source citation; reviewer/publisher; AI cannot publish | P9.5 |
 | Reconciliation/close | generate/assign/investigate/resolve/reopen/accept close | Control owner distinct from source maker where material | P10.2 |
 
-## 7. Separation-of-duties baseline
+## 7. Separation-of-duties and Self-Approval baseline
 
-Every package explicitly decides whether the following are prohibited, allowed
-only for small-tenant owner fallback, or configurable with documented risk:
+The Product Owner selected final **G3 — Revised with Protected Operations** instead
+of the original G1 recommendation and replaced every earlier Q04-G response.
+Platform-level `Protected
+Operations` mandate separation for system, security, authorization, privileged-
+access and access-management operations where Self-Approval could elevate the
+actor or bypass a security control. Self-Approval is never allowed for these
+operations. Tenant configuration and Tenant Owner, Tenant Admin, Platform Admin
+or Superuser roles cannot override this prohibition.
+
+At minimum, Protected Operations cover self-grant/access increase, own privileged-
+role assignment/approval, own support/emergency access, same-actor change and
+approval of authorization/security policy, same-actor weakening and approval of
+audit/security controls, and equivalent system-level self-elevation or control
+bypass.
+
+Other functional/business operations—including financial, contractual, project,
+procurement, administrative and workflow approvals—may support configurable
+Self-Approval. Superuser defines at platform level which business operation types
+support it. Where permitted, a Tenant Owner or another Tenant user with the
+explicit policy-management permission may enable or disable it according to that
+Tenant's policy. Tenant Owner status alone enables nothing. Changing the platform
+classification is a Protected Operation because it
+changes authorization policy; Platform Admin assignment alone does not supply the
+Superuser capability. There is no special single-user-tenant mode or classification.
+
+Each package still identifies the following operation combinations so they can be
+configured, reviewed, displayed and audited explicitly:
 
 - creating and approving the same procurement, expense, claim or journal;
 - preparing and releasing the same payment/cheque/transfer;
@@ -145,11 +202,29 @@ only for small-tenant owner fallback, or configurable with documented risk:
 - reporting/investigating/closing the same HSE/QA case; and
 - creating and resolving the same reconciliation exception.
 
-Fallback requires the underlying permission, lack of another eligible actor when
-policy permits it, explicit reason and retained evidence. It never bypasses legal,
-period-close or independent-verification requirements.
+Every policy/configuration change records actor, date/time, Tenant where applicable,
+operation, previous/new values and required reason/context; every actual
+Self-Approval use is also audited. Self-Approval never supplies a missing membership,
+permission, object scope, delegation or valid domain state. Configuring it for
+financial, contractual, statutory or independent-verification business actions
+carries heightened fraud, error-detection, professional-validity and regulatory
+risk. Tenant enablement remains subject to its internal-control, contractual,
+accounting, audit, legal and regulatory obligations. Required named reviewers must
+assess classification completeness, those risks and release implications.
 
 ## 8. Project/site and external scope
+
+The [S07 scope ADR proposal](ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md) records
+current selector/runtime differences and proposed grant/workflow semantics.
+It is not an accepted ADR or P1.1 implementation. Q04-A through Q04-H Product Owner
+selections are recorded, but accountable reviewer names/evidence remain OPEN; the
+target bullets below grant no runtime access.
+
+The [S11 lifecycle/support ADR proposal](ADR_P0_S11_TENANT_LIFECYCLE_ENTITLEMENTS_SUPPORT.md)
+adds entitlement/capacity, inactive-tenant export and offboarding boundaries.
+It preserves current active-tenant checks and implements no support, Tenant Owner,
+privileged or background exception. Revised F2 and E1 supply policy direction;
+D03-D05/Q03 and accountable Q04 review remain open, and P0.3 is not implemented.
 
 - Tenant permission is necessary but may be narrowed by project/site scope.
 - Parent/child relationships are validated server-side; filtering a selector is

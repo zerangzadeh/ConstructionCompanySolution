@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-09-24
+**Status date:** 2026-09-26
 
 **Product stage:** pre-production
 
@@ -118,6 +118,136 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P0.1 Architecture decisions and correction plan
 
 - **Status / priority:** **NEXT-CANDIDATE / MUST**
+- **Planning progress (2026-09-25):** P0-S01–S03 evidence, decision preparation and
+  [release-assumption clarification](docs/ROADMAP_EXECUTION_PLAYBOOK.md#28-p0-s03-release-assumptions-and-s04-handoff)
+  are complete. P0-S04 prepared the
+  [Accounting/posting and Treasury/AP/AR source-contract proposal](docs/architecture/ADR_P0_S04_ACCOUNTING_POSTING.md)
+  with Payment containment, reversal/close and reconciliation walkthroughs;
+  [S04 evidence and S05 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#29-p0-s04-accounting-posting-adr-proposal-and-s05-handoff)
+  record that bounded result. P0-S05 prepared the
+  [budget/CBS/cost-center and project-cost authority proposal](docs/architecture/ADR_P0_S05_BUDGET_PROJECT_COST.md),
+  including pinned estimate handoff, commitment/actual/paid distinctions and
+  legacy Project-field containment; see the
+  [S05 evidence and S06 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#30-p0-s05-budget-and-project-cost-adr-proposal-and-s06-handoff).
+  P0-S06 prepared the
+  [regulatory rules, contract terms and tenant policy proposal](docs/architecture/ADR_P0_S06_REGULATORY_CONTRACT_POLICY.md);
+  [S06 evidence and S07 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#31-p0-s06-regulatory-and-commercial-policy-adr-proposal-and-s07-handoff)
+  record field ownership, version/snapshot rules and legacy behavior gaps.
+  P0-S07 prepared the
+  [project/site authorization and workflow-intersection proposal](docs/architecture/ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md);
+  [S07 evidence and handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#32-p0-s07-projectsite-authorization-adr-proposal-and-handoff)
+  record current privileged-path differences, proposed scope semantics and Q04 gates.
+  P0-S08 prepared the
+  [private document storage, upload safety and retention proposal](docs/architecture/ADR_P0_S08_PRIVATE_DOCUMENT_STORAGE.md);
+  [S08 evidence and S09 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#33-p0-s08-private-document-storage-adr-proposal-and-s09-handoff)
+  record quarantine/availability, hold/export, migration and recovery gates.
+  P0-S09 prepared the
+  [explicit DMS domain-link proposal](docs/architecture/ADR_P0_S09_DMS_DOMAIN_LINKS.md);
+  [S09 evidence and S10 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#34-p0-s09-dms-domain-link-adr-proposal-and-s10-handoff)
+  record typed-link/registry alternatives, every-context access and lineage/cutover gates.
+  P0-S10 prepared the
+  [async/outbox and idempotency proposal](docs/architecture/ADR_P0_S10_ASYNC_OUTBOX_IDEMPOTENCY.md);
+  [S10 evidence and S11 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#35-p0-s10-asyncoutbox-adr-proposal-and-s11-handoff)
+  record atomic intent, delivery/authority separation, uncertain outcomes and recovery gates.
+  P0-S11 prepared the
+  [tenant lifecycle, entitlements, quotas, offboarding and support-access proposal](docs/architecture/ADR_P0_S11_TENANT_LIFECYCLE_ENTITLEMENTS_SUPPORT.md);
+  [S11 evidence and S12 handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#36-p0-s11-tenant-lifecycle-adr-proposal-and-s12-handoff)
+  record current access restrictions, capacity/retention boundaries and unresolved authority.
+  P0-S12 prepared the
+  [future-network privacy, consent and shared-data proposal](docs/architecture/ADR_P0_S12_FUTURE_NETWORK_PRIVACY.md);
+  [S12 evidence and bounded handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#37-p0-s12-future-network-privacy-adr-proposal-and-handoff)
+  keep tenant data private by default and define separate publication, revocation,
+  provenance, isolation, retention and acceptance boundaries without activating
+  the deferred network. All nine ADRs remain PROPOSED, not accepted or implemented.
+  The Product Owner accepted the S02 recommendations; D03–D05 parameters and S03
+  release questions remain open. S07 preparation is complete; P1.1 remains PLANNED and Q04 accountable review remains open.
+  S08 preparation is complete; D03-D05/Q03 and Q04 review storage gates remain open.
+  S09 preparation is complete; PPC-10/P1.3 remain incomplete and Q03/Q04 review remains open.
+  S10 preparation is complete; async delivery and affected packages remain unimplemented by this session.
+  S11 preparation is complete; P0.3 remains PLANNED and D03-D05/Q03/Q04 review remain open.
+  S12 preparation is complete; the controlled B2B network remains deferred and its
+  consent, identity, legal/commercial, moderation, privacy/competition and operating decisions remain open.
+  P0-S13 prepared the consolidated
+  [P0.1 ADR review and decision packet](docs/architecture/P0_S13_P01_ADR_REVIEW_PACKET.md);
+  [S13 evidence and handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#38-p0-s13-p01-adr-review-packet-and-handoff)
+  find the proposals conditionally coherent, group their shared blockers and retain
+  every disposition/owner assignment as OPEN. All nine ADRs remain PROPOSED. The
+  next bounded handoff is explicit Product Owner dispositions and named reviewers,
+  with Q04 recommended first if review is incremental; no implementation session
+  is inferred. P0-S14 prepared the bounded
+  [Q04 Product Owner decision packet](docs/architecture/P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md);
+  [S14 evidence and handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#39-p0-s14-q04-product-owner-decision-packet-and-handoff)
+  compare eight explicit choices for project/site grants, inheritance/delegation,
+  privileged/support access, maker-checker separation and workflow fallback. All
+  choice, rationale, reviewer-name and review-evidence fields initially OPEN.
+  P0-S15 recorded the Product Owner's A1/B1/C1/D1/E1, revised F2, final
+  G3 — Revised with Protected Operations, and H1
+  selections in that packet and reconciled the affected proposals and policy
+  references. Revised F2 adds a separately controlled emergency path when tenant
+  approval is practically impossible. The final **G3 — Revised with Protected
+  Operations** explicitly revises original G1 and replaces every earlier Q04-G
+  response: Protected Operations never allow Self-Approval and Tenant configuration
+  cannot override that restriction, while other business operations may use auditable
+  platform- and tenant-level configuration. The original G1 recommendation remains
+  intentionally rejected. Reviewer
+  names and review evidence remain OPEN, all ADRs remain PROPOSED, current behavior
+  is unchanged, and no implementation is authorized. See the
+  [S15 record and handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#40-p0-s15-q04-decision-recording-and-review-handoff).
+  The [final Q04-G decision record](docs/ROADMAP_EXECUTION_PLAYBOOK.md#41-final-q04-g-product-owner-decision-and-handoff)
+  supersedes only the earlier G3 wording and preserves all other Q04 decisions.
+  Directly affected authorization documentation now uses the authoritative role
+  vocabulary: independent Superuser and Platform Admin roles at platform level,
+  and independent Tenant Owner, Tenant Admin / Local Admin and Tenant Manager roles
+  at Tenant level. Multiple roles require explicit assignment and never imply one
+  another. The authoritative target now also requires Tenant-membership-scoped
+  many-to-many role assignments: one Membership may hold several independent roles,
+  the same User may have different role sets in different Tenants, and role-derived
+  permissions are unioned before intersection with all remaining authorization
+  factors. Current single-role membership behavior remains unchanged. This is
+  documentation normalization, not role implementation. See the
+  [multi-role rule record](docs/ROADMAP_EXECUTION_PLAYBOOK.md#43-membership-scoped-multi-role-authorization-rule).
+  P0-S16 then recorded the explicitly supplied accountable-review status: the
+  Q04-A through Q04-H Product Owner decisions remain recorded, but no accountable
+  review is complete. Reviewer names, outcomes, evidence/version and review dates,
+  unresolved objections and resulting reviewer-feedback revisions all remain
+  OPEN. The [per-item responsibility register](docs/architecture/P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md#3-accountable-review-requirements)
+  identifies the still-required reviewer responsibilities; the
+  [S16 record and handoff](docs/ROADMAP_EXECUTION_PLAYBOOK.md#44-p0-s16-q04-accountable-review-pending-record)
+  closes no gate, accepts no ADR and authorizes no implementation.
+  P0-S17 records only the Product Owner-supplied assignments of Azam Zerangzadeh
+  as Security / Authorization Reviewer for Q04-A/B/C/D/E/F/H, Workflow / Control
+  Reviewer for Q04-C/G/H, Accounting / Control Reviewer for Q04-G, and Operations /
+  Privacy Reviewer for Q04-E/F. All unassigned reviewer responsibilities, review
+  outcomes, evidence/version, dates, unresolved objections and resulting revisions
+  remain OPEN. The [S17 record](docs/ROADMAP_EXECUTION_PLAYBOOK.md#45-p0-s17-q04-reviewer-assignment-record)
+  records no review or approval, closes no gate, accepts no ADR and authorizes no
+  implementation.
+  P0-S18 records the explicit Product Owner decision that Azam Zerangzadeh is the
+  final accountable reviewer for every required responsibility across Q04-A through
+  Q04-H and explicitly overrides the packet's reviewer-independence expectation
+  where applicable. The [S18 record](docs/ROADMAP_EXECUTION_PLAYBOOK.md#46-p0-s18-q04-final-accountable-reviewer-and-independence-override)
+  preserves the conflict and concentration risk without replacing or rejecting the
+  decision. All review outcomes/evidence remain OPEN; no ADR is accepted and no
+  implementation is authorized.
+  P0-S19 records the P0-S18 handoff without adding an inferred review: for every
+  Q04-A through Q04-H responsibility, review outcome, evidence/version, review
+  date, unresolved objection and resulting revision remain OPEN. Azam Zerangzadeh
+  remains the final accountable reviewer under the recorded Product Owner
+  independence override; the concentration and external-independence risks remain
+  explicit. The [S19 record](docs/ROADMAP_EXECUTION_PLAYBOOK.md#47-p0-s19-q04-review-outcome-recording-from-s18-handoff)
+  accepts no ADR and authorizes no implementation.
+  P0-S21 then performed the documentation-only
+  [P0 readiness and unresolved-risk review](docs/architecture/P0_S21_READINESS_AND_UNRESOLVED_RISK_REVIEW.md).
+  It verifies that Q04 selection/assignment records and the D03-D05 directional
+  records are narrow completed decisions, while every Q04 accountable review and
+  every S04-S12 ADR disposition remains OPEN. All nine ADRs remain PROPOSED; no
+  P1.1/P0.2/P0.3 implementation is authorized and P0 is not accepted or complete.
+  P0-S22 completed the documentation-only
+  [P0 closeout and conditional P1 handoff](docs/architecture/P0_S22_DOCUMENTATION_CLOSEOUT_AND_P1_HANDOFF.md).
+  The packet carries the unresolved decision/evidence queue forward and explicitly
+  blocks P0 phase exit and P1 entry; it does not change any gate or authorize
+  implementation.
+  The release contract is not frozen and P0/P0.1 are not complete.
 - **Outcome and rationale:** decide authoritative boundaries before real financial,
   payroll, document, and tenant history makes change expensive.
 - **Prerequisites:** repository audit accepted; initial customer segment and
@@ -145,6 +275,12 @@ Stable masters + consent/privacy + support operations -> future network/AI
   backups and proven restore; migration/rollback deployment runbook; retention,
   export, incident and support-access operations.
 - **Prerequisites:** P0.1 hosting/data-residency and RPO/RTO decisions.
+- **Decision state:** D03/D04 managed-service and shared-recovery directions are
+  approved; residency/provider/operator and numeric RPO/RTO remain open. These
+  unresolved parameters still gate implementation and service commitments.
+- **P0-S21 readiness:** **OPEN.** D03/D04 parameter gates and separate package
+  authorization are absent; no implementation, restore, deployment or operational
+  acceptance evidence is inferred from the completed directional decisions.
 - **Libraries to evaluate:** `django-allauth`, `django-storages`, `pip-audit`,
   `sentry-sdk` or equivalent, stable OpenTelemetry components. No package is pre-approved.
 - **Data/migration:** production storage migration and backup compatibility plan;
@@ -161,11 +297,23 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **Status / priority:** **PLANNED / MUST before commercial SaaS launch**
 - **Outcome:** versioned plan/feature entitlements; user/project/storage and other
   justified quotas; usage visibility; controlled grace/suspension/cancellation;
-  tenant export, retention, legal hold, and offboarding evidence. Commercial
-  subscription invoicing is not implied by this package and remains a product
-  decision.
+  tenant export, retention, legal hold, and offboarding evidence. Initial SaaS
+  subscription invoicing is administered externally under accepted P0-D05;
+  an in-product subscription billing engine is not part of that initial policy.
+- **Policy decision:** one core plan with versioned entitlements and justified
+  capacity limits, warnings and protection of existing authorized work/history/export
+  is approved. Exact limits, commercial and lifecycle parameters remain open under
+  P0-D05 and must be resolved before policy implementation.
 - **Prerequisites:** P0.1 tenant-lifecycle/support-access ADR, P0.2 storage/export
   operations, and product-owner packaging/limit decisions.
+- **ADR preparation (2026-09-25):** [S11 proposal](docs/architecture/ADR_P0_S11_TENANT_LIFECYCLE_ENTITLEMENTS_SUPPORT.md)
+  is prepared, not accepted. Current active-tenant access remains unchanged; the
+  controlled inactive-tenant export path, quota definitions, lifecycle parameters,
+  support/privileged decisions and background-operation authority remain gated.
+  No P0.3 implementation or prerequisite completion is implied.
+- **P0-S21 readiness:** **OPEN.** S11 remains PROPOSED, P0.2 storage/export
+  operations are not accepted, D05 exact capacity/commercial/lifecycle parameters
+  remain open and no P0.3 package authorization is recorded.
 - **Ownership/integration:** Organizations owns entitlement state; every consuming
   domain enforces it server-side. Identity, storage, projects, jobs, export,
   support and audit consume the same authority rather than local feature flags.
@@ -179,7 +327,19 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P0.4 Existing UI consistency and accessibility remediation
 
-- **Status / priority:** **NEXT-CANDIDATE / SHOULD; release gate for selected screens**
+- **Status / priority:** **ASSESSED; REMEDIATION DEFERRED / SHOULD; release gate for selected screens**
+- **P0-S20 assessment (2026-09-26):** the
+  [workbench UI/accessibility assessment](docs/architecture/P0_S20_UI_ACCESSIBILITY_ASSESSMENT.md)
+  selects the centralized personal workbench as the first future remediation
+  journey, but defers actual UI changes until the relevant multi-role,
+  Tenant-role separation, project/site scope, Q04-G and Q04-H server semantics are
+  accepted and implemented. Semantic-neutral accessibility improvements are
+  recorded as a safe backlog, not implemented by this session. Q04 review fields
+  remain OPEN, S07 remains PROPOSED and no implementation is authorized.
+- **P0-S21 readiness:** the S20 assessment/deferral decision is **VERIFIED
+  CLOSED**, but authorization-dependent prerequisites, actual remediation and all
+  browser/device/keyboard, RTL/Jalali/unit, component and permission-safe
+  acceptance evidence remain **OPEN**.
 - **Outcome:** inventory already delivered screens against `docs/ui-guidelines.md`
   and remediate by reusable pattern: tenant/project/site context, cascading and
   searchable choices, list/filter/table consistency, workflow/cartable actions,
@@ -202,18 +362,32 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P1.1 Project/site object-scope authorization
 
 - **Status / priority:** **PLANNED / MUST**
+- **P0-S21 authorization gate:** **OPEN.** S07 remains PROPOSED, Q04 accountable
+  reviews remain OPEN and no separately scoped P1.1 implementation authorization
+  is recorded. Q04 decisions and reviewer assignment are not package authority.
+- **P0-S22 handoff:** **CONDITIONAL / BLOCKED.** Documentation closeout records
+  the required Q04, ADR, parameter and migration evidence queue; it does not
+  authorize P1.1 implementation or P0 phase exit.
 - **Outcome:** permissions are the intersection of active tenant membership,
-  business permission, object scope, tenant status, and—only for workflow
-  actions—assignment/candidacy. Positions continue to route, never grant.
+  the union of permissions from all active applicable membership-scoped role
+  assignments, explicit grants, object scope, tenant status, delegation, policy,
+  and—only for workflow actions—assignment/candidacy. Positions continue to route,
+  never grant; common role combinations never become composite roles.
 - **Prerequisites:** P0.1 scope ADR and target role vocabulary.
-- **Models/services:** effective project/site grants or restricted assignments,
-  scope selectors, service checks, queryset helpers, grant history; decide owner
-  and emergency/support access.
+- **Models/services:** independent auditable Membership-role assignments (a
+  Tenant-preserving many-to-many relation), effective project/site grants or
+  restricted assignments, scope selectors, service checks, queryset helpers,
+  role/grant history; preserve the
+  independent Tenant Owner/Tenant Admin/Tenant Manager and Platform Admin/
+  Superuser boundaries in ordinary and emergency/support access.
 - **Integration:** every domain and workbench; payroll/finance scopes are stricter.
 - **UI/security:** explicit tenant/project/site context, safe empty results,
   no unauthorized option leakage; UI visibility is never authorization.
-- **Migration/testing:** backfill unrestricted scope only by explicit policy;
-  exhaustive cross-tenant/cross-project tests and query/performance review.
+- **Migration/testing:** expand and backfill the current single-role Membership
+  compatibility fields without inventing composite roles or cross-Tenant carryover;
+  backfill unrestricted scope only by explicit policy; test independent role
+  add/remove, permission union, audit evidence and different per-Tenant role sets,
+  plus exhaustive cross-tenant/cross-project and query/performance review.
 - **Effort / risk:** **L / Critical**.
 
 ### P1.2 Configuration and master-governance corrections
@@ -858,19 +1032,65 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ## Product-owner decision register
 
-The owner must decide, before the relevant phase: initial customer segment;
-native vs integrated accounting boundary; initial statutory filing scope;
-Rial-only vs multi-currency; inventory valuation method; payroll employment/pay
-models and attendance providers; document signature/retention rules;
-hosting/data-residency and RPO/RTO; project scope semantics; SaaS plans/limits and
-whether commercial subscription billing is in-product; BOQ/price-book licensing,
+**P0-S03 decision status (2026-09-24):** the Product Owner explicitly accepted the
+S02 recommendations and requested S03. See the
+[approval evidence and accepted choices](docs/ROADMAP_EXECUTION_PLAYBOOK.md#s03-approval-evidence-and-current-decisions);
+the [S02 comparisons](docs/ROADMAP_EXECUTION_PLAYBOOK.md#27-p0-s02-decision-packet-and-s03-handoff)
+remain historical. Approval of direction does not supply unspecified parameters.
+
+| ID | Decision | Current status | Remaining gate / comparison |
+| --- | --- | --- | --- |
+| P0-D01 | Initial customer segment | APPROVED | B: growing multi-project contractors; pilot/scale details open; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d01-initial-customer-segment) |
+| P0-D02 | Accounting/Treasury/AP/AR authority | APPROVED | A: native authorities; detailed ADR/professional review and package authorization still required; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d02-financial-authority-boundary) |
+| P0-D03 | Hosting, residency and operator | DIRECTION APPROVED; PARAMETERS OPEN | A: managed SaaS; residency/provider/operator before P0.2 implementation or data placement; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d03-hosting-residency-and-operational-ownership) |
+| P0-D04 | RPO/RTO and loss/outage tolerances | DIRECTION APPROVED; PARAMETERS OPEN | A: one recovery baseline; numeric objectives/scenarios before P0.2 recovery implementation or customer commitment; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d04-recovery-objectives) |
+| P0-D05 | SaaS packaging, entitlements and quotas | POLICY APPROVED; PARAMETERS OPEN | A: one core plan and external subscription administration; exact limits/lifecycle before P0.3 implementation, terms before sale; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d05-saas-packaging-entitlements-and-quotas) |
+| P0-D06 | Audit findings/priorities and separate implementation authority | FINDINGS/PRIORITIES APPROVED; IMPLEMENTATION NOT AUTHORIZED | Planning baseline/PPC priorities accepted; separately scoped package approval before application implementation; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d06-audit-findings-priorities-and-implementation-authority) |
+
+**P0-S03-Q04 decision status (verified by P0-S21 on 2026-09-26):** Product Owner selections
+A1/B1/C1/D1/E1, revised F2, final G3 — Revised with Protected Operations, and H1 are recorded in the
+[Q04 decision packet](docs/architecture/P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md).
+The P0-S18 final accountable reviewer decision and independence override are
+recorded, and P0-S19 records no supplied completed review. Azam Zerangzadeh holds
+every Q04 review responsibility, while every review outcome, evidence/version,
+date, unresolved-objection and resulting-revision field remains OPEN; S07 and all
+other P0.1 ADRs remain PROPOSED, and P1.1/P0.2/P0.3 implementation is not
+authorized.
+P0-S21 preserves the reviewer-concentration and external-independence risks and
+classifies every Q04-A through Q04-H accountable review as OPEN; it does not
+convert selection or assignment evidence into review approval.
+The authoritative role vocabulary is recorded in the packet and permission matrix;
+the additional authoritative multi-role rule requires independent Tenant
+Membership-scoped many-to-many role assignments, different role sets per Tenant,
+permission union and audited independent assignment/revocation. Current role codes,
+single-role Membership schema and runtime behavior remain unchanged pending
+separately authorized design, migration and implementation.
+
+**Confirmed direction:** the Product Owner's explicit P0-S02 instruction places
+advanced AI, B2B network, GPS/telematics, GIS, enterprise SSO, broad offline work and
+architectural distribution after the core. This confirms sequencing, not a reduced
+core or a frozen release scope; approval evidence is recorded in the packet.
+
+Remaining phase-gated choices/parameters are tracked in the
+[S03 open-input register](docs/ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates):
+pilot scale/owners; statutory filing scope; Rial-only vs multi-currency and fiscal
+settings; inventory valuation; payroll employment/pay models and attendance
+providers; document signature/retention rules; hosting/data residency/operator and
+numeric RPO/RTO; Q04 review outcomes/evidence and the recorded reviewer-concentration risk; exact SaaS limits, lifecycle, pricing and
+external invoicing operator. Other existing decisions remain: BOQ/price-book licensing,
 coefficient and import-template policy; material coding/catalogue stewardship;
 external portal identity/onboarding; electronic-signature legal/provider scope;
 enterprise SSO trigger and IdP/account-linking/MFA policy; notification channels
 including any SMS use; contractual claim/change/EOT governance; project-closeout
 acceptance ownership; GIS/offline/media/equipment-telematics scope; AI provider/
-data-residency/tool permissions; and future network consent/business model. These
-are decision gates, not reasons to invent defaults.
+data-residency/tool permissions; and future network consent/business model. The
+[bounded Q04 packet](docs/architecture/P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md)
+records the current selections, revisions, rationale, accountable-review
+requirements and latest gates for the project/site authorization cluster. Reviewer
+assignment and independence override are recorded in P0-S18; P0-S19 preserves
+every unprovided review field as OPEN and the concentration and external-
+independence risks remain explicit. These are decision gates, not reasons to
+invent defaults.
 
 ## Roadmap governance
 

@@ -25,6 +25,11 @@ business logic and integrates with specialist systems where justified.
 One core model supports these segments. Enterprise structures remain optional so
 small customers do not inherit unnecessary setup or UI complexity.
 
+**Initial focus accepted (2026-09-24, P0-D01):** growing multi-project contractors
+lead onboarding and validation; the shared model and small-contractor usability
+remain. Pilot customers and representative workload sizes are still open. See
+[S03 approval evidence](../ROADMAP_EXECUTION_PLAYBOOK.md#s03-approval-evidence-and-current-decisions).
+
 ## 3. Buyer, user, and stakeholder groups
 
 - Economic buyer: owner/executive leadership seeking project profitability,
@@ -71,8 +76,13 @@ authorization remains code/permission-registry owned.
 
 ## 6. Packaging and monetization direction
 
-Plan, entitlement and quota capability is approved target scope; exact commercial
-packaging is unresolved. The product should support a coherent combination of:
+Plan, entitlement and quota capability is approved target scope. On 2026-09-24 the
+Product Owner accepted P0-D05: one core plan, versioned entitlements and justified
+user/project/storage limits, with initial subscription invoicing administered
+externally. Warn before limits and reject usage-increasing operations at the cap
+while preserving authorized existing work, history and export. This does not alter
+construction Billing/claims scope. Exact commercial and lifecycle parameters remain
+open. The product should support a coherent combination of:
 
 - organization subscription state;
 - entitled modules/capabilities;
@@ -84,12 +94,20 @@ packaging is unresolved. The product should support a coherent combination of:
 Do not equate plan enforcement with application authorization. A user still needs
 membership, business permission, object scope and valid lifecycle state.
 
-Open Product Owner decisions include plan tiers, trial/onboarding, pricing metric,
-commercial invoicing ownership, overage policy, grace periods, contract/support
-levels, data residency and RPO/RTO. `ROADMAP.md` P0.3 schedules the product
-foundation without assuming an in-product subscription billing engine.
+Open Product Owner parameters include trial/onboarding, pricing/metric definitions,
+quota values, the named external invoicing operator, overage/upgrade rules, grace
+and cancellation policy, contract/support levels, data residency and numeric
+RPO/RTO. See [S03 open inputs](../ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates).
+`ROADMAP.md` P0.3 schedules the foundation; the accepted initial policy does not
+include an in-product SaaS subscription billing engine.
 
 ## 7. Adoption and operating model
+
+**Accepted direction (2026-09-24, P0-D02–D04):** native Accounting, Treasury and
+AP/AR; product-accountable SaaS using managed services subject to suitability; one
+core recovery baseline. Provider/residency, named operational owners and quantified
+recovery commitments remain open. Approval evidence is in the S03 record linked
+above; implementation, detailed ADRs and production certification are separate.
 
 Implementation should progress by integrated value stream rather than isolated
 module count:
@@ -110,8 +128,12 @@ the product must not turn spreadsheet inconsistency into authoritative data.
 
 - Product support uses cases, known issues, feature requests, release linkage,
   safe diagnostics and SLA analytics.
-- Tenant support access is purpose-limited, approved, scoped, time-bounded and
-  audited; there is no silent standing support access.
+- Normal tenant support access is purpose-limited, scoped, time-bounded, revocable
+  and audited, with understandable approval by an authorized tenant user plus
+  independent platform approval; there is no silent standing access. When tenant
+  approval is practically impossible in a genuine emergency, revised Q04-F2
+  permits only a separately reviewed, highly restricted, independently approved,
+  minimum-scope, short-lived and fully attributed emergency path.
 - An AI Support Assistant may retrieve cited approved knowledge and propose
   diagnostics/troubleshooting. It cannot bypass permissions or finalize actions.
 - Operational ownership includes incident response, status communication,
@@ -148,6 +170,10 @@ privacy controls, adequate opt-in density and a sustainable operating model.
 Tenant transactions, contacts, private evaluations and documents are never shared
 by default. Network lock-in or data hostage behavior is not an acceptable business
 model; export, revocation and purpose limitation remain required.
+
+The [P0-S12 future-network privacy proposal](ADR_P0_S12_FUTURE_NETWORK_PRIVACY.md)
+records the planning boundary. It does not select participants, consent terms,
+shared claims, commercial terms or launch authority.
 
 ## 11. Success metrics
 

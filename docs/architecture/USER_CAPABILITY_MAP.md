@@ -32,17 +32,35 @@ Authenticated User
 Position, department, team, employee relationship, UI visibility and possession
 of an object UUID do not independently grant access.
 
-## 3. Tenant roles and responsibility profiles
+## 3. Platform and Tenant roles
 
 Current protected role codes differ from the target vocabulary. Role migration
-and default grants require an approved package. The target responsibility model is:
+and default grants require an approved package. Platform and Tenant roles are
+independent assignments; one user may explicitly hold multiple roles, but no role
+implicitly assigns or merges another.
+
+Tenant/business roles are scoped to the user's Tenant membership. A single User may
+therefore be Tenant Owner, Tenant Admin and Project Manager in Tenant A while being
+only Project Manager in Tenant B. These are separate assignments in a conceptual
+many-to-many `User -> Membership -> MembershipRoleAssignment -> Role` relation,
+not a composite role. Assigning or revoking one does not change another and must
+retain actor, Tenant, role, time and relevant reason/context. Effective access uses
+all active applicable role-derived permissions but still requires explicit grants,
+effective project/site scope, delegation/workflow eligibility and applicable policy.
+
+| Platform role | Primary goals | Typical capability boundary |
+| --- | --- | --- |
+| Superuser | Exceptional highest-level technical/system intervention and Protected Operations | No automatic Tenant business-data access; separate explicit scoped authority is required |
+| Platform Admin | Tenant provisioning, global configuration and permitted operational platform administration | Distinct from Superuser; no implicit Superuser capability or ordinary Tenant business-data authority |
+
+The target Tenant responsibility model is:
 
 | Profile | Primary goals | Typical capability boundary |
 | --- | --- | --- |
-| Owner | Govern tenant, appoint responsibility, see enterprise health, approve exceptional high-impact actions | Tenant lifecycle, roles/scopes, plan/export, broad reporting; owner fallback must not bypass mandatory SoD |
-| Admin | Configure tenant, membership, masters and non-financial platform settings | Administration without automatic accounting/payroll/commercial approval |
-| Manager | Control projects, budgets, contracts, procurement and operational approvals | Scoped portfolio/project management and configured approvals |
-| Accountant | Maintain books/subledgers, posting, periods, reconciliation and financial/statutory outputs | Sensitive financial permissions with maker-checker and period controls |
+| Tenant Owner | Govern Tenant, appoint responsibility, define/approve high-level Tenant policy and see enterprise health | Does not imply Tenant Admin; explicit scope required; no automatic organization-wide access or Self-Approval |
+| Tenant Admin / Local Admin | Operate one Tenant's users, delegated role/access assignment, workflow administration and first-line user support | No other-Tenant/global-platform authority and no unrestricted business-data access from the role alone |
+| Tenant Manager | Control projects, budgets, contracts, procurement and operational approvals | Business/operational management only; separate from Tenant and platform administration |
+| Accountant | Maintain books/subledgers, posting, periods, reconciliation and financial/statutory outputs | Sensitive financial permissions, period controls and explicit auditable Self-Approval policy where configured |
 | Supervisor | Record/review site work, time, materials, equipment, HSE and QA/QC | Assigned project/site operations; no broad tenant finance by default |
 | Viewer/Auditor | Read permitted records, evidence and reports | Read/export only when separately granted; no mutation |
 
@@ -58,7 +76,9 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 
 | User group | Current capabilities | Target capabilities | Key restrictions |
 | --- | --- | --- | --- |
-| Tenant Owner/Admin | Organization/settings, memberships/roles, shared masters, broad delivered-domain administration | Plans/entitlements/quotas, object scopes, export/offboarding, MFA/support grants | Owner invariants, no silent support access, tenant lifecycle and SoD |
+| Tenant Owner | Tenant ownership and high-level policy where explicitly granted | Plans/entitlements/quotas, ownership, export/offboarding and high-level access policy | Does not imply Tenant Admin or unrestricted business access |
+| Tenant Admin / Local Admin | Tenant-local settings, users, delegated roles/access, workflow administration and first-line support | Object-scope administration, MFA/support-grant administration where explicitly permitted | No global or other-Tenant authority; no unrestricted business-data access |
+| Tenant Manager | Projects and operational records within granted business scope | Portfolio/project management and configured business approvals | No Tenant/platform administration merely from management role |
 | Executive/Portfolio Manager | Projects, delivered financial read views, workbench and operational records as permitted | Portfolio cost/cash/forecast/KPI, risk/change, governed management queries | KPI drill-through, project scope, no unrestricted SQL/AI |
 | Project Manager | Project/site/WBS/activity, contracts, estimates, daily/operational records, assigned workflow | Budget/commitment/forecast, schedule/risk/change, claims/payables and reconciliations | Project/site scope and configured approval limits |
 | Commercial/Quantity Surveyor | Contracts/amendments, estimate revisions, baselines/progress/receivable claims | BOQ/resource/coefficient/scenario, subcontract certificates, variations, guarantees | Contract term/rule versions, claim SoD and source evidence |
@@ -75,7 +95,8 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 | Document Controller | Versioned documents/links/download/archive where granted | OCR/search, transmittals, RFI/submittal/drawing review, signatures, hold/export | Linked-context permission, retention/legal hold and download audit |
 | Knowledge Reviewer | No formal domain | Review/publish/version/retract lessons, procedures, articles/cases and promotions | Source citation, audience/sensitivity and no AI auto-publication |
 | Support Operator | No formal support platform or standing tenant access | Cases/known issues/features/releases, safe diagnostics and approved timed access | Purpose, scope, expiry, tenant consent, audit and PII minimization |
-| System Administrator | Django/platform administration subject to current controls | Operational platform/security/tenant recovery tools | Platform authority does not erase audit or justify routine tenant browsing |
+| Platform Admin | Permitted operational platform administration and Tenant provisioning | Global configuration and platform operations | Distinct from Superuser; no automatic Tenant business-data access |
+| Superuser | Current highest technical/system capability | Exceptional protected technical operations | Distinct from Platform Admin; no automatic Tenant business-data access |
 
 ## 5. External and self-service participants
 
@@ -92,8 +113,8 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 
 | Capability family | Primary actors | Review/approval actors | Read/assurance actors | Roadmap disposition |
 | --- | --- | --- | --- | --- |
-| Tenant lifecycle/entitlements | Owner/Admin | Owner/platform policy | Owner/support with grant | P0.3 |
-| Identity/roles/object scope | Owner/Admin | Owner and protected policy | Auditor/security | P1.1/P1.2 |
+| Tenant lifecycle/entitlements | Tenant Owner / Tenant Admin as explicitly permitted | Tenant Owner / Platform Admin policy split | Tenant Owner/support with grant | P0.3 |
+| Identity/roles/object scope | Tenant Owner / Tenant Admin as explicitly permitted | Tenant Owner plus protected platform policy | Auditor/security | P1.1/P1.2 |
 | Masters/materials/parties | Authorized master-data users | Data/quality owner | Operational consumers | P1.2/P1.4 |
 | Estimate/BOQ/budget | Estimator/QS | Commercial/Project Manager | Finance/executive | P4.0/P4.1 |
 | Project cost/forecast | Project controls | Project/finance management | Executive/auditor | P4.1/P10 |

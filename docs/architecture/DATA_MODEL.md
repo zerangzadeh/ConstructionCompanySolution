@@ -39,7 +39,8 @@ named concept immediately.
 ```text
 User (global authentication identity)
   -> OrganizationMembership (tenant access identity)
-       -> Role/BusinessPermission grants
+       -> MembershipRoleAssignment [target, zero-to-many independent assignments]
+            -> Role -> BusinessPermission grants
        -> Project/Site scope grants [target]
        -> Workflow candidacy/assignment [responsibility, not permission]
 
@@ -52,12 +53,21 @@ time-limited support-access grants, entitlements/quotas and project/site scope.
 External portal identity must be explicitly invitation-scoped and cannot expose
 the tenant user directory or imply ordinary membership.
 
+Tenant/business role assignment is membership-scoped. The same User may hold
+Tenant Owner plus Tenant Admin plus Project Manager in one Tenant and only Project
+Manager in another. These remain independent assignment rows; common combinations
+must not become composite roles. Effective role permissions are unioned across
+active applicable assignments and then intersected with membership, explicit
+grants, project/site scope, delegation, workflow eligibility and policy constraints.
+Adding or removing one role changes no other role assignment. Assignment/revocation
+history retains actor, Tenant, role, timestamp and relevant reason/context.
+
 ## 4. Master-data catalogue
 
 | Master | Authoritative domain | Key target facts | Historical rule |
 | --- | --- | --- | --- |
 | Organization settings | Platform/Tenant | locale, timezone, currency, fiscal/numbering settings | One authority; effective history where calculations depend on it |
-| Role/permission/scope | Authorization | code-owned permission, role grants, project/site scope | Effective grants and audited elevation/removal |
+| Role/permission/scope | Authorization | code-owned permission, membership-scoped independent role assignments, role grants, project/site scope | Effective grants plus audited role assignment/revocation and elevation/removal |
 | Employee/position/team | Workforce | identity, employment state, effective responsibility | Assignment history retained; optional `User` link |
 | Skill/qualification/training | Workforce | competency, evidence, issuer, dates, proficiency | Expiry/revocation and applied qualification preserved |
 | Party/contact/profile | Parties | legal/tax identity, roles, contacts, bank/qualification facts | Effective/verified state; sensitive-field permissions |
@@ -77,7 +87,7 @@ Names are descriptive and may change during an approved detailed design.
 | Area | Target concepts |
 | --- | --- |
 | SaaS lifecycle | Plan, FeatureEntitlement, Quota/Usage, SubscriptionState, TenantExport, RetentionPolicy, OffboardingRun, SupportAccessGrant |
-| Authorization | ProjectScopeGrant, SiteScopeGrant, Elevation/Delegation evidence, separation policy |
+| Authorization | MembershipRoleAssignment/history, ProjectScopeGrant, SiteScopeGrant, Elevation/Delegation evidence, separation policy |
 | Materials | MaterialAlias, AttributeDefinition/Value, UOMConversion, MaterialSubstitute, MaterialPriceObservation, MaterialApproval |
 | Workforce | Skill, CompetencyRequirement, EmployeeSkill, Certificate, Training, PerformanceEvaluation, LaborRateVersion |
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
@@ -180,6 +190,10 @@ private by default. Future network records use separate platform identity/claim,
 explicit publication consent, purpose, audience, provenance, verification,
 expiry/revocation and abuse controls. Anonymized benchmarking requires a defined
 aggregation/privacy threshold and must not permit re-identification.
+
+The [P0-S12 future-network privacy proposal](ADR_P0_S12_FUTURE_NETWORK_PRIVACY.md)
+develops ownership, consent, revocation, isolation, retention and acceptance
+boundaries without creating these conceptual records or authorizing network scope.
 
 ## 12. Schema-evolution policy
 
