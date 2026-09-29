@@ -22,6 +22,7 @@ from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
+    scope_queryset,
 )
 from apps.organizations.models import (
     BusinessPermissionCode,
@@ -37,8 +38,6 @@ from apps.projects.models import (
 
 
 def _validate_active_access(user: User, organization: Organization) -> None:
-    if user.is_superuser and user.is_active:
-        return
     get_active_membership(user=user, organization=organization)
 
 
@@ -75,19 +74,31 @@ def _validate_phase(
         raise PermissionDenied("فاز پروژه برای این کارگاه فعال نیست.")
 
 
-def _can_create_daily_reports(user: User, organization: Organization) -> bool:
+def _can_create_daily_reports(
+    user: User, organization: Organization, *, project: Project, site: ProjectSite
+) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.DAILY_REPORTS_CREATE,
+        project=project,
+        site=site,
     )
 
 
-def _can_approve_daily_reports(user: User, organization: Organization) -> bool:
+def _can_approve_daily_reports(
+    user: User,
+    organization: Organization,
+    *,
+    project: Project,
+    site: ProjectSite,
+) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.DAILY_REPORTS_APPROVE,
+        project=project,
+        site=site,
     )
 
 
@@ -102,8 +113,15 @@ def _can_update_daily_report(
         user=actor,
         organization=organization,
         permission=permission,
+        project=report.project,
+        site=report.site,
     ) and (
-        _can_approve_daily_reports(actor, organization)
+        _can_approve_daily_reports(
+            actor,
+            organization,
+            project=report.project,
+            site=report.site,
+        )
         or report.created_by_id == actor.pk
     )
 
@@ -160,7 +178,7 @@ def create_daily_report(
 ) -> DailyReport:
     """Create a draft report after checking tenant, role, and project scope."""
 
-    if not _can_create_daily_reports(actor, organization):
+    if not _can_create_daily_reports(actor, organization, project=project, site=site):
         raise PermissionDenied("اجازه ایجاد گزارش روزانه در این سازمان را ندارید.")
     _validate_project(organization=organization, project=project)
     _validate_site(organization=organization, project=project, site=site)
@@ -221,12 +239,19 @@ def get_organization_daily_reports(
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.DAILY_REPORTS_VIEW,
+        allow_any_scope=True,
     ):
         raise PermissionDenied("اجازه مشاهده گزارش‌های روزانه این سازمان را ندارید.")
+    membership = get_active_membership(user=user, organization=organization)
     return (
-        DailyReport.objects.filter(
-            organization=organization,
-            project__deleted_at__isnull=True,
+        scope_queryset(
+            DailyReport.objects.filter(
+                organization=organization,
+                project__deleted_at__isnull=True,
+            ),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="site_id",
         )
         .select_related("project", "site", "phase", "created_by", "approved_by")
         .order_by("-reporting_date", "-created_at")
@@ -607,8 +632,6 @@ def _approve_daily_report_domain(
 ) -> DailyReport:
     """Approve a submitted report and make its operational history final."""
 
-    if not _can_approve_daily_reports(actor, organization):
-        raise PermissionDenied("اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.")
     try:
         report = (
             DailyReport.objects.select_for_update()
@@ -623,6 +646,13 @@ def _approve_daily_report_domain(
         project=report.project,
         site=report.site,
     )
+    if not _can_approve_daily_reports(
+        actor,
+        organization,
+        project=report.project,
+        site=report.site,
+    ):
+        raise PermissionDenied("اجازه تأیید گزارش‌های روزانه این سازمان را ندارید.")
     if report.status != DailyReportStatus.SUBMITTED:
         raise ValueError("فقط گزارش‌های روزانه ارسال‌شده قابل تأیید هستند.")
 

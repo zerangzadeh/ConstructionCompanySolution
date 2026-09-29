@@ -1,17 +1,20 @@
 # ADR P0-S07: Project/site authorization and workflow intersection
 
-**Status:** PROPOSED — preparation complete; acceptance and implementation pending.
-**Recorded:** 2026-09-25. **Scope:** P0.1 / PPC-04; P1.1 remains PLANNED.
-**Authorization:** Product Owner requested S07 and this ADR only, preserving current
-behavior, without P1.1 implementation or invented privileged/support exceptions.
+**Status:** PROPOSED design record; P1.1 implementation is complete under its separate,
+bounded Product Owner authorization. This status does not accept the ADR or complete P0.
+**Recorded:** 2026-09-25. **P0-G02 reconciled:** 2026-09-27. **Implementation
+closeout:** 2026-09-28. **Scope:** P0.1 / PPC-04.
+**Authorization:** P1.1 implemented only the section 6 contract, preserving its
+support/emergency, export/storage, quota/lifecycle and downstream-domain exclusions.
 
 This proposal develops [Roadmap P1.1](../../ROADMAP.md) and the target
 [authorization equation](WORKFLOW_AND_PERMISSION_MATRIX.md#2-authorization-equation).
 It does not implement grants, role migrations, Tenant Owner fallback or support access.
 The [P0-S15 Q04 selections](P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md#5-product-owner-response-record)
-now supply Product Owner policy direction; accountable reviewer names/evidence and
-formal acceptance remain open. Other inputs retain their original gates. Models,
-migrations and tests remain authoritative for delivered behavior.
+now supply Product Owner policy direction. P0-G01 recorded accountable review
+findings and P0-G02 incorporates their design remediations in section 6. The
+review does not accept this ADR or authorize implementation. Models, migrations
+and tests remain authoritative for delivered behavior.
 
 Role terms in this ADR follow the authoritative split: Superuser and Platform Admin
 are independent platform roles; Tenant Owner, Tenant Admin / Local Admin and Tenant
@@ -75,7 +78,9 @@ valid scopes before intersection with all other authority; a project grant cover
 all current/future sites and cannot exclude sites; partial-project access uses
 explicit site grants; and delegation is bounded, time/scope-limited, revocable,
 audited and non-transitive by default. Organization-wide access is explicit; role,
-missing scope and null context never imply it. Reviewer names/evidence remain OPEN.
+missing scope and null context never imply it. P0-G01 records A/B as accepted
+with conditions and C as revision required; section 6 turns those findings into
+P1.1 implementation requirements.
 
 The authoritative multi-role rule adds no shortcut to that intersection. Target
 authorization unions business permissions from every active applicable role
@@ -103,8 +108,9 @@ scope at organization creation; Tenant Admin / Local Admin is a separate explici
 assignment even for the same user. Later Tenant Owners require an existing Tenant
 Owner, Tenant Admin or another actor with the required user/access-management
 permission and independently recorded scope/grants. Neither Tenant role alone
-implies organization-wide business-data access. Exact
-grantors, reviewers and implementation mechanics remain open.
+implies organization-wide business-data access. Exact grantors, reviewers and
+implementation mechanics are defined as P1.1 requirements in section 6; their
+runtime proof remains future acceptance work.
 
 ## 3. Enforcement and workflow contract
 
@@ -164,27 +170,27 @@ it. Workflow definitions remain declarative and domain services own invariants.
 | Self-Approval — final G3, Revised with Protected Operations | Self-Approval is never allowed for platform-level `Protected Operations`, covering system/security/authorization/privileged-access/access-management operations; Tenant policy and Tenant Owner/Tenant Admin/Platform Admin/Superuser roles cannot override. Other financial, contractual, project, procurement, administrative and workflow approvals may support configuration. Superuser defines supported business operation types at platform level; where permitted, an explicitly authorized Tenant Owner/user may enable or disable Self-Approval for that Tenant. Tenant Owner status alone enables nothing. Platform classification changes are themselves Protected Operations. No single-user-Tenant mode; all policy changes and actual uses are audited. This explicitly revises original G1 and replaces every earlier Q04-G response. |
 
 Product Owner selections A1/B1/C1/D1/E1, revised F2, final G3 — Revised with
-Protected Operations, and H1 are recorded.
-Named security/workflow and conditional domain/accounting/legal/operations/privacy
-reviewers and evidence remain OPEN before this ADR can be accepted or P1.1
-implemented. Final G3 — Revised with Protected Operations mandates separation while
-allowing configuration for non-protected functional/business operations. Reviewers
-must validate classification completeness and record misconfiguration, fraud/error-
-detection, professional-validity and regulatory risks for configurable business
-operations. Support
-jurisdiction also depends on D03; tenant lifecycle/retention and exports retain
-D05/Q03 gates. Suspended tenants
+Protected Operations, and H1 are recorded. P0-G01 records A/B/F as accepted with
+conditions and C/D/E/G/H as revision required; P0-G02 makes the required revisions
+explicit P1.1 work rather than unresolved design choices. Final G3 — Revised with
+Protected Operations mandates separation while allowing configuration for
+non-protected functional/business operations. Classification completeness and
+business-operation control suitability remain implementation and release evidence,
+not reasons to enable configurable Self-Approval in P1.1. Support jurisdiction
+depends on D03; tenant lifecycle/retention and exports retain D05/Q03 gates and
+are outside P1.1 unless separately authorized. Suspended tenants
 must not mutate business data and cancelled tenants must not use normal business
 access in the target; special retention/export policy is separate. Current
 authorization helpers require an active organization and are unchanged.
 
 C1 self-elevation controls and F2 independent support/emergency approval fall
 within final G3 Protected Operations, resolving the prior recorded precedence
-tension. Exact operation classification and reviewer evidence remain open.
+tension. Exact operation classification is a P1.1 deliverable; its runtime proof
+and any external review evidence remain acceptance or release evidence.
 
 ## 5. Compatibility and implementation acceptance gates
 
-After ADR acceptance and separate implementation authorization:
+A separately authorized P1.1 package must:
 
 1. Inventory each affected read/write/export and subject adapter, with its scope
    classification and privileged behavior. Resolve Q04 and role vocabulary first.
@@ -227,3 +233,157 @@ independent role add/remove and permission-union tests, per-Tenant role isolatio
 role/grant lifecycle and anti-escalation audit tests, workbench/source-link leakage
 checks, concurrency and representative query/performance evidence. S07 supplies
 none of that runtime certification. PPC-04, P0.1 and P1.1 remain incomplete.
+
+## 6. P0-G02 remediation and complete P1.1 implementation contract
+
+P0-G02 resolves the P0-G01 design findings without accepting this ADR. No remaining
+item below requires a new Product Owner policy decision before coding; each is an
+explicit P1.1 requirement. A later Product Owner implementation authorization must
+approve this bounded contract as a whole.
+
+1. **Independent membership roles and Tenant separation (D1).** Expand from the
+   current single `role_definition` to independently auditable, Tenant-scoped role
+   assignments. Support independent Tenant Owner, Tenant Admin / Local Admin,
+   Tenant Manager and other canonical roles on one Membership; union only active
+   applicable role permissions. Tenant Owner does not imply Tenant Admin, scope or
+   candidacy; positions remain routing evidence, never permission. Protect the
+   final active Tenant Owner through the migration and normal lifecycle.
+2. **Explicit grants and scope (A1/B1).** Add membership-linked grant/history
+   records with explicit organization-wide, project and optional site scope,
+   interval, lifecycle, grantor/approver/reason and immutable audit evidence.
+   Union valid grants, then intersect every authorization factor. Project grants
+   cover current/future child sites; site grants expose only their site plus a
+   versioned, minimal parent-field policy. Null/missing scope is deny, never
+   wildcard. Build one shared service/queryset policy and apply it before lists,
+   counts, search, autocomplete, export, detail and mutation.
+3. **Grant administration, delegation and reassignment (C1).** Introduce explicit
+   grant-management permissions and require the actor's accepted administrative
+   boundary to cover the proposed grant. Prohibit self-grant, self-approval,
+   scope expansion and permission transfer. Delegation/reassignment must require
+   an active recipient with the independently required business permission and
+   effective scope; be non-transitive, tenant/project/site/time bounded, auditable,
+   immediately revocable and rechecked at claim, reassignment, delegation,
+   completion and any retry. Existing generic workflow delegation cannot be
+   treated as sufficient target enforcement until adapted and tested.
+4. **Bootstrap, migration, backfill and rollback.** Use expand -> backfill ->
+   switch -> validate, preserving the current compatibility field until data,
+   dependencies and acceptance evidence permit an explicitly approved removal.
+   Create initial Tenant Owner plus explicit ownership/governance scope atomically;
+   separately assign Tenant Admin when needed. Backfill only evidence-supported
+   roles/scopes, quarantine ambiguous memberships, never infer broad scope from
+   role or current tenant-wide access, and retain role/grant history. Define a
+   reversible read/write compatibility period and rollback that never silently
+   restores broader access after a restriction takes effect.
+5. **Platform privileged boundaries (E1).** Inventory every direct, service,
+   export, admin and workbench path that currently recognizes `is_superuser`.
+   Separate Platform Admin from Superuser and remove ordinary Tenant business-data
+   authority from both on each migrated path. Any future diagnostic/control access
+   is a separate, explicit, minimally scoped, auditable mechanism; support access
+   is not implemented by P1.1.
+6. **Protected Operations and Self-Approval (G3).** Establish a platform-owned,
+   versioned catalogue of Protected Operations at minimum covering self-grant/
+   access increase, own privileged-role assignment/approval, own support/emergency
+   access, authorization/security-policy weakening and audit/security-control
+   weakening. No role or Tenant policy overrides it. P1.1 must provide the
+   classification and audit boundary only; it must not enable configurable
+   business-operation Self-Approval, financial controls or legal/regulatory
+   operation types without their separately approved consuming packages.
+7. **Workflow eligibility, fallback and unresolved work (H1).** Resolve primary
+   candidates, then filter by active membership, permission, scope, delegation
+   and separation; only then evaluate fallback through the same filter. If none
+   is eligible, retain visible unresolved work and provide only an authorized,
+   auditable recovery action. Never auto-route to Tenant Owner, Tenant Admin,
+   Platform Admin, Superuser or support. Preserve qualifying assignment/delegation/
+   grant evidence in completed history and lock/recheck authorization with domain
+   completion to prevent stale-authority commits.
+8. **Support/emergency boundary (F2 Revised).** Keep ordinary support and emergency
+   Tenant-data access disabled in P1.1. P1.1 may supply no implicit bypass. D03,
+   Q03, applicable D05/S11 controls and an actually independent Platform approval
+   remain required before a future F2 mechanism is enabled.
+9. **Minimum P1.1 proof.** Add service and integration tests for independent role
+   add/remove and Tenant isolation; grant union/intersection; project/site and
+   minimal-parent-context denial; cross-Tenant/query/export leakage; bootstrap and
+   backfill; privileged-path denial; delegation/reassignment/expiry/revocation;
+   fallback/unresolved work; Protected Operations; audit lineage; concurrency and
+   rollback. Run migrations against PostgreSQL and rehearse backfill/rollback on a
+   representative non-production copy before production rollout.
+
+The same-person independent-challenge gap remains a governance/release constraint,
+not a P1.1 coding blocker. Any genuinely applicable external legal, contractual,
+professional or customer independence requirement remains a future enablement or
+release gate for F2/G3-sensitive operations; P1.1 must preserve the restriction
+and must not claim to satisfy it.
+
+## 7. P1.1 implementation closeout
+
+P1-E0 and P1-S01 through P1-S13 implemented the bounded contract on 2026-09-28.
+The delivered model includes membership-scoped multi-role assignments, effective
+project/site grants, migration issue quarantine, Platform Admin assignments,
+Protected Operation versions and unresolved workflow work. Shared authorization
+now intersects active membership, unioned active roles, explicit scope, tenant state,
+delegation and workflow eligibility; no Superuser, Platform Admin, Tenant Owner or
+Tenant Admin ordinary-business-data bypass remains on migrated paths.
+
+Organizations migrations `0030`/`0031` and workflows migrations `0021` through
+`0023` provide expand/backfill, restrictive catalog corrections and rollback paths
+that do not restore broad access. PostgreSQL forward/reverse/reapply rehearsals and
+targeted authorization, workflow and affected-domain tests provide the implementation
+evidence. Configurable business-operation Self-Approval is deliberately not enabled:
+the historical flag is inert at runtime and removed from live templates. Support and
+emergency access, exports/storage, quota/lifecycle and financial/regulatory controls
+remain excluded.
+
+### 7.1 Platform Admin assignment governance update
+
+On 2026-09-28, the Product Owner changed the operational assignment control for
+`Platform Admin`: one active Superuser may assign the role to another active user
+with a recorded reason. The assigning Superuser remains distinct from the target;
+the persisted approver field records that same authorized actor for compatibility.
+This change applies only to assignment of the platform role. It does not grant
+Platform Admin ordinary Tenant business-data access, weaken Protected Operations,
+or implement support/emergency access.
+
+### 7.2 Protected Operations catalogue governance update
+
+On 2026-09-28, the Product Owner transferred ownership of the platform
+`Protected Operations` catalogue lifecycle to Platform Admin. An active Platform
+Admin may create an immutable classification version or retire the current version
+alone when an auditable reason is recorded. This supersedes only the earlier
+Superuser-only catalogue-ownership rule. It does not grant Tenant business-data
+access, enable Self-Approval, or permit a protected business action; retired
+catalogue history remains retained and auditable.
+
+### 7.3 Role catalogue governance update
+
+On 2026-09-28, the Product Owner assigned global-custom, tenant-custom and
+system-role presentation/permission binding management to Platform Admin. A Tenant
+Admin may manage only custom roles of its active Tenant and cannot create global
+roles or modify system roles. System-role identity and permission-code catalogue
+remain migration-owned and system roles cannot be archived. Custom-role removal is
+an auditable archive operation retaining existing memberships and assignment history.
+
+### 7.4 Verified P1.1 acceptance closeout
+
+The 2026-09-28 closeout verified the implemented governance against current models,
+migrations, services, routes and tests rather than relying on status text. Platform
+Admin can manage global-custom, exact-Tenant custom and editable system-role
+properties/permission bindings without receiving ordinary Tenant-data access. Tenant
+Admin can manage only custom roles of its active Tenant. Assignment and account
+compatibility paths accept only global/system roles or custom roles owned by the
+same Tenant; inactive or foreign-Tenant roles are denied.
+
+System roles remain code/migration-owned and cannot be archived. Permission codes
+remain code/migration-owned and only active catalogue permissions can be attached.
+Custom-role archival disables future effective authority while retaining the role,
+memberships, assignments and audit history. Role lifecycle audit evidence records
+actor/time/Tenant/reason and previous/new permission sets. Organizations migration
+`0035` idempotently guarantees the active `admin` Platform Admin bootstrap when that
+active account exists and refuses reversal when Tenant-owned or archived role data
+would be lost by reversing `0034`.
+
+Persian-first RTL platform and active-Tenant role-catalog routes/forms, plus the
+Platform Protected Operations catalogue route, provide the approved management
+journeys with server-side authorization. Focused P1.1 tests and
+the affected tenant-isolation, account, Admin and audit regression groups passed.
+P1.1 acceptance criteria are satisfied; this does not accept this still-PROPOSED ADR,
+complete P0, or authorize P1-S14/P1.2.

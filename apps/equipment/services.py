@@ -18,7 +18,11 @@ from apps.equipment.models import (
     MaintenanceRecord,
     MaintenanceStatus,
 )
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
@@ -63,11 +67,18 @@ def _require_permission(
     user: User,
     permission: BusinessPermissionCode,
     management: bool = False,
+    project: Project | None = None,
+    site: ProjectSite | None = None,
+    allow_any_scope: bool = False,
 ) -> None:
     require_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        project=project,
+        site=site,
+        allow_any_scope=allow_any_scope,
+        allow_site_parent=True,
         message=(
             "اجازه مدیریت تجهیزات این شرکت را ندارید."
             if management
@@ -270,6 +281,8 @@ def assign_equipment(
         user=actor,
         permission=BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_CREATE,
         management=True,
+        project=project,
+        site=site,
     )
     locked_equipment = Equipment.objects.select_for_update().get(pk=equipment.pk)
     _require_same_organization(
@@ -339,6 +352,8 @@ def get_organization_equipment_assignments(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_VIEW,
+        project=project,
+        allow_any_scope=project is None,
     )
     _require_same_organization(organization, equipment=equipment, project=project)
     assignments = EquipmentAssignment.objects.filter(organization=organization)
@@ -346,7 +361,13 @@ def get_organization_equipment_assignments(
         assignments = assignments.filter(equipment=equipment)
     if project is not None:
         assignments = assignments.filter(project=project)
-    return assignments.select_related("equipment", "project", "site")
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        assignments,
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="site_id",
+    ).select_related("equipment", "project", "site")
 
 
 @transaction.atomic
@@ -358,16 +379,18 @@ def transition_equipment_assignment_status(
     target_status: str,
     effective_date: date,
 ) -> EquipmentAssignment:
+    locked = (
+        EquipmentAssignment.objects.select_for_update()
+        .select_related("equipment")
+        .get(pk=assignment.pk)
+    )
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.EQUIPMENT_ASSIGNMENTS_TRANSITION,
         management=True,
-    )
-    locked = (
-        EquipmentAssignment.objects.select_for_update()
-        .select_related("equipment")
-        .get(pk=assignment.pk)
+        project=locked.project,
+        site=locked.site,
     )
     _require_same_organization(organization, assignment=locked)
     if target_status not in _ASSIGNMENT_STATUS_TRANSITIONS.get(locked.status, ()):
@@ -432,6 +455,8 @@ def create_maintenance_record(
         user=actor,
         permission=BusinessPermissionCode.MAINTENANCE_RECORDS_CREATE,
         management=True,
+        project=project,
+        site=site,
     )
     locked_equipment = Equipment.objects.select_for_update().get(pk=equipment.pk)
     _require_same_organization(
@@ -498,12 +523,19 @@ def get_organization_maintenance_records(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.MAINTENANCE_RECORDS_VIEW,
+        allow_any_scope=True,
     )
     _require_same_organization(organization, equipment=equipment)
     records = MaintenanceRecord.objects.filter(organization=organization)
     if equipment is not None:
         records = records.filter(equipment=equipment)
-    return records.select_related("equipment", "project", "site", "provider")
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        records,
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="site_id",
+    ).select_related("equipment", "project", "site", "provider")
 
 
 @transaction.atomic
@@ -516,16 +548,18 @@ def _transition_maintenance_status_domain(
     effective_date: date,
     cost: Decimal | None = None,
 ) -> MaintenanceRecord:
+    locked = (
+        MaintenanceRecord.objects.select_for_update()
+        .select_related("equipment")
+        .get(pk=record.pk)
+    )
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.MAINTENANCE_RECORDS_TRANSITION,
         management=True,
-    )
-    locked = (
-        MaintenanceRecord.objects.select_for_update()
-        .select_related("equipment")
-        .get(pk=record.pk)
+        project=locked.project,
+        site=locked.site,
     )
     _require_same_organization(organization, record=locked)
     if target_status not in _MAINTENANCE_STATUS_TRANSITIONS.get(locked.status, ()):

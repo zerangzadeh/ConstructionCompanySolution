@@ -2,9 +2,7 @@
 {% block title %}اعضای شرکت | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
   {% include "components/page_header.html" with page_eyebrow="شرکت" page_title="اعضای شرکت" page_description=request.organization.name only %}
-  {% if can_create_accounts %}
-    <div class="mt-4 flex justify-end"><a class="erp-btn erp-btn--primary" href="{% url 'organizations:account_create' %}">ایجاد یا اتصال حساب</a></div>
-  {% endif %}
+  <div class="mt-4 flex justify-end gap-2">{% if can_manage_role_catalog %}<a class="erp-btn erp-btn--secondary" href="{% url 'organizations:role_catalog' %}">مدیریت نقش‌ها</a>{% endif %}{% if can_create_accounts %}<a class="erp-btn erp-btn--primary" href="{% url 'organizations:account_create' %}">ایجاد یا اتصال حساب</a>{% endif %}</div>
   <section class="erp-surface mt-6 overflow-hidden rounded-xl">
     <div class="overflow-x-auto">
       {% if memberships %}

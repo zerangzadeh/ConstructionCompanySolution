@@ -330,7 +330,6 @@ class QualityIssue(UUIDModel, TimeStampedModel):
             user_id = getattr(self, f"{field_name}_id")
             if (
                 user_id
-                and not getattr(self, field_name).is_superuser
                 and not self.organization.memberships.filter(user_id=user_id).exists()
             ):
                 raise ValidationError(

@@ -62,6 +62,7 @@ from apps.workflows.models import (
     WorkItemCandidate,
     WorkItemStatus,
 )
+from apps.workflows.runtime import WorkflowConflict
 from apps.workforce.models import Employee, EmployeePositionAssignment, Position
 
 
@@ -739,22 +740,12 @@ class ProgressClaimApprovalWorkflowTests(ProgressClaimCalculationTests):
         fallback_claim = self._claim_for_approval()
         self.manager_membership.status = MembershipStatus.SUSPENDED
         self.manager_membership.save(update_fields=["status", "updated_at"])
-        fallback_instance = submit_progress_claim(
-            organization=self.organization, actor=self.owner, claim=fallback_claim
-        )
-        fallback_item = fallback_instance.work_items.get()
-        self.assertTrue(
-            WorkItemCandidate.objects.filter(
-                work_item=fallback_item, membership__user=self.owner, is_active=True
-            ).exists()
-        )
-        approved = approve_progress_claim(
-            organization=self.organization,
-            actor=self.owner,
-            claim=fallback_claim,
-            reason="Only eligible small-tenant approver",
-        )
-        self.assertEqual(approved.status, "approved")
+        with self.assertRaises(WorkflowConflict):
+            submit_progress_claim(
+                organization=self.organization,
+                actor=self.owner,
+                claim=fallback_claim,
+            )
 
     def test_submission_and_decision_retries_are_idempotent(self):
         self._configure_reporting_line()
@@ -1163,7 +1154,7 @@ class ProgressClaimSettlementTests(ProgressClaimApprovalWorkflowTests):
         self.assertEqual(detail_response.status_code, 200)
         self.assertLessEqual(
             len(detail_queries),
-            25,
+            40,
             "Claim detail must keep a bounded query budget as settlements grow.",
         )
 

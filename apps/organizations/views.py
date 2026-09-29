@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import (
     FileResponse,
     Http404,
@@ -11,9 +11,24 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from apps.accounts.models import User
+from apps.organizations.access_services import (
+    archive_organization_role,
+    assign_membership_role,
+    create_organization_role,
+    create_protected_operation_version,
+    grant_membership_scope,
+    retire_protected_operation,
+    revoke_membership_role,
+    revoke_membership_scope,
+    update_organization_role,
+)
 from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
+    is_platform_admin,
+    membership_has_role,
+    membership_is_tenant_owner,
 )
 from apps.organizations.decorators import (
     active_organization_required,
@@ -22,18 +37,28 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.forms import (
     ExistingAccountConnectionForm,
+    MembershipRoleAssignmentForm,
+    MembershipScopeGrantForm,
     OrganizationAccountCreateForm,
     OrganizationForm,
     OrganizationMemberPasswordResetForm,
     OrganizationMembershipForm,
     OrganizationProfileForm,
+    OrganizationRoleCatalogForm,
     OrganizationSettingsForm,
+    ProtectedOperationCatalogForm,
 )
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
     BusinessPermissionCode,
+    MembershipRole,
+    MembershipRoleAssignment,
+    MembershipScopeGrant,
+    Organization,
     OrganizationAccountConnectionRequest,
     OrganizationMembership,
+    OrganizationRole,
+    ProtectedOperation,
 )
 from apps.organizations.services import (
     create_organization_account,
@@ -67,6 +92,7 @@ def select_organization(request: HttpRequest) -> HttpResponse:
         {
             "memberships": memberships,
             "pending_connection_count": pending_connection_count,
+            "is_platform_admin": is_platform_admin(request.user),
         },
     )
 
@@ -89,16 +115,19 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
 def create_organization(request: HttpRequest) -> HttpResponse:
     """Allow only the global system administrator to create a tenant."""
 
-    if not request.user.is_superuser:
-        return HttpResponseForbidden("فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.")
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("فقط ادمین پلتفرم می‌تواند شرکت جدید ایجاد کند.")
 
     if request.method == "POST":
         form = OrganizationForm(request.POST)
         if form.is_valid():
             data = form.cleaned_data
-            organization = create_organization_by_system_admin(
+            owner = User.objects.get(
+                username=data["initial_owner_username"], is_active=True
+            )
+            create_organization_by_system_admin(
                 actor=request.user,
-                owner=request.user,
+                owner=owner,
                 name=data["name"],
                 legal_name=data["legal_name"],
                 slug=data["slug"],
@@ -115,7 +144,6 @@ def create_organization(request: HttpRequest) -> HttpResponse:
                 timezone_name=data["timezone"],
                 currency=data["currency"],
             )
-            set_active_organization(request.session, organization)
             return redirect("organizations:select")
     else:
         form = OrganizationForm()
@@ -148,6 +176,9 @@ def organization_members(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
         permission=BusinessPermissionCode.ACCOUNTS_CREATE,
     )
+    actor_membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
     memberships = get_organization_members(
         user=request.user,
         organization=request.organization,
@@ -171,6 +202,9 @@ def organization_members(request: HttpRequest) -> HttpResponse:
             "memberships": memberships,
             "can_manage_members": can_change_roles or can_change_statuses,
             "can_create_accounts": can_create_accounts,
+            "can_manage_role_catalog": membership_has_role(
+                actor_membership, MembershipRole.TENANT_ADMIN
+            ),
         },
     )
 
@@ -226,11 +260,13 @@ def organization_account_create(request: HttpRequest) -> HttpResponse:
     create_form = OrganizationAccountCreateForm(
         request.POST if action == "create" else None,
         allow_owner_role=allow_owner_role,
+        organization=request.organization,
         prefix="create",
     )
     connection_form = ExistingAccountConnectionForm(
         request.POST if action == "connect" else None,
         allow_owner_role=allow_owner_role,
+        organization=request.organization,
         prefix="connect",
     )
     if action == "create" and create_form.is_valid():
@@ -391,15 +427,11 @@ def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
     except OrganizationMembership.DoesNotExist as exc:
         raise PermissionDenied("عضویت موردنظر در این شرکت یافت نشد.") from exc
 
-    actor_membership = None
-    if not request.user.is_superuser:
-        actor_membership = get_active_membership(
-            user=request.user,
-            organization=request.organization,
-        )
-    allow_owner_role = request.user.is_superuser or bool(
-        actor_membership and actor_membership.role_definition.is_owner
+    actor_membership = get_active_membership(
+        user=request.user,
+        organization=request.organization,
     )
+    allow_owner_role = membership_is_tenant_owner(actor_membership)
     if (
         membership.role_definition_id is not None
         and membership.role_definition.is_owner
@@ -436,8 +468,10 @@ def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
             instance=membership,
             allow_owner_role=allow_owner_role,
         )
-    if not can_change_role:
-        form.fields["role_definition"].disabled = True
+    form.fields["role_definition"].disabled = True
+    form.fields[
+        "role_definition"
+    ].help_text = "نقش سازگار فقط نمایش داده می‌شود؛ نقش‌های مستقل از مسیر نقش‌ها و دامنه‌ها مدیریت می‌شوند."
     if not can_change_status:
         form.fields["status"].disabled = True
     return render(
@@ -453,6 +487,341 @@ def update_member(request: HttpRequest, membership_id: str) -> HttpResponse:
             ),
         },
     )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.MEMBERSHIP_VIEW)
+def member_authorization(request: HttpRequest, membership_id: str) -> HttpResponse:
+    """Manage independent roles and object scopes without compatibility writes."""
+
+    if not (
+        has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.AUTHORIZATION_ROLES_VIEW,
+        )
+        or has_business_permission(
+            user=request.user,
+            organization=request.organization,
+            permission=BusinessPermissionCode.AUTHORIZATION_GRANTS_VIEW,
+        )
+    ):
+        return HttpResponseForbidden("اجازه مشاهده کنترل‌های مجوزدهی را ندارید.")
+    membership = (
+        OrganizationMembership.objects.select_related("user")
+        .filter(
+            pk=membership_id,
+            organization=request.organization,
+        )
+        .first()
+    )
+    if membership is None:
+        raise PermissionDenied("عضویت موردنظر در این شرکت یافت نشد.")
+    actor_membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    form_kwargs = {
+        "organization": request.organization,
+        "actor_membership": actor_membership,
+        "target_membership": membership,
+    }
+    role_form = MembershipRoleAssignmentForm(prefix="role", **form_kwargs)
+    scope_form = MembershipScopeGrantForm(prefix="scope", **form_kwargs)
+    if request.method == "POST":
+        action = request.POST.get("action", "")
+        try:
+            if action == "assign_role":
+                role_form = MembershipRoleAssignmentForm(
+                    request.POST, prefix="role", **form_kwargs
+                )
+                if role_form.is_valid():
+                    assign_membership_role(
+                        organization=request.organization,
+                        actor=request.user,
+                        membership_id=membership.pk,
+                        role=role_form.cleaned_data["role"],
+                        approver_membership_id=role_form.cleaned_data[
+                            "approver_membership"
+                        ].pk,
+                        reason=role_form.cleaned_data["reason"],
+                        ends_at=role_form.cleaned_data["ends_at"],
+                    )
+                    messages.success(request, "نقش مستقل ثبت شد.")
+                    return redirect(
+                        "organizations:member_authorization",
+                        membership_id=membership.pk,
+                    )
+            elif action == "grant_scope":
+                scope_form = MembershipScopeGrantForm(
+                    request.POST, prefix="scope", **form_kwargs
+                )
+                if scope_form.is_valid():
+                    grant_membership_scope(
+                        organization=request.organization,
+                        actor=request.user,
+                        membership_id=membership.pk,
+                        scope_type=scope_form.cleaned_data["scope_type"],
+                        project=scope_form.cleaned_data["project"],
+                        site=scope_form.cleaned_data["site"],
+                        approver_membership_id=scope_form.cleaned_data[
+                            "approver_membership"
+                        ].pk,
+                        reason=scope_form.cleaned_data["reason"],
+                        ends_at=scope_form.cleaned_data["ends_at"],
+                    )
+                    messages.success(request, "دامنه دسترسی ثبت شد.")
+                    return redirect(
+                        "organizations:member_authorization",
+                        membership_id=membership.pk,
+                    )
+            elif action == "revoke_role":
+                revoke_membership_role(
+                    organization=request.organization,
+                    actor=request.user,
+                    assignment_id=request.POST.get("assignment_id"),
+                    approver_membership_id=request.POST.get("approver_membership_id"),
+                    reason=request.POST.get("reason", ""),
+                )
+                messages.success(request, "نقش لغو شد.")
+                return redirect(
+                    "organizations:member_authorization", membership_id=membership.pk
+                )
+            elif action == "revoke_scope":
+                revoke_membership_scope(
+                    organization=request.organization,
+                    actor=request.user,
+                    grant_id=request.POST.get("grant_id"),
+                    approver_membership_id=request.POST.get("approver_membership_id"),
+                    reason=request.POST.get("reason", ""),
+                )
+                messages.success(request, "دامنه دسترسی لغو شد.")
+                return redirect(
+                    "organizations:member_authorization", membership_id=membership.pk
+                )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            if action in {"assign_role", "revoke_role"}:
+                role_form.add_error(None, str(exc))
+            else:
+                scope_form.add_error(None, str(exc))
+    return render(
+        request,
+        "organizations/member_authorization.html",
+        {
+            "membership": membership,
+            "role_form": role_form,
+            "scope_form": scope_form,
+            "role_assignments": MembershipRoleAssignment.objects.filter(
+                organization=request.organization,
+                membership=membership,
+            ).select_related("role", "assigned_by__user", "approved_by__user"),
+            "scope_grants": MembershipScopeGrant.objects.filter(
+                organization=request.organization,
+                membership=membership,
+            ).select_related(
+                "project", "site", "granted_by__user", "approved_by__user"
+            ),
+            "approvers": OrganizationMembership.objects.filter(
+                organization=request.organization,
+                status="active",
+                user__is_active=True,
+            )
+            .exclude(pk__in=(actor_membership.pk, membership.pk))
+            .select_related("user"),
+        },
+    )
+
+
+def _role_catalog_response(
+    request: HttpRequest, *, platform_mode: bool
+) -> HttpResponse:
+    """Render and mutate the role catalogue through audited services only."""
+
+    if platform_mode:
+        if not is_platform_admin(request.user):
+            return HttpResponseForbidden("فقط Platform Admin به این بخش دسترسی دارد.")
+        catalog_organization = None
+        organization_id = request.GET.get("organization") or request.POST.get(
+            "catalog_organization"
+        )
+        if organization_id:
+            catalog_organization = Organization.objects.filter(
+                pk=organization_id, status="active", archived_at__isnull=True
+            ).first()
+            if catalog_organization is None:
+                return HttpResponseForbidden("Tenant معتبر نیست.")
+        roles = OrganizationRole.objects.filter(organization=catalog_organization)
+    else:
+        catalog_organization = request.organization
+        actor_membership = get_active_membership(
+            user=request.user, organization=catalog_organization
+        )
+        if not membership_has_role(actor_membership, MembershipRole.TENANT_ADMIN):
+            return HttpResponseForbidden(
+                "فقط Tenant Admin می‌تواند نقش‌های این Tenant را مدیریت کند."
+            )
+        roles = OrganizationRole.objects.filter(organization=catalog_organization)
+
+    selected_role = None
+    selected_role_id = request.GET.get("edit") or request.POST.get("role_id")
+    if selected_role_id:
+        selected_role = roles.filter(pk=selected_role_id).first()
+        if selected_role is None:
+            return HttpResponseForbidden("نقش در دامنه مجاز شما نیست.")
+
+    form = OrganizationRoleCatalogForm(
+        request.POST or None,
+        platform_mode=platform_mode,
+        organization=catalog_organization,
+        role=selected_role,
+    )
+    if request.method == "POST":
+        action = request.POST.get("action", "save")
+        try:
+            if action == "archive":
+                if selected_role is None:
+                    raise ValidationError("نقش برای بایگانی انتخاب نشده است.")
+                archive_organization_role(
+                    actor=request.user,
+                    role_id=selected_role.pk,
+                    reason=request.POST.get("reason", ""),
+                )
+                messages.success(request, "نقش سفارشی بایگانی شد.")
+            elif form.is_valid():
+                data = form.cleaned_data
+                if selected_role is None:
+                    create_organization_role(
+                        actor=request.user,
+                        organization=data.get("organization")
+                        if platform_mode
+                        else catalog_organization,
+                        code=data["code"],
+                        name=data["name"],
+                        description=data["description"],
+                        permissions=[item.code for item in data["permissions"]],
+                        reason=data["reason"],
+                    )
+                    messages.success(request, "نقش سفارشی ایجاد شد.")
+                else:
+                    update_organization_role(
+                        actor=request.user,
+                        role_id=selected_role.pk,
+                        name=data["name"],
+                        description=data["description"],
+                        permissions=[item.code for item in data["permissions"]],
+                        reason=data["reason"],
+                    )
+                    messages.success(request, "نقش به‌روزرسانی شد.")
+            else:
+                return render(
+                    request,
+                    "organizations/role_catalog.html",
+                    _role_catalog_context(
+                        form, roles, selected_role, platform_mode, catalog_organization
+                    ),
+                )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect(
+                "organizations:platform_role_catalog"
+                if platform_mode
+                else "organizations:role_catalog"
+            )
+
+    return render(
+        request,
+        "organizations/role_catalog.html",
+        _role_catalog_context(
+            form, roles, selected_role, platform_mode, catalog_organization
+        ),
+    )
+
+
+def _role_catalog_context(
+    form: OrganizationRoleCatalogForm,
+    roles: object,
+    selected_role: OrganizationRole | None,
+    platform_mode: bool,
+    catalog_organization: Organization | None,
+) -> dict[str, object]:
+    return {
+        "form": form,
+        "roles": roles.prefetch_related("permissions").order_by("name"),
+        "selected_role": selected_role,
+        "platform_mode": platform_mode,
+        "catalog_organization": catalog_organization,
+        "organizations": Organization.objects.filter(
+            status="active", archived_at__isnull=True
+        ).order_by("name")
+        if platform_mode
+        else None,
+    }
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def platform_role_catalog(request: HttpRequest) -> HttpResponse:
+    return _role_catalog_response(request, platform_mode=True)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
+    """Manage immutable protected-operation versions under Platform Admin control."""
+
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("فقط Platform Admin به این بخش دسترسی دارد.")
+    form = ProtectedOperationCatalogForm(request.POST or None)
+    if request.method == "POST":
+        action = request.POST.get("action", "create")
+        try:
+            if action == "retire":
+                retire_protected_operation(
+                    actor=request.user,
+                    code=request.POST.get("code", ""),
+                    reason=request.POST.get("reason", ""),
+                )
+                messages.success(request, "نسخه فعال عملیات حفاظت‌شده بازنشسته شد.")
+            elif form.is_valid():
+                create_protected_operation_version(
+                    actor=request.user,
+                    code=form.cleaned_data["code"],
+                    name=form.cleaned_data["name"],
+                    description=form.cleaned_data["description"],
+                    reason=form.cleaned_data["reason"],
+                )
+                messages.success(request, "نسخه جدید عملیات حفاظت‌شده ثبت شد.")
+            else:
+                return render(
+                    request,
+                    "organizations/protected_operation_catalog.html",
+                    {
+                        "form": form,
+                        "operations": ProtectedOperation.objects.select_related(
+                            "created_by", "retired_by"
+                        ),
+                    },
+                )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect("organizations:protected_operation_catalog")
+    return render(
+        request,
+        "organizations/protected_operation_catalog.html",
+        {
+            "form": form,
+            "operations": ProtectedOperation.objects.select_related(
+                "created_by", "retired_by"
+            ),
+        },
+    )
+
+
+@active_organization_required
+@require_http_methods(["GET", "POST"])
+def role_catalog(request: HttpRequest) -> HttpResponse:
+    return _role_catalog_response(request, platform_mode=False)
 
 
 @active_organization_required

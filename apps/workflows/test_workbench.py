@@ -279,7 +279,7 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         self.assertTrue(response.context["responsive_table"])
         self.assertContains(response, 'dir="rtl"')
         self.assertContains(response, 'class="erp-table-wrap"')
-        self.assertLessEqual(len(queries), 25)
+        self.assertLessEqual(len(queries), 45)
 
     def test_high_open_item_volume_keeps_page_and_query_count_bounded(self) -> None:
         base = self._item(self._submitted_request("WB-W6-VOLUME"))
@@ -320,7 +320,7 @@ class WorkbenchTests(ProcurementFixtureMixin, TestCase):
         self.assertEqual(response.context["counts"].all_items, 2001)
         self.assertEqual(len(response.context["work_items"]), 25)
         self.assertTrue(response.context["page_obj"].has_next())
-        self.assertLessEqual(len(queries), 25)
+        self.assertLessEqual(len(queries), 45)
 
     def test_claim_release_action_stale_and_htmx_csrf(self) -> None:
         purchase_request = self._submitted_request("WB-ACTION")

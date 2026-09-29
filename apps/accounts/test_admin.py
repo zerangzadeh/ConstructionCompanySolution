@@ -144,17 +144,17 @@ class UserDetailAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "اطلاعات پایه")
-        self.assertContains(response, "عضویت‌ها و نقش‌های شرکتی")
+        self.assertContains(response, "مرز عضویت‌های شرکتی")
         self.assertContains(response, "مجوزها و دسترسی‌ها")
         self.assertContains(response, "تاریخچهٔ فعالیت")
         self.assertContains(response, "سارا احمدی")
-        self.assertContains(response, "شرکت سازه شمال")
-        self.assertContains(response, "Operations Manager")
-        self.assertContains(response, "تعیین نقش یا وضعیت")
-        self.assertContains(response, "پروژه ایجاد شد")
+        self.assertNotContains(response, "شرکت سازه شمال")
+        self.assertNotContains(response, "Operations Manager")
+        self.assertNotContains(response, "تعیین نقش یا وضعیت")
+        self.assertNotContains(response, "پروژه ایجاد شد")
         self.assertContains(
             response,
-            "برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.",
+            "این صفحه هیچ دسترسی عملیاتی Tenant ایجاد نمی‌کند.",
         )
         self.assertContains(response, "دسترسی به پنل مدیریت سامانه")
         self.assertContains(response, "دسترسی کامل فنی سامانه")
@@ -203,10 +203,10 @@ class UserDetailAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "نام کامل ثبت نشده است")
-        self.assertContains(response, "عضویت شرکتی وجود ندارد")
+        self.assertContains(response, "اطلاعات عضویت در این مسیر قابل مشاهده نیست")
         self.assertContains(
             response,
-            "برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.",
+            "این صفحه هیچ دسترسی عملیاتی Tenant ایجاد نمی‌کند.",
         )
         self.assertContains(response, "فعالیت مهمی ثبت نشده است")
 
@@ -225,7 +225,7 @@ class UserDetailAdminTests(TestCase):
         self.user.refresh_from_db()
         self.assertTrue(self.user.check_password("new-secure-password-2026"))
 
-    def test_superuser_creates_active_user_with_selected_company_role(self) -> None:
+    def test_superuser_cannot_create_tenant_user_from_global_admin(self) -> None:
         self.client.force_login(self.admin)
 
         response = self.client.post(
@@ -246,19 +246,10 @@ class UserDetailAdminTests(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 302)
-        user = User.objects.get(username="new-company-user")
-        membership = OrganizationMembership.objects.get(
-            organization=self.organization,
-            user=user,
-        )
-        self.assertEqual(user.national_id, "1234567891")
-        self.assertTrue(user.is_active)
-        self.assertEqual(membership.status, MembershipStatus.ACTIVE)
-        self.assertEqual(membership.role, MembershipRole.COMPANY_MANAGER)
-        self.assertEqual(membership.assigned_by, self.admin)
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(User.objects.filter(username="new-company-user").exists())
 
-    def test_superuser_can_assign_role_to_existing_user_membership(self) -> None:
+    def test_superuser_cannot_assign_tenant_role_from_global_admin(self) -> None:
         pending_user = User.objects.create_user(
             username="pending-role-user",
             password="user-password",
@@ -286,12 +277,12 @@ class UserDetailAdminTests(TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 403)
         membership.refresh_from_db()
         pending_user.refresh_from_db()
-        self.assertEqual(membership.role, MembershipRole.OPERATIONS_MANAGER)
-        self.assertEqual(membership.status, MembershipStatus.ACTIVE)
-        self.assertTrue(pending_user.is_active)
+        self.assertEqual(membership.role, "")
+        self.assertEqual(membership.status, MembershipStatus.PENDING_ROLE)
+        self.assertFalse(pending_user.is_active)
 
     def test_superuser_change_records_status_audit_event(self) -> None:
         self.client.force_login(self.admin)
@@ -401,15 +392,17 @@ class UserDetailAdminTenantIsolationTests(TestCase):
         set_active_organization(self.client.session, self.organization)
         self.client.session.save()
 
-    def test_tenant_admin_sees_only_membership_for_active_organization(self) -> None:
+    def test_tenant_admin_sees_no_tenant_membership_or_audit_in_global_admin(
+        self,
+    ) -> None:
         response = self.client.get(
             reverse("admin:accounts_user_change", args=[self.visible_user.pk])
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "سازمان قابل مشاهده")
+        self.assertNotContains(response, "سازمان قابل مشاهده")
         self.assertNotContains(response, "سازمان محرمانه")
-        self.assertContains(response, "پروژه ایجاد شد")
+        self.assertNotContains(response, "پروژه ایجاد شد")
         self.assertNotContains(response, "پرداخت ثبت شد")
 
     def test_tenant_admin_cannot_view_user_from_another_organization(self) -> None:

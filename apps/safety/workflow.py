@@ -108,11 +108,6 @@ def _routes(step_key: str, permission: str) -> list[dict[str, Any]]:
             "resolver_type": "business_permission",
             "configuration": {"permission": permission},
         },
-        {
-            "resolver_type": "organization_owner",
-            "configuration": {},
-            "is_fallback": True,
-        },
     ]
 
 
@@ -194,7 +189,7 @@ def _sync_active_work_item_deadline(
     due_at = datetime.combine(
         incident.due_date,
         time.max,
-        tzinfo=ZoneInfo(incident.organization.timezone),
+        tzinfo=ZoneInfo(incident.organization.settings.timezone),
     )
     WorkItem.objects.filter(
         organization=incident.organization,
@@ -213,6 +208,7 @@ def load_safety_subject(
         message="اجازه مشاهده حادثه ایمنی را ندارید.",
     )
     queryset = SafetyIncident.objects.select_related(
+        "organization__settings",
         "project",
         "site",
         "responsible_user",
@@ -662,7 +658,9 @@ class BackfillReport:
 def backfill_open_safety_incidents(
     *, organization: Organization | None = None
 ) -> BackfillReport:
-    queryset = SafetyIncident.objects.exclude(status=SafetyIncidentStatus.CLOSED)
+    queryset = SafetyIncident.objects.exclude(
+        status=SafetyIncidentStatus.CLOSED
+    ).select_related("organization__settings")
     if organization is not None:
         queryset = queryset.filter(organization=organization)
     scanned = created = existing = skipped = 0

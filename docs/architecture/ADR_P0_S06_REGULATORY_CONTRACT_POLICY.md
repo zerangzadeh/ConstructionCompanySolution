@@ -1,6 +1,7 @@
 # ADR P0-S06: Regulatory rules, contract terms and tenant billing settings
 
-**Date:** 2026-09-25. **Status: PROPOSED — NOT ACCEPTED; NO IMPLEMENTATION AUTHORIZATION.**
+**Date:** 2026-09-25. **Status: ACCEPTED AS TARGET ARCHITECTURE ON 2026-09-28;
+P1-S14 GOVERNANCE CLOSED 2026-09-29; RULE VALUES/ACTIVATION STILL GATED.**
 
 Scope: P0.1/PPC-01/PPC-06, following the
 [S05 handoff](../ROADMAP_EXECUTION_PLAYBOOK.md#compact-p0-s06-handoff).
@@ -8,8 +9,10 @@ Scope: P0.1/PPC-01/PPC-06, following the
 owns the correction; P6.3 and other consumers retain their separate gates.
 Target ownership follows the [Data Model](DATA_MODEL.md#4-master-data-catalogue)
 and [effective-history rules](DATA_MODEL.md#8-effective-dating-and-snapshots).
-S04/S05 remain proposed; this ADR supplies their applied-version lineage without
-choosing currency, recognition, tax, insurance or filing policy.
+S04/S05 are accepted as target architecture. This ADR supplies their
+applied-version lineage; section 7 incorporates the later Product Owner currency,
+calendar, valuation and filing-scope decisions without choosing a statutory rate,
+recognition rule, tax/insurance value or activated filing behavior.
 
 ## 1. Current evidence and correction boundary
 
@@ -73,7 +76,7 @@ contract, not those rules. All unverified rules remain **«نیازمند برر
 
 Regulatory versions record rule family, jurisdiction/applicability, effective
 interval, source publication/reference and retained evidence, publication/recording
-times, reviewer/decision, units/currency and calculator/schema version. Distinguish
+times, optional review evidence, units/currency and calculator/schema version. Distinguish
 the time a rule applies from the time the system learned/approved it. Proposed
 interval convention is `[valid_from, valid_to)`; actual dates and date-selection
 rules require review. Contract versions retain signed/amendment evidence, scope,
@@ -147,8 +150,9 @@ Stable tenant/aggregate/action/request identities make retries idempotent; chang
 payload with the same key conflicts. A rule upgrade never reposts the same source
 event: downstream financial correction follows S04 reversal/replacement contracts.
 
-Preparation, professional review, publication/activation, contract amendment and
-claim revision require separately defined permissions and maker/checker policy.
+Preparation, publication/activation, contract amendment and claim revision require
+separately defined permissions and maker/checker policy. Optional professional
+evidence is metadata, not a mandatory actor or approval step.
 Future implementation must register codes, catalog/default grants and service/view
 checks with negative tests. Existing `COMPANY_SETTINGS_CHANGE` is current evidence,
 not authorization for every future role. Use existing workflow services. Recorded
@@ -160,8 +164,8 @@ and protected-source read/export checks remain mandatory.
 
 ## 5. Containment and correction sequence
 
-1. Accept the ownership ADR, resolve Q01/Q02, complete Q04 accountable review and professional review,
-   effective-date, basis/order and cap semantics before affected implementation.
+1. Accept the ownership ADR, resolve Q01/Q02 and define effective-date,
+   basis/order and cap semantics before affected behavior is activated.
 2. In approved P1.2 work, expand settings/contract/rule version support and the
    resolved-package contract. Inventory policy readers/writers, forms/Django Admin,
    migrations, fixtures and financial consumers before switching authority.
@@ -196,14 +200,19 @@ These are hypothetical software-contract examples, not legal rates or runtime te
 | A cumulative cap is explicitly approved at 100, consumed 80; two claims each request 15 | Serialized consumption/reservation allows only 20 more in total; the second result is limited or rejected under the approved policy. No automatic cap reset on term revision. |
 | Later retroactive correction or tenant-default change | Retain original package; produce an impact list and explicit revision/adjustment path. Same request retries do not create duplicate versions, cap consumption or journals. |
 
-Q01 remains open for currency/fiscal/calendar and precision decisions. Q02 requires
-named accounting/legal reviewers, authoritative sources and filing/export scope;
-no external legal research or professional validation occurred here. Policy-specific
-date selection, insurance classification, rule precedence/order, cap meaning and
-retroactive correction treatment remain decisions before affected design acceptance.
+Section 7 records the Product Owner's Q01 currency/calendar/valuation/precision
+boundary and Q02 export/source-hierarchy decisions. The final 2026-09-29 decision
+makes professional evidence optional policy-version metadata and removes a named
+reviewer or professional acceptance as a global development gate. No external
+legal research or professional validation occurred here; actual source versions
+and regulated values remain absent, so affected activation stays unset and fails
+closed. Policy-specific date selection, insurance classification, rule
+precedence/order, cap meaning and retroactive correction treatment remain
+decisions before affected design acceptance.
 Q04 selections are recorded but its named review/evidence gate remains, and the
 full [S03 input register](../ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates)
-retains D01/D03-D05/Q03. No ADR/package acceptance is implied.
+retains D01/D03-D05/Q03. This ADR is accepted as target architecture by section 7;
+no package implementation or release acceptance is implied.
 
 Required future tests: complete field semantics; version/date boundaries and gaps/
 overlaps; saved snapshot stability under policy/master changes; corrected basis/
@@ -218,3 +227,27 @@ tenant formulas. Explicit versions require migration/review effort but retain
 explainable history. Reuse Decimal, Django/PostgreSQL transactions/constraints and
 existing settings/workflow/audit mechanisms; own applicability/calculation rules.
 No package, new app, external service or generic rule-engine dependency is approved.
+
+## 7. P1-S14 Product Owner disposition and incorporated Q01/Q02 baseline
+
+**D14-03 Option A accepts this ADR as target architecture.** Effective-dated
+regulatory rules, versioned contract commercial terms and Tenant configuration
+remain separate owners; finalized history retains applied-version lineage and
+snapshots. No mutable `BillingPolicy` value becomes certified law or contract
+merely through this acceptance.
+
+The initial filing boundary is preparation, validation and controlled export for
+human filing or external-system submission across taxpayer invoices, VAT/tax,
+payroll tax, employee insurance, contractor insurance/clearance and statutory
+books/reports. Autonomous filing is out of scope. Official identifiable sources by
+version/publication/effective date are primary authority; versioned professional
+interpretation may supplement but never silently replace them. Vendor docs, blogs
+and informal material are not authority.
+
+Actual official sources/applicable versions remain required where an affected
+regulated policy explicitly declares provenance mandatory or makes a source-backed
+claim. Professional evidence is optional and
+creates no application role or global development gate. Unknown precision or
+rounding facts remain unset/inactive and **«نیازمند بررسی قانونی/حسابداری»**. This
+acceptance authorizes no statutory rate, precedence result, rule activation,
+filing, implementation or migration.

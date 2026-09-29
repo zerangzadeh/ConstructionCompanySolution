@@ -12,7 +12,12 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.organizations.models import (
+    MembershipRole,
+    MembershipStatus,
+    Organization,
+    OrganizationSettings,
+)
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.projects.models import Project
 from apps.safety.models import (
@@ -85,7 +90,9 @@ class SafetyWorkflowTests(SafetyTestBase):
         )
         active_item = instance.work_items.get(status=WorkItemStatus.OPEN)
         self.assertEqual(
-            active_item.due_at.astimezone(ZoneInfo(self.organization.timezone)).date(),
+            active_item.due_at.astimezone(
+                ZoneInfo(self.organization.settings.timezone)
+            ).date(),
             incident.due_date,
         )
         self.client.force_login(self.owner)
@@ -358,7 +365,9 @@ class SafetyWorkflowTests(SafetyTestBase):
         active_item = instance.work_items.get()
         self.assertEqual(active_item.action_key, "start_action")
         self.assertEqual(
-            active_item.due_at.astimezone(ZoneInfo(self.organization.timezone)).date(),
+            active_item.due_at.astimezone(
+                ZoneInfo(self.organization.settings.timezone)
+            ).date(),
             open_incident.due_date,
         )
         self.assertFalse(WorkflowInstance.objects.filter(subject_id=closed.pk).exists())
@@ -484,6 +493,7 @@ class SafetyWorkflowConcurrencyTests(TransactionTestCase):
         organization = Organization.objects.create(
             name="Safety Race", slug="safety-race"
         )
+        OrganizationSettings.objects.create(organization=organization)
         organization.memberships.create(
             user=owner,
             role=MembershipRole.COMPANY_OWNER,

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}مدیریت نقش‌ها | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+  {% include "components/page_header.html" with page_eyebrow="مجوزدهی" page_title="مدیریت نقش‌ها" page_description="نقش‌های سیستمی هویت پایدار دارند و حذف یا بایگانی نمی‌شوند." only %}
+
+  {% if platform_mode %}
+    <form method="get" class="erp-surface mt-5 flex flex-wrap items-end gap-3 rounded-xl p-4">
+      <div class="min-w-64"><label class="mb-1 block text-xs font-bold text-slate-600" for="organization-filter">Tenant</label><select id="organization-filter" name="organization" class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5"><option value="">نقش‌های سراسری و سیستمی</option>{% for organization in organizations %}<option value="{{ organization.id }}"{% if catalog_organization.id == organization.id %} selected{% endif %}>{{ organization.name }}</option>{% endfor %}</select></div>
+      <button class="erp-btn erp-btn--secondary" type="submit">نمایش</button>
+    </form>
+  {% endif %}
+
+  <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(340px,0.7fr)]">
+    <section class="erp-surface overflow-hidden rounded-xl">
+      <div class="border-b border-slate-200 px-5 py-4"><h2 class="font-black text-slate-900">فهرست نقش‌ها</h2></div>
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[720px] text-right text-sm">
+          <thead class="bg-slate-50 text-xs text-slate-500"><tr><th class="px-4 py-3">عنوان</th><th class="px-4 py-3">کد</th><th class="px-4 py-3">دامنه</th><th class="px-4 py-3">وضعیت</th><th class="px-4 py-3">مجوزها</th><th class="px-4 py-3"></th></tr></thead>
+          <tbody class="divide-y divide-slate-100">{% for role in roles %}<tr><td class="px-4 py-3 font-bold">{{ role.name }}{% if role.is_system %}<span class="mr-2 rounded bg-slate-100 px-2 py-1 text-[10px] text-slate-600">سیستمی</span>{% endif %}</td><td class="px-4 py-3" dir="ltr">{{ role.code }}</td><td class="px-4 py-3">{{ role.organization.name|default:"سراسری" }}</td><td class="px-4 py-3">{% if role.is_active %}فعال{% else %}بایگانی‌شده{% endif %}</td><td class="px-4 py-3">{{ role.permissions.count }}</td><td class="px-4 py-3"><a class="text-blue-700 hover:underline" href="?{% if platform_mode and catalog_organization %}organization={{ catalog_organization.id }}&{% endif %}edit={{ role.id }}">ویرایش</a></td></tr>{% empty %}<tr><td colspan="6" class="p-10 text-center text-slate-500">نقشی در این دامنه ثبت نشده است.</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="erp-surface rounded-xl p-5">
+      <h2 class="font-black text-slate-900">{% if selected_role %}ویرایش نقش{% else %}ایجاد نقش سفارشی{% endif %}</h2>
+      <form method="post" class="mt-4 space-y-4">{% csrf_token %}{% if selected_role %}<input type="hidden" name="role_id" value="{{ selected_role.id }}">{% endif %}{% if catalog_organization %}<input type="hidden" name="catalog_organization" value="{{ catalog_organization.id }}">{% endif %}
+        {% if form.non_field_errors %}<div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+        {% for field in form %}<div><label class="mb-1 block text-xs font-bold text-slate-700" for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<p class="mt-1 text-xs text-slate-500">{{ field.help_text }}</p>{% endif %}{% for error in field.errors %}<p class="mt-1 text-xs text-red-700">{{ error }}</p>{% endfor %}</div>{% endfor %}
+        <div class="flex flex-wrap gap-2"><button class="erp-btn erp-btn--primary" type="submit" name="action" value="save">ذخیره ممیزی‌شده</button>{% if selected_role and not selected_role.is_system and selected_role.is_active %}<button class="erp-btn erp-btn--secondary" type="submit" name="action" value="archive">بایگانی نقش</button>{% endif %}</div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

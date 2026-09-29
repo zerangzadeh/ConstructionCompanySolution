@@ -5,13 +5,14 @@
 **Product stage:** pre-production; no real tenant, payroll, accounting, or contractual history is assumed
 
 **Authority:** code, migrations, and tests describe current implementation; this document describes findings and target direction
-**Implementation authorization:** none. Every target capability still requires an approved delivery slice.
+**Implementation authorization:** P1.1 project/site authorization is closed under
+its bounded authorization. Every other target capability still requires its own approved delivery slice.
 
 ## 1. Executive summary
 
 The repository is a substantial modular Django monolith, not an early CRUD prototype. It already contains tenant membership and permission enforcement, shared masters, project/WBS structures, versioned estimates and documents, controlled procurement/inventory/equipment operations, workforce structures, auditable domain lifecycles, a bounded tenant workflow runtime and workbench, and receivable progress claims. The code is materially ahead of several older documents.
 
-The product is not yet ready for a first operational deployment. Its largest risks are not missing screens; they are unresolved authoritative ownership and posting boundaries. A mutable organization-wide `BillingPolicy` currently mixes commercial contract terms with regulatory rates. `Project.estimated_budget` and `Project.actual_budget` coexist with more authoritative estimates and transactions. `Payment` combines receipt/disbursement cash events but is not a Treasury or general-ledger journal. Authorization is tenant-wide rather than project/site scoped. Production operations, secure object storage, MFA, dependency locking/auditing, backup restoration, observability, retention/export, and regulatory legal sign-off are incomplete.
+The product is not yet ready for a first operational deployment. Its largest risks are not missing screens; they are unresolved authoritative ownership and posting boundaries. A mutable organization-wide `BillingPolicy` currently mixes commercial contract terms with regulatory rates. `Project.estimated_budget` and `Project.actual_budget` coexist with more authoritative estimates and transactions. `Payment` combines receipt/disbursement cash events but is not a Treasury or general-ledger journal. P1.1 now enforces membership-scoped multi-role authorization and explicit project/site scope on migrated paths. Production operations, secure object storage, MFA, dependency locking/auditing, backup restoration, observability, retention/export, and regulatory legal sign-off are incomplete.
 
 The recommended product shape remains a Persian-first construction ERP for Iranian contractors. The differentiator should be traceable integration from field evidence and commercial documents into project cost, claims, Treasury, and Accounting—not an indiscriminate collection of generic ERP modules. Strategic business rules, construction costing, claim calculations, reconciliation, and bounded workflow remain owned code. Commodity security protocols, object storage adapters, job execution, vulnerability scanning, PDF handling, and observability should be evaluated as mature dependencies rather than reimplemented.
 
@@ -19,7 +20,7 @@ The recommended product shape remains a Persian-first construction ERP for Irani
 
 | Class | Conclusion |
 | --- | --- |
-| **MUST FIX BEFORE FIRST PRODUCTION RELEASE** | Separate effective-dated regulatory configuration from contract commercial terms; decide and implement the Accounting/Treasury posting boundary; establish one budget/actual source of truth and project-cost coding; add project/site object scope; prove secure storage, backup/restore, migration, monitoring, MFA, dependency integrity, retention/export, and support access; obtain legal/accounting review of Iranian rules. |
+| **MUST FIX BEFORE FIRST PRODUCTION RELEASE** | Separate effective-dated regulatory configuration from contract commercial terms; decide and implement the Accounting/Treasury posting boundary; establish one budget/actual source of truth and project-cost coding; add project/site object scope; prove secure storage, backup/restore, migration, monitoring, MFA, dependency integrity, retention/export, and support access; record authoritative sources for every activated Iranian rule and retain optional professional evidence where obtained. |
 | **SHOULD FIX BEFORE FIRST PRODUCTION RELEASE** | Normalize duplicated organization locale/currency ownership; canonicalize role semantics and separation of duties; improve party/bank/regulatory identifiers; connect daily labor/equipment observations to masters while retaining snapshots; redesign extensible document linking; add audit correlation/diffs and UOM conversion governance. |
 | **SAFE TO DEFER** | Cross-tenant network/catalogue, marketplace, predictive AI, broad offline sync, public APIs, microservices, event sourcing, and general-purpose BPMN. |
 
@@ -42,7 +43,7 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 | Domain | Classification | Repository evidence and boundary |
 | --- | --- | --- |
 | Identity and tenant core | **PARTIALLY IMPLEMENTED** | Custom `User`, `Organization`, settings, memberships, invitations/connection requests, active-tenant session resolution, lifecycle checks, permission catalogue, and audit exist. MFA, SSO, subscription/entitlements, quota enforcement, tenant export/offboarding, and mature invitation governance do not. |
-| Authorization | **PARTIALLY IMPLEMENTED** | Deny-by-default tenant permission checks exist and are well tested. There is no first-class project/site access scope. Each current Membership references one role definition, while the authoritative target requires independent many-to-many Membership role assignments, different role sets per Tenant and auditable assignment/revocation. Current role codes also do not map cleanly to the independent target Tenant Owner, Tenant Admin / Local Admin, Tenant Manager, Accountant, Supervisor and Viewer vocabulary; the distinct target Platform Admin role is not implemented, and current Superuser compatibility paths must not be treated as that role. |
+| Authorization | **CLOSED P1.1 / PARTIAL PRODUCT TARGET** | Deny-by-default membership-scoped multi-role permission checks, explicit project/site grants, effective assignment/revocation, Platform Admin separation, protected-operation and role-catalog lifecycles, Persian Platform/Tenant Admin management routes and scoped service/queryset/view enforcement are implemented and verified. Support/emergency access, export/storage, quota/lifecycle and configurable business Self-Approval remain outside P1.1. |
 | Parties and shared masters | **IMPLEMENTED / PARTIAL** | `BusinessParty`, roles/contacts, materials, categories, and UOM exist. Bank accounts, regulatory profiles, qualification facts, effective relationships, UOM conversions, merge/deduplication, and governance workflows are absent. |
 | Projects and controls | **PARTIALLY IMPLEMENTED** | Projects, sites, phases, WBS, activities, baselines, and progress exist. Formal schedule baselines, CBS/cost centers, risk/change controls, resource planning, earned-value controls, and integrated forecasting are absent. |
 | Workforce | **PARTIALLY IMPLEMENTED** | Employees, optional login link, departments, positions, teams, effective assignments, and project/site assignments exist. Skills, qualifications, labor rates, attendance, time capture, leave, payroll, and insurance lists do not. |
@@ -66,7 +67,7 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 
 The modular-monolith shape is appropriate. Domain services own transitions and workflows invoke registered commands rather than updating arbitrary states. The ORM and explicit foreign keys are appropriate; repository abstractions and microservices are not currently justified. Important inconsistencies are:
 
-1. `Organization` and `OrganizationSettings` duplicate timezone/currency. Compatibility dual-write is a temporary bridge, not a permanent source of truth.
+1. `OrganizationSettings` is now the application authority for organization-level configuration. P1-S14A removed runtime read-repair/dual-write and switched known timezone consumers. `Organization.timezone`/`currency` remain inert compatibility columns until a separately authorized contract stage; their physical duplication is retained migration debt, not a second source of truth.
 2. `BillingPolicy` combines claim numbering/precision/period controls with tax, insurance, retention, and advance recovery. Those concepts have different owners and effective dates.
 3. `Project.estimated_budget` and `Project.actual_budget` are editable summary facts competing with estimates and transaction-derived actuals.
 4. `Payment` is both incoming and outgoing cash. That is acceptable as a legacy cash transaction but not as the future Treasury aggregate and never as an accounting journal.
@@ -130,7 +131,7 @@ These capabilities were not consistently represented in the previous roadmap but
 
 | Master | Authoritative domain | Target governance |
 | --- | --- | --- |
-| Tenant identity/settings | Organizations | One settings authority; effective history where fiscal/localization facts affect history |
+| Tenant identity/settings | Organizations | `OrganizationSettings` is the accepted single configuration authority; `Organization` retains Tenant identity/core attributes; effective history is required where fiscal/localization facts affect history |
 | User identity | Accounts | Global identity; no business employment facts |
 | Membership/role/project scope | Organizations/Authorization | Independent Tenant-scoped Membership role assignments, effective-dated grants and audited assignment/revocation; positions never replace grants |
 | Employee/position/team | Workforce | Optional `User` link; effective assignment history |
@@ -389,13 +390,19 @@ not leak complexity into the default journey.
 | Operations | Runbooks, incident severity/escalation, support-access grants, status/communication plan, responsible on-call ownership |
 
 The [P0-S21 readiness and unresolved-risk review](P0_S21_READINESS_AND_UNRESOLVED_RISK_REVIEW.md)
-verifies the current gate state against these requirements. P0 is not ready for
-integrated acceptance: all Q04 accountable reviews and S04-S12 dispositions,
-P1.1 authorization, D03-D05/Q03 parameters, P0.2/P0.3 prerequisites and P0.4
-remediation evidence remain OPEN. The recorded single-reviewer concentration and
-external-independence risks remain release constraints rather than accepted risk
-closure. The [P0-S22 documentation closeout and conditional P1 handoff](P0_S22_DOCUMENTATION_CLOSEOUT_AND_P1_HANDOFF.md)
-preserves that state and does not authorize P1 entry.
+records the historical gate state against these requirements. P0-G01/G02 later
+completed the Q04 review and P1.1 design remediation, and the separately authorized
+P1.1 package is now **CLOSED** against the bounded
+[S07 implementation contract](ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md#6-p0-g02-remediation-and-complete-p11-implementation-contract).
+P0 is still not ready for integrated acceptance. P1-S14 governance later accepted
+S04-S06 as target architecture, recorded Q01/Q02 and closed the mandatory-reviewer/
+D14-11 global gate. P1-S15 now supplies the versioned policy/localization and
+source-provenance foundation. Actual source versions and values remain absent, so
+affected sensitive behavior stays inactive; S07-S12 dispositions, D03-D05/Q03
+parameters, P0.2/P0.3 prerequisites and P0.4 remediation evidence also remain open
+for their governed packages and release. The recorded
+single-reviewer concentration and external-independence risks remain release or
+sensitive-feature enablement constraints rather than accepted risk closure.
 
 ## 16. Dependency and library reuse assessment
 
@@ -462,11 +469,11 @@ Current corrective themes:
 | PPC-01 | **MUST** | Split `BillingPolicy` ownership and effective dates | Prevent wrong historical/legal calculations before first real claim. Contract commercial terms belong to versioned contract terms; regulatory rules to approved rule sets; formatting/numbering to tenant configuration. |
 | PPC-02 | **MUST** | Accounting/Treasury/AP/AR boundaries and posting kernel | Financial history becomes expensive to migrate immediately after go-live. Define before building more cash/claim/payroll integrations. |
 | PPC-03 | **MUST** | One budget/actual authority and CBS/cost-center model | Manual project totals will conflict with estimate/budget and transaction actuals. Correct before real budgets/cost history. |
-| PPC-04 | **MUST** | Project/site object-scope authorization | Tenant-wide permission is too broad for larger contractors and sensitive payroll/finance. Add before real multi-project tenants. |
+| PPC-04 | **CLOSED** | Project/site object-scope authorization | P1.1 delivered and verified membership-scoped multi-role authorization, explicit object scope, role-catalog governance and negative Tenant/project/site enforcement. |
 | PPC-05 | **MUST** | Production security/operations gates | Avoid deploying without MFA, storage, dependency, backup/restore, observability, retention/export, support controls. |
-| PPC-06 | **MUST** | Effective-dated regulatory registry and professional review | Annual/changing rules must not live in constants or mutable policy. Required before taxpayer/payroll/insurance features. |
-| PPC-07 | **SHOULD** | Consolidate organization settings authority | Avoid permanent dual-write ambiguity before integrations consume locale/currency/fiscal settings. |
-| PPC-08 | **SHOULD** | Canonical role vocabulary, membership-scoped multi-role assignments and separation-of-duties policy | Preserve independent Superuser, Platform Admin, Tenant Owner, Tenant Admin / Local Admin and Tenant Manager boundaries; support different role sets per Tenant without composite roles; audit assignment/revocation; clarify Accountant/Supervisor duties and migrate grants explicitly. |
+| PPC-06 | **FOUNDATION CLOSED / VALUES GATED** | Effective-dated regulatory/policy registry and source provenance | P1-S15 provides Platform-owned structures/versions, external-source metadata, Tenant selection/application, RBAC, audit and fail-closed resolution. A policy explicitly declares whether provenance is mandatory; ordinary Tenant configuration is not source-gated. No statutory value is populated or activated, and optional professional evidence is metadata rather than a global gate. |
+| PPC-07 | **CLOSED / CONTRACT DEFERRED** | Consolidate organization settings authority | P1-S14 established `OrganizationSettings` authority, fail-closed IRR migration, consumer switch, no dual-write/read-repair and before/after audit evidence. Legacy columns remain until a separately authorized contract stage; effective-dated/shared policy is separately owned without duplicating direct Tenant settings. |
+| PPC-08 | **CLOSED FOR P1.1** | Canonical role vocabulary, membership-scoped multi-role assignments and separation-of-duties policy | P1.1 preserves independent Superuser, Platform Admin and Tenant role boundaries, supports global and Tenant custom roles, archives without history loss and audits assignments and permission changes. Future domain-specific separation rules remain owned by their consuming packages. |
 | PPC-09 | **SHOULD** | Master-backed daily labor/equipment links | Unlock payroll/equipment costing while preserving snapshot text for history. |
 | PPC-10 | **SHOULD** | Extensible explicit DMS link ownership | Avoid continually widening one nullable-FK table; decide before many new domains adopt DMS. |
 | PPC-11 | **SHOULD** | Party regulatory/bank/qualification profiles and UOM conversions | Required for tax, Treasury, sourcing, claims, and reliable quantity conversion. |

@@ -7,6 +7,10 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q, QuerySet
 from django.utils import timezone
 
+from apps.organizations.authorization import (
+    membership_has_permission,
+    membership_has_role,
+)
 from apps.organizations.models import MembershipStatus, OrganizationMembership
 from apps.workforce.models import (
     Employee,
@@ -16,7 +20,17 @@ from apps.workforce.models import (
     WorkTeam,
 )
 
-from .models import WorkflowDelegation, WorkflowInstance, WorkflowRoutingRule
+from .models import (
+    WorkflowDelegation,
+    WorkflowInstance,
+    WorkflowRoutingRule,
+    WorkflowStepDefinition,
+)
+from .scope import (
+    delegation_scope_is_bounded,
+    membership_has_workflow_scope,
+    workflow_scope_objects,
+)
 
 
 @dataclass(slots=True)
@@ -34,12 +48,19 @@ class RoutingResult:
 
 
 def _active_memberships(instance: WorkflowInstance) -> QuerySet[OrganizationMembership]:
-    return OrganizationMembership.objects.filter(
-        organization_id=instance.organization_id,
-        status=MembershipStatus.ACTIVE,
-        role_definition__is_active=True,
-        user__is_active=True,
-    ).select_related("user", "role_definition")
+    return (
+        OrganizationMembership.objects.filter(
+            organization_id=instance.organization_id,
+            status=MembershipStatus.ACTIVE,
+            user__is_active=True,
+        )
+        .select_related("user", "role_definition")
+        .prefetch_related(
+            "role_assignments__role__permissions",
+            "role_definition__permissions",
+            "scope_grants",
+        )
+    )
 
 
 def _memberships_by_user(
@@ -70,18 +91,15 @@ def _resolve_rule(
         "fallback": str(rule.is_fallback).lower(),
     }
     if rule.resolver_type == "organization_owner":
-        return [
-            ResolvedCandidate(item, [basis])
-            for item in memberships.filter(role_definition__is_owner=True)
-        ]
+        # H1 forbids privileged-role fallback. Owner routing must be replaced by
+        # an explicit permission/scope route and is retained only as history.
+        return []
     if rule.resolver_type == "business_permission":
         permission = configuration["permission"]
         candidates = [
             ResolvedCandidate(item, [basis])
-            for item in memberships.filter(
-                role_definition__permissions__code=permission,
-                role_definition__permissions__is_active=True,
-            ).distinct()
+            for item in memberships
+            if membership_has_permission(item, permission)
         ]
         if configuration.get("exclude_submitter_unless_no_other"):
             submitter_id = instance.subject_context.get("submitter_membership_id")
@@ -144,12 +162,11 @@ def _resolve_rule(
             instance=instance, employees=[item.employee for item in assignments]
         )
         permission = configuration["permission"]
-        permitted_ids = set(
-            memberships.filter(
-                role_definition__permissions__code=permission,
-                role_definition__permissions__is_active=True,
-            ).values_list("pk", flat=True)
-        )
+        permitted_ids = {
+            item.pk
+            for item in memberships
+            if membership_has_permission(item, permission)
+        }
         resolved: list[ResolvedCandidate] = []
         for assignment in assignments:
             membership = memberships_by_user.get(assignment.employee.user_id)
@@ -181,9 +198,8 @@ def _resolve_rule(
     if rule.resolver_type == "organization_role":
         return [
             ResolvedCandidate(item, [basis])
-            for item in memberships.filter(
-                role_definition__code=configuration["role_code"]
-            )
+            for item in memberships
+            if membership_has_role(item, configuration["role_code"])
         ]
     if rule.resolver_type == "position":
         today = timezone.localdate()
@@ -313,7 +329,7 @@ def _apply_delegations(
             Q(workflow_type__isnull=True)
             | Q(workflow_type=instance.definition.workflow_type)
         )
-        .filter(Q(permission__isnull=True) | Q(permission__code=permission))
+        .filter(permission__code=permission)
         .select_related("delegate__user", "delegate__role_definition")
         .order_by("pk")
     )
@@ -324,8 +340,16 @@ def _apply_delegations(
     )
     additions: list[ResolvedCandidate] = []
     for delegation in delegations:
-        if delegation.delegate_id not in active_ids or not _scope_matches(
-            delegation.scope, instance.subject_context
+        if (
+            delegation.delegate_id not in active_ids
+            or not _scope_matches(delegation.scope, instance.subject_context)
+            or not delegation_scope_is_bounded(
+                scope=delegation.scope, instance=instance
+            )
+            or not membership_has_permission(delegation.delegate, permission)
+            or not membership_has_workflow_scope(
+                membership=delegation.delegate, instance=instance
+            )
         ):
             continue
         source = candidates[str(delegation.delegator_id)]
@@ -347,6 +371,63 @@ def _apply_delegations(
     _merge_candidates(candidates, additions)
 
 
+def _candidate_is_eligible(
+    *,
+    instance: WorkflowInstance,
+    step: WorkflowStepDefinition,
+    candidate: ResolvedCandidate,
+    required_permission: str,
+    resolved_scope: tuple[Any | None, Any | None],
+) -> bool:
+    membership = candidate.membership
+    if required_permission and not membership_has_permission(
+        membership, required_permission
+    ):
+        return False
+    if not membership_has_workflow_scope(
+        membership=membership,
+        instance=instance,
+        resolved_scope=resolved_scope,
+    ):
+        return False
+    checks = (
+        ("exclude_creator", "creator_membership_id"),
+        ("exclude_starter", "starter_membership_id"),
+    )
+    submitter_id = instance.subject_context.get("submitter_membership_id")
+    if step.configuration.get("exclude_submitter") and str(submitter_id) == str(
+        membership.pk
+    ):
+        return False
+    return not any(
+        step.configuration.get(flag)
+        and str(instance.subject_context.get(context_key)) == str(membership.pk)
+        for flag, context_key in checks
+    )
+
+
+def _eligible_candidates(
+    *,
+    instance: WorkflowInstance,
+    step: WorkflowStepDefinition,
+    candidates: list[ResolvedCandidate],
+    required_permission: str,
+    resolved_scope: tuple[Any | None, Any | None],
+) -> list[ResolvedCandidate]:
+    eligible = [
+        candidate
+        for candidate in candidates
+        if _candidate_is_eligible(
+            instance=instance,
+            step=step,
+            candidate=candidate,
+            required_permission=required_permission,
+            resolved_scope=resolved_scope,
+        )
+    ]
+    return eligible
+
+
 def resolve_step_candidates(
     *, instance: WorkflowInstance, step_id: object, required_permission: str
 ) -> RoutingResult:
@@ -360,16 +441,37 @@ def resolve_step_candidates(
     )
     primary = [item for item in rules if not item.is_fallback]
     fallbacks = [item for item in rules if item.is_fallback]
+    step = WorkflowStepDefinition.objects.get(
+        pk=step_id,
+        organization_id=instance.organization_id,
+        version_id=instance.version_id,
+    )
     resolved: dict[str, ResolvedCandidate] = {}
+    resolved_scope = workflow_scope_objects(instance)
     attempted: list[str] = []
     for rule in primary:
         attempted.append(str(rule.pk))
-        _merge_candidates(resolved, _resolve_rule(instance=instance, rule=rule))
+        _merge_candidates(
+            resolved,
+            _eligible_candidates(
+                instance=instance,
+                step=step,
+                candidates=_resolve_rule(instance=instance, rule=rule),
+                required_permission=required_permission,
+                resolved_scope=resolved_scope,
+            ),
+        )
     used_fallback = False
     if not resolved:
         for rule in fallbacks:
             attempted.append(str(rule.pk))
-            fallback_candidates = _resolve_rule(instance=instance, rule=rule)
+            fallback_candidates = _eligible_candidates(
+                instance=instance,
+                step=step,
+                candidates=_resolve_rule(instance=instance, rule=rule),
+                required_permission=required_permission,
+                resolved_scope=resolved_scope,
+            )
             if fallback_candidates:
                 _merge_candidates(resolved, fallback_candidates)
                 used_fallback = True
@@ -377,6 +479,17 @@ def resolve_step_candidates(
     _apply_delegations(
         instance=instance, candidates=resolved, permission=required_permission
     )
+    resolved = {
+        key: candidate
+        for key, candidate in resolved.items()
+        if _candidate_is_eligible(
+            instance=instance,
+            step=step,
+            candidate=candidate,
+            required_permission=required_permission,
+            resolved_scope=resolved_scope,
+        )
+    }
     return RoutingResult(
         candidates=tuple(resolved[key] for key in sorted(resolved)),
         used_fallback=used_fallback,

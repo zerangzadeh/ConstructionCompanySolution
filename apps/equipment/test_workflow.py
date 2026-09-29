@@ -31,7 +31,12 @@ from apps.equipment.workflow import (
     backfill_open_maintenance_workflows,
     maintenance_shadow_comparison,
 )
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.organizations.models import (
+    MembershipRole,
+    MembershipStatus,
+    Organization,
+    OrganizationSettings,
+)
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.workflows.models import (
     WorkflowInstance,
@@ -66,7 +71,9 @@ class MaintenanceWorkflowTests(EquipmentTestBase, TestCase):
         item = instance.work_items.get(status=WorkItemStatus.OPEN)
         self.assertEqual(item.action_key, "scheduled")
         self.assertEqual(
-            item.due_at.astimezone(ZoneInfo(self.organization.timezone)).date(),
+            item.due_at.astimezone(
+                ZoneInfo(self.organization.settings.timezone)
+            ).date(),
             record.scheduled_date,
         )
         self.client.force_login(self.owner)
@@ -249,6 +256,7 @@ class MaintenanceWorkflowConcurrencyTests(TransactionTestCase):
         owner = User.objects.create_user(username="w57-owner")
         manager = User.objects.create_user(username="w57-manager")
         organization = Organization.objects.create(name="W57", slug="w57")
+        OrganizationSettings.objects.create(organization=organization)
         for user, role in (
             (owner, MembershipRole.COMPANY_OWNER),
             (manager, MembershipRole.COMPANY_MANAGER),

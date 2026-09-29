@@ -1,11 +1,12 @@
 # ADR P0-S05: Budget, CBS, cost-center and project actual-cost authority
 
-**Date:** 2026-09-25. **Status: PROPOSED — NOT ACCEPTED; NOT IMPLEMENTATION AUTHORIZATION.**
+**Date:** 2026-09-25. **Status: ACCEPTED AS TARGET ARCHITECTURE ON 2026-09-28;
+NOT IMPLEMENTATION AUTHORIZATION; INDEPENDENT P4 GATES PRESERVED.**
 
 The Product Owner requested P0-S05 following the
 [S04 handoff](../ROADMAP_EXECUTION_PLAYBOOK.md#compact-p0-s05-handoff).
 This proposal addresses P0.1/PPC-03 and informs P4.1. It preserves the accepted
-native financial direction and the **proposed**, unaccepted
+native financial direction and the accepted target
 [S04 financial-source contracts](ADR_P0_S04_ACCOUNTING_POSTING.md).
 No cost producer, schema, permission, workflow or UI is implemented here.
 
@@ -134,7 +135,7 @@ assertion or certification of comprehensive actuals.
 | Paid cash | Treasury outflow, with AP/AR/source links when allocated. Advances, asset purchases and settlement are not automatically current project cost. Unallocated cash remains explicit. |
 | ETC / EAC | Approved remaining-work forecast and total forecast. For a matching scope/currency/cutoff, EAC = actual cost + ETC. ETC includes remaining committed work once plus uncommitted forecast work; do not add open commitments again to EAC. |
 | Variance | Label budget-to-actual remaining capacity separately from forecast variance. Here remaining capacity = current budget - actual; favorable forecast variance = current budget - EAC. This is not earned-value cost variance, which belongs to P4.2. |
-| WIP | Separate professionally reviewed Accounting/project-control policy and reconciliation. Neither budget minus expense nor cash surplus establishes WIP, revenue recognition or profit. No WIP formula is approved here. |
+| WIP | Separate versioned Accounting/project-control policy, source provenance and reconciliation. Neither budget minus expense nor cash surplus establishes WIP, revenue recognition or profit. No WIP formula is approved here; optional professional evidence may attach to a future policy version. |
 
 Forecast versions retain the source cutoff, selected budget, assumptions, preparer,
 review evidence and risk/exception explanations. Submitted/accepted forecasts are
@@ -266,14 +267,15 @@ No actuals produced yet means missing coverage, not a demonstrated zero balance.
 | Input / accountable role | Latest gate and retained boundary |
 | --- | --- |
 | Budget policy / Product Owner and Project Controls reviewer, to be named | Before accepting detailed P4.1 design: initial baseline/change authority, eligible source revisions, one-budget scope, starter CBS, cost-center applicability, allocation bases, contingency/overhead treatment and overrun controls. These are proposals, not new accepted defaults. |
-| Q01 / Product Owner with accounting reviewer | Currency/fiscal/calendar and valuation choices retain their original P1.2/P2/P8.1 gates; budget conversion/rounding and inventory/project-cost bridges must align before affected P4.1 implementation. |
-| Q02 / Product Owner to name accounting/legal reviewers | Original statutory/payroll gates remain; review recognition/accrual replacement, capitalization/WIP, forecast basis and source-to-GL reconciliation before accepting affected financial design. No legal formula or current BillingPolicy rate is certified. |
+| Q01 / Product Owner and Platform policy owner | Section 9 records IRR initial base/storage/display, no FX behavior, UTC/ISO persistence with Jalali UI, explicit fiscal calendar, versioned precision categories and no current financial inventory valuation. Actual precision/rounding values and later P4/P8 valuation decisions require authorized effective configuration; source evidence is mandatory only where the policy or claimed basis requires it. |
+| Q02 / Product Owner and Platform policy owner | Section 9 records the export-only boundary and official-source hierarchy. Actual source versions remain required where recognition/accrual replacement, capitalization/WIP, forecast basis or source-to-GL assertions declare provenance dependence. Optional professional evidence is not a global development gate. No legal formula or current BillingPolicy rate is certified. |
 | Q04 / Product Owner and security/workflow owner | A-H selections are recorded; named security/workflow/accounting/domain and applicable legal review remains before affected acceptance. Budget services must prohibit Self-Approval for Protected Operations and apply auditable platform/tenant policy plus tenant compliance responsibility to configurable business approvals. |
 | Migration / Product Owner, reviewer and operator | Approve pilot/coverage, cutoff, historical evidence mapping, exceptions and rollback acceptance before switching authority or rollout. No sample project/producer is selected by the walkthroughs. |
 
 The full [S03 open-input register](../ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates)
 remains open at its original gates, including D01 workload/pilot details, D03-D05
-and Q03 retention/storage requirements. S04 also remains proposed. This ADR does
+and Q03 retention/storage requirements. S04 is accepted as target architecture;
+its implementation and affected policy/source gates remain. This ADR does
 not freeze release scope, complete PPC-03/P0.1 or authorize implementation.
 
 Alternatives declined in this proposal: retain editable Project totals as final
@@ -296,3 +298,24 @@ supersession and source reversal; currency/UOM precision; financial tie-out and
 partial-coverage labels; legacy cutover/rollback and representative volume.
 Existing Project/Estimate/Billing/report behavior remains a regression obligation
 until replaced by an approved product change. These are planned tests, not results.
+
+## 9. P1-S14 Product Owner disposition and incorporated Q01/Q02 baseline
+
+**D14-02 Option A accepts this ADR as target architecture.** Immutable accepted
+budget baselines, CBS/cost-center classification and separate commitment, accrual,
+actual, paid and forecast facts retain the ownership and lineage described above.
+All detailed P4 budget policy, pilot, migration, implementation and acceptance
+gates remain independent and open.
+
+The incorporated P1-S14 baseline is: initial Tenant base currency/storage/display
+IRR with future multi-currency readiness but no FX behavior; UTC/ISO-compatible
+storage with Jalali UI and explicit fiscal calendar; versioned platform-governed
+precision categories with final accounting values unset until configured through
+an applicable versioned policy;
+and no authoritative financial inventory valuation in P1-S14/current Inventory.
+Official versioned sources remain required where an S05 policy declares provenance
+mandatory or its semantics make a source-backed accounting/legal assertion.
+Optional professional evidence may supplement an exact
+policy/source version but is not a global development gate. This acceptance
+authorizes no financial implementation, valuation method, statutory rate, Chart of
+Accounts or P4 work.

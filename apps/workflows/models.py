@@ -52,6 +52,7 @@ class WorkflowStepInstanceStatus(models.TextChoices):
 class WorkItemStatus(models.TextChoices):
     OPEN = "open", "باز"
     CLAIMED = "claimed", "اخذشده"
+    UNRESOLVED = "unresolved", "حل‌نشده"
     COMPLETED = "completed", "تکمیل‌شده"
     CANCELLED = "cancelled", "لغوشده"
 
@@ -61,6 +62,7 @@ class WorkItemAssignmentAction(models.TextChoices):
     CLAIM = "claim", "اخذ"
     RELEASE = "release", "آزادسازی"
     REASSIGN = "reassign", "تخصیص مجدد"
+    RECOVER = "recover", "بازیابی"
     COMPLETE = "complete", "تکمیل"
     CANCEL = "cancel", "لغو"
 
@@ -773,6 +775,8 @@ class WorkItem(UUIDModel, TimeStampedModel):
     due_at = models.DateTimeField(null=True, blank=True)
     priority = models.PositiveSmallIntegerField(default=0)
     routing_basis = models.JSONField(default=list, blank=True)
+    unresolved_at = models.DateTimeField(null=True, blank=True)
+    unresolved_reason = models.TextField(blank=True)
     claimed_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
@@ -807,7 +811,12 @@ class WorkItem(UUIDModel, TimeStampedModel):
     @property
     def is_overdue(self) -> bool:
         return bool(
-            self.status in (WorkItemStatus.OPEN, WorkItemStatus.CLAIMED)
+            self.status
+            in (
+                WorkItemStatus.OPEN,
+                WorkItemStatus.CLAIMED,
+                WorkItemStatus.UNRESOLVED,
+            )
             and self.due_at
             and self.due_at < timezone.now()
         )

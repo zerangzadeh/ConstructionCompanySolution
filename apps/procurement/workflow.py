@@ -81,11 +81,6 @@ COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
                         )
                     },
                 },
-                {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
-                    "is_fallback": True,
-                },
             ],
         },
         {
@@ -460,11 +455,11 @@ def _authorize_owned_request_action(
         user=actor,
         organization=organization,
         permission=permission,
+        project=purchase_request.project,
         message="اجازه انجام این عملیات درخواست خرید را ندارید.",
     ) or get_active_membership(user=actor, organization=organization)
     if (
-        not actor.is_superuser
-        and not membership_has_permission(
+        not membership_has_permission(
             membership, BusinessPermissionCode.PURCHASE_REQUESTS_APPROVE
         )
         and purchase_request.created_by_id != actor.pk

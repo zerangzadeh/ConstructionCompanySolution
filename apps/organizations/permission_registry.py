@@ -25,6 +25,43 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("apps.organizations.services", "apps.organizations.views"),
     ),
     PermissionResource(
+        "authorization_roles",
+        "نقش‌های دسترسی",
+        ("organizations.MembershipRoleAssignment",),
+        (
+            P.AUTHORIZATION_ROLES_VIEW,
+            P.AUTHORIZATION_ROLES_ASSIGN,
+            P.AUTHORIZATION_ROLES_REVOKE,
+        ),
+        (
+            "apps.organizations.authorization",
+            "apps.organizations.access_services",
+            "apps.organizations.views",
+        ),
+    ),
+    PermissionResource(
+        "authorization_grants",
+        "دامنه‌های دسترسی",
+        ("organizations.MembershipScopeGrant",),
+        (
+            P.AUTHORIZATION_GRANTS_VIEW,
+            P.AUTHORIZATION_GRANTS_CREATE,
+            P.AUTHORIZATION_GRANTS_REVOKE,
+        ),
+        (
+            "apps.organizations.authorization",
+            "apps.organizations.access_services",
+            "apps.organizations.views",
+        ),
+    ),
+    PermissionResource(
+        "authorization_unresolved",
+        "کارهای حل‌نشده مجوزدهی",
+        ("organizations.AuthorizationMigrationIssue",),
+        (P.AUTHORIZATION_UNRESOLVED_RECOVER,),
+        ("apps.workflows.runtime",),
+    ),
+    PermissionResource(
         "accounts",
         "حساب‌های کاربری شرکت",
         ("organizations.OrganizationAccountConnectionRequest",),
@@ -45,6 +82,17 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "apps.organizations.views",
             "apps.billing.services",
         ),
+    ),
+    PermissionResource(
+        "tenant_policies",
+        "سیاست‌های Tenant",
+        ("organizations.TenantPolicySelection",),
+        (
+            P.TENANT_POLICIES_VIEW,
+            P.TENANT_POLICIES_APPROVE,
+            P.TENANT_POLICIES_APPLY,
+        ),
+        ("apps.organizations.policy_services",),
     ),
     PermissionResource(
         "parties",
@@ -578,6 +626,13 @@ GLOBAL_PERMISSION_MODEL_EXCLUSIONS = frozenset(
     {
         "organizations.BusinessPermission",
         "organizations.OrganizationRole",
+        "organizations.PlatformRoleAssignment",
+        "organizations.ProtectedOperation",
+        "organizations.AuthorizationPolicyVersion",
+        "organizations.PolicySource",
+        "organizations.PlatformPolicy",
+        "organizations.PlatformPolicyVersion",
+        "organizations.PolicyReviewEvidence",
         "workflows.WorkflowType",
         "workflows.WorkflowTemplate",
     }

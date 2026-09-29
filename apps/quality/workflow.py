@@ -123,11 +123,6 @@ def _routes(step_key: str, permission: str) -> list[dict[str, Any]]:
             "resolver_type": "business_permission",
             "configuration": {"permission": permission},
         },
-        {
-            "resolver_type": "organization_owner",
-            "configuration": {},
-            "is_fallback": True,
-        },
     ]
 
 
@@ -209,7 +204,7 @@ def _sync_active_work_item_deadline(
     due_at = datetime.combine(
         issue.due_date,
         time.max,
-        tzinfo=ZoneInfo(issue.organization.timezone),
+        tzinfo=ZoneInfo(issue.organization.settings.timezone),
     )
     WorkItem.objects.filter(
         organization=issue.organization,
@@ -228,6 +223,7 @@ def load_quality_subject(
         message="اجازه مشاهده مسئله کیفیت را ندارید.",
     )
     queryset = QualityIssue.objects.select_related(
+        "organization__settings",
         "project",
         "site",
         "responsible_user",
@@ -684,7 +680,9 @@ class BackfillReport:
 def backfill_open_quality_issues(
     *, organization: Organization | None = None
 ) -> BackfillReport:
-    queryset = QualityIssue.objects.exclude(status=QualityIssueStatus.CLOSED)
+    queryset = QualityIssue.objects.exclude(
+        status=QualityIssueStatus.CLOSED
+    ).select_related("organization__settings")
     if organization is not None:
         queryset = queryset.filter(organization=organization)
     scanned = created = existing = skipped = 0

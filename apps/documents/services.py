@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.db.models import Max, QuerySet
+from django.db.models import Max, Q, QuerySet
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -22,10 +22,13 @@ from apps.documents.models import (
 from apps.estimates.models import Estimate
 from apps.expenses.models import Expense
 from apps.organizations.authorization import (
-    has_business_permission,
+    effective_scope_grants,
+    get_active_membership,
+    membership_has_permission,
     require_business_permission,
 )
 from apps.organizations.models import (
+    AuthorizationScopeType,
     BusinessPermissionCode,
     Organization,
     OrganizationStatus,
@@ -90,6 +93,7 @@ def _validate_access(
         user=user,
         organization=organization,
         permission=permission,
+        allow_any_scope=True,
         message="اجازه انجام این عملیات روی اسناد را ندارید.",
     )
 
@@ -108,12 +112,15 @@ def _validate_target_access(
     if getattr(target, "organization_id", None) != organization.pk:
         raise PermissionDenied("موجودیت مرتبط متعلق به این سازمان نیست.")
     project = target if field_name == "project" else getattr(target, "project", None)
+    site = getattr(target, "site", None)
     if project is not None and project.deleted_at is not None:
         raise PermissionDenied("پروژه مرتبط بایگانی شده است.")
     require_business_permission(
         user=actor,
         organization=organization,
         permission=TARGET_VIEW_PERMISSIONS[field_name],
+        project=project,
+        site=site,
         message="اجازه مشاهده موجودیت مرتبط با سند را ندارید.",
     )
     return field_name
@@ -368,13 +375,36 @@ def get_organization_documents(
         current_version__isnull=False,
         links__isnull=False,
     )
+    membership = get_active_membership(user=user, organization=organization)
     for field_name, permission in TARGET_VIEW_PERMISSIONS.items():
-        if not has_business_permission(
-            user=user,
-            organization=organization,
-            permission=permission,
-        ):
+        if not membership_has_permission(membership, permission):
             documents = documents.exclude(**{f"links__{field_name}__isnull": False})
+    grants = effective_scope_grants(membership)
+    if not grants.filter(scope_type=AuthorizationScopeType.ORGANIZATION).exists():
+        project_ids = list(
+            grants.filter(scope_type=AuthorizationScopeType.PROJECT).values_list(
+                "project_id", flat=True
+            )
+        )
+        site_grants = grants.filter(scope_type=AuthorizationScopeType.SITE)
+        site_ids = list(site_grants.values_list("site_id", flat=True))
+        for field_name in ("project", "contract", "estimate", "expense", "payment"):
+            project_lookup = (
+                f"links__{field_name}_id"
+                if field_name == "project"
+                else f"links__{field_name}__project_id"
+            )
+            documents = documents.exclude(
+                Q(**{f"links__{field_name}__isnull": False})
+                & ~Q(**{f"{project_lookup}__in": project_ids})
+            )
+        documents = documents.exclude(
+            Q(links__daily_report__isnull=False)
+            & ~(
+                Q(links__daily_report__project_id__in=project_ids)
+                | Q(links__daily_report__site_id__in=site_ids)
+            )
+        )
     return _with_document_context(documents.distinct()).order_by("-created_at")
 
 

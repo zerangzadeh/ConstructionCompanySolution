@@ -723,7 +723,6 @@ registry.register_routing_resolver(
                 "exclude_submitter_unless_no_other": ConfigField(bool),
             }
         ),
-        requires_fallback=True,
     )
 )
 registry.register_routing_resolver(

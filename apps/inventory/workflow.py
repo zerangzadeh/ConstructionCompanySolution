@@ -229,11 +229,6 @@ def _configuration(action: WorkflowAction) -> dict[str, Any]:
                         "resolver_type": "business_permission",
                         "configuration": {"permission": action.permission},
                     },
-                    {
-                        "resolver_type": "organization_owner",
-                        "configuration": {},
-                        "is_fallback": True,
-                    },
                 ],
             },
             {

@@ -36,6 +36,7 @@ def record_audit_event(
     organization: Organization | None = None,
     actor: User | None = None,
     metadata: dict[str, Any] | None = None,
+    allow_platform_actor: bool = False,
 ) -> AuditEvent:
     """Persist an audit event without exposing sensitive token values."""
 
@@ -43,14 +44,18 @@ def record_audit_event(
         raise ValueError("عملیات ممیزی معتبر نیست.")
     normalized_metadata = metadata or {}
     _validate_audit_metadata(normalized_metadata)
+    platform_actor_allowed = False
+    if allow_platform_actor and actor is not None:
+        from apps.organizations.authorization import is_platform_admin
+
+        platform_actor_allowed = is_platform_admin(actor)
     if (
         organization is not None
         and actor is not None
-        and not actor.is_superuser
+        and not platform_actor_allowed
         and not organization.memberships.filter(
             user=actor,
             status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
         ).exists()
     ):
         raise PermissionDenied("عامل رویداد ممیزی متعلق به این سازمان نیست.")

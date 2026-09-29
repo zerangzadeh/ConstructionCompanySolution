@@ -82,11 +82,6 @@ COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
                     "resolver_type": "business_permission",
                     "configuration": {"permission": TRANSITION_PERMISSION},
                 },
-                {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
-                    "is_fallback": True,
-                },
             ],
         },
         {
@@ -98,11 +93,6 @@ COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
                 {
                     "resolver_type": "business_permission",
                     "configuration": {"permission": TRANSITION_PERMISSION},
-                },
-                {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
-                    "is_fallback": True,
                 },
             ],
         },
@@ -185,7 +175,7 @@ def _due_at(record: MaintenanceRecord) -> datetime:
     return datetime.combine(
         record.scheduled_date,
         time.max,
-        tzinfo=ZoneInfo(record.organization.timezone),
+        tzinfo=ZoneInfo(record.organization.settings.timezone),
     )
 
 
@@ -208,7 +198,9 @@ def load_maintenance_subject(
         permission=BusinessPermissionCode.MAINTENANCE_RECORDS_VIEW,
         message="اجازه مشاهده سوابق سرویس یا تعمیر را ندارید.",
     )
-    queryset = MaintenanceRecord.objects.select_related("equipment", "project", "site")
+    queryset = MaintenanceRecord.objects.select_related(
+        "equipment", "project", "site", "organization__settings"
+    )
     if for_update:
         queryset = queryset.select_for_update(of=("self",))
     try:
@@ -653,7 +645,9 @@ def backfill_open_maintenance_workflows(
     if organization is not None:
         queryset = queryset.filter(organization=organization)
     scanned = created = existing = skipped = 0
-    for record in queryset.select_related("organization", "updated_by").iterator():
+    for record in queryset.select_related(
+        "organization__settings", "updated_by"
+    ).iterator():
         scanned += 1
         actor = _backfill_actor(record)
         if actor is None:

@@ -8,6 +8,13 @@ urlpatterns = [
     path("", views.select_organization, name="select"),
     path("create/", views.create_organization, name="create"),
     path("members/", views.organization_members, name="members"),
+    path("roles/", views.role_catalog, name="role_catalog"),
+    path("platform/roles/", views.platform_role_catalog, name="platform_role_catalog"),
+    path(
+        "platform/protected-operations/",
+        views.protected_operation_catalog,
+        name="protected_operation_catalog",
+    ),
     path(
         "members/<uuid:membership_id>/profile-image/",
         views.member_profile_image,
@@ -22,6 +29,11 @@ urlpatterns = [
         "members/<uuid:membership_id>/edit/",
         views.update_member,
         name="member_update",
+    ),
+    path(
+        "members/<uuid:membership_id>/authorization/",
+        views.member_authorization,
+        name="member_authorization",
     ),
     path(
         "members/<uuid:membership_id>/reset-password/",

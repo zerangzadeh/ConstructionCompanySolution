@@ -15,7 +15,11 @@ from apps.expenses.models import (
     ExpenseStatus,
     LegacyExpenseCategory,
 )
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     Organization,
@@ -29,11 +33,16 @@ def _has_expense_permission(
     user: User,
     organization: Organization,
     permission: BusinessPermissionCode,
+    *,
+    project: Project | None = None,
+    allow_any_scope: bool = False,
 ) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        project=project,
+        allow_any_scope=allow_any_scope,
     )
 
 
@@ -51,7 +60,7 @@ def _validate_context(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _has_expense_permission(actor, organization, permission):
+    if not _has_expense_permission(actor, organization, permission, project=project):
         raise PermissionDenied("اجازه مدیریت هزینه‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -165,14 +174,22 @@ def get_organization_expenses(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _has_expense_permission(
-        user, organization, BusinessPermissionCode.EXPENSES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.EXPENSES_VIEW,
+        allow_any_scope=True,
     ):
         raise PermissionDenied("اجازه مشاهده هزینه‌های این سازمان را ندارید.")
+    membership = get_active_membership(user=user, organization=organization)
     return (
-        Expense.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-            project__deleted_at__isnull=True,
+        scope_queryset(
+            Expense.objects.filter(
+                organization=organization,
+                deleted_at__isnull=True,
+                project__deleted_at__isnull=True,
+            ),
+            membership=membership,
+            project_lookup="project_id",
         )
         .select_related(
             "project",

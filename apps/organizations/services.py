@@ -11,7 +11,11 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    membership_is_tenant_owner,
+    membership_permission_codes,
+    require_business_permission,
+)
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
     BusinessPermissionCode,
@@ -45,7 +49,9 @@ ORGANIZATION_PROFILE_FIELDS = (
 )
 
 
-def _resolve_active_role(role: OrganizationRole | str) -> OrganizationRole:
+def _resolve_active_role(
+    role: OrganizationRole | str, *, organization: Organization | None = None
+) -> OrganizationRole:
     if isinstance(role, OrganizationRole):
         role_definition = role
     else:
@@ -55,6 +61,11 @@ def _resolve_active_role(role: OrganizationRole | str) -> OrganizationRole:
             raise ValueError("نقش انتخاب‌شده معتبر نیست.") from exc
     if not role_definition.is_active:
         raise ValueError("نقش انتخاب‌شده غیرفعال است.")
+    if organization is not None and role_definition.organization_id not in (
+        None,
+        organization.pk,
+    ):
+        raise PermissionDenied("نقش انتخاب‌شده متعلق به Tenant دیگری است.")
     return role_definition
 
 
@@ -67,17 +78,11 @@ def _validate_role_delegation(
 ) -> None:
     """Prevent membership managers from delegating privileges they do not hold."""
 
-    if actor.is_superuser or (
-        actor_membership is not None and actor_membership.role_definition.is_owner
-    ):
+    if actor_membership is not None and membership_is_tenant_owner(actor_membership):
         return
     if actor_membership is None:
         raise PermissionDenied("اجازه واگذاری این نقش را ندارید.")
-    actor_permissions = set(
-        actor_membership.role_definition.permissions.filter(is_active=True).values_list(
-            "code", flat=True
-        )
-    )
+    actor_permissions = set(membership_permission_codes(actor_membership))
     roles_to_compare = [assigned_role]
     if current_role is not None:
         roles_to_compare.append(current_role)
@@ -115,7 +120,7 @@ def create_organization_account(
         permission=BusinessPermissionCode.ACCOUNTS_CREATE,
         message="اجازه ایجاد حساب کاربری برای این شرکت را ندارید.",
     )
-    role_definition = _resolve_active_role(role)
+    role_definition = _resolve_active_role(role, organization=organization)
     _validate_role_delegation(
         actor=actor,
         actor_membership=actor_membership,
@@ -153,6 +158,16 @@ def create_organization_account(
         status=MembershipStatus.ACTIVE,
         joined_at=timezone.now(),
         assigned_by=actor,
+    )
+    from apps.organizations.access_services import quarantine_membership_authorization
+
+    quarantine_membership_authorization(
+        membership=membership,
+        issue_code="explicit_role_and_scope_required",
+        detail=(
+            "Account creation completed without activating Tenant access; "
+            "independent role assignment and explicit scope are required."
+        ),
     )
     record_audit_event(
         action=AuditAction.ORGANIZATION_ACCOUNT_CREATED,
@@ -224,7 +239,7 @@ def request_existing_account_connection(
         permission=BusinessPermissionCode.ACCOUNTS_CREATE,
         message="اجازه ثبت درخواست اتصال حساب را ندارید.",
     )
-    role_definition = _resolve_active_role(role)
+    role_definition = _resolve_active_role(role, organization=organization)
     _validate_role_delegation(
         actor=actor,
         actor_membership=actor_membership,
@@ -299,7 +314,7 @@ def respond_to_account_connection_request(
         raise ValueError("این حساب قبلاً به شرکت تخصیص داده شده است.")
     now = timezone.now()
     if accept:
-        OrganizationMembership.objects.create(
+        membership = OrganizationMembership.objects.create(
             organization=locked.organization,
             user=target_user,
             role=locked.role_definition.code,
@@ -307,6 +322,18 @@ def respond_to_account_connection_request(
             status=MembershipStatus.ACTIVE,
             joined_at=now,
             assigned_by=locked.requested_by,
+        )
+        from apps.organizations.access_services import (
+            quarantine_membership_authorization,
+        )
+
+        quarantine_membership_authorization(
+            membership=membership,
+            issue_code="explicit_role_and_scope_required",
+            detail=(
+                "Connected account remains quarantined until independent role "
+                "assignment and explicit scope are recorded."
+            ),
         )
         locked.status = AccountConnectionRequestStatus.ACCEPTED
         action = AuditAction.ACCOUNT_CONNECTION_ACCEPTED
@@ -338,36 +365,10 @@ def provision_user_for_organization(
 ) -> OrganizationMembership:
     """Assign a new account to a tenant without granting business access."""
 
-    if not actor.is_authenticated or not actor.is_active or not actor.is_superuser:
-        raise PermissionDenied("فقط ادمین سامانه می‌تواند کاربر را به شرکت تخصیص دهد.")
-    if not organization.is_active:
-        raise PermissionDenied("سازمان فعال نیست.")
-    if OrganizationMembership.objects.filter(
-        organization=organization,
-        user=user,
-    ).exists():
-        raise ValueError("این کاربر قبلاً به شرکت تخصیص داده شده است.")
-
-    membership = OrganizationMembership.objects.create(
-        organization=organization,
-        user=user,
-        role="",
-        role_definition=None,
-        status=MembershipStatus.PENDING_ROLE,
-        assigned_by=actor,
+    raise PermissionDenied(
+        "Superuser و Platform Admin دسترسی ضمنی به داده یا عضویت Tenant ندارند؛ "
+        "از فرایند کنترل‌شده Tenant استفاده کنید."
     )
-    record_audit_event(
-        action=AuditAction.MEMBERSHIP_PROVISIONED,
-        entity_type="organization_membership",
-        entity_id=membership.pk,
-        organization=organization,
-        actor=actor,
-        metadata={
-            "target_user_id": str(user.pk),
-            "target_username": user.username,
-        },
-    )
-    return membership
 
 
 @transaction.atomic
@@ -387,7 +388,7 @@ def update_organization_membership(
     if not locked_organization.is_active:
         raise PermissionDenied("سازمان فعال نیست.")
 
-    role_definition = _resolve_active_role(role)
+    role_definition = _resolve_active_role(role, organization=organization)
     if status not in MembershipStatus.values or status == MembershipStatus.PENDING_ROLE:
         raise ValueError("وضعیت عضویت معتبر نیست.")
 
@@ -398,6 +399,11 @@ def update_organization_membership(
     )
     if locked_membership.organization_id != locked_organization.pk:
         raise PermissionDenied("عضویت متعلق به این سازمان نیست.")
+    if locked_membership.role_definition_id != role_definition.pk:
+        raise PermissionDenied(
+            "تغییر نقش از مسیر سازگار قدیمی غیرفعال است؛ از تخصیص/لغو نقش "
+            "مستقل با تأیید دوگانه استفاده کنید."
+        )
     required_permissions = []
     if locked_membership.role_definition_id != role_definition.pk:
         required_permissions.append(BusinessPermissionCode.MEMBERSHIP_CHANGE_ROLE)
@@ -415,18 +421,14 @@ def update_organization_membership(
         )
         actor_membership = actor_membership or checked_membership
     actor_is_owner = bool(
-        actor_membership and actor_membership.role_definition.is_owner
+        actor_membership and membership_is_tenant_owner(actor_membership)
     )
-    if (
-        not actor.is_superuser
-        and not actor_is_owner
-        and (
-            (
-                locked_membership.role_definition_id is not None
-                and locked_membership.role_definition.is_owner
-            )
-            or role_definition.is_owner
+    if not actor_is_owner and (
+        (
+            locked_membership.role_definition_id is not None
+            and locked_membership.role_definition.is_owner
         )
+        or role_definition.is_owner
     ):
         raise PermissionDenied("فقط مالک می‌تواند نقش مالک را مدیریت کند.")
     _validate_role_delegation(
@@ -437,20 +439,19 @@ def update_organization_membership(
     )
 
     owner_access_removed = (
-        locked_membership.role_definition_id is not None
-        and locked_membership.role_definition.is_owner
+        membership_is_tenant_owner(locked_membership)
         and locked_membership.status == MembershipStatus.ACTIVE
-        and (not role_definition.is_owner or status != MembershipStatus.ACTIVE)
+        and status != MembershipStatus.ACTIVE
     )
-    if (
-        owner_access_removed
-        and not OrganizationMembership.objects.filter(
+    if owner_access_removed and not any(
+        membership_is_tenant_owner(item)
+        for item in OrganizationMembership.objects.filter(
             organization=locked_organization,
-            role_definition__is_owner=True,
             status=MembershipStatus.ACTIVE,
         )
         .exclude(pk=locked_membership.pk)
-        .exists()
+        .select_related("role_definition")
+        .prefetch_related("role_assignments__role")
     ):
         raise ValueError("سازمان باید حداقل یک مالک فعال داشته باشد.")
 
@@ -524,16 +525,25 @@ def update_organization_membership(
 
 
 def get_organization_settings(*, organization: Organization) -> OrganizationSettings:
-    """Return settings, safely restoring a missing compatibility row if needed."""
+    """Return the authoritative settings row without consulting legacy fields."""
 
-    settings_record, _ = OrganizationSettings.objects.get_or_create(
-        organization=organization,
-        defaults={
-            "timezone": organization.timezone,
-            "currency": organization.currency,
-        },
-    )
-    return settings_record
+    return OrganizationSettings.objects.get(organization=organization)
+
+
+def _organization_settings_snapshot(
+    settings_record: OrganizationSettings,
+) -> dict[str, str | int]:
+    return {
+        "timezone": settings_record.timezone,
+        "currency": settings_record.currency,
+        "fiscal_year_start_month": settings_record.fiscal_year_start_month,
+        "fiscal_year_start_day": settings_record.fiscal_year_start_day,
+        "language": settings_record.language,
+        "project_code_prefix": settings_record.project_code_prefix,
+        "contract_code_prefix": settings_record.contract_code_prefix,
+        "site_code_prefix": settings_record.site_code_prefix,
+        "document_code_prefix": settings_record.document_code_prefix,
+    }
 
 
 @transaction.atomic
@@ -567,7 +577,10 @@ def update_organization_settings(
         message="اجازه به‌روزرسانی تنظیمات این شرکت را ندارید.",
     )
 
-    settings_record = get_organization_settings(organization=locked_organization)
+    settings_record = OrganizationSettings.objects.select_for_update().get(
+        organization=locked_organization
+    )
+    before = _organization_settings_snapshot(settings_record)
     settings_record.timezone = timezone_name
     settings_record.currency = currency
     settings_record.fiscal_year_start_month = fiscal_year_start_month
@@ -606,19 +619,16 @@ def update_organization_settings(
         for field_name in ORGANIZATION_PROFILE_FIELDS:
             if field_name in profile_data:
                 setattr(locked_organization, field_name, profile_data[field_name])
-    locked_organization.timezone = settings_record.timezone
-    locked_organization.currency = settings_record.currency
     locked_organization.updated_by = updated_by
     locked_organization.full_clean()
     locked_organization.save(
         update_fields=[
             *ORGANIZATION_PROFILE_FIELDS,
-            "timezone",
-            "currency",
             "updated_by",
             "updated_at",
         ]
     )
+    after = _organization_settings_snapshot(settings_record)
     record_audit_event(
         action=AuditAction.ORGANIZATION_SETTINGS_UPDATED,
         entity_type="organization_settings",
@@ -626,15 +636,12 @@ def update_organization_settings(
         organization=locked_organization,
         actor=updated_by,
         metadata={
-            "timezone": settings_record.timezone,
-            "currency": settings_record.currency,
-            "fiscal_year_start_month": settings_record.fiscal_year_start_month,
-            "fiscal_year_start_day": settings_record.fiscal_year_start_day,
-            "language": settings_record.language,
-            "project_code_prefix": settings_record.project_code_prefix,
-            "contract_code_prefix": settings_record.contract_code_prefix,
-            "site_code_prefix": settings_record.site_code_prefix,
-            "document_code_prefix": settings_record.document_code_prefix,
+            "before": before,
+            "after": after,
+            "changed_fields": sorted(
+                key for key, value in after.items() if before.get(key) != value
+            ),
+            "authority": "organizations.OrganizationSettings",
         },
     )
     return settings_record
@@ -658,7 +665,7 @@ def create_organization_with_owner(
     address: str = "",
     postal_code: str = "",
     timezone_name: str = "UTC",
-    currency: str = "USD",
+    currency: str = "IRR",
     logo: object = None,
     language: str = "fa",
     fiscal_year_start_month: int = 1,
@@ -687,8 +694,6 @@ def create_organization_with_owner(
         city=city,
         address=address,
         postal_code=postal_code,
-        timezone=timezone_name,
-        currency=currency,
         created_by=owner,
         updated_by=owner,
     )
@@ -714,7 +719,7 @@ def create_organization_with_owner(
         is_active=True,
         is_owner=True,
     )
-    OrganizationMembership.objects.create(
+    owner_membership = OrganizationMembership.objects.create(
         organization=organization,
         user=owner,
         role=MembershipRole.COMPANY_OWNER,
@@ -722,6 +727,13 @@ def create_organization_with_owner(
         status=MembershipStatus.ACTIVE,
         joined_at=timezone.now(),
         assigned_by=None,
+    )
+    from apps.organizations.access_services import bootstrap_membership_authorization
+
+    bootstrap_membership_authorization(
+        membership=owner_membership,
+        actor=owner,
+        source="bootstrap",
     )
     record_audit_event(
         action=AuditAction.ORGANIZATION_CREATED,
@@ -769,7 +781,7 @@ def create_organization_by_system_admin(
     address: str = "",
     postal_code: str = "",
     timezone_name: str = "UTC",
-    currency: str = "USD",
+    currency: str = "IRR",
     logo: object = None,
     language: str = "fa",
     fiscal_year_start_month: int = 1,
@@ -779,15 +791,17 @@ def create_organization_by_system_admin(
     site_code_prefix: str = "SITE",
     document_code_prefix: str = "DOC",
 ) -> Organization:
-    """Create a tenant only when requested by the global system administrator."""
+    """Create a tenant only through the independently assigned platform-admin role."""
+
+    from apps.organizations.authorization import is_platform_admin
 
     if (
         not actor.is_authenticated
         or actor._state.adding
         or not actor.is_active
-        or not actor.is_superuser
+        or not is_platform_admin(actor)
     ):
-        raise PermissionDenied("فقط ادمین سامانه می‌تواند شرکت جدید ایجاد کند.")
+        raise PermissionDenied("فقط ادمین پلتفرم می‌تواند شرکت جدید ایجاد کند.")
 
     return create_organization_with_owner(
         owner=owner,

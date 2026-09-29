@@ -24,7 +24,9 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.organizations.authorization import (
     get_active_membership,
+    membership_permission_codes,
     require_business_permission,
+    scope_queryset,
 )
 from apps.organizations.models import (
     BusinessPermissionCode,
@@ -45,6 +47,7 @@ from .models import (
     WorkItemStatus,
 )
 from .registry import SubjectAdapterSpec, registry
+from .scope import scope_work_item_queryset
 
 ASSIGNMENT_STATES = {
     "assigned": "تخصیص‌یافته",
@@ -115,12 +118,7 @@ def _authorized_membership(
         message="اجازه مشاهده کارتابل این شرکت را ندارید.",
     )
     membership = get_active_membership(user=actor, organization=organization)
-    if actor.is_superuser:
-        return membership, frozenset(BusinessPermissionCode.values)
-    codes = membership.role_definition.permissions.filter(is_active=True).values_list(
-        "code", flat=True
-    )
-    return membership, frozenset(codes)
+    return membership, membership_permission_codes(membership)
 
 
 def _authorized_adapters(
@@ -174,6 +172,7 @@ def _base_queryset(
             ),
         )
     )
+    queryset = scope_work_item_queryset(queryset, membership=membership)
     if not include_terminal:
         queryset = queryset.filter(
             status__in=(WorkItemStatus.OPEN, WorkItemStatus.CLAIMED)
@@ -394,6 +393,7 @@ def _position_counts(
 def _filter_choices(
     *,
     organization: Organization,
+    actor: User,
     base: models.QuerySet[WorkItem],
     positions: tuple[dict[str, object], ...],
 ) -> dict[str, tuple[tuple[str, str], ...]]:
@@ -415,15 +415,22 @@ def _filter_choices(
     )
     projects = tuple(
         (str(item.pk), item.name)
-        for item in Project.objects.filter(
-            organization=organization, deleted_at__isnull=True
+        for item in scope_queryset(
+            queryset=Project.objects.filter(
+                organization=organization, deleted_at__isnull=True
+            ),
+            membership=get_active_membership(user=actor, organization=organization),
+            project_lookup="pk",
         ).order_by("name")
     )
     sites = tuple(
         (str(item.pk), item.name)
-        for item in ProjectSite.objects.filter(organization=organization).order_by(
-            "project__name", "name"
-        )
+        for item in scope_queryset(
+            queryset=ProjectSite.objects.filter(organization=organization),
+            membership=get_active_membership(user=actor, organization=organization),
+            project_lookup="project_id",
+            site_lookup="pk",
+        ).order_by("project__name", "name")
     )
     return {
         "workflow": workflows,
@@ -499,7 +506,10 @@ def build_workbench(
             positions=positions,
         ),
         filters=_filter_choices(
-            organization=organization, base=base, positions=positions
+            organization=organization,
+            actor=actor,
+            base=base,
+            positions=positions,
         ),
     )
 

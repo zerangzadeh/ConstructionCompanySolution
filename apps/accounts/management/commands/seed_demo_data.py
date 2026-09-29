@@ -435,12 +435,17 @@ class Command(BaseCommand):
             )
 
         before = {model: model.objects.count() for model in self.tracked_models}
+        # This development command is idempotent.  Keep each tenant isolated in
+        # its own transaction instead of holding one multi-tenant transaction
+        # open for the whole dataset; long checkpoints or an interrupted local
+        # session must not leave all four tenants in one oversized transaction.
         with transaction.atomic():
             self._ensure_system_catalog()
             admin = self._admin_user()
-            for organization_index, organization_name in enumerate(
-                ORGANIZATION_NAMES, start=1
-            ):
+        for organization_index, organization_name in enumerate(
+            ORGANIZATION_NAMES, start=1
+        ):
+            with transaction.atomic():
                 self._seed_organization(organization_index, organization_name, admin)
 
         self.stdout.write(self.style.SUCCESS("Persian demo dataset is ready."))
@@ -650,11 +655,6 @@ class Command(BaseCommand):
                                         "permission": "baselines.approve"
                                     },
                                 },
-                                {
-                                    "resolver_type": "organization_owner",
-                                    "configuration": {},
-                                    "is_fallback": True,
-                                },
                             ],
                         },
                         {
@@ -706,11 +706,6 @@ class Command(BaseCommand):
                                 {
                                     "resolver_type": "business_permission",
                                     "configuration": {"permission": "progress.verify"},
-                                },
-                                {
-                                    "resolver_type": "organization_owner",
-                                    "configuration": {},
-                                    "is_fallback": True,
                                 },
                             ],
                         },
@@ -774,7 +769,6 @@ class Command(BaseCommand):
                             "configuration": {
                                 "decision_policy": "any",
                                 "exclude_submitter": True,
-                                "allow_submitter_if_no_other_candidate": True,
                             },
                             "routing": [
                                 {
@@ -1003,8 +997,10 @@ class Command(BaseCommand):
                         "configuration": {"decision_policy": "any"},
                         "routing": [
                             {
-                                "resolver_type": "organization_owner",
-                                "configuration": {},
+                                "resolver_type": "business_permission",
+                                "configuration": {
+                                    "permission": "purchase_requests.reject"
+                                },
                             }
                         ],
                     },

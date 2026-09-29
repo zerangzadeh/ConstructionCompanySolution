@@ -9,6 +9,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator, RegexVa
 from django.db import models
 from django.db.models import Q
 from django.db.models.functions import Lower
+from django.utils import timezone
 
 from core.identifiers import (
     canonicalize_lower_identifier,
@@ -17,6 +18,7 @@ from core.identifiers import (
 from core.models import TimeStampedModel, UUIDModel
 
 MAX_ORGANIZATION_LOGO_SIZE = 2 * 1024 * 1024
+SUPPORTED_BASE_CURRENCY = "IRR"
 ORGANIZATION_LOGO_SIGNATURES = {
     ".jpg": (b"\xff\xd8\xff",),
     ".jpeg": (b"\xff\xd8\xff",),
@@ -83,6 +85,13 @@ def validate_timezone_name(value: str) -> None:
         raise ValidationError("منطقه زمانی معتبر نیست.") from exc
 
 
+def validate_supported_base_currency(value: str) -> None:
+    """Fail closed until a later accepted design enables another base currency."""
+
+    if canonicalize_upper_identifier(value) != SUPPORTED_BASE_CURRENCY:
+        raise ValidationError("در محدوده فعلی فقط واحد پول پایه IRR پشتیبانی می‌شود.")
+
+
 class OrganizationLanguage(models.TextChoices):
     PERSIAN = "fa", "فارسی"
     ENGLISH = "en", "English"
@@ -104,6 +113,13 @@ class MembershipRole(models.TextChoices):
     MEMBER = "member", "Member"
     VIEWER = "viewer", "Viewer"
 
+    TENANT_OWNER = "tenant_owner", "Tenant Owner"
+    TENANT_ADMIN = "tenant_admin", "Tenant Admin"
+    TENANT_MANAGER = "tenant_manager", "Tenant Manager"
+    PROJECT_MANAGER = "project_manager", "Project Manager"
+    ACCOUNTANT = "accountant", "Accountant"
+    SUPERVISOR = "supervisor", "Supervisor"
+
 
 class MembershipStatus(models.TextChoices):
     PENDING_ROLE = "pending_role", "در انتظار تعیین نقش"
@@ -112,9 +128,80 @@ class MembershipStatus(models.TextChoices):
     REVOKED = "revoked", "لغوشده"
 
 
+class AuthorizationScopeType(models.TextChoices):
+    ORGANIZATION = "organization", "کل سازمان"
+    PROJECT = "project", "پروژه"
+    SITE = "site", "کارگاه"
+
+
+class PlatformRoleCode(models.TextChoices):
+    PLATFORM_ADMIN = "platform_admin", "Platform Admin"
+
+
+class ProtectedOperationCode(models.TextChoices):
+    SELF_GRANT = "authorization.self_grant", "افزایش دسترسی خود"
+    OWN_PRIVILEGED_ROLE = (
+        "authorization.own_privileged_role",
+        "تخصیص یا تأیید نقش ممتاز خود",
+    )
+    OWN_SUPPORT_ACCESS = (
+        "authorization.own_support_access",
+        "دسترسی پشتیبانی یا اضطراری خود",
+    )
+    AUTHORIZATION_POLICY_WEAKEN = (
+        "authorization.policy_weaken",
+        "تضعیف سیاست امنیت یا مجوز",
+    )
+    AUDIT_CONTROL_WEAKEN = (
+        "authorization.audit_control_weaken",
+        "تضعیف کنترل ممیزی یا امنیت",
+    )
+    PROTECTED_CLASSIFICATION_CHANGE = (
+        "authorization.protected_classification_change",
+        "تغییر طبقه‌بندی عملیات حفاظت‌شده",
+    )
+
+
 class AccountConnectionRequestStatus(models.TextChoices):
     PENDING = "pending", "در انتظار پاسخ"
     ACCEPTED = "accepted", "پذیرفته‌شده"
+    REJECTED = "rejected", "ردشده"
+
+
+class PolicyCategory(models.TextChoices):
+    BASE_CURRENCY = "base_currency", "ارز پایه"
+    DISPLAY_CALENDAR = "display_calendar", "تقویم نمایشی"
+    FISCAL_CALENDAR = "fiscal_calendar", "تقویم مالی"
+    PRECISION = "precision", "دقت محاسبات"
+    ROUNDING = "rounding", "گرد کردن"
+    REGULATORY_RULE_SET = "regulatory_rule_set", "مجموعه قواعد مقرراتی"
+    FILING_EXPORT = "filing_export", "ارسال یا خروجی مقرراتی"
+    INSURANCE_REGULATORY = "insurance_regulatory", "بیمه و مقررات"
+    OTHER = "other", "سایر"
+
+
+class PolicySensitivity(models.TextChoices):
+    OPERATIONAL = "operational", "عملیاتی"
+    ACCOUNTING = "accounting", "حسابداری"
+    REGULATORY = "regulatory", "مقرراتی"
+
+
+class PolicyVersionStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    PUBLISHED = "published", "منتشرشده"
+    RETIRED = "retired", "بازنشسته"
+
+
+class TenantPolicySelectionStatus(models.TextChoices):
+    APPROVED = "approved", "تأییدشده توسط مالک Tenant"
+    ACTIVE = "active", "اعمال‌شده توسط مدیر Tenant"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+
+
+class PolicyReviewDisposition(models.TextChoices):
+    ACCEPTED = "accepted", "پذیرفته‌شده"
+    ACCEPTED_WITH_CONDITIONS = "accepted_with_conditions", "پذیرفته‌شده مشروط"
+    REVISION_REQUIRED = "revision_required", "نیازمند بازنگری"
     REJECTED = "rejected", "ردشده"
 
 
@@ -124,6 +211,34 @@ class BusinessPermissionCode(models.TextChoices):
     MEMBERSHIP_VIEW = "membership.view", "مشاهده اعضای شرکت"
     MEMBERSHIP_CHANGE_ROLE = "membership.change_role", "تغییر نقش اعضای شرکت"
     MEMBERSHIP_CHANGE_STATUS = "membership.change_status", "تغییر وضعیت اعضای شرکت"
+    AUTHORIZATION_ROLES_VIEW = (
+        "authorization_roles.view",
+        "مشاهده نقش‌های عضویت",
+    )
+    AUTHORIZATION_ROLES_ASSIGN = (
+        "authorization_roles.assign",
+        "تخصیص نقش عضویت",
+    )
+    AUTHORIZATION_ROLES_REVOKE = (
+        "authorization_roles.revoke",
+        "لغو نقش عضویت",
+    )
+    AUTHORIZATION_GRANTS_VIEW = (
+        "authorization_grants.view",
+        "مشاهده دامنه‌های دسترسی",
+    )
+    AUTHORIZATION_GRANTS_CREATE = (
+        "authorization_grants.create",
+        "ایجاد دامنه دسترسی",
+    )
+    AUTHORIZATION_GRANTS_REVOKE = (
+        "authorization_grants.revoke",
+        "لغو دامنه دسترسی",
+    )
+    AUTHORIZATION_UNRESOLVED_RECOVER = (
+        "authorization_unresolved.recover",
+        "بازیابی کار حل‌نشده",
+    )
     ACCOUNTS_CREATE = "accounts.create", "ایجاد حساب کاربری شرکت"
     ACCOUNTS_RESET_PASSWORD = (
         "accounts.reset_password",
@@ -131,6 +246,15 @@ class BusinessPermissionCode(models.TextChoices):
     )
     COMPANY_SETTINGS_VIEW = "company.settings.view", "مشاهده تنظیمات شرکت"
     COMPANY_SETTINGS_CHANGE = "company.settings.change", "ویرایش تنظیمات شرکت"
+    TENANT_POLICIES_VIEW = "tenant_policies.view", "مشاهده سیاست‌های Tenant"
+    TENANT_POLICIES_APPROVE = (
+        "tenant_policies.approve",
+        "تأیید انتخاب سیاست‌های Tenant",
+    )
+    TENANT_POLICIES_APPLY = (
+        "tenant_policies.apply",
+        "اعمال سیاست‌های تأییدشده Tenant",
+    )
 
     PARTIES_VIEW = "parties.view", "مشاهده طرف‌های تجاری"
     PARTIES_CREATE = "parties.create", "ایجاد طرف تجاری"
@@ -421,9 +545,17 @@ class BusinessPermission(UUIDModel, TimeStampedModel):
 
 
 class OrganizationRole(UUIDModel, TimeStampedModel):
-    """A global role assembled by a system administrator from known capabilities."""
+    """A system, global-custom, or tenant-custom role using code-owned permissions."""
 
-    code = models.SlugField("کد نقش", max_length=64, unique=True)
+    organization = models.ForeignKey(
+        "Organization",
+        verbose_name="شرکت",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="custom_roles",
+    )
+    code = models.SlugField("کد نقش", max_length=64)
     name = models.CharField("عنوان نقش", max_length=255)
     description = models.TextField("توضیحات", blank=True)
     permissions = models.ManyToManyField(
@@ -451,6 +583,16 @@ class OrganizationRole(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="organization_roles_updated",
     )
+    archived_at = models.DateTimeField("زمان بایگانی", null=True, blank=True)
+    archived_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="بایگانی‌کننده",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="organization_roles_archived",
+    )
+    archive_reason = models.TextField("دلیل بایگانی", blank=True)
 
     class Meta:
         verbose_name = "نقش شرکتی"
@@ -461,7 +603,21 @@ class OrganizationRole(UUIDModel, TimeStampedModel):
                 fields=["is_owner"],
                 condition=Q(is_owner=True),
                 name="unique_company_owner_role",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=["code"],
+                condition=Q(organization__isnull=True),
+                name="unique_global_organization_role_code",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "code"],
+                condition=Q(organization__isnull=False),
+                name="unique_tenant_organization_role_code",
+            ),
+            models.CheckConstraint(
+                condition=Q(is_system=False) | Q(organization__isnull=True),
+                name="system_organization_role_is_global",
+            ),
         ]
 
     def clean(self) -> None:
@@ -469,6 +625,10 @@ class OrganizationRole(UUIDModel, TimeStampedModel):
         self.code = canonicalize_lower_identifier(self.code)
         if self.is_owner and (not self.is_system or not self.is_active):
             raise ValidationError("نقش مالک شرکت باید یک نقش سیستمی و فعال باقی بماند.")
+        if self.is_owner and self.organization_id:
+            raise ValidationError("نقش مالک شرکت نمی‌تواند اختصاصی یک شرکت باشد.")
+        if self.is_system and self.organization_id:
+            raise ValidationError("نقش سیستمی باید سراسری باشد.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.code = canonicalize_lower_identifier(self.code)
@@ -620,11 +780,10 @@ class Organization(UUIDModel, TimeStampedModel):
 
 
 class OrganizationSettings(UUIDModel, TimeStampedModel):
-    """Configuration owned by exactly one organization.
+    """Authoritative organization-level configuration for exactly one Tenant.
 
-    The timezone and currency fields on :class:`Organization` remain during the
-    compatibility period. Services keep their values synchronized when settings
-    are changed.
+    The timezone and currency fields on :class:`Organization` remain inert legacy
+    compatibility data until the separately authorized contract stage.
     """
 
     organization = models.OneToOneField(
@@ -655,12 +814,13 @@ class OrganizationSettings(UUIDModel, TimeStampedModel):
     currency = models.CharField(
         "واحد پول پیش‌فرض",
         max_length=3,
-        default="USD",
+        default=SUPPORTED_BASE_CURRENCY,
         validators=[
             RegexValidator(
                 regex=r"^[A-Z]{3}$",
                 message="واحد پول باید یک کد سه‌حرفی با حروف بزرگ لاتین باشد.",
-            )
+            ),
+            validate_supported_base_currency,
         ],
     )
     fiscal_year_start_month = models.PositiveSmallIntegerField(
@@ -804,6 +964,18 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="organization_memberships_assigned",
     )
+    authorization_migrated_at = models.DateTimeField(
+        "زمان انتقال به مجوزدهی دامنه‌دار",
+        null=True,
+        blank=True,
+        editable=False,
+    )
+    authorization_quarantined_at = models.DateTimeField(
+        "زمان قرنطینه مجوزدهی",
+        null=True,
+        blank=True,
+        editable=False,
+    )
 
     class Meta:
         verbose_name = "عضویت سازمان"
@@ -860,6 +1032,413 @@ class OrganizationMembership(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.user.username} - {self.organization.name}"
+
+
+class MembershipRoleAssignment(UUIDModel, TimeStampedModel):
+    """Effective-dated, independently auditable role on one tenant membership."""
+
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="membership_role_assignments",
+    )
+    membership = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        related_name="role_assignments",
+    )
+    role = models.ForeignKey(
+        OrganizationRole,
+        on_delete=models.PROTECT,
+        related_name="membership_assignments",
+    )
+    starts_at = models.DateTimeField(default=timezone.now)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    assigned_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="role_assignments_created",
+    )
+    approved_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="role_assignments_approved",
+    )
+    reason = models.TextField()
+    source = models.CharField(max_length=32, default="manual")
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revoked_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="role_assignments_revoked",
+    )
+    revocation_reason = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["membership_id", "starts_at", "pk"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["membership", "role"],
+                condition=Q(revoked_at__isnull=True),
+                name="membership_one_unrevoked_role",
+            ),
+            models.CheckConstraint(
+                condition=Q(ends_at__isnull=True)
+                | Q(ends_at__gt=models.F("starts_at")),
+                name="membership_role_assignment_dates",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "membership", "revoked_at", "ends_at"],
+                name="membership_role_effective_idx",
+            )
+        ]
+
+    @property
+    def is_effective(self) -> bool:
+        now = timezone.now()
+        return (
+            self.revoked_at is None
+            and self.starts_at <= now
+            and (self.ends_at is None or self.ends_at > now)
+        )
+
+    def clean(self) -> None:
+        super().clean()
+        if (
+            self.membership_id
+            and self.membership.organization_id != self.organization_id
+        ):
+            raise ValidationError({"membership": "عضویت متعلق به این سازمان نیست."})
+        for field_name in ("assigned_by", "approved_by", "revoked_by"):
+            value = getattr(self, field_name, None)
+            if value is not None and value.organization_id != self.organization_id:
+                raise ValidationError({field_name: "عامل متعلق به این سازمان نیست."})
+        if self.assigned_by_id and self.approved_by_id == self.assigned_by_id:
+            raise ValidationError(
+                {"approved_by": "تخصیص‌دهنده نمی‌تواند تأییدکننده باشد."}
+            )
+        if self.approved_by_id and self.approved_by_id == self.membership_id:
+            raise ValidationError(
+                {"approved_by": "گیرنده نقش نمی‌تواند نقش خود را تأیید کند."}
+            )
+
+    def __str__(self) -> str:
+        return f"{self.membership} · {self.role.code}"
+
+
+class MembershipScopeGrant(UUIDModel, TimeStampedModel):
+    """Explicit organization, project, or site scope for one membership."""
+
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="membership_scope_grants",
+    )
+    membership = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        related_name="scope_grants",
+    )
+    scope_type = models.CharField(max_length=20, choices=AuthorizationScopeType.choices)
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="authorization_grants",
+    )
+    site = models.ForeignKey(
+        "projects.ProjectSite",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="authorization_grants",
+    )
+    starts_at = models.DateTimeField(default=timezone.now)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    granted_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="scope_grants_created",
+    )
+    approved_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="scope_grants_approved",
+    )
+    reason = models.TextField()
+    source = models.CharField(max_length=32, default="manual")
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revoked_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="scope_grants_revoked",
+    )
+    revocation_reason = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["membership_id", "scope_type", "starts_at", "pk"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        scope_type=AuthorizationScopeType.ORGANIZATION,
+                        project__isnull=True,
+                        site__isnull=True,
+                    )
+                    | Q(
+                        scope_type=AuthorizationScopeType.PROJECT,
+                        project__isnull=False,
+                        site__isnull=True,
+                    )
+                    | Q(
+                        scope_type=AuthorizationScopeType.SITE,
+                        project__isnull=False,
+                        site__isnull=False,
+                    )
+                ),
+                name="membership_scope_grant_shape",
+            ),
+            models.CheckConstraint(
+                condition=Q(ends_at__isnull=True)
+                | Q(ends_at__gt=models.F("starts_at")),
+                name="membership_scope_grant_dates",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "membership", "scope_type", "revoked_at"],
+                name="membership_scope_effective_idx",
+            ),
+            models.Index(
+                fields=["organization", "project", "site", "revoked_at"],
+                name="membership_scope_object_idx",
+            ),
+        ]
+
+    @property
+    def is_effective(self) -> bool:
+        now = timezone.now()
+        return (
+            self.revoked_at is None
+            and self.starts_at <= now
+            and (self.ends_at is None or self.ends_at > now)
+        )
+
+    def clean(self) -> None:
+        super().clean()
+        if (
+            self.membership_id
+            and self.membership.organization_id != self.organization_id
+        ):
+            raise ValidationError({"membership": "عضویت متعلق به این سازمان نیست."})
+        if self.project_id and self.project.organization_id != self.organization_id:
+            raise ValidationError({"project": "پروژه متعلق به این سازمان نیست."})
+        if self.site_id:
+            if self.site.organization_id != self.organization_id:
+                raise ValidationError({"site": "کارگاه متعلق به این سازمان نیست."})
+            if self.project_id != self.site.project_id:
+                raise ValidationError({"site": "کارگاه متعلق به پروژه انتخاب‌شده نیست."})
+        for field_name in ("granted_by", "approved_by", "revoked_by"):
+            value = getattr(self, field_name, None)
+            if value is not None and value.organization_id != self.organization_id:
+                raise ValidationError({field_name: "عامل متعلق به این سازمان نیست."})
+        if self.granted_by_id and self.granted_by_id == self.membership_id:
+            raise ValidationError({"granted_by": "خودافزایی دامنه دسترسی ممنوع است."})
+        if self.granted_by_id and self.approved_by_id == self.granted_by_id:
+            raise ValidationError(
+                {"approved_by": "اعطاکننده نمی‌تواند تأییدکننده باشد."}
+            )
+        if self.approved_by_id and self.approved_by_id == self.membership_id:
+            raise ValidationError(
+                {"approved_by": "گیرنده نمی‌تواند دسترسی خود را تأیید کند."}
+            )
+
+    def __str__(self) -> str:
+        return f"{self.membership} · {self.scope_type}"
+
+
+class AuthorizationMigrationIssue(UUIDModel, TimeStampedModel):
+    """A tenant-scoped quarantine record for ambiguous legacy authorization."""
+
+    organization = models.ForeignKey(
+        Organization,
+        on_delete=models.PROTECT,
+        related_name="authorization_migration_issues",
+    )
+    membership = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        related_name="authorization_migration_issues",
+    )
+    issue_code = models.CharField(max_length=64)
+    detail = models.TextField()
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    resolved_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="authorization_migration_issues_resolved",
+    )
+    resolution = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["membership", "issue_code"],
+                condition=Q(resolved_at__isnull=True),
+                name="membership_open_auth_migration_issue",
+            )
+        ]
+
+
+class PlatformRoleAssignment(UUIDModel, TimeStampedModel):
+    """Independent platform role; it never grants ordinary tenant-data access."""
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="platform_role_assignments",
+    )
+    role = models.CharField(max_length=32, choices=PlatformRoleCode.choices)
+    starts_at = models.DateTimeField(default=timezone.now)
+    ends_at = models.DateTimeField(null=True, blank=True)
+    assigned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="platform_roles_assigned",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="platform_roles_approved",
+    )
+    reason = models.TextField()
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revoked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="platform_roles_revoked",
+    )
+    revocation_reason = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["user", "role"],
+                condition=Q(revoked_at__isnull=True),
+                name="user_one_unrevoked_platform_role",
+            ),
+            models.CheckConstraint(
+                condition=Q(ends_at__isnull=True)
+                | Q(ends_at__gt=models.F("starts_at")),
+                name="platform_role_dates",
+            ),
+        ]
+
+
+class ProtectedOperation(UUIDModel, TimeStampedModel):
+    """Immutable, platform-owned version of one non-overridable operation class."""
+
+    code = models.CharField(max_length=100, choices=ProtectedOperationCode.choices)
+    version = models.PositiveIntegerField()
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    effective_at = models.DateTimeField(default=timezone.now)
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="protected_operations_created",
+    )
+    reason = models.TextField()
+    retired_at = models.DateTimeField(null=True, blank=True)
+    retired_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="protected_operations_retired",
+    )
+    retirement_reason = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["code", "-version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["code", "version"],
+                name="protected_operation_code_version",
+            )
+        ]
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("طبقه‌بندی عملیات حفاظت‌شده تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("طبقه‌بندی عملیات حفاظت‌شده قابل حذف نیست.")
+
+
+class AuthorizationPolicyVersion(UUIDModel, TimeStampedModel):
+    """Immutable versioned policy, including the site parent-context field set."""
+
+    code = models.CharField(max_length=64)
+    version = models.PositiveIntegerField()
+    policy = models.JSONField(default=dict)
+    effective_at = models.DateTimeField(default=timezone.now)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="authorization_policy_versions_created",
+    )
+    reason = models.TextField()
+
+    class Meta:
+        ordering = ["code", "-version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["code", "version"],
+                name="authorization_policy_code_version",
+            )
+        ]
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("نسخه سیاست مجوزدهی تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("نسخه سیاست مجوزدهی قابل حذف نیست.")
 
 
 class OrganizationAccountConnectionRequest(UUIDModel, TimeStampedModel):
@@ -926,3 +1505,416 @@ class OrganizationAccountConnectionRequest(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.target_user.username} - {self.organization.name}"
+
+
+class PolicySource(UUIDModel, TimeStampedModel):
+    """External provenance metadata; the issuer is never an application actor."""
+
+    issuer = models.CharField("مرجع صادرکننده", max_length=255)
+    title = models.CharField("عنوان منبع", max_length=500)
+    source_identifier = models.CharField("شناسه منبع", max_length=255)
+    source_location = models.CharField("محل دسترسی", max_length=500, blank=True)
+    version = models.CharField("نسخه", max_length=100)
+    publication_date = models.DateField("تاریخ انتشار", null=True, blank=True)
+    effective_from = models.DateField("شروع اعتبار", null=True, blank=True)
+    effective_to = models.DateField("پایان اعتبار", null=True, blank=True)
+    applicability = models.TextField("دامنه کاربرد")
+    supersedes = models.ForeignKey(
+        "self",
+        verbose_name="جایگزین منبع",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by_sources",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        verbose_name="ثبت‌کننده Platform",
+        on_delete=models.PROTECT,
+        related_name="policy_sources_created",
+    )
+
+    class Meta:
+        verbose_name = "منبع سیاست"
+        verbose_name_plural = "منابع سیاست"
+        ordering = ["issuer", "source_identifier", "version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["source_identifier", "version"],
+                name="unique_policy_source_version",
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_to__isnull=True)
+                | Q(effective_from__isnull=True)
+                | Q(effective_to__gt=models.F("effective_from")),
+                name="policy_source_effective_interval",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        for field_name in ("issuer", "title", "source_identifier", "version"):
+            if not str(getattr(self, field_name)).strip():
+                raise ValidationError({field_name: "این مقدار الزامی است."})
+        if self.supersedes_id and self.supersedes_id == self.pk:
+            raise ValidationError({"supersedes": "منبع نمی‌تواند جایگزین خود باشد."})
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError(
+                "رکورد منبع سیاست تغییرناپذیر است؛ نسخه جدید ثبت کنید."
+            )
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("رکورد منبع سیاست قابل حذف نیست.")
+
+    def __str__(self) -> str:
+        return f"{self.issuer} · {self.source_identifier} · {self.version}"
+
+
+class PlatformPolicy(UUIDModel, TimeStampedModel):
+    """Platform-owned definition of a bounded policy/localization option."""
+
+    code = models.SlugField("کد سیاست", max_length=100, unique=True)
+    name = models.CharField("عنوان سیاست", max_length=255)
+    category = models.CharField(
+        "دسته سیاست", max_length=40, choices=PolicyCategory.choices
+    )
+    sensitivity = models.CharField(
+        "حساسیت",
+        max_length=20,
+        choices=PolicySensitivity.choices,
+        default=PolicySensitivity.OPERATIONAL,
+    )
+    tenant_selectable = models.BooleanField("قابل انتخاب توسط Tenant", default=True)
+    requires_source_provenance = models.BooleanField(
+        "نیازمند منبع برای انتشار و اعمال", default=False
+    )
+    is_active = models.BooleanField("فعال", default=True, db_index=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="platform_policies_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="platform_policies_updated",
+    )
+
+    class Meta:
+        verbose_name = "سیاست پلتفرم"
+        verbose_name_plural = "سیاست‌های پلتفرم"
+        ordering = ["code"]  # noqa: RUF012
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.code = canonicalize_lower_identifier(self.code)
+        if not self._state.adding and self.versions.exists():
+            original = PlatformPolicy.objects.get(pk=self.pk)
+            stable_fields = (
+                "code",
+                "category",
+                "sensitivity",
+                "tenant_selectable",
+                "requires_source_provenance",
+            )
+            if any(
+                getattr(original, field) != getattr(self, field)
+                for field in stable_fields
+            ):
+                raise ValidationError(
+                    "مرز سیاست دارای نسخه تغییرناپذیر است؛ سیاست جدید ایجاد کنید."
+                )
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return self.code
+
+
+def validate_policy_parameters(value: object) -> None:
+    """Keep policy data declarative and reject imprecise floating-point values."""
+
+    def walk(item: object) -> None:
+        if isinstance(item, float):
+            raise ValidationError("مقادیر اعشاری سیاست باید به‌صورت رشته ثبت شوند.")
+        if isinstance(item, dict):
+            for key, nested in item.items():
+                if not isinstance(key, str):
+                    raise ValidationError("کلیدهای پارامتر سیاست باید رشته باشند.")
+                if key.casefold() in {"python", "sql", "script", "executable"}:
+                    raise ValidationError("کد اجرایی در پارامتر سیاست مجاز نیست.")
+                walk(nested)
+        elif isinstance(item, list):
+            for nested in item:
+                walk(nested)
+        elif item is not None and not isinstance(item, (str, int, bool)):
+            raise ValidationError("نوع مقدار پارامتر سیاست پشتیبانی نمی‌شود.")
+
+    if not isinstance(value, dict):
+        raise ValidationError("پارامترهای سیاست باید یک شیء JSON باشند.")
+    walk(value)
+
+
+class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
+    """Immutable-after-publication platform policy version with provenance."""
+
+    policy = models.ForeignKey(
+        PlatformPolicy, on_delete=models.PROTECT, related_name="versions"
+    )
+    version = models.PositiveIntegerField("شماره نسخه")
+    parameters = models.JSONField(
+        "پارامترهای کنترل‌شده",
+        default=dict,
+        blank=True,
+        validators=[validate_policy_parameters],
+    )
+    effective_from = models.DateField("شروع اعتبار")
+    effective_to = models.DateField("پایان اعتبار", null=True, blank=True)
+    status = models.CharField(
+        "وضعیت",
+        max_length=20,
+        choices=PolicyVersionStatus.choices,
+        default=PolicyVersionStatus.DRAFT,
+        db_index=True,
+    )
+    sources = models.ManyToManyField(
+        PolicySource, verbose_name="منابع", related_name="policy_versions", blank=True
+    )
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by_versions",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="policy_versions_created",
+    )
+    published_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="policy_versions_published",
+    )
+    published_at = models.DateTimeField(null=True, blank=True)
+    reason = models.TextField("دلیل نسخه")
+
+    class Meta:
+        verbose_name = "نسخه سیاست پلتفرم"
+        verbose_name_plural = "نسخه‌های سیاست پلتفرم"
+        ordering = ["policy__code", "-version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["policy", "version"], name="unique_platform_policy_version"
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_to__isnull=True)
+                | Q(effective_to__gt=models.F("effective_from")),
+                name="platform_policy_effective_interval",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        status=PolicyVersionStatus.DRAFT,
+                        published_at__isnull=True,
+                        published_by__isnull=True,
+                    )
+                    | Q(
+                        status__in=[
+                            PolicyVersionStatus.PUBLISHED,
+                            PolicyVersionStatus.RETIRED,
+                        ],
+                        published_at__isnull=False,
+                        published_by__isnull=False,
+                    )
+                ),
+                name="platform_policy_publication_state",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_policy_parameters(self.parameters)
+        if self.supersedes_id:
+            if self.supersedes_id == self.pk:
+                raise ValidationError({"supersedes": "نسخه نمی‌تواند جایگزین خود باشد."})
+            if self.supersedes.policy_id != self.policy_id:
+                raise ValidationError(
+                    {"supersedes": "نسخه جایگزین متعلق به سیاست دیگری است."}
+                )
+        if not self.reason.strip():
+            raise ValidationError({"reason": "دلیل ایجاد نسخه الزامی است."})
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            original = PlatformPolicyVersion.objects.get(pk=self.pk)
+            if original.status != PolicyVersionStatus.DRAFT:
+                immutable_fields = (
+                    "policy_id",
+                    "version",
+                    "parameters",
+                    "effective_from",
+                    "effective_to",
+                    "supersedes_id",
+                    "reason",
+                )
+                if any(
+                    getattr(original, field) != getattr(self, field)
+                    for field in immutable_fields
+                ):
+                    raise ValidationError("نسخه منتشرشده سیاست تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def __str__(self) -> str:
+        return f"{self.policy.code} v{self.version}"
+
+
+class PolicyReviewEvidence(UUIDModel, TimeStampedModel):
+    """Optional external professional evidence; never a role or approval actor."""
+
+    policy_version = models.ForeignKey(
+        PlatformPolicyVersion,
+        on_delete=models.PROTECT,
+        related_name="review_evidence",
+    )
+    reviewer_identity = models.CharField("هویت بازبین", max_length=255)
+    qualification_summary = models.TextField("خلاصه صلاحیت")
+    independence_statement = models.TextField("اظهار استقلال")
+    evidence_reference = models.CharField("مرجع مدرک", max_length=500)
+    reviewed_on = models.DateField("تاریخ بررسی")
+    review_scope = models.TextField("دامنه بررسی")
+    disposition = models.CharField(
+        "نتیجه", max_length=40, choices=PolicyReviewDisposition.choices
+    )
+    conditions = models.TextField("شرایط و محدودیت‌ها", blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="policy_review_evidence_created",
+    )
+
+    class Meta:
+        verbose_name = "مدرک اختیاری بررسی سیاست"
+        verbose_name_plural = "مدارک اختیاری بررسی سیاست"
+        ordering = ["-reviewed_on", "policy_version"]  # noqa: RUF012
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("مدرک بررسی سیاست تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("مدرک بررسی سیاست قابل حذف نیست.")
+
+
+class TenantPolicySelection(UUIDModel, TimeStampedModel):
+    """Tenant selection of one published platform option, without overrides."""
+
+    organization = models.ForeignKey(
+        Organization, on_delete=models.PROTECT, related_name="policy_selections"
+    )
+    policy = models.ForeignKey(
+        PlatformPolicy, on_delete=models.PROTECT, related_name="tenant_selections"
+    )
+    policy_version = models.ForeignKey(
+        PlatformPolicyVersion,
+        on_delete=models.PROTECT,
+        related_name="tenant_selections",
+    )
+    status = models.CharField(
+        "وضعیت",
+        max_length=20,
+        choices=TenantPolicySelectionStatus.choices,
+        default=TenantPolicySelectionStatus.APPROVED,
+        db_index=True,
+    )
+    approved_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        related_name="policy_selections_approved",
+    )
+    approved_at = models.DateTimeField()
+    applied_by = models.ForeignKey(
+        OrganizationMembership,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="policy_selections_applied",
+    )
+    applied_at = models.DateTimeField(null=True, blank=True)
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by_selections",
+    )
+    reason = models.TextField("دلیل انتخاب")
+
+    class Meta:
+        verbose_name = "انتخاب سیاست Tenant"
+        verbose_name_plural = "انتخاب‌های سیاست Tenant"
+        ordering = ["organization", "policy", "-created_at"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "policy"],
+                condition=Q(status=TenantPolicySelectionStatus.ACTIVE),
+                name="unique_active_tenant_policy_selection",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        status=TenantPolicySelectionStatus.APPROVED,
+                        applied_by__isnull=True,
+                        applied_at__isnull=True,
+                    )
+                    | Q(
+                        status__in=[
+                            TenantPolicySelectionStatus.ACTIVE,
+                            TenantPolicySelectionStatus.SUPERSEDED,
+                        ],
+                        applied_by__isnull=False,
+                        applied_at__isnull=False,
+                    )
+                ),
+                name="tenant_policy_application_state",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        if self.policy_version_id and self.policy_id != self.policy_version.policy_id:
+            raise ValidationError({"policy_version": "نسخه متعلق به این سیاست نیست."})
+        if self.policy_id and not self.policy.tenant_selectable:
+            raise ValidationError({"policy": "این سیاست توسط Tenant قابل انتخاب نیست."})
+        for field_name in ("approved_by", "applied_by"):
+            membership = getattr(self, field_name, None)
+            if (
+                membership is not None
+                and membership.organization_id != self.organization_id
+            ):
+                raise ValidationError({field_name: "عضویت متعلق به این Tenant نیست."})
+        if (
+            self.supersedes_id
+            and self.supersedes.organization_id != self.organization_id
+        ):
+            raise ValidationError(
+                {"supersedes": "انتخاب قبلی متعلق به Tenant دیگری است."}
+            )
+        if not self.reason.strip():
+            raise ValidationError({"reason": "دلیل انتخاب سیاست الزامی است."})
+
+    def __str__(self) -> str:
+        return f"{self.organization} · {self.policy.code} · {self.status}"
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)

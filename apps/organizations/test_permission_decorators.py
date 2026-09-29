@@ -35,6 +35,7 @@ class OrganizationPermissionDecoratorTests(SimpleTestCase):
             user=self.request.user,
             organization=self.request.organization,
             permission=BusinessPermissionCode.PROJECTS_VIEW,
+            allow_any_scope=True,
         )
 
     @patch("apps.organizations.decorators.has_business_permission", return_value=True)

@@ -74,11 +74,6 @@ COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
                     "resolver_type": "business_permission",
                     "configuration": {"permission": "estimates.approve"},
                 },
-                {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
-                    "is_fallback": True,
-                },
             ],
         },
         {

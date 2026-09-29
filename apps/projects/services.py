@@ -9,7 +9,11 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     Organization,
@@ -61,11 +65,20 @@ def _has_project_permission(
     user: User,
     organization: Organization,
     permission: BusinessPermissionCode,
+    *,
+    project: Project | None = None,
+    site: ProjectSite | None = None,
+    allow_any_scope: bool = False,
+    allow_site_parent: bool = False,
 ) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        project=project,
+        site=site,
+        allow_any_scope=allow_any_scope,
+        allow_site_parent=allow_site_parent,
     )
 
 
@@ -74,6 +87,8 @@ def _require_project_management_access(
     organization: Organization,
     actor: User,
     permission: BusinessPermissionCode,
+    project: Project | None = None,
+    site: ProjectSite | None = None,
 ) -> None:
     if not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied("ورود به حساب کاربری الزامی است.")
@@ -82,7 +97,9 @@ def _require_project_management_access(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _has_project_permission(actor, organization, permission):
+    if not _has_project_permission(
+        actor, organization, permission, project=project, site=site
+    ):
         raise PermissionDenied("اجازه مدیریت کنترل پروژه در این سازمان را ندارید.")
 
 
@@ -162,13 +179,21 @@ def get_organization_projects(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.PROJECTS_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.PROJECTS_VIEW,
+        allow_any_scope=True,
     ):
         raise PermissionDenied("اجازه مشاهده پروژه‌های این سازمان را ندارید.")
+    membership = get_active_membership(user=user, organization=organization)
     return (
-        Project.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
+        scope_queryset(
+            Project.objects.filter(
+                organization=organization,
+                deleted_at__isnull=True,
+            ),
+            membership=membership,
+            project_lookup="pk",
         )
         .select_related("created_by", "updated_by")
         .order_by("name")
@@ -210,7 +235,10 @@ def create_project_site(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _has_project_permission(
-        actor, organization, BusinessPermissionCode.PROJECT_SITES_CREATE
+        actor,
+        organization,
+        BusinessPermissionCode.PROJECT_SITES_CREATE,
+        project=project,
     ):
         raise PermissionDenied("اجازه مدیریت کارگاه‌های این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
@@ -253,18 +281,29 @@ def get_organization_project_sites(
 ) -> QuerySet[ProjectSite]:
     """Return sites only for a project in the active organization."""
 
-    project = get_organization_project(
-        user=user,
-        organization=organization,
-        project_id=project_id,
-    )
+    try:
+        project = Project.objects.get(
+            pk=project_id, organization=organization, deleted_at__isnull=True
+        )
+    except Project.DoesNotExist as exc:
+        raise PermissionDenied("پروژه در این سازمان یافت نشد.") from exc
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.PROJECT_SITES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.PROJECT_SITES_VIEW,
+        project=project,
+        allow_site_parent=True,
     ):
         raise PermissionDenied("اجازه مشاهده کارگاه‌های این سازمان را ندارید.")
-    return ProjectSite.objects.filter(
-        organization=organization,
-        project=project,
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        ProjectSite.objects.filter(
+            organization=organization,
+            project=project,
+        ),
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="pk",
     ).select_related("project")
 
 
@@ -276,12 +315,19 @@ def get_organization_sites(
     """Return every worksite in the active organization."""
 
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.PROJECT_SITES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.PROJECT_SITES_VIEW,
+        allow_any_scope=True,
     ):
         raise PermissionDenied("اجازه مشاهده کارگاه‌های این سازمان را ندارید.")
-    return ProjectSite.objects.filter(organization=organization).select_related(
-        "project"
-    )
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        ProjectSite.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="pk",
+    ).select_related("project")
 
 
 def get_organization_project_site(
@@ -326,7 +372,11 @@ def create_project_phase(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _has_project_permission(
-        actor, organization, BusinessPermissionCode.PROJECT_PHASES_CREATE
+        actor,
+        organization,
+        BusinessPermissionCode.PROJECT_PHASES_CREATE,
+        project=site.project,
+        site=site,
     ):
         raise PermissionDenied("اجازه مدیریت فازهای پروژه در این سازمان را ندارید.")
     if (
@@ -391,7 +441,11 @@ def get_organization_project_phases(
         site_id=site_id,
     )
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.PROJECT_PHASES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.PROJECT_PHASES_VIEW,
+        project=site.project,
+        site=site,
     ):
         raise PermissionDenied("اجازه مشاهده فازهای این سازمان را ندارید.")
     return ProjectPhase.objects.filter(
@@ -452,10 +506,6 @@ def transition_project_phase_status(
         or organization.deleted_at is not None
     ):
         raise PermissionDenied("سازمان فعال نیست.")
-    if not _has_project_permission(
-        actor, organization, BusinessPermissionCode.PROJECT_PHASES_TRANSITION
-    ):
-        raise PermissionDenied("اجازه تغییر فازهای پروژه در این سازمان را ندارید.")
     try:
         site = ProjectSite.objects.select_related("project").get(
             pk=site_id,
@@ -466,6 +516,14 @@ def transition_project_phase_status(
         raise PermissionDenied("کارگاه در این پروژه یافت نشد.") from exc
     if not site.is_active or site.project.deleted_at is not None:
         raise PermissionDenied("کارگاه فعال نیست.")
+    if not _has_project_permission(
+        actor,
+        organization,
+        BusinessPermissionCode.PROJECT_PHASES_TRANSITION,
+        project=site.project,
+        site=site,
+    ):
+        raise PermissionDenied("اجازه تغییر فازهای پروژه در این سازمان را ندارید.")
     try:
         phase = (
             ProjectPhase.objects.select_for_update()
@@ -507,10 +565,6 @@ def archive_project(
 ) -> None:
     """Soft-delete a project after validating tenant and management scope."""
 
-    if not _has_project_permission(
-        user, organization, BusinessPermissionCode.PROJECTS_ARCHIVE
-    ):
-        raise PermissionDenied("اجازه بایگانی پروژه‌های این سازمان را ندارید.")
     try:
         project = Project.objects.select_for_update().get(
             pk=project_id,
@@ -519,6 +573,13 @@ def archive_project(
         )
     except Project.DoesNotExist as exc:
         raise PermissionDenied("پروژه در این سازمان یافت نشد.") from exc
+    if not _has_project_permission(
+        user,
+        organization,
+        BusinessPermissionCode.PROJECTS_ARCHIVE,
+        project=project,
+    ):
+        raise PermissionDenied("اجازه بایگانی پروژه‌های این سازمان را ندارید.")
     if project.warehouses.filter(is_active=True, archived_at__isnull=True).exists():
         raise ValueError("ابتدا انبارهای فعال پروژه را بایگانی کنید.")
     if project.stock_transactions.filter(status="draft").exists():
@@ -559,6 +620,7 @@ def create_wbs_node(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.WBS_NODES_CREATE,
+        project=project,
     )
     if project.organization_id != organization.id or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -608,16 +670,17 @@ def update_wbs_node(
     parent: WBSNode | None = None,
     sort_order: int = 0,
 ) -> WBSNode:
-    _require_project_management_access(
-        organization=organization,
-        actor=actor,
-        permission=BusinessPermissionCode.WBS_NODES_CHANGE,
-    )
     locked_node = (
         WBSNode.objects.select_for_update().select_related("project").get(pk=node.pk)
     )
     if locked_node.organization_id != organization.id:
         raise PermissionDenied("گره ساختار شکست متعلق به این سازمان نیست.")
+    _require_project_management_access(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.WBS_NODES_CHANGE,
+        project=locked_node.project,
+    )
     if locked_node.archived_at:
         raise ValueError("گره ساختار شکست بایگانی‌شده قابل به‌روزرسانی نیست.")
     if parent and (
@@ -660,7 +723,10 @@ def get_organization_wbs_nodes(
         user=user, organization=organization, project_id=project_id
     )
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.WBS_NODES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.WBS_NODES_VIEW,
+        project=project,
     ):
         raise PermissionDenied("اجازه مشاهده ساختار شکست این پروژه را ندارید.")
     return WBSNode.objects.filter(
@@ -672,14 +738,17 @@ def get_organization_wbs_nodes(
 def archive_wbs_node(
     *, organization: Organization, actor: User, node: WBSNode
 ) -> WBSNode:
+    locked_node = (
+        WBSNode.objects.select_for_update().select_related("project").get(pk=node.pk)
+    )
+    if locked_node.organization_id != organization.id:
+        raise PermissionDenied("گره ساختار شکست متعلق به این سازمان نیست.")
     _require_project_management_access(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.WBS_NODES_ARCHIVE,
+        project=locked_node.project,
     )
-    locked_node = WBSNode.objects.select_for_update().get(pk=node.pk)
-    if locked_node.organization_id != organization.id:
-        raise PermissionDenied("گره ساختار شکست متعلق به این سازمان نیست.")
     if locked_node.archived_at:
         raise ValueError("گره ساختار شکست از قبل بایگانی شده است.")
     if (
@@ -729,6 +798,8 @@ def create_activity(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.ACTIVITIES_CREATE,
+        project=project,
+        site=site,
     )
     if project.organization_id != organization.id or project.deleted_at is not None:
         raise PermissionDenied("پروژه متعلق به این سازمان نیست.")
@@ -782,15 +853,28 @@ def create_activity(
 def get_organization_activities(
     *, user: User, organization: Organization, project_id: str
 ) -> QuerySet[Activity]:
-    project = get_organization_project(
-        user=user, organization=organization, project_id=project_id
-    )
+    try:
+        project = Project.objects.get(
+            pk=project_id, organization=organization, deleted_at__isnull=True
+        )
+    except Project.DoesNotExist as exc:
+        raise PermissionDenied("پروژه در این سازمان یافت نشد.") from exc
     if not _has_project_permission(
-        user, organization, BusinessPermissionCode.ACTIVITIES_VIEW
+        user,
+        organization,
+        BusinessPermissionCode.ACTIVITIES_VIEW,
+        project=project,
+        allow_site_parent=True,
     ):
         raise PermissionDenied("اجازه مشاهده فعالیت‌های این پروژه را ندارید.")
-    return Activity.objects.filter(
-        organization=organization, project=project, archived_at__isnull=True
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        Activity.objects.filter(
+            organization=organization, project=project, archived_at__isnull=True
+        ),
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="site_id",
     ).select_related("wbs_node", "site", "phase", "unit_of_measure")
 
 
@@ -798,14 +882,20 @@ def get_organization_activities(
 def transition_activity_status(
     *, organization: Organization, actor: User, activity: Activity, target_status: str
 ) -> Activity:
+    locked_activity = (
+        Activity.objects.select_for_update(of=("self",))
+        .select_related("project", "site")
+        .get(pk=activity.pk)
+    )
+    if locked_activity.organization_id != organization.id:
+        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     _require_project_management_access(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.ACTIVITIES_TRANSITION,
+        project=locked_activity.project,
+        site=locked_activity.site,
     )
-    locked_activity = Activity.objects.select_for_update().get(pk=activity.pk)
-    if locked_activity.organization_id != organization.id:
-        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     if locked_activity.archived_at:
         raise ValueError("وضعیت فعالیت بایگانی‌شده قابل تغییر نیست.")
     if target_status not in ActivityStatus.values:
@@ -833,14 +923,20 @@ def transition_activity_status(
 def archive_activity(
     *, organization: Organization, actor: User, activity: Activity
 ) -> Activity:
+    locked_activity = (
+        Activity.objects.select_for_update(of=("self",))
+        .select_related("project", "site")
+        .get(pk=activity.pk)
+    )
+    if locked_activity.organization_id != organization.id:
+        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     _require_project_management_access(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.ACTIVITIES_ARCHIVE,
+        project=locked_activity.project,
+        site=locked_activity.site,
     )
-    locked_activity = Activity.objects.select_for_update().get(pk=activity.pk)
-    if locked_activity.organization_id != organization.id:
-        raise PermissionDenied("فعالیت متعلق به این سازمان نیست.")
     if locked_activity.archived_at:
         raise ValueError("فعالیت از قبل بایگانی شده است.")
     (

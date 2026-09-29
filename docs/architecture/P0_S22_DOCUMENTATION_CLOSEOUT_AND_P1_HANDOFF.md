@@ -8,6 +8,13 @@ preserve the unresolved gate register, and provide a conditional P1 handoff
 packet. This is a documentation record only. It does not accept P0, accept an ADR,
 freeze release scope, authorize P1.1 or change runtime behavior.
 
+**P0-G02 addendum (2026-09-27):** this record remains the historical P0-S22
+closeout state. P0-G01/G02 subsequently completed the Q04 review and reconciled
+the P1.1-only design contract in
+[S07 section 6](ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md#6-p0-g02-remediation-and-complete-p11-implementation-contract).
+P1.1 is now **READY FOR AUTHORIZATION**, while P0 remains incomplete and this
+addendum neither accepts an ADR nor grants implementation authority.
+
 ## 1. Closeout result
 
 P0-S22 closes the documentation work for the current P0 session sequence. It does
@@ -36,7 +43,7 @@ to start P1 implementation.
 
 ## 3. Conditional P1 handoff contract
 
-P1 is not an implementation-ready phase. Before any P1.1 session is authorized,
+At P0-S22, P1 was not an implementation-ready phase. Before any P1.1 session was authorized,
 the Product Owner must have evidence for:
 
 1. completed Q04-A through Q04-H accountable reviews, including any required
@@ -48,9 +55,9 @@ the Product Owner must have evidence for:
 4. an explicit, separately scoped P1.1 package authorization covering models,
    services, queryset/view enforcement, migration/backfill, tests and rollback.
 
-Until those conditions are met, P1.1 remains `PLANNED / MUST`, not approved for
-implementation. P1 handoff does not authorize P0.2, P0.3, P0.4 or any downstream
-domain package.
+That historical handoff did not authorize P0.2, P0.3, P0.4 or any downstream
+domain package. P0-G02 later resolves the P1.1-only design conditions; its
+separate implementation authorization remains required.
 
 ## 4. Required decision/evidence queue
 

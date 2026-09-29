@@ -4,10 +4,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest
 
-from apps.audit.models import AuditAction
-from apps.audit.services import record_audit_event
 from apps.organizations.forms import (
-    ORGANIZATION_PROFILE_FIELDS,
     OrganizationAdminForm,
     OrganizationMembershipForm,
 )
@@ -18,11 +15,6 @@ from apps.organizations.models import (
     OrganizationRole,
 )
 from apps.organizations.permission_catalog import permission_group_label
-from apps.organizations.services import (
-    create_organization_by_system_admin,
-    update_organization_membership,
-    update_organization_settings,
-)
 
 
 @admin.register(Organization)
@@ -33,10 +25,10 @@ class OrganizationAdmin(admin.ModelAdmin):
         "national_id",
         "slug",
         "status",
-        "currency",
+        "authoritative_currency",
         "created_at",
     )
-    list_filter = ("status", "currency")
+    list_filter = ("status", "settings__currency")
     search_fields = (
         "name",
         "legal_name",
@@ -124,7 +116,11 @@ class OrganizationAdmin(admin.ModelAdmin):
     )
 
     def has_add_permission(self, request: HttpRequest) -> bool:
-        return request.user.is_superuser
+        return False
+
+    @admin.display(description="واحد پول", ordering="settings__currency")
+    def authoritative_currency(self, obj: Organization) -> str:
+        return obj.settings.currency
 
     def save_model(
         self,
@@ -133,64 +129,15 @@ class OrganizationAdmin(admin.ModelAdmin):
         form: OrganizationAdminForm,
         change: bool,
     ) -> None:
-        """Persist both admin form sections through the tenant services."""
-
-        if change:
-            update_organization_settings(
-                organization=obj,
-                updated_by=request.user,
-                timezone_name=form.cleaned_data["settings_timezone"],
-                currency=form.cleaned_data["default_currency"],
-                fiscal_year_start_month=form.cleaned_data["fiscal_year_start_month"],
-                fiscal_year_start_day=form.cleaned_data["fiscal_year_start_day"],
-                language=form.cleaned_data["language"],
-                project_code_prefix=form.cleaned_data["project_code_prefix"],
-                contract_code_prefix=form.cleaned_data["contract_code_prefix"],
-                site_code_prefix=form.cleaned_data["site_code_prefix"],
-                document_code_prefix=form.cleaned_data["document_code_prefix"],
-                logo=form.cleaned_data["logo"],
-                profile_data={
-                    field_name: form.cleaned_data[field_name]
-                    for field_name in ORGANIZATION_PROFILE_FIELDS
-                },
-            )
-            obj.refresh_from_db()
-            return
-
-        organization = create_organization_by_system_admin(
-            actor=request.user,
-            owner=request.user,
-            name=form.cleaned_data["name"],
-            legal_name=form.cleaned_data["legal_name"],
-            slug=form.cleaned_data["slug"],
-            registration_number=form.cleaned_data["registration_number"],
-            national_id=form.cleaned_data["national_id"],
-            economic_code=form.cleaned_data["economic_code"],
-            phone=form.cleaned_data["phone"],
-            email=form.cleaned_data["email"],
-            website=form.cleaned_data["website"],
-            province=form.cleaned_data["province"],
-            city=form.cleaned_data["city"],
-            address=form.cleaned_data["address"],
-            postal_code=form.cleaned_data["postal_code"],
-            timezone_name=form.cleaned_data["settings_timezone"],
-            currency=form.cleaned_data["default_currency"],
-            logo=form.cleaned_data["logo"],
-            language=form.cleaned_data["language"],
-            fiscal_year_start_month=form.cleaned_data["fiscal_year_start_month"],
-            fiscal_year_start_day=form.cleaned_data["fiscal_year_start_day"],
-            project_code_prefix=form.cleaned_data["project_code_prefix"],
-            contract_code_prefix=form.cleaned_data["contract_code_prefix"],
-            site_code_prefix=form.cleaned_data["site_code_prefix"],
-            document_code_prefix=form.cleaned_data["document_code_prefix"],
+        raise PermissionDenied(
+            "ایجاد یا ویرایش Tenant از Django Admin غیرفعال است؛ "
+            "از مسیر کنترل‌شده پلتفرم استفاده کنید."
         )
-        obj.pk = organization.pk
-        obj._state.adding = False
 
     def has_change_permission(
         self, request: HttpRequest, obj: Organization | None = None
     ) -> bool:
-        return request.user.is_superuser
+        return False
 
     def has_delete_permission(
         self, request: HttpRequest, obj: Organization | None = None
@@ -200,7 +147,7 @@ class OrganizationAdmin(admin.ModelAdmin):
 
 @admin.register(OrganizationMembership)
 class OrganizationMembershipAdmin(admin.ModelAdmin):
-    """Allow only system admins to manage a user's scoped business access."""
+    """Legacy membership rows are not mutable or visible through global admin."""
 
     form = OrganizationMembershipForm
     list_display = (
@@ -221,7 +168,15 @@ class OrganizationMembershipAdmin(admin.ModelAdmin):
     def has_change_permission(
         self, request: HttpRequest, obj: OrganizationMembership | None = None
     ) -> bool:
-        return request.user.is_superuser
+        return False
+
+    def has_module_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_view_permission(
+        self, request: HttpRequest, obj: OrganizationMembership | None = None
+    ) -> bool:
+        return False
 
     def has_delete_permission(
         self, request: HttpRequest, obj: OrganizationMembership | None = None
@@ -252,14 +207,8 @@ class OrganizationMembershipAdmin(admin.ModelAdmin):
         form: OrganizationMembershipForm,
         change: bool,
     ) -> None:
-        if not change:  # Defensive: creation is intentionally disabled.
-            return
-        update_organization_membership(
-            organization=obj.organization,
-            actor=request.user,
-            membership=obj,
-            role=form.cleaned_data["role_definition"],
-            status=form.cleaned_data["status"],
+        raise PermissionDenied(
+            "مدیریت عضویت از Django Admin غیرفعال است؛ از مسیر Tenant استفاده کنید."
         )
 
 
@@ -328,7 +277,7 @@ class OrganizationRoleAdminForm(forms.ModelForm):
 
 @admin.register(OrganizationRole)
 class OrganizationRoleAdmin(admin.ModelAdmin):
-    """Let only the system admin compose global roles from implemented permissions."""
+    """Expose the code-owned role catalogue as read-only platform metadata."""
 
     form = OrganizationRoleAdminForm
     list_display = ("name", "code", "is_active", "is_system", "is_owner", "updated_at")
@@ -375,22 +324,17 @@ class OrganizationRoleAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
     def has_add_permission(self, request: HttpRequest) -> bool:
-        return request.user.is_superuser
+        return False
 
     def has_change_permission(
         self, request: HttpRequest, obj: OrganizationRole | None = None
     ) -> bool:
-        return request.user.is_superuser
+        return False
 
     def has_delete_permission(
         self, request: HttpRequest, obj: OrganizationRole | None = None
     ) -> bool:
-        return bool(
-            request.user.is_superuser
-            and obj is not None
-            and not obj.is_system
-            and not obj.memberships.exists()
-        )
+        return False
 
     def get_readonly_fields(
         self, request: HttpRequest, obj: OrganizationRole | None = None
@@ -407,54 +351,16 @@ class OrganizationRoleAdmin(admin.ModelAdmin):
         form,
         change: bool,
     ) -> None:
-        if not request.user.is_superuser:
-            raise PermissionDenied("فقط ادمین سامانه می‌تواند نقش‌ها را مدیریت کند.")
-        if change:
-            request._previous_role_permissions = set(
-                OrganizationRole.objects.get(pk=obj.pk).permissions.values_list(
-                    "code", flat=True
-                )
-            )
-        obj.updated_by = request.user
-        if not change:
-            obj.created_by = request.user
-        obj.full_clean()
-        super().save_model(request, obj, form, change)
-        record_audit_event(
-            action=AuditAction.ROLE_UPDATED if change else AuditAction.ROLE_CREATED,
-            entity_type="organization_role",
-            entity_id=obj.pk,
-            actor=request.user,
-            metadata={"code": obj.code, "name": obj.name, "is_active": obj.is_active},
+        raise PermissionDenied(
+            "کاتالوگ نقش‌های سامانه فقط از طریق migration قابل تغییر است."
         )
 
     def save_related(self, request, form, formsets, change: bool) -> None:
-        super().save_related(request, form, formsets, change)
-        previous = getattr(request, "_previous_role_permissions", set())
-        current = set(form.instance.permissions.values_list("code", flat=True))
-        if previous != current:
-            record_audit_event(
-                action=AuditAction.ROLE_PERMISSIONS_CHANGED,
-                entity_type="organization_role",
-                entity_id=form.instance.pk,
-                actor=request.user,
-                metadata={
-                    "code": form.instance.code,
-                    "previous_permissions": sorted(previous),
-                    "new_permissions": sorted(current),
-                },
-            )
+        raise PermissionDenied(
+            "کاتالوگ نقش‌های سامانه فقط از طریق migration قابل تغییر است."
+        )
 
     def delete_model(self, request: HttpRequest, obj: OrganizationRole) -> None:
-        if not self.has_delete_permission(request, obj):
-            raise PermissionDenied(
-                "فقط نقش سفارشیِ استفاده‌نشده توسط ادمین سامانه قابل حذف است."
-            )
-        record_audit_event(
-            action=AuditAction.ROLE_DELETED,
-            entity_type="organization_role",
-            entity_id=obj.pk,
-            actor=request.user,
-            metadata={"code": obj.code, "name": obj.name},
+        raise PermissionDenied(
+            "کاتالوگ نقش‌های سامانه فقط از طریق migration قابل تغییر است."
         )
-        super().delete_model(request, obj)

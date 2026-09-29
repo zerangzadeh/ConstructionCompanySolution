@@ -13,7 +13,7 @@
             <span class="erp-admin-page-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z"/></svg></span>
             <div><span class="erp-admin-eyebrow">مدیریت سیستم</span><h1>داشبورد مدیریت</h1><p>دسترسی یکپارچه به داده‌ها و تنظیمات سامانه</p></div>
         </div>
-        <div class="erp-admin-header-actions"><span class="erp-admin-access-summary"><strong>{{ app_list|length }}</strong> بخش در دسترس</span><a class="erp-admin-view-site" href="{{ site_url|default:'/' }}"><span>بازگشت به سامانه</span><span aria-hidden="true">←</span></a></div>
+        <div class="erp-admin-header-actions"><span class="erp-admin-access-summary"><strong>{{ app_list|length }}</strong> بخش در دسترس</span><a class="erp-admin-view-site" href="{% url 'organizations:select' %}" aria-label="بازگشت به منوی اصلی سامانه"><span>بازگشت به منوی اصلی</span><span aria-hidden="true">←</span></a></div>
     </div>
     <div id="content-main" class="erp-admin-dashboard-main">
         <div class="erp-admin-section-heading"><div><span class="erp-admin-eyebrow">دسترسی سریع</span><h2>بخش‌های سامانه</h2><p>مدل‌ها براساس حوزه کاری گروه‌بندی شده‌اند.</p></div></div>

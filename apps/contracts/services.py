@@ -18,7 +18,11 @@ from apps.contracts.models import (
     ContractType,
 )
 from apps.materials.models import UnitOfMeasure
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     Organization,
@@ -36,6 +40,7 @@ def can_view_contracts(user: User, organization: Organization) -> bool:
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.CONTRACTS_VIEW,
+        allow_any_scope=True,
     )
 
 
@@ -44,6 +49,7 @@ def can_manage_contracts(user: User, organization: Organization) -> bool:
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.CONTRACTS_CREATE,
+        allow_any_scope=True,
     )
 
 
@@ -51,11 +57,16 @@ def _has_contract_permission(
     user: User,
     organization: Organization,
     permission: BusinessPermissionCode,
+    *,
+    project: Project | None = None,
+    allow_any_scope: bool = False,
 ) -> bool:
     return has_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        project=project,
+        allow_any_scope=allow_any_scope,
     )
 
 
@@ -88,7 +99,10 @@ def create_contract(
     ):
         raise PermissionDenied("سازمان فعال نیست.")
     if not _has_contract_permission(
-        actor, organization, BusinessPermissionCode.CONTRACTS_CREATE
+        actor,
+        organization,
+        BusinessPermissionCode.CONTRACTS_CREATE,
+        project=project,
     ):
         raise PermissionDenied("اجازه ایجاد قرارداد در این سازمان را ندارید.")
     if project.organization_id != organization.pk or project.deleted_at is not None:
@@ -168,11 +182,16 @@ def get_organization_contracts(
         raise PermissionDenied("سازمان فعال نیست.")
     if not can_view_contracts(user, organization):
         raise PermissionDenied("اجازه مشاهده قراردادهای این سازمان را ندارید.")
+    membership = get_active_membership(user=user, organization=organization)
     return (
-        Contract.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-            project__deleted_at__isnull=True,
+        scope_queryset(
+            Contract.objects.filter(
+                organization=organization,
+                deleted_at__isnull=True,
+                project__deleted_at__isnull=True,
+            ),
+            membership=membership,
+            project_lookup="project_id",
         )
         .select_related("project", "party", "created_by", "updated_by")
         .order_by("-created_at")
@@ -180,7 +199,11 @@ def get_organization_contracts(
 
 
 def _get_locked_contract(*, contract: Contract, organization: Organization) -> Contract:
-    locked = Contract.objects.select_for_update().get(pk=contract.pk)
+    locked = (
+        Contract.objects.select_for_update()
+        .select_related("project")
+        .get(pk=contract.pk)
+    )
     if locked.organization_id != organization.pk:
         raise PermissionDenied("قرارداد متعلق به این سازمان نیست.")
     return locked
@@ -201,11 +224,14 @@ def update_draft_contract(
     notes: str = "",
 ) -> Contract:
     """Edit only a draft contract; finalized commercial terms use amendments."""
+    locked = _get_locked_contract(contract=contract, organization=organization)
     if not _has_contract_permission(
-        actor, organization, BusinessPermissionCode.CONTRACTS_CHANGE
+        actor,
+        organization,
+        BusinessPermissionCode.CONTRACTS_CHANGE,
+        project=locked.project,
     ):
         raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
-    locked = _get_locked_contract(contract=contract, organization=organization)
     if locked.status != ContractStatus.DRAFT:
         raise ValueError("فقط قراردادهای پیش‌نویس قابل ویرایش هستند.")
     if (
@@ -248,11 +274,14 @@ def transition_contract_status(
     *, organization: Organization, actor: User, contract: Contract, status: str
 ) -> Contract:
     """Apply the deliberately narrow contract lifecycle under a row lock."""
+    locked = _get_locked_contract(contract=contract, organization=organization)
     if not _has_contract_permission(
-        actor, organization, BusinessPermissionCode.CONTRACTS_TRANSITION
+        actor,
+        organization,
+        BusinessPermissionCode.CONTRACTS_TRANSITION,
+        project=locked.project,
     ):
         raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
-    locked = _get_locked_contract(contract=contract, organization=organization)
     allowed = {
         ContractStatus.DRAFT: {ContractStatus.ACTIVE, ContractStatus.TERMINATED},
         ContractStatus.ACTIVE: {ContractStatus.COMPLETED, ContractStatus.TERMINATED},
@@ -287,11 +316,14 @@ def add_contract_item(
     wbs_node: WBSNode | None = None,
     sort_order: int = 0,
 ) -> ContractItem:
+    locked = _get_locked_contract(contract=contract, organization=organization)
     if not _has_contract_permission(
-        actor, organization, BusinessPermissionCode.CONTRACT_ITEMS_ADD
+        actor,
+        organization,
+        BusinessPermissionCode.CONTRACT_ITEMS_ADD,
+        project=locked.project,
     ):
         raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
-    locked = _get_locked_contract(contract=contract, organization=organization)
     if locked.status != ContractStatus.DRAFT:
         raise ValueError("فقط ردیف‌های قرارداد پیش‌نویس قابل تغییر هستند.")
     if not description.strip() or quantity <= Decimal(0) or unit_price < Decimal(0):
@@ -323,15 +355,20 @@ def _approve_contract_amendment_domain(
     *, organization: Organization, actor: User, amendment: ContractAmendment
 ) -> ContractAmendment:
     """Approve a single immutable amendment without changing the legacy header value."""
+    locked = (
+        ContractAmendment.objects.select_for_update()
+        .select_related("contract__project")
+        .get(pk=amendment.pk)
+    )
+    if locked.organization_id != organization.pk:
+        raise PermissionDenied("الحاقیه متعلق به این سازمان نیست.")
     if not _has_contract_permission(
         actor,
         organization,
         BusinessPermissionCode.CONTRACT_AMENDMENTS_APPROVE,
+        project=locked.contract.project,
     ):
         raise PermissionDenied("اجازه مدیریت قراردادهای این سازمان را ندارید.")
-    locked = ContractAmendment.objects.select_for_update().get(pk=amendment.pk)
-    if locked.organization_id != organization.pk:
-        raise PermissionDenied("الحاقیه متعلق به این سازمان نیست.")
     if locked.contract.status not in {ContractStatus.ACTIVE, ContractStatus.COMPLETED}:
         raise ValueError("فقط قراردادهای نهایی‌شده می‌توانند الحاقیه داشته باشند.")
     if locked.status != ContractAmendmentStatus.DRAFT:

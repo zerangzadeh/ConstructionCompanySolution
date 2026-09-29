@@ -1,28 +1,44 @@
 # P0-S14: Q04 Product Owner decision packet
 
-**Status:** PRODUCT OWNER DECISIONS AND P0-S18 FINAL ACCOUNTABLE REVIEWER DECISION
-RECORDED — all review outcomes and evidence remain OPEN
+**Status:** PRODUCT OWNER DECISIONS, P0-S18 FINAL ACCOUNTABLE REVIEWER DECISION
+AND P0-G01 REVIEW RECORDED — no ADR accepted and no implementation authorized
 
 **Recorded:** 2026-09-25. **Final Q04-G decision reconfirmed:** 2026-09-26.
 **Role vocabulary normalized:** 2026-09-26.
 **Membership-scoped multi-role rule recorded:** 2026-09-26.
 **Accountable-review assignments recorded (P0-S17):** 2026-09-26 — only the
-explicitly supplied reviewer assignments are recorded; all review outcomes,
-evidence/version, dates, unresolved objections and resulting revisions remain
-`OPEN`.
+explicitly supplied reviewer assignments are recorded; the later P0-G01 review
+findings are recorded below without claiming implemented-control evidence.
 **Final accountable reviewer decision recorded (P0-S18):** 2026-09-26 — Azam
 Zerangzadeh is assigned all Q04-A through Q04-H review responsibilities. This is
 an explicit Product Owner override of the packet's reviewer-independence
-expectation where applicable; every review-result field remains `OPEN`.
+expectation where applicable; it does not create an independent second human.
+
+**P0-G01 identity-policy clarification (2026-09-27):** Azam Zerangzadeh is the
+real accountable person for Platform-level review responsibilities, including
+Platform Owner, Platform Admin, Superuser, Platform Security / Authorization and
+Platform Operations / Privacy responsibilities. Tenant-role examples use only
+clearly labelled Seed/Test identities and never constitute a real reviewer,
+governance evidence or gate closure. The
+[P0-G01 evidence matrix](P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md) is
+the authoritative preparation record for this clarification. Where a requirement
+demands an independent second human, the current single-person project records an
+explicit OPEN independence gap rather than inventing a person.
+
+**P0-G01 accountable review recorded (2026-09-27):** the
+[evidence matrix](P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings)
+records A/B/F as `accepted with conditions` and C/D/E/G/H as `revision required`.
+These are review findings about policy readiness and verified implementation gaps;
+they do not accept S07 or another ADR, close P0, or authorize P1.
 
 This packet isolates P0-S03-Q04 from the consolidated
 [P0.1 ADR review packet](P0_S13_P01_ADR_REVIEW_PACKET.md). P0-S15 records the
 Product Owner's explicit Q04-A through Q04-H selections and revisions for
 project/site scope, privileged access, separation and workflow fallback. P0-S17
 records the initially supplied reviewer assignments, and P0-S18 records the final
-accountable reviewer and explicit independence override. Neither session accepts
-an ADR, records a review outcome or evidence, or authorizes P1.1, P0.2, P0.3 or
-any other implementation.
+accountable reviewer and explicit independence override. P0-G01 records the later
+bounded review findings. None accepts an ADR or authorizes P1.1, P0.2, P0.3 or any
+other implementation.
 
 The [S07 scope ADR](ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md) and current code/tests
 remain authoritative for proposed and delivered behavior respectively. In
@@ -344,6 +360,13 @@ future owner do not close a gate.
 | Affected domain owner | Action-by-action scope classification, parent-context fields and domain-specific SoD/fallback additions | Before each consuming package's design acceptance |
 | Legal/compliance reviewer, where applicable | Review configured Self-Approval and emergency access against external independence, statutory, contractual and evidence obligations; record unresolved release constraints | F-G for regulated or contractually controlled operations |
 
+For P0-G01, the real accountable reviewer named for each Platform-level
+responsibility is Azam Zerangzadeh under the 2026-09-27 identity policy. A
+Tenant Owner, Tenant Admin, approver or workflow actor appearing in a test case
+must use the named Seed/Test identity in the P0-G01 matrix. Such an identity is
+test data only: it cannot be substituted for a reviewer, approval, evidence or
+independent challenge.
+
 The packet originally required the Product Owner to record why independence is not
 defeated when one person holds more than one review responsibility, and prohibited
 the decision maker from being the sole reviewer of their own privileged access.
@@ -365,10 +388,11 @@ or rejected; these risks remain explicit review and release constraints until
 supported by supplied evidence or a later explicit Product Owner revision.
 
 P0-S18 records Azam Zerangzadeh as the final accountable reviewer for every
-required responsibility across Q04-A through Q04-H. P0-S19 records the S18
-handoff without inferring a review: no review outcome, evidence/version, review
-date, unresolved objection or resulting revision was supplied. All those fields
-therefore remain `OPEN`:
+required responsibility across Q04-A through Q04-H. The following table is the
+**historical P0-S19 pre-review register**: it recorded no supplied review fact at
+that time, so its fields were `OPEN`. The current P0-G01 findings, evidence
+references, dates, objections and conditions are authoritative in the
+[P0-G01 evidence matrix](P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings).
 
 | Choice | Required reviewer responsibilities | Reviewer names | Review outcomes | Evidence/version and review dates | Unresolved objections | Resulting revisions from reviewer feedback |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -404,7 +428,9 @@ operation, P1.1, P0.2 or P0.3.
 ## 5. Product Owner response record
 
 Selections, rationale and the explicit P0-S18 final accountable reviewer decision
-are recorded. All review outcomes and evidence remain intentionally open.
+are recorded. The table below is the historical Product Owner selection record;
+the later review outcomes and evidence findings are recorded in the
+[P0-G01 evidence matrix](P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings).
 
 | Choice | Selected option / revision | Product Owner rationale | Required reviewer name(s) | Review outcome/evidence |
 | --- | --- | --- | --- | --- |
@@ -427,12 +453,13 @@ P0-S14 packet preparation is complete, P0-S15 records the Product Owner selectio
 and P0-S16 records that accountable reviews were pending. P0-S17 records the
 initial assignments, and P0-S18 records Azam Zerangzadeh as final accountable
 reviewer for all Q04 review responsibilities together with the explicit Product
-Owner independence override. P0-S19 records no supplied completed review. All
-review outcomes, evidence/version, dates, unresolved objections and resulting
-revisions remain **OPEN**. The Q04
-accountable-review gate therefore remains **OPEN**; reviewer assignment and the
-independence override are not approval. The recorded concentration and external-
-independence risks remain explicit.
+Owner independence override. P0-S19 is historical pre-review evidence only.
+P0-G01 records the current review outcomes: A/B/F are `accepted with conditions`;
+C/D/E/G/H are `revision required`. The Q04 accountable-review gate remains
+**OPEN** because no ADR is accepted and the recorded remediation, implementation,
+compliance and independence conditions remain unresolved. Reviewer assignment and
+the independence override are not approval. The recorded concentration and
+external-independence risks remain explicit.
 
 The next bounded handoff is submission of actual review outcomes and evidence for
 each decision, with particular attention to the recorded concentration risk,

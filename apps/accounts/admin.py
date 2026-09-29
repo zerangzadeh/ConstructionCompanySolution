@@ -12,8 +12,9 @@ from django.contrib.auth.forms import (
 )
 from django.contrib.auth.hashers import UNUSABLE_PASSWORD_PREFIX
 from django.contrib.auth.models import Group, Permission
+from django.core.exceptions import PermissionDenied
 from django.db import models
-from django.db.models import Q, QuerySet
+from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.utils import timezone
 
@@ -28,10 +29,6 @@ from apps.organizations.models import (
     Organization,
     OrganizationRole,
     OrganizationStatus,
-)
-from apps.organizations.services import (
-    provision_user_for_organization,
-    update_organization_membership,
 )
 
 
@@ -323,7 +320,7 @@ class CustomUserAdmin(UserAdmin):
         )
 
     def has_add_permission(self, request: HttpRequest) -> bool:
-        return request.user.is_superuser and super().has_add_permission(request)
+        return False
 
     def has_change_permission(
         self, request: HttpRequest, obj: User | None = None
@@ -342,27 +339,14 @@ class CustomUserAdmin(UserAdmin):
         form: PersianUserChangeForm | PersianUserCreationForm,
         change: bool,
     ) -> None:
+        if not change:
+            raise PermissionDenied(
+                "ایجاد هویت و عضویت سازمانی فقط از مسیر مدیریت مستأجر مجاز است."
+            )
         previous_status = None
-        if change:
-            previous = User.objects.get(pk=obj.pk)
-            previous_status = previous.account_status
-        if not change:
-            obj.is_active = False
+        previous = User.objects.get(pk=obj.pk)
+        previous_status = previous.account_status
         super().save_model(request, obj, form, change)
-        if not change:
-            membership = provision_user_for_organization(
-                organization=form.cleaned_data["organization"],
-                user=obj,
-                actor=request.user,
-            )
-            update_organization_membership(
-                organization=membership.organization,
-                actor=request.user,
-                membership=membership,
-                role=form.cleaned_data["role_definition"],
-                status=MembershipStatus.ACTIVE,
-            )
-            return
         if previous_status is not None and previous_status != obj.account_status:
             record_audit_event(
                 action=AuditAction.USER_ACCOUNT_STATUS_CHANGED,
@@ -393,32 +377,15 @@ class CustomUserAdmin(UserAdmin):
     def _build_detail_context(
         self, request: HttpRequest, user: User
     ) -> dict[str, object]:
-        memberships = user.organization_memberships.select_related(
-            "organization", "assigned_by"
-        )
-        if not request.user.is_superuser:
-            memberships = memberships.filter(organization=request.organization)
-        membership_rows = [
-            {
-                "membership": membership,
-                "role_label": membership.role_label,
-                "status_label": membership.get_status_display(),
-                "status_class": self._membership_status_class(membership.status),
-            }
-            for membership in memberships
-        ]
-        membership_ids = [str(row["membership"].pk) for row in membership_rows]
-
-        event_filter = Q(actor=user) | Q(entity_type="user", entity_id=str(user.pk))
-        if membership_ids:
-            event_filter |= Q(
-                entity_type="organization_membership",
-                entity_id__in=membership_ids,
+        # Global identity administration must not expose tenant membership or audit data.
+        events = (
+            AuditEvent.objects.filter(
+                organization__isnull=True,
+                actor=user,
             )
-        events = AuditEvent.objects.filter(event_filter)
-        if not request.user.is_superuser:
-            events = events.filter(organization=request.organization)
-        events = events.select_related("organization", "actor").order_by("-created_at")
+            .select_related("actor")
+            .order_by("-created_at")
+        )
         last_access_change = events.filter(
             action__in=[
                 AuditAction.MEMBERSHIP_ROLE_CHANGED,
@@ -429,8 +396,8 @@ class CustomUserAdmin(UserAdmin):
         return {
             "detail_user": user,
             "account_status_class": self._account_status_class(user.account_status),
-            "can_manage_memberships": request.user.is_superuser,
-            "membership_rows": membership_rows,
+            "can_manage_memberships": False,
+            "membership_rows": (),
             "audit_events": events[:25],
             "last_access_change": last_access_change,
         }

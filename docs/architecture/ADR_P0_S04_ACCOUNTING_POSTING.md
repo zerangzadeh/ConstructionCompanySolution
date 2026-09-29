@@ -1,6 +1,7 @@
 # ADR P0-S04: Native Accounting posting and Treasury/AP/AR source contracts
 
-**Date:** 2026-09-24. **Status: PROPOSED — NOT ACCEPTED; NOT IMPLEMENTATION AUTHORIZATION.**
+**Date:** 2026-09-24. **Status: ACCEPTED AS TARGET ARCHITECTURE ON 2026-09-28;
+P1-S14 GOVERNANCE CLOSED 2026-09-29; P2 VALUE/RELEASE GATES PRESERVED.**
 
 P0-D02 approves native financial authorities; it does not approve this detailed
 design. The Product Owner requested P0-S04 within the
@@ -129,8 +130,7 @@ not new permission codes or grants in this session:
 New capabilities require `BusinessPermissionCode`, registry entries, catalog/default
 grant migrations and view/service enforcement with negative tests. No implicit
 Tenant Owner, Tenant Admin, Platform Admin, Superuser or support exception is implemented here: D1/E1/revised F2 now
-supply policy direction, while reviewer evidence and compatible implementation
-remain open. Suspended tenants cannot
+supply policy direction, while compatible implementation remains open. Suspended tenants cannot
 mutate business data; cancelled tenants cannot use normal business access.
 
 ## 5. Reversal, close and reconciliation
@@ -140,7 +140,8 @@ reason and preserved close/reopen evidence. Posting and close must lock the same
 period control so neither can validate stale state. Close evaluates in-scope
 unposted/rejected sources, source/subledger/GL differences and unresolved material
 exceptions. Materiality, exception signoff and the exact close checklist need
-professional approval; do not invent a tolerance or waive mismatches here.
+an accepted versioned policy/source basis; do not invent a tolerance or waive
+mismatches here.
 
 No backdated mutation of closed history. A late correction is blocked until an
 authorized explicit reopening or an approved adjustment in an open period; exact
@@ -205,12 +206,12 @@ approved contract/removal:
 These are proposal-review examples in one hypothetical approved currency `C`,
 using Decimal amounts, not certified accounting rules, an IRR decision, statutory
 advice or executed tests. Tax, retention, advances and FX are intentionally absent;
-their mappings require Q01/Q02 and professional review. Account labels are roles,
+their mappings require Q01/Q02 and versioned policy/source evidence. Account labels are roles,
 not an approved chart of accounts.
 
 | Event | Illustrative balanced journal | Lineage and expected result |
 | --- | --- | --- |
-| Recognize approved claim version A for 100 | Dr AR control 100; Cr reviewed recognition account 100 | Claim/version + recognition occurrence -> AR obligation -> journal; outstanding 100. Recognition timing/account still require reviewer acceptance. |
+| Recognize approved claim version A for 100 | Dr AR control 100; Cr policy-selected recognition account 100 | Claim/version + recognition occurrence -> AR obligation -> journal; outstanding 100. Recognition timing/account still requires an accepted versioned policy before use. |
 | Receive 60 before assigning it | Dr cash 60; Cr unapplied receipts 60 | Treasury movement/version -> cash journal, exactly once; AR outstanding remains 100. Contract allocation alone does not recognize another receipt. |
 | Apply that 60 to claim A | Dr unapplied receipts 60; Cr AR control 60 | AP/AR allocation -> claim obligation + Treasury receipt + settlement journal; outstanding 40, cash still 60, unapplied balance 0. |
 | Reverse that application | Dr AR control 60; Cr unapplied receipts 60 | Reversal links original allocation/journal and reason; outstanding 100, cash still 60, unapplied 60. Retry returns the same result. |
@@ -232,16 +233,16 @@ completed PPC-02 is made.
 
 | Open input / owner | Required gate |
 | --- | --- |
-| Q01 / Product Owner with accounting reviewer | Decide IRR-only vs multi-currency, fiscal/calendar boundaries, quantization/rounding and relevant valuation policy before affected P1.2/P2/P8.1 design acceptance or financial implementation. FX rates/gains/losses cannot be assumed. |
-| Q02 / Product Owner to name professional reviewer | Confirm statutory filing/export scope and validate recognition, COA/mappings, posting/reversal dates, close/reopen, opening balances and review evidence before accepting affected design/implementing it; professional release signoff remains required. No current BillingPolicy rate is certified. |
+| Q01 / Product Owner and Platform policy owner | Product scope is recorded in section 9: IRR initial base/storage/display, multi-currency-ready but no FX behavior, UTC/ISO persistence with Jalali UI and explicit fiscal calendar, versioned precision categories and no current financial inventory valuation. Exact accounting precision/rounding facts require a configured, sourced policy before use. |
+| Q02 / Product Owner and Platform policy owner | Export-only initial boundary and official-source hierarchy are recorded in section 9. Actual source versions are required where the policy declares provenance mandatory or the feature makes a source-backed regulated claim; professional evidence is optional governance metadata, not a global development gate. No current BillingPolicy rate is certified. |
 | Q04 / Product Owner and security/workflow design owner | A1-B1-C1-D1-E1, revised F2, final G3 — Revised with Protected Operations, and H1 are selected. Named security/workflow/accounting and applicable legal review remains before affected acceptance. Protected Operations prohibit Self-Approval; financial/business approvals may be platform-configurable and, where permitted, tenant-configurable with full audit and tenant-specific control/regulatory responsibility. |
-| Migration / Product Owner, accounting reviewer and operator | Select pilot, cutoff, replay/opening strategy, source-version bridge and reconciliation/rollback acceptance before P2/P3 rollout. Named reviewers/operators remain to be assigned. |
+| Migration / Product Owner and operator | Select pilot, cutoff, replay/opening strategy, source-version bridge and reconciliation/rollback acceptance before P2/P3 rollout. Optional professional evidence may be attached to the exact reviewed version. |
 | Q03 and D03-D05 / existing S03 owners | Retain original storage/retention, hosting, recovery and commercial gates. This proposal supplies no location, duration, RPO/RTO, quota or price. |
 
 The complete [S03 open-input register](../ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates)
-remains authoritative, including D01 pilot/workload details. No row is closed here.
-No external legal/provider research was necessary to prepare this gated proposal;
-professional/source validation is outstanding.
+remains authoritative for unaffected inputs, including D01 pilot/workload details.
+Section 9 supersedes the historical Q01/Q02 decision status in this table; actual
+source/policy validation remains outstanding only for affected activation.
 
 Before implementation acceptance, approved packages must test: tenant/project and
 permission denials (including inactive/suspended/cancelled contexts); source and
@@ -252,3 +253,33 @@ allocation caps; migration double counting and rollback; and source-to-subledger
 to-GL tie-out. Existing Payment/Billing behavior remains a regression obligation.
 These are planned gates, not passing test results. P0/P0.1 and the final release
 contract remain incomplete; accepting this ADR also would not authorize packages.
+
+## 9. P1-S14 Product Owner disposition and incorporated Q01/Q02 baseline
+
+The Product Owner's D14-01 instruction held acceptance pending until the recorded
+Q01/Q02 decisions were incorporated. The following incorporation was checked
+against sections 2-8 and introduces no contradiction, so D14-01 Option A now
+accepts this ADR as target architecture only:
+
+- one explicit Tenant base currency; initial support, canonical storage and all
+  monetary display are IRR; no Toman denomination; multi-currency-ready design but
+  no FX transaction, conversion, revaluation or exchange-rate accounting in scope;
+  unsupported conversion fails closed;
+- UTC timestamps and ISO/Gregorian-compatible persistence/processing, Jalali UI
+  display, explicit Tenant fiscal-calendar configuration and effective-dated
+  changes that never rewrite historical meaning;
+- platform-governed, versioned domain precision policies distinguishing money,
+  quantities, rates/percentages, intermediate results and document totals;
+  a configured versioned policy with required provenance must supply any method,
+  scale or rounding point before use;
+- no authoritative financial inventory valuation in P1-S14/current Inventory;
+- export/preparation only for the initial statutory boundary, not autonomous
+  filing; official versioned sources are primary authority and reviewed
+  professional interpretations may only supplement them; and
+- Platform Admin owns the allowed versioned policy space; Tenant Owner selects and
+  Tenant Admin applies permitted options. Professional review is optional evidence,
+  not an application role or global development gate.
+
+This disposition approves no Chart of Accounts, statutory rate, recognition rule,
+filing, implementation, pilot, migration or release. The pending evidence remains
+a blocking gate for P1-S14 implementation and every affected financial use.

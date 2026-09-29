@@ -130,6 +130,7 @@ class IdentifierCanonicalizationTests(TestCase):
                 "slug": "  Form-Organization  ",
                 "timezone": "UTC",
                 "currency": "USD",
+                "initial_owner_username": self.owner.username,
             }
         )
         self.assertTrue(form.is_valid(), form.errors)
@@ -142,6 +143,7 @@ class IdentifierCanonicalizationTests(TestCase):
                 "slug": " MIXED-ORGANIZATION ",
                 "timezone": "UTC",
                 "currency": "USD",
+                "initial_owner_username": self.owner.username,
             }
         )
         self.assertFalse(duplicate_form.is_valid())

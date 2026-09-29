@@ -6,7 +6,10 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    has_business_permission,
+    permission_supports_object_scope,
+)
 from apps.organizations.models import BusinessPermissionCode
 
 
@@ -22,6 +25,7 @@ def require_organization_permission(
         user=request.user,
         organization=organization,
         permission=permission,
+        allow_any_scope=permission_supports_object_scope(permission),
     ):
         raise PermissionDenied(message)
 

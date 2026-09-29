@@ -118,6 +118,13 @@ class PermissionRegistryArchitectureTests(SimpleTestCase):
             {
                 "organizations.BusinessPermission",
                 "organizations.OrganizationRole",
+                "organizations.PlatformRoleAssignment",
+                "organizations.ProtectedOperation",
+                "organizations.AuthorizationPolicyVersion",
+                "organizations.PolicySource",
+                "organizations.PlatformPolicy",
+                "organizations.PlatformPolicyVersion",
+                "organizations.PolicyReviewEvidence",
                 "workflows.WorkflowType",
                 "workflows.WorkflowTemplate",
             },

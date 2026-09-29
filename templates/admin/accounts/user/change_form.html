@@ -73,9 +73,9 @@
         <header class="erp-user-section__header">
           <div>
             <span class="erp-user-section__index">۲</span>
-            <h2 id="memberships-title">عضویت‌ها و نقش‌های شرکتی</h2>
+            <h2 id="memberships-title">مرز عضویت‌های شرکتی</h2>
           </div>
-          <p>نقش و وضعیت کاربر در هر tenant قابل مشاهده</p>
+          <p>عضویت و نقش Tenant در پنل فنی سراسری نمایش داده یا مدیریت نمی‌شود</p>
         </header>
         {% if membership_rows %}
           <div class="erp-user-table-wrap">
@@ -109,8 +109,8 @@
           </div>
         {% else %}
           <div class="erp-user-empty-state">
-            <strong>عضویت شرکتی وجود ندارد</strong>
-            <p>این کاربر در محدودهٔ شرکتی قابل مشاهده، عضویتی ندارد.</p>
+            <strong>اطلاعات عضویت در این مسیر قابل مشاهده نیست</strong>
+            <p>مدیریت نقش و دامنه فقط از مسیر کنترل‌شدهٔ Tenant انجام می‌شود.</p>
           </div>
         {% endif %}
       </section>
@@ -121,7 +121,7 @@
             <span class="erp-user-section__index">۳</span>
             <h2 id="permissions-title">مجوزها و دسترسی‌ها</h2>
           </div>
-          <p>دسترسی عملیاتی از نقش عضویت شرکتی کاربر تعیین می‌شود</p>
+          <p>اختیار فنی سامانه از دسترسی عملیاتی Tenant مستقل است</p>
         </header>
         <div class="erp-access-summary-grid">
           <div>
@@ -134,13 +134,13 @@
           </div>
           <div>
             <span>منبع دسترسی عملیاتی</span>
-            <strong>نقش شرکتی</strong>
+            <strong>مسیر کنترل‌شدهٔ Tenant</strong>
           </div>
         </div>
 
         <div class="erp-user-notice">
-          <strong>برای تغییر دسترسی عملیاتی، نقش عضویت شرکتی را تغییر دهید.</strong>
-          <p>مجوزهای مستقیم و گروه‌های سراسری از فرم کاربر حذف شده‌اند تا دسترسی هر شرکت فقط از نقش همان عضویت دریافت شود.</p>
+          <strong>این صفحه هیچ دسترسی عملیاتی Tenant ایجاد نمی‌کند.</strong>
+          <p>نقش‌ها، دامنه‌ها و تأیید دوگانه فقط در مرز عضویت همان Tenant مدیریت می‌شوند.</p>
         </div>
       </section>
 
@@ -150,7 +150,7 @@
             <span class="erp-user-section__index">۴</span>
             <h2 id="activity-title">تاریخچهٔ فعالیت</h2>
           </div>
-          <p>۲۵ رویداد مهم اخیر در محدودهٔ مجاز شرکتی</p>
+          <p>۲۵ رویداد اخیر در سطح سراسری سامانه؛ رویداد Tenant نمایش داده نمی‌شود</p>
         </header>
         {% if audit_events %}
           <div class="erp-user-table-wrap">

@@ -207,6 +207,8 @@ Use references progressively; read only those relevant to the task:
 
 ## 10. Working process and validation
 
+Validation: use the smallest sufficient test scope; do not run or retry known heavy or long-running validations during routine work; defer them to explicit acceptance checkpoints and continue autonomously without waiting for approval.
+
 Before implementing a feature:
 
 1. Inspect the relevant project structure and code.

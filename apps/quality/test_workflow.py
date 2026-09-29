@@ -12,7 +12,12 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.organizations.models import (
+    MembershipRole,
+    MembershipStatus,
+    Organization,
+    OrganizationSettings,
+)
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.projects.models import Project
 from apps.quality.models import (
@@ -87,7 +92,9 @@ class QualityWorkflowTests(QualityTestBase):
         )
         item = instance.work_items.get(status=WorkItemStatus.OPEN)
         self.assertEqual(
-            item.due_at.astimezone(ZoneInfo(self.organization.timezone)).date(),
+            item.due_at.astimezone(
+                ZoneInfo(self.organization.settings.timezone)
+            ).date(),
             issue.due_date,
         )
         self.client.force_login(self.owner)
@@ -318,6 +325,7 @@ class QualityWorkflowConcurrencyTests(TransactionTestCase):
         organization = Organization.objects.create(
             name="Quality Race", slug="quality-race"
         )
+        OrganizationSettings.objects.create(organization=organization)
         for user, role in (
             (owner, MembershipRole.COMPANY_OWNER),
             (manager, MembershipRole.COMPANY_MANAGER),

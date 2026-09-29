@@ -15,7 +15,7 @@
     </div>
     <div class="flex items-center gap-3">
         <a class="h-10 rounded-lg border border-blue-200 px-4 text-sm font-semibold leading-10 text-blue-700 hover:bg-blue-50" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
-        {% if request.user.is_superuser %}<a class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold leading-10 text-white" href="{% url 'organizations:create' %}">شرکت جدید</a>{% endif %}
+        {% if is_platform_admin %}<a class="h-10 rounded-lg border border-blue-200 px-4 text-sm font-semibold leading-10 text-blue-700" href="{% url 'organizations:platform_role_catalog' %}">نقش‌های پلتفرم</a><a class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold leading-10 text-white" href="{% url 'organizations:create' %}">شرکت جدید</a>{% endif %}
     </div>
 </div>
 {% if memberships %}
@@ -33,6 +33,6 @@
     {% endfor %}
 </div>
 {% else %}
-<div class="erp-surface mt-6 rounded-xl p-12 text-center"><h2 class="font-bold">عضویت فعالی وجود ندارد</h2><p class="mt-1 text-sm text-slate-500">{% if request.user.is_superuser %}برای شروع یک شرکت ایجاد کنید.{% else %}برای دسترسی، از ادمین سامانه بخواهید شما را به یک شرکت اضافه کند.{% endif %}</p></div>
+<div class="erp-surface mt-6 rounded-xl p-12 text-center"><h2 class="font-bold">عضویت فعالی وجود ندارد</h2><p class="mt-1 text-sm text-slate-500">{% if is_platform_admin %}از ابزارهای مدیریت پلتفرم استفاده کنید.{% else %}برای دسترسی، از ادمین سامانه بخواهید شما را به یک شرکت اضافه کند.{% endif %}</p></div>
 {% endif %}
 {% endblock %}

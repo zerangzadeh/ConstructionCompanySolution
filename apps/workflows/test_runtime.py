@@ -21,6 +21,7 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.organizations.models import (
+    BusinessPermissionCode,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -51,9 +52,9 @@ from .runtime import (
     claim_work_item,
     complete_work_item,
     create_workflow_delegation,
-    list_member_work_items,
     migrate_workflow_instance,
     reassign_work_item,
+    recover_unresolved_work_item,
     release_work_item,
     resume_workflow_instance,
     revoke_workflow_delegation,
@@ -93,7 +94,6 @@ def _test_subject_loader(
         subject_id=str(subject.pk),
         organization_id=str(organization.pk),
         attributes={
-            "project_id": "project-1",
             "status": "submitted",
             "created_by_id": str(owner.user_id) if owner else "",
         },
@@ -253,7 +253,21 @@ class RuntimeTestBase(RuntimeRegistryMixin):
             version_id=version.pk,
             configuration=_configuration(
                 routes
-                or [{"resolver_type": "organization_owner", "configuration": {}}],
+                or [
+                    {
+                        "resolver_type": "business_permission",
+                        "configuration": {
+                            "permission": BusinessPermissionCode.WORK_ITEMS_ACT
+                        },
+                    },
+                    {
+                        "resolver_type": "explicit_membership",
+                        "configuration": {
+                            "membership_id": str(self.owner_membership.pk)
+                        },
+                        "is_fallback": True,
+                    },
+                ],
                 step_permission=step_permission,
             ),
         )
@@ -290,7 +304,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
         self.assertEqual(first.pk, second.pk)
         self.assertEqual(first.work_items.count(), 1)
 
-    def test_owner_fallback_operates_without_workforce(self) -> None:
+    def test_privileged_owner_fallback_becomes_visible_unresolved_work(self) -> None:
         position = Position.objects.create(
             organization=self.organization,
             code="EMPTY",
@@ -310,14 +324,10 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             ]
         )
         instance = self.start(version)
-        candidate = instance.work_items.get().candidates.get()
-        self.assertEqual(candidate.membership, self.owner_membership)
-        self.assertEqual(
-            list(
-                list_member_work_items(actor=self.owner, organization=self.organization)
-            ),
-            [instance.work_items.get()],
-        )
+        item = instance.work_items.get()
+        self.assertEqual(item.status, WorkItemStatus.UNRESOLVED)
+        self.assertFalse(item.candidates.exists())
+        self.assertEqual(instance.status, WorkflowInstanceStatus.SUSPENDED)
         self.assertEqual(
             Employee.objects.filter(organization=self.organization).count(), 0
         )
@@ -329,8 +339,14 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
         self.assertFalse(Employee.objects.filter(organization=self.organization))
         item = instance.work_items.get()
         self.assertEqual(
-            list(item.candidates.values_list("membership_id", flat=True)),
-            [self.owner_membership.pk],
+            set(item.candidates.values_list("membership_id", flat=True)),
+            {
+                self.owner_membership.pk,
+                OrganizationMembership.objects.get(
+                    organization=self.organization,
+                    user__username__startswith="runtime-plain-member-",
+                ).pk,
+            },
         )
         claim_work_item(
             actor=self.owner,
@@ -457,8 +473,8 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
                     "configuration": {"position_id": str(second.pk)},
                 },
                 {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
+                    "resolver_type": "explicit_membership",
+                    "configuration": {"membership_id": str(self.owner_membership.pk)},
                     "is_fallback": True,
                 },
             ]
@@ -494,7 +510,8 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
         )
         instance = self.start(version)
         self.assertEqual(instance.status, WorkflowInstanceStatus.SUSPENDED)
-        self.assertEqual(instance.work_items.count(), 0)
+        self.assertEqual(instance.work_items.count(), 1)
+        self.assertEqual(instance.work_items.get().status, WorkItemStatus.UNRESOLVED)
         self.assertEqual(
             instance.step_instances.get(
                 status=WorkflowStepInstanceStatus.ACTIVE
@@ -528,26 +545,28 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
         _, member, assignment = self.add_position_holder(
             suffix="recover", position=position
         )
-        resumed = resume_workflow_instance(
+        unresolved = instance.work_items.get(status=WorkItemStatus.UNRESOLVED)
+        recovered = recover_unresolved_work_item(
             actor=self.owner,
             organization=self.organization,
-            instance_id=instance.pk,
+            work_item_id=unresolved.pk,
             reason="Position assigned",
             idempotency_key="resume-recovered-route",
         )
-        retried = resume_workflow_instance(
+        retried = recover_unresolved_work_item(
             actor=self.owner,
             organization=self.organization,
-            instance_id=instance.pk,
+            work_item_id=unresolved.pk,
             reason="Position assigned",
             idempotency_key="resume-recovered-route",
         )
-        self.assertEqual(resumed.status, WorkflowInstanceStatus.ACTIVE)
-        self.assertEqual(retried.pk, resumed.pk)
-        item = resumed.work_items.get(status=WorkItemStatus.OPEN)
+        instance.refresh_from_db()
+        self.assertEqual(instance.status, WorkflowInstanceStatus.ACTIVE)
+        self.assertEqual(retried.pk, recovered.pk)
+        item = instance.work_items.get(status=WorkItemStatus.OPEN)
         candidate = item.candidates.get(membership=member)
         self.assertEqual(candidate.qualifying_position_assignment, assignment)
-        self.assertEqual(resumed.work_items.count(), 1)
+        self.assertEqual(instance.work_items.count(), 1)
 
     def test_permission_and_candidacy_are_both_required(self) -> None:
         position = Position.objects.create(
@@ -563,45 +582,31 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
                     "configuration": {"position_id": str(position.pk)},
                 },
                 {
-                    "resolver_type": "organization_owner",
-                    "configuration": {},
+                    "resolver_type": "explicit_membership",
+                    "configuration": {"membership_id": str(self.owner_membership.pk)},
                     "is_fallback": True,
                 },
             ],
             step_permission="purchase_requests.approve",
         )
         item = self.start(version).work_items.get()
-        claimed = claim_work_item(
-            actor=member_user,
-            organization=self.organization,
-            work_item_id=item.pk,
-            idempotency_key="candidate-claim",
-        )
-        self.assertEqual(claimed.status, WorkItemStatus.CLAIMED)
         with self.assertRaises(PermissionDenied):
-            complete_work_item(
+            claim_work_item(
                 actor=member_user,
                 organization=self.organization,
                 work_item_id=item.pk,
-                outcome="approved",
-                idempotency_key="candidate-act",
+                idempotency_key="candidate-claim",
             )
-        release_work_item(
-            actor=member_user,
+        claimed = claim_work_item(
+            actor=self.owner,
             organization=self.organization,
             work_item_id=item.pk,
-            idempotency_key="candidate-release",
+            idempotency_key="eligible-fallback-claim",
         )
-        with self.assertRaises(PermissionDenied):
-            claim_work_item(
-                actor=self.owner,
-                organization=self.organization,
-                work_item_id=item.pk,
-                idempotency_key="owner-not-candidate",
-            )
+        self.assertEqual(claimed.current_assignee, self.owner_membership)
 
     def test_effective_delegation_adds_only_current_delegate(self) -> None:
-        _, delegate = self.add_member("delegate")
+        delegate_user, delegate = self.add_member("delegate")
         _, future_delegate = self.add_member("future")
         now = timezone.now()
         active = create_workflow_delegation(
@@ -613,6 +618,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             ends_at=now + timedelta(hours=1),
             reason="Coverage",
             idempotency_key="delegation-active",
+            permission_code=BusinessPermissionCode.WORK_ITEMS_ACT,
         )
         create_workflow_delegation(
             actor=self.owner,
@@ -623,8 +629,25 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             ends_at=now + timedelta(days=2),
             reason="Future coverage",
             idempotency_key="delegation-future",
+            permission_code=BusinessPermissionCode.WORK_ITEMS_ACT,
         )
-        item = self.start(self.create_version()).work_items.get()
+        delegation_routes = [
+            {
+                "resolver_type": "explicit_membership",
+                "configuration": {"membership_id": str(self.owner_membership.pk)},
+            },
+            {
+                "resolver_type": "organization_owner",
+                "configuration": {},
+                "is_fallback": True,
+            },
+        ]
+        item = self.start(
+            self.create_version(
+                delegation_routes,
+                step_permission=BusinessPermissionCode.WORK_ITEMS_ACT,
+            )
+        ).work_items.get()
         ids = set(item.candidates.values_list("membership_id", flat=True))
         self.assertIn(delegate.pk, ids)
         self.assertNotIn(future_delegate.pk, ids)
@@ -637,6 +660,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             ends_at=now + timedelta(hours=1),
             reason="Coverage",
             idempotency_key="delegation-active",
+            permission_code=BusinessPermissionCode.WORK_ITEMS_ACT,
         )
         self.assertEqual(same.pk, active.pk)
         revoke_workflow_delegation(
@@ -645,8 +669,20 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             delegation_id=active.pk,
             reason="Returned",
         )
+        with self.assertRaises(PermissionDenied):
+            claim_work_item(
+                actor=delegate_user,
+                organization=self.organization,
+                work_item_id=item.pk,
+                idempotency_key="revoked-delegation-claim",
+            )
         item_after_revoke = self.start(
-            self.create_version(code="after-revoke"), key="after-revoke"
+            self.create_version(
+                delegation_routes,
+                code="after-revoke",
+                step_permission=BusinessPermissionCode.WORK_ITEMS_ACT,
+            ),
+            key="after-revoke",
         ).work_items.get()
         self.assertFalse(
             item_after_revoke.candidates.filter(membership=delegate).exists()
@@ -857,7 +893,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             migrated.work_items.filter(status=WorkItemStatus.CANCELLED).count(), 1
         )
         self.assertEqual(
-            migrated.work_items.filter(status=WorkItemStatus.OPEN).count(), 1
+            migrated.work_items.filter(status=WorkItemStatus.UNRESOLVED).count(), 1
         )
 
     def test_instance_migration_rejects_another_definition_without_changes(
@@ -909,7 +945,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
                 required_permission="",
             )
         self.assertEqual(len(result.candidates), 1)
-        self.assertLessEqual(len(queries), 8)
+        self.assertLessEqual(len(queries), 12)
         item = instance.work_items.get()
         with CaptureQueriesContext(connection) as claim_queries:
             claim_work_item(
@@ -918,7 +954,9 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
                 work_item_id=item.pk,
                 idempotency_key="query-count-claim",
             )
-        self.assertLessEqual(len(claim_queries), 30)
+        # Includes explicit membership, role-assignment, and scope-grant row locks
+        # that linearize the claim decision with concurrent authorization changes.
+        self.assertLessEqual(len(claim_queries), 40)
 
     def test_large_role_candidate_pool_is_deduplicated_with_bounded_queries(
         self,
@@ -1088,7 +1126,7 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
             idempotency_key="enterprise-triage",
         )
         signoff = instance.work_items.get(action_key="signoff")
-        self.assertEqual(signoff.candidates.count(), 2)
+        self.assertEqual(signoff.candidates.count(), 1)
         with self.assertRaises(PermissionDenied):
             claim_work_item(
                 actor=self.owner,

@@ -13,6 +13,7 @@ from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
     Organization,
+    OrganizationSettings,
 )
 from apps.organizations.services import ACTIVE_ORGANIZATION_SESSION_KEY
 from apps.parties.models import BusinessParty, PartyKind
@@ -48,6 +49,10 @@ class QualityTestBase(TestCase):
         self.other_organization = Organization.objects.create(
             name="Other Quality Co", slug="other-quality-co"
         )
+        OrganizationSettings.objects.create(
+            organization=self.organization, timezone="Asia/Tehran"
+        )
+        OrganizationSettings.objects.create(organization=self.other_organization)
         self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,

@@ -32,6 +32,7 @@ from apps.organizations.models import (
     MembershipRole,
     MembershipStatus,
     Organization,
+    OrganizationSettings,
 )
 from apps.organizations.services import set_active_organization
 from apps.projects.models import Project, ProjectSite
@@ -48,6 +49,10 @@ class EquipmentTestBase(TestCase):
         self.other_organization = Organization.objects.create(
             name="Other Equipment Co", slug="other-equipment-co"
         )
+        OrganizationSettings.objects.create(
+            organization=self.organization, timezone="Asia/Tehran"
+        )
+        OrganizationSettings.objects.create(organization=self.other_organization)
         self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,

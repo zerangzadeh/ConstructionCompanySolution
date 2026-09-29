@@ -16,7 +16,11 @@ from apps.inventory.models import (
     Warehouse,
 )
 from apps.materials.models import Material, UnitOfMeasure
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     Organization,
@@ -36,22 +40,30 @@ def _validate_active_access(
     organization: Organization,
     user: User,
     permission: BusinessPermissionCode,
+    allow_any_scope: bool = False,
 ) -> None:
     require_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        allow_any_scope=allow_any_scope,
         message="اجازه مشاهده اطلاعات انبار این سازمان را ندارید.",
     )
 
 
 def _require_role(
-    *, organization: Organization, actor: User, permission: str, message: str
+    *,
+    organization: Organization,
+    actor: User,
+    permission: str,
+    message: str,
+    project: Project | None = None,
 ) -> None:
     require_business_permission(
         user=actor,
         organization=organization,
         permission=permission,
+        project=project,
         message=message,
     )
 
@@ -192,13 +204,14 @@ def create_warehouse(
     project: Project | None = None,
     location: str = "",
 ) -> Warehouse:
+    project = _validate_project(organization=organization, project=project)
     _require_role(
         organization=organization,
         actor=actor,
         permission=BusinessPermissionCode.WAREHOUSES_CREATE,
         message="اجازه مدیریت انبارهای این سازمان را ندارید.",
+        project=project,
     )
-    project = _validate_project(organization=organization, project=project)
     warehouse = Warehouse(
         organization=organization,
         project=project,
@@ -227,12 +240,6 @@ def create_warehouse(
 def archive_warehouse(
     *, organization: Organization, actor: User, warehouse: Warehouse
 ) -> Warehouse:
-    _require_role(
-        organization=organization,
-        actor=actor,
-        permission=BusinessPermissionCode.WAREHOUSES_ARCHIVE,
-        message="اجازه مدیریت انبارهای این سازمان را ندارید.",
-    )
     try:
         locked = Warehouse.objects.select_for_update().get(
             pk=warehouse.pk,
@@ -240,6 +247,13 @@ def archive_warehouse(
         )
     except Warehouse.DoesNotExist as exc:
         raise PermissionDenied("انبار در این سازمان یافت نشد.") from exc
+    _require_role(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.WAREHOUSES_ARCHIVE,
+        message="اجازه مدیریت انبارهای این سازمان را ندارید.",
+        project=locked.project,
+    )
     if not locked.is_active or locked.archived_at is not None:
         raise ValueError("انبار از قبل بایگانی شده است.")
     if (
@@ -301,12 +315,6 @@ def create_stock_transaction(
 ) -> StockTransaction:
     """Create an auditable draft movement; posting separately changes stock."""
 
-    _require_role(
-        organization=organization,
-        actor=actor,
-        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
-        message="اجازه ایجاد تراکنش انبار در این سازمان را ندارید.",
-    )
     if transaction_type not in StockTransactionType.values or (
         transaction_type == StockTransactionType.REVERSAL
     ):
@@ -325,6 +333,16 @@ def create_stock_transaction(
     destination = _get_warehouse(
         organization=organization,
         warehouse=destination_warehouse,
+    )
+    effective_project = project or source.project if source else project
+    if effective_project is None and destination is not None:
+        effective_project = destination.project
+    _require_role(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
+        message="اجازه ایجاد تراکنش انبار در این سازمان را ندارید.",
+        project=effective_project,
     )
     if goods_receipt_item is not None:
         try:
@@ -391,12 +409,6 @@ def create_stock_transaction(
 def _post_stock_transaction_domain(
     *, organization: Organization, actor: User, stock_transaction: StockTransaction
 ) -> StockTransaction:
-    _require_role(
-        organization=organization,
-        actor=actor,
-        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
-        message="اجازه نهایی‌سازی تراکنش‌های انبار این سازمان را ندارید.",
-    )
     try:
         transaction_record = (
             StockTransaction.objects.select_for_update(of=("self",))
@@ -413,6 +425,13 @@ def _post_stock_transaction_domain(
         )
     except StockTransaction.DoesNotExist as exc:
         raise PermissionDenied("تراکنش انبار در این سازمان یافت نشد.") from exc
+    _require_role(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_POST,
+        message="اجازه نهایی‌سازی تراکنش‌های انبار این سازمان را ندارید.",
+        project=transaction_record.project,
+    )
     if transaction_record.status != StockTransactionStatus.DRAFT:
         raise ValueError("فقط تراکنش‌های انبار پیش‌نویس قابل نهایی‌سازی هستند.")
     transaction_record.project = _validate_project(
@@ -468,12 +487,6 @@ def _reverse_stock_transaction_domain(
 ) -> StockTransaction:
     """Reverse a posted movement with an equal and opposite posted ledger entry."""
 
-    _require_role(
-        organization=organization,
-        actor=actor,
-        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE,
-        message="اجازه برگشت تراکنش‌های انبار این سازمان را ندارید.",
-    )
     try:
         original = (
             StockTransaction.objects.select_for_update(of=("self",))
@@ -488,6 +501,13 @@ def _reverse_stock_transaction_domain(
         )
     except StockTransaction.DoesNotExist as exc:
         raise PermissionDenied("تراکنش انبار در این سازمان یافت نشد.") from exc
+    _require_role(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_REVERSE,
+        message="اجازه برگشت تراکنش‌های انبار این سازمان را ندارید.",
+        project=original.project,
+    )
     if original.status != StockTransactionStatus.POSTED:
         raise ValueError("فقط تراکنش‌های انبار نهایی‌شده قابل برگشت هستند.")
     if original.transaction_type == StockTransactionType.REVERSAL:
@@ -595,13 +615,19 @@ def get_organization_warehouses(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.WAREHOUSES_VIEW,
+        allow_any_scope=True,
     )
     queryset = Warehouse.objects.filter(organization=organization).select_related(
         "project", "created_by", "updated_by"
     )
     if active_only:
         queryset = queryset.filter(is_active=True, archived_at__isnull=True)
-    return queryset
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        queryset=queryset,
+        membership=membership,
+        project_lookup="project_id",
+    )
 
 
 def get_organization_stock_transactions(
@@ -611,8 +637,14 @@ def get_organization_stock_transactions(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW,
+        allow_any_scope=True,
     )
-    return StockTransaction.objects.filter(organization=organization).select_related(
+    membership = get_active_membership(user=user, organization=organization)
+    return scope_queryset(
+        queryset=StockTransaction.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="project_id",
+    ).select_related(
         "source_warehouse",
         "destination_warehouse",
         "material",
@@ -639,11 +671,23 @@ def get_stock_balance(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.STOCK_BALANCES_VIEW,
+        allow_any_scope=True,
     )
     if warehouse.organization_id != organization.pk:
         raise PermissionDenied("انبار در این سازمان یافت نشد.")
     if material.organization_id != organization.pk:
         raise PermissionDenied("مصالح در این سازمان یافت نشد.")
+    membership = get_active_membership(user=user, organization=organization)
+    if (
+        not scope_queryset(
+            queryset=Warehouse.objects.filter(organization=organization),
+            membership=membership,
+            project_lookup="project_id",
+        )
+        .filter(pk=warehouse.pk)
+        .exists()
+    ):
+        raise PermissionDenied("انبار خارج از دامنه دسترسی شما است.")
     return _stock_balance_value(
         organization=organization,
         warehouse=warehouse,

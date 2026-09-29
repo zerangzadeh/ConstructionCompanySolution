@@ -52,6 +52,10 @@ class AuditAction(models.TextChoices):
         "workflow_routing.unresolvable",
         "مسیریابی گردش‌کار حل‌نشدنی بود",
     )
+    WORKFLOW_UNRESOLVED_RECOVERED = (
+        "workflow_routing.unresolved_recovered",
+        "کار حل‌نشده بازیابی شد",
+    )
     WORKFLOW_CANDIDATES_CHANGED = (
         "workflow_candidates.changed",
         "نامزدهای گردش‌کار تغییر کردند",
@@ -74,6 +78,22 @@ class AuditAction(models.TextChoices):
         "organization_settings.updated",
         "تنظیمات سازمان به‌روزرسانی شد",
     )
+    POLICY_SOURCE_RECORDED = "policy.source_recorded", "منبع سیاست ثبت شد"
+    PLATFORM_POLICY_CREATED = "policy.platform_created", "سیاست پلتفرم ایجاد شد"
+    PLATFORM_POLICY_VERSION_CREATED = (
+        "policy.version_created",
+        "نسخه سیاست پلتفرم ایجاد شد",
+    )
+    PLATFORM_POLICY_VERSION_PUBLISHED = (
+        "policy.version_published",
+        "نسخه سیاست پلتفرم منتشر شد",
+    )
+    POLICY_REVIEW_EVIDENCE_RECORDED = (
+        "policy.review_evidence_recorded",
+        "مدرک اختیاری بررسی سیاست ثبت شد",
+    )
+    TENANT_POLICY_APPROVED = "policy.tenant_approved", "سیاست Tenant تأیید شد"
+    TENANT_POLICY_APPLIED = "policy.tenant_applied", "سیاست Tenant اعمال شد"
     BUSINESS_PARTY_CREATED = "business_party.created", "طرف تجاری ایجاد شد"
     BUSINESS_PARTY_UPDATED = "business_party.updated", "طرف تجاری به‌روزرسانی شد"
     BUSINESS_PARTY_ARCHIVED = "business_party.archived", "طرف تجاری بایگانی شد"
@@ -316,6 +336,42 @@ class AuditAction(models.TextChoices):
         "membership.status_changed",
         "وضعیت عضویت تغییر کرد",
     )
+    MEMBERSHIP_ROLE_ASSIGNED = (
+        "authorization.role_assigned",
+        "نقش مستقل عضویت تخصیص یافت",
+    )
+    MEMBERSHIP_ROLE_REVOKED = (
+        "authorization.role_revoked",
+        "نقش مستقل عضویت لغو شد",
+    )
+    MEMBERSHIP_SCOPE_GRANTED = (
+        "authorization.scope_granted",
+        "دامنه دسترسی عضویت اعطا شد",
+    )
+    MEMBERSHIP_SCOPE_REVOKED = (
+        "authorization.scope_revoked",
+        "دامنه دسترسی عضویت لغو شد",
+    )
+    AUTHORIZATION_MIGRATION_ROLLED_BACK = (
+        "authorization.migration_rolled_back",
+        "خواندن نقش سازگار بازگردانی شد",
+    )
+    PLATFORM_ROLE_ASSIGNED = (
+        "authorization.platform_role_assigned",
+        "نقش پلتفرمی تخصیص یافت",
+    )
+    PLATFORM_ROLE_REVOKED = (
+        "authorization.platform_role_revoked",
+        "نقش پلتفرمی لغو شد",
+    )
+    PROTECTED_OPERATION_CLASSIFIED = (
+        "authorization.protected_operation_classified",
+        "عملیات حفاظت‌شده طبقه‌بندی شد",
+    )
+    PROTECTED_OPERATION_RETIRED = (
+        "authorization.protected_operation_retired",
+        "عملیات حفاظت‌شده بازنشسته شد",
+    )
     ORGANIZATION_ACCOUNT_CREATED = (
         "organization_account.created",
         "حساب کاربری شرکت ایجاد شد",
@@ -367,6 +423,7 @@ class AuditAction(models.TextChoices):
         "role.permissions_changed",
         "مجوزهای نقش شرکتی تغییر کرد",
     )
+    ROLE_ARCHIVED = "role.archived", "نقش شرکتی بایگانی شد"
 
 
 class AuditEventQuerySet(models.QuerySet):

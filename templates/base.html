@@ -668,7 +668,7 @@
                 <span><strong class="block text-sm font-semibold text-white">سازه‌یار</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت ساخت</small></span>
             </a>
             <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
-                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}
+                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}
             </div>
             <div class="border-t border-slate-800 p-3">
                 <div class="mb-2 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-[10px] text-slate-400"><span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>فضای کاری فعال</span><span dir="ltr">ERP</span></div>
@@ -680,7 +680,7 @@
                 <details class="erp-mobile-nav lg:hidden">
                     <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
                     <summary class="erp-mobile-nav__backdrop" aria-label="بستن فهرست"></summary>
-                    <div class="erp-mobile-nav__panel">{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}</div>
+                    <div class="erp-mobile-nav__panel">{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}</div>
                 </details>
                 <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">{{ request.organization.name|default:"انتخاب شرکت" }}</span></a>
                 <div class="hidden h-5 w-px bg-slate-200 md:block"></div>

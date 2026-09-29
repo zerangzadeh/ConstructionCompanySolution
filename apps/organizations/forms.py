@@ -4,15 +4,24 @@ from django import forms
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from apps.accounts.models import User
+from apps.organizations.authorization import (
+    MINIMAL_SITE_PARENT_FIELDS,
+    scope_queryset,
+)
 from apps.organizations.models import (
+    AuthorizationScopeType,
+    BusinessPermission,
     MembershipStatus,
     Organization,
     OrganizationMembership,
     OrganizationRole,
     OrganizationSettings,
+    ProtectedOperationCode,
 )
+from apps.projects.models import Project, ProjectSite
 from core.identifiers import canonicalize_lower_identifier
 
 TEXT_INPUT_CLASS = (
@@ -103,23 +112,52 @@ class OrganizationProfileForm(forms.ModelForm):
 
 
 class OrganizationForm(OrganizationProfileForm):
-    """Form for creating a new organization with compatibility defaults."""
+    """Create Tenant identity plus authoritative settings through the service."""
+
+    timezone = _settings_form_field(
+        "timezone",
+        widget=forms.TextInput(
+            attrs={
+                "class": TEXT_INPUT_CLASS,
+                "placeholder": "Asia/Tehran",
+                "dir": "ltr",
+            }
+        ),
+    )
+    currency = _settings_form_field(
+        "currency",
+        widget=forms.TextInput(
+            attrs={
+                "class": f"{TEXT_INPUT_CLASS} uppercase",
+                "placeholder": "IRR",
+                "dir": "ltr",
+            }
+        ),
+    )
+
+    initial_owner_username = forms.CharField(
+        label="نام کاربری Tenant Owner اولیه",
+        max_length=150,
+        widget=forms.TextInput(attrs={"class": TEXT_INPUT_CLASS, "dir": "ltr"}),
+        help_text="مالک اولیه به‌صورت صریح و مستقل از Platform Admin انتخاب می‌شود.",
+    )
 
     class Meta(OrganizationProfileForm.Meta):
-        fields = [*ORGANIZATION_PROFILE_FIELDS, "timezone", "currency"]  # noqa: RUF012
-        widgets = {  # noqa: RUF012
-            **ORGANIZATION_PROFILE_WIDGETS,
-            "timezone": forms.TextInput(
-                attrs={"class": TEXT_INPUT_CLASS, "placeholder": "UTC"}
-            ),
-            "currency": forms.TextInput(
-                attrs={
-                    "class": f"{TEXT_INPUT_CLASS} uppercase",
-                    "placeholder": "USD",
-                    "dir": "ltr",
-                }
-            ),
-        }
+        fields = (
+            "initial_owner_username",
+            *ORGANIZATION_PROFILE_FIELDS,
+            "timezone",
+            "currency",
+        )
+        widgets = ORGANIZATION_PROFILE_WIDGETS
+
+    def clean_initial_owner_username(self) -> str:
+        username = canonicalize_lower_identifier(
+            self.cleaned_data["initial_owner_username"]
+        )
+        if not User.objects.filter(username=username, is_active=True).exists():
+            raise ValidationError("حساب فعال مالک اولیه یافت نشد.")
+        return username
 
 
 class OrganizationAdminForm(OrganizationProfileForm):
@@ -154,11 +192,7 @@ class OrganizationAdminForm(OrganizationProfileForm):
             organization=self.instance
         ).first()
         if settings_record is None:
-            settings_record = OrganizationSettings(
-                organization=self.instance,
-                timezone=self.instance.timezone,
-                currency=self.instance.currency,
-            )
+            settings_record = OrganizationSettings(organization=self.instance)
         for (
             form_field_name,
             model_field_name,
@@ -263,7 +297,10 @@ class OrganizationMembershipForm(forms.ModelForm):
         **kwargs: object,
     ) -> None:
         super().__init__(*args, **kwargs)
-        roles = OrganizationRole.objects.filter(is_active=True)
+        organization_id = self.instance.organization_id
+        roles = OrganizationRole.objects.filter(is_active=True).filter(
+            Q(organization__isnull=True) | Q(organization_id=organization_id)
+        )
         if not allow_owner_role:
             roles = roles.filter(is_owner=False)
         self.fields["role_definition"].queryset = roles.order_by("name")
@@ -287,6 +324,108 @@ class OrganizationMemberPasswordResetForm(SetPasswordForm):
         self.fields[
             "new_password1"
         ].help_text = "عضو در ورود بعدی باید گذرواژه شخصی خود را تعیین کند."
+
+
+class MembershipRoleAssignmentForm(forms.Form):
+    role = forms.ModelChoiceField(
+        label="نقش مستقل",
+        queryset=OrganizationRole.objects.none(),
+    )
+    approver_membership = forms.ModelChoiceField(
+        label="تأییدکننده مستقل",
+        queryset=OrganizationMembership.objects.none(),
+    )
+    ends_at = forms.DateTimeField(label="پایان اعتبار", required=False)
+    reason = forms.CharField(label="دلیل", widget=forms.Textarea(attrs={"rows": 2}))
+
+    def __init__(
+        self,
+        *args: object,
+        organization: Organization,
+        actor_membership: OrganizationMembership,
+        target_membership: OrganizationMembership,
+        **kwargs: object,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["role"].queryset = (
+            OrganizationRole.objects.filter(is_active=True)
+            .filter(Q(organization__isnull=True) | Q(organization=organization))
+            .order_by("name")
+        )
+        self.fields["approver_membership"].queryset = (
+            OrganizationMembership.objects.filter(
+                organization=organization,
+                status=MembershipStatus.ACTIVE,
+                user__is_active=True,
+            )
+            .exclude(pk__in=(actor_membership.pk, target_membership.pk))
+            .select_related("user")
+            .order_by("user__username")
+        )
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
+
+
+class MembershipScopeGrantForm(forms.Form):
+    scope_type = forms.ChoiceField(
+        label="نوع دامنه", choices=AuthorizationScopeType.choices
+    )
+    project = forms.ModelChoiceField(
+        label="پروژه", queryset=Project.objects.none(), required=False
+    )
+    site = forms.ModelChoiceField(
+        label="کارگاه", queryset=ProjectSite.objects.none(), required=False
+    )
+    approver_membership = forms.ModelChoiceField(
+        label="تأییدکننده مستقل",
+        queryset=OrganizationMembership.objects.none(),
+    )
+    ends_at = forms.DateTimeField(label="پایان اعتبار", required=False)
+    reason = forms.CharField(label="دلیل", widget=forms.Textarea(attrs={"rows": 2}))
+
+    def __init__(
+        self,
+        *args: object,
+        organization: Organization,
+        actor_membership: OrganizationMembership,
+        target_membership: OrganizationMembership,
+        **kwargs: object,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["project"].queryset = (
+            scope_queryset(
+                Project.objects.filter(
+                    organization=organization, deleted_at__isnull=True
+                ),
+                membership=actor_membership,
+                project_lookup="pk",
+                include_site_parent=True,
+            )
+            .only(*MINIMAL_SITE_PARENT_FIELDS)
+            .order_by("name")
+        )
+        self.fields["site"].queryset = (
+            scope_queryset(
+                ProjectSite.objects.filter(organization=organization, is_active=True),
+                membership=actor_membership,
+                project_lookup="project_id",
+                site_lookup="pk",
+            )
+            .select_related("project")
+            .order_by("project__name", "name")
+        )
+        self.fields["approver_membership"].queryset = (
+            OrganizationMembership.objects.filter(
+                organization=organization,
+                status=MembershipStatus.ACTIVE,
+                user__is_active=True,
+            )
+            .exclude(pk__in=(actor_membership.pk, target_membership.pk))
+            .select_related("user")
+            .order_by("user__username")
+        )
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
 
 
 class OrganizationAccountCreateForm(forms.Form):
@@ -317,9 +456,17 @@ class OrganizationAccountCreateForm(forms.Form):
         widget=forms.PasswordInput(render_value=True),
     )
 
-    def __init__(self, *args: object, allow_owner_role: bool, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        allow_owner_role: bool,
+        organization: Organization | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        roles = OrganizationRole.objects.filter(is_active=True)
+        roles = OrganizationRole.objects.filter(is_active=True).filter(
+            Q(organization__isnull=True) | Q(organization=organization)
+        )
         if not allow_owner_role:
             roles = roles.filter(is_owner=False)
         self.fields["role_definition"].queryset = roles.order_by("name")
@@ -363,9 +510,17 @@ class ExistingAccountConnectionForm(forms.Form):
         help_text=ROLE_ACCESS_HELP_TEXT,
     )
 
-    def __init__(self, *args: object, allow_owner_role: bool, **kwargs: object) -> None:
+    def __init__(
+        self,
+        *args: object,
+        allow_owner_role: bool,
+        organization: Organization | None = None,
+        **kwargs: object,
+    ) -> None:
         super().__init__(*args, **kwargs)
-        roles = OrganizationRole.objects.filter(is_active=True)
+        roles = OrganizationRole.objects.filter(is_active=True).filter(
+            Q(organization__isnull=True) | Q(organization=organization)
+        )
         if not allow_owner_role:
             roles = roles.filter(is_owner=False)
         self.fields["role_definition"].queryset = roles.order_by("name")
@@ -374,3 +529,83 @@ class ExistingAccountConnectionForm(forms.Form):
 
     def clean_username(self) -> str:
         return canonicalize_lower_identifier(self.cleaned_data["username"])
+
+
+class OrganizationRoleCatalogForm(forms.Form):
+    """Edit role presentation and bind only active, code-owned permissions."""
+
+    organization = forms.ModelChoiceField(
+        label="Tenant",
+        queryset=Organization.objects.none(),
+        required=False,
+        help_text="برای نقش سراسری خالی بگذارید.",
+    )
+    code = forms.SlugField(label="کد پایدار نقش", max_length=64)
+    name = forms.CharField(label="عنوان نقش", max_length=255)
+    description = forms.CharField(
+        label="توضیحات", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+    permissions = forms.ModelMultipleChoiceField(
+        label="مجوزهای فعال",
+        queryset=BusinessPermission.objects.none(),
+        widget=forms.CheckboxSelectMultiple,
+    )
+    reason = forms.CharField(
+        label="دلیل تغییر", widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(
+        self,
+        *args: object,
+        platform_mode: bool,
+        organization: Organization | None = None,
+        role: OrganizationRole | None = None,
+        **kwargs: object,
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["permissions"].queryset = BusinessPermission.objects.filter(
+            is_active=True
+        ).order_by("code")
+        self.fields["organization"].queryset = Organization.objects.filter(
+            status="active", archived_at__isnull=True
+        ).order_by("name")
+        if not platform_mode:
+            self.fields.pop("organization")
+        if role is not None:
+            self.initial.update(
+                {
+                    "organization": role.organization,
+                    "code": role.code,
+                    "name": role.name,
+                    "description": role.description,
+                    "permissions": role.permissions.all(),
+                }
+            )
+            self.fields["code"].disabled = True
+            if platform_mode:
+                self.fields["organization"].disabled = True
+        elif not platform_mode:
+            self.initial["organization"] = organization
+        for field in self.fields.values():
+            if not isinstance(field.widget, forms.CheckboxSelectMultiple):
+                field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)
+
+
+class ProtectedOperationCatalogForm(forms.Form):
+    """Create an immutable protected-operation classification version."""
+
+    code = forms.ChoiceField(
+        label="کد عملیات حفاظت‌شده", choices=ProtectedOperationCode.choices
+    )
+    name = forms.CharField(label="عنوان", max_length=255)
+    description = forms.CharField(
+        label="شرح کنترل", widget=forms.Textarea(attrs={"rows": 3})
+    )
+    reason = forms.CharField(
+        label="دلیل تغییر", widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault("class", TEXT_INPUT_CLASS)

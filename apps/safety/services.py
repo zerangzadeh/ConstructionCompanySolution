@@ -9,7 +9,11 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.daily_reports.models import DailyReport
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.parties.models import BusinessParty
 from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite
@@ -31,11 +35,18 @@ def _require_permission(
     organization: Organization,
     user: User,
     permission: BusinessPermissionCode,
+    project: Project | None = None,
+    site: ProjectSite | None = None,
+    allow_any_scope: bool = False,
 ) -> None:
     require_business_permission(
         user=user,
         organization=organization,
         permission=permission,
+        project=project,
+        site=site,
+        allow_any_scope=allow_any_scope,
+        allow_site_parent=True,
         message="اجازه انجام این عملیات ایمنی را ندارید.",
     )
 
@@ -190,6 +201,8 @@ def _create_safety_incident_domain(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_CREATE,
+        project=project,
+        site=site,
     )
     _validate_structure(
         organization=organization,
@@ -241,11 +254,20 @@ def get_organization_safety_incidents(
         organization=organization,
         user=user,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_VIEW,
+        project=project,
+        allow_any_scope=project is None,
     )
     _require_same_organization(organization, project=project)
     incidents = SafetyIncident.objects.filter(organization=organization)
     if project is not None:
         incidents = incidents.filter(project=project)
+    membership = get_active_membership(user=user, organization=organization)
+    incidents = scope_queryset(
+        queryset=incidents,
+        membership=membership,
+        project_lookup="project_id",
+        site_lookup="site_id",
+    )
     return incidents.select_related(
         "project",
         "site",
@@ -259,11 +281,6 @@ def get_organization_safety_incidents(
 def get_organization_safety_incident(
     *, user: User, organization: Organization, incident_id: str
 ) -> SafetyIncident:
-    _require_permission(
-        organization=organization,
-        user=user,
-        permission=BusinessPermissionCode.SAFETY_INCIDENTS_VIEW,
-    )
     try:
         return get_organization_safety_incidents(
             user=user, organization=organization
@@ -276,12 +293,14 @@ def get_organization_safety_incident(
 def _review_safety_incident_domain(
     *, organization: Organization, actor: User, incident_id: str
 ) -> SafetyIncident:
+    incident = _locked_incident(organization=organization, incident_id=incident_id)
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_REVIEW,
+        project=incident.project,
+        site=incident.site,
     )
-    incident = _locked_incident(organization=organization, incident_id=incident_id)
     previous_status = incident.status
     if SafetyIncidentStatus.UNDER_REVIEW not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط حادثه ثبت‌شده قابل ورود به بررسی است.")
@@ -314,12 +333,14 @@ def _assign_safety_incident_domain(
     responsible_employee: Employee | None = None,
     responsible_party: BusinessParty | None = None,
 ) -> SafetyIncident:
+    incident = _locked_incident(organization=organization, incident_id=incident_id)
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_REVIEW,
+        project=incident.project,
+        site=incident.site,
     )
-    incident = _locked_incident(organization=organization, incident_id=incident_id)
     previous_status = incident.status
     if SafetyIncidentStatus.ASSIGNED not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط حادثه در حال بررسی قابل تخصیص است.")
@@ -365,12 +386,14 @@ def _start_corrective_action_domain(
     incident_id: str,
     corrective_action: str,
 ) -> SafetyIncident:
+    incident = _locked_incident(organization=organization, incident_id=incident_id)
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_MANAGE,
+        project=incident.project,
+        site=incident.site,
     )
-    incident = _locked_incident(organization=organization, incident_id=incident_id)
     previous_status = incident.status
     if (
         SafetyIncidentStatus.ACTION_IN_PROGRESS
@@ -402,12 +425,14 @@ def _resolve_safety_incident_domain(
     incident_id: str,
     resolution_summary: str,
 ) -> SafetyIncident:
+    incident = _locked_incident(organization=organization, incident_id=incident_id)
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_MANAGE,
+        project=incident.project,
+        site=incident.site,
     )
-    incident = _locked_incident(organization=organization, incident_id=incident_id)
     previous_status = incident.status
     if SafetyIncidentStatus.RESOLVED not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط حادثه دارای اقدام اصلاحی قابل رفع است.")
@@ -438,12 +463,14 @@ def _close_safety_incident_domain(
     incident_id: str,
     closure_summary: str,
 ) -> SafetyIncident:
+    incident = _locked_incident(organization=organization, incident_id=incident_id)
     _require_permission(
         organization=organization,
         user=actor,
         permission=BusinessPermissionCode.SAFETY_INCIDENTS_CLOSE,
+        project=incident.project,
+        site=incident.site,
     )
-    incident = _locked_incident(organization=organization, incident_id=incident_id)
     previous_status = incident.status
     if SafetyIncidentStatus.CLOSED not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط حادثه رفع‌شده قابل بستن است.")

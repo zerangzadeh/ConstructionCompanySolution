@@ -18,8 +18,9 @@ This is a rolling-wave plan:
 3. Actual session usage recalibrates later phases.
 4. Model names and reasoning levels are revalidated at every phase boundary.
 
-The plan is based on the repository and model availability reviewed on
-2026-09-24. Model availability and usage limits can change.
+The architecture, gate state and execution order were last reconciled against
+the repository on 2026-09-27. Model availability and usage limits are runtime
+facts and must be rechecked when an executable session starts.
 
 ## 2. Scope boundary
 
@@ -134,9 +135,9 @@ as the efficient option for scoped work. It recommends experimenting and keeping
 the lightest setting that meets the quality bar:
 <https://developers.openai.com/api/docs/guides/model-selection>.
 
-This repository currently exposes `gpt-6-astra`, `gpt-5.6-terra`, and
-`gpt-5.6-luna` among its usable choices. The mappings below are starting points,
-not permanent model approvals.
+The mappings below are starting points, not permanent model approvals or a
+complete inventory of currently available models. Session launch must use the
+closest available tier that satisfies the recorded risk and reasoning need.
 
 | Code | Model | Reasoning | Use |
 | --- | --- | --- | --- |
@@ -183,17 +184,16 @@ At 3-5 active hours per session, the baseline represents approximately
 assumptions, integration defects, and production-gate remediation. The resulting
 planning envelope is consistent with roughly 1,200-1,900 active Codex hours.
 
-## 6. P0 session map — 22 sessions
+## 6. P0 recorded session sequence — 22 sessions
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
 | P0-S01..S03 | 3 | `A-H` | Confirm current evidence, Product Owner decision packet, release-scope assumptions |
-| P0-S04..S08 | 5 | `A-H` | Required ADRs and correction sequencing without application implementation |
-| P0-S09..S11 | 3 | `A-X` | Threat model, secrets/dependency/storage/recovery design and adversarial review |
-| P0-S12..S15 | 4 | `T-M` | CI, reproducible environment, operational checks, observability scaffolding |
-| P0-S16..S18 | 3 | `A-H` | Entitlements, quota and tenant offboarding services/invariants |
-| P0-S19..S20 | 2 | `T-M` | Selected UI consistency/accessibility remediation and automated checks |
-| P0-S21 | 1 | `A-H` | P0 integrated acceptance and unresolved-risk review |
+| P0-S04..S12 | 9 | `A-H`/`A-X` | Prepare the nine P0.1 ADR proposals and bounded handoffs; no application implementation |
+| P0-S13..S15 | 3 | `A-H` | Consolidate ADR review, prepare Q04 choices and record Product Owner selections |
+| P0-S16..S19 | 4 | `A-H` | Record the pending-review state, reviewer assignments, independence override and still-OPEN review fields |
+| P0-S20 | 1 | `T-M` | Assess workbench UI/accessibility and defer remediation that depends on authoritative backend semantics |
+| P0-S21 | 1 | `A-H` | Review readiness and unresolved risk; integrated acceptance not achieved |
 | P0-S22 | 1 | `L-M` | Documentation closeout and P1 handoff packet |
 
 **Product Owner gates:** financial boundary, hosting/data residency, RPO/RTO,
@@ -227,21 +227,193 @@ session result, but it does not satisfy P0 exit criteria: P0 remains incomplete,
 the release contract is not frozen and P1 entry remains blocked pending the
 decision/evidence queue recorded in the packet.
 
+The earlier forecast that attached CI, operations, entitlement or UI
+implementation outcomes to P0-S12..S20 is retired and non-authoritative. Those
+identifiers were consumed by the recorded documentation and decision sessions
+above. Remaining P0 implementation must be re-estimated and receive new session
+identifiers only after its applicable gates and package authority are explicit.
+
 ## 7. P1 session map — 28 sessions
 
-| Sessions | Count | Model | Outcome |
-| --- | ---: | --- | --- |
-| P1-S01..S04 | 4 | `A-H` | Object-scope model, permission intersection and migration design |
-| P1-S05..S09 | 5 | `A-H` | Project/site authorization services, queryset/view enforcement and tests |
-| P1-S10..S13 | 4 | `T-M` | Scoped forms/Django Admin/UI states without option leakage |
-| P1-S14..S18 | 5 | `A-H` | Configuration authority, BusinessParty governance and regulatory-version boundary |
-| P1-S19..S22 | 4 | `A-H` | DMS numbering/classification/confidentiality/link/search/retention slices |
-| P1-S23..S26 | 4 | `T-M` | Material catalogue, UOM conversion and approval workflow slices |
-| P1-S27 | 1 | `A-X` | Cross-tenant, privilege, merge/history and document-security review |
-| P1-S28 | 1 | `L-M` | Documentation closeout and P2 handoff packet |
+**Current status (2026-09-29): P1.1, P1-S14 and P1-S15 are complete under their
+bounded authorizations.** `P1-E0` and `P1-S01` through `P1-S15` are complete.
+P1-S16+ retain their own authority and entry gates.
 
-**Product Owner gates:** role/scope semantics, party merge/restriction ownership,
-material coding, document signature/retention policy, and regulatory source owners.
+| Order / provisional sessions | Count | Model | Outcome and direct entry dependency |
+| --- | ---: | --- | --- |
+| P1-E0 | complete | `A-H` | Verified P0-G01/P0-G02 and the explicit bounded P1.1 package authority; no unrelated support, storage/export, quota/lifecycle or financial/regulatory behavior entered scope. |
+| P1-S01..S04 | complete | `A-H` | Delivered membership-scoped multi-role assignments, explicit project/site grants, audit history and expand/backfill/switch/rollback design. |
+| P1-S05..S09 | complete | `A-H` | Delivered shared authorization policy, service/queryset/view enforcement, concurrency-safe grant administration and negative tenant/project/site tests. |
+| P1-S10..S13 | complete | `T-M` | Delivered scoped forms, Admin remediation, context selectors and permission-safe UI states; UI remains non-authoritative. |
+| P1.1 closeout | complete | `A-H` / `T-M` | Verified role-catalog governance end to end: exact-Tenant assignment, system-role protection, code-owned active permissions, archival/history, before/after audit evidence, guarded rollback, active `admin` Platform Admin bootstrap and Persian RTL Platform/Tenant Admin routes. The Platform menu also exposes the approved Protected Operations lifecycle. Targeted 21-test P1.1 and 54-test tenant/audit/admin groups passed; the prohibited heavy seed was not run. |
+| P1-S14A | complete | `A-H` | Delivered regulatory-independent `OrganizationSettings` authority, fail-closed IRR migration, removal of legacy read-repair/dual-write, consumer switch and before/after audit evidence. Legacy fields remain; no regulated/accounting-sensitive behavior was activated. |
+| P1-S14B | complete / reframed | `A-H` | Final Product Owner decision removes Professional Reviewer/D14-11 as global development gates. Source provenance still gates only affected sensitive-policy activation; optional review remains evidence metadata. |
+| P1-S15 | complete | `A-H` | Delivered source provenance, versioned Platform policy/localization catalogue, optional review evidence, Tenant Owner approval, Tenant Admin application, dedicated permissions/audit and fail-closed resolution. No regulated value or consumer behavior was activated. |
+| P1-S16..S18 | 3 | `A-H` | BusinessParty governance and regulatory-version work remain not started and separately gated; P1-S14A completion supplies no authority for them. |
+| P1-S19..S22 | 4 | `A-H` | Implement DMS numbering/classification/confidentiality, explicit domain links, search and retention slices. Requires accepted S08/S09, P0.2 private-storage prerequisites, Q03 evidence lifecycle, applicable D03-D05 parameters, explicit package authority and P1.1 access enforcement. |
+| P1-S23..S26 | 4 | `T-M`/`A-H` | Implement material catalogue, UOM conversion and approval slices. Requires stable P1.2 ownership/configuration rules, the P1.3 document boundary, material coding/conversion/approval decisions and explicit package authority. |
+| P1-S27 | 1 | `A-X` | Cross-tenant, privilege, merge/history and document-security review after all authorized P1 slices are integrated. |
+| P1-S28 | 1 | `L-M` | Documentation closeout and conditional P2 handoff after P1 acceptance evidence exists. |
+
+The authoritative authorization vocabulary is: independent platform roles
+**Superuser** and **Platform Admin**; independent membership-scoped Tenant roles
+**Tenant Owner**, **Tenant Admin / Local Admin**, **Tenant Manager**, **Project
+Manager**, **Accountant**, **Supervisor** and **Viewer**. A user may hold several
+roles, but no assignment implies, merges or inherits another. Effective business
+permission is the union from active applicable role assignments, intersected with
+active Tenant membership/status, explicit object scope, delegation, policy,
+domain state and, for workflow actions, eligibility and separation. Positions
+route responsibility and never grant permission. Role, missing scope, null
+project/site, Superuser, Platform Admin, Tenant Owner, Tenant Admin or support
+status supplies no ordinary business-data bypass.
+
+Final Q04 selections are A1/B1/C1/D1/E1, revised F2, final G3 — Revised with
+Protected Operations, and H1. They are binding design inputs, not accepted review
+evidence or implementation authority. Self-Approval is always forbidden for
+Protected Operations. Configurable business-operation Self-Approval remains outside
+the bounded P1.1 implementation and requires a separately authorized consuming package.
+
+**2026-09-28 Product Owner amendment:** Platform Admin owns the Protected
+Operations catalogue lifecycle. An active Platform Admin may create a version or
+retire a current classification alone with an auditable reason. This supersedes the
+earlier catalogue-ownership references to Superuser only; it does not grant Tenant
+business-data access, enable Self-Approval, or permit a protected business action.
+
+**2026-09-28 Product Owner role-catalog amendment:** Platform Admin manages
+global-custom, tenant-custom and system-role permission bindings; Tenant Admin
+manages only custom roles of its active Tenant. System-role identity remains
+code-owned and non-archivable. Permission codes remain code-and-migration owned;
+custom-role archival preserves memberships, assignment history and audit evidence.
+
+**Remaining Product Owner gates:** P1.1 has consumed its bounded package authority.
+Party merge/restriction ownership, actual regulated values and sources, document signature/retention policy, material
+coding/conversion/approval ownership, D03-D05/Q03 and all other ADR dispositions
+remain gates for their named P0.2/P0.3/P1.2-P1.4 or release/enablement packages,
+not blockers to P1.1 coding.
+
+**Stop and next session:** P1.1, P1-S14 and P1-S15 are closed. The historical
+P1-S14 checks below are retained as chronology but their mandatory-reviewer/D14-11
+blocking interpretation is superseded by the final 2026-09-29 Product Owner
+decision. P1-S16 is not authorized by this closeout.
+
+### P1-S14 entry-gate verification and authorized split
+
+**Recorded:** 2026-09-28. **Authorization:** the Product Owner explicitly
+authorized the bounded P1-S14 Configuration Authority package subject to verifying
+every entry gate. This record is the required stop because not every gate passed;
+it authorizes no inference of missing accounting/legal decisions.
+
+| Entry dependency | Result | Verified evidence / consequence |
+| --- | --- | --- |
+| Explicit bounded P1-S14 authority | SATISFIED | The Product Owner requested P1-S14 only and prohibited P1-S15 or later work. |
+| P1.1 authorization foundation used by the slice | SATISFIED | P1-S01-S13 and the P1.1 closeout record membership-scoped roles, permission enforcement, Tenant/object scope, Protected Operations and audit foundations. |
+| Organization configuration ownership | **ACCEPTED** | `OrganizationSettings` is the sole authority for all organization-level configurable settings; `Organization` retains only identity/core domain attributes. This is architectural authority, not migration authority. |
+| Accepted affected S04-S06 decisions | **SATISFIED AS TARGET ARCHITECTURE** | D14-02 and D14-03 selected Option A. D14-01's pending condition was satisfied when D14-04-D14-11 were incorporated; the contradiction review found none, so S04 Option A applies. These dispositions authorize no implementation or regulated/accounting value. |
+| Q01 product/accounting decisions | **PRODUCT POLICY RECORDED / VALUES UNSET** | D14-04-D14-07 record IRR initial base/storage/display, no Toman/FX behavior, UTC/ISO persistence with Jalali UI, explicit fiscal calendar, versioned precision categories and no current financial inventory valuation. Unknown method, scale and rounding points remain unset until an authorized, effective policy/configuration supplies them; source provenance is mandatory only when explicitly required. |
+| Q02 legal/accounting source gate | **POLICY RECORDED / AFFECTED ACTIVATION FAILS CLOSED** | D14-08 records export-only initial scope; D14-09 records official versioned sources plus limited interpretation. Revised D14-10 makes professional evidence optional metadata; revised D14-11 closes the global development gate. Platform/Tenant roles may maintain authorized field-specific values; only policies explicitly marked source-required fail publication/application without provenance. Current `BillingPolicy` rates remain uncertified. |
+
+#### Current configuration and compatibility inventory
+
+**Accepted boundary:** `OrganizationSettings` owns timezone, currency, fiscal
+settings, locale and numbering schemes, plus any later organization-level
+configurable setting. `Organization` owns Tenant identity and core organization
+domain attributes only. No consumer may make a duplicate `Organization` setting a
+new authority.
+
+- `OrganizationSettings` is the intended one-to-one Tenant settings record and
+  already contains language, timezone, currency, fiscal-year start month/day and
+  project/contract/site/document code prefixes. `Organization` still duplicates
+  timezone and currency as compatibility fields.
+- P1-S14A removed read-repair and dual-write: `get_organization_settings` requires
+  the authoritative row; `update_organization_settings` locks and updates only that
+  row after active-Tenant/membership/permission checks and emits before/after audit
+  evidence. Tenant creation writes configuration only to `OrganizationSettings`.
+- Migration `0036` fills only a missing IRR settings row from legacy timezone
+  evidence, preserves an existing authoritative row, and fails closed rather than
+  infer or convert an unsupported currency. Equipment, Safety and Quality workflow
+  due-date calculations now read `OrganizationSettings.timezone`. No production
+  consumer remains for legacy `Organization.timezone`/`currency`; the columns are
+  retained as inert compatibility data. Fiscal/language/prefix settings remain in
+  the authoritative row; prefixes are not statutory numbering schemes.
+- `BillingPolicy` remains a separate compatibility hotspot combining claim
+  numbering/precision/period controls with tax, insurance, retention and advance
+  recovery. It is inventory evidence only: P1-S14 must not split, certify or move
+  those regulated/commercial values without applicable versioned policy/source and
+  domain-package authority.
+
+#### Compatibility sequence status
+
+1. **Complete in P1-S14A:** authoritative settings validation and current IRR
+   guard, without regulated precision or fiscal-period behavior.
+2. **Complete in P1-S14A:** fail-closed missing-row backfill and preservation of
+   existing authoritative settings; unsupported currency requires operator action.
+3. **Complete in P1-S14A:** switch production timezone readers and settings writers
+   to `OrganizationSettings`; remove legacy read-repair and dual-write.
+4. **Complete in P1-S14A:** targeted Tenant isolation, active status,
+   authorization, audit before/after, consumer and migration-safety validation.
+5. **Not authorized:** contract duplicate `Organization` fields only in a separately
+   controlled removal step after dependency and rollback evidence passes. This
+   accepted target does not authorize that destructive step in the governance
+   session.
+
+**Final closeout:** P1-S14 is complete. `OrganizationSettings` owns direct Tenant
+settings; Platform Admin owns Platform/localization structures and versions; Tenant
+Owner approves important selections; Tenant Admin applies selections and maintains
+authorized operational values. Missing required configuration, or a source for a
+policy explicitly marked source-required, fails closed. No professional actor or
+global D14-11 gate exists.
+
+**Historical 2026-09-29 P1-S14B execution recheck:** the Product Owner supplied bounded
+execution authority, but the repository still has none of the required actual
+source versions, named qualified-independent-reviewer evidence, completed review
+of the affected architecture/precision facts, or D14-11 disposition. The entry
+gate failed before implementation. No application/schema/runtime change is
+authorized by that recheck. The final Product Owner decision supersedes only its
+global reviewer/D14-11 block; it does not validate absent sources or values.
+
+The [P1-S14B evidence register](architecture/P1_S14B_PROFESSIONAL_EVIDENCE_REGISTER.md)
+now records source provenance and optional professional evidence. Blank records are
+not evidence, but do not globally block generic development.
+
+### P1-S15 policy/localization foundation closeout
+
+**Authorization:** the final Product Owner decision authorizes a technically
+coherent scope independent of unknown regulatory/accounting values.
+
+**Delivered boundary:** migration `organizations.0037` adds `PolicySource`,
+`PlatformPolicy`, immutable-after-publication `PlatformPolicyVersion`, optional
+`PolicyReviewEvidence` and `TenantPolicySelection`. Platform Admin alone creates
+source/catalogue/version records and publishes versions. Tenant Owner alone
+approves a selectable version; Tenant Admin alone applies it. Dedicated code-owned
+permissions/default grants, active Tenant/membership checks, transactions, locks,
+audit events and one-active-selection database protection enforce the hierarchy.
+
+Each policy explicitly declares whether source provenance is required; source is
+otherwise optional and never blocks ordinary Tenant configuration. Empty Platform
+parameters, overlapping published intervals, floating-point values, executable
+payload keys, missing/expired required selection and cross-Tenant operations fail
+closed. Direct operational values remain in `OrganizationSettings`; later
+field-specific Tenant values may be authorized, while unrestricted parameter bags
+and arbitrary formulas remain prohibited.
+Optional professional evidence attaches to an exact policy version and grants no
+role or runtime authority.
+
+**Excluded/deferred:** no actual statutory/accounting value, calculator, filing,
+valuation, precision/rounding setting, `BillingPolicy` migration/consumer switch,
+BusinessParty governance, UI or P1-S16 work. Fourteen targeted policy and
+permission-registry tests (plus 11 subtests), Django system check,
+migration-state check and targeted Ruff validation passed.
+
+**Next executable session:** P1-S16 only after explicit bounded authorization and
+its own entry-contract reconciliation.
+
+The 2026-09-28 governance continuation prepared the
+[remaining-decision packet](architecture/P1_S14_REMAINING_DECISION_PACKET.md).
+It records D14-01 through D14-09 Product Owner dispositions. The final 2026-09-29
+decision revised D14-10 so professional evidence is optional version metadata and
+closed D14-11 as a global development gate. The accepted `OrganizationSettings`
+ownership decision remains closed. Missing official sources or values still keep
+their affected sensitive-policy activation unset and fail closed.
 
 ## 8. P2 session map — 38 sessions
 
@@ -533,6 +705,26 @@ attempt remains unresolved. De-escalate once the ambiguity/risk has been removed
 - session cards for the first five sessions are ready;
 - migration, rollback and test environment assumptions are known.
 
+For **P1.1 specifically**, entry means all of the following are evidenced together:
+
+1. P0-G01's accountable review and P0-G02's complete implementation contract are
+   recorded, with final A1/B1/C1/D1/E1, revised F2, final G3 and H1 terminology.
+2. The P1.1 authorization is explicitly bounded to section 6 of S07: models,
+   services, queryset/view enforcement, migration/backfill/rollback, tests and
+   documentation closeout. It does not enable support/emergency access, exports,
+   storage, quota/lifecycle behavior, configurable business Self-Approval or any
+   downstream financial/regulatory feature.
+3. PostgreSQL migration/rehearsal, test-database ownership and rollback
+   assumptions are available to the implementation session. The occupied current
+   test database is an execution-environment coordination item, not an
+   architecture/product decision blocker.
+
+Whole-P0 phase exit, D03-D05/Q03, P0.2/P0.3/P0.4 completion and formal acceptance
+of unrelated ADRs are not P1.1 entry prerequisites. They remain binding gates for
+the packages and release/enablement behavior they directly govern. P1-E0 must not
+be bypassed by expanding the P1.1 scope or starting UI work before server-side
+authority exists; P1.2-P1.4 retain the additional gates in section 7.
+
 ### Exit
 
 - every accepted session outcome is implemented and validated;
@@ -545,7 +737,9 @@ attempt remains unresolved. De-escalate once the ambiguity/risk has been removed
 ## 24. Calibration record
 
 Update this table only at a phase boundary. It records execution accuracy, not
-product implementation status.
+product implementation status. P0-S01..S22 consumed 22 recorded planning,
+decision and documentation session identifiers, but P0 has not reached a phase
+boundary; therefore they are not entered below as completed P0 implementation.
 
 | Phase | Planned sessions | Actual sessions | Variance reason | Remaining estimate adjustment |
 | --- | ---: | ---: | --- | --- |
@@ -561,13 +755,14 @@ product implementation status.
 | P9 core | 26 | — | — | — |
 | P10 | 24 | — | — | — |
 
-## 25. First operating rule
+## 25. Current operating rule
 
-Do not generate all 344 detailed prompts now. Before beginning P0, expand only
-P0-S01..S05 into session cards. After P0-S05, compare actual duration, token use,
-defects and decision latency, then calibrate P0-S06 onward. This preserves roadmap
-coverage without creating hundreds of stale prompts or consuming tokens before the
-work is authorized.
+Do not generate all 344 detailed prompts or execute the provisional P1 ranges.
+The original instruction to expand P0-S01..S05 before beginning P0 is historical
+and obsolete. Use the exact gate-resolution session in section 51 next. Only
+after P1-E0 passes may the Product Owner authorize a current-code reconciliation
+and final session cards for P1-S01..S05. Later P1 cards remain rolling-wave
+planning so unresolved dependencies cannot become accidental scope or authority.
 
 ## 26. P0-S01 — Entry baseline evidence and S02 handoff
 
@@ -1005,8 +1200,8 @@ or recovery commitments are assumed.
 | P0-D03 parameters | Permitted primary/backup/log/document locations and support-access jurisdictions; selected provider, named operator/incident owner, support hours and operating budget. | Before P0.2 implementation, hosting commitment or production data placement. |
 | P0-D04 parameters | Maximum acceptable lost acknowledged data and outage, with units; incident scenarios/service hours, contractual applicability and recovery owner. | Before P0.2 recovery implementation/customer promises; measured restore evidence before P10.3. |
 | P0-D05 parameters | Definitions and values for user/project/storage limits; warning/overage/upgrade, trial, grace/suspension/cancellation rules, price/support terms and external invoicing operator. | Before P0.3 policy implementation; commercial terms before sale. |
-| P0-S03-Q01 | IRR-only versus multi-currency requirements, fiscal/calendar settings, and approved inventory valuation/traceability policy. | Before affected P1.2/P2/P8.1 design acceptance and financial implementation. |
-| P0-S03-Q02 | Exact statutory filing versus export/submission scope; employment/pay components, attendance-integration scope, named accounting/legal reviewer and source validation. | Before affected P1.2/P6.3/P7 design/implementation; professional acceptance before release. P6.3 remains legally gated. |
+| P0-S03-Q01 | **Product policy recorded by D14-04-D14-07:** IRR initial base/storage/display, no Toman/FX behavior, UTC/ISO persistence with Jalali UI, explicit fiscal calendar, versioned precision categories and no current authoritative financial inventory valuation. | Exact accounting/legal rounding methods, scales and points remain unset until an authorized effective policy/configuration supplies them; source provenance is required only where the policy declares it. Later P2/P8 design gates remain. |
+| P0-S03-Q02 | **Product policy recorded by D14-08 and revised D14-09-D14-11:** export-only initial filing boundary, official versioned provenance capability, Platform-owned policy structures, Tenant Owner selection and Tenant Admin operational configuration. Professional evidence is optional metadata, not an actor or global gate. | Unknown required values remain unset/inactive. Missing provenance fails closed only for policies explicitly marked source-required. P6.3 remains legally gated for its affected behavior. |
 | P0-S03-Q03 | Required signatures/evidence standards, retention/hold/export obligations and responsible approver. | Before affected P0.2/P0.3/P1.3 storage/DMS design acceptance or data placement. |
 | P0-S03-Q04 | Product Owner selections A1/B1/C1/D1/E1, revised F2, final G3 — Revised with Protected Operations, and H1 are recorded. P0-S18 assigns Azam Zerangzadeh every review responsibility and explicitly overrides the independence expectation; every review/evidence field remains OPEN and the concentration risk is recorded. | Completed named review before accepting S07/affected ADR clauses or implementing P1.1; external professional/statutory independence obligations are not waived; tenant-wide permissions remain insufficient. |
 
@@ -2525,12 +2720,68 @@ phase exit are not achieved.
 
 The P1 handoff is conditional and blocked. Before a separately authorized P1.1
 package, the Product Owner must receive completed Q04 review evidence, affected
-ADR dispositions, resolved operational/commercial/evidence parameters, a
-tenant-preserving multi-role migration/design boundary and explicit package
-authorization. This packet does not authorize P1 or downstream packages.
+ADR dispositions, a tenant-preserving multi-role migration/design boundary and
+explicit package authorization. The operational, commercial and evidence
+parameters remain required for P0 exit and for the P1 slices they directly gate;
+their directional approval is not blanket P1 authority. This packet does not
+authorize P1 or downstream packages.
 
 Azam Zerangzadeh remains the final accountable reviewer under the recorded
 independence override. Reviewer concentration, reduced independent challenge,
 confirmation-bias, key-person and external-independence risks remain explicit.
 No application, schema, permission, migration, dependency, template or runtime
 behavior changed.
+
+## 51. P0 closeout and P1 readiness reconciliation
+
+**Recorded:** 2026-09-26. **Status:** documentation review complete; P0 phase exit
+and P1 implementation entry remain blocked. This section supersedes only obsolete
+Playbook forecasts and operating instructions; it does not replace `ROADMAP.md`,
+accept an ADR, close a gate or authorize implementation.
+
+### Reconciliation result
+
+- P0-S01..S22 are historical recorded sessions. Their documentation sequence is
+  closed, but P0 itself is not accepted or complete.
+- The section 6 forecast rows that previously assigned implementation outcomes to
+  P0-S12..S20 are retired. No CI, operations, entitlement, offboarding or UI
+  implementation may be inferred from those consumed identifiers.
+- The finalized authorization terms and Q04 choices in section 7 are mandatory
+  design inputs. The current single-role runtime remains compatibility evidence,
+  not the target authorization model.
+- The P1 order remains P1.1 authorization foundation, P1.2 configuration/master
+  governance, P1.3 DMS/audit extensibility, P1.4 material/UOM governance,
+  integrated review and closeout. P1.2-P1.4 are not implicitly authorized by
+  completing P1.1 and retain their own dependencies.
+- `P1-E0` and the three P1.1 entry criteria in section 23 replace any implication
+  that a provisional range or the conditional S22 handoff is executable authority.
+
+### Remaining OPEN gates
+
+The remaining hard P1.1 gate is its explicit bounded package authorization. Q04
+conditions are now P1.1 implementation requirements in S07 section 6, not
+unresolved design decisions. S04-S12 dispositions, D03 hosting/residency/operator,
+D04 recovery, Q03 evidence lifecycle, D05 commercial/lifecycle, P0.2/P0.3/P0.4
+and whole-P0 phase exit remain open for their governed packages or release; they
+do not block P1.1 unless its scope is expanded to enable those behaviors.
+
+### Historical P0-G01 session card
+
+The next bounded session is **P0-G01 — Q04 accountable-review evidence
+recording** (`A-H`, documentation/decision evidence only).
+
+| Field | Bounded contract |
+| --- | --- |
+| Entry input | **Satisfied on 2026-09-27:** Azam Zerangzadeh completed the bounded documentation review using the [P0-G01 evidence matrix](architecture/P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings). Outstanding implementation, compliance and independence evidence remains a gate; it must not be repeated as an empty recording session. |
+| Goal / scope | Validate the supplied record against final A1/B1/C1/D1/E1, revised F2, final G3 and H1; record only supported review facts; identify required S07 revisions or readiness for disposition. |
+| Excluded | Inferring or self-generating human approval; accepting S07; closing P0; authorizing or implementing P1; changing code, schema, migrations, permissions, dependencies, UI or runtime behavior. |
+| C0/C1 | This section; sections 41-50; `ROADMAP.md` P0/P1 and decision register; Q04 packet; [P0-G01 evidence matrix](architecture/P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md); S07 ADR; S21 readiness review; S22 conditional handoff; current scoped documentation diff. |
+| Validation | Every A-H field is evidence-backed or remains OPEN; final terminology and Q04 revisions are retained; reviewer-concentration and external-independence risks are addressed or explicitly remain open; links, anchors, stale claims and whitespace pass. |
+| Stop / handoff | **Complete as documentation-only review.** P0-G02 is now complete and reconciles the required remediations into S07. The next action is explicit P1.1 package authorization under P1-E0. |
+
+P0-G01 completed on 2026-09-27 with A/B/F `accepted with conditions` and
+C/D/E/G/H `revision required`. P0-G02 then reconciled every required remediation
+into [S07 section 6](architecture/ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md#6-p0-g02-remediation-and-complete-p11-implementation-contract). P1.1 is **READY
+FOR AUTHORIZATION**: the exact next executable action is a Product Owner
+authorization of the bounded P1.1 contract, after which P1-E0 records that
+authority and P1-S01 begins. It does not authorize later P1 slices.

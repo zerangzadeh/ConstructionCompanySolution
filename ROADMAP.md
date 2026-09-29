@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-09-26
+**Status date:** 2026-09-27
 
 **Product stage:** pre-production
 
@@ -160,11 +160,17 @@ Stable masters + consent/privacy + support operations -> future network/AI
   provenance, isolation, retention and acceptance boundaries without activating
   the deferred network. All nine ADRs remain PROPOSED, not accepted or implemented.
   The Product Owner accepted the S02 recommendations; D03–D05 parameters and S03
-  release questions remain open. S07 preparation is complete; P1.1 remains PLANNED and Q04 accountable review remains open.
-  S08 preparation is complete; D03-D05/Q03 and Q04 review storage gates remain open.
-  S09 preparation is complete; PPC-10/P1.3 remain incomplete and Q03/Q04 review remains open.
+  release questions remain open. S07 preparation and P0-G02 remediation are complete;
+  P1.1 has been implemented under the bounded Product Owner authorization; its
+  acceptance evidence is recorded with the P1.1 closeout, while P0 remains
+  incomplete and no later P1 package is implied.
+  S08 preparation is complete; D03-D05/Q03 storage gates remain open, while Q04
+  design constraints are recorded for any future storage implementation.
+  S09 preparation is complete; PPC-10/P1.3 remain incomplete and Q03 plus the
+  relevant Q04 design constraints remain applicable.
   S10 preparation is complete; async delivery and affected packages remain unimplemented by this session.
-  S11 preparation is complete; P0.3 remains PLANNED and D03-D05/Q03/Q04 review remain open.
+  S11 preparation is complete; P0.3 remains PLANNED and D03-D05/Q03 plus the
+  relevant Q04 design constraints remain applicable.
   S12 preparation is complete; the controlled B2B network remains deferred and its
   consent, identity, legal/commercial, moderation, privacy/competition and operating decisions remain open.
   P0-S13 prepared the consolidated
@@ -238,15 +244,26 @@ Stable masters + consent/privacy + support operations -> future network/AI
   accepts no ADR and authorizes no implementation.
   P0-S21 then performed the documentation-only
   [P0 readiness and unresolved-risk review](docs/architecture/P0_S21_READINESS_AND_UNRESOLVED_RISK_REVIEW.md).
-  It verifies that Q04 selection/assignment records and the D03-D05 directional
-  records are narrow completed decisions, while every Q04 accountable review and
-  every S04-S12 ADR disposition remains OPEN. All nine ADRs remain PROPOSED; no
-  P1.1/P0.2/P0.3 implementation is authorized and P0 is not accepted or complete.
+  At that historical review, Q04 selection/assignment records and the D03-D05
+  directional records were narrow completed decisions while every Q04 accountable
+  review and every S04-S12 ADR disposition remained OPEN. Later P1-S14 governance
+  accepts S04-S06 as target architecture only; the historical P0-S21 finding did
+  not authorize implementation, and P0 remains incomplete.
   P0-S22 completed the documentation-only
   [P0 closeout and conditional P1 handoff](docs/architecture/P0_S22_DOCUMENTATION_CLOSEOUT_AND_P1_HANDOFF.md).
   The packet carries the unresolved decision/evidence queue forward and explicitly
   blocks P0 phase exit and P1 entry; it does not change any gate or authorize
   implementation.
+  P0-G01 then completed the bounded documentation-only
+  [Q04 accountable review](docs/architecture/P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings): A/B/F are accepted with conditions and
+  C/D/E/G/H require revision. The findings retain every implementation,
+  compliance and independence condition, accept no ADR and authorize neither P1
+  nor a runtime change.
+  P0-G02 reconciled those findings into the complete
+  [S07 P1.1 implementation contract](docs/architecture/ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md#6-p0-g02-remediation-and-complete-p11-implementation-contract).
+  The P1.1 foundation is **IMPLEMENTED** under its bounded authorization. D03-D05/Q03,
+  P0.2/P0.3/P0.4 and unrelated ADR dispositions remain gates only for their directly
+  governed packages or release/enablement behavior. P0 as a whole remains incomplete.
   The release contract is not frozen and P0/P0.1 are not complete.
 - **Outcome and rationale:** decide authoritative boundaries before real financial,
   payroll, document, and tenant history makes change expensive.
@@ -291,6 +308,22 @@ Stable masters + consent/privacy + support operations -> future network/AI
   license gates, restore exercise, deployment rehearsal, security review,
   representative load budgets.
 - **Effort / risk:** **L / Critical**.
+
+  **2026-09-28 Product Owner operational decision:** Platform Admin assignment
+  requires one active Superuser and an auditable reason; the assigning Superuser
+  must remain distinct from the target. This does not alter the separate Platform
+  Admin/Superuser boundary or create ordinary Tenant-data/support access.
+
+  **2026-09-28 Product Owner Protected Operations decision:** an active Platform
+  Admin owns the platform catalogue lifecycle and may create versions or retire a
+  current classification alone with an auditable reason. Catalogue ownership does
+  not itself grant Tenant-data access or permit a protected business action.
+
+  **2026-09-28 Product Owner role-catalog decision:** Platform Admin manages
+  global-custom, tenant-custom and system-role presentation/permission bindings;
+  Tenant Admin manages only custom roles of its active Tenant. System roles remain
+  non-archivable; custom roles are archived with retained assignment/history and
+  audit evidence. Permission codes remain code-and-migration owned.
 
 ### P0.3 SaaS plans, entitlements, quotas, and tenant offboarding
 
@@ -361,13 +394,14 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P1.1 Project/site object-scope authorization
 
-- **Status / priority:** **PLANNED / MUST**
-- **P0-S21 authorization gate:** **OPEN.** S07 remains PROPOSED, Q04 accountable
-  reviews remain OPEN and no separately scoped P1.1 implementation authorization
-  is recorded. Q04 decisions and reviewer assignment are not package authority.
-- **P0-S22 handoff:** **CONDITIONAL / BLOCKED.** Documentation closeout records
-  the required Q04, ADR, parameter and migration evidence queue; it does not
-  authorize P1.1 implementation or P0 phase exit.
+- **Status / priority:** **CLOSED / MUST — acceptance criteria verified 2026-09-28**
+- **Authority and contract:** P0-G01/P0-G02 findings were reconciled into the S07
+  contract and separately authorized for P1.1. P1.1 implements only that bounded
+  contract; it neither accepts the ADR nor completes P0 as a whole.
+- **Boundary against unrelated P0 gates:** D03-D05/Q03, P0.2/P0.3/P0.4 and
+  unrelated ADR dispositions do not block P1.1 coding unless the authorized slice
+  enables their support/emergency, storage/export, quota/lifecycle, UI or
+  financial/regulatory behavior.
 - **Outcome:** permissions are the intersection of active tenant membership,
   the union of permissions from all active applicable membership-scoped role
   assignments, explicit grants, object scope, tenant status, delegation, policy,
@@ -388,11 +422,98 @@ Stable masters + consent/privacy + support operations -> future network/AI
   backfill unrestricted scope only by explicit policy; test independent role
   add/remove, permission union, audit evidence and different per-Tenant role sets,
   plus exhaustive cross-tenant/cross-project and query/performance review.
+- **Closeout evidence (2026-09-28):** organizations migrations `0030`–`0035`
+  and audit migration `0030` now cover authorization foundation, restrictive
+  backfill, single-Superuser Platform Admin assignment compatibility, Protected
+  Operations lifecycle, role-catalog lifecycle, active `admin` bootstrap and a
+  lossy-rollback guard. Focused service/route tests verify Platform Admin and
+  Tenant Admin boundaries, system-role non-archival, active permission-catalog
+  bindings, exact-Tenant role assignment, archival/history retention and
+  before/after audit evidence. Persian-first RTL role-catalog and Protected
+  Operations screens are available from the platform journey. No P1.2 scope is
+  implemented by this closeout.
 - **Effort / risk:** **L / Critical**.
 
 ### P1.2 Configuration and master-governance corrections
 
-- **Status / priority:** **PLANNED / MUST+SHOULD**
+- **Status / priority:** **P1-S14 COMPLETE; P1-S15 COMPLETE; P1-S16+ NOT STARTED
+  / MUST+SHOULD**
+- **P1-S14 entry-gate result (2026-09-28):** the Product Owner supplied explicit
+  bounded package authorization and the P1.1 authorization foundation is present,
+  and the later Product Owner disposition accepted
+  S04-S06 as target architecture and closed the Q01 product choices plus Q02
+  filing/source-hierarchy choices. The final 2026-09-29 Product Owner decision
+  removed mandatory professional-review authority and D14-11 as global development
+  gates while retaining source/version requirements for affected activation. The
+  pre-implementation compatibility inventory confirmed duplicate
+  `Organization.timezone`/`currency` and `OrganizationSettings.timezone`/`currency`,
+  service dual-write/read-repair and direct legacy timezone consumers. The later
+  P1-S14A split authorized correction of those regulatory-independent paths;
+  final closeout below supersedes the former P1-S14B global block.
+- **Accepted P1-S14 configuration-ownership decision (2026-09-28):**
+  `OrganizationSettings` is the single authoritative owner of every
+  organization-level configurable setting, including timezone, currency, fiscal
+  settings, locale and numbering schemes. `Organization` owns only Tenant identity
+  and core organization-domain attributes. Its duplicate timezone/currency fields
+  are temporary compatibility fields: a later authorized implementation must use
+  expand -> migrate/backfill -> switch -> validate and a separately controlled
+  contract step to remove legacy reads/writes and fields. This decision records
+  ownership only; this governance session changes no schema, data or runtime path
+  and supplies no Q01/Q02 value or legal/accounting rule.
+- **P1-S14 decision record (2026-09-28):** the
+  [P1-S14 decision packet](docs/architecture/P1_S14_REMAINING_DECISION_PACKET.md)
+  records D14-01 through D14-09 Product Owner dispositions. Revised D14-10 makes
+  professional evidence optional metadata rather than a role/gate; revised D14-11
+  is closed as a global development gate. S04-S06 remain accepted target
+  architecture; this grants no statutory rate, Chart of Accounts, filing behavior
+  or regulated-value authority.
+- **P1-S14 split and P1-S14A closeout (2026-09-28):** the Product Owner split the
+  package into executable **P1-S14A — Configuration Authority** and blocked
+  **P1-S14B — Regulatory/Accounting Validation**. Organizations migration `0036`
+  establishes the IRR-only current base-currency guard and fail-closed backfill;
+  authoritative reads no longer repair from legacy fields, settings updates no
+  longer dual-write `Organization.timezone`/`currency`, and audit evidence records
+  before/after values plus changed fields. Equipment, Safety and Quality workflow
+  deadlines now consume `OrganizationSettings.timezone`; Tenant creation writes
+  configuration only to `OrganizationSettings`. Legacy fields remain physically
+  present and inert pending a separately authorized contract stage. Targeted 30
+  tests, Django checks/migration-state validation and Ruff passed. No tax/VAT,
+  filing, unverified precision/rounding, valuation or other regulated behavior was
+  activated. P1-S14A completion does not complete P1-S14 or authorize P1-S15.
+- **Historical P1-S14B execution gate recheck (2026-09-29):** bounded execution authority was
+  present, but the repository still contains no actual official source versions,
+  named qualified independent reviewer evidence, completed professional review of
+  the affected baseline/precision facts, or D14-11 disposition. The gate therefore
+  failed before implementation; no code, schema, migration or runtime behavior was
+  changed. The later final Product Owner decision supersedes only its global
+  reviewer/D14-11 blocking semantics; the missing source facts remain absent.
+- **Source/evidence register (2026-09-29):** the
+  [source and optional-review register](docs/architecture/P1_S14B_PROFESSIONAL_EVIDENCE_REGISTER.md)
+  preserves provenance and optional professional-validation metadata. A missing
+  source fails closed only where the affected policy explicitly requires one;
+  optional review is not an ERP actor or global stage gate.
+- **P1-S14 final closeout (2026-09-29):** `OrganizationSettings` remains the sole
+  direct Tenant-settings authority. The accepted configuration flow is external
+  source -> versioned Platform policy/localization catalogue -> Tenant Owner
+  selection -> authorized Tenant configuration/runtime use. Platform Admin owns
+  Platform/localization structures and values, while Tenant Owner/Tenant Admin may
+  decide or maintain field-specific Tenant values within RBAC boundaries. Unknown
+  required regulated/accounting values remain unset/inactive and no rule,
+  filing, valuation, precision or rounding fact was invented. P1-S14 is complete;
+  legacy Organization columns remain for a separately controlled contract stage.
+- **P1-S15 closeout (2026-09-29):** migration `organizations.0037` adds immutable
+  source provenance, Platform policy definitions/versions, optional professional
+  evidence and Tenant selections. Services enforce Platform Admin catalogue
+  authority, Tenant Owner approval, Tenant Admin application, active Tenant and
+  membership checks, dedicated permissions, audit evidence, effective dates,
+  non-overlap, explicit per-policy source requirements and fail-closed resolution.
+  Direct Tenant operational values remain in `OrganizationSettings`; future
+  field-specific Tenant parameters may be authorized, but unrestricted parameter
+  bags and executable formulas are prohibited. Fourteen targeted
+  policy/permission-registry tests (plus 11
+  subtests) passed; no regulated value or consumer activation,
+  `BillingPolicy` switch, autonomous filing, BusinessParty governance or P1-S16
+  work is included.
 - **Outcome:** one owner for organization timezone/currency/fiscal settings;
   effective-dated approved regulatory rule sets; versioned contract commercial
   terms; governed UOM conversions; canonical roles and separation-of-duties
@@ -405,7 +526,9 @@ Stable masters + consent/privacy + support operations -> future network/AI
   includes annual VAT/tax, taxpayer-invoice schema, payroll-tax, monthly employee
   insurance, contractor-insurance/clearance parameters, calendars and rounding;
   every unverified rule remains **«نیازمند بررسی قانونی»**.
-- **Prerequisites:** P0.1 and legal/accounting source register.
+- **Prerequisites:** P0.1 and applicable legal/accounting source records remain
+  required for affected regulated/accounting activation and later P1.2 slices;
+  the separately authorized P1-S15 technical foundation does not validate values.
 - **Models:** `RegulatoryRuleSet`/version (final naming by design), contract term
   versions, party profile/representative/alias/merge/restriction evidence, UOM
   conversions, effective grants. Split the current `BillingPolicy` into its
@@ -414,7 +537,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **Integration:** Billing, Payroll, taxpayer invoices, Treasury, Procurement,
   Inventory, reporting; historical documents store applied versions/snapshots.
 - **UI:** effective date, provenance, reviewer, impact preview, dual control,
-  clear Rial/Toman and Jalali/Gregorian display; explain duplicate/merge and
+  unambiguous Rial-only monetary display and Jalali presentation over canonical
+  UTC/ISO-compatible persistence; explain duplicate/merge and
   restriction decisions, including transaction-block reason and retained history.
 - **Migration/testing:** pre-production data may be discarded/backfilled if that
   is safer, but migrations remain; golden calculations by rule version and
@@ -1047,34 +1171,49 @@ remain historical. Approval of direction does not supply unspecified parameters.
 | P0-D05 | SaaS packaging, entitlements and quotas | POLICY APPROVED; PARAMETERS OPEN | A: one core plan and external subscription administration; exact limits/lifecycle before P0.3 implementation, terms before sale; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d05-saas-packaging-entitlements-and-quotas) |
 | P0-D06 | Audit findings/priorities and separate implementation authority | FINDINGS/PRIORITIES APPROVED; IMPLEMENTATION NOT AUTHORIZED | Planning baseline/PPC priorities accepted; separately scoped package approval before application implementation; [comparison](docs/ROADMAP_EXECUTION_PLAYBOOK.md#p0-d06-audit-findings-priorities-and-implementation-authority) |
 
-**P0-S03-Q04 decision status (verified by P0-S21 on 2026-09-26):** Product Owner selections
+**P0-S03-Q04 decision status (updated by P0-G01 on 2026-09-27):** Product Owner selections
 A1/B1/C1/D1/E1, revised F2, final G3 — Revised with Protected Operations, and H1 are recorded in the
 [Q04 decision packet](docs/architecture/P0_S14_Q04_PRODUCT_OWNER_DECISION_PACKET.md).
 The P0-S18 final accountable reviewer decision and independence override are
-recorded, and P0-S19 records no supplied completed review. Azam Zerangzadeh holds
-every Q04 review responsibility, while every review outcome, evidence/version,
-date, unresolved-objection and resulting-revision field remains OPEN; S07 and all
-other P0.1 ADRs remain PROPOSED, and P1.1/P0.2/P0.3 implementation is not
-authorized.
-P0-S21 preserves the reviewer-concentration and external-independence risks and
-classifies every Q04-A through Q04-H accountable review as OPEN; it does not
-convert selection or assignment evidence into review approval.
+recorded; P0-S19 is historical pre-review evidence. Under the authoritative
+Platform/Tenant identity policy, Azam Zerangzadeh is the real accountable reviewer
+for Platform-level responsibilities and Tenant examples remain Seed/Test only.
+P0-G01 records A/B/F as `accepted with conditions` and C/D/E/G/H as `revision
+required`, with stable evidence references, review date, objections, conditions
+and independence gaps in the
+[P0-G01 evidence matrix](docs/architecture/P0_G01_Q04_ACCOUNTABLE_REVIEW_EVIDENCE_MATRIX.md#3-p0-g01-accountable-review-findings).
+The same-person independent-challenge gap remains OPEN; F/G also retain applicable
+external legal/compliance independence gaps. S07 and all other P0.1 ADRs remain
+PROPOSED. The historical P0-G01 record did not authorize P1.1/P0.2/P0.3; the later
+bounded P1.1 authorization and verified closeout above supersede that P1.1 status
+without authorizing P0.2/P0.3 or accepting S07.
 The authoritative role vocabulary is recorded in the packet and permission matrix;
 the additional authoritative multi-role rule requires independent Tenant
 Membership-scoped many-to-many role assignments, different role sets per Tenant,
-permission union and audited independent assignment/revocation. Current role codes,
-single-role Membership schema and runtime behavior remain unchanged pending
-separately authorized design, migration and implementation.
+permission union and audited independent assignment/revocation. P1.1 has now
+implemented that rule through membership-scoped assignments while retaining the
+single-role Membership fields only as compatibility data; later packages remain
+separately governed.
 
 **Confirmed direction:** the Product Owner's explicit P0-S02 instruction places
 advanced AI, B2B network, GPS/telematics, GIS, enterprise SSO, broad offline work and
 architectural distribution after the core. This confirms sequencing, not a reduced
 core or a frozen release scope; approval evidence is recorded in the packet.
 
+**P1-S14 Q01/Q02 status (revised 2026-09-29):** D14-04 through D14-09 record the
+Product Owner's IRR/no-FX, UTC/ISO plus Jalali UI, explicit fiscal calendar,
+versioned precision-category, no-current-financial-valuation, export-only and
+official-source-hierarchy decisions. Revised D14-10 makes professional review
+optional policy-version evidence, not an authority or global gate; revised
+D14-11 is closed as a global development gate. Actual official source versions
+and regulated/accounting values remain absent, so each affected activation must
+remain unset/inactive and fail closed. See the
+[P1-S14 decision record](docs/architecture/P1_S14_REMAINING_DECISION_PACKET.md#5-post-decision-gate-reassessment).
+
 Remaining phase-gated choices/parameters are tracked in the
 [S03 open-input register](docs/ROADMAP_EXECUTION_PLAYBOOK.md#unresolved-parameters-and-latest-gates):
-pilot scale/owners; statutory filing scope; Rial-only vs multi-currency and fiscal
-settings; inventory valuation; payroll employment/pay models and attendance
+pilot scale/owners; actual legal/accounting source versions, qualified independent
+review evidence and professional acceptance; payroll employment/pay models and attendance
 providers; document signature/retention rules; hosting/data residency/operator and
 numeric RPO/RTO; Q04 review outcomes/evidence and the recorded reviewer-concentration risk; exact SaaS limits, lifecycle, pricing and
 external invoicing operator. Other existing decisions remain: BOQ/price-book licensing,

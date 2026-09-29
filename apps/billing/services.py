@@ -21,7 +21,11 @@ from apps.contracts.models import (
     ContractItem,
     ContractStatus,
 )
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     MembershipStatus,
@@ -85,12 +89,19 @@ def _decimal_with_scale(
 
 
 def _require_permission(
-    *, actor: User, organization: Organization, permission: BusinessPermissionCode
+    *,
+    actor: User,
+    organization: Organization,
+    permission: BusinessPermissionCode,
+    project: Project | None = None,
+    allow_any_scope: bool = False,
 ) -> None:
     require_business_permission(
         user=actor,
         organization=organization,
         permission=permission,
+        project=project,
+        allow_any_scope=allow_any_scope,
         message="مجوز لازم برای مبنای تجاری این سازمان را ندارید.",
     )
 
@@ -197,10 +208,14 @@ def get_project_baselines(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_VIEW,
+        allow_any_scope=True,
     )
-    return ProjectBaseline.objects.filter(organization=organization).select_related(
-        "project", "contract", "approved_by", "created_by"
-    )
+    membership = get_active_membership(user=actor, organization=organization)
+    return scope_queryset(
+        queryset=ProjectBaseline.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="project_id",
+    ).select_related("project", "contract", "approved_by", "created_by")
 
 
 @transaction.atomic
@@ -218,6 +233,7 @@ def create_project_baseline(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=project,
     )
     _validate_project_contract(
         organization=organization, project=project, contract=contract
@@ -261,12 +277,13 @@ def update_project_baseline_effective_date(
     baseline: ProjectBaseline,
     effective_date: date,
 ) -> ProjectBaseline:
+    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_permission(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=locked.project,
     )
-    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_draft(locked)
     locked.effective_date = effective_date
     locked.updated_by = actor
@@ -323,12 +340,13 @@ def add_baseline_item(
     activity: Activity | None = None,
     sort_order: int = 0,
 ) -> BaselineItem:
+    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_permission(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=locked.project,
     )
-    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_draft(locked)
     if not line_key.strip() or not description.strip() or not unit.strip():
         raise ValidationError("کلید، شرح و واحد ردیف الزامی است.")
@@ -382,11 +400,6 @@ def update_baseline_item(
     activity: Activity | None = None,
     sort_order: int = 0,
 ) -> BaselineItem:
-    _require_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.BASELINES_MANAGE,
-    )
     try:
         locked_item = (
             BaselineItem.objects.select_for_update()
@@ -396,6 +409,12 @@ def update_baseline_item(
     except BaselineItem.DoesNotExist as exc:
         raise PermissionDenied("ردیف مبنا متعلق به این سازمان نیست.") from exc
     locked = _locked_baseline(organization=organization, baseline=locked_item.baseline)
+    _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=locked.project,
+    )
     _require_draft(locked)
     if not description.strip() or not unit.strip() or sort_order < 0:
         raise ValidationError("شرح، واحد و ترتیب نمایش ردیف معتبر نیست.")
@@ -432,11 +451,6 @@ def update_baseline_item(
 def remove_baseline_item(
     *, organization: Organization, actor: User, item: BaselineItem
 ) -> None:
-    _require_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.BASELINES_MANAGE,
-    )
     try:
         locked_item = (
             BaselineItem.objects.select_for_update()
@@ -446,6 +460,12 @@ def remove_baseline_item(
     except BaselineItem.DoesNotExist as exc:
         raise PermissionDenied("ردیف مبنا متعلق به این سازمان نیست.") from exc
     locked = _locked_baseline(organization=organization, baseline=locked_item.baseline)
+    _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=locked.project,
+    )
     _require_draft(locked)
     line_key = locked_item.line_key
     locked_item.delete()
@@ -463,14 +483,15 @@ def remove_baseline_item(
 def withdraw_project_baseline(
     *, organization: Organization, actor: User, baseline: ProjectBaseline, reason: str
 ) -> ProjectBaseline:
+    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_permission(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_MANAGE,
+        project=locked.project,
     )
     if not reason.strip():
         raise ValidationError("دلیل استرداد الزامی است.")
-    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_draft(locked)
     locked.status = ProjectBaselineStatus.WITHDRAWN
     locked.withdrawn_by = actor
@@ -504,14 +525,15 @@ def _approve_project_baseline_domain(
 ) -> ProjectBaseline:
     """Certify the baseline inside the shared runtime transaction only."""
 
+    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_permission(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.BASELINES_APPROVE,
+        project=locked.project,
     )
     if not reason.strip():
         raise ValidationError("دلیل تأیید مبنا الزامی است.")
-    locked = _locked_baseline(organization=organization, baseline=baseline)
     _require_draft(locked)
     locked_contract = _locked_contract(
         organization=organization, contract=locked.contract

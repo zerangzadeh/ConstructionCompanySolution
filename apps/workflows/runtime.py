@@ -16,15 +16,19 @@ from apps.audit.services import record_audit_event
 from apps.organizations.authorization import (
     get_active_membership,
     membership_has_permission,
+    membership_has_scope,
     require_business_permission,
 )
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
+    MembershipRoleAssignment,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
 )
+from apps.projects.models import Project, ProjectSite
 
 from .models import (
     WorkflowDelegation,
@@ -45,6 +49,7 @@ from .models import (
 )
 from .registry import SubjectSnapshot, registry
 from .routing import ResolvedCandidate, resolve_step_candidates
+from .scope import scope_work_item_queryset, workflow_scope_objects
 from .validators import evaluate_condition, validate_workflow_version
 
 
@@ -64,14 +69,65 @@ def _require_permission(
     actor: User,
     organization: Organization,
     permission: str | BusinessPermissionCode,
+    project: Any | None = None,
+    site: Any | None = None,
+    allow_any_scope: bool = False,
 ) -> OrganizationMembership:
     membership = require_business_permission(
         user=actor,
         organization=organization,
         permission=permission,
         message="مجوز لازم برای عملیات گردش‌کار را ندارید.",
+        project=project,
+        site=site,
+        allow_any_scope=allow_any_scope,
     )
-    return membership or _require_membership(actor=actor, organization=organization)
+    return membership
+
+
+def _require_instance_permission(
+    *,
+    actor: User,
+    organization: Organization,
+    instance: WorkflowInstance,
+    permission: str | BusinessPermissionCode,
+) -> OrganizationMembership:
+    project, site = workflow_scope_objects(instance)
+    return _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=permission,
+        project=project,
+        site=site,
+    )
+
+
+def _lock_membership_authority(
+    *, organization: Organization, membership_id: object
+) -> None:
+    """Linearize a runtime decision with role/grant assignment and revocation."""
+
+    try:
+        OrganizationMembership.objects.select_for_update().get(
+            pk=membership_id,
+            organization=organization,
+            status=MembershipStatus.ACTIVE,
+            user__is_active=True,
+        )
+    except (ValueError, OrganizationMembership.DoesNotExist) as exc:
+        raise PermissionDenied("عضویت فعال و متعلق به این سازمان یافت نشد.") from exc
+    list(
+        MembershipRoleAssignment.objects.select_for_update()
+        .filter(membership_id=membership_id, revoked_at__isnull=True)
+        .order_by("pk")
+        .values_list("pk", flat=True)
+    )
+    list(
+        MembershipScopeGrant.objects.select_for_update()
+        .filter(membership_id=membership_id, revoked_at__isnull=True)
+        .order_by("pk")
+        .values_list("pk", flat=True)
+    )
 
 
 def _audit(
@@ -380,6 +436,28 @@ def _activate_action_step(
     )
     if not result.candidates:
         now = timezone.now()
+        WorkItem.objects.get_or_create(
+            organization_id=instance.organization_id,
+            step_instance=step_instance,
+            action_key=step.key,
+            defaults={
+                "instance": instance,
+                "status": WorkItemStatus.UNRESOLVED,
+                "required_permission": step.required_permission,
+                "routing_basis": [
+                    {
+                        "resolver": "unresolved",
+                        "attempted_rule_ids": ",".join(result.attempted_rules),
+                    }
+                ],
+                "unresolved_at": now,
+                "unresolved_reason": "no_eligible_primary_or_fallback_candidate",
+                "priority": step.configuration.get("priority", 0),
+                "idempotency_key": _idempotency_key(
+                    instance.pk, step_instance.pk, step.key, "unresolved"
+                ),
+            },
+        )
         _raw_update(
             WorkflowInstance.objects.filter(pk=instance.pk),
             status=WorkflowInstanceStatus.SUSPENDED,
@@ -688,6 +766,11 @@ def _lock_runtime_for_item(
         instance=instance,
         step_instance=step_instance,
     )
+    actor_membership = get_active_membership(user=actor, organization=organization)
+    _lock_membership_authority(
+        organization=organization,
+        membership_id=actor_membership.pk,
+    )
     return snapshot, instance, step_instance, work_item
 
 
@@ -706,6 +789,67 @@ def _active_candidate(
     )
 
 
+def _candidate_delegation_is_current(
+    *,
+    candidate: WorkItemCandidate,
+    item: WorkItem,
+    instance: WorkflowInstance,
+    membership: OrganizationMembership,
+) -> bool:
+    delegation_bases = [
+        basis
+        for basis in candidate.routing_basis
+        if basis.get("resolver") == "delegation"
+    ]
+    if not delegation_bases:
+        return True
+    if any(basis.get("resolver") != "delegation" for basis in candidate.routing_basis):
+        return True
+    required_permission = (
+        item.required_permission
+        or item.step_instance.step_definition.required_permission
+    )
+    if not required_permission:
+        return False
+    now = timezone.now()
+    delegation_ids = [
+        basis.get("delegation_id")
+        for basis in delegation_bases
+        if basis.get("delegation_id")
+    ]
+    delegations = (
+        WorkflowDelegation.objects.select_for_update(of=("self",))
+        .filter(
+            pk__in=delegation_ids,
+            organization_id=item.organization_id,
+            delegate=membership,
+            permission__code=required_permission,
+            starts_at__lte=now,
+            ends_at__gt=now,
+            revoked_at__isnull=True,
+        )
+        .select_related("delegator__user", "delegator__role_definition")
+        .prefetch_related(
+            "delegator__role_assignments__role__permissions",
+            "delegator__scope_grants",
+        )
+    )
+    from .scope import delegation_scope_is_bounded, membership_has_workflow_scope
+
+    for delegation in delegations:
+        if (
+            delegation.delegator.status == MembershipStatus.ACTIVE
+            and delegation.delegator.user.is_active
+            and membership_has_permission(delegation.delegator, required_permission)
+            and membership_has_workflow_scope(
+                membership=delegation.delegator, instance=instance
+            )
+            and delegation_scope_is_bounded(scope=delegation.scope, instance=instance)
+        ):
+            return True
+    return False
+
+
 def list_member_work_items(
     *,
     actor: User,
@@ -718,6 +862,7 @@ def list_member_work_items(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORK_ITEMS_VIEW,
+        allow_any_scope=True,
     )
     queryset = (
         WorkItem.objects.filter(organization=organization)
@@ -728,11 +873,165 @@ def list_member_work_items(
         .select_related("instance", "step_instance", "current_assignee")
         .distinct()
     )
+    queryset = scope_work_item_queryset(queryset, membership=membership)
     if not include_terminal:
         queryset = queryset.filter(
             status__in=[WorkItemStatus.OPEN, WorkItemStatus.CLAIMED]
         )
     return queryset.order_by("-priority", "due_at", "created_at")
+
+
+def list_unresolved_work_items(
+    *, actor: User, organization: Organization
+) -> models.QuerySet[WorkItem]:
+    """Return visible unresolved work only to explicit recovery authority."""
+
+    membership = _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
+        allow_any_scope=True,
+    )
+    queryset = WorkItem.objects.filter(
+        organization=organization,
+        status=WorkItemStatus.UNRESOLVED,
+    ).select_related("instance", "step_instance__step_definition")
+    return scope_work_item_queryset(queryset, membership=membership).order_by(
+        "-priority", "created_at"
+    )
+
+
+@transaction.atomic
+def recover_unresolved_work_item(
+    *,
+    actor: User,
+    organization: Organization,
+    work_item_id: object,
+    reason: str,
+    idempotency_key: str,
+) -> WorkItem:
+    """Re-run eligible routing without privileged auto-assignment."""
+
+    if not reason.strip():
+        raise ValidationError("دلیل بازیابی کار حل‌نشده الزامی است.")
+    _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
+        allow_any_scope=True,
+    )
+    try:
+        item = (
+            WorkItem.objects.select_for_update()
+            .select_related(
+                "instance__version",
+                "step_instance__step_definition",
+            )
+            .get(
+                pk=work_item_id,
+                organization=organization,
+            )
+        )
+    except (ValueError, WorkItem.DoesNotExist) as exc:
+        raise PermissionDenied("کار حل‌نشده در این سازمان یافت نشد.") from exc
+    instance = WorkflowInstance.objects.select_for_update().get(pk=item.instance_id)
+    actor_membership = get_active_membership(user=actor, organization=organization)
+    _lock_membership_authority(
+        organization=organization,
+        membership_id=actor_membership.pk,
+    )
+    actor_membership = _require_instance_permission(
+        actor=actor,
+        organization=organization,
+        instance=instance,
+        permission=BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
+    )
+    if item.assignment_history.filter(idempotency_key=idempotency_key).exists():
+        return item
+    if item.status != WorkItemStatus.UNRESOLVED:
+        raise PermissionDenied("کار حل‌نشده در این سازمان یافت نشد.")
+    if (
+        instance.status != WorkflowInstanceStatus.SUSPENDED
+        or instance.suspension_reason != "unresolvable_routing"
+    ):
+        raise WorkflowConflict("اجرای گردش‌کار دیگر در وضعیت حل‌نشده نیست.")
+    step = item.step_instance.step_definition
+    result = resolve_step_candidates(
+        instance=instance,
+        step_id=step.pk,
+        required_permission=step.required_permission,
+    )
+    if not result.candidates:
+        raise ValidationError("هنوز نامزد واجد شرایطی برای این کار وجود ندارد.")
+    now = timezone.now()
+    decision_policy = step.configuration.get("decision_policy", "any")
+    if decision_policy == "any":
+        for candidate in result.candidates:
+            _create_candidate(work_item=item, candidate=candidate)
+        _raw_update(
+            WorkItem.objects.filter(pk=item.pk),
+            status=WorkItemStatus.OPEN,
+            routing_basis=[
+                basis
+                for candidate in result.candidates
+                for basis in candidate.routing_basis
+            ],
+            unresolved_at=None,
+            unresolved_reason="",
+            updated_at=now,
+        )
+        new_state = WorkItemStatus.OPEN
+    else:
+        _raw_update(
+            WorkItem.objects.filter(pk=item.pk),
+            status=WorkItemStatus.CANCELLED,
+            cancelled_at=now,
+            completion_outcome="recovered",
+            updated_at=now,
+        )
+        for candidate in result.candidates:
+            _make_work_item(
+                instance=instance,
+                step_instance=item.step_instance,
+                action_key=f"{step.key}:{candidate.membership.pk}",
+                candidates=[candidate],
+                assigned_candidate=candidate,
+                actor=actor,
+                actor_membership=actor_membership,
+            )
+        new_state = WorkItemStatus.CANCELLED
+    _history(
+        work_item=item,
+        action=WorkItemAssignmentAction.RECOVER,
+        actor_membership=actor_membership,
+        idempotency_key=idempotency_key,
+        previous_state=WorkItemStatus.UNRESOLVED,
+        new_state=new_state,
+        permission_code=BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
+        reason=reason.strip(),
+        metadata={"candidate_ids": [str(c.membership.pk) for c in result.candidates]},
+    )
+    _raw_update(
+        WorkflowInstance.objects.filter(pk=instance.pk),
+        status=WorkflowInstanceStatus.ACTIVE,
+        suspended_at=None,
+        suspension_reason="",
+        updated_at=now,
+    )
+    _audit(
+        action=AuditAction.WORKFLOW_UNRESOLVED_RECOVERED,
+        entity_type="workflows.WorkItem",
+        entity_id=item.pk,
+        organization=organization,
+        actor=actor,
+        actor_membership=actor_membership,
+        metadata={
+            "candidate_ids": [str(c.membership.pk) for c in result.candidates],
+            "reason": reason.strip(),
+        },
+    )
+    item.refresh_from_db()
+    return item
 
 
 def _check_sod(
@@ -747,19 +1046,6 @@ def _check_sod(
         if step.configuration.get(flag) and str(
             instance.subject_context.get(context_key)
         ) == str(membership_id):
-            if (
-                context_key == "submitter_membership_id"
-                and step.configuration.get("allow_submitter_if_no_other_candidate")
-                and not WorkItemCandidate.objects.filter(
-                    work_item__step_instance__instance=instance,
-                    work_item__step_instance__step_definition=step,
-                    work_item__status__in=(WorkItemStatus.OPEN, WorkItemStatus.CLAIMED),
-                    is_active=True,
-                )
-                .exclude(membership_id=membership_id)
-                .exists()
-            ):
-                continue
             raise PermissionDenied("قاعده تفکیک وظایف این اقدام را منع می‌کند.")
 
 
@@ -786,13 +1072,15 @@ def claim_work_item(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORK_ITEMS_CLAIM,
+        allow_any_scope=True,
     )
     _, instance, step, item = _lock_runtime_for_item(
         actor=actor, organization=organization, work_item_id=work_item_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORK_ITEMS_CLAIM,
     )
     previous_history = item.assignment_history.filter(
@@ -806,6 +1094,20 @@ def claim_work_item(
     candidate = _active_candidate(work_item=item, membership=actor_membership)
     if candidate is None:
         raise PermissionDenied("عضویت فعلی نامزد این کار نیست.")
+    required_permission = (
+        item.required_permission or step.step_definition.required_permission
+    )
+    if required_permission and not membership_has_permission(
+        actor_membership, required_permission
+    ):
+        raise PermissionDenied("نامزد مجوز فعلی لازم را ندارد.")
+    if not _candidate_delegation_is_current(
+        candidate=candidate,
+        item=item,
+        instance=instance,
+        membership=actor_membership,
+    ):
+        raise PermissionDenied("واگذاری این نامزد دیگر معتبر نیست.")
     if item.current_assignee_id and item.current_assignee_id != actor_membership.pk:
         raise PermissionDenied("کار به عضویت دیگری تخصیص یافته است.")
     _check_sod(
@@ -868,13 +1170,15 @@ def release_work_item(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORK_ITEMS_CLAIM,
+        allow_any_scope=True,
     )
     _, instance, step, item = _lock_runtime_for_item(
         actor=actor, organization=organization, work_item_id=work_item_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORK_ITEMS_CLAIM,
     )
     if item.assignment_history.filter(idempotency_key=idempotency_key).exists():
@@ -938,32 +1242,50 @@ def reassign_work_item(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
+        allow_any_scope=True,
     )
     if not reason.strip():
         raise ValidationError("دلیل تخصیص مجدد الزامی است.")
     _, instance, step, item = _lock_runtime_for_item(
         actor=actor, organization=organization, work_item_id=work_item_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
     )
     if item.assignment_history.filter(idempotency_key=idempotency_key).exists():
         return item
     _assert_live_runtime(instance=instance, step=step, item=item)
     try:
-        assignee = OrganizationMembership.objects.select_related(
-            "user", "role_definition"
-        ).get(
-            pk=assignee_membership_id,
+        _lock_membership_authority(
             organization=organization,
-            status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
-            user__is_active=True,
+            membership_id=assignee_membership_id,
+        )
+        assignee = (
+            OrganizationMembership.objects.select_related("user", "role_definition")
+            .prefetch_related("role_assignments__role__permissions", "scope_grants")
+            .get(
+                pk=assignee_membership_id,
+                organization=organization,
+                status=MembershipStatus.ACTIVE,
+                user__is_active=True,
+            )
         )
     except (ValueError, OrganizationMembership.DoesNotExist) as exc:
         raise PermissionDenied("عضویت مقصد فعال و متعلق به این سازمان نیست.") from exc
+    required_permission = (
+        item.required_permission or step.step_definition.required_permission
+    )
+    if required_permission and not membership_has_permission(
+        assignee, required_permission
+    ):
+        raise PermissionDenied("عضویت مقصد مجوز مستقل لازم را ندارد.")
+    from .scope import membership_has_workflow_scope
+
+    if not membership_has_workflow_scope(membership=assignee, instance=instance):
+        raise PermissionDenied("عضویت مقصد دامنه مؤثر این کار را ندارد.")
     _check_sod(
         instance=instance,
         step=step.step_definition,
@@ -1099,13 +1421,15 @@ def complete_work_item(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORK_ITEMS_ACT,
+        allow_any_scope=True,
     )
     snapshot, instance, step, item = _lock_runtime_for_item(
         actor=actor, organization=organization, work_item_id=work_item_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORK_ITEMS_ACT,
     )
     if item.assignment_history.filter(idempotency_key=idempotency_key).exists():
@@ -1119,6 +1443,13 @@ def complete_work_item(
     candidate = _active_candidate(work_item=item, membership=actor_membership)
     if candidate is None:
         raise PermissionDenied("عضویت فعلی نامزد فعال این کار نیست.")
+    if not _candidate_delegation_is_current(
+        candidate=candidate,
+        item=item,
+        instance=instance,
+        membership=actor_membership,
+    ):
+        raise PermissionDenied("واگذاری این نامزد دیگر معتبر نیست.")
     _check_sod(
         instance=instance,
         step=step.step_definition,
@@ -1326,19 +1657,15 @@ def suspend_workflow_instance(
     reason: str,
     idempotency_key: str,
 ) -> WorkflowInstance:
-    actor_membership = _require_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
-    )
     if not reason.strip():
         raise ValidationError("دلیل تعلیق الزامی است.")
     _, instance, _ = _lock_instance_runtime(
         actor=actor, organization=organization, instance_id=instance_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
     )
     if _operation_already_processed(
@@ -1384,19 +1711,15 @@ def resume_workflow_instance(
     reason: str,
     idempotency_key: str,
 ) -> WorkflowInstance:
-    actor_membership = _require_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
-    )
     if not reason.strip():
         raise ValidationError("دلیل ادامه الزامی است.")
     _, instance, step = _lock_instance_runtime(
         actor=actor, organization=organization, instance_id=instance_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
     )
     if _operation_already_processed(
@@ -1405,6 +1728,10 @@ def resume_workflow_instance(
         return instance
     if instance.status != WorkflowInstanceStatus.SUSPENDED or step is None:
         raise WorkflowConflict("فقط اجرای تعلیق‌شده با گام فعال قابل ادامه است.")
+    if step.work_items.filter(status=WorkItemStatus.UNRESOLVED).exists():
+        raise PermissionDenied(
+            "کار حل‌نشده فقط از مسیر بازیابی مجاز و ممیزی‌شده قابل ادامه است."
+        )
     now = timezone.now()
     _raw_update(
         WorkflowInstance.objects.filter(pk=instance.pk),
@@ -1453,19 +1780,15 @@ def cancel_workflow_instance(
     reason: str,
     idempotency_key: str,
 ) -> WorkflowInstance:
-    actor_membership = _require_permission(
-        actor=actor,
-        organization=organization,
-        permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
-    )
     if not reason.strip():
         raise ValidationError("دلیل لغو الزامی است.")
     _, instance, step = _lock_instance_runtime(
         actor=actor, organization=organization, instance_id=instance_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORKFLOWS_REASSIGN,
     )
     if _operation_already_processed(
@@ -1626,15 +1949,17 @@ def migrate_workflow_instance(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORKFLOWS_MIGRATE_INSTANCES,
+        allow_any_scope=True,
     )
     if not reason.strip():
         raise ValidationError("دلیل مهاجرت نسخه الزامی است.")
     _, instance, step = _lock_instance_runtime(
         actor=actor, organization=organization, instance_id=instance_id
     )
-    actor_membership = _require_permission(
+    actor_membership = _require_instance_permission(
         actor=actor,
         organization=organization,
+        instance=instance,
         permission=BusinessPermissionCode.WORKFLOWS_MIGRATE_INSTANCES,
     )
     if _operation_already_processed(
@@ -1737,9 +2062,18 @@ def create_workflow_delegation(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORKFLOWS_DELEGATE,
+        allow_any_scope=True,
     )
     if not idempotency_key.strip():
         raise ValidationError("کلید تکرارپذیری واگذاری الزامی است.")
+    if not reason.strip():
+        raise ValidationError("دلیل واگذاری الزامی است.")
+    if not permission_code:
+        raise ValidationError("واگذاری باید به یک مجوز کسب‌وکار محدود باشد.")
+    if starts_at >= ends_at:
+        raise ValidationError("پایان واگذاری باید پس از شروع آن باشد.")
+    if str(delegator_membership_id) == str(delegate_membership_id):
+        raise PermissionDenied("واگذاری به همان عضویت مجاز نیست.")
     Organization.objects.select_for_update().get(pk=organization.pk)
     existing = WorkflowDelegation.objects.filter(
         organization=organization, idempotency_key=idempotency_key
@@ -1750,16 +2084,34 @@ def create_workflow_delegation(
         ) != str(delegate_membership_id):
             raise ValidationError("کلید تکرارپذیری برای واگذاری دیگری استفاده شده است.")
         return existing
+    authority_ids = sorted(
+        {
+            str(actor_membership.pk),
+            str(delegator_membership_id),
+            str(delegate_membership_id),
+        }
+    )
+    for membership_id in authority_ids:
+        _lock_membership_authority(
+            organization=organization,
+            membership_id=membership_id,
+        )
+    actor_membership = _require_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.WORKFLOWS_DELEGATE,
+        allow_any_scope=True,
+    )
     memberships = list(
-        OrganizationMembership.objects.select_for_update()
+        OrganizationMembership.objects.select_for_update(of=("self",))
         .select_related("role_definition", "user")
         .filter(
             organization=organization,
             pk__in=(delegator_membership_id, delegate_membership_id),
             status=MembershipStatus.ACTIVE,
-            role_definition__is_active=True,
             user__is_active=True,
         )
+        .prefetch_related("role_assignments__role__permissions", "scope_grants")
         .order_by("pk")
     )
     by_id = {str(item.pk): item for item in memberships}
@@ -1784,17 +2136,62 @@ def create_workflow_delegation(
             )
         except BusinessPermission.DoesNotExist as exc:
             raise ValidationError("مجوز واگذاری ثبت نشده است.") from exc
+    if not membership_has_permission(
+        delegator, permission_code
+    ) or not membership_has_permission(delegate, permission_code):
+        raise PermissionDenied(
+            "واگذارکننده و جانشین باید مستقلاً مجوز کسب‌وکار لازم را داشته باشند."
+        )
+    normalized_scope = scope or {}
+    project = None
+    site = None
+    project_id = normalized_scope.get("project_id")
+    site_id = normalized_scope.get("site_id")
+    if project_id:
+        project = Project.objects.filter(
+            pk=project_id, organization=organization, deleted_at__isnull=True
+        ).first()
+        if project is None:
+            raise PermissionDenied("پروژه واگذاری در این سازمان یافت نشد.")
+    if site_id:
+        if project is None:
+            raise ValidationError("دامنه کارگاه باید پروژه را نیز مشخص کند.")
+        site = ProjectSite.objects.filter(
+            pk=site_id,
+            organization=organization,
+            project=project,
+            is_active=True,
+        ).first()
+        if site is None:
+            raise PermissionDenied("کارگاه واگذاری در این پروژه یافت نشد.")
+    for membership in (actor_membership, delegator, delegate):
+        if not membership_has_scope(membership, project=project, site=site):
+            raise PermissionDenied(
+                "دامنه واگذاری خارج از اختیار مؤثر یکی از عوامل است."
+            )
+    if (
+        WorkflowDelegation.objects.filter(
+            organization=organization,
+            delegate=delegator,
+            revoked_at__isnull=True,
+            starts_at__lt=ends_at,
+            ends_at__gt=starts_at,
+        )
+        .filter(permission__code=permission_code)
+        .exists()
+    ):
+        raise PermissionDenied("واگذاری زنجیره‌ای مجاز نیست.")
     delegation = WorkflowDelegation.objects.create(
         organization=organization,
         delegator=delegator,
         delegate=delegate,
         workflow_type=workflow_type,
         permission=permission,
-        scope=scope or {},
+        scope=normalized_scope,
         idempotency_key=idempotency_key,
         starts_at=starts_at,
         ends_at=ends_at,
-        reason=reason,
+        reason=reason.strip(),
         created_by=actor_membership,
     )
     _audit(
@@ -1827,6 +2224,7 @@ def revoke_workflow_delegation(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORKFLOWS_DELEGATE,
+        allow_any_scope=True,
     )
     if not reason.strip():
         raise ValidationError("دلیل لغو واگذاری الزامی است.")
@@ -1836,11 +2234,30 @@ def revoke_workflow_delegation(
         )
     except (ValueError, WorkflowDelegation.DoesNotExist) as exc:
         raise PermissionDenied("واگذاری در این سازمان یافت نشد.") from exc
+    _lock_membership_authority(
+        organization=organization,
+        membership_id=actor_membership.pk,
+    )
     actor_membership = _require_permission(
         actor=actor,
         organization=organization,
         permission=BusinessPermissionCode.WORKFLOWS_DELEGATE,
+        allow_any_scope=True,
     )
+    project = None
+    site = None
+    if delegation.scope.get("project_id"):
+        project = Project.objects.filter(
+            pk=delegation.scope["project_id"], organization=organization
+        ).first()
+    if project is not None and delegation.scope.get("site_id"):
+        site = ProjectSite.objects.filter(
+            pk=delegation.scope["site_id"],
+            organization=organization,
+            project=project,
+        ).first()
+    if not membership_has_scope(actor_membership, project=project, site=site):
+        raise PermissionDenied("دامنه این واگذاری خارج از اختیار عامل است.")
     if delegation.revoked_at:
         return delegation
     delegation.revoked_at = timezone.now()
