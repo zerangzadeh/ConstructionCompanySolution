@@ -1,0 +1,18 @@
+from typing import ClassVar
+
+from django.db import migrations, models
+
+from apps.audit.models import AuditAction
+
+
+class Migration(migrations.Migration):
+    dependencies: ClassVar[list[tuple[str, str]]] = [("audit", "0034_auditevent_changes_auditevent_correlation_id")]
+    operations: ClassVar[list[migrations.operations.base.Operation]] = [
+        migrations.AlterField(
+            model_name="auditevent",
+            name="action",
+            field=models.CharField(
+                choices=AuditAction.choices, max_length=64, verbose_name="عملیات"
+            ),
+        )
+    ]

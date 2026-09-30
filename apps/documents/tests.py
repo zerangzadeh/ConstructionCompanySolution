@@ -21,7 +21,9 @@ from apps.documents.services import (
     get_organization_document,
     get_organization_documents,
     record_document_download,
+    record_document_processing_assessment,
 )
+from apps.organizations.access_services import assign_platform_role
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
@@ -30,16 +32,22 @@ from apps.organizations.models import (
     Organization,
     OrganizationMembership,
     OrganizationRole,
+    OrganizationSettings,
+    PlatformRoleCode,
 )
-from apps.payments.models import PaymentDirection
+from apps.payments.models import PaymentDirection, PaymentDocumentLink
 from apps.payments.services import create_payment
+from apps.projects.models import ProjectDocumentLink
 from apps.projects.services import create_project
 
 
 class DocumentServiceTests(TestCase):
     def setUp(self) -> None:
         self.media_directory = TemporaryDirectory()
-        self.media_override = override_settings(MEDIA_ROOT=self.media_directory.name)
+        self.media_override = override_settings(
+            MEDIA_ROOT=self.media_directory.name,
+            DOCUMENT_PROTECTED_ROOT=self.media_directory.name,
+        )
         self.media_override.enable()
         self.addCleanup(self.media_override.disable)
         self.addCleanup(self.media_directory.cleanup)
@@ -61,6 +69,8 @@ class DocumentServiceTests(TestCase):
             created_by=self.other_user,
             updated_by=self.other_user,
         )
+        OrganizationSettings.objects.create(organization=self.organization)
+        OrganizationSettings.objects.create(organization=self.other_organization)
         self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
@@ -120,6 +130,9 @@ class DocumentServiceTests(TestCase):
             )
         )
         self.assertEqual(document.links.get().project, self.project)
+        typed_link = ProjectDocumentLink.objects.get(document=document)
+        self.assertEqual(typed_link.pk, document.links.get().pk)
+        self.assertEqual(typed_link.legacy_link_id, document.links.get().pk)
         self.assertTrue(
             AuditEvent.objects.filter(
                 action=AuditAction.DOCUMENT_UPLOADED,
@@ -224,6 +237,11 @@ class DocumentServiceTests(TestCase):
 
         self.assertEqual(link.payment, payment)
         self.assertEqual(link.target_type, "payment")
+        typed_link = PaymentDocumentLink.objects.get(document=document)
+        self.assertEqual(typed_link.pk, link.pk)
+        typed_link.payment = self._payment()
+        with self.assertRaisesMessage(ValidationError, "تغییرپذیر نیست"):
+            typed_link.save()
         self.assertTrue(
             AuditEvent.objects.filter(
                 action=AuditAction.DOCUMENT_LINK_ADDED,
@@ -339,6 +357,27 @@ class DocumentServiceTests(TestCase):
         )
         document.refresh_from_db()
         self.assertEqual(document.current_version.version_number, 2)
+        response = self.client.get(
+            reverse("documents:download", kwargs={"document_id": document.pk})
+        )
+        self.assertEqual(response.status_code, 403)
+
+        assigner = User.objects.create_superuser(username="storage-assigner")
+        approver = User.objects.create_superuser(username="storage-approver")
+        operator = User.objects.create_user(username="storage-operator")
+        assign_platform_role(
+            actor=assigner,
+            approver=approver,
+            target=operator,
+            role=PlatformRoleCode.PLATFORM_OPERATIONS,
+            reason="Document processing test duty",
+        )
+        record_document_processing_assessment(
+            version=document.current_version,
+            actor=operator,
+            verdict="clean",
+            adapter_code="test-scanner",
+        )
         response = self.client.get(
             reverse("documents:download", kwargs={"document_id": document.pk})
         )

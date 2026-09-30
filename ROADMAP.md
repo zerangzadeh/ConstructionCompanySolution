@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-09-27
+**Status date:** 2026-09-30
 
 **Product stage:** pre-production
 
@@ -436,8 +436,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P1.2 Configuration and master-governance corrections
 
-- **Status / priority:** **P1-S14 COMPLETE; P1-S15 COMPLETE; P1-S16+ NOT STARTED
-  / MUST+SHOULD**
+- **Status / priority:** **P1-S14 THROUGH P1-S18 COMPLETE / MUST+SHOULD**
 - **P1-S14 entry-gate result (2026-09-28):** the Product Owner supplied explicit
   bounded package authorization and the P1.1 authorization foundation is present,
   and the later Product Owner disposition accepted
@@ -514,6 +513,79 @@ Stable masters + consent/privacy + support operations -> future network/AI
   subtests) passed; no regulated value or consumer activation,
   `BillingPolicy` switch, autonomous filing, BusinessParty governance or P1-S16
   work is included.
+- **P1-S16 execution contract (2026-09-29):** the Product Owner authorized the
+  smallest coherent generic `BusinessParty` foundation. The slice owns
+  Tenant-local canonical identity and normalized duplicate candidates without
+  silent merge; preservation of original/current identity evidence; explicit,
+  permission-controlled merge lineage whose survivor is canonical and whose
+  historical foreign keys are not rewritten; and generic Tenant/Platform-scoped,
+  effective-dated restrictions plus a reusable explicit transaction guard.
+  Platform restriction imposition must not create Platform Admin access to Tenant
+  business data; that write path is deferred while the schema/enforcement contract
+  prevents Tenant actors from weakening Platform restrictions. P1-S16 adds no
+  regulated meaning or consumer activation. Tax/insurance rules, accounting,
+  regulatory consumers, qualification, bank/legal profiles, speculative workflow,
+  destructive deduplication and P1-S17+ are excluded. Acceptance requires
+  deterministic canonicalization, non-destructive duplicate/merge behavior,
+  immutable identity/merge traceability, scoped restriction precedence, dedicated
+  RBAC and audit, negative Tenant tests, fail-closed migration collision handling,
+  and S15 regression coverage.
+- **P1-S16 closeout (2026-09-29):** migrations `organizations.0038`, `audit.0031`
+  and `parties.0003` deliver dedicated merge/restriction permissions and default
+  grants, audit actions, deterministic Unicode-aware match keys, fail-closed
+  identifier backfill, append-only identity snapshots, non-destructive direct
+  merge lineage and generic effective-dated Tenant/Platform restriction records.
+  Services provide explainable Tenant-local duplicate candidates, canonical-party
+  resolution, locked/audited merge recording, Tenant restriction create/revoke
+  and an explicit transaction guard. Merge never rewrites historical foreign keys;
+  Tenant services cannot revoke Platform restrictions. The Platform restriction
+  imposition path and all consuming-domain activation remain deferred so Platform
+  Admin gains no Tenant business-data access. Eight P1-S16 tests and twelve
+  existing party/P1-S15 regression tests passed, as did Django system/migration
+  checks and targeted Ruff. No regulated value, rule, filing, tax/insurance,
+  accounting, qualification/profile or P1-S17+ behavior was introduced.
+- **P1-S17 entry-gate result (2026-09-29):** **NOT SATISFIED; no implementation
+  started.** The Product Owner explicitly authorized P1-S17 only, and the completed
+  P1-S14 through P1-S16 foundations and dirty-worktree boundary were verified.
+  However, neither this roadmap nor the execution playbook defines a standalone
+  P1-S17 goal, assigns the combined P1-S17..S18 outcomes between the two sessions,
+  or supplies P1-S17 decisions, exclusions and acceptance criteria. The combined
+  P1.2 outcome mixes categories/tags, representative/signatory evidence,
+  regulated and bank/legal/qualification profiles, qualification lifecycle,
+  restriction/violation history and consuming-domain enforcement with regulatory
+  rule/contract-term versioning. Choosing any subset would invent scope and could
+  activate expressly deferred regulated or restriction behavior. Before P1-S17
+  can execute, the Product Owner must approve its exact bounded allocation and
+  acceptance criteria, including which party records/lifecycles (if any) belong to
+  S17 and confirmation that Platform restriction imposition, consuming-domain
+  enforcement, regulated values/profiles, accounting, workflow and destructive
+  deduplication remain deferred unless expressly included with their own satisfied
+  gates. P1-S18 and later work remains unauthorized and not started.
+- **P1-S17 derived contract and closeout (2026-09-29):** the Product Owner later
+  authorized autonomous derivation of the smallest coherent contracts for all
+  remaining P1 stages, superseding only the missing-contract blocker above.
+  P1-S17 owns generic, non-regulated party governance: immutable normalized aliases
+  with Tenant-local resolution through preserved merge lineage; Tenant category/tag
+  vocabularies with non-destructive assignment/revocation history; and effective-
+  dated representative/signatory evidence with explicit evidence reference and
+  revocation history. Migrations `organizations.0039`, `audit.0032` and
+  `parties.0004` add dedicated RBAC/default grants, audit actions, models,
+  constraints and indexes. Five focused tests and eight S16 regression tests pass;
+  migration-state and targeted Ruff checks pass. Bank, tax, insurance, legal and
+  qualification profiles, Platform restriction imposition, consuming-domain
+  enforcement, workflow and destructive deduplication remain deferred.
+- **P1-S18 reconciliation and closeout (2026-09-29):** the smallest coherent
+  regulatory-version contract is already implemented by P1-S15 and is not
+  duplicated: `PolicySource`, `PlatformPolicy`, immutable-after-publication
+  `PlatformPolicyVersion`, optional review evidence and explicit Tenant selection
+  provide source/version/effective-date/supersession lineage, controlled declarative
+  parameters, non-overlap and fail-closed resolution. The accepted architecture
+  assigns actual contract commercial terms to Contracts and resolved calculation
+  snapshots to consuming domains, so inventing parallel models in P1-S18 would
+  violate ownership. Seven focused S15/S18 tests pass. No actual regulated value,
+  applicability rule, calculator, filing, `BillingPolicy` switch, Tenant activation
+  or consuming-domain behavior was added. Those remain gated by source facts and
+  their later owning packages.
 - **Outcome:** one owner for organization timezone/currency/fiscal settings;
   effective-dated approved regulatory rule sets; versioned contract commercial
   terms; governed UOM conversions; canonical roles and separation-of-duties
@@ -549,7 +621,60 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P1.3 DMS and audit extensibility
 
-- **Status / priority:** **PLANNED / SHOULD**
+- **Status / priority:** **P1-S19..S22 COMPLETE / SHOULD**
+- **Entry-gate result (2026-09-29):** **NOT SATISFIED; no P1.3 implementation
+  started.** S08 private-storage and S09 domain-link ADRs remain explicitly
+  `PROPOSED`, with acceptance/implementation pending. Q03 retention, hold,
+  disposal, export and signature/evidence decisions remain open; D03-D05 provider,
+  location, operator, recovery and quota inputs are also unresolved. These are
+  direct data-ownership, access, lifecycle and migration dependencies—not optional
+  implementation detail. Numbering/classification cannot be safely released as an
+  isolated P1-S19 completion because the roadmap acceptance outcome also requires
+  confidentiality/access expiry and the approved document authority; doing so
+  would establish a competing partial governance contract. Existing immutable
+  versions, hashes, six typed links and all-linked-context permission checks remain
+  unchanged. S19-S22 are not partially marked complete.
+- **Product Owner decision packet (2026-09-29):**
+  [P1-S19–S22 decision packet](docs/architecture/P1_S19_S22_PRODUCT_OWNER_DECISION_PACKET.md)
+  records the minimum S08/S09, Q03 and D03-D05 dispositions required to unblock
+  implementation, with recommended defaults and explicitly deferrable parameters.
+  Preparing the packet changes no runtime behavior and does not itself accept an
+  ADR or authorize S19-S22 implementation.
+- **Decision disposition (2026-09-29):** the Product Owner accepted S08/S09 and
+  supplied `D19-01..D19-10` as recorded in the decision packet. The selected P1
+  boundary uses protected filesystem storage behind an adapter without a
+  production-readiness claim; unscanned/unknown content is unavailable; typed
+  links are append-only and all retained links govern access; Tenant retention,
+  hold, export and non-destructive disposal intent use dedicated permissions;
+  storage/recovery, key custody and restore-evidence approval are separated
+  Platform duties. Every named deferral remains open without an invented value.
+- **P1-S19 closeout (2026-09-30):** documents migration `0005`, organizations
+  migration `0040` and audit migration `0033` add immutable Tenant-sequenced
+  document numbers, descriptive Tenant categories, closed `internal` /
+  `confidential` / `restricted` levels and access expiry. Existing versions and
+  links are preserved; expired access fails closed.
+- **P1-S20 closeout (2026-09-30):** domain migrations in Projects `0005`,
+  Contracts/Estimates/Expenses/Daily Reports `0004` and Payments `0006`, plus
+  documents migration `0006`, establish domain-owned typed links and deterministic
+  six-type backfill preserving UUID/actor/time lineage. The closed registry is the
+  authorization/query authority; compatibility rows remain dual-written for
+  presentation and rollback. Missing parity fails closed; mutation, removal and
+  access-releasing correction remain absent.
+- **P1-S21 closeout (2026-09-30):** organizations migration `0041`, audit
+  migration `0034` and documents migration `0007` add separated Platform duties,
+  audit correlation/change metadata, protected-filesystem storage abstraction,
+  append-only scan/OCR assessments, fail-closed availability, PostgreSQL
+  permission-scoped search, version comparison and provider-neutral signature
+  evidence. No real scanner/OCR/signature provider or async transport is claimed.
+- **P1-S22 closeout (2026-09-30):** organizations migrations `0042`/`0043` and
+  documents migration `0008` add versioned Tenant retention policy/application,
+  protected legal-hold release and disposal-intent review, manifest-only export,
+  separated key/recovery/restore evidence and byte accounting for originals,
+  quarantine, derivatives and export bundles. Unknown duration and active hold
+  block disposal; no destructive executor exists. Recovery evidence unifies DB,
+  blobs, policy/hold/audit and key custody without numeric RPO/RTO or production
+  readiness. Seventeen focused/regression document tests pass with Django checks,
+  migration-state validation and targeted Ruff.
 - **Outcome:** explicit scalable domain links; governed document numbering,
   classification and confidentiality; access expiry; retention/legal hold/export;
   upload security pipeline; OCR and permission-scoped full-text search; versioning
@@ -570,7 +695,57 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P1.4 Material catalogue and UOM governance
 
-- **Status / priority:** **PLANNED / SHOULD before advanced estimating, sourcing, and valuation**
+- **Status / priority:** **P1-S23 through P1-S27 COMPLETE; P1-S28 Product Owner
+  acceptance pending / SHOULD before advanced estimating, sourcing, and valuation**
+- **Historical entry-gate result (2026-09-30):** the Product Owner selected D23-01=A,
+  D23-02=A, D24-01=A, D24-02=A, D25-01=A and D26-01=A. Material/UOM product-policy
+  and execution-contract gates are satisfied. No P1.4 implementation started in
+  this decision-recording session; S23 remains blocked only until the separately
+  executing S19-S22 work completes the required P1.3 technical-document boundary.
+  Existing Tenant-local `Material`, `MaterialCategory` and `UnitOfMeasure` behavior
+  remains unchanged meanwhile.
+- **Product Owner decision packet (2026-09-29):**
+  [P1-S23–S28 decision packet](docs/architecture/P1_S23_S28_PRODUCT_OWNER_DECISION_PACKET.md)
+  records the accepted Option A boundaries, S23-S28 execution contracts, mandatory
+  S27 evidence, non-deferrable failures and explicit later-phase deferrals. D28-01=A
+  is only the closeout rule; final P1 acceptance still requires S27 evidence. This
+  record does not reopen or restate S19-S22 or change runtime behavior.
+- **P1-S23 closeout (2026-09-30):** materials migration `0004` and organizations
+  migration `0044` add dedicated stewardship/merge permissions, immutable aliases,
+  manual duplicate candidates and locked non-destructive supersession. Existing
+  Tenant codes are adopted; a code becomes immutable after transactional use.
+  Losing records, historical FKs and snapshots remain unchanged, while new
+  identifier resolution follows the survivor. Five focused/regression material
+  tests pass; no cross-Tenant catalogue, probabilistic matching or bulk merge was
+  added. P1-S24 proceeded under D24-01/02=A.
+- **P1-S24 closeout (2026-09-30):** materials migrations `0005`–`0007` and
+  organizations migration `0045` add Tenant-local conversion families, one family
+  base, immutable effective-dated factors to that base, versioned rounding policy
+  and immutable conversion snapshots. Existing units are safely backfilled to
+  isolated families; no factor is invented. Cross-Tenant, incompatible, overlapping
+  or under-precision conversion fails closed. Eight focused/regression material
+  tests pass. Formula/compound units and external feeds remain deferred. P1-S25 is
+  next under D25-01=A.
+- **P1-S25 closeout (2026-09-30):** materials migrations `0008`–`0009`,
+  organizations migration `0046` and audit migration `0035` add Platform-closed
+  declarative value types/operators, Tenant/category-scoped immutable definition
+  versions and values, reviewable idempotent row imports, bounded attribute search,
+  and sourced currency/unit price observations. Observations are not quotes or a
+  financial ledger. Invalid, version-mismatched and cross-Tenant data fails closed;
+  no executable Tenant content, formulas, taxonomy synchronization or shared
+  templates were added. Two targeted tests pass.
+- **P1-S26 closeout (2026-09-30):** materials migration `0010`, organizations
+  migration `0047` and audit migration `0036` add immutable Tenant-local
+  equivalent/substitute records, version-pinned technical-document links, and
+  separated technical review evidence. Existing materials are migrated only to
+  `legacy_unreviewed`; no approval is fabricated. Controlled decisions require a
+  non-submitter, a reason and supersede a prior effective revision rather than
+  rewriting it. Three focused S26 tests pass.
+- **P1-S27 integrated acceptance (2026-09-30):** 26 targeted document/material
+  regression tests passed for Tenant isolation, permission boundaries, immutable
+  lineage, deterministic conversions and document availability/access behavior.
+  No non-deferrable failure was found. P1-S28 is now awaiting the Product Owner's
+  explicit accept-or-return disposition; P2 is not yet authorized.
 - **Outcome:** governed canonical tenant material codes and aliases; UOM families
   and explicit conversions; category-specific technical/dynamic attributes;
   brand/model/manufacturer/country; substitutes/equivalents; effective price

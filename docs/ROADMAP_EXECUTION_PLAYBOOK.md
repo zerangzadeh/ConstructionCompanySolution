@@ -235,9 +235,11 @@ identifiers only after its applicable gates and package authority are explicit.
 
 ## 7. P1 session map — 28 sessions
 
-**Current status (2026-09-29): P1.1, P1-S14 and P1-S15 are complete under their
-bounded authorizations.** `P1-E0` and `P1-S01` through `P1-S15` are complete.
-P1-S16+ retain their own authority and entry gates.
+**Current status (2026-09-30): P1.1 and P1-S14 through P1-S27 are complete under
+their bounded authorizations.** `P1-E0` and `P1-S01` through `P1-S27` are complete.
+The Product Owner recorded every P1-S23–S28 product-policy choice on 2026-09-30;
+S26 implementation and S27 integrated evidence are complete. P1-S28 awaits the
+Product Owner's explicit accept-or-return disposition.
 
 | Order / provisional sessions | Count | Model | Outcome and direct entry dependency |
 | --- | ---: | --- | --- |
@@ -249,11 +251,16 @@ P1-S16+ retain their own authority and entry gates.
 | P1-S14A | complete | `A-H` | Delivered regulatory-independent `OrganizationSettings` authority, fail-closed IRR migration, removal of legacy read-repair/dual-write, consumer switch and before/after audit evidence. Legacy fields remain; no regulated/accounting-sensitive behavior was activated. |
 | P1-S14B | complete / reframed | `A-H` | Final Product Owner decision removes Professional Reviewer/D14-11 as global development gates. Source provenance still gates only affected sensitive-policy activation; optional review remains evidence metadata. |
 | P1-S15 | complete | `A-H` | Delivered source provenance, versioned Platform policy/localization catalogue, optional review evidence, Tenant Owner approval, Tenant Admin application, dedicated permissions/audit and fail-closed resolution. No regulated value or consumer behavior was activated. |
-| P1-S16..S18 | 3 | `A-H` | BusinessParty governance and regulatory-version work remain not started and separately gated; P1-S14A completion supplies no authority for them. |
-| P1-S19..S22 | 4 | `A-H` | Implement DMS numbering/classification/confidentiality, explicit domain links, search and retention slices. Requires accepted S08/S09, P0.2 private-storage prerequisites, Q03 evidence lifecycle, applicable D03-D05 parameters, explicit package authority and P1.1 access enforcement. |
-| P1-S23..S26 | 4 | `T-M`/`A-H` | Implement material catalogue, UOM conversion and approval slices. Requires stable P1.2 ownership/configuration rules, the P1.3 document boundary, material coding/conversion/approval decisions and explicit package authority. |
-| P1-S27 | 1 | `A-X` | Cross-tenant, privilege, merge/history and document-security review after all authorized P1 slices are integrated. |
-| P1-S28 | 1 | `L-M` | Documentation closeout and conditional P2 handoff after P1 acceptance evidence exists. |
+| P1-S16 | complete | `A-H` | Delivered generic Tenant-local party canonicalization, non-destructive merge lineage, append-only identity history, scoped restrictions, RBAC/audit and an explicit unactivated transaction guard. |
+| P1-S17 | complete | `A-H` | Delivered immutable Tenant-local aliases, category/tag history and effective representative/signatory evidence with dedicated RBAC/audit. Regulated profiles and consumer activation remain deferred. |
+| P1-S18 | complete by reconciliation | `A-H` | Verified that P1-S15 already supplies the accepted structural regulatory-version authority. No duplicate model or regulated value/consumer activation was added; Contracts and consuming domains retain their target ownership. |
+| P1-S19..S22 | complete | `A-H` | Delivered accepted S08/S09 boundaries: governed numbering/classification/expiry, typed links, protected filesystem adapter, fail-closed processing/search/signature evidence, retention/hold/export and separated recovery evidence. Production providers, destructive disposal and numeric/legal/commercial values remain gated. |
+| P1-S23 | complete | `A-H` | Delivered Tenant-local immutable aliases, manual duplicate review and non-destructive supersession with dedicated RBAC/audit and preserved historical references. |
+| P1-S24 | complete | `T-M` | Delivered family-base directed effective conversion versions, versioned rounding and immutable snapshots; legacy units were backfilled only to isolated families. |
+| P1-S25 | complete | `A-H` | Delivered closed declarative attribute types/operators, versioned values, reviewable idempotent imports, bounded search and sourced price observations without a ledger or quote behavior. |
+| P1-S26 | complete | `A-H` | Delivered immutable Tenant-local equivalent/substitute records, version-pinned technical-document links and separated technical evidence/revision transitions; existing material history is explicitly `legacy_unreviewed`, never fabricated as approved. |
+| P1-S27 | complete | `A-X` | 26 targeted document/material tests passed the required Tenant, permission, history, deterministic-conversion and document-security evidence; no non-deferrable failure was found. |
+| P1-S28 | Product Owner acceptance pending | `L-M` | D28-01=A remains the closeout rule. P1 acceptance and the conditional P2 handoff still require an explicit Product Owner accept-or-return disposition. |
 
 The authoritative authorization vocabulary is: independent platform roles
 **Superuser** and **Platform Admin**; independent membership-scoped Tenant roles
@@ -286,8 +293,8 @@ code-owned and non-archivable. Permission codes remain code-and-migration owned;
 custom-role archival preserves memberships, assignment history and audit evidence.
 
 **Remaining Product Owner gates:** P1.1 has consumed its bounded package authority.
-Party merge/restriction ownership, actual regulated values and sources, document signature/retention policy, material
-coding/conversion/approval ownership, D03-D05/Q03 and all other ADR dispositions
+Party merge/restriction ownership, actual regulated values and sources, document signature/retention policy,
+D03-D05/Q03 and all other ADR dispositions
 remain gates for their named P0.2/P0.3/P1.2-P1.4 or release/enablement packages,
 not blockers to P1.1 coding.
 
@@ -406,6 +413,222 @@ migration-state check and targeted Ruff validation passed.
 
 **Next executable session:** P1-S16 only after explicit bounded authorization and
 its own entry-contract reconciliation.
+
+### P1-S16 execution contract
+
+**Recorded:** 2026-09-29. **Authorization:** the Product Owner supplied the missing
+party-governance decisions and explicitly authorized P1-S16 only. S14/S15 are
+accepted foundations; inspection found no contradiction requiring either to be
+reopened.
+
+| Entry dependency | Result | Verified evidence / consequence |
+| --- | --- | --- |
+| Explicit bounded P1-S16 authority | SATISFIED | The Product Owner requested P1-S16 only. |
+| P1.1/P1-S14/P1-S15 foundations | SATISFIED | Membership-scoped authorization, direct Tenant-settings authority and the versioned policy/localization foundation are implemented; no regulated value or consumer behavior is thereby activated. |
+| Exact P1-S16 session contract and acceptance criteria | SATISFIED | The bounded goal, decisions, exclusions and criteria below split the generic party foundation from P1-S17+ concerns. |
+| Party merge/restriction ownership and semantics | SATISFIED FOR THIS SLICE | Merge is explicit and non-destructive: one survivor is canonical, source history and transaction references remain unchanged, and no automatic deduplication occurs. Restrictions are explicit BusinessParty-context records; Tenant restrictions stay Tenant-local and cannot weaken Platform restrictions. |
+| Actual regulated/accounting values and sources | GATED BY CONSUMER | P1-S15 provides structures only. Unknown required values stay unset and fail closed; no P1-S16 scope may infer rates, precision, rounding, valuation, filing or legal rules. |
+
+#### Goal and bounded implementation
+
+Extend the existing Tenant-owned `BusinessParty` aggregate with deterministic
+normalized identity keys used only for matching, append-only identity snapshots,
+explicit merge-to-survivor lineage that never rewrites historical foreign keys,
+and generic effective-dated restrictions. Provide focused services for duplicate
+candidates, canonical resolution, merge recording, Tenant restriction management
+and an explicit transaction-eligibility guard. Add only the dedicated permissions,
+default grants, audit actions, constraints and indexes required by those services.
+
+Platform and Tenant restriction scope are distinct. Tenant actors may manage only
+Tenant restrictions in their active Tenant and cannot revoke or weaken Platform
+records. P1-S16 does not grant Platform Admin access to Tenant business data, so a
+Platform-restriction imposition UI/service is deferred; the persistence and guard
+contract remains capable of honoring such records when a separately authorized,
+non-bypassing control-plane path exists.
+
+#### Decisions and exclusions
+
+- A live Tenant-local party row is canonical unless it records one direct,
+  same-Tenant canonical survivor. Normalized display/legal names and the existing
+  identifier support candidate detection only; equal normalized values never merge
+  records automatically.
+- Original display/legal/identifier values remain stored and each authorized
+  identity change appends a snapshot. A merge preserves the source row, its
+  snapshots and every existing transaction FK; only future active selection and
+  canonical resolution point callers to the survivor.
+- Merge needs a dedicated permission, reason, row locks, same-Tenant active source
+  and survivor, no chain/cycle, and audit evidence. There is no unmerge, FK rewrite
+  or bulk deduplication in this slice.
+- Restrictions carry explicit scope, code, blocking effect, reason and effective
+  interval. The generic guard blocks only when an effective record explicitly has
+  the transaction-block effect. No legal meaning is inferred from its code.
+- Regulatory consumers, tax/insurance implementation, accounting/posting,
+  qualification/performance, bank/legal profiles, UI/workflow, destructive
+  automated deduplication and all P1-S17+ work are excluded.
+
+#### Acceptance criteria
+
+1. **Canonical identity:** normalization is deterministic; original values remain
+   intact; a party resolves to itself or one same-Tenant survivor without chains.
+2. **Duplicate behavior:** candidate lookup is Tenant-scoped and explainable by
+   matching normalized fields; it never mutates or merges either record.
+3. **Merge safety:** the service is explicit, authorized, atomic and audited;
+   source/survivor are locked; cross-Tenant, archived, already-merged, chain and
+   self merges fail; historical references are not rewritten.
+4. **Restriction ownership/scope:** Tenant and Platform scopes are distinguishable,
+   dates are valid, and Tenant services cannot mutate Platform restrictions.
+5. **RBAC:** new merge and restriction operations use code-owned permissions,
+   catalog/default-grant migration and active Tenant/membership enforcement.
+6. **Auditability/history:** identity snapshots and merge/restriction audit events
+   retain actor, time, reason and affected identities without destructive changes.
+7. **Tenant isolation:** services and constraints reject cross-Tenant reads/writes;
+   matching never reveals another Tenant's existence.
+8. **Migration safety:** normalized existing values are backfilled; ambiguous
+   identifier collisions fail closed rather than selecting a canonical row.
+9. **S15 regression:** focused S15 policy/localization tests remain green and no
+   policy value, selection or consumer is modified.
+
+**Entry result:** **SATISFIED for the bounded contract above.** Implementation may
+proceed without further Product Owner confirmation. P1-S17 and later remain not
+started.
+
+#### P1-S16 closeout
+
+Migrations `organizations.0038`, `audit.0031` and `parties.0003` add the two
+code-owned permissions/default grants, party audit actions, normalized match
+fields, immutable identity snapshots, direct merge-to-survivor evidence and
+effective-dated Tenant/Platform restrictions. Existing values are retained while
+normalized keys are backfilled; ambiguous same-Tenant identifier collisions abort
+the migration. The canonical uniqueness constraint applies to unmerged records so
+a survivor may safely adopt a merged source identifier without deleting the
+source evidence.
+
+The services keep candidate detection read-only and Tenant-local, lock both merge
+records, prohibit self/cross-Tenant/archived/chained merges, archive only the
+source and leave every historical FK unchanged. Tenant restriction services use a
+dedicated permission and cannot revoke Platform records. The reusable guard blocks
+only an effective restriction with the explicit `block_new_transactions` effect;
+no current transaction consumer was switched in this slice.
+
+Validation passed: eight focused P1-S16 tests, twelve existing party/P1-S15
+regression tests, Django system check, migration-state check and targeted Ruff.
+The Platform restriction imposition path remains deferred because P1-S16 does not
+grant Platform Admin Tenant-data access. Regulatory consumers, tax/insurance,
+accounting, qualification/profile expansion, UI/workflow and destructive
+deduplication remain outside scope. The bounded acceptance criteria are
+**SATISFIED**. **Next session:** P1-S17, only after its own bounded contract and
+entry-gate reconciliation; no P1-S17 authority is implied by this closeout.
+
+### P1-S17 entry-gate reconciliation
+
+**Recorded:** 2026-09-29. **Authorization:** the Product Owner explicitly requested
+P1-S17 only and prohibited P1-S18 or later work. The S14/S15 policy/configuration
+foundation and completed uncommitted S16 party foundation remain accepted and
+must be preserved.
+
+| Entry dependency | Result | Verified evidence / consequence |
+| --- | --- | --- |
+| Explicit bounded P1-S17 authority | SATISFIED | The Product Owner requested P1-S17 only. This does not define its contents or authorize P1-S18. |
+| P1-S14/P1-S15/P1-S16 foundations | SATISFIED | Current models, migrations, services and focused tests show the accepted settings/policy foundation plus Tenant-local canonical identity, immutable snapshots, non-destructive merge lineage, generic scoped restrictions, RBAC/audit and an unactivated explicit transaction guard. |
+| Dirty-worktree preservation | SATISFIED | The uncommitted S16 files and documentation were inventoried; this gate record changes documentation only and does not alter their code, migrations or tests. |
+| Standalone P1-S17 contract | **NOT SATISFIED** | The session map groups P1-S17..S18 as “BusinessParty governance and regulatory-version work.” It does not assign either outcome to S17, define a bounded goal, or state exclusions and acceptance criteria. |
+| Required scope/ownership decisions | **OPEN** | The P1.2 target combines categories/tags, representative/signatory evidence, tax/bank/legal/qualification profiles, qualification state, restriction/violation history and consumer enforcement with regulatory and contract-term versions. Existing accepted decisions do not select which of these belong to S17. |
+| Regulated values and deferred enforcement | GATED | No official value/source is supplied for an affected regulated activation. Platform restriction imposition and all consuming-domain enforcement remain deferred; unknown required values stay unset and fail closed. |
+
+**Entry result:** **NOT SATISFIED; implementation stopped before code or schema
+changes.** Choosing an apparently independent subset would create a session
+contract not approved by the Product Owner and risks crossing the S16 exclusions.
+The Product Owner must approve a standalone P1-S17 goal, its allocation relative
+to P1-S18, explicit inclusions/exclusions and testable acceptance criteria. That
+decision must also identify any intended party record/lifecycle and permissions,
+and expressly preserve or separately authorize Platform restriction imposition,
+transaction-consumer enforcement, regulated profiles/values, accounting,
+workflow and destructive deduplication.
+
+**Next executable session:** P1-S17 after that bounded contract is supplied and
+its entry gate is rechecked. P1-S18 and later remain not started and unauthorized.
+
+#### P1-S17 derived contract and closeout
+
+The Product Owner subsequently authorized autonomous derivation of the smallest
+coherent remaining P1 contracts. The executable P1-S17 slice is therefore limited
+to generic, non-regulated party governance: immutable normalized aliases;
+Tenant-local category/tag vocabularies with assignment/revocation history; and
+effective-dated representative/signatory evidence with an explicit evidence
+reference. These records never grant application permission, never rewrite party
+or transaction history and never infer legal validity.
+
+Migrations `organizations.0039`, `audit.0032` and `parties.0004` add a dedicated
+management permission/default grants, audit actions, models, constraints and
+indexes. Services enforce active Tenant membership, dedicated RBAC, row locking,
+same-Tenant relationships and non-destructive revocation. Alias lookup is exact,
+Tenant-local and resolves preserved merge lineage without hiding ambiguity. Five
+focused tests and eight P1-S16 regression tests passed; migration-state and targeted
+Ruff checks passed. Bank/tax/insurance/legal/qualification profiles, Platform
+restriction imposition, consuming-domain enforcement, workflow and destructive
+deduplication remain excluded. The derived acceptance criteria are **SATISFIED**.
+
+**Next executable session:** P1-S18 regulatory-version foundation, after confirming
+that it can remain structural, source-bound and inactive without inventing a rule.
+
+### P1-S18 regulatory-version reconciliation and closeout
+
+The derived P1-S18 acceptance outcome is a versioned, source-aware, effective-dated
+and fail-closed regulatory policy authority without any invented rule or activated
+consumer. Inspection confirms P1-S15 already implements this through immutable
+`PolicySource`, `PlatformPolicyVersion` publication/supersession, optional review
+evidence, explicit Tenant Owner approval/Tenant Admin application and fail-closed
+resolution. Parameters reject executable content and floating-point values;
+publication rejects empty payloads, required-source omissions and overlapping
+published intervals.
+
+No second `RegulatoryRuleSet` model was added because it would duplicate the
+accepted P1-S15 authority. The accepted S06 boundary leaves versioned commercial
+terms with Contracts and applied rule/term snapshots with each consuming domain.
+Actual applicability facts, business-date choice, calculators, rates, schemas,
+filing, `BillingPolicy` migration and runtime activation remain gated by official
+sources and later owning packages. Seven focused policy tests passed. The derived
+P1-S18 criteria are **SATISFIED without code/schema changes**.
+
+**Next session:** P1-S23 under the accepted S23-S28 decision packet.
+
+### P1-S19 through P1-S28 gate reconciliation
+
+The remaining stages were evaluated in roadmap order under the Product Owner's
+autonomous-continuation instruction.
+
+| Sessions | Gate result | Exact consequence |
+| --- | --- | --- |
+| P1-S19..S22 | **COMPLETE** | The Product Owner accepted S08/S09 and D19-01..D19-10. Migrations through documents `0008`, organizations `0043` and audit `0034` implement the bounded non-production P1 contract; targeted document tests pass. Named provider/value/disposal/cutover deferrals remain explicit. |
+| P1-S23..S24 | **COMPLETE** | S23 delivered canonical identity/lineage; S24 delivered isolated-family backfill, deterministic effective conversion and rounding snapshots. Targeted material tests pass. |
+| P1-S25 | **COMPLETE** | Closed declarative attributes, immutable definition/value history, idempotent row-import evidence and non-ledger sourced observations are implemented and targeted tests pass. |
+| P1-S26 | **COMPLETE** | D26-01=A is implemented through immutable Tenant-local material relationships, version-pinned technical documents, separated decision evidence and `legacy_unreviewed` migration history. |
+| P1-S27 | **COMPLETE** | The required targeted document/material suite passed 26 tests. Tenant isolation, permissions, history, deterministic conversions and document-security behavior found no non-deferrable failure. |
+| P1-S28 | **PRODUCT OWNER ACCEPTANCE PENDING** | D28-01=A defines the rule but does not substitute for the explicit accept-or-return disposition. P2 remains blocked until that record exists. |
+
+No independently releaseable remainder was found. Document numbering and
+classification are coupled in the roadmap acceptance outcome to confidentiality,
+access expiry and the approved document authority; extracting them now would create
+a competing partial governance contract. Material aliases/attributes are similarly
+coupled to the unresolved canonical-code and approval ownership decisions, while
+conversion behavior cannot precede its precision/direction rules. This is a real
+Product Owner/external-dependency boundary rather than a missing session-card issue.
+
+**Exact next action for this path:** execute the approved S23-S26 contracts in
+order, run S27 integrated acceptance and apply D28-01=A at S28. P1 is not fully
+accepted until that evidence and final Product Owner accept-or-return record exist.
+
+The minimum choices and recommended defaults are consolidated in the
+[P1-S19–S22 Product Owner decision packet](architecture/P1_S19_S22_PRODUCT_OWNER_DECISION_PACKET.md).
+The packet now records the accepted decisions and bounded S19-S22 implementation.
+
+The remaining P1-S23–S28 choices are consolidated separately in the
+[P1-S23–S28 Product Owner decision packet](architecture/P1_S23_S28_PRODUCT_OWNER_DECISION_PACKET.md).
+It records D23-01=A, D23-02=A, D24-01=A, D24-02=A, D25-01=A, D26-01=A and
+D28-01=A, their exact boundaries, per-session execution contracts, explicit
+deferrals and mandatory S27/S28 gates. It does not reopen S01-S22. Cross-Tenant
+access, unauthorized approval/merge, historical rewrite, ambiguous or non-
+deterministic conversion, and document-security failure cannot be deferred.
 
 The 2026-09-28 governance continuation prepared the
 [remaining-decision packet](architecture/P1_S14_REMAINING_DECISION_PACKET.md).

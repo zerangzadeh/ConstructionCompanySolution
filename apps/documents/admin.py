@@ -1,7 +1,23 @@
 from django.contrib import admin
 from django.http import HttpRequest
 
-from apps.documents.models import Document, DocumentLink, DocumentVersion
+from apps.documents.models import (
+    Document,
+    DocumentCategory,
+    DocumentDisposalIntent,
+    DocumentExportManifest,
+    DocumentKeyCustodyAttestation,
+    DocumentLegalHold,
+    DocumentLink,
+    DocumentNumberSequence,
+    DocumentProcessingAssessment,
+    DocumentRecoveryManifest,
+    DocumentRetentionApplication,
+    DocumentRetentionPolicy,
+    DocumentRetentionPolicyVersion,
+    DocumentSignatureEvidence,
+    DocumentVersion,
+)
 
 
 class ImmutableAdminMixin:
@@ -19,6 +35,8 @@ class ImmutableAdminMixin:
 class DocumentAdmin(ImmutableAdminMixin, admin.ModelAdmin):
     list_display = (
         "title",
+        "document_number",
+        "confidentiality",
         "document_type",
         "reference",
         "organization",
@@ -26,12 +44,22 @@ class DocumentAdmin(ImmutableAdminMixin, admin.ModelAdmin):
         "archived_at",
         "created_at",
     )
-    list_filter = ("document_type", "organization", "archived_at")
-    search_fields = ("title", "reference", "description", "organization__name")
+    list_filter = ("document_type", "confidentiality", "organization", "archived_at")
+    search_fields = (
+        "title",
+        "document_number",
+        "reference",
+        "description",
+        "organization__name",
+    )
     readonly_fields = (
         "id",
         "organization",
         "document_type",
+        "document_number",
+        "category",
+        "confidentiality",
+        "access_expires_at",
         "title",
         "reference",
         "description",
@@ -102,3 +130,29 @@ class DocumentLinkAdmin(ImmutableAdminMixin, admin.ModelAdmin):
         "created_by",
         "created_at",
     )
+
+
+@admin.register(DocumentCategory)
+class DocumentCategoryAdmin(ImmutableAdminMixin, admin.ModelAdmin):
+    list_display = ("name", "code", "organization", "archived_at")
+    list_filter = ("organization", "archived_at")
+
+
+@admin.register(DocumentNumberSequence)
+class DocumentNumberSequenceAdmin(ImmutableAdminMixin, admin.ModelAdmin):
+    list_display = ("organization", "next_value", "updated_at")
+
+
+for model in (
+    DocumentProcessingAssessment,
+    DocumentSignatureEvidence,
+    DocumentRetentionPolicy,
+    DocumentRetentionPolicyVersion,
+    DocumentRetentionApplication,
+    DocumentLegalHold,
+    DocumentDisposalIntent,
+    DocumentExportManifest,
+    DocumentKeyCustodyAttestation,
+    DocumentRecoveryManifest,
+):
+    admin.site.register(model, type(f"{model.__name__}Admin", (ImmutableAdminMixin, admin.ModelAdmin), {}))

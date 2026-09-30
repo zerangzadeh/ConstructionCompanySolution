@@ -4,9 +4,34 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+class ContractDocumentLink(AbstractTypedDocumentLink):
+    """Contract-owned append-only evidence link."""
+
+    target_field_name = "contract"
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "contract"], name="contract_document_link_uq"
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="contract_doclink_org_doc_idx",
+            )
+        ]
 
 
 class ContractStatus(models.TextChoices):

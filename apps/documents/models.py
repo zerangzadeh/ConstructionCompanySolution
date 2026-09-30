@@ -1,11 +1,13 @@
 import uuid
 from pathlib import Path
+from typing import ClassVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
+from apps.documents.storage import document_storage
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
@@ -18,6 +20,114 @@ class DocumentType(models.TextChoices):
     PHOTO = "photo", "تصویر"
     REPORT = "report", "گزارش"
     OTHER = "other", "سایر"
+
+
+class DocumentConfidentiality(models.TextChoices):
+    INTERNAL = "internal", "داخلی"
+    CONFIDENTIAL = "confidential", "محرمانه"
+    RESTRICTED = "restricted", "بسیار محدود"
+
+
+class DocumentProcessingVerdict(models.TextChoices):
+    CLEAN = "clean", "پاک و قابل استفاده"
+    UNSAFE = "unsafe", "ناامن"
+    UNSUPPORTED = "unsupported", "پشتیبانی‌نشده"
+    ERROR = "error", "خطای پردازش"
+
+
+class SignatureVerificationState(models.TextChoices):
+    UNKNOWN = "unknown", "نامشخص"
+    PENDING = "pending", "در انتظار بررسی"
+    VERIFIED = "verified", "تأیید فنی"
+    FAILED = "failed", "نامعتبر"
+
+
+class RetentionTrigger(models.TextChoices):
+    DOCUMENT_RECEIVED = "document_received", "دریافت سند"
+    DOCUMENT_ARCHIVED = "document_archived", "بایگانی سند"
+
+
+class RetentionPolicyVersionState(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    APPROVED = "approved", "تأییدشده"
+
+
+class DisposalIntentState(models.TextChoices):
+    REQUESTED = "requested", "درخواست‌شده"
+    BLOCKED = "blocked", "مسدود"
+    APPROVED_NON_DESTRUCTIVE = (
+        "approved_non_destructive",
+        "تأیید قصد بدون اجرای امحا",
+    )
+
+
+class ManifestCompleteness(models.TextChoices):
+    COMPLETE = "complete", "کامل"
+    INCOMPLETE = "incomplete", "ناقص"
+
+
+class RecoveryEvidenceState(models.TextChoices):
+    RECONCILED = "reconciled", "تطبیق‌شده"
+    INCOMPLETE = "incomplete", "ناقص"
+    APPROVED = "approved", "تأییدشده"
+
+
+class DocumentCategory(UUIDModel, TimeStampedModel):
+    """Tenant-owned descriptive category without authorization semantics."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="document_categories",
+    )
+    code = models.SlugField(max_length=50)
+    name = models.CharField(max_length=120)
+    description = models.TextField(blank=True)
+    archived_at = models.DateTimeField(null=True, blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="document_categories_created",
+    )
+
+    class Meta:
+        ordering = ["name"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "code"],
+                name="document_category_org_code_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        self.code = self.code.strip().lower()
+        self.name = self.name.strip()
+        if not self.code or not self.name:
+            raise ValidationError("کد و نام دسته‌بندی سند الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class DocumentNumberSequence(UUIDModel, TimeStampedModel):
+    """Serialized Tenant-local allocator; issued document numbers never change."""
+
+    organization = models.OneToOneField(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_number_sequence",
+    )
+    next_value = models.PositiveBigIntegerField(default=1)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=Q(next_value__gte=1),
+                name="document_sequence_next_positive",
+            )
+        ]
 
 
 DOCUMENT_LINK_TARGET_FIELDS = (
@@ -65,6 +175,20 @@ class Document(UUIDModel, TimeStampedModel):
         choices=DocumentType.choices,
         default=DocumentType.GENERAL,
     )
+    document_number = models.CharField(max_length=40, editable=False)
+    category = models.ForeignKey(
+        DocumentCategory,
+        on_delete=models.PROTECT,
+        related_name="documents",
+        null=True,
+        blank=True,
+    )
+    confidentiality = models.CharField(
+        max_length=20,
+        choices=DocumentConfidentiality.choices,
+        default=DocumentConfidentiality.INTERNAL,
+    )
+    access_expires_at = models.DateTimeField(null=True, blank=True)
     title = models.CharField("عنوان سند", max_length=255)
     reference = models.CharField("شماره مرجع", max_length=120, blank=True)
     description = models.TextField("توضیحات", blank=True)
@@ -108,6 +232,10 @@ class Document(UUIDModel, TimeStampedModel):
         verbose_name_plural = "اسناد"
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
+                fields=["organization", "document_number"],
+                name="document_org_number_uq",
+            ),
+            models.UniqueConstraint(
                 fields=["organization", "reference"],
                 condition=~Q(reference=""),
                 name="document_org_reference_uq",
@@ -131,6 +259,13 @@ class Document(UUIDModel, TimeStampedModel):
         self.description = self.description.strip()
         if not self.title:
             raise ValidationError({"title": "وارد کردن عنوان سند الزامی است."})
+        if not self.document_number.strip():
+            raise ValidationError({"document_number": "شماره داخلی سند الزامی است."})
+        if self.category_id:
+            if self.category.organization_id != self.organization_id:
+                raise ValidationError("دسته‌بندی سند باید متعلق به همین سازمان باشد.")
+            if self.category.archived_at:
+                raise ValidationError("دسته‌بندی بایگانی‌شده قابل استفاده نیست.")
         if self.current_version_id:
             if self.current_version.document_id != self.pk:
                 raise ValidationError(
@@ -148,6 +283,14 @@ class Document(UUIDModel, TimeStampedModel):
                 )
 
     def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            original_number = (
+                type(self).objects.filter(pk=self.pk)
+                .values_list("document_number", flat=True)
+                .first()
+            )
+            if original_number and original_number != self.document_number:
+                raise ValidationError("شماره داخلی صادرشده سند تغییرپذیر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)
 
@@ -173,7 +316,10 @@ class DocumentVersion(UUIDModel, CreatedAtModel):
     version_number = models.PositiveIntegerField("شماره نسخه")
     original_file_name = models.CharField("نام اصلی فایل", max_length=255)
     file = models.FileField(
-        "فایل", upload_to=document_version_upload_path, max_length=255
+        "فایل",
+        upload_to=document_version_upload_path,
+        storage=document_storage,
+        max_length=255,
     )
     content_type = models.CharField("نوع محتوای فایل", max_length=100)
     file_size = models.PositiveBigIntegerField("حجم فایل")
@@ -228,6 +374,529 @@ class DocumentVersion(UUIDModel, CreatedAtModel):
 
     def delete(self, *args: object, **kwargs: object) -> None:
         raise ValidationError("نسخه سند immutable است و قابل حذف نیست.")
+
+    @property
+    def latest_processing_assessment(self) -> "DocumentProcessingAssessment | None":
+        cache = getattr(self, "_prefetched_objects_cache", {})
+        if "processing_assessments" in cache:
+            assessments = cache["processing_assessments"]
+            return max(assessments, key=lambda item: item.sequence, default=None)
+        return self.processing_assessments.order_by("-sequence").first()
+
+    @property
+    def is_available(self) -> bool:
+        assessment = self.latest_processing_assessment
+        return bool(
+            assessment and assessment.verdict == DocumentProcessingVerdict.CLEAN
+        )
+
+
+class DocumentProcessingAssessment(UUIDModel, CreatedAtModel):
+    """Append-only scan/OCR assessment; absence is unknown and unavailable."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_processing_assessments",
+    )
+    version = models.ForeignKey(
+        DocumentVersion,
+        on_delete=models.PROTECT,
+        related_name="processing_assessments",
+    )
+    sequence = models.PositiveIntegerField()
+    verdict = models.CharField(
+        max_length=20, choices=DocumentProcessingVerdict.choices
+    )
+    input_sha256 = models.CharField(max_length=64)
+    adapter_code = models.CharField(max_length=80)
+    adapter_version = models.CharField(max_length=80, blank=True)
+    provider_reference = models.CharField(max_length=160, blank=True)
+    extracted_text = models.TextField(blank=True)
+    details = models.JSONField(default=dict, blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="document_processing_assessments_recorded",
+    )
+
+    class Meta:
+        ordering = ["version", "sequence"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["version", "sequence"],
+                name="document_assessment_sequence_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(sequence__gte=1),
+                name="document_assessment_sequence_positive",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "verdict", "created_at"],
+                name="docassessment_org_verdict_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(self, version=self.version)
+        if self.input_sha256 != self.version.sha256:
+            raise ValidationError("هویت بایت ارزیابی با نسخه سند یکسان نیست.")
+        if not self.adapter_code.strip():
+            raise ValidationError("شناسه آداپتور ارزیابی الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("ارزیابی پردازش سند تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("ارزیابی پردازش سند حذف‌پذیر نیست.")
+
+
+class DocumentSignatureEvidence(UUIDModel, CreatedAtModel):
+    """Provider-neutral signature evidence; legal effect is intentionally unset."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_signature_evidence",
+    )
+    version = models.ForeignKey(
+        DocumentVersion,
+        on_delete=models.PROTECT,
+        related_name="signature_evidence",
+    )
+    verification_state = models.CharField(
+        max_length=20,
+        choices=SignatureVerificationState.choices,
+        default=SignatureVerificationState.UNKNOWN,
+    )
+    provider_code = models.CharField(max_length=80, blank=True)
+    provider_reference = models.CharField(max_length=160, blank=True)
+    standard_code = models.CharField(max_length=120, blank=True)
+    evidence = models.JSONField(default=dict, blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="document_signature_evidence_recorded",
+    )
+
+    class Meta:
+        ordering = ["-created_at"]  # noqa: RUF012
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "verification_state", "created_at"],
+                name="docsig_org_state_created_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(self, version=self.version)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد امضای سند تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("شاهد امضای سند حذف‌پذیر نیست.")
+
+
+class DocumentRetentionPolicy(UUIDModel, TimeStampedModel):
+    """Tenant-owned retention identity; versions carry effective obligations."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_retention_policies",
+    )
+    code = models.SlugField(max_length=60)
+    name = models.CharField(max_length=160)
+    created_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_retention_policies_created",
+    )
+
+    class Meta:
+        ordering = ["code"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "code"],
+                name="document_retention_policy_org_code_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        self.code = self.code.strip().lower()
+        self.name = self.name.strip()
+        validate_related_organizations(
+            self, created_by_membership=self.created_by_membership
+        )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class DocumentRetentionPolicyVersion(UUIDModel, TimeStampedModel):
+    """Versioned retention rule; null duration is explicitly non-disposable."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_retention_policy_versions",
+    )
+    policy = models.ForeignKey(
+        DocumentRetentionPolicy,
+        on_delete=models.PROTECT,
+        related_name="versions",
+    )
+    version = models.PositiveIntegerField()
+    state = models.CharField(
+        max_length=20,
+        choices=RetentionPolicyVersionState.choices,
+        default=RetentionPolicyVersionState.DRAFT,
+    )
+    trigger = models.CharField(max_length=30, choices=RetentionTrigger.choices)
+    duration_days = models.PositiveIntegerField(null=True, blank=True)
+    source_reference = models.CharField(max_length=255)
+    applies_to_category = models.ForeignKey(
+        DocumentCategory,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="retention_policy_versions",
+    )
+    effective_from = models.DateTimeField()
+    created_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_retention_policy_versions_created",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="document_retention_policy_versions_approved",
+    )
+
+    class Meta:
+        ordering = ["policy", "version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["policy", "version"],
+                name="document_retention_policy_version_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(version__gte=1),
+                name="document_retention_version_positive",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        relations: dict[str, models.Model] = {
+            "policy": self.policy,
+            "created_by_membership": self.created_by_membership,
+        }
+        if self.applies_to_category_id:
+            relations["applies_to_category"] = self.applies_to_category
+        if self.approved_by_membership_id:
+            relations["approved_by_membership"] = self.approved_by_membership
+        validate_related_organizations(self, **relations)
+        if not self.source_reference.strip():
+            raise ValidationError("مرجع منبع سیاست نگهداری الزامی است.")
+        approval_complete = bool(self.approved_at and self.approved_by_membership_id)
+        if self.state == RetentionPolicyVersionState.APPROVED and not approval_complete:
+            raise ValidationError("شاهد تأیید سیاست نگهداری کامل نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            original_state = (
+                type(self).objects.filter(pk=self.pk).values_list("state", flat=True).first()
+            )
+            if original_state == RetentionPolicyVersionState.APPROVED:
+                raise ValidationError("نسخه تأییدشده سیاست نگهداری تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class DocumentRetentionApplication(UUIDModel, CreatedAtModel):
+    """Immutable application snapshot; conflicting/unknown obligations accumulate."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_retention_applications",
+    )
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.PROTECT,
+        related_name="retention_applications",
+    )
+    policy_version = models.ForeignKey(
+        DocumentRetentionPolicyVersion,
+        on_delete=models.PROTECT,
+        related_name="applications",
+    )
+    trigger_at = models.DateTimeField()
+    retention_until = models.DateTimeField(null=True, blank=True)
+    applied_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_retention_applications",
+    )
+
+    class Meta:
+        ordering = ["created_at"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "policy_version"],
+                name="document_retention_application_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            document=self.document,
+            policy_version=self.policy_version,
+            applied_by_membership=self.applied_by_membership,
+        )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("اعمال سیاست نگهداری تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class DocumentLegalHold(UUIDModel, TimeStampedModel):
+    """Retained hold evidence; release never implies disposal."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_legal_holds",
+    )
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.PROTECT,
+        related_name="legal_holds",
+    )
+    reason = models.TextField()
+    source_reference = models.CharField(max_length=255)
+    placed_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_holds_placed",
+    )
+    released_at = models.DateTimeField(null=True, blank=True)
+    released_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="document_holds_released",
+    )
+    release_reason = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]  # noqa: RUF012
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document", "released_at"],
+                name="dochold_org_doc_release_idx",
+            )
+        ]
+
+
+class DocumentDisposalIntent(UUIDModel, TimeStampedModel):
+    """Non-destructive intent only; P1 deliberately has no byte deletion command."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_disposal_intents",
+    )
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.PROTECT,
+        related_name="disposal_intents",
+    )
+    state = models.CharField(
+        max_length=32,
+        choices=DisposalIntentState.choices,
+        default=DisposalIntentState.REQUESTED,
+    )
+    reason = models.TextField()
+    requested_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_disposals_requested",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="document_disposals_approved",
+    )
+    block_reason = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]  # noqa: RUF012
+
+
+class DocumentExportManifest(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_export_manifests",
+    )
+    requested_by_membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="document_export_manifests",
+    )
+    completeness = models.CharField(
+        max_length=20, choices=ManifestCompleteness.choices
+    )
+    manifest = models.JSONField(default=dict)
+    original_bytes = models.PositiveBigIntegerField(default=0)
+    quarantine_bytes = models.PositiveBigIntegerField(default=0)
+    derivative_bytes = models.PositiveBigIntegerField(default=0)
+    export_bundle_bytes = models.PositiveBigIntegerField(default=0)
+
+
+class DocumentKeyCustodyAttestation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_key_custody_attestations",
+    )
+    boundary_id = models.UUIDField(default=uuid.uuid4, unique=True)
+    reference = models.CharField(max_length=255)
+    attested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="document_key_custody_attestations",
+    )
+
+
+class DocumentRecoveryManifest(UUIDModel, TimeStampedModel):
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="document_recovery_manifests",
+    )
+    boundary_id = models.UUIDField(default=uuid.uuid4, unique=True)
+    database_reference = models.CharField(max_length=255)
+    key_custody_attestation = models.ForeignKey(
+        DocumentKeyCustodyAttestation,
+        on_delete=models.PROTECT,
+        related_name="recovery_manifests",
+    )
+    state = models.CharField(max_length=20, choices=RecoveryEvidenceState.choices)
+    manifest = models.JSONField(default=dict)
+    byte_counts = models.JSONField(default=dict)
+    generated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="document_recovery_manifests_generated",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="document_recovery_manifests_approved",
+    )
+
+
+class AbstractTypedDocumentLink(UUIDModel, CreatedAtModel):
+    """Shared invariant shell for domain-owned, append-only document links."""
+
+    target_field_name: ClassVar[str]
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    document = models.ForeignKey(
+        Document,
+        on_delete=models.PROTECT,
+        related_name="+",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
+    legacy_link_id = models.UUIDField(null=True, blank=True, unique=True)
+
+    class Meta:
+        abstract = True
+        ordering = ["created_at"]  # noqa: RUF012
+
+    @property
+    def target(self) -> models.Model:
+        return getattr(self, self.target_field_name)
+
+    @property
+    def target_type(self) -> str:
+        return self.target_field_name
+
+    def clean(self) -> None:
+        super().clean()
+        target = self.target
+        validate_related_organizations(self, document=self.document, target=target)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            target_id_field = f"{self.target_field_name}_id"
+            original = (
+                type(self)
+                .objects.filter(pk=self.pk)
+                .values(
+                    "organization_id",
+                    "document_id",
+                    target_id_field,
+                    "created_by_id",
+                    "legacy_link_id",
+                )
+                .first()
+            )
+            current = {
+                "organization_id": self.organization_id,
+                "document_id": self.document_id,
+                target_id_field: getattr(self, target_id_field),
+                "created_by_id": self.created_by_id,
+                "legacy_link_id": self.legacy_link_id,
+            }
+            if original is not None and original != current:
+                raise ValidationError("لینک نوع‌دار سند تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("لینک نوع‌دار سند جزئی از سابقه و حذف‌ناپذیر است.")
 
 
 class DocumentLink(UUIDModel, CreatedAtModel):

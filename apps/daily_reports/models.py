@@ -4,8 +4,34 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+class DailyReportDocumentLink(AbstractTypedDocumentLink):
+    """Daily-report-owned append-only evidence link."""
+
+    target_field_name = "daily_report"
+    daily_report = models.ForeignKey(
+        "daily_reports.DailyReport",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "daily_report"],
+                name="daily_report_document_link_uq",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="daily_doclink_org_doc_idx",
+            )
+        ]
 
 
 class DailyReportStatus(models.TextChoices):

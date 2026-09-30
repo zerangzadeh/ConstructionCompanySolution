@@ -22,6 +22,23 @@ OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.AUTHORIZATION_GRANTS_REVOKE,
     BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
     BusinessPermissionCode.TENANT_POLICIES_APPROVE,
+    BusinessPermissionCode.PARTIES_MERGE,
+    BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE,
+    BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
+    BusinessPermissionCode.DOCUMENT_CATEGORIES_MANAGE,
+    BusinessPermissionCode.DOCUMENT_RETENTION_APPROVE,
+    BusinessPermissionCode.DOCUMENT_RETENTION_MANAGE,
+    BusinessPermissionCode.DOCUMENT_HOLDS_PLACE,
+    BusinessPermissionCode.DOCUMENT_HOLDS_RELEASE,
+    BusinessPermissionCode.DOCUMENT_DISPOSALS_REQUEST,
+    BusinessPermissionCode.DOCUMENT_DISPOSALS_APPROVE,
+    BusinessPermissionCode.DOCUMENTS_EXPORT,
+    BusinessPermissionCode.MATERIALS_MERGE,
+    BusinessPermissionCode.UOM_CONVERSIONS_MANAGE,
+    BusinessPermissionCode.UOM_ROUNDING_MANAGE,
+    BusinessPermissionCode.MATERIAL_ATTRIBUTE_DEFINITIONS_MANAGE,
+    BusinessPermissionCode.MATERIAL_ATTRIBUTES_IMPORT,
+    BusinessPermissionCode.MATERIAL_TECHNICAL_APPROVE,
 )
 MANAGER_EXPLICIT_PERMISSIONS = permission_codes(
     BusinessPermissionCode.WORKFLOWS_VIEW,
@@ -77,6 +94,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     - {
         str(BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER),
         str(BusinessPermissionCode.TENANT_POLICIES_APPROVE),
+        str(BusinessPermissionCode.DOCUMENT_RETENTION_APPROVE),
     },
     MembershipRole.TENANT_MANAGER: (
         ALL_PERMISSIONS

@@ -44,7 +44,7 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 | --- | --- | --- |
 | Identity and tenant core | **PARTIALLY IMPLEMENTED** | Custom `User`, `Organization`, settings, memberships, invitations/connection requests, active-tenant session resolution, lifecycle checks, permission catalogue, and audit exist. MFA, SSO, subscription/entitlements, quota enforcement, tenant export/offboarding, and mature invitation governance do not. |
 | Authorization | **CLOSED P1.1 / PARTIAL PRODUCT TARGET** | Deny-by-default membership-scoped multi-role permission checks, explicit project/site grants, effective assignment/revocation, Platform Admin separation, protected-operation and role-catalog lifecycles, Persian Platform/Tenant Admin management routes and scoped service/queryset/view enforcement are implemented and verified. Support/emergency access, export/storage, quota/lifecycle and configurable business Self-Approval remain outside P1.1. |
-| Parties and shared masters | **IMPLEMENTED / PARTIAL** | `BusinessParty`, roles/contacts, materials, categories, and UOM exist. Bank accounts, regulatory profiles, qualification facts, effective relationships, UOM conversions, merge/deduplication, and governance workflows are absent. |
+| Parties and shared masters | **IMPLEMENTED / PARTIAL** | `BusinessParty` now has Tenant-local normalized duplicate candidates and aliases, append-only identity evidence, permission-controlled non-destructive merge lineage, historical category/tag assignments, effective representative/signatory evidence, and generic effective-dated Tenant/Platform restrictions plus an explicit unactivated transaction guard. Materials now include Tenant-local aliases/supersession, deterministic UOM conversion history, governed attributes/observations, immutable substitute/equivalent records, version-pinned technical documents and separated technical approval evidence. Platform restriction imposition, consuming-domain enforcement, bank accounts, regulatory profiles, qualification facts, advanced formula conversions and quality workflows remain absent or deferred. |
 | Projects and controls | **PARTIALLY IMPLEMENTED** | Projects, sites, phases, WBS, activities, baselines, and progress exist. Formal schedule baselines, CBS/cost centers, risk/change controls, resource planning, earned-value controls, and integrated forecasting are absent. |
 | Workforce | **PARTIALLY IMPLEMENTED** | Employees, optional login link, departments, positions, teams, effective assignments, and project/site assignments exist. Skills, qualifications, labor rates, attendance, time capture, leave, payroll, and insurance lists do not. |
 | Contracts | **PARTIALLY IMPLEMENTED** | Receivable/payable direction, items, controlled lifecycle, and immutable approved amendments exist. Subcontract administration, change orders/variation valuation, guarantees, insurance evidence, contractual schedules, and payables certification are incomplete. |
@@ -403,6 +403,15 @@ parameters, P0.2/P0.3 prerequisites and P0.4 remediation evidence also remain op
 for their governed packages and release. The recorded
 single-reviewer concentration and external-independence risks remain release or
 sensitive-feature enablement constraints rather than accepted risk closure.
+
+P1-S19..S22 subsequently accepted S08/S09 as target architecture and implemented
+the bounded DMS governance structure: protected-filesystem adapter, fail-closed
+scan/OCR availability, typed domain links, permission-scoped PostgreSQL search,
+versioned retention/hold/export evidence and separated recovery/key/approval
+duties. This closes the P1 structural package only. Production object storage and
+scanner providers, object-storage cutover/rehearsal, destructive disposal, legal
+duration/signature facts, numeric RPO/RTO, quota/commercial values and operational
+proof remain release gates; no production-readiness claim follows.
 
 ## 16. Dependency and library reuse assessment
 

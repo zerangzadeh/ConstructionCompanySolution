@@ -117,6 +117,43 @@ def is_platform_admin(user: User) -> bool:
     )
 
 
+def has_platform_role(user: User, role: str) -> bool:
+    """Check one active platform duty without implying Tenant-data access."""
+
+    if role not in PlatformRoleCode.values:
+        return False
+    if not user.is_authenticated or not user.is_active:
+        return False
+    now = timezone.now()
+    return (
+        PlatformRoleAssignment.objects.filter(
+            user=user,
+            role=role,
+            starts_at__lte=now,
+            revoked_at__isnull=True,
+        )
+        .filter(Q(ends_at__isnull=True) | Q(ends_at__gt=now))
+        .exists()
+    )
+
+
+def is_platform_actor(user: User) -> bool:
+    """Return whether an active user holds any current platform duty."""
+
+    if not user.is_authenticated or not user.is_active:
+        return False
+    now = timezone.now()
+    return (
+        PlatformRoleAssignment.objects.filter(
+            user=user,
+            starts_at__lte=now,
+            revoked_at__isnull=True,
+        )
+        .filter(Q(ends_at__isnull=True) | Q(ends_at__gt=now))
+        .exists()
+    )
+
+
 def effective_role_assignments(membership: OrganizationMembership) -> QuerySet[Any]:
     now = timezone.now()
     return membership.role_assignments.filter(

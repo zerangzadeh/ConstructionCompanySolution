@@ -4,7 +4,11 @@ from django import forms
 
 from apps.contracts.models import Contract
 from apps.daily_reports.models import DailyReport
-from apps.documents.models import DocumentType
+from apps.documents.models import (
+    DocumentCategory,
+    DocumentConfidentiality,
+    DocumentType,
+)
 from apps.estimates.models import Estimate
 from apps.expenses.models import Expense
 from apps.organizations.authorization import has_business_permission
@@ -112,11 +116,31 @@ class DocumentTargetForm(forms.Form):
 class DocumentCreateForm(DocumentTargetForm):
     document_type = forms.ChoiceField(label="نوع سند", choices=DocumentType.choices)
     title = forms.CharField(label="عنوان سند", max_length=255)
+    category = forms.ModelChoiceField(
+        label="دسته‌بندی", queryset=DocumentCategory.objects.none(), required=False
+    )
+    confidentiality = forms.ChoiceField(
+        label="سطح محرمانگی",
+        choices=DocumentConfidentiality.choices,
+        required=False,
+        initial=DocumentConfidentiality.INTERNAL,
+    )
+    access_expires_at = forms.DateTimeField(
+        label="پایان دسترسی",
+        required=False,
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+    )
     reference = forms.CharField(label="شماره مرجع", max_length=120, required=False)
     description = forms.CharField(
         label="توضیحات", widget=forms.Textarea, required=False
     )
     file = forms.FileField(label="فایل نسخه اول")
+
+    def __init__(self, *args: Any, organization: Any = None, **kwargs: Any) -> None:
+        super().__init__(*args, organization=organization, **kwargs)
+        self.fields["category"].queryset = DocumentCategory.objects.filter(
+            organization=organization, archived_at__isnull=True
+        ).order_by("name")
 
 
 class DocumentVersionForm(forms.Form):

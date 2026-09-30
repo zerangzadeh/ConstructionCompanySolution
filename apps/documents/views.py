@@ -8,7 +8,7 @@ from apps.documents.forms import (
     DocumentLinkForm,
     DocumentVersionForm,
 )
-from apps.documents.models import DocumentType
+from apps.documents.models import DocumentConfidentiality, DocumentType
 from apps.documents.services import (
     add_document_link,
     add_document_version,
@@ -18,6 +18,7 @@ from apps.documents.services import (
     get_organization_document,
     get_organization_documents,
     record_document_download,
+    search_organization_documents,
 )
 from apps.organizations.decorators import (
     active_organization_required,
@@ -55,6 +56,13 @@ def document_list(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
+    content_query = request.GET.get("content", "").strip()
+    if content_query:
+        documents = search_organization_documents(
+            user=request.user,
+            organization=request.organization,
+            query=content_query,
+        )
     documents = apply_table_filters(
         documents,
         request,
@@ -86,7 +94,11 @@ def document_list(request: HttpRequest) -> HttpResponse:
                 request,
                 [
                     {"name": "document", "kind": "text", "label": "سند"},
-                    None,
+                    {
+                        "name": "content",
+                        "kind": "text",
+                        "label": "محتوا/OCR",
+                    },
                     {
                         "name": "document_type",
                         "kind": "select",
@@ -119,6 +131,11 @@ def document_upload(request: HttpRequest) -> HttpResponse:
                 actor=request.user,
                 document_type=data["document_type"],
                 title=data["title"],
+                category=data["category"],
+                confidentiality=(
+                    data["confidentiality"] or DocumentConfidentiality.INTERNAL
+                ),
+                access_expires_at=data["access_expires_at"],
                 reference=data["reference"],
                 description=data["description"],
                 upload=data["file"],

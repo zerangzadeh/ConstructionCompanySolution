@@ -1,6 +1,7 @@
 # ADR P0-S09: Extensible explicit DMS domain links
 
-**Status:** PROPOSED — preparation complete; acceptance and implementation pending.
+**Status:** ACCEPTED AS TARGET; P1-S20 expand/backfill and compatibility switch
+implemented, legacy contraction pending separate approval.
 **Recorded:** 2026-09-25. **Scope:** P0.1 / PPC-10, informing P1.3.
 **Authorization:** Product Owner: “continue and do S09”, continuing the
 [S08 handoff](../ROADMAP_EXECUTION_PLAYBOOK.md#33-p0-s08-private-document-storage-adr-proposal-and-s09-handoff).
@@ -13,6 +14,13 @@ proposed [S08 storage ADR](ADR_P0_S08_PRIVATE_DOCUMENT_STORAGE.md) and
 [S07 authorization ADR](ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md), neither accepted
 by this session. DMS numbering, OCR, signatures and search implementation are out
 of scope; their link-consumption requirements are considered only where necessary.
+
+**Product Owner disposition (2026-09-29):** `D19-02=A` and `D19-09=A` accept
+domain-owned typed tables behind the closed Platform registry. P1-S20 preserves
+legacy link UUIDs, backfills all six target types, dual-writes compatibility rows,
+uses typed links for authorization and retains the full append-only link set as
+governing. Access-releasing correction and legacy-table contraction remain
+separately gated.
 
 ## 1. Verified current link contract
 

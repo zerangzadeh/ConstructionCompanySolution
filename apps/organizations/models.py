@@ -136,6 +136,12 @@ class AuthorizationScopeType(models.TextChoices):
 
 class PlatformRoleCode(models.TextChoices):
     PLATFORM_ADMIN = "platform_admin", "Platform Admin"
+    PLATFORM_OPERATIONS = "platform_operations", "Platform Operations"
+    PLATFORM_SECURITY = "platform_security", "Platform Security"
+    RESTORE_EVIDENCE_APPROVER = (
+        "restore_evidence_approver",
+        "Restore Evidence Approver",
+    )
 
 
 class ProtectedOperationCode(models.TextChoices):
@@ -159,6 +165,14 @@ class ProtectedOperationCode(models.TextChoices):
     PROTECTED_CLASSIFICATION_CHANGE = (
         "authorization.protected_classification_change",
         "تغییر طبقه‌بندی عملیات حفاظت‌شده",
+    )
+    DOCUMENT_HOLD_RELEASE = (
+        "documents.hold_release",
+        "آزادسازی نگهداری حقوقی سند",
+    )
+    DOCUMENT_DISPOSAL_APPROVAL = (
+        "documents.disposal_approval",
+        "تأیید قصد امحای سند",
     )
 
 
@@ -260,12 +274,27 @@ class BusinessPermissionCode(models.TextChoices):
     PARTIES_CREATE = "parties.create", "ایجاد طرف تجاری"
     PARTIES_CHANGE = "parties.change", "ویرایش طرف تجاری"
     PARTIES_ARCHIVE = "parties.archive", "بایگانی طرف تجاری"
+    PARTIES_MERGE = "parties.merge", "ثبت ادغام طرف تجاری"
+    PARTY_RESTRICTIONS_MANAGE = (
+        "party_restrictions.manage",
+        "مدیریت محدودیت‌های طرف تجاری",
+    )
+    PARTY_GOVERNANCE_MANAGE = (
+        "party_governance.manage",
+        "مدیریت شواهد و دسته‌بندی طرف تجاری",
+    )
     PARTY_ROLES_ASSIGN = "party_roles.assign", "تخصیص نقش به طرف تجاری"
     PARTY_CONTACTS_ADD = "party_contacts.add", "افزودن راه ارتباطی طرف تجاری"
 
     UNITS_VIEW = "units.view", "مشاهده واحدهای اندازه‌گیری"
     UNITS_CREATE = "units.create", "ایجاد واحد اندازه‌گیری"
     UNITS_ARCHIVE = "units.archive", "بایگانی واحد اندازه‌گیری"
+    UOM_CONVERSIONS_MANAGE = (
+        "units.conversions_manage",
+        "مدیریت تبدیل نسخه‌دار واحدها",
+    )
+    UOM_ROUNDING_MANAGE = "units.rounding_manage", "مدیریت سیاست گرد کردن کمیت"
+    UOM_CONVERT = "units.convert", "اجرای تبدیل کمیت"
     MATERIAL_CATEGORIES_VIEW = (
         "material_categories.view",
         "مشاهده دسته‌بندی‌های مصالح",
@@ -286,6 +315,23 @@ class BusinessPermissionCode(models.TextChoices):
     MATERIALS_CREATE = "materials.create", "ایجاد مصالح"
     MATERIALS_CHANGE = "materials.change", "ویرایش مصالح"
     MATERIALS_ARCHIVE = "materials.archive", "بایگانی مصالح"
+    MATERIALS_STEWARD = "materials.steward", "راهبری هویت مصالح"
+    MATERIALS_MERGE = "materials.merge", "ادغام غیرمخرب مصالح"
+    MATERIAL_ATTRIBUTE_DEFINITIONS_MANAGE = (
+        "material_attributes.definitions_manage",
+        "مدیریت تعریف نسخه‌دار ویژگی مصالح",
+    )
+    MATERIAL_ATTRIBUTES_APPLY = "material_attributes.apply", "اعمال ویژگی مصالح"
+    MATERIAL_ATTRIBUTES_IMPORT = "material_attributes.import", "درون‌ریزی ویژگی مصالح"
+    MATERIAL_PRICE_OBSERVATIONS_RECORD = (
+        "material_prices.observations_record",
+        "ثبت مشاهده قیمت مصالح",
+    )
+    MATERIAL_RELATIONSHIPS_MANAGE = "material_relationships.manage", "مدیریت هم‌ارز/جایگزین مصالح"
+    MATERIAL_TECHNICAL_SUBMIT = "material_technical.submit", "ارسال بررسی فنی مصالح"
+    MATERIAL_TECHNICAL_REVIEW = "material_technical.review", "بازبینی فنی مصالح"
+    MATERIAL_TECHNICAL_APPROVE = "material_technical.approve", "تأیید فنی مصالح"
+    MATERIAL_DOCUMENTS_LINK = "material_documents.link", "پیوند سند فنی مصالح"
 
     PROJECTS_VIEW = "projects.view", "مشاهده پروژه‌ها"
     PROJECTS_CREATE = "projects.create", "ایجاد پروژه"
@@ -364,6 +410,29 @@ class BusinessPermissionCode(models.TextChoices):
     DOCUMENTS_UPLOAD = "documents.upload", "بارگذاری و نسخه‌بندی اسناد"
     DOCUMENTS_DOWNLOAD = "documents.download", "دانلود اسناد"
     DOCUMENTS_ARCHIVE = "documents.archive", "بایگانی اسناد"
+    DOCUMENT_RETENTION_MANAGE = (
+        "documents.retention_manage",
+        "مدیریت پیش‌نویس سیاست نگهداری اسناد",
+    )
+    DOCUMENT_RETENTION_APPROVE = (
+        "documents.retention_approve",
+        "تأیید سیاست نگهداری اسناد",
+    )
+    DOCUMENT_HOLDS_PLACE = "documents.holds_place", "ثبت نگهداری حقوقی سند"
+    DOCUMENT_HOLDS_RELEASE = "documents.holds_release", "آزادسازی نگهداری حقوقی سند"
+    DOCUMENT_DISPOSALS_REQUEST = (
+        "documents.disposals_request",
+        "درخواست قصد امحای سند",
+    )
+    DOCUMENT_DISPOSALS_APPROVE = (
+        "documents.disposals_approve",
+        "تأیید قصد امحای سند",
+    )
+    DOCUMENTS_EXPORT = "documents.export", "خروجی کنترل‌شده اسناد"
+    DOCUMENT_CATEGORIES_MANAGE = (
+        "document_categories.manage",
+        "مدیریت دسته‌بندی اسناد",
+    )
 
     DAILY_REPORTS_VIEW = "daily_reports.view", "مشاهده گزارش‌های روزانه"
     DAILY_REPORTS_CREATE = "daily_reports.create", "ثبت گزارش روزانه"

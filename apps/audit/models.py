@@ -1,3 +1,5 @@
+import uuid
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -97,10 +99,50 @@ class AuditAction(models.TextChoices):
     BUSINESS_PARTY_CREATED = "business_party.created", "طرف تجاری ایجاد شد"
     BUSINESS_PARTY_UPDATED = "business_party.updated", "طرف تجاری به‌روزرسانی شد"
     BUSINESS_PARTY_ARCHIVED = "business_party.archived", "طرف تجاری بایگانی شد"
+    BUSINESS_PARTY_MERGED = "business_party.merged", "ادغام طرف تجاری ثبت شد"
+    PARTY_RESTRICTION_CREATED = (
+        "party_restriction.created",
+        "محدودیت طرف تجاری ثبت شد",
+    )
+    PARTY_RESTRICTION_REVOKED = (
+        "party_restriction.revoked",
+        "محدودیت طرف تجاری لغو شد",
+    )
     PARTY_ROLE_ASSIGNED = "party_role.assigned", "نقش طرف تجاری تخصیص یافت"
     PARTY_CONTACT_ADDED = "party_contact.added", "راه ارتباطی طرف تجاری افزوده شد"
+    PARTY_ALIAS_RECORDED = "party_alias.recorded", "نام مستعار طرف تجاری ثبت شد"
+    PARTY_CLASSIFICATION_CREATED = (
+        "party_classification.created",
+        "دسته یا برچسب طرف تجاری ایجاد شد",
+    )
+    PARTY_CLASSIFICATION_ASSIGNED = (
+        "party_classification.assigned",
+        "دسته یا برچسب به طرف تجاری تخصیص یافت",
+    )
+    PARTY_CLASSIFICATION_REVOKED = (
+        "party_classification.revoked",
+        "انتساب دسته یا برچسب طرف تجاری لغو شد",
+    )
+    PARTY_REPRESENTATIVE_RECORDED = (
+        "party_representative.recorded",
+        "نماینده یا امضادار طرف تجاری ثبت شد",
+    )
+    PARTY_REPRESENTATIVE_REVOKED = (
+        "party_representative.revoked",
+        "نماینده یا امضادار طرف تجاری لغو شد",
+    )
     UNIT_OF_MEASURE_CREATED = "unit_of_measure.created", "واحد اندازه‌گیری ایجاد شد"
     UNIT_OF_MEASURE_ARCHIVED = "unit_of_measure.archived", "واحد اندازه‌گیری بایگانی شد"
+    UOM_FAMILY_CONFIGURED = "unit.family_configured", "خانواده واحد پیکربندی شد"
+    UOM_CONVERSION_VERSION_CREATED = (
+        "unit.conversion_version_created",
+        "نسخه تبدیل واحد ایجاد شد",
+    )
+    UOM_ROUNDING_POLICY_CREATED = (
+        "unit.rounding_policy_created",
+        "سیاست گرد کردن کمیت ایجاد شد",
+    )
+    UOM_CONVERSION_APPLIED = "unit.conversion_applied", "تبدیل کمیت اعمال شد"
     MATERIAL_CATEGORY_CREATED = (
         "material_category.created",
         "دسته‌بندی مصالح ایجاد شد",
@@ -116,6 +158,34 @@ class AuditAction(models.TextChoices):
     MATERIAL_CREATED = "material.created", "مصالح ایجاد شد"
     MATERIAL_UPDATED = "material.updated", "مصالح به‌روزرسانی شد"
     MATERIAL_ARCHIVED = "material.archived", "مصالح بایگانی شد"
+    MATERIAL_ALIAS_RECORDED = "material.alias_recorded", "شناسه جایگزین مصالح ثبت شد"
+    MATERIAL_DUPLICATE_REVIEWED = (
+        "material.duplicate_reviewed",
+        "نامزد تکراری مصالح بررسی شد",
+    )
+    MATERIAL_SUPERSEDED = (
+        "material.superseded",
+        "جایگزینی غیرمخرب مصالح ثبت شد",
+    )
+    MATERIAL_ATTRIBUTE_DEFINITION_VERSION_CREATED = (
+        "material_attribute.definition_version_created",
+        "نسخه تعریف ویژگی مصالح ایجاد شد",
+    )
+    MATERIAL_ATTRIBUTE_VALUE_RECORDED = (
+        "material_attribute.value_recorded",
+        "مقدار ویژگی مصالح ثبت شد",
+    )
+    MATERIAL_ATTRIBUTE_IMPORT_RECORDED = (
+        "material_attribute.import_recorded",
+        "درون‌ریزی ویژگی مصالح ثبت شد",
+    )
+    MATERIAL_PRICE_OBSERVATION_RECORDED = (
+        "material_price.observation_recorded",
+        "مشاهده قیمت مصالح ثبت شد",
+    )
+    MATERIAL_TECHNICAL_STATUS_CHANGED = "material_technical.status_changed", "وضعیت بررسی فنی مصالح تغییر کرد"
+    MATERIAL_DOCUMENT_LINKED = "material_document.linked", "سند فنی مصالح پیوند خورد"
+    MATERIAL_RELATIONSHIP_RECORDED = "material_relationship.recorded", "رابطه مصالح ثبت شد"
     PROJECT_CREATED = "project.created", "پروژه ایجاد شد"
     PROJECT_ARCHIVED = "project.archived", "پروژه بایگانی شد"
     PROJECT_SITE_CREATED = "project_site.created", "کارگاه پروژه ایجاد شد"
@@ -201,6 +271,59 @@ class AuditAction(models.TextChoices):
     DOCUMENT_LINK_ADDED = "document.link_added", "لینک سند افزوده شد"
     DOCUMENT_DOWNLOADED = "document.downloaded", "سند دریافت شد"
     DOCUMENT_ARCHIVED = "document.archived", "سند بایگانی شد"
+    DOCUMENT_CATEGORY_CREATED = (
+        "document.category_created",
+        "دسته‌بندی سند ایجاد شد",
+    )
+    DOCUMENT_PROCESSING_ASSESSED = (
+        "document.processing_assessed",
+        "ارزیابی پردازش سند ثبت شد",
+    )
+    DOCUMENT_SIGNATURE_EVIDENCE_RECORDED = (
+        "document.signature_evidence_recorded",
+        "شاهد امضای سند ثبت شد",
+    )
+    DOCUMENT_RETENTION_POLICY_CREATED = (
+        "document.retention_policy_created",
+        "سیاست نگهداری سند ایجاد شد",
+    )
+    DOCUMENT_RETENTION_POLICY_APPROVED = (
+        "document.retention_policy_approved",
+        "سیاست نگهداری سند تأیید شد",
+    )
+    DOCUMENT_RETENTION_APPLIED = (
+        "document.retention_applied",
+        "سیاست نگهداری به سند اعمال شد",
+    )
+    DOCUMENT_HOLD_PLACED = "document.hold_placed", "نگهداری حقوقی سند ثبت شد"
+    DOCUMENT_HOLD_RELEASED = (
+        "document.hold_released",
+        "نگهداری حقوقی سند آزاد شد",
+    )
+    DOCUMENT_DISPOSAL_REQUESTED = (
+        "document.disposal_requested",
+        "قصد امحای سند درخواست شد",
+    )
+    DOCUMENT_DISPOSAL_REVIEWED = (
+        "document.disposal_reviewed",
+        "قصد امحای سند بررسی شد",
+    )
+    DOCUMENT_EXPORT_MANIFEST_CREATED = (
+        "document.export_manifest_created",
+        "مانیفست خروجی سند ایجاد شد",
+    )
+    DOCUMENT_KEY_CUSTODY_ATTESTED = (
+        "document.key_custody_attested",
+        "شاهد نگهداری کلید ثبت شد",
+    )
+    DOCUMENT_RECOVERY_RECONCILED = (
+        "document.recovery_reconciled",
+        "مرز بازیابی سند تطبیق شد",
+    )
+    DOCUMENT_RESTORE_EVIDENCE_APPROVED = (
+        "document.restore_evidence_approved",
+        "شاهد بازیابی سند تأیید شد",
+    )
     DAILY_REPORT_CREATED = "daily_report.created", "گزارش روزانه ایجاد شد"
     DAILY_REPORT_SUBMITTED = "daily_report.submitted", "گزارش روزانه ارسال شد"
     DAILY_REPORT_APPROVED = "daily_report.approved", "گزارش روزانه تأیید شد"
@@ -465,6 +588,8 @@ class AuditEvent(UUIDModel, CreatedAtModel):
     action = models.CharField("عملیات", max_length=64, choices=AuditAction.choices)
     entity_type = models.CharField("نوع موجودیت", max_length=100)
     entity_id = models.CharField("شناسه موجودیت", max_length=100, blank=True)
+    correlation_id = models.UUIDField(default=uuid.uuid4, db_index=True)
+    changes = models.JSONField("تغییرات", default=dict, blank=True)
     metadata = models.JSONField("فراداده", default=dict, blank=True)
 
     objects = AuditEventManager()

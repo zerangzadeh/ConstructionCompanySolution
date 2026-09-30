@@ -1,6 +1,7 @@
 # ADR P0-S08: Private document storage, upload safety and evidence retention
 
-**Status:** PROPOSED — preparation complete; acceptance and implementation pending.
+**Status:** ACCEPTED AS TARGET; bounded P1-S19..S22 implementation complete,
+production storage/operations acceptance pending.
 **Recorded:** 2026-09-25. **Scope:** P0.1 storage ADR / PPC-05, informing P0.2,
 P0.3 and P1.3. **Authorization:** Product Owner: “Continue and do S08”.
 
@@ -10,6 +11,16 @@ This session prepares that proposal only. Provider selection, packages, producti
 configuration, data movement, scanning jobs and P1.3 implementation are excluded.
 The separate DMS link-extensibility ADR/PPC-10 remains pending; this proposal
 preserves existing link semantics without choosing its replacement schema.
+
+**Product Owner disposition (2026-09-29):** accepted by `D19-01=A`, revised by
+`D19-05=C`, `D19-06=A`, `D19-07=A/A1` and `D19-08=A`. P1 uses a protected
+filesystem adapter, durable immutable version receipt, separate append-only
+availability assessments, fail-closed unknown/unscanned content, versioned Tenant
+retention/hold/export structures, and reconciled recovery manifests with separated
+Platform duties. This does not approve a production provider/region, scanner/OCR
+provider, asynchronous transport, destructive disposal, legal retention values,
+signature standard, RPO/RTO or quota/commercial values. Object-storage migration
+requires a later explicit inventory/copy/verify/cutover/rollback gate.
 
 ## 1. Current evidence and limits
 

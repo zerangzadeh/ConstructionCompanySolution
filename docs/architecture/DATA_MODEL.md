@@ -48,6 +48,22 @@ Employee (tenant workforce identity) -- optional --> User
 BusinessParty (tenant counterparty identity) -- independent of --> User/Employee
 ```
 
+P1-S16 keeps `BusinessParty` identity Tenant-local. Normalized display/legal and
+existing identifier values are match evidence, not cross-Tenant identity proof and
+never trigger automatic merge. Identity changes append immutable snapshots. An
+explicit merge records one direct same-Tenant survivor, archives the source for new
+selection and preserves every historical FK to that source. Generic restrictions
+remain in the party context with explicit Tenant/Platform scope, effect and
+effective interval; only the explicit transaction-block effect can make the
+unactivated reusable guard deny a new transaction.
+
+P1-S17 adds immutable normalized aliases that resolve only inside the Tenant and
+follow an explicit merge survivor without rewriting source evidence. Tenant-owned
+category/tag assignments and representative/signatory authority are historical,
+effective/revocable records. Representative evidence is neither `User` identity
+nor an authorization grant; regulated bank, tax, legal and qualification profiles
+are not implemented by these generic records.
+
 Target identity additions include MFA/SSO evidence, invitation/onboarding history,
 time-limited support-access grants, entitlements/quotas and project/site scope.
 External portal identity must be explicitly invitation-scoped and cannot expose
@@ -71,8 +87,8 @@ history retains actor, Tenant, role, timestamp and relevant reason/context.
 | Employee/position/team | Workforce | identity, employment state, effective responsibility | Assignment history retained; optional `User` link |
 | Skill/qualification/training | Workforce | competency, evidence, issuer, dates, proficiency | Expiry/revocation and applied qualification preserved |
 | Party/contact/profile | Parties | legal/tax identity, roles, contacts, bank/qualification facts | Effective/verified state; sensitive-field permissions |
-| Material/category | Materials | canonical tenant code, aliases, technical attributes, approval | Merge/alias history; transactions retain snapshot/reference |
-| UOM/conversion | Materials | dimension/family, canonical unit and directed conversion | Version/precision where commercial history depends on it |
+| Material/category | Materials | canonical tenant code, aliases, category-scoped declarative attributes, sourced observations, immutable relationships and technical approval evidence | Version-pinned governed documents and immutable definition/value/import/approval history; observations are not quotes or ledger facts |
+| UOM/conversion | Materials | Tenant family/dimension, one family base and directed conversion to base | Immutable effective version/rounding snapshots; legacy units begin isolated with no invented factor |
 | Project/site/WBS/activity | Projects | operational structure and location/context | Approved baseline/rebaseline history separate from current display |
 | CBS/cost center | Project Controls | financial cost classification and WBS/activity mapping | Mapping/version retained with budget and cost facts |
 | COA/dimensions | Accounting | account hierarchy and posting dimensions | Effective status; posted lines retain original account/dimensions |
@@ -88,7 +104,7 @@ Names are descriptive and may change during an approved detailed design.
 | --- | --- |
 | SaaS lifecycle | Plan, FeatureEntitlement, Quota/Usage, SubscriptionState, TenantExport, RetentionPolicy, OffboardingRun, SupportAccessGrant |
 | Authorization | MembershipRoleAssignment/history, ProjectScopeGrant, SiteScopeGrant, Elevation/Delegation evidence, separation policy |
-| Materials | MaterialAlias, AttributeDefinition/Value, UOMConversion, MaterialSubstitute, MaterialPriceObservation, MaterialApproval |
+| Materials | MaterialAlias, MaterialDuplicateCandidate, MaterialSupersession, UnitFamily, UnitConversionVersion, QuantityRoundingPolicyVersion, QuantityConversionSnapshot, MaterialAttributeDefinition/Value, MaterialRelationship, MaterialPriceObservation, MaterialTechnicalApproval, MaterialDocumentLink |
 | Workforce | Skill, CompetencyRequirement, EmployeeSkill, Certificate, Training, PerformanceEvaluation, LaborRateVersion |
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
 | Project cost/control | BudgetBaseline/Version/Line, CBSNode, CostCenter, Commitment, Accrual, CostFact projection, ForecastVersion/Line, Risk/Change/Schedule baseline |
@@ -170,6 +186,18 @@ storage.
 Retention, legal hold, export, malware/content status and access audit apply at
 the document/version/link boundary. Search indexes are rebuildable projections
 and must enforce tenant/object permissions before returning results.
+
+P1-S19..S22 implement this boundary with immutable Tenant document numbers,
+descriptive classification/confidentiality and expiry; domain-owned typed links
+behind a closed registry; durable versions whose separate append-only processing
+assessment controls availability; provider-neutral signature evidence; versioned
+Tenant retention applications, legal holds, non-destructive disposal intents and
+export manifests; and reconciled recovery evidence spanning DB, blobs,
+policy/hold/audit and key custody. The legacy six-target link row remains an
+expand/backfill/rollback compatibility projection and is dual-written; it is not
+authorization authority. Unknown scan or retention state fails closed. Production
+object storage/scanning, destructive disposal and concrete legal/recovery/quota
+values remain unimplemented gates.
 
 ## 10. Reconciliation and data lineage
 

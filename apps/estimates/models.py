@@ -4,9 +4,34 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+class EstimateDocumentLink(AbstractTypedDocumentLink):
+    """Estimate-owned append-only evidence link."""
+
+    target_field_name = "estimate"
+    estimate = models.ForeignKey(
+        "estimates.Estimate",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "estimate"], name="estimate_document_link_uq"
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="estimate_doclink_org_doc_idx",
+            )
+        ]
 
 
 class EstimateStatus(models.TextChoices):

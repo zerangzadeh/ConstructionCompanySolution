@@ -1,7 +1,17 @@
 from django.contrib import admin
 from django.http import HttpRequest
 
-from apps.parties.models import BusinessParty, PartyContact, PartyRole
+from apps.parties.models import (
+    BusinessParty,
+    PartyAlias,
+    PartyClassification,
+    PartyClassificationAssignment,
+    PartyContact,
+    PartyIdentitySnapshot,
+    PartyRepresentative,
+    PartyRestriction,
+    PartyRole,
+)
 
 
 class ReadOnlyTenantAdmin(admin.ModelAdmin):
@@ -38,3 +48,57 @@ class PartyRoleAdmin(ReadOnlyTenantAdmin):
 class PartyContactAdmin(ReadOnlyTenantAdmin):
     list_display = ("party", "contact_type", "value", "organization", "is_primary")
     list_filter = ("contact_type", "organization", "is_primary")
+
+
+@admin.register(PartyIdentitySnapshot)
+class PartyIdentitySnapshotAdmin(ReadOnlyTenantAdmin):
+    readonly_fields = ("id", "recorded_at")
+    list_display = ("party", "sequence", "organization", "recorded_at")
+    list_filter = ("organization", "party_kind")
+    search_fields = ("display_name", "legal_name", "tax_identifier")
+
+
+@admin.register(PartyRestriction)
+class PartyRestrictionAdmin(ReadOnlyTenantAdmin):
+    list_display = (
+        "party",
+        "scope",
+        "code",
+        "effect",
+        "effective_from",
+        "effective_until",
+        "revoked_at",
+    )
+    list_filter = ("organization", "scope", "effect")
+
+
+@admin.register(PartyAlias)
+class PartyAliasAdmin(ReadOnlyTenantAdmin):
+    list_display = ("party", "alias_type", "value", "organization", "created_at")
+    list_filter = ("organization", "alias_type")
+    search_fields = ("value", "normalized_value")
+
+
+@admin.register(PartyClassification)
+class PartyClassificationAdmin(ReadOnlyTenantAdmin):
+    list_display = ("name", "code", "kind", "organization", "archived_at")
+    list_filter = ("organization", "kind")
+
+
+@admin.register(PartyClassificationAssignment)
+class PartyClassificationAssignmentAdmin(ReadOnlyTenantAdmin):
+    list_display = ("party", "classification", "assigned_at", "revoked_at")
+    list_filter = ("organization",)
+
+
+@admin.register(PartyRepresentative)
+class PartyRepresentativeAdmin(ReadOnlyTenantAdmin):
+    list_display = (
+        "party",
+        "full_name",
+        "authority",
+        "effective_from",
+        "effective_until",
+        "revoked_at",
+    )
+    list_filter = ("organization", "authority")

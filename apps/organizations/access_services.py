@@ -811,16 +811,17 @@ def revoke_membership_scope(
 
 
 @transaction.atomic
-def assign_platform_admin(
+def assign_platform_role(
     *,
     actor: User,
     approver: User,
     target: User,
+    role: str,
     reason: str,
     starts_at: datetime | None = None,
     ends_at: datetime | None = None,
 ) -> PlatformRoleAssignment:
-    """Assign platform control by an active Superuser, never tenant access."""
+    """Assign a separated platform duty; no platform role grants Tenant access."""
 
     if not reason.strip():
         raise ValidationError("دلیل تخصیص نقش پلتفرمی الزامی است.")
@@ -832,11 +833,13 @@ def assign_platform_admin(
         raise PermissionDenied("تخصیص یا تأیید نقش پلتفرمی خود ممنوع است.")
     if not target.is_active:
         raise ValidationError("نقش پلتفرمی فقط به کاربر فعال تخصیص می‌یابد.")
+    if role not in PlatformRoleCode.values:
+        raise ValidationError("نقش پلتفرمی معتبر نیست.")
     start = starts_at or timezone.now()
     _validate_interval(starts_at=start, ends_at=ends_at)
     assignment = PlatformRoleAssignment.objects.create(
         user=target,
-        role=PlatformRoleCode.PLATFORM_ADMIN,
+        role=role,
         starts_at=start,
         ends_at=ends_at,
         assigned_by=actor,
@@ -850,12 +853,34 @@ def assign_platform_admin(
         actor=actor,
         metadata={
             "target_user_id": str(target.pk),
-            "role": PlatformRoleCode.PLATFORM_ADMIN,
+            "role": role,
             "approver_user_id": str(approver.pk),
             "reason": reason.strip(),
         },
     )
     return assignment
+
+
+def assign_platform_admin(
+    *,
+    actor: User,
+    approver: User,
+    target: User,
+    reason: str,
+    starts_at: datetime | None = None,
+    ends_at: datetime | None = None,
+) -> PlatformRoleAssignment:
+    """Compatibility wrapper for the original Platform Admin assignment API."""
+
+    return assign_platform_role(
+        actor=actor,
+        approver=approver,
+        target=target,
+        role=PlatformRoleCode.PLATFORM_ADMIN,
+        reason=reason,
+        starts_at=starts_at,
+        ends_at=ends_at,
+    )
 
 
 @transaction.atomic

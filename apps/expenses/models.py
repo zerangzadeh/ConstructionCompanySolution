@@ -4,8 +4,33 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+class ExpenseDocumentLink(AbstractTypedDocumentLink):
+    """Expense-owned append-only evidence link."""
+
+    target_field_name = "expense"
+    expense = models.ForeignKey(
+        "expenses.Expense",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "expense"], name="expense_document_link_uq"
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="expense_doclink_org_doc_idx",
+            )
+        ]
 
 
 class LegacyExpenseCategory(models.TextChoices):

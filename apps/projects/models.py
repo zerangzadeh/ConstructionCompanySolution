@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
@@ -15,6 +16,30 @@ class ProjectStatus(models.TextChoices):
     ON_HOLD = "on_hold", "متوقف‌شده"
     COMPLETED = "completed", "تکمیل‌شده"
     CANCELLED = "cancelled", "لغوشده"
+
+
+class ProjectDocumentLink(AbstractTypedDocumentLink):
+    """Project-owned evidence link; its UUID survives legacy migration."""
+
+    target_field_name = "project"
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "project"], name="project_document_link_uq"
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="project_doclink_org_doc_idx",
+            )
+        ]
 
 
 class Project(UUIDModel, TimeStampedModel):

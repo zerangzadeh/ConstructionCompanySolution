@@ -1,3 +1,4 @@
+import uuid
 from typing import Any
 
 from django.core.exceptions import PermissionDenied
@@ -36,6 +37,8 @@ def record_audit_event(
     organization: Organization | None = None,
     actor: User | None = None,
     metadata: dict[str, Any] | None = None,
+    changes: dict[str, Any] | None = None,
+    correlation_id: uuid.UUID | None = None,
     allow_platform_actor: bool = False,
 ) -> AuditEvent:
     """Persist an audit event without exposing sensitive token values."""
@@ -43,12 +46,14 @@ def record_audit_event(
     if action not in AuditAction.values:
         raise ValueError("عملیات ممیزی معتبر نیست.")
     normalized_metadata = metadata or {}
+    normalized_changes = changes or {}
     _validate_audit_metadata(normalized_metadata)
+    _validate_audit_metadata(normalized_changes)
     platform_actor_allowed = False
     if allow_platform_actor and actor is not None:
-        from apps.organizations.authorization import is_platform_admin
+        from apps.organizations.authorization import is_platform_actor
 
-        platform_actor_allowed = is_platform_admin(actor)
+        platform_actor_allowed = is_platform_actor(actor)
     if (
         organization is not None
         and actor is not None
@@ -65,6 +70,8 @@ def record_audit_event(
         entity_id=str(entity_id),
         organization=organization,
         actor=actor,
+        correlation_id=correlation_id or uuid.uuid4(),
+        changes=normalized_changes,
         metadata=normalized_metadata,
     )
 

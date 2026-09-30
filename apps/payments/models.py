@@ -2,9 +2,34 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
+
+
+class PaymentDocumentLink(AbstractTypedDocumentLink):
+    """Payment-owned append-only evidence link."""
+
+    target_field_name = "payment"
+    payment = models.ForeignKey(
+        "payments.Payment",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "payment"], name="payment_document_link_uq"
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="payment_doclink_org_doc_idx",
+            )
+        ]
 
 
 class PaymentDirection(models.TextChoices):
