@@ -513,6 +513,32 @@ Stable masters + consent/privacy + support operations -> future network/AI
   subtests) passed; no regulated value or consumer activation,
   `BillingPolicy` switch, autonomous filing, BusinessParty governance or P1-S16
   work is included.
+- **Accounting-policy foundation supplement (2026-10-01):** migrations
+  `organizations.0056`/`0057` and `accounting.0010` narrow
+  `accounting-money-precision` and
+  `accounting-rounding` to a closed code-owned catalogue. Their versions accept
+  only an approved policy-specific schema, and accounting submission validates the
+  exact code and consumer contract before preserving both applied version links on
+  the journal. Published versions and their append-only source links are immutable;
+  retirement/supersession cannot reinterpret historical journals. Platform Admin
+  may initialize the two definitions, while Tenant Admin may select/apply an
+  already-valid published version under existing permissions; neither UI exposes
+  arbitrary policy JSON, publication nor activation while the Product Owner has
+  supplied no financial values. Consequently every accounting post remains
+  fail-closed. Source provenance is required only for external-authority claims;
+  every lifecycle action retains actor, reason, time and before/after evidence.
+  **Activation execution (2026-09-30):** Product Owner then selected Product-defined
+  IRR money scale `0`, intermediate calculation scale `6`, `ROUND_HALF_UP` and
+  final-monetary-line-only rounding/tie behavior. Both v1 policy versions were
+  published with audited Product Owner rationale and effective date `2026-12-22`,
+  derived as the next open-period start for `demo-construction-01`; no external
+  authority is claimed. Future Tenant selection is unsupported, so neither policy
+  is selected/applied before that date and posting remains fail-closed. The exact
+  closed values, deterministic boundary utility, manual/opening final-line
+  validation and historical version-pin checks are implemented without FX, tax,
+  valuation or an operational producer. تصمیم‌ها و TINF-01 در
+  [بسته تصمیم فعال‌سازی سیاست‌های حسابداری](docs/architecture/P2_ACCOUNTING_POLICY_ACTIVATION_DECISION_PACKET.md)
+  ثبت شده‌اند.
 - **P1-S16 execution contract (2026-09-29):** the Product Owner authorized the
   smallest coherent generic `BusinessParty` foundation. The slice owns
   Tenant-local canonical identity and normalized duplicate candidates without
@@ -695,8 +721,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P1.4 Material catalogue and UOM governance
 
-- **Status / priority:** **P1-S23 through P1-S27 COMPLETE; P1-S28 Product Owner
-  acceptance pending / SHOULD before advanced estimating, sourcing, and valuation**
+- **Status / priority:** **P1-S23 through P1-S28 COMPLETE / ACCEPTED / SHOULD
+  before advanced estimating, sourcing, and valuation**
 - **Historical entry-gate result (2026-09-30):** the Product Owner selected D23-01=A,
   D23-02=A, D24-01=A, D24-02=A, D25-01=A and D26-01=A. Material/UOM product-policy
   and execution-contract gates are satisfied. No P1.4 implementation started in
@@ -744,8 +770,12 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **P1-S27 integrated acceptance (2026-09-30):** 26 targeted document/material
   regression tests passed for Tenant isolation, permission boundaries, immutable
   lineage, deterministic conversions and document availability/access behavior.
-  No non-deferrable failure was found. P1-S28 is now awaiting the Product Owner's
-  explicit accept-or-return disposition; P2 is not yet authorized.
+  No non-deferrable failure was found.
+- **P1-S28 Product Owner acceptance (2026-09-30):** the Product Owner reported that
+  P0/P1 went well, accepted the completed P1 result and requested that P2 start.
+  P1 is therefore **ACCEPTED** against the bounded S19-S27 evidence and its explicit
+  deferrals. This is not P10 production certification and does not fabricate
+  still-open P0.2/P0.3 operating parameters. The conditional P2 handoff is active.
 - **Outcome:** governed canonical tenant material codes and aliases; UOM families
   and explicit conversions; category-specific technical/dynamic attributes;
   brand/model/manufacturer/country; substitutes/equivalents; effective price
@@ -771,7 +801,148 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P2.1 Ledger, fiscal periods, and posting registry
 
-- **Status / priority:** **PLANNED / MUST before native financial go-live**
+- **Status / priority:** **P2-S01–S38 COMPLETE; P2 SESSION PACKAGE CLOSED;
+  P3 ENTRY REMAINS PRODUCT-OWNER GATED /
+  MUST before native financial go-live**
+- **P2-S01 entry result (2026-09-30):** P1-S28 acceptance and the Product Owner's
+  request to start P2 authorize the bounded policy/ADR entry session. The
+  [P2-S01–S04 decision packet](docs/architecture/P2_S01_S04_ACCOUNTING_DECISION_PACKET.md)
+  preserves P0-D02 and P1-S14 decisions and presents the minimum executable choices
+  for native-book scope, COA/dimensions, fiscal periods, precision activation,
+  opening balances, close/reopen, sign-off and the first producer. No ledger code,
+  schema, permission or statutory value is authorized until those choices are
+  explicit and S02-S04 validate the resulting implementation contract.
+- **P2-S02–S04 decision/contract closeout (2026-09-30):** the Product Owner selected
+  D2-01 through D2-08 = A and supplied the binding authority, dimension,
+  history, fail-closed policy, opening-provenance, Protected Operation,
+  permission-based SoD and synchronous/manual-source clarifications recorded in
+  the packet. S02-S04 found no conflict with S04 target architecture or the P1
+  foundations. The first expand-only foundation slice adds Tenant-scoped Account,
+  FiscalYear/Period and manual/opening JournalEntry/Line authority, accounting
+  permissions/protected classifications, version pinning, balance/period checks,
+  independent posting and audited period close/reopen.
+- **P2-S05–S12 implementation closeout (2026-09-30):** the ledger/schema and
+  opening-data group is complete. It strengthens leaf-account and non-overlapping
+  fiscal controls, keeps organization-scoped numbering transactional, freezes
+  posted account/dimension snapshots, and adds code-owned manual/opening/reversal/
+  replacement contracts with durable source/version/event identity, canonical
+  payload hashes, duplicate conflict handling and concurrent idempotent posting.
+  Reversal and replacement are linked immutable journals. Opening imports retain
+  cutoff, source evidence and reconciliation, require independent protected
+  acceptance, and create one balanced opening journal without fabricated history.
+  The approved continuation pulled this bounded registry/reversal kernel forward
+  from the earlier S13–S22 plan; operational producers and their adapters remain
+  unimplemented. Precision/rounding values remain unset and correctly block
+  submission without blocking development. Targeted PostgreSQL tests and a fresh
+  migration run pass.
+- **P2-S13 lineage/reconciliation foundation (2026-09-30):** the S13–S22
+  contract was recalibrated to the accepted D2-08=A boundary. The closed
+  code-owned registry now declares Accounting ownership and exact source/source-
+  line models, journal lines retain immutable source-line UUIDs (including exact
+  opening-import and reversal lineage), and a synchronous Tenant-scoped read-only
+  preflight reports manual/opening/correction counts, totals, pending facts and
+  explicit lineage exceptions through a cutoff. This is not a retained or signed
+  reconciliation run. No operational producer is registered; durable runs,
+  exception resolution and protected independent sign-off remain S14–S19 work.
+- **P2-S14–S15 retained reconciliation evidence (2026-09-30):** Accounting now
+  retains immutable Tenant-scoped manual/opening/correction runs with a versioned
+  scope, cutoff, deterministic scope/input/result SHA-256 evidence, counts/totals,
+  creator membership and immutable exception snapshots. Identical input retries
+  return the same run and one audit event; a dedicated run permission is enforced.
+  Five targeted PostgreSQL tests passed at that checkpoint. Expanded tie-outs were
+  then closed by S16–S17 below; exception disposition, protected independent
+  review/sign-off and operational producers remain separately gated.
+- **P2-S16–S17 retained tie-out closeout (2026-09-30):** retained runs now include
+  immutable per-source manual, opening and correction tie-out snapshots. Each
+  snapshot pins source version, source/journal line counts and debit/credit totals,
+  exact line UUID/account/amount evidence, dimension IDs and posted snapshots, plus
+  explicit count, amount, version, line, dimension and correction-chain results.
+  Accepted opening imports reconcile to their exact posted lines; reversals require
+  inverted amounts with the same source lines/dimensions; replacements retain the
+  linked prior version while allowing corrected line/amount shape. The run scope is
+  version 2 and its result hash covers the ordered tie-outs. Eight targeted
+  PostgreSQL reconciliation tests pass. That slice added no exception disposition,
+  protected sign-off or operational producer.
+- **P2-S18 controlled exception disposition (2026-09-30):** each retained
+  exception can now receive exactly one immutable Tenant-scoped disposition from
+  the bounded correction-required, explained-variance or not-applicable catalogue.
+  A dedicated permission, mandatory reason, optional evidence reference,
+  membership actor and append-only audit event are retained. Identical retries
+  return the same disposition; conflicting rewrites, deletion, unauthorized and
+  cross-Tenant action fail closed. Disposition never changes the run, exception,
+  tie-out or journal balance. Ten focused PostgreSQL reconciliation tests pass.
+  At that checkpoint protected independent review/sign-off remained P2-S19 and no
+  operational producer was added.
+- **P2-S19 protected reconciliation sign-off (2026-09-30):** a retained run can
+  now receive one immutable independent review through a dedicated permission,
+  mandatory reason and append-only audit event. The reviewer must differ from the
+  run creator and every disposer on that run; all exceptions must be dispositioned
+  first. Sign-off pins the scope, input, result, disposition and combined evidence
+  hashes after verifying the retained snapshots and creation audit. It does not
+  edit dispositions, evidence, journals or balances.
+- **P2-S20–S21 focused acceptance (2026-09-30):** twelve targeted PostgreSQL
+  tests pass for Tenant and permission boundaries, sign-off SoD, exact-retry and
+  concurrent run/sign-off idempotency, cutoff stability, retained-evidence tamper
+  detection, immutable controls and missing-policy fail-closed behavior.
+- **P2-S22 closeout and producer handoff (2026-09-30):** the bounded
+  manual/opening/correction reconciliation contract is closed and authoritative
+  documents are reconciled. An operational producer remains a separate Product
+  Owner approval: it must name the producer and owner and approve finalized-source
+  eligibility, source/version/line identity, recognition and mapping policy,
+  precision, idempotency/atomicity, correction/reversal/close, cutoff/opening,
+  Tenant/authorization, exception/reconciliation and rollout/rollback contracts.
+  No producer, adapter, Treasury/AP/AR behavior or asynchronous path was selected,
+  registered or implemented.
+- **P2-S23–S27 Accounting Admin/UI closeout (2026-09-30):** Persian-first RTL
+  tenant routes now expose existing service-backed accounts, fiscal controls,
+  manual/opening journals, immutable posted/reversal/replacement history, retained
+  reconciliation/tie-out/disposition/sign-off evidence and source-to-journal
+  drill-through. Django Admin is tenant-filtered inspection only, so it cannot
+  bypass audited services or mutate finalized evidence. No producer, Treasury/AP/AR,
+  statement, trial-balance, background-job or dependency scope was added.
+- **P2-S28–S34 statements and close-control closeout (2026-09-30):** Accounting
+  now derives trial balance, account turnover/general-ledger drill-through,
+  balance sheet and profit/loss read models only from posted immutable journal
+  lines and retained account/dimension snapshots. Permission-controlled retained
+  statement runs pin scope/input/result hashes and exact source-line evidence.
+  Period close now rejects draft/proposed journals and pending opening imports,
+  requires a cutoff-matched independently signed reconciliation, retains the three
+  close statements and an append-only hash-pinned close event; reopen retains a
+  separate linked event and enforces independence from the close approver.
+  Authorized late corrections may be prepared only as linked manual journals in
+  an explicitly configured open adjustment period, retaining reason, evidence and
+  reconciliation references without changing the closed source journal. Persian
+  RTL reporting/adjustment UI and read-only Admin inspection use the same services.
+  No producer, Treasury/AP/AR, export, background job, dependency or later scope
+  was added at that checkpoint. Seven focused PostgreSQL tests pass for reporting accuracy, Tenant/
+  permission boundaries, cutoff/immutability, close/reopen SoD and controlled-
+  adjustment lineage; the recovered S23–S27 UI slice also passes three tests.
+- **P2-S35–S37 financial hardening and integrated acceptance (2026-09-30):**
+  Accounting financial mutations now acquire one Tenant accounting coordination
+  lock before narrower rows, so posting/number allocation, statement retention,
+  reconciliation/sign-off, close/reopen and linked correction paths serialize
+  consistently without duplicate journals, numbers, runs, events, reversals or
+  adjustments. Close re-verifies the signed cutoff against current posted facts;
+  stale reconciliation cannot race a posting into a close. Exact close/reopen and
+  retained-statement retries are idempotent, while conflicting state fails closed.
+  Retained statement rows and signed reconciliation/audit hashes are re-verified
+  before reuse. Forty-seven focused PostgreSQL Accounting tests pass, including eight
+  S35–S37 tests and an Accounting `0009` rollback/reapply rehearsal. No schema
+  change, producer, Treasury/AP/AR, cash/bank reconciliation, payroll, export,
+  background job, dependency or P2-S38 scope was added.
+- **P2-S38 documentation closeout and P3 handoff (2026-09-30):** the completed
+  P2 session package is reconciled across this roadmap, the execution playbook,
+  Accounting ADR and readiness audit. The
+  [P2-S38 P3 handoff packet](docs/architecture/P2_S38_P3_HANDOFF_PACKET.md)
+  records the sole-GL-authority boundary, retained-evidence invariants, verified
+  PostgreSQL/migration evidence, non-goals and named P3 entry gates. It does not
+  authorize P3, a producer, Treasury/AP/AR, exports or any operational posting.
+- **Post-close accounting-policy UI/RBAC correction (2026-10-01):** Tenant policy
+  selection now presents only published, schema-valid versions effective on the
+  current date; future versions remain read-only. The unused
+  `tenant_policies.approve` catalog entry is deprecated/inactive, with no added
+  approval path; Tenant Admin continues to select and apply through
+  `tenant_policies.apply`.
 - **Outcome:** chart of accounts and dimensions; fiscal year/period; balanced
   immutable journal entries/lines; proposed vs posted state; numbering;
   close/reopen; reversal/replacement; source version and idempotency; opening
@@ -779,8 +950,9 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **Prerequisites:** P0.1, P1.1, P1.2; product-owner decision on native books.
 - **Ownership:** operational domains own source documents; Accounting alone owns
   journals. No posting from signals and no editable posted entries.
-- **Integration:** initially controlled manual/opening journals and one pilot
-  domain; add each producer only with its reconciliation contract.
+- **Integration:** P2.1 currently permits controlled manual/opening journals only;
+  add a pilot producer later only with separate approval and its reconciliation
+  contract.
 - **Compliance:** professional review of Iranian accounting/tax book requirements;
   rule versions and fiscal locks.
 - **UI/security:** Persian journal entry/review, balanced totals, dimension
@@ -793,7 +965,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P2.2 Accounting statements and close controls
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **PARTIAL — P2-S28–S38 REPORTING/CLOSE CORE AND SESSION
+  CLOSEOUT COMPLETE; controlled export remains separately planned/unapproved**
 - **Outcome:** trial balance, general ledger, account turnover, balance sheet,
   profit/loss and controlled exports with drill-through and close checklist.
 - **Prerequisites:** P2.1 stable postings and reconciled opening balances.
@@ -806,20 +979,35 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P3.1 Treasury and bank reconciliation
 
-- **Status / priority:** **PLANNED / MUST for native cash control**
+- **Status / priority:** **P3-S01–S04 DECISION/DESIGN TRANCHE COMPLETE;
+  P3-S05 IMPLEMENTATION NOT AUTHORIZED / MUST for native cash control**
+- **P3-S01–S04 decision closeout (2026-10-01):** the
+  [Treasury/subledger and legacy Payment decision packet](docs/architecture/P3_S01_S04_TREASURY_SUBLEDGER_DECISION_PACKET.md)
+  reconciles current Payment/allocation/claim-settlement evidence with the P2
+  handoff and records D3-01 through D3-08 = A, D3-09 = A-Revised, and D3-10
+  through D3-12 = A. The accepted ownership, account/movement/instrument, Accounting
+  producer, permission/SoD, party-bank-profile, cheque, statement-import and
+  migration/rollback contracts preserve platform-policy-controlled Self-Approval:
+  Protected Operations never allow it, while other Treasury business operations
+  follow explicit versioned scope-bound platform/Tenant policy and fail closed
+  when required configuration is missing. No model, migration, permission,
+  producer, backfill, UI, bank integration or P3-S05 implementation is authorized.
 - **Outcome:** bank/cash accounts including petty cash; payment requests,
   scheduling and proposals; receipts, payments and bank transfers; employee/vendor
   advances and advance settlement; cheque lifecycle, clearing, statement import,
   match suggestions, reconciliation, cash position and cash-flow forecast.
-- **Prerequisites:** P2.1; party bank profiles; object scope; async decision for
-  statement/import jobs.
+- **Prerequisites:** P2.1; implement the accepted Party-owned bank-profile and
+  Treasury object-scope boundaries; D3-11 selects bounded synchronous statement
+  import initially, while exact provider/file sources and limits remain open.
 - **Migration:** contain/rename current `Payment`; map it only with explicit
   semantics. `PaymentAllocation` is not a journal line.
 - **Integration:** AP/AR, claims, payroll, guarantees and Accounting postings.
 - **Boundary:** Treasury owns cash movement and instruments; AP/AR owns
   obligations/open items; Accounting owns journals. Petty cash, advances,
   allocations and bank matches must not become competing ledgers.
-- **UI/security:** sensitive account masking, maker-checker, batch approval,
+- **UI/security:** sensitive account masking; platform-policy-controlled
+  Self-Approval with no Self-Approval for Protected Operations and an independent
+  checker when disabled or when an additional threshold applies; batch approval,
   unmatched exception queue, bank evidence and reversal.
 - **Testing:** duplicate import/idempotency, cheque/clearing states, match
   confidence, allocation caps, reconciliation and tenant isolation.

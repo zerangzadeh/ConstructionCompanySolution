@@ -5,8 +5,15 @@
 **Product stage:** pre-production; no real tenant, payroll, accounting, or contractual history is assumed
 
 **Authority:** code, migrations, and tests describe current implementation; this document describes findings and target direction
-**Implementation authorization:** P1.1 project/site authorization is closed under
-its bounded authorization. Every other target capability still requires its own approved delivery slice.
+**Implementation authorization:** P1 is accepted under its bounded delivery
+authorizations. D2-01 through D2-08=A and P2-S02–S04 are closed; the first bounded
+P2-S05–S38 accounting-kernel/lineage, retained-run, detailed tie-out, controlled
+exception-disposition, protected independent sign-off, posted-line statements,
+close/reopen evidence, controlled-adjustment and PostgreSQL concurrency/migration
+acceptance plus P3 handoff documentation are complete. Remaining producer integration,
+controlled exports, operational producers and broader reconciliation work retain
+their roadmap gates. Every other
+target capability still requires its own approved delivery slice.
 
 ## 1. Executive summary
 
@@ -58,7 +65,7 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 | HSE and Quality | **PARTIALLY IMPLEMENTED** | Safety incidents and quality issues have controlled lifecycles, assignments, workflow adoption, and audit. Inspections, risk registers, permits, toolbox talks, test/inspection plans, formal CAPA, knowledge extraction, and generalized document links are absent. |
 | Documents | **PARTIALLY IMPLEMENTED** | Private versioned documents, immutable versions, explicit links to six domains, validation, secure download, and audit exist. The wide link table will not scale across all target domains; classification, OCR, signatures, retention, legal holds, antivirus scanning, object storage, and export are absent. |
 | Expenses and payments | **IMPLEMENTED / ARCHITECTURALLY INADEQUATE FOR TARGET** | Immutable/voidable expenses, posted receipt/disbursement `Payment`, allocations, and read models exist. These are useful operational records but are not AP/AR, Treasury, bank/cheque management, or double-entry Accounting. |
-| Accounting, Treasury, Payroll, Fixed assets | **MISSING** | No ledger accounts, journals, fiscal periods, subledgers, bank/cash/cheques, reconciliation, payroll, insurance list, depreciation, or asset register exists. |
+| Accounting, Treasury, Payroll, Fixed assets | **PARTIAL ACCOUNTING KERNEL / OTHERS MISSING** | Tenant-scoped accounts/fiscal periods, controlled manual/opening posting, immutable reversal/replacement and controlled-adjustment lineage, posted snapshots, opening import, retained reconciliation/tie-outs/dispositions/sign-off, posted-line-only retained trial balance/balance sheet/profit-loss, append-only close/reopen evidence, tenant-filtered read-only Admin and Persian RTL service-backed UI now exist. Operational producers, controlled exports, Treasury, subledgers, payroll, insurance, depreciation and fixed assets remain missing. |
 | Audit and observability | **PARTIALLY IMPLEMENTED** | Append-only `AuditEvent` exists with sensitive-key filtering. Correlation/request IDs, structured change sets, security monitoring, metrics, tracing, error tracking, and operational alerting are absent. |
 | Reporting/BI | **PARTIALLY IMPLEMENTED** | Financial read models aggregate approved estimates, recorded expenses, and posted payments. There is no governed semantic metric catalogue, warehouse, scheduled reporting, drill-through contract, or reconciliation control. |
 | Support and AI | **MISSING** | No support-ticket, tenant support-access grant, knowledge base, AI support assistant, extraction review, model governance, or AI audit trail exists. |

@@ -283,3 +283,100 @@ accepts this ADR as target architecture only:
 This disposition approves no Chart of Accounts, statutory rate, recognition rule,
 filing, implementation, pilot, migration or release. The pending evidence remains
 a blocking gate for P1-S14 implementation and every affected financial use.
+
+## 10. P2-S05–S38 implementation conformance and handoff note (2026-09-30)
+
+The approved P2 decision bundle has now implemented the bounded manual/opening
+kernel described by this ADR. Accounting owns Tenant-scoped accounts, fiscal
+periods, transactional journal numbering and immutable balanced journals. Posted
+lines retain account and independent Project/Site/WBS/BusinessParty snapshots.
+The code-owned registry accepts only manual, opening, reversal and replacement
+contracts; journals pin source UUID/version, event/occurrence identity, canonical
+payload hash and posting-rule version under database uniqueness.
+
+Posted corrections use one linked reversal and, when required, a linked
+replacement. Reviewable opening imports retain cutoff, source evidence and
+reconciliation references and produce one opening journal without historical
+replay. Protected posting, reversal, opening acceptance and period controls retain
+permission, reason, audit and independent membership evidence. PostgreSQL
+constraints and tests cover fiscal overlap, duplicate/concurrent posting, closed
+periods, Tenant/permission separation and opening/reversal behavior.
+
+This note records implementation conformance only. It does not approve an
+operational producer, Treasury/AP/AR, FX, tax, filing, valuation, background jobs
+or any currently unset precision/rounding value; all continue to fail closed or
+remain outside this package.
+
+P2-S13 closes the source-line identity gap inside the accepted boundary. The
+registry describes the Accounting owner and constrained source/source-line models,
+and journal lines pin a durable UUID back to the manual line itself, the exact
+opening-import line or the reversed journal line as applicable. The new
+Tenant-scoped synchronous preflight compares accepted opening facts to the posted
+journal at line and dimension level, reports pending sources and named exceptions,
+and totals only posted journals through the requested cutoff. It is a read-only
+diagnostic, not retained reconciliation evidence or approval. No operational
+source adapter or producer contract was added.
+
+P2-S14–S15 retain each manual/opening/correction result as an immutable
+Tenant-scoped run with a versioned scope and cutoff, deterministic scope/input/
+result hashes, exact counts/totals, creator membership and ordered immutable
+exception snapshots. Identical input retries return the existing run and do not
+duplicate its audit event. At that checkpoint this evidence was not an exception
+disposition, review or protected sign-off; those controls were gated to P2-S18–S19.
+
+P2-S16–S17 make the retained result inspectable at the source boundary. Scope
+version 2 stores ordered immutable tie-out snapshots for every bounded manual,
+opening and correction fact. The snapshots retain source/journal line counts,
+debit and credit totals, source version, exact line/account/amount evidence,
+dimension identifiers and posted dimension snapshots. Accepted opening imports
+must match their exact posted lines; reversal chains must invert the linked source
+amounts while preserving line and dimension lineage; replacement chains pin the
+linked source and next version while permitting corrected line and amount shape.
+The run result hash covers this evidence. Pending opening inputs remain explicit
+pending facts rather than fabricated failures. That S16–S17 slice introduced no
+exception disposition, review, sign-off or producer behavior.
+
+P2-S18 adds one append-only disposition per retained exception. The bounded
+catalogue distinguishes correction required, explained variance and not applicable;
+each action requires a dedicated Tenant permission, non-empty reason, actor
+membership and audit event, with an optional evidence reference. Exact retries are
+idempotent and conflicting second dispositions fail closed. The disposition is a
+classification record only: it cannot rewrite the immutable run, exception,
+tie-out, journal or balance and it is not approval or sign-off. Protected
+independent review and separation of duties remain P2-S19.
+
+P2-S19 adds one protected independent review per retained run. The sign-off service
+requires its own permission and non-empty reason, locks and re-reads the run, verifies
+the scope/result hashes, ordered exception/tie-out evidence and original creation
+audit, requires every exception to have an immutable disposition, and pins the run,
+disposition and combined evidence hashes. The signer cannot be the run creator or
+any disposer for that run. Exact retries return the same review; conflicts and
+tampering fail closed. P2-S20–S21 verify these rules, Tenant isolation, cutoff
+stability and concurrent idempotency on PostgreSQL. Sign-off never edits a
+disposition, retained snapshot, journal or balance. P2-S22 selects no operational
+producer; that requires a separate complete producer contract and Product Owner
+approval.
+
+P2-S28–S34 add no producer. Trial balance, balance sheet, profit/loss and account
+ledger drill-through are derived solely from posted immutable journal lines and
+their retained account/dimension snapshots. Retained statement runs pin scope,
+input, result and exact source-line evidence and are append-only. Period close
+requires no draft/proposed journals or pending opening imports, a cutoff-matched
+independently signed reconciliation, and retained trial-balance/balance-sheet/
+profit-loss evidence; close and reopen create separate immutable hash-pinned events,
+and the reopen actor/requester remain independent from the close approver. A late
+controlled adjustment is a new manual journal linked to the posted source journal,
+requires reason and evidence references, and is permitted only in an explicit open
+adjustment period. It never mutates closed journals, lines, reconciliation evidence,
+statements or prior close history.
+
+P2-S35–S37 serialize every affected financial mutation on the Tenant row before
+narrower Accounting locks. This gives posting and journal-number allocation,
+retained statements, reconciliation/disposition/sign-off, period controls and
+correction paths one deterministic contention boundary. Close re-verifies the
+signed reconciliation against current cutoff evidence while holding that boundary,
+then validates retained statement headers and exact line snapshots before reuse.
+Exact retries return the existing posting, statement, close/reopen event, reversal
+or controlled adjustment; conflicting requests fail closed. Focused PostgreSQL
+regression covers the contention and stale-cutoff cases, and migration `0009` has
+been rehearsed backward to `0008` and forward again without adding schema.

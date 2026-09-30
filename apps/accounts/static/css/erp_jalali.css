@@ -129,3 +129,13 @@
 .datetimeshortcuts {
     display: none !important;
 }
+
+/* Keep each accounting tree toggle scoped to its own details element. */
+.account-tree-node > summary::-webkit-details-marker {
+    display: none;
+}
+
+.account-tree-node > summary {
+    list-style: none;
+}
+

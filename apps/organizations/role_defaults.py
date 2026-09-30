@@ -6,6 +6,26 @@ from apps.organizations.permission_catalog import (
 from apps.organizations.permission_registry import registered_permission_codes
 
 ALL_PERMISSIONS = registered_permission_codes()
+DEPRECATED_PERMISSION_CODES = permission_codes(
+    BusinessPermissionCode.TENANT_POLICIES_APPROVE,
+)
+ACTIVE_DEFAULT_PERMISSIONS = ALL_PERMISSIONS - DEPRECATED_PERMISSION_CODES
+ACCOUNTING_RESTRICTED_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
+    BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,
+    BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE,
+    BusinessPermissionCode.ACCOUNTING_JOURNALS_SUBMIT,
+    BusinessPermissionCode.ACCOUNTING_JOURNALS_APPROVE,
+    BusinessPermissionCode.ACCOUNTING_JOURNALS_POST,
+    BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_RUN,
+    BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_DISPOSE,
+    BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_SIGN_OFF,
+    BusinessPermissionCode.ACCOUNTING_REPORTS_VIEW,
+    BusinessPermissionCode.ACCOUNTING_STATEMENTS_RUN,
+    BusinessPermissionCode.ACCOUNTING_ADJUSTMENTS_PREPARE,
+    BusinessPermissionCode.ACCOUNTING_PERIODS_CLOSE,
+    BusinessPermissionCode.ACCOUNTING_PERIODS_REOPEN,
+)
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
     BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
@@ -21,7 +41,6 @@ OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.AUTHORIZATION_GRANTS_CREATE,
     BusinessPermissionCode.AUTHORIZATION_GRANTS_REVOKE,
     BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER,
-    BusinessPermissionCode.TENANT_POLICIES_APPROVE,
     BusinessPermissionCode.PARTIES_MERGE,
     BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE,
     BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
@@ -39,6 +58,7 @@ OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.MATERIAL_ATTRIBUTE_DEFINITIONS_MANAGE,
     BusinessPermissionCode.MATERIAL_ATTRIBUTES_IMPORT,
     BusinessPermissionCode.MATERIAL_TECHNICAL_APPROVE,
+    BusinessPermissionCode.ACCOUNTING_PERIODS_REOPEN,
 )
 MANAGER_EXPLICIT_PERMISSIONS = permission_codes(
     BusinessPermissionCode.WORKFLOWS_VIEW,
@@ -73,32 +93,35 @@ MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.WORK_ITEMS_CLAIM,
     BusinessPermissionCode.WORK_ITEMS_ACT,
 )
-OPERATIONS_MANAGER_EXCLUSIONS = permission_codes(
-    BusinessPermissionCode.MEMBERSHIP_VIEW,
-    BusinessPermissionCode.MEMBERSHIP_CHANGE_ROLE,
-    BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS,
-    BusinessPermissionCode.COMPANY_SETTINGS_VIEW,
-    BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
-    BusinessPermissionCode.TENANT_POLICIES_APPLY,
-    BusinessPermissionCode.ESTIMATES_APPROVE,
-    BusinessPermissionCode.BASELINES_APPROVE,
-    BusinessPermissionCode.PROGRESS_VERIFY,
-    BusinessPermissionCode.CLAIMS_REVISE,
-    BusinessPermissionCode.CLAIMS_APPROVE,
+OPERATIONS_MANAGER_EXCLUSIONS = (
+    permission_codes(
+        BusinessPermissionCode.MEMBERSHIP_VIEW,
+        BusinessPermissionCode.MEMBERSHIP_CHANGE_ROLE,
+        BusinessPermissionCode.MEMBERSHIP_CHANGE_STATUS,
+        BusinessPermissionCode.COMPANY_SETTINGS_VIEW,
+        BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
+        BusinessPermissionCode.TENANT_POLICIES_APPLY,
+        BusinessPermissionCode.ESTIMATES_APPROVE,
+        BusinessPermissionCode.BASELINES_APPROVE,
+        BusinessPermissionCode.PROGRESS_VERIFY,
+        BusinessPermissionCode.CLAIMS_REVISE,
+        BusinessPermissionCode.CLAIMS_APPROVE,
+    )
+    | ACCOUNTING_RESTRICTED_PERMISSIONS
 )
 
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
-    MembershipRole.TENANT_OWNER: ALL_PERMISSIONS,
-    MembershipRole.TENANT_ADMIN: ALL_PERMISSIONS
+    MembershipRole.TENANT_OWNER: ACTIVE_DEFAULT_PERMISSIONS,
+    MembershipRole.TENANT_ADMIN: ACTIVE_DEFAULT_PERMISSIONS
     - {
         str(BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER),
-        str(BusinessPermissionCode.TENANT_POLICIES_APPROVE),
         str(BusinessPermissionCode.DOCUMENT_RETENTION_APPROVE),
     },
     MembershipRole.TENANT_MANAGER: (
         ALL_PERMISSIONS
         - OWNER_ONLY_PERMISSIONS
+        - ACCOUNTING_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -113,6 +136,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     MembershipRole.PROJECT_MANAGER: (
         ALL_PERMISSIONS
         - OWNER_ONLY_PERMISSIONS
+        - ACCOUNTING_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -125,6 +149,19 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     ),
     MembershipRole.ACCOUNTANT: READ_ONLY_PERMISSIONS
     | permission_codes(
+        BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
+        BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,
+        BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE,
+        BusinessPermissionCode.ACCOUNTING_JOURNALS_SUBMIT,
+        BusinessPermissionCode.ACCOUNTING_JOURNALS_APPROVE,
+        BusinessPermissionCode.ACCOUNTING_JOURNALS_POST,
+        BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_RUN,
+        BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_DISPOSE,
+        BusinessPermissionCode.ACCOUNTING_RECONCILIATIONS_SIGN_OFF,
+        BusinessPermissionCode.ACCOUNTING_REPORTS_VIEW,
+        BusinessPermissionCode.ACCOUNTING_STATEMENTS_RUN,
+        BusinessPermissionCode.ACCOUNTING_ADJUSTMENTS_PREPARE,
+        BusinessPermissionCode.ACCOUNTING_PERIODS_CLOSE,
         BusinessPermissionCode.EXPENSES_CREATE,
         BusinessPermissionCode.EXPENSES_VOID,
         BusinessPermissionCode.PAYMENTS_CREATE,

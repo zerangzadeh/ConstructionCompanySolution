@@ -235,11 +235,11 @@ identifiers only after its applicable gates and package authority are explicit.
 
 ## 7. P1 session map — 28 sessions
 
-**Current status (2026-09-30): P1.1 and P1-S14 through P1-S27 are complete under
-their bounded authorizations.** `P1-E0` and `P1-S01` through `P1-S27` are complete.
-The Product Owner recorded every P1-S23–S28 product-policy choice on 2026-09-30;
-S26 implementation and S27 integrated evidence are complete. P1-S28 awaits the
-Product Owner's explicit accept-or-return disposition.
+**Current status (2026-09-30): P1 is accepted under its bounded authorizations.**
+`P1-E0` and `P1-S01` through `P1-S27` are complete. On 2026-09-30 the Product Owner
+reported that P0/P1 went well, accepted the completed P1 evidence and requested
+that P2 start. This closes P1-S28 and activates the conditional P2 handoff without
+claiming P10 production certification or resolving unrelated P0.2/P0.3 parameters.
 
 | Order / provisional sessions | Count | Model | Outcome and direct entry dependency |
 | --- | ---: | --- | --- |
@@ -260,7 +260,7 @@ Product Owner's explicit accept-or-return disposition.
 | P1-S25 | complete | `A-H` | Delivered closed declarative attribute types/operators, versioned values, reviewable idempotent imports, bounded search and sourced price observations without a ledger or quote behavior. |
 | P1-S26 | complete | `A-H` | Delivered immutable Tenant-local equivalent/substitute records, version-pinned technical-document links and separated technical evidence/revision transitions; existing material history is explicitly `legacy_unreviewed`, never fabricated as approved. |
 | P1-S27 | complete | `A-X` | 26 targeted document/material tests passed the required Tenant, permission, history, deterministic-conversion and document-security evidence; no non-deferrable failure was found. |
-| P1-S28 | Product Owner acceptance pending | `L-M` | D28-01=A remains the closeout rule. P1 acceptance and the conditional P2 handoff still require an explicit Product Owner accept-or-return disposition. |
+| P1-S28 | complete / accepted | `L-M` | Product Owner accepted the successful P1 result on 2026-09-30. Explicit deferrals remain owned by their later packages; the conditional P2 handoff is active. |
 
 The authoritative authorization vocabulary is: independent platform roles
 **Superuser** and **Platform Admin**; independent membership-scoped Tenant roles
@@ -604,7 +604,7 @@ autonomous-continuation instruction.
 | P1-S25 | **COMPLETE** | Closed declarative attributes, immutable definition/value history, idempotent row-import evidence and non-ledger sourced observations are implemented and targeted tests pass. |
 | P1-S26 | **COMPLETE** | D26-01=A is implemented through immutable Tenant-local material relationships, version-pinned technical documents, separated decision evidence and `legacy_unreviewed` migration history. |
 | P1-S27 | **COMPLETE** | The required targeted document/material suite passed 26 tests. Tenant isolation, permissions, history, deterministic conversions and document-security behavior found no non-deferrable failure. |
-| P1-S28 | **PRODUCT OWNER ACCEPTANCE PENDING** | D28-01=A defines the rule but does not substitute for the explicit accept-or-return disposition. P2 remains blocked until that record exists. |
+| P1-S28 | **COMPLETE / ACCEPTED** | The Product Owner accepted the completed P1 evidence on 2026-09-30 and requested P2 start. This closes the P1 gate without production certification. |
 
 No independently releaseable remainder was found. Document numbering and
 classification are coupled in the roadmap acceptance outcome to confidentiality,
@@ -640,25 +640,101 @@ their affected sensitive-policy activation unset and fail closed.
 
 ## 8. P2 session map — 38 sessions
 
+**Current status (2026-09-30): P2-S01 through P2-S38 are complete; the bounded
+ledger/schema, opening-data, source-line lineage, retained-run foundation and
+manual/opening/correction tie-outs plus controlled exception disposition are
+implemented.** The
+[P2-S01–S04 accounting decision packet](architecture/P2_S01_S04_ACCOUNTING_DECISION_PACKET.md)
+records D2-01 through D2-08 = A and the Product Owner's binding clarifications.
+S02-S04 validated the COA/dimension, fiscal, policy, opening, Protected Operation,
+SoD and synchronous-source contracts. The foundation adds the Accounting app,
+permissions/catalogue, Account/FiscalYear/FiscalPeriod/JournalEntry/JournalLine
+schema and bounded manual/opening services. S05-S12 add immutable correction,
+posted snapshots, code-owned posting identity/idempotency and reviewable opening
+imports without activating any unset accounting value or regulated behavior. S13
+adds registry ownership/source metadata, immutable source-line identifiers and a
+Tenant-scoped read-only lineage/reconciliation preflight. S14-S15 retain immutable,
+idempotent scope/cutoff/hash run evidence and exact exception snapshots for that
+same boundary. S16-S17 add immutable per-source count, amount, source-version,
+exact line/dimension and correction-chain tie-outs. S18 adds one immutable,
+permission-controlled reasoned disposition per retained exception without editing
+financial or reconciliation evidence. S19 adds immutable protected independent
+sign-off over verified retained evidence; S20-S21 close its focused PostgreSQL
+acceptance, S22 leaves the operational-producer approval contract separate, and
+S23-S27 add service-backed, tenant-scoped Accounting Admin/UI, fiscal-control
+interactions and source drill-through. S28-S34 add posted-line-only trial balance,
+balance sheet, profit/loss and account-ledger drill-through; immutable retained
+statement evidence; checklist-backed append-only close/reopen history; and linked
+manual adjustments confined to an explicit open adjustment period. S35-S37 add a
+Tenant accounting coordination lock, stale-cutoff and retained-evidence
+re-verification, idempotent close/reopen and correction contention handling, plus
+the focused PostgreSQL regression and `0009` rollback/reapply rehearsal. S38
+reconciles the authoritative documents and records the P3 entry handoff; it does
+not authorize a producer, Treasury/AP/AR, export, background job or P3 work.
+
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P2-S01..S04 | 4 | `A-X` | Accounting policies, COA/dimensions, period and posting ADR validation |
-| P2-S05..S12 | 8 | `A-H` | Ledger schema, constraints, migrations and opening-data strategy |
-| P2-S13..S22 | 10 | `A-H` | Posting registry, idempotency, balanced journals, reversal and source lineage |
-| P2-S23..S27 | 5 | `T-M` | Accounting Django Admin/UI, period controls and source drill-through |
-| P2-S28..S34 | 7 | `A-H` | Trial balance, statements, close/reopen and controlled adjustments |
-| P2-S35..S36 | 2 | `A-X` | Concurrency, closed-period, duplicate-posting and financial-invariant review |
-| P2-S37 | 1 | `A-H` | Integrated PostgreSQL regression and migration rehearsal |
-| P2-S38 | 1 | `L-M` | Documentation closeout and P3 handoff packet |
+| P2-S01..S04 | complete | `A-X` | D2-01..D2-08=A recorded; Accounting authority, independent dimensions, immutable fiscal history, fail-closed policies, opening provenance, Protected Operations, permission-based SoD and synchronous manual/opening boundary validated. |
+| P2-S05..S12 | complete | `A-H` | Ledger constraints/migrations, transactional numbering, posted snapshots, immutable reversal/replacement, bounded code registry/identity/idempotency and reviewable opening import delivered and tested. |
+| P2-S13 | complete | `A-H` | Pin Accounting-owned source/source-line metadata, retain exact journal-line lineage and deliver a synchronous read-only manual/opening/correction reconciliation preflight. No producer or protected sign-off. |
+| P2-S14..S15 | complete | `A-H` | Immutable, idempotent Tenant-scoped reconciliation-run scope/cutoff/hash evidence, dedicated run permission/audit and retained exception snapshots delivered for the manual/opening/correction boundary. No disposition or sign-off. |
+| P2-S16..S17 | complete | `A-H` | Immutable manual/opening/correction count, amount, source-version, exact line/dimension and correction-chain tie-out snapshots delivered; no disposition or sign-off. |
+| P2-S18 | complete | `A-H` | One immutable controlled exception disposition, dedicated permission, mandatory reason, optional evidence reference, audit and Tenant enforcement delivered. No balance/evidence edit or sign-off. |
+| P2-S19 | complete | `A-H` | Immutable protected independent sign-off with a dedicated permission, reason, audit evidence, creator/disposer separation and no financial/evidence edit. |
+| P2-S20..S21 | complete | `A-X` | Twelve focused PostgreSQL tests prove Tenant/authorization/SoD, idempotency/concurrency, cutoff stability, tamper detection and fail-closed behavior. |
+| P2-S22 | complete | `L-M` | Authoritative documents reconciled; the named operational-producer contract remains separately approval-gated and no producer was selected or registered. |
+| P2-S23..S27 | complete | `T-M` | Tenant-filtered read-only Accounting Django Admin; Persian RTL service-backed Accounting UI for accounts, fiscal controls, manual/opening journals, retained reconciliation/tie-outs/dispositions/sign-off and source-to-journal drill-through. Finalized history is not editable. |
+| P2-S28..S34 | complete | `A-H` | Posted-line-only trial balance/statements and exact drill-through; immutable retained runs; signed-reconciliation-backed append-only close/reopen evidence with SoD; linked manual controlled adjustments in explicit open adjustment periods. Seven focused PostgreSQL tests pass, and the recovered S23–S27 UI slice passes three tests. |
+| P2-S35..S36 | complete | `A-X` | Tenant accounting coordination lock, deterministic lock order, exact retry handling and current-cutoff/evidence re-verification close concurrency, duplicate posting/numbering, retained statement, close/reopen, reversal and controlled-adjustment gaps. |
+| P2-S37 | complete | `A-H` | Forty-seven focused PostgreSQL Accounting tests pass, including eight S35–S37 tests; Accounting migration `0009` rolls back to `0008` and reapplies cleanly. No migration was added. |
+| P2-S38 | complete | `L-M` | Authoritative closeout and [P3 handoff packet](architecture/P2_S38_P3_HANDOFF_PACKET.md) recorded; no P3 implementation, producer or new dependency authorized. |
 
-**Product Owner gates:** native accounting scope, COA policy, fiscal calendar,
-currency, opening balances, close authority, and accountant sign-off.
+**Remaining Product Owner gates:** do not start P3 or register any operational
+posting producer until its separately named owner,
+source/finalization, posting, correction, reconciliation, rollout and rollback
+contract is approved. Existing professional/statutory review and production gates
+remain open.
+
+### P2-S01 compact handoff
+
+**Outcome/acceptance:** P1-S28 is accepted and P2 entry is authorized. P2-S01
+reconciled the accepted P0-D02 native-authority direction, P1-S14 IRR/no-FX and
+calendar policy, S04 accounting/posting target architecture, current compatibility
+evidence and P2 gates into one decision packet. No unresolved choice was inferred.
+
+**Closeout update:** D2-01 through D2-08 = A were accepted on 2026-09-30 and
+S02-S04 validated the implementation contract. S05-S22 are complete: the bounded
+kernel now has forward migrations, immutable source/rule/dimension evidence,
+concurrent idempotent numbering/posting, linked reversal/replacement and controlled
+opening import acceptance, exact source-line identity, a read-only reconciliation
+preflight, immutable idempotent retained runs/exception snapshots and scope-v2
+per-source tie-out evidence, controlled exception disposition and protected
+independent sign-off over verified retained hashes/audit evidence. Focused
+PostgreSQL acceptance covers Tenant/authorization/SoD, concurrent idempotency,
+cutoff stability, tamper detection and missing-policy failure. An operational
+producer still requires separate Product Owner selection and a complete
+eligibility, identity/version/lineage, recognition/mapping/precision, idempotency,
+correction/close, reconciliation and rollout/rollback contract; no producer was
+selected or registered. Missing precision/rounding values remain fail-closed.
 
 ## 9. P3 session map — 32 sessions
 
+**Current status (2026-10-01): P3-S01–S04 decision/design tranche is complete;
+P3-S05 implementation remains explicitly unauthorized.** The
+[P3-S01–S04 Treasury/subledger decision packet](architecture/P3_S01_S04_TREASURY_SUBLEDGER_DECISION_PACKET.md)
+records the verified legacy Payment/allocation/claim-settlement boundary and the
+Product Owner's accepted D3-01..D3-08 = A, D3-09 = A-Revised, and D3-10..D3-12 = A
+bundle. D3-09 applies the existing platform Self-Approval policy: Protected
+Operations never permit Self-Approval; other Treasury business operations follow
+explicit, versioned, scope-bound and audited platform/Tenant policy, with an
+independent permissioned checker whenever Self-Approval is disabled or an
+additional threshold applies. The packet defines the first operational producer
+and controlled transition contract while keeping every application/migration
+action and P3-S05 out of scope.
+
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P3-S01..S04 | 4 | `A-H` | Treasury/AP/AR ownership, legacy Payment containment and transition design |
+| P3-S01..S04 | complete | `A-H` | D3-01..D3-08=A, D3-09=A-Revised and D3-10..D3-12=A recorded; Treasury/AP/AR ownership, platform-policy-controlled Self-Approval, legacy Payment containment and transition design accepted; no P3-S05 implementation authority |
 | P3-S05..S11 | 7 | `A-H` | Bank/cash/petty-cash accounts, receipts, payments, transfers and cheques |
 | P3-S12..S17 | 6 | `A-H` | Payment requests/scheduling, employee/vendor advances and settlement |
 | P3-S18..S22 | 5 | `A-H` | Statement import, matching, clearing and bank reconciliation |
@@ -667,8 +743,12 @@ currency, opening balances, close authority, and accountant sign-off.
 | P3-S30..S31 | 2 | `A-X` | Maker-checker, duplicate import, cash-to-GL and subledger reconciliation review |
 | P3-S32 | 1 | `L-M` | Documentation closeout and P4 handoff packet |
 
-**Product Owner gates:** bank integration/import sources, cheque policy, approval
-limits, cash-account structure, payment scheduling, and write-off authority.
+**Product Owner gates:** D3 closed the initial cash-account structure, cheque
+recognition, synchronous-import direction and platform-policy-controlled
+Self-Approval/threshold architecture. Exact bank provider/file sources and limits,
+any numeric approval thresholds, payment scheduling, write-off authority, pilot
+Tenant/cutoff, rollout tolerances and recovery operators remain open at their
+applicable implementation/activation gates.
 
 ## 10. P4 session map — 38 sessions
 
@@ -3008,3 +3088,32 @@ into [S07 section 6](architecture/ADR_P0_S07_PROJECT_SITE_AUTHORIZATION.md#6-p0-
 FOR AUTHORIZATION**: the exact next executable action is a Product Owner
 authorization of the bounded P1.1 contract, after which P1-E0 records that
 authority and P1-S01 begins. It does not authorize later P1 slices.
+
+## 52. Accounting-policy foundation supplement
+
+**Recorded:** 2026-10-01. **Authorization:** the Product Owner authorized only the
+policy foundation and its minimum safe UI; no financial calculation value was
+authorized.
+
+The delivered supplement narrows the generic P1-S15 policy mechanism for the two
+accounting codes: a closed code-level specification, exact consumer/schema
+validation, immutable published versions and append-only immutable source links,
+audited create/publish/retire/deactivate/supersede/source/selection/application
+lifecycle and Tenant Admin selection/application. Journal submission resolves and
+validates both exact policy contracts and pins their version links, otherwise it
+fails closed. Platform UI can initialize the two definitions and Tenant UI can
+show/select only already-valid published versions; while value schemas/values are
+unapproved, it permits neither publication nor activation. No source is required
+for Product-defined values; external-authority claims require provenance.
+
+**Activation decision recorded:** Product Owner selected Product-defined money
+scale `0`, intermediate calculation scale `6`, `ROUND_HALF_UP`, final monetary
+line boundary/tie behavior and common future effective date `2026-12-22`, derived
+from the next open period of `demo-construction-01`. Both v1 Platform versions are
+published and audited. Tenant selection/application is deliberately unavailable
+before the effective date; posting remains fail-closed until both selections are
+active.
+
+The concise [accounting-policy activation decision packet](architecture/P2_ACCOUNTING_POLICY_ACTIVATION_DECISION_PACKET.md)
+records the adopted values and TINF-01, the independently confirmed full-project pytest DB bootstrap
+failure; targeted checks do not close that infrastructure issue.

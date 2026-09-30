@@ -16,6 +16,16 @@ urlpatterns = [
         name="protected_operation_catalog",
     ),
     path(
+        "platform/accounting-policies/",
+        views.platform_policy_catalog,
+        name="platform_policy_catalog",
+    ),
+    path(
+        "policies/",
+        views.tenant_policy_configuration,
+        name="tenant_policy_configuration",
+    ),
+    path(
         "members/<uuid:membership_id>/profile-image/",
         views.member_profile_image,
         name="member_profile_image",

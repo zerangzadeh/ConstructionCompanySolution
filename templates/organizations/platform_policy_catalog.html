@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}سیاست‌های حسابداری پلتفرم{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-6xl">
+    <p class="text-xs font-semibold text-blue-600">کنترل‌های پلتفرم</p>
+    <h1 class="mt-1 text-2xl font-bold text-slate-950">سیاست‌های حسابداری</h1>
+    <p class="mt-1 text-sm text-slate-500">کاتالوگ بسته و کد-محور؛ انتشار و انتخاب فقط از چرخهٔ کنترل‌شدهٔ سیاست انجام می‌شود.</p>
+    <section class="erp-surface mt-6 overflow-hidden rounded-xl">
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[760px] text-right text-sm">
+                <thead><tr><th class="px-4 py-3">سیاست</th><th class="px-4 py-3">مصرف‌کننده</th><th class="px-4 py-3">وضعیت تعریف</th><th class="px-4 py-3">نسخه‌ها</th><th class="px-4 py-3">اقدام</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for entry in policy_entries %}
+                    <tr>
+                        <td class="px-4 py-3"><strong class="block text-slate-900">{{ entry.spec.name }}</strong><span class="text-xs text-slate-500" dir="ltr">{{ entry.spec.code }}</span></td>
+                        <td class="px-4 py-3 text-slate-600" dir="ltr">{{ entry.spec.permitted_consumers|join:", " }}</td>
+                        <td class="px-4 py-3">{% if entry.policy %}<span class="erp-badge erp-badge--info">ثبت‌شده</span>{% else %}<span class="erp-badge erp-badge--neutral">ثبت‌نشده</span>{% endif %}<p class="mt-1 text-xs text-slate-500">مقادیر فقط از نسخهٔ منتشرشده قابل اعمال‌اند.</p></td>
+                        <td class="px-4 py-3 text-slate-600">{{ entry.versions|length|erp_number }}{% for version in entry.versions %}<p class="mt-1 text-xs">v{{ version.version|erp_number }} · {{ version.get_status_display }} · {{ version.effective_from|jalali_date }}</p>{% endfor %}</td>
+                        <td class="px-4 py-3">{% if not entry.policy %}<form method="post">{% csrf_token %}<input type="hidden" name="code" value="{{ entry.spec.code }}"><button class="erp-btn erp-btn--secondary erp-btn--compact" type="submit">ثبت تعریف</button></form>{% else %}<span class="text-xs text-slate-500">نسخه‌ها فقط از سرویس کنترل‌شده منتشر می‌شوند.</span>{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

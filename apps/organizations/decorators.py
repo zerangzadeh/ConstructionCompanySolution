@@ -44,6 +44,10 @@ def active_organization_required(
         if not request.user.is_authenticated:
             return redirect("accounts:login")
         if getattr(request, "organization", None) is None:
+            if getattr(request, "organization_access_denied", False):
+                raise PermissionDenied(
+                    "شرکت انتخاب‌شده فعال نیست یا عضویت معتبر وجود ندارد."
+                )
             return redirect("organizations:select")
         return view_func(request, *args, **kwargs)
 

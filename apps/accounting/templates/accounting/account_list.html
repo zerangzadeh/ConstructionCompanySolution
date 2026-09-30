@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+{% if "accounting.accounts_manage" in business_permission_codes %}{% url "accounting:account_create" as create_url %}{% endif %}{% include "components/page_header.html" with page_eyebrow="حسابداری" page_title="کدینگ حساب‌ها" page_description=request.organization.name page_action_url=create_url page_action_label="حساب جدید" only %}{% include "accounting/_tabs.html" %}
+<section class="erp-surface mt-5 overflow-hidden rounded-xl">
+    <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
+        <div>
+            <h2 class="text-sm font-bold text-slate-900">درخت کدینگ حساب‌ها</h2>
+            <p class="mt-1 text-xs text-slate-500">برای باز و بسته‌کردن هر سطح، نشانگر کنار آن را انتخاب کنید.</p>
+        </div>
+        <span class="rounded-md bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">{{ accounts|length|erp_number }} حساب</span>
+    </div>
+    {% if account_tree %}
+    <div class="overflow-x-auto p-3 sm:p-4">
+        <div class="min-w-[38rem]" aria-label="درخت کدینگ حساب‌ها" data-account-tree>
+            <ul class="space-y-1">
+                {% include "accounting/_account_tree_nodes.html" with nodes=account_tree only %}
+            </ul>
+        </div>
+    </div>
+    {% else %}
+    <p class="px-4 py-10 text-center text-sm text-slate-500">کدینگ حسابی موجود نیست.</p>
+    {% endif %}
+</section>
+{% if account_tree %}
+<script>
+    (() => {
+        document.querySelectorAll("[data-account-tree] details").forEach((details) => {
+            const toggle = details.firstElementChild?.querySelector("[data-tree-toggle]");
+            if (!toggle) return;
+            const sync = () => {
+                toggle.textContent = details.open ? "−" : "+";
+                toggle.setAttribute("aria-label", details.open ? "بستن سطح" : "بازکردن سطح");
+            };
+            details.addEventListener("toggle", sync);
+            sync();
+        });
+    })();
+</script>
+{% endif %}
+{% endblock %}

@@ -343,14 +343,16 @@ never becomes a second authorization system.
 
 Daily-report equipment rows remain immutable descriptive snapshots and expenses remain general financial records; neither currently references the equipment master. Structured daily usage, fuel, and equipment-cost integration require separately approved workflows and must preserve existing historical rows.
 
-## Approved future product domains
+## Approved remaining product domains
 
-The following approved target concepts are not implemented. Their presence here records product direction only and does not authorize schema or application changes.
+The following rows describe remaining target scope. Delivered partial foundations
+are stated explicitly; target concepts do not authorize additional schema or
+application changes.
 
 | Future domain | Approved direction |
 | --- | --- |
 | Identity, tenant commercial controls, and object scope | MFA, optional SSO, subscription/feature entitlements, quotas, export/offboarding, time-limited support access, and explicit project/site authorization intersecting tenant permissions. |
-| Accounting and Treasury | Chart of accounts, fiscal periods, immutable balanced journals, posting rules, reversal/close, AP/AR, bank/cash/cheques, and bank reconciliation. Existing `Payment` and financial read models are not a ledger. |
+| Accounting and Treasury | Accounting now has a partial native kernel: chart of accounts, fiscal periods, immutable balanced manual/opening journals, reversal/replacement, signed retained manual/opening/correction reconciliation, posted-line-only retained trial balance/balance sheet/profit-loss, append-only close/reopen evidence and linked controlled adjustments in explicit adjustment periods. Operational producers, controlled exports, AP/AR, bank/cash/cheques and bank reconciliation remain target scope. Existing `Payment` and legacy financial read models are not a ledger. |
 | Regulatory configuration | Effective-dated tax, payroll, social-insurance, invoice-schema, calendar and rounding policy/configuration with RBAC, history, applied-version snapshots and policy-specific provenance requirements. Contract commercial terms remain separately versioned. |
 | Project control and costing | `CostCenter`/CBS, accepted budget baselines, commitments, accruals, actuals, forecast, schedule/risk/change controls, and source-traceable KPI projections. `ProjectBaseline` and `ProgressRecord` already implement the Billing measurement baseline, not the complete cost-control model. |
 | Billing and commercial extensions | Correct ownership of contract terms and regulation, party/currency snapshots, Accounting/AR/e-invoice integration, subcontract/payable certificates, guarantees, releases, and Article 38 evidence. Current receivable Billing remains the delivered baseline. |

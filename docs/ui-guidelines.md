@@ -1364,6 +1364,25 @@ internal paths, or other tenants' identifiers.
 - Success messages state what changed and what did not, especially when a reversal
   does not itself refund/pay/move cash.
 
+### Accounting control surfaces
+
+Accounting screens distinguish editable drafts from submitted and posted history.
+Posted journals, retained reconciliation runs, tie-outs, dispositions, and
+independent sign-off evidence are read-only; the UI may initiate only existing
+audited service transitions. Present source keys, versions, line identifiers,
+reversal/replacement links and opening-import lineage as diagnostic drill-through
+evidence, never as editable inputs. Period close/reopen and reversal routes collect
+their required reason and independent requester without using the UI as an
+authorization decision.
+
+Trial balance, balance sheet and profit/loss screens present explicit IRR scope,
+Jalali dates, retained-run hashes and account-to-posted-line drill-through. They
+must never merge legacy `financials` or payment projections into ledger facts.
+Retained statement and close/reopen history is read-only. A controlled-adjustment
+form selects only a posted journal in a closed period and an explicitly configured
+open adjustment period, requires reason/evidence/reconciliation references, and
+creates a linked draft through the Accounting service; it never edits the source.
+
 ## 48. Mobile and Site Workflow Standard
 
 - Design field workflows for sunlight, gloves, intermittent connectivity, one-hand

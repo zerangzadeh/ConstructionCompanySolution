@@ -135,6 +135,7 @@ implementation work.
 | Claim settlement | allocate -> reverse | Settlement permission; approved claim and compatible payment allocation | Append/reverse; never synthesizes cash |
 | Workflow definition/version | draft configuration -> publish | Dedicated workflow-administration/publish permission | Published version immutable |
 | Work item | offer/claim/release/act/reassign/delegate/complete | Underlying domain permission + candidacy/assignment + separation | Assignment/decision history append-only |
+| Accounting reconciliation | retain -> disposition -> sign off | Dedicated run/disposition/sign-off permissions; signer differs from run creator and every disposer | Runs, exceptions, tie-outs, dispositions, reviews and audit are append-only; sign-off changes no journal or balance |
 
 ## 6. Target workflow matrix
 
@@ -144,8 +145,8 @@ implementation work.
 | Object-scope grants | propose/grant/change/revoke/emergency access | Cannot self-elevate; grantor must hold delegated authority; full audit | P1.1 |
 | Regulatory rules | draft/review/activate/supersede | Legal/accounting reviewer; maker cannot be sole activator where required | P1.2 |
 | Material/technical approval | draft/review/approve/reject/archive/substitute | Master-data vs technical/quality approval separation | P1.4 |
-| Journal/period close | propose/review/post/reverse; open/close/reopen | Maker-checker; close/reopen and reversal dedicated; source idempotency | P2 |
-| Treasury/AP/AR | propose/approve/release/clear/reconcile/write-off | Bank/account sensitivity; maker-checker; allocation/write-off limits | P3 |
+| Journal/period close | propose/review/post/reverse/replace/adjust; open/close/reopen | Maker-checker; close requires no pending accounting artifacts, cutoff-matched signed reconciliation and retained statements; reopen is separately permissioned and independent from the close approver; late adjustment is a new linked journal in an explicit open adjustment period | P2 |
+| Treasury/AP/AR | propose/approve/release/clear/reconcile/write-off | Bank/account sensitivity; Protected Operations never permit Self-Approval; other business-operation Self-Approval follows explicit versioned scope-bound platform/Tenant policy; independent checker when disabled or an additional threshold applies; allocation/write-off limits | P3 |
 | Estimate/BOQ/budget | import/validate/revise/compare/approve/handoff/rebaseline | Estimator vs approver; accepted handoff explicit; approved versions immutable | P4.0/P4.1 |
 | Expense | draft/submit/approve/return/void/allocate/settle | Requester vs approver; budget/duplicate controls; finance settlement distinct | P4.3 |
 | RFQ/quote/award/invoice match | issue/invite/submit/open/compare/award/receive/match/exception | Bid confidentiality; requester/buyer/award/receipt/AP separation | P5.1 |

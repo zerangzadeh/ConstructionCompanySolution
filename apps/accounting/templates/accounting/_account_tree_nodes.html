@@ -1,0 +1,26 @@
+{% for node in nodes %}
+<li class="relative" data-account-id="{{ node.account.pk }}">
+    {% if node.children %}
+    <details class="account-tree-node"{% if node.depth == 0 %} open{% endif %}>
+        <summary class="flex cursor-pointer list-none items-center gap-2 rounded-lg px-2 py-2 text-sm transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500">
+            <span class="account-tree-toggle flex h-5 w-5 shrink-0 items-center justify-center rounded border border-slate-300 bg-white font-mono text-xs text-slate-600" data-tree-toggle aria-label="بازکردن سطح">{% if node.depth == 0 %}−{% else %}+{% endif %}</span>
+            <span class="min-w-14 font-semibold text-slate-900" dir="ltr">{{ node.account.code }}</span>
+            <span class="font-semibold text-slate-800">{{ node.account.name }}</span>
+            <span class="mr-auto rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{{ node.account.get_account_type_display }}</span>
+            <span class="rounded-md bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">{{ node.children|length|erp_number }} زیرحساب</span>
+        </summary>
+        <ul class="mr-4 space-y-1 border-r border-slate-200 pr-4 sm:mr-6 sm:pr-5">
+            {% include "accounting/_account_tree_nodes.html" with nodes=node.children only %}
+        </ul>
+    </details>
+    {% else %}
+    <div class="flex items-center gap-2 rounded-lg px-2 py-2 text-sm hover:bg-slate-50">
+        <span class="flex h-5 w-5 shrink-0 items-center justify-center text-slate-300" aria-hidden="true">•</span>
+        <span class="min-w-14 font-semibold text-slate-900" dir="ltr">{{ node.account.code }}</span>
+        <span class="font-semibold text-slate-800">{{ node.account.name }}</span>
+        <span class="mr-auto rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{{ node.account.get_account_type_display }}</span>
+        <span class="rounded-md bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">{% if node.account.is_posting %}قابل ثبت{% else %}گروه حساب{% endif %}</span>
+    </div>
+    {% endif %}
+</li>
+{% endfor %}

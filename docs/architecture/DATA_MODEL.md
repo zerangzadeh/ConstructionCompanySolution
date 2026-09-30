@@ -108,7 +108,7 @@ Names are descriptive and may change during an approved detailed design.
 | Workforce | Skill, CompetencyRequirement, EmployeeSkill, Certificate, Training, PerformanceEvaluation, LaborRateVersion |
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
 | Project cost/control | BudgetBaseline/Version/Line, CBSNode, CostCenter, Commitment, Accrual, CostFact projection, ForecastVersion/Line, Risk/Change/Schedule baseline |
-| Accounting | FiscalYear/Period, Account, JournalEntry/Line, PostingRuleVersion, PostingSource, ReversalLink, Close/Reopen evidence |
+| Accounting | FiscalYear/Period, Account, JournalEntry/Line, PostingRuleVersion, PostingSource, Reversal/Replacement/Adjustment links, immutable FinancialStatementRun/LineSnapshot, FiscalPeriodControlEvent close/reopen evidence |
 | AP/AR | Obligation/OpenItem, Credit/DebitAdjustment, Allocation, Aging projection, SubledgerReconciliation |
 | Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, Statement/Line, Match/Reconciliation, PaymentProposal |
 | Procurement | RFQ/Invitation, Quote/Revision/Line, Comparison/Award, PO/Change, Receipt/ServiceAcceptance, SupplierInvoice/MatchException |
@@ -122,7 +122,7 @@ Names are descriptive and may change during an approved detailed design.
 | Knowledge | LessonLearned, BestPractice, TechnicalNote, Procedure, KnowledgeArticle, CaseStudy, Promotion/PublicationVersion, ReuseEvidence |
 | Partner | Qualification, Evidence/Expiry, CategoryApproval, ProjectEvaluation, PerformanceMetric/ScoreExplanation |
 | Support/AI | Notification, SupportCase, KnownIssue, FeatureRequest, ReleaseLink, DiagnosticConsent, Knowledge source, AIInteraction/Review evidence |
-| Reporting/reconciliation | MetricDefinition, ProjectionRefresh, ReconciliationRun/Exception/Resolution, Report/ExportJob |
+| Reporting/reconciliation | MetricDefinition, ProjectionRefresh, ReconciliationRun/Exception/TieOut/Disposition/Review, Report/ExportJob |
 | Future network | PlatformPartyClaim, VerifiedRelationship, PublicationConsent, Discovery/Recommendation, anonymized aggregate with privacy controls |
 
 ## 6. Transaction source-of-truth matrix
@@ -171,6 +171,17 @@ rules and account mappings. Finalized documents record the applied version plus
 material calculated inputs/outputs. A later master/rule edit cannot reinterpret
 approved history.
 
+For the closed accounting-policy catalogue, only
+`accounting-money-precision` and `accounting-rounding` are eligible for Tenant
+selection. They use code-owned schemas (not free-form JSON) and their published v1
+Product-defined contract is money scale `0`, intermediate scale `6`, unrounded
+intermediate preservation and `ROUND_HALF_UP` only at the final monetary-line
+boundary. Both policy versions are pinned on each posted journal. A published
+version and its append-only source links are immutable; correction is a
+superseding version. Until a valid effective version is selected, accounting
+posting fails closed. These values claim no statutory, legal or external
+accounting authority.
+
 Snapshot text remains valuable for legal/display history even when a master link
 exists. Label current master value separately from the recorded value.
 
@@ -205,7 +216,10 @@ Each cross-domain fact stores or can derive: tenant, project/context, source
 type/id/version, effective/document/posted dates, status, unit/currency,
 producer/consumer, posting/integration key and reversal/replacement lineage.
 Reconciliation exceptions are append-only resolution evidence, not editable
-alternate balances.
+alternate balances. The delivered Accounting boundary retains versioned run scope,
+cutoff, input/result hashes, ordered exception and tie-out snapshots, one immutable
+disposition per exception and one independent protected review. Review pins the
+verified run/disposition hashes and cannot mutate source facts, journals or balances.
 
 Required controls include estimate-to-budget, commitment, PO-receipt-invoice,
 inventory quantity/value, claim-to-subledger, AP/AR-to-GL, Treasury-to-bank,

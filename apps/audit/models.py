@@ -8,6 +8,59 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    ACCOUNTING_ACCOUNT_CREATED = "accounting.account_created", "حساب دفترکل ایجاد شد"
+    ACCOUNTING_FISCAL_YEAR_CREATED = (
+        "accounting.fiscal_year_created",
+        "سال مالی ایجاد شد",
+    )
+    ACCOUNTING_FISCAL_PERIOD_CREATED = (
+        "accounting.fiscal_period_created",
+        "دوره مالی ایجاد شد",
+    )
+    ACCOUNTING_JOURNAL_CREATED = "accounting.journal_created", "سند حسابداری ایجاد شد"
+    ACCOUNTING_JOURNAL_SUBMITTED = (
+        "accounting.journal_submitted",
+        "سند حسابداری ارسال شد",
+    )
+    ACCOUNTING_JOURNAL_POSTED = "accounting.journal_posted", "سند حسابداری ثبت قطعی شد"
+    ACCOUNTING_JOURNAL_REVERSED = (
+        "accounting.journal_reversed",
+        "سند حسابداری برگشت خورد",
+    )
+    ACCOUNTING_OPENING_IMPORT_CREATED = (
+        "accounting.opening_import_created",
+        "ورودی افتتاحیه ایجاد شد",
+    )
+    ACCOUNTING_OPENING_IMPORT_SUBMITTED = (
+        "accounting.opening_import_submitted",
+        "ورودی افتتاحیه ارسال شد",
+    )
+    ACCOUNTING_OPENING_IMPORT_ACCEPTED = (
+        "accounting.opening_import_accepted",
+        "ورودی افتتاحیه پذیرفته شد",
+    )
+    ACCOUNTING_PERIOD_CLOSED = "accounting.period_closed", "دوره مالی بسته شد"
+    ACCOUNTING_PERIOD_REOPENED = "accounting.period_reopened", "دوره مالی بازگشایی شد"
+    ACCOUNTING_RECONCILIATION_RUN_CREATED = (
+        "accounting.reconciliation_run_created",
+        "اجرای تطبیق حسابداری نگهداری شد",
+    )
+    ACCOUNTING_RECONCILIATION_EXCEPTION_DISPOSED = (
+        "accounting.reconciliation_exception_disposed",
+        "استثنای تطبیق حسابداری تعیین تکلیف شد",
+    )
+    ACCOUNTING_RECONCILIATION_SIGNED_OFF = (
+        "accounting.reconciliation_signed_off",
+        "تطبیق حسابداری به‌طور مستقل تأیید شد",
+    )
+    ACCOUNTING_STATEMENT_RETAINED = (
+        "accounting.statement_retained",
+        "صورت مالی نگهداری شد",
+    )
+    ACCOUNTING_CONTROLLED_ADJUSTMENT_CREATED = (
+        "accounting.controlled_adjustment_created",
+        "تعدیل کنترل‌شده ایجاد شد",
+    )
     WORKFLOW_DEFINITION_CREATED = (
         "workflow_definition.created",
         "تعریف گردش‌کار ایجاد شد",
@@ -90,11 +143,24 @@ class AuditAction(models.TextChoices):
         "policy.version_published",
         "نسخه سیاست پلتفرم منتشر شد",
     )
+    PLATFORM_POLICY_SOURCE_LINKED = (
+        "policy.source_linked",
+        "منبع به نسخه سیاست پیوند شد",
+    )
+    PLATFORM_POLICY_VERSION_RETIRED = (
+        "policy.version_retired",
+        "نسخه سیاست پلتفرم بازنشسته شد",
+    )
+    PLATFORM_POLICY_DEACTIVATED = (
+        "policy.deactivated",
+        "سیاست پلتفرم غیرفعال شد",
+    )
     POLICY_REVIEW_EVIDENCE_RECORDED = (
         "policy.review_evidence_recorded",
         "مدرک اختیاری بررسی سیاست ثبت شد",
     )
     TENANT_POLICY_APPROVED = "policy.tenant_approved", "سیاست Tenant تأیید شد"
+    TENANT_POLICY_SELECTED = "policy.tenant_selected", "سیاست Tenant انتخاب شد"
     TENANT_POLICY_APPLIED = "policy.tenant_applied", "سیاست Tenant اعمال شد"
     BUSINESS_PARTY_CREATED = "business_party.created", "طرف تجاری ایجاد شد"
     BUSINESS_PARTY_UPDATED = "business_party.updated", "طرف تجاری به‌روزرسانی شد"
@@ -183,9 +249,15 @@ class AuditAction(models.TextChoices):
         "material_price.observation_recorded",
         "مشاهده قیمت مصالح ثبت شد",
     )
-    MATERIAL_TECHNICAL_STATUS_CHANGED = "material_technical.status_changed", "وضعیت بررسی فنی مصالح تغییر کرد"
+    MATERIAL_TECHNICAL_STATUS_CHANGED = (
+        "material_technical.status_changed",
+        "وضعیت بررسی فنی مصالح تغییر کرد",
+    )
     MATERIAL_DOCUMENT_LINKED = "material_document.linked", "سند فنی مصالح پیوند خورد"
-    MATERIAL_RELATIONSHIP_RECORDED = "material_relationship.recorded", "رابطه مصالح ثبت شد"
+    MATERIAL_RELATIONSHIP_RECORDED = (
+        "material_relationship.recorded",
+        "رابطه مصالح ثبت شد",
+    )
     PROJECT_CREATED = "project.created", "پروژه ایجاد شد"
     PROJECT_ARCHIVED = "project.archived", "پروژه بایگانی شد"
     PROJECT_SITE_CREATED = "project_site.created", "کارگاه پروژه ایجاد شد"

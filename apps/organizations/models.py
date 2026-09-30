@@ -174,6 +174,15 @@ class ProtectedOperationCode(models.TextChoices):
         "documents.disposal_approval",
         "تأیید قصد امحای سند",
     )
+    ACCOUNTING_JOURNAL_POST = "accounting.journal_post", "ثبت قطعی سند حسابداری"
+    ACCOUNTING_OPENING_ACCEPT = "accounting.opening_accept", "پذیرش مانده افتتاحیه"
+    ACCOUNTING_JOURNAL_REVERSE = "accounting.journal_reverse", "برگشت سند حسابداری"
+    ACCOUNTING_PERIOD_CLOSE = "accounting.period_close", "بستن دوره مالی"
+    ACCOUNTING_PERIOD_REOPEN = "accounting.period_reopen", "بازگشایی دوره مالی"
+    ACCOUNTING_RECONCILIATION_SIGN_OFF = (
+        "accounting.reconciliation_sign_off",
+        "تأیید نهایی تطبیق حسابداری",
+    )
 
 
 class AccountConnectionRequestStatus(models.TextChoices):
@@ -200,6 +209,11 @@ class PolicySensitivity(models.TextChoices):
     REGULATORY = "regulatory", "مقرراتی"
 
 
+class PolicySourceBasis(models.TextChoices):
+    PRODUCT_DEFINED = "product_defined", "سیاست فنی/کسب‌وکاری محصول"
+    EXTERNAL_AUTHORITY = "external_authority", "مرجع بیرونی قانونی/مقرراتی/حسابداری"
+
+
 class PolicyVersionStatus(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     PUBLISHED = "published", "منتشرشده"
@@ -207,7 +221,7 @@ class PolicyVersionStatus(models.TextChoices):
 
 
 class TenantPolicySelectionStatus(models.TextChoices):
-    APPROVED = "approved", "تأییدشده توسط مالک Tenant"
+    APPROVED = "approved", "انتخاب‌شده توسط مدیر Tenant"
     ACTIVE = "active", "اعمال‌شده توسط مدیر Tenant"
     SUPERSEDED = "superseded", "جایگزین‌شده"
 
@@ -263,12 +277,49 @@ class BusinessPermissionCode(models.TextChoices):
     TENANT_POLICIES_VIEW = "tenant_policies.view", "مشاهده سیاست‌های Tenant"
     TENANT_POLICIES_APPROVE = (
         "tenant_policies.approve",
-        "تأیید انتخاب سیاست‌های Tenant",
+        "منسوخ — تأیید انتخاب سیاست‌های Tenant (بدون مسیر اجرایی)",
     )
     TENANT_POLICIES_APPLY = (
         "tenant_policies.apply",
         "اعمال سیاست‌های تأییدشده Tenant",
     )
+
+    ACCOUNTING_VIEW = "accounting.view", "مشاهده حسابداری"
+    ACCOUNTING_ACCOUNTS_MANAGE = "accounting.accounts_manage", "مدیریت کدینگ حساب‌ها"
+    ACCOUNTING_PERIODS_MANAGE = "accounting.periods_manage", "مدیریت سال و دوره مالی"
+    ACCOUNTING_JOURNALS_PREPARE = "accounting.journals_prepare", "تهیه سند حسابداری"
+    ACCOUNTING_JOURNALS_SUBMIT = "accounting.journals_submit", "ارسال سند حسابداری"
+    ACCOUNTING_JOURNALS_APPROVE = (
+        "accounting.journals_approve",
+        "تأیید مستقل سند حسابداری",
+    )
+    ACCOUNTING_JOURNALS_POST = "accounting.journals_post", "ثبت قطعی سند حسابداری"
+    ACCOUNTING_RECONCILIATIONS_RUN = (
+        "accounting.reconciliations_run",
+        "اجرای تطبیق حسابداری",
+    )
+    ACCOUNTING_RECONCILIATIONS_DISPOSE = (
+        "accounting.reconciliations_dispose",
+        "ثبت تعیین تکلیف استثنای تطبیق حسابداری",
+    )
+    ACCOUNTING_RECONCILIATIONS_SIGN_OFF = (
+        "accounting.reconciliations_sign_off",
+        "بررسی و تأیید مستقل تطبیق حسابداری",
+    )
+    ACCOUNTING_REPORTS_VIEW = (
+        "accounting.reports_view",
+        "مشاهده گزارش‌ها و صورت‌های مالی حسابداری",
+    )
+    ACCOUNTING_STATEMENTS_RUN = (
+        "accounting.statements_run",
+        "نگهداری اجرای صورت مالی",
+    )
+    ACCOUNTING_ADJUSTMENTS_PREPARE = (
+        "accounting.adjustments_prepare",
+        "تهیه تعدیل کنترل‌شده",
+    )
+    ACCOUNTING_PERIODS_CLOSE = "accounting.periods_close", "بستن دوره مالی"
+    ACCOUNTING_PERIODS_REOPEN = "accounting.periods_reopen", "بازگشایی دوره مالی"
 
     PARTIES_VIEW = "parties.view", "مشاهده طرف‌های تجاری"
     PARTIES_CREATE = "parties.create", "ایجاد طرف تجاری"
@@ -327,7 +378,10 @@ class BusinessPermissionCode(models.TextChoices):
         "material_prices.observations_record",
         "ثبت مشاهده قیمت مصالح",
     )
-    MATERIAL_RELATIONSHIPS_MANAGE = "material_relationships.manage", "مدیریت هم‌ارز/جایگزین مصالح"
+    MATERIAL_RELATIONSHIPS_MANAGE = (
+        "material_relationships.manage",
+        "مدیریت هم‌ارز/جایگزین مصالح",
+    )
     MATERIAL_TECHNICAL_SUBMIT = "material_technical.submit", "ارسال بررسی فنی مصالح"
     MATERIAL_TECHNICAL_REVIEW = "material_technical.review", "بازبینی فنی مصالح"
     MATERIAL_TECHNICAL_APPROVE = "material_technical.approve", "تأیید فنی مصالح"
@@ -1588,6 +1642,7 @@ class PolicySource(UUIDModel, TimeStampedModel):
     effective_from = models.DateField("شروع اعتبار", null=True, blank=True)
     effective_to = models.DateField("پایان اعتبار", null=True, blank=True)
     applicability = models.TextField("دامنه کاربرد")
+    reason = models.TextField("دلیل ثبت منبع", blank=True)
     supersedes = models.ForeignKey(
         "self",
         verbose_name="جایگزین منبع",
@@ -1622,7 +1677,13 @@ class PolicySource(UUIDModel, TimeStampedModel):
 
     def clean(self) -> None:
         super().clean()
-        for field_name in ("issuer", "title", "source_identifier", "version"):
+        for field_name in (
+            "issuer",
+            "title",
+            "source_identifier",
+            "version",
+            "reason",
+        ):
             if not str(getattr(self, field_name)).strip():
                 raise ValidationError({field_name: "این مقدار الزامی است."})
         if self.supersedes_id and self.supersedes_id == self.pk:
@@ -1680,6 +1741,17 @@ class PlatformPolicy(UUIDModel, TimeStampedModel):
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.code = canonicalize_lower_identifier(self.code)
+        from apps.organizations.policy_specs import get_platform_policy_spec
+
+        spec = get_platform_policy_spec(self.code)
+        if (
+            self.name != spec.name
+            or self.category != spec.category
+            or self.sensitivity != spec.sensitivity
+            or self.tenant_selectable != spec.tenant_selectable
+            or self.requires_source_provenance
+        ):
+            raise ValidationError("تعریف سیاست باید دقیقاً با کاتالوگ کد-محور هم‌خوان باشد.")
         if not self._state.adding and self.versions.exists():
             original = PlatformPolicy.objects.get(pk=self.pk)
             stable_fields = (
@@ -1749,8 +1821,19 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
         default=PolicyVersionStatus.DRAFT,
         db_index=True,
     )
+    source_basis = models.CharField(
+        "مبنای مقدار سیاست",
+        max_length=30,
+        choices=PolicySourceBasis.choices,
+        null=True,
+        blank=True,
+    )
     sources = models.ManyToManyField(
-        PolicySource, verbose_name="منابع", related_name="policy_versions", blank=True
+        PolicySource,
+        verbose_name="منابع",
+        related_name="policy_versions",
+        through="PlatformPolicyVersionSource",
+        blank=True,
     )
     supersedes = models.ForeignKey(
         "self",
@@ -1772,6 +1855,15 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
         related_name="policy_versions_published",
     )
     published_at = models.DateTimeField(null=True, blank=True)
+    retired_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="policy_versions_retired",
+    )
+    retired_at = models.DateTimeField(null=True, blank=True)
+    retirement_reason = models.TextField("دلیل بازنشستگی", blank=True)
     reason = models.TextField("دلیل نسخه")
 
     class Meta:
@@ -1819,6 +1911,20 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
                 )
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل ایجاد نسخه الزامی است."})
+        if self.status == PolicyVersionStatus.RETIRED:
+            if not self.retired_by_id or not self.retired_at or not self.retirement_reason.strip():
+                raise ValidationError("بازنشستگی نسخه به عامل، زمان و دلیل نیاز دارد.")
+        elif self.retired_by_id or self.retired_at or self.retirement_reason:
+            raise ValidationError("جزئیات بازنشستگی فقط برای نسخه بازنشسته مجاز است.")
+        if not self._state.adding:
+            original = PlatformPolicyVersion.objects.get(pk=self.pk)
+            if original.status == PolicyVersionStatus.RETIRED and self.status != original.status:
+                raise ValidationError("نسخه بازنشسته قابل فعال‌سازی مجدد نیست.")
+            if (
+                original.status == PolicyVersionStatus.PUBLISHED
+                and self.status not in {PolicyVersionStatus.PUBLISHED, PolicyVersionStatus.RETIRED}
+            ):
+                raise ValidationError("نسخه منتشرشده فقط می‌تواند بازنشسته شود.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         if not self._state.adding:
@@ -1831,7 +1937,10 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
                     "effective_from",
                     "effective_to",
                     "supersedes_id",
+                    "source_basis",
                     "reason",
+                    "published_by_id",
+                    "published_at",
                 )
                 if any(
                     getattr(original, field) != getattr(self, field)
@@ -1843,6 +1952,51 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.policy.code} v{self.version}"
+
+
+class PlatformPolicyVersionSource(UUIDModel, TimeStampedModel):
+    """Append-only source linkage; published policy provenance never changes in place."""
+
+    policy_version = models.ForeignKey(
+        PlatformPolicyVersion,
+        on_delete=models.PROTECT,
+        related_name="source_links",
+    )
+    source = models.ForeignKey(
+        PolicySource,
+        on_delete=models.PROTECT,
+        related_name="policy_version_links",
+    )
+    linked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="policy_version_sources_linked",
+    )
+    reason = models.TextField("دلیل پیوند منبع")
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["policy_version", "source"],
+                name="unique_platform_policy_version_source",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        if self.policy_version_id and self.policy_version.status != PolicyVersionStatus.DRAFT:
+            raise ValidationError("منبع فقط به نسخه پیش‌نویس قابل پیوند است.")
+        if not self.reason.strip():
+            raise ValidationError({"reason": "دلیل پیوند منبع الزامی است."})
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("پیوند منبع سیاست تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("پیوند منبع سیاست قابل حذف نیست.")
 
 
 class PolicyReviewEvidence(UUIDModel, TimeStampedModel):

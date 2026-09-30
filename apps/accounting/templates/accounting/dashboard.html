@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}حسابداری | سازه‌یار{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="حسابداری" page_title="کنترل دفتر کل" page_description=request.organization.name only %}
+{% include "accounting/_tabs.html" %}
+<section class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <article class="erp-surface rounded-xl p-5"><p class="text-xs text-slate-500">حساب‌های کدینگ</p><p class="mt-2 text-2xl font-bold tabular-nums text-slate-900">{{ account_count|erp_number }}</p></article>
+    <article class="erp-surface rounded-xl p-5"><p class="text-xs text-slate-500">دوره‌های باز</p><p class="mt-2 text-2xl font-bold tabular-nums text-slate-900">{{ open_period_count|erp_number }}</p></article>
+    <article class="erp-surface rounded-xl p-5"><p class="text-xs text-slate-500">اسناد در انتظار تأیید</p><p class="mt-2 text-2xl font-bold tabular-nums text-amber-700">{{ proposed_count|erp_number }}</p></article>
+    <article class="erp-surface rounded-xl p-5"><p class="text-xs text-slate-500">گزارش‌های نگهداری‌شده</p><p class="mt-2 text-2xl font-bold tabular-nums text-slate-900">{{ statement_count|erp_number }}</p></article>
+</section>
+<section class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">آخرین اسناد</h2><p class="text-xs text-slate-500">دسترسی فقط در شرکت فعال</p></div><a class="erp-btn erp-btn--secondary erp-btn--compact" href="{% url 'accounting:journal_list' %}">همه اسناد</a></div><div class="erp-table-wrap"><table class="w-full min-w-[620px] text-right text-sm"><thead><tr><th class="px-4 py-3">شماره</th><th class="px-4 py-3">دوره</th><th class="px-4 py-3">شرح</th><th class="px-4 py-3">وضعیت</th></tr></thead><tbody class="divide-y divide-slate-100">{% for journal in recent_journals %}<tr><td class="px-4 py-3" dir="ltr"><a class="font-semibold text-blue-700" href="{% url 'accounting:journal_detail' journal.pk %}">{{ journal.number|default:"—" }}</a></td><td class="px-4 py-3">{{ journal.period }}</td><td class="px-4 py-3">{{ journal.description }}</td><td class="px-4 py-3">{{ journal.get_status_display }}</td></tr>{% empty %}<tr><td colspan="4" class="px-4 py-8 text-center text-slate-500">سندی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

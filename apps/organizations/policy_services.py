@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import Iterable
 from datetime import date
 from typing import Any
 
@@ -23,12 +22,21 @@ from apps.organizations.models import (
     Organization,
     PlatformPolicy,
     PlatformPolicyVersion,
+    PlatformPolicyVersionSource,
     PolicyReviewDisposition,
     PolicyReviewEvidence,
     PolicySource,
+    PolicySourceBasis,
     PolicyVersionStatus,
     TenantPolicySelection,
     TenantPolicySelectionStatus,
+)
+from apps.organizations.policy_specs import (
+    ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+    ACCOUNTING_ROUNDING_POLICY_CODE,
+    get_platform_policy_spec,
+    initial_accounting_policy_parameters,
+    validate_policy_parameters,
 )
 
 
@@ -46,6 +54,8 @@ def _snapshot_version(version: PlatformPolicyVersion) -> dict[str, Any]:
         "effective_to": (
             version.effective_to.isoformat() if version.effective_to else None
         ),
+        "supersedes_id": str(version.supersedes_id) if version.supersedes_id else None,
+        "source_basis": version.source_basis,
         "source_ids": sorted(
             str(item) for item in version.sources.values_list("pk", flat=True)
         ),
@@ -61,6 +71,7 @@ def record_policy_source(
     source_identifier: str,
     version: str,
     applicability: str,
+    reason: str,
     source_location: str = "",
     publication_date: date | None = None,
     effective_from: date | None = None,
@@ -80,6 +91,7 @@ def record_policy_source(
         effective_from=effective_from,
         effective_to=effective_to,
         applicability=applicability.strip(),
+        reason=reason.strip(),
         supersedes=supersedes,
         created_by=actor,
     )
@@ -92,9 +104,13 @@ def record_policy_source(
         actor=actor,
         allow_platform_actor=True,
         metadata={
-            "issuer": source.issuer,
-            "source_identifier": source.source_identifier,
-            "version": source.version,
+            "before": None,
+            "after": {
+                "issuer": source.issuer,
+                "source_identifier": source.source_identifier,
+                "version": source.version,
+            },
+            "reason": source.reason,
         },
     )
     return source
@@ -105,38 +121,50 @@ def create_platform_policy(
     *,
     actor: User,
     code: str,
-    name: str,
-    category: str,
-    sensitivity: str,
-    tenant_selectable: bool = True,
-    requires_source_provenance: bool = False,
+    reason: str,
 ) -> PlatformPolicy:
     _require_platform_admin(actor)
-    policy = PlatformPolicy(
-        code=code,
-        name=name.strip(),
-        category=category,
-        sensitivity=sensitivity,
-        tenant_selectable=tenant_selectable,
-        requires_source_provenance=requires_source_provenance,
-        created_by=actor,
-        updated_by=actor,
-    )
-    policy.full_clean()
-    policy.save()
-    record_audit_event(
-        action=AuditAction.PLATFORM_POLICY_CREATED,
-        entity_type="organizations.PlatformPolicy",
-        entity_id=policy.pk,
-        actor=actor,
-        allow_platform_actor=True,
-        metadata={
-            "policy_code": policy.code,
-            "category": policy.category,
-            "sensitivity": policy.sensitivity,
-            "requires_source_provenance": policy.requires_source_provenance,
+    spec = get_platform_policy_spec(code)
+    if not reason.strip():
+        raise ValidationError("دلیل ثبت تعریف سیاست الزامی است.")
+    policy, created = PlatformPolicy.objects.get_or_create(
+        code=spec.code,
+        defaults={
+            "name": spec.name,
+            "category": spec.category,
+            "sensitivity": spec.sensitivity,
+            "tenant_selectable": spec.tenant_selectable,
+            "requires_source_provenance": False,
+            "created_by": actor,
+            "updated_by": actor,
         },
     )
+    if (
+        policy.name != spec.name
+        or policy.category != spec.category
+        or policy.sensitivity != spec.sensitivity
+        or policy.tenant_selectable != spec.tenant_selectable
+        or policy.requires_source_provenance
+    ):
+        raise ValidationError("تعریف ذخیره‌شده با کاتالوگ کد-محور سیاست هم‌خوان نیست.")
+    if created:
+        record_audit_event(
+            action=AuditAction.PLATFORM_POLICY_CREATED,
+            entity_type="organizations.PlatformPolicy",
+            entity_id=policy.pk,
+            actor=actor,
+            allow_platform_actor=True,
+            metadata={
+                "before": None,
+                "after": {
+                    "policy_code": policy.code,
+                    "category": policy.category,
+                    "sensitivity": policy.sensitivity,
+                    "tenant_selectable": policy.tenant_selectable,
+                },
+                "reason": reason.strip(),
+            },
+        )
     return policy
 
 
@@ -149,14 +177,32 @@ def create_platform_policy_version(
     parameters: dict[str, Any],
     effective_from: date,
     reason: str,
+    source_basis: str,
     effective_to: date | None = None,
-    sources: Iterable[PolicySource] = (),
     supersedes: PlatformPolicyVersion | None = None,
 ) -> PlatformPolicyVersion:
     _require_platform_admin(actor)
     locked_policy = PlatformPolicy.objects.select_for_update().get(pk=policy.pk)
     if not locked_policy.is_active:
         raise ValidationError("سیاست غیرفعال نسخه جدید نمی‌پذیرد.")
+    spec = get_platform_policy_spec(locked_policy.code)
+    if (
+        locked_policy.name != spec.name
+        or locked_policy.category != spec.category
+        or locked_policy.sensitivity != spec.sensitivity
+        or locked_policy.tenant_selectable != spec.tenant_selectable
+    ):
+        raise ValidationError("تعریف ذخیره‌شده با کاتالوگ کد-محور سیاست هم‌خوان نیست.")
+    if effective_from < timezone.localdate():
+        raise ValidationError("تغییر با تاریخ گذشته برای سیاست مجاز نیست.")
+    if source_basis not in PolicySourceBasis.values:
+        raise ValidationError("مبنای منبع سیاست معتبر نیست.")
+    validate_policy_parameters(spec=spec, parameters=parameters)
+    existing_versions = locked_policy.versions.exclude(status=PolicyVersionStatus.DRAFT)
+    if existing_versions.exists() and supersedes is None:
+        raise ValidationError("نسخه جایگزین باید صریحاً نسخه قبلی را supersede کند.")
+    if supersedes and supersedes.policy_id != locked_policy.pk:
+        raise ValidationError("نسخه supersede‌شده متعلق به همین سیاست نیست.")
     policy_version = PlatformPolicyVersion(
         policy=locked_policy,
         version=version,
@@ -164,28 +210,66 @@ def create_platform_policy_version(
         effective_from=effective_from,
         effective_to=effective_to,
         supersedes=supersedes,
+        source_basis=source_basis,
         created_by=actor,
         reason=reason.strip(),
     )
     policy_version.full_clean()
     policy_version.save()
-    policy_version.sources.set(sources)
     record_audit_event(
         action=AuditAction.PLATFORM_POLICY_VERSION_CREATED,
         entity_type="organizations.PlatformPolicyVersion",
         entity_id=policy_version.pk,
         actor=actor,
         allow_platform_actor=True,
-        metadata=_snapshot_version(policy_version),
+        metadata={
+            "before": None,
+            "after": _snapshot_version(policy_version),
+            "reason": policy_version.reason,
+        },
     )
     return policy_version
 
 
 @transaction.atomic
+def link_policy_version_source(
+    *,
+    actor: User,
+    policy_version: PlatformPolicyVersion,
+    source: PolicySource,
+    reason: str,
+) -> PlatformPolicyVersionSource:
+    _require_platform_admin(actor)
+    locked = PlatformPolicyVersion.objects.select_for_update().get(pk=policy_version.pk)
+    if locked.status != PolicyVersionStatus.DRAFT:
+        raise ValidationError("منبع فقط به نسخه پیش‌نویس قابل پیوند است.")
+    before = _snapshot_version(locked)
+    link = PlatformPolicyVersionSource(
+        policy_version=locked,
+        source=source,
+        linked_by=actor,
+        reason=reason.strip(),
+    )
+    link.full_clean()
+    link.save()
+    record_audit_event(
+        action=AuditAction.PLATFORM_POLICY_SOURCE_LINKED,
+        entity_type="organizations.PlatformPolicyVersionSource",
+        entity_id=link.pk,
+        actor=actor,
+        allow_platform_actor=True,
+        metadata={"before": before, "after": _snapshot_version(locked), "reason": link.reason},
+    )
+    return link
+
+
+@transaction.atomic
 def publish_platform_policy_version(
-    *, actor: User, policy_version: PlatformPolicyVersion
+    *, actor: User, policy_version: PlatformPolicyVersion, reason: str
 ) -> PlatformPolicyVersion:
     _require_platform_admin(actor)
+    if not reason.strip():
+        raise ValidationError("دلیل انتشار نسخه سیاست الزامی است.")
     locked = (
         PlatformPolicyVersion.objects.select_for_update()
         .select_related("policy")
@@ -193,10 +277,12 @@ def publish_platform_policy_version(
     )
     if locked.status != PolicyVersionStatus.DRAFT:
         raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
-    if not locked.parameters:
-        raise ValidationError("سیاست بدون پارامتر مشخص قابل انتشار نیست.")
-    if locked.policy.requires_source_provenance and not locked.sources.exists():
-        raise ValidationError("سیاست دارای الزام منبع بدون منبع قابل انتشار نیست.")
+    spec = get_platform_policy_spec(locked.policy.code)
+    validate_policy_parameters(spec=spec, parameters=locked.parameters)
+    if locked.source_basis == PolicySourceBasis.EXTERNAL_AUTHORITY and not locked.sources.exists():
+        raise ValidationError("سیاست مبتنی بر مرجع بیرونی بدون منبع قابل انتشار نیست.")
+    if not locked.source_basis:
+        raise ValidationError("مبنای منبع سیاست باید مشخص باشد.")
     overlap = PlatformPolicyVersion.objects.filter(
         policy=locked.policy,
         status=PolicyVersionStatus.PUBLISHED,
@@ -204,6 +290,7 @@ def publish_platform_policy_version(
     ).filter(Q(effective_to__isnull=True) | Q(effective_to__gt=locked.effective_from))
     if overlap.exists():
         raise ValidationError("بازه اعتبار نسخه با نسخه منتشرشده هم‌پوشانی دارد.")
+    before = _snapshot_version(locked)
     locked.status = PolicyVersionStatus.PUBLISHED
     locked.published_by = actor
     locked.published_at = timezone.now()
@@ -214,7 +301,64 @@ def publish_platform_policy_version(
         entity_id=locked.pk,
         actor=actor,
         allow_platform_actor=True,
-        metadata=_snapshot_version(locked),
+        metadata={
+            "before": before,
+            "after": _snapshot_version(locked),
+            "reason": reason.strip(),
+        },
+    )
+    return locked
+
+
+@transaction.atomic
+def retire_platform_policy_version(
+    *, actor: User, policy_version: PlatformPolicyVersion, reason: str
+) -> PlatformPolicyVersion:
+    _require_platform_admin(actor)
+    locked = PlatformPolicyVersion.objects.select_for_update().get(pk=policy_version.pk)
+    if locked.status != PolicyVersionStatus.PUBLISHED:
+        raise ValidationError("فقط نسخه منتشرشده قابل بازنشستگی است.")
+    before = _snapshot_version(locked)
+    locked.status = PolicyVersionStatus.RETIRED
+    locked.retired_by = actor
+    locked.retired_at = timezone.now()
+    locked.retirement_reason = reason.strip()
+    locked.full_clean()
+    locked.save(
+        update_fields=[
+            "status", "retired_by", "retired_at", "retirement_reason", "updated_at"
+        ]
+    )
+    record_audit_event(
+        action=AuditAction.PLATFORM_POLICY_VERSION_RETIRED,
+        entity_type="organizations.PlatformPolicyVersion",
+        entity_id=locked.pk,
+        actor=actor,
+        allow_platform_actor=True,
+        metadata={"before": before, "after": _snapshot_version(locked), "reason": reason.strip()},
+    )
+    return locked
+
+
+@transaction.atomic
+def deactivate_platform_policy(*, actor: User, policy: PlatformPolicy, reason: str) -> PlatformPolicy:
+    _require_platform_admin(actor)
+    locked = PlatformPolicy.objects.select_for_update().get(pk=policy.pk)
+    if not locked.is_active:
+        raise ValidationError("سیاست از قبل غیرفعال است.")
+    if not reason.strip():
+        raise ValidationError("دلیل غیرفعال‌سازی سیاست الزامی است.")
+    before = {"is_active": locked.is_active}
+    locked.is_active = False
+    locked.updated_by = actor
+    locked.save(update_fields=["is_active", "updated_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.PLATFORM_POLICY_DEACTIVATED,
+        entity_type="organizations.PlatformPolicy",
+        entity_id=locked.pk,
+        actor=actor,
+        allow_platform_actor=True,
+        metadata={"before": before, "after": {"is_active": locked.is_active}, "reason": reason.strip()},
     )
     return locked
 
@@ -287,7 +431,7 @@ def _require_tenant_role(
 
 
 @transaction.atomic
-def approve_tenant_policy_selection(
+def select_tenant_policy_version(
     *,
     organization: Organization,
     actor: User,
@@ -297,11 +441,11 @@ def approve_tenant_policy_selection(
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
     )
-    owner = _require_tenant_role(
+    admin = _require_tenant_role(
         organization=locked_organization,
         actor=actor,
-        permission=BusinessPermissionCode.TENANT_POLICIES_APPROVE,
-        role=MembershipRole.TENANT_OWNER,
+        permission=BusinessPermissionCode.TENANT_POLICIES_APPLY,
+        role=MembershipRole.TENANT_ADMIN,
     )
     version = (
         PlatformPolicyVersion.objects.select_for_update()
@@ -312,26 +456,36 @@ def approve_tenant_policy_selection(
         raise ValidationError("فقط نسخه منتشرشده سیاست فعال قابل انتخاب است.")
     if not version.policy.tenant_selectable:
         raise ValidationError("این سیاست توسط Tenant قابل انتخاب نیست.")
+    if not _version_is_effective(version, timezone.localdate()):
+        raise ValidationError("انتخاب آینده یا با تاریخ گذشته پشتیبانی نمی‌شود.")
+    validate_policy_parameters(
+        spec=get_platform_policy_spec(version.policy.code), parameters=version.parameters
+    )
     selection = TenantPolicySelection(
         organization=locked_organization,
         policy=version.policy,
         policy_version=version,
-        approved_by=owner,
+        approved_by=admin,
         approved_at=timezone.now(),
         reason=reason.strip(),
     )
     selection.full_clean()
     selection.save()
     record_audit_event(
-        action=AuditAction.TENANT_POLICY_APPROVED,
+        action=AuditAction.TENANT_POLICY_SELECTED,
         entity_type="organizations.TenantPolicySelection",
         entity_id=selection.pk,
         organization=locked_organization,
         actor=actor,
         metadata={
-            "policy_code": version.policy.code,
-            "policy_version": version.version,
+            "before": None,
+            "after": {
+                "policy_code": version.policy.code,
+                "policy_version": version.version,
+                "status": selection.status,
+            },
             "reason": selection.reason,
+            "selected_by": str(admin.pk),
         },
     )
     return selection
@@ -343,6 +497,80 @@ def _version_is_effective(version: PlatformPolicyVersion, on_date: date) -> bool
         and version.effective_from <= on_date
         and (version.effective_to is None or version.effective_to > on_date)
     )
+
+
+def derive_next_open_fiscal_period_start(
+    *, organization: Organization, on_date: date | None = None
+) -> date:
+    """Return the next non-retroactive open accounting-period start for one Tenant."""
+
+    from apps.accounting.models import FiscalPeriod, FiscalPeriodStatus
+
+    if not organization.is_active:
+        raise ValidationError("Tenant غیرفعال تاریخ اثر سیاست دریافت نمی‌کند.")
+    as_of = on_date or timezone.localdate()
+    period = (
+        FiscalPeriod.objects.filter(
+            organization=organization,
+            status=FiscalPeriodStatus.OPEN,
+            starts_on__gt=as_of,
+        )
+        .order_by("starts_on", "number")
+        .first()
+    )
+    if period is None:
+        raise ValidationError(
+            "دوره مالی باز آینده برای تاریخ اثر سیاست حسابداری پیکربندی نشده است."
+        )
+    return period.starts_on
+
+
+@transaction.atomic
+def publish_initial_accounting_policy_versions(
+    *, actor: User, effective_from: date, reason: str
+) -> dict[str, PlatformPolicyVersion]:
+    """Publish the two Product Owner-approved initial accounting policies together."""
+
+    _require_platform_admin(actor)
+    normalized_reason = reason.strip()
+    if not normalized_reason:
+        raise ValidationError("دلیل تصمیم مالک محصول الزامی است.")
+    if effective_from < timezone.localdate():
+        raise ValidationError("نسخه نخست سیاست حسابداری نباید با تاریخ گذشته منتشر شود.")
+
+    published: dict[str, PlatformPolicyVersion] = {}
+    for code in (
+        ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+        ACCOUNTING_ROUNDING_POLICY_CODE,
+    ):
+        policy = create_platform_policy(actor=actor, code=code, reason=normalized_reason)
+        existing = policy.versions.filter(version=1).first()
+        parameters = initial_accounting_policy_parameters(code)
+        if existing is not None:
+            if (
+                existing.status == PolicyVersionStatus.PUBLISHED
+                and existing.effective_from == effective_from
+                and existing.parameters == parameters
+                and existing.source_basis == PolicySourceBasis.PRODUCT_DEFINED
+            ):
+                published[code] = existing
+                continue
+            raise ValidationError("نسخه نخست سیاست حسابداری از قبل با قرارداد دیگری وجود دارد.")
+        draft = create_platform_policy_version(
+            actor=actor,
+            policy=policy,
+            version=1,
+            parameters=parameters,
+            effective_from=effective_from,
+            source_basis=PolicySourceBasis.PRODUCT_DEFINED,
+            reason=normalized_reason,
+        )
+        published[code] = publish_platform_policy_version(
+            actor=actor,
+            policy_version=draft,
+            reason=normalized_reason,
+        )
+    return published
 
 
 def list_tenant_policy_selections(*, organization: Organization, actor: User):
@@ -384,17 +612,23 @@ def apply_tenant_policy_selection(
     if not _version_is_effective(locked.policy_version, timezone.localdate()):
         raise ValidationError("نسخه سیاست در تاریخ جاری معتبر و منتشرشده نیست.")
     if (
-        locked.policy.requires_source_provenance
+        locked.policy_version.source_basis == PolicySourceBasis.EXTERNAL_AUTHORITY
         and not locked.policy_version.sources.exists()
     ):
-        raise ValidationError("سیاست دارای الزام منبع بدون منبع قابل اعمال نیست.")
+        raise ValidationError("سیاست مبتنی بر مرجع بیرونی بدون منبع قابل اعمال نیست.")
+    validate_policy_parameters(
+        spec=get_platform_policy_spec(locked.policy.code),
+        parameters=locked.policy_version.parameters,
+    )
     prior = TenantPolicySelection.objects.select_for_update().filter(
         organization=locked_organization,
         policy=locked.policy,
         status=TenantPolicySelectionStatus.ACTIVE,
     )
     now = timezone.now()
+    superseded_selection_ids: list[str] = []
     for previous in prior:
+        superseded_selection_ids.append(str(previous.pk))
         previous.status = TenantPolicySelectionStatus.SUPERSEDED
         previous.save(update_fields=["status", "updated_at"])
         locked.supersedes = previous
@@ -418,8 +652,15 @@ def apply_tenant_policy_selection(
         organization=locked_organization,
         actor=actor,
         metadata={
-            "policy_code": locked.policy.code,
-            "policy_version": locked.policy_version.version,
+            "before": {
+                "status": TenantPolicySelectionStatus.APPROVED,
+                "superseded_selection_ids": superseded_selection_ids,
+            },
+            "after": {
+                "status": locked.status,
+                "policy_code": locked.policy.code,
+                "policy_version": locked.policy_version.version,
+            },
             "reason": locked.reason,
         },
     )
@@ -446,8 +687,12 @@ def resolve_active_tenant_policy(
     if not _version_is_effective(selection.policy_version, timezone.localdate()):
         raise ValidationError("نسخه سیاست فعال منقضی یا منتشرنشده است.")
     if (
-        selection.policy.requires_source_provenance
+        selection.policy_version.source_basis == PolicySourceBasis.EXTERNAL_AUTHORITY
         and not selection.policy_version.sources.exists()
     ):
-        raise ValidationError("سیاست دارای الزام منبع فاقد منبع است.")
+        raise ValidationError("سیاست مبتنی بر مرجع بیرونی فاقد منبع است.")
+    validate_policy_parameters(
+        spec=get_platform_policy_spec(selection.policy.code),
+        parameters=selection.policy_version.parameters,
+    )
     return selection.policy_version

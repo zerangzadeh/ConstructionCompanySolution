@@ -18,11 +18,18 @@ class OrganizationMiddleware:
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
         request.organization = None
+        request.organization_access_denied = False
 
         if request.user.is_authenticated:
+            had_selected_organization = (
+                ACTIVE_ORGANIZATION_SESSION_KEY in request.session
+            )
             organization = resolve_session_organization(
                 request.user,
                 request.session,
+            )
+            request.organization_access_denied = bool(
+                had_selected_organization and organization is None
             )
 
             if (

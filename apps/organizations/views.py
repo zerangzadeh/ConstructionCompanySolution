@@ -9,6 +9,7 @@ from django.http import (
     HttpResponseForbidden,
 )
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.accounts.models import User
@@ -58,7 +59,19 @@ from apps.organizations.models import (
     OrganizationAccountConnectionRequest,
     OrganizationMembership,
     OrganizationRole,
+    PlatformPolicy,
+    PlatformPolicyVersion,
     ProtectedOperation,
+)
+from apps.organizations.policy_services import (
+    apply_tenant_policy_selection,
+    create_platform_policy,
+    list_tenant_policy_selections,
+    select_tenant_policy_version,
+)
+from apps.organizations.policy_specs import (
+    PLATFORM_POLICY_SPECS,
+    policy_version_is_configuration_ready,
 )
 from apps.organizations.services import (
     create_organization_account,
@@ -814,6 +827,124 @@ def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
             "operations": ProtectedOperation.objects.select_related(
                 "created_by", "retired_by"
             ),
+        },
+    )
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
+    """Expose only the closed accounting-policy catalogue to Platform Admins."""
+
+    if not is_platform_admin(request.user):
+        return HttpResponseForbidden("فقط Platform Admin به این بخش دسترسی دارد.")
+    if request.method == "POST":
+        try:
+            create_platform_policy(
+                actor=request.user,
+                code=request.POST.get("code", ""),
+                reason="ثبت تعریف کد-محور سیاست حسابداری در کاتالوگ Platform.",
+            )
+        except (PermissionDenied, ValidationError, ValueError) as exc:
+            messages.error(request, str(exc))
+        else:
+            messages.success(request, "تعریف کد-محور سیاست ثبت شد؛ هیچ مقدار مالی فعال نشده است.")
+        return redirect("organizations:platform_policy_catalog")
+
+    policies = {
+        policy.code: policy
+        for policy in PlatformPolicy.objects.filter(code__in=PLATFORM_POLICY_SPECS)
+    }
+    versions = PlatformPolicyVersion.objects.filter(
+        policy__code__in=PLATFORM_POLICY_SPECS
+    ).select_related("policy")
+    versions_by_code: dict[str, list[PlatformPolicyVersion]] = {
+        code: [] for code in PLATFORM_POLICY_SPECS
+    }
+    for version in versions:
+        versions_by_code[version.policy.code].append(version)
+    return render(
+        request,
+        "organizations/platform_policy_catalog.html",
+        {
+            "policy_entries": [
+                {
+                    "spec": spec,
+                    "policy": policies.get(code),
+                    "versions": versions_by_code[code],
+                }
+                for code, spec in PLATFORM_POLICY_SPECS.items()
+            ]
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.TENANT_POLICIES_VIEW)
+@require_http_methods(["GET", "POST"])
+def tenant_policy_configuration(request: HttpRequest) -> HttpResponse:
+    """Allow only selection/application of ready, published Platform versions."""
+
+    organization = request.organization
+    if request.method == "POST":
+        try:
+            if request.POST.get("action") == "select":
+                version = PlatformPolicyVersion.objects.select_related("policy").get(
+                    pk=request.POST.get("policy_version_id"),
+                    policy__code__in=PLATFORM_POLICY_SPECS,
+                )
+                select_tenant_policy_version(
+                    organization=organization,
+                    actor=request.user,
+                    policy_version=version,
+                    reason=request.POST.get("reason", ""),
+                )
+                messages.success(request, "نسخه سیاست انتخاب شد؛ برای اعمال آماده است.")
+            elif request.POST.get("action") == "apply":
+                selection = list_tenant_policy_selections(
+                    organization=organization, actor=request.user
+                ).get(pk=request.POST.get("selection_id"))
+                apply_tenant_policy_selection(
+                    organization=organization, actor=request.user, selection=selection
+                )
+                messages.success(request, "نسخه سیاست اعمال شد.")
+            else:
+                raise ValidationError("عملیات سیاست معتبر نیست.")
+        except (PlatformPolicyVersion.DoesNotExist, PermissionDenied, ValidationError) as exc:
+            messages.error(request, str(exc))
+        return redirect("organizations:tenant_policy_configuration")
+
+    selections = list_tenant_policy_selections(
+        organization=organization, actor=request.user
+    )
+    today = timezone.localdate()
+    published_versions = PlatformPolicyVersion.objects.filter(
+        policy__code__in=PLATFORM_POLICY_SPECS,
+        status="published",
+        policy__is_active=True,
+        policy__tenant_selectable=True,
+    ).select_related("policy")
+    ready_versions = [
+        version
+        for version in published_versions
+        if (
+            version.effective_from <= today
+            and (version.effective_to is None or version.effective_to > today)
+            and policy_version_is_configuration_ready(version)
+        )
+    ]
+    upcoming_versions = [
+        version
+        for version in published_versions
+        if version.effective_from > today and policy_version_is_configuration_ready(version)
+    ]
+    return render(
+        request,
+        "organizations/tenant_policy_configuration.html",
+        {
+            "selections": selections,
+            "ready_versions": ready_versions,
+            "upcoming_versions": upcoming_versions,
         },
     )
 

@@ -1,14 +1,18 @@
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.access_services import assign_platform_admin
+from apps.organizations.authorization import membership_permission_codes
 from apps.organizations.models import (
     AuthorizationScopeType,
+    BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
     MembershipRoleAssignment,
@@ -16,350 +20,358 @@ from apps.organizations.models import (
     MembershipStatus,
     OrganizationMembership,
     OrganizationRole,
-    OrganizationStatus,
-    PolicyCategory,
-    PolicySensitivity,
+    PlatformPolicyVersionSource,
+    PolicySourceBasis,
     PolicyVersionStatus,
     TenantPolicySelectionStatus,
 )
 from apps.organizations.policy_services import (
     apply_tenant_policy_selection,
-    approve_tenant_policy_selection,
     create_platform_policy,
     create_platform_policy_version,
-    list_tenant_policy_selections,
+    deactivate_platform_policy,
+    link_policy_version_source,
     publish_platform_policy_version,
     record_policy_source,
     resolve_active_tenant_policy,
+    retire_platform_policy_version,
+    select_tenant_policy_version,
+)
+from apps.organizations.policy_specs import (
+    ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+    initial_accounting_policy_parameters,
+    validate_policy_for_consumer,
 )
 from apps.organizations.services import create_organization_with_owner
 
 
-class P1S15PolicyLocalizationTests(TestCase):
+class AccountingPolicyFoundationTests(TestCase):
     def setUp(self) -> None:
         self.root = User.objects.create_superuser(
-            username="p1s15-root", password="x", email="root@example.test"
+            username="policy-root", password="x", email="root@example.test"
         )
-        self.approver = User.objects.create_superuser(
-            username="p1s15-approver", password="x", email="approver@example.test"
+        approver = User.objects.create_superuser(
+            username="policy-approver", password="x", email="approver@example.test"
         )
-        self.platform_admin = User.objects.create_user(
-            username="p1s15-platform", password="x"
-        )
+        self.platform_admin = User.objects.create_user(username="policy-platform", password="x")
         assign_platform_admin(
             actor=self.root,
-            approver=self.approver,
+            approver=approver,
             target=self.platform_admin,
-            reason="P1-S15 test authority",
+            reason="Policy foundation test authority",
         )
-        self.owner = User.objects.create_user(username="p1s15-owner", password="x")
+        self.owner = User.objects.create_user(username="policy-owner", password="x")
         self.organization = create_organization_with_owner(
-            owner=self.owner,
-            name="P1-S15 Tenant",
-            slug="p1-s15-tenant",
+            owner=self.owner, name="Policy Tenant", slug="policy-tenant"
         )
-        self.tenant_admin = self._membership_with_role(
-            organization=self.organization,
-            username="p1s15-admin",
-            role_code=MembershipRole.TENANT_ADMIN,
-        )
-        self.other_owner = User.objects.create_user(
-            username="p1s15-other-owner", password="x"
-        )
-        self.other_organization = create_organization_with_owner(
-            owner=self.other_owner,
-            name="Other P1-S15 Tenant",
-            slug="other-p1-s15-tenant",
-        )
-        self.other_admin = self._membership_with_role(
-            organization=self.other_organization,
-            username="p1s15-other-admin",
-            role_code=MembershipRole.TENANT_ADMIN,
-        )
+        self.tenant_admin = self._tenant_admin("policy-admin")
 
-    def _membership_with_role(
-        self, *, organization, username: str, role_code: str
-    ) -> User:
+    def _tenant_admin(self, username: str) -> User:
         user = User.objects.create_user(username=username, password="x")
-        role = OrganizationRole.objects.get(code=role_code, organization__isnull=True)
+        role = OrganizationRole.objects.get(
+            code=MembershipRole.TENANT_ADMIN, organization__isnull=True
+        )
         membership = OrganizationMembership.objects.create(
-            organization=organization,
+            organization=self.organization,
             user=user,
-            role=role_code,
+            role=MembershipRole.TENANT_ADMIN,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
             authorization_migrated_at=timezone.now(),
         )
         MembershipRoleAssignment.objects.create(
-            organization=organization,
+            organization=self.organization,
             membership=membership,
             role=role,
-            reason="P1-S15 test role",
+            reason="Policy test role",
         )
         MembershipScopeGrant.objects.create(
-            organization=organization,
+            organization=self.organization,
             membership=membership,
             scope_type=AuthorizationScopeType.ORGANIZATION,
-            reason="P1-S15 test scope",
+            reason="Policy test scope",
         )
         return user
 
-    def _published_operational_version(self):
-        policy = create_platform_policy(
+    def _activate_client(self, user: User) -> None:
+        self.client.force_login(user)
+        session = self.client.session
+        session["active_organization_id"] = str(self.organization.pk)
+        session.save()
+
+    def _policy(self):
+        return create_platform_policy(
             actor=self.platform_admin,
-            code="display-calendar-policy",
-            name="Display calendar options",
-            category=PolicyCategory.DISPLAY_CALENDAR,
-            sensitivity=PolicySensitivity.OPERATIONAL,
+            code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+            reason="Initialize closed accounting policy definition.",
         )
-        version = create_platform_policy_version(
+
+    def _published_policy_version(self, *, effective_from):
+        policy = self._policy()
+        draft = create_platform_policy_version(
             actor=self.platform_admin,
             policy=policy,
             version=1,
-            parameters={"allowed_value": "jalali"},
-            effective_from=timezone.localdate() - timedelta(days=1),
-            reason="Accepted product display boundary",
+            parameters=initial_accounting_policy_parameters(
+                ACCOUNTING_MONEY_PRECISION_POLICY_CODE
+            ),
+            effective_from=effective_from,
+            source_basis=PolicySourceBasis.PRODUCT_DEFINED,
+            reason="Create policy version for Tenant selection tests.",
         )
         return publish_platform_policy_version(
-            actor=self.platform_admin, policy_version=version
+            actor=self.platform_admin,
+            policy_version=draft,
+            reason="Publish policy version for Tenant selection tests.",
         )
 
-    def test_platform_admin_owns_catalog_and_external_source_is_metadata(self) -> None:
+    def test_only_closed_catalog_codes_and_exact_approved_values_are_accepted(self) -> None:
         with self.assertRaises(PermissionDenied):
             create_platform_policy(
                 actor=self.owner,
-                code="forbidden-policy",
-                name="Forbidden",
-                category=PolicyCategory.OTHER,
-                sensitivity=PolicySensitivity.OPERATIONAL,
+                code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+                reason="Forbidden",
             )
-        source = record_policy_source(
-            actor=self.platform_admin,
-            issuer="Supplied external issuer",
-            title="Supplied source title",
-            source_identifier="SRC-TEST-1",
-            version="v1",
-            applicability="Test-only provenance; no legal assertion.",
-        )
-        self.assertEqual(source.created_by, self.platform_admin)
-        self.assertFalse(User.objects.filter(username=source.issuer).exists())
+        with self.assertRaisesMessage(ValidationError, "کاتالوگ کد-محور"):
+            create_platform_policy(
+                actor=self.platform_admin,
+                code="arbitrary-policy",
+                reason="Forbidden",
+            )
+        policy = self._policy()
+        with self.assertRaisesMessage(ValidationError, "دقیقاً با قرارداد"):
+            create_platform_policy_version(
+                actor=self.platform_admin,
+                policy=policy,
+                version=1,
+                parameters={},
+                effective_from=timezone.localdate(),
+                source_basis=PolicySourceBasis.PRODUCT_DEFINED,
+                reason="Incomplete parameters are forbidden.",
+            )
         self.assertTrue(
             AuditEvent.objects.filter(
-                action=AuditAction.POLICY_SOURCE_RECORDED,
-                entity_id=str(source.pk),
+                action=AuditAction.PLATFORM_POLICY_CREATED, entity_id=str(policy.pk)
             ).exists()
         )
 
-    def test_policy_with_explicit_source_requirement_fails_closed_without_source(
-        self,
-    ) -> None:
-        policy = create_platform_policy(
-            actor=self.platform_admin,
-            code="regulated-placeholder",
-            name="Regulated placeholder",
-            category=PolicyCategory.REGULATORY_RULE_SET,
-            sensitivity=PolicySensitivity.REGULATORY,
-            requires_source_provenance=True,
+    def test_retroactive_version_is_rejected_before_any_value_validation(self) -> None:
+        policy = self._policy()
+        with self.assertRaisesMessage(ValidationError, "تاریخ گذشته"):
+            create_platform_policy_version(
+                actor=self.platform_admin,
+                policy=policy,
+                version=1,
+                parameters={"unapproved": "value"},
+                effective_from=timezone.localdate() - timedelta(days=1),
+                source_basis=PolicySourceBasis.PRODUCT_DEFINED,
+                reason="Retroactive policy prohibited.",
+            )
+
+    def test_accounting_consumer_requires_the_closed_policy_contract(self) -> None:
+        policy = SimpleNamespace(
+            code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+            name="دقت پول حسابداری",
+            category="precision",
+            sensitivity="accounting",
+            tenant_selectable=True,
         )
+        version = SimpleNamespace(
+            policy=policy,
+            parameters=initial_accounting_policy_parameters(
+                ACCOUNTING_MONEY_PRECISION_POLICY_CODE
+            ),
+        )
+        with self.assertRaisesMessage(ValidationError, "کد سیاست با قرارداد"):
+            validate_policy_for_consumer(
+                policy_version=version,
+                consumer="accounting.journal.submit",
+                expected_policy_code="accounting-rounding",
+            )
+
+        unknown = SimpleNamespace(policy=SimpleNamespace(code="unknown-policy"), parameters={})
+        with self.assertRaisesMessage(ValidationError, "کاتالوگ کد-محور"):
+            validate_policy_for_consumer(
+                policy_version=unknown, consumer="accounting.journal.submit"
+            )
+
+    def test_lifecycle_and_source_immutability_with_a_test_only_contract(self) -> None:
+        # The lifecycle contract uses the actual closed Product Owner values; no
+        # test-only financial values are introduced.
+        policy = self._policy()
         version = create_platform_policy_version(
             actor=self.platform_admin,
             policy=policy,
             version=1,
-            parameters={"enabled": False},
+            parameters=initial_accounting_policy_parameters(
+                ACCOUNTING_MONEY_PRECISION_POLICY_CODE
+            ),
             effective_from=timezone.localdate(),
-            reason="No regulatory facts activated",
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            reason="Exercise lifecycle controls only.",
         )
-        with self.assertRaisesMessage(ValidationError, "سیاست دارای الزام منبع"):
-            publish_platform_policy_version(
-                actor=self.platform_admin, policy_version=version
-            )
-        version.refresh_from_db()
-        self.assertEqual(version.status, PolicyVersionStatus.DRAFT)
-        self.assertFalse(version.review_evidence.exists())
         source = record_policy_source(
             actor=self.platform_admin,
-            issuer="Test-only issuer",
-            title="Test-only source",
-            source_identifier="SRC-SENSITIVE-TEST",
-            version="v1",
-            applicability="Test provenance only; no legal assertion.",
+            issuer="Test authority",
+            title="Test source",
+            source_identifier="POLICY-TEST-1",
+            version="1",
+            applicability="Test provenance only.",
+            reason="Lifecycle source evidence.",
         )
-        version.sources.add(source)
-        published = publish_platform_policy_version(
-            actor=self.platform_admin, policy_version=version
-        )
-        self.assertEqual(published.status, PolicyVersionStatus.PUBLISHED)
-        self.assertFalse(published.review_evidence.exists())
-
-        tenant_entered_policy = create_platform_policy(
+        link = link_policy_version_source(
             actor=self.platform_admin,
-            code="regulated-source-optional",
-            name="Regulated parameter with optional provenance",
-            category=PolicyCategory.REGULATORY_RULE_SET,
-            sensitivity=PolicySensitivity.REGULATORY,
-            requires_source_provenance=False,
-        )
-        tenant_entered_version = create_platform_policy_version(
-            actor=self.platform_admin,
-            policy=tenant_entered_policy,
-            version=1,
-            parameters={"enabled": False},
-            effective_from=timezone.localdate(),
-            reason="Structure only; no regulated value asserted",
-        )
-        self.assertEqual(
-            publish_platform_policy_version(
-                actor=self.platform_admin, policy_version=tenant_entered_version
-            ).status,
-            PolicyVersionStatus.PUBLISHED,
-        )
-
-    def test_permission_catalog_preserves_owner_approval_admin_application(
-        self,
-    ) -> None:
-        owner_role = OrganizationRole.objects.get(
-            code=MembershipRole.TENANT_OWNER, organization__isnull=True
-        )
-        admin_role = OrganizationRole.objects.get(
-            code=MembershipRole.TENANT_ADMIN, organization__isnull=True
-        )
-        manager_role = OrganizationRole.objects.get(
-            code=MembershipRole.TENANT_MANAGER, organization__isnull=True
-        )
-        self.assertTrue(
-            owner_role.permissions.filter(
-                code=BusinessPermissionCode.TENANT_POLICIES_APPROVE
-            ).exists()
-        )
-        self.assertFalse(
-            admin_role.permissions.filter(
-                code=BusinessPermissionCode.TENANT_POLICIES_APPROVE
-            ).exists()
-        )
-        self.assertTrue(
-            admin_role.permissions.filter(
-                code=BusinessPermissionCode.TENANT_POLICIES_APPLY
-            ).exists()
-        )
-        self.assertTrue(
-            manager_role.permissions.filter(
-                code=BusinessPermissionCode.TENANT_POLICIES_VIEW
-            ).exists()
-        )
-        self.assertFalse(
-            manager_role.permissions.filter(
-                code=BusinessPermissionCode.TENANT_POLICIES_APPLY
-            ).exists()
-        )
-
-    def test_float_and_executable_policy_parameters_are_rejected(self) -> None:
-        policy = create_platform_policy(
-            actor=self.platform_admin,
-            code="precision-placeholder",
-            name="Precision placeholder",
-            category=PolicyCategory.PRECISION,
-            sensitivity=PolicySensitivity.ACCOUNTING,
-        )
-        with self.assertRaises(ValidationError):
-            create_platform_policy_version(
-                actor=self.platform_admin,
-                policy=policy,
-                version=1,
-                parameters={"scale": 2.5},
-                effective_from=timezone.localdate(),
-                reason="Rejected imprecise value",
-            )
-        with self.assertRaises(ValidationError):
-            create_platform_policy_version(
-                actor=self.platform_admin,
-                policy=policy,
-                version=1,
-                parameters={"script": "return arbitrary_value"},
-                effective_from=timezone.localdate(),
-                reason="Rejected executable input",
-            )
-
-    def test_owner_approves_admin_applies_and_resolution_is_audited(self) -> None:
-        version = self._published_operational_version()
-        selection = approve_tenant_policy_selection(
-            organization=self.organization,
-            actor=self.owner,
             policy_version=version,
-            reason="Owner selected an allowed platform option",
+            source=source,
+            reason="Link before publication.",
         )
-        with self.assertRaises(PermissionDenied):
-            apply_tenant_policy_selection(
-                organization=self.organization,
-                actor=self.owner,
-                selection=selection,
+        published = publish_platform_policy_version(
+            actor=self.platform_admin,
+            policy_version=version,
+            reason="Publish lifecycle test version.",
+        )
+        with self.assertRaises(ValidationError):
+            PlatformPolicyVersionSource.objects.create(
+                policy_version=published,
+                source=source,
+                linked_by=self.platform_admin,
+                reason="Forbidden post-publication mutation.",
             )
+        selection = select_tenant_policy_version(
+            organization=self.organization,
+            actor=self.tenant_admin,
+            policy_version=published,
+            reason="Tenant selection.",
+        )
         applied = apply_tenant_policy_selection(
             organization=self.organization,
             actor=self.tenant_admin,
             selection=selection,
         )
         self.assertEqual(applied.status, TenantPolicySelectionStatus.ACTIVE)
-        self.assertEqual(
-            list(
-                list_tenant_policy_selections(
-                    organization=self.organization, actor=self.tenant_admin
-                )
-            ),
-            [applied],
+        other_owner = User.objects.create_user(username="other-policy-owner", password="x")
+        other_organization = create_organization_with_owner(
+            owner=other_owner,
+            name="Other policy tenant",
+            slug="other-policy-tenant",
         )
-        with self.assertRaises(PermissionDenied):
-            list_tenant_policy_selections(
-                organization=self.organization, actor=self.other_admin
-            )
-        self.assertEqual(
+        with self.assertRaises(ValidationError):
             resolve_active_tenant_policy(
-                organization=self.organization,
-                policy_code=version.policy.code,
-            ),
-            version,
+                organization=other_organization, policy_code=policy.code
+            )
+        version_id = published.pk
+        retire_platform_policy_version(
+            actor=self.platform_admin,
+            policy_version=published,
+            reason="Retire without rewriting history.",
+        )
+        published.refresh_from_db()
+        self.assertEqual(published.pk, version_id)
+        self.assertEqual(published.status, PolicyVersionStatus.RETIRED)
+        with self.assertRaises(ValidationError):
+            resolve_active_tenant_policy(
+                organization=self.organization, policy_code=policy.code
+            )
+        deactivate_platform_policy(
+            actor=self.platform_admin,
+            policy=policy,
+            reason="Deactivate policy catalogue entry.",
         )
         self.assertTrue(
             AuditEvent.objects.filter(
-                organization=self.organization,
-                action=AuditAction.TENANT_POLICY_APPROVED,
-                entity_id=str(selection.pk),
+                action=AuditAction.PLATFORM_POLICY_SOURCE_LINKED, entity_id=str(link.pk)
             ).exists()
         )
         self.assertTrue(
             AuditEvent.objects.filter(
-                organization=self.organization,
-                action=AuditAction.TENANT_POLICY_APPLIED,
-                entity_id=str(selection.pk),
+                action=AuditAction.PLATFORM_POLICY_VERSION_RETIRED,
+                entity_id=str(version_id),
             ).exists()
         )
 
-    def test_cross_tenant_and_inactive_tenant_application_are_denied(self) -> None:
-        version = self._published_operational_version()
-        selection = approve_tenant_policy_selection(
+    def test_policy_ui_exposes_only_safe_catalog_and_empty_tenant_state(self) -> None:
+        self.client.force_login(self.owner)
+        self.assertEqual(
+            self.client.get(reverse("organizations:platform_policy_catalog")).status_code,
+            403,
+        )
+        self.client.force_login(self.platform_admin)
+        platform_page = self.client.get(reverse("organizations:platform_policy_catalog"))
+        self.assertEqual(platform_page.status_code, 200)
+        self.assertContains(platform_page, "ثبت تعریف")
+        self.assertNotContains(platform_page, "انتشار نسخه")
+        self.assertEqual(
+            self.client.post(
+                reverse("organizations:platform_policy_catalog"),
+                {"code": ACCOUNTING_MONEY_PRECISION_POLICY_CODE},
+            ).status_code,
+            302,
+        )
+        platform_page = self.client.get(reverse("organizations:platform_policy_catalog"))
+        self.assertContains(platform_page, "مقادیر فقط از نسخهٔ منتشرشده قابل اعمال‌اند.")
+
+        self._activate_client(self.tenant_admin)
+        tenant_page = self.client.get(
+            reverse("organizations:tenant_policy_configuration")
+        )
+        self.assertEqual(tenant_page.status_code, 200)
+        self.assertContains(tenant_page, "نسخه قابل انتخابی وجود ندارد.")
+        self.assertNotContains(tenant_page, 'name="policy_version_id"', html=False)
+
+    def test_tenant_policy_ui_keeps_future_version_read_only(self) -> None:
+        future_version = self._published_policy_version(
+            effective_from=timezone.localdate() + timedelta(days=1)
+        )
+
+        self._activate_client(self.tenant_admin)
+        tenant_page = self.client.get(
+            reverse("organizations:tenant_policy_configuration")
+        )
+
+        self.assertEqual(tenant_page.status_code, 200)
+        self.assertNotContains(tenant_page, 'name="policy_version_id"', html=False)
+        self.assertContains(tenant_page, "نسخه‌های منتشرشدهٔ آینده")
+        self.assertContains(tenant_page, future_version.policy.name)
+        self.assertEqual(tenant_page.context["ready_versions"], [])
+        self.assertEqual(tenant_page.context["upcoming_versions"], [future_version])
+
+    def test_tenant_admin_uses_apply_permission_not_legacy_approval_permission(self) -> None:
+        published = self._published_policy_version(effective_from=timezone.localdate())
+        legacy_permission = BusinessPermission.objects.get(
+            code=BusinessPermissionCode.TENANT_POLICIES_APPROVE
+        )
+        tenant_admin_membership = OrganizationMembership.objects.get(
+            organization=self.organization, user=self.tenant_admin
+        )
+        owner_membership = OrganizationMembership.objects.get(
+            organization=self.organization, user=self.owner
+        )
+
+        self.assertFalse(legacy_permission.is_active)
+        self.assertIn(
+            BusinessPermissionCode.TENANT_POLICIES_APPLY,
+            membership_permission_codes(tenant_admin_membership),
+        )
+        self.assertNotIn(
+            BusinessPermissionCode.TENANT_POLICIES_APPROVE,
+            membership_permission_codes(tenant_admin_membership),
+        )
+        self.assertNotIn(
+            BusinessPermissionCode.TENANT_POLICIES_APPROVE,
+            membership_permission_codes(owner_membership),
+        )
+
+        selection = select_tenant_policy_version(
             organization=self.organization,
-            actor=self.owner,
-            policy_version=version,
-            reason="Tenant-owned selection",
+            actor=self.tenant_admin,
+            policy_version=published,
+            reason="Tenant Admin selects the effective version.",
         )
+        self.assertEqual(selection.status, TenantPolicySelectionStatus.APPROVED)
         with self.assertRaises(PermissionDenied):
-            apply_tenant_policy_selection(
-                organization=self.other_organization,
-                actor=self.other_admin,
-                selection=selection,
-            )
-        self.organization.status = OrganizationStatus.SUSPENDED
-        self.organization.save(update_fields=["status", "updated_at"])
-        with self.assertRaises(PermissionDenied):
-            apply_tenant_policy_selection(
+            select_tenant_policy_version(
                 organization=self.organization,
-                actor=self.tenant_admin,
-                selection=selection,
-            )
-
-    def test_missing_tenant_policy_resolution_fails_closed(self) -> None:
-        with self.assertRaisesMessage(
-            ValidationError, "سیاست فعال برای Tenant پیکربندی نشده است"
-        ):
-            resolve_active_tenant_policy(
-                organization=self.organization, policy_code="missing-policy"
+                actor=self.owner,
+                policy_version=published,
+                reason="Tenant Owner has no separate approval route.",
             )
