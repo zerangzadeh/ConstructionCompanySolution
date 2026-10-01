@@ -361,6 +361,7 @@ def create_journal(
         JournalKind.OPENING: ("opening", "opening_balance"),
         JournalKind.REVERSAL: ("accounting", "reversal"),
         JournalKind.REPLACEMENT: ("accounting", "replacement"),
+        JournalKind.OPERATIONAL: ("treasury", "movement_posted"),
     }[kind]
     resolved_source_kind = source_kind or default_contract[0]
     resolved_event_kind = event_kind or default_contract[1]
@@ -539,6 +540,7 @@ def add_journal_line(
     site: ProjectSite | None = None,
     wbs_node: WBSNode | None = None,
     party: BusinessParty | None = None,
+    source_line_uuid: uuid.UUID | None = None,
 ) -> JournalLine:
     require_business_permission(
         user=actor,
@@ -566,6 +568,8 @@ def add_journal_line(
         wbs_node=wbs_node,
         party=party,
     )
+    if source_line_uuid is not None:
+        line.source_line_uuid = source_line_uuid
     line.save()
     return line
 

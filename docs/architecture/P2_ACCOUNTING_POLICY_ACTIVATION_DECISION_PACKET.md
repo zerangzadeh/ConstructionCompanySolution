@@ -56,16 +56,22 @@ provenance سطح فیلد جداگانه تصویب و پیاده‌سازی ش
 
 ## TINF-01 — مسئله مستقل زیرساخت آزمون pytest
 
-**وضعیت:** تأییدشده مستقل از این پیاده‌سازی سیاست.
+**وضعیت:** رفع‌شده برای چرخهٔ دادهٔ مرجع آزمون (2026-10-01).
 
-ساخت تازه DB آزمون PostgreSQL در اجرای pytest، پیش از اجرای تست‌ها با خطای
-`duplicate key ... pg_type_typname_nsp_index` هنگام ایجاد
-`workflows_workflowtype` متوقف شد. `workflows.0001_initial` وابستگیِ
-`organizations.0056_accounting_policy_foundation` یا `organizations.0057` نیست؛
-بنابراین این خطا در زنجیره migration بنیاد سیاست قرار ندارد. اجرای
-`--nomigrations` نیز به‌دلیل رد شدن migration ایجاد `btree_gist` برای قیدهای
-حسابداری معتبر نیست و نشانه موفقیت/شکست بنیاد سیاست محسوب نمی‌شود.
+علت، `flush` در `TransactionTestCase` بود: داده‌های global که فقط با data
+migration ایجاد می‌شدند حذف می‌شدند، اما migration دوباره اجرا نمی‌شد. بنابراین
+`OrganizationRole` و `BusinessPermission` کانونی از بین می‌رفتند و پس از آن
+رگرسیون‌های Accounting نمی‌توانستند سازمان بسازند. همان حالت، `WorkflowType`
+ثبت‌شده را نیز حذف می‌کرد و ایجاد سازمان سپس نبودِ قالب سازگاریِ system-owned را
+آشکار می‌ساخت.
 
-تست‌های هدفمندِ عبوری، این مشکل کامل‌پروژه را حل‌شده نشان نمی‌دهند. مالک جداگانه
-TINF-01 باید ساخت DB آزمون، ترتیب/حالت migration و extensionهای PostgreSQL را
-بازآفرینی و اصلاح کند؛ سپس pytest کامل مستقل اجرا شود.
+اکنون `post_migrate`، کاتالوگ authorization را از registry و نقش‌های پیش‌فرض، و
+`WorkflowType` را از registry کانونی workflow به‌طور idempotent بازسازی می‌کند.
+قالب‌های compatibility فقط در مسیر bootstrap رسمی خودشان و تنها هنگام فقدان از
+پیکربندی کد-مالک موجود بازسازی می‌شوند؛ fixture، retry یا seed مخصوص تست افزوده
+نشده است. شواهد: دو آزمون واقعی flush، ۶ آزمون Treasury، سه رگرسیون پیشین
+Accounting و کل `AccountingFoundationTests` (۲۹ آزمون) همگی سبز شدند.
+
+این شواهد به‌معنای سبز بودن pytest کامل نیست؛ آن اجرا عمداً جزو این رفع محدود
+نبود. خطای مستقل registry برای `MATERIAL_DOCUMENTS_LINK` نیز تغییر نکرده و باید
+جداگانه رسیدگی شود.

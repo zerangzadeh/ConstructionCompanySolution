@@ -46,6 +46,7 @@ class JournalKind(models.TextChoices):
     OPENING = "opening", "افتتاحیه"
     REVERSAL = "reversal", "برگشت"
     REPLACEMENT = "replacement", "جایگزین"
+    OPERATIONAL = "operational", "عملیاتی"
 
 
 class JournalStatus(models.TextChoices):
@@ -508,6 +509,7 @@ class JournalEntry(UUIDModel, TimeStampedModel):
                             JournalKind.MANUAL,
                             JournalKind.REVERSAL,
                             JournalKind.REPLACEMENT,
+                            JournalKind.OPERATIONAL,
                         ],
                         cutoff_date__isnull=True,
                     )
@@ -527,7 +529,11 @@ class JournalEntry(UUIDModel, TimeStampedModel):
                         replaces__isnull=False,
                     )
                     | Q(
-                        kind__in=[JournalKind.MANUAL, JournalKind.OPENING],
+                        kind__in=[
+                            JournalKind.MANUAL,
+                            JournalKind.OPENING,
+                            JournalKind.OPERATIONAL,
+                        ],
                         reverses__isnull=True,
                         replaces__isnull=True,
                     )
@@ -570,6 +576,7 @@ class JournalEntry(UUIDModel, TimeStampedModel):
             JournalKind.OPENING: ("opening", "opening_balance"),
             JournalKind.REVERSAL: ("accounting", "reversal"),
             JournalKind.REPLACEMENT: ("accounting", "replacement"),
+            JournalKind.OPERATIONAL: ("treasury", "movement_posted"),
         }[self.kind]
         if (self.source_kind, self.event_kind) != expected_contract:
             raise ValidationError("نوع سند با قرارداد منبع/رویداد سازگار نیست.")

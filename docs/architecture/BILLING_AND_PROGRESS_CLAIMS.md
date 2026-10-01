@@ -139,6 +139,14 @@ commercial, or accounting boundary:
   permission, workflow assignment/candidacy, and UI filtering do not substitute
   for that future access boundary.
 
+P3-S27-Q01 now accepts an approved immutable `ProgressClaim` revision as the first
+eligible staged AR source only after Billing supplies an explicit immutable due
+date, party/tax/currency snapshot and linked post-approval correction facts.
+Recognition uses the Tenant-local date of `approved_at`; missing required facts
+fail closed, approved history is never edited, and correction reverses dependent
+evidence and the original recognition before replacement. This accepted source
+contract does not implement or activate the adapter, and no AP source is selected.
+
 These are **pre-production correction candidates** in
 `PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md` and `ROADMAP.md`; this document does
 not authorize their implementation.

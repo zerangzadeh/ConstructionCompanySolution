@@ -719,8 +719,10 @@ selected or registered. Missing precision/rounding values remain fail-closed.
 
 ## 9. P3 session map — 32 sessions
 
-**Current status (2026-10-01): P3-S01–S04 decision/design tranche is complete;
-P3-S05 implementation remains explicitly unauthorized.** The
+**Current status (2026-10-01): P3-S01–S27 Treasury and AP/AR foundation is
+complete; P3-S28–S29 workbench implementation awaits Product Owner acceptance;
+P3-S30–S31 controls are complete/accepted; and P3-S32 documentation closeout/P4
+handoff is complete. P3 activation remains unauthorized.** The
 [P3-S01–S04 Treasury/subledger decision packet](architecture/P3_S01_S04_TREASURY_SUBLEDGER_DECISION_PACKET.md)
 records the verified legacy Payment/allocation/claim-settlement boundary and the
 Product Owner's accepted D3-01..D3-08 = A, D3-09 = A-Revised, and D3-10..D3-12 = A
@@ -730,25 +732,133 @@ explicit, versioned, scope-bound and audited platform/Tenant policy, with an
 independent permissioned checker whenever Self-Approval is disabled or an
 additional threshold applies. The packet defines the first operational producer
 and controlled transition contract while keeping every application/migration
-action and P3-S05 out of scope.
+action and P3-S05 out of scope for that earlier decision tranche. The separately
+authorized S05–S11 implementation provides the native account, movement,
+instrument, Accounting-producer and Treasury-to-GL reconciliation boundary. The
+subsequently authorized S12–S17 tranche adds the bounded request/advance boundary
+without closing any production activation gate. The authorized S18–S22 tranche
+adds format-neutral bounded statement evidence, exact match/clearing correction
+and retained bank reconciliation without selecting a provider adapter or
+production limit and without closing an activation gate.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
 | P3-S01..S04 | complete | `A-H` | D3-01..D3-08=A, D3-09=A-Revised and D3-10..D3-12=A recorded; Treasury/AP/AR ownership, platform-policy-controlled Self-Approval, legacy Payment containment and transition design accepted; no P3-S05 implementation authority |
-| P3-S05..S11 | 7 | `A-H` | Bank/cash/petty-cash accounts, receipts, payments, transfers and cheques |
-| P3-S12..S17 | 6 | `A-H` | Payment requests/scheduling, employee/vendor advances and settlement |
-| P3-S18..S22 | 5 | `A-H` | Statement import, matching, clearing and bank reconciliation |
-| P3-S23..S27 | 5 | `A-H` | AP/AR obligations, allocations, aging and controlled write-off/reversal |
-| P3-S28..S29 | 2 | `T-M` | Treasury/subledger UI and exception workbenches |
-| P3-S30..S31 | 2 | `A-X` | Maker-checker, duplicate import, cash-to-GL and subledger reconciliation review |
-| P3-S32 | 1 | `L-M` | Documentation closeout and P4 handoff packet |
+| P3-S05..S11 | complete | `A-H` | Tenant bank/cash/petty-cash accounts, versioned GL mapping, direct receipt/disbursement, atomic transfers, cheque cash-on-clear/bounce reversal, synchronous `treasury.movement.posted.v1` producer and retained Treasury-to-GL reconciliation delivered; six focused PostgreSQL tests, three retained Accounting regressions and the 29-test Accounting foundation set passed; TINF-01 flush seed-loss root cause is closed, while `MATERIAL_DOCUMENTS_LINK` remains separate |
+| P3-S12..S17 | complete | `A-H` | The bounded implementation contract delivered unscheduled payment requests, exact posted-disbursement release, employee/vendor advances, cash-return settlement, integrated protected reversal and retained advance-to-Treasury-to-GL evidence. Nine focused PostgreSQL Treasury tests, three Accounting regressions, and focused permission/catalog checks passed. Scheduling, thresholds and non-cash substantiation remain explicit gates; `MATERIAL_DOCUMENTS_LINK` remains independent. |
+| P3-S18..S22 | complete | `A-H` | Bounded synchronous statement evidence, duplicate/idempotency controls, exact deterministic/ambiguous matching, policy-controlled clearing/correction and retained bank reconciliation delivered; no adapter, numeric default, activation or Accounting mutation |
+| P3-S23..S27 | complete | `A-H` | Immutable AP/AR authority, Treasury-linked capped allocation/reversal, exact as-of aging and retained reconciliation delivered; Q01=A, Q02=A clarified, Q03=A-Revised and Q04=A accepted, while implementation/activation remains separately gated |
+| P3-S28..S29 | implemented / acceptance pending | `T-M` | Persian-first, permissioned Treasury/subledger and exception workbenches; only existing retained evidence and service transitions are exposed, while recognition/posting/write-off approval/reversal remain unavailable; focused workbench DB coverage passed in the later isolated S30–S31 acceptance run |
+| P3-S30..S31 | complete / accepted | `A-X` | Dedicated independent review permissions and immutable signed review evidence for cash-to-GL and AP/AR runs; existing exact duplicate-import controls retained and regression-covered; eight focused tests and the three retained Treasury/subledger/Accounting regressions passed. The prior apparent setup stall was isolated to orphaned diagnostic pytest processes retaining a partial disposable test database; no product-code change was required. |
+| P3-S32 | complete | `L-M` | [P3 closeout/P4 handoff packet](architecture/P3_S32_CLOSEOUT_AND_P4_HANDOFF.md) reconciles implemented evidence and preserves the P4 source-classification, budget/CBS/cost-center, migration and activation boundaries; P4 implementation remains separately authorized. |
 
 **Product Owner gates:** D3 closed the initial cash-account structure, cheque
 recognition, synchronous-import direction and platform-policy-controlled
 Self-Approval/threshold architecture. Exact bank provider/file sources and limits,
-any numeric approval thresholds, payment scheduling, write-off authority, pilot
-Tenant/cutoff, rollout tolerances and recovery operators remain open at their
-applicable implementation/activation gates.
+numeric approval thresholds for separately gated operations, payment scheduling,
+write-off implementation/activation, pilot Tenant/cutoff, rollout tolerances and
+recovery operators remain open at their applicable gates. No write-off threshold
+is authorized or required by accepted P3-S27-Q03 A-Revised.
+
+### P3-S12–S17 implementation contract and closeout
+
+The Product Owner authorized P3-S12–S17 on 2026-10-01 and required the contract to
+be finalized before application changes. The
+[P3-S12–S17 implementation contract](architecture/P3_S12_S17_IMPLEMENTATION_CONTRACT.md)
+records ownership, lifecycle, permissions/object scope, audit, Self-Approval/SoD,
+lock order, idempotency, correction, Accounting boundaries, reconciliation,
+migration/rollback and acceptance evidence. S14 remains a deliberate no-code
+deferral for scheduling/proposal rules and every numeric threshold.
+
+Implementation adds only expand-only `treasury.0004`, `organizations.0060` and
+`audit.0042`. It does not migrate or reinterpret legacy `Payment`, activate a
+Tenant, import statements, implement AP/AR, connect a bank, or begin P3-S18. The
+cash-return-only settlement boundary preserves Accounting ownership through the
+existing posted-movement producer; non-cash expense/invoice/payroll/AP evidence
+requires its separately authorized owner and producer.
+
+Validation passed: all nine Treasury PostgreSQL tests (including policy SoD,
+idempotency, exact movement linkage, immutable reversal, reconciliation, account
+uniqueness and concurrent settlement caps), three retained Accounting posting/
+reversal/reconciliation regressions, four focused permission/catalog tests plus
+eleven role-default subtests, Django system/migration checks, and targeted Ruff.
+The full registry audit continues to report only the pre-existing broad model/
+namespace gaps including `MATERIAL_DOCUMENTS_LINK`; those failures were not
+changed or absorbed. At that closeout, P3-S18–S22 remained the next separately
+authorized package; its completed bounded result is recorded below.
+
+### P3-S18–S22 implementation contract and closeout
+
+The Product Owner authorized P3-S18–S22 on 2026-10-01 and required the contract
+to be finalized before application changes. The
+[P3-S18–S22 implementation contract](architecture/P3_S18_S22_IMPLEMENTATION_CONTRACT.md)
+records ownership/lifecycle, format-neutral validation, explicit caller-supplied
+bounds, file/row duplicates, idempotency, permissions/object scope, audit,
+Self-Approval/SoD, lock order, exact matching, clearing/correction,
+Treasury/Accounting separation, reconciliation, migration/rollback and focused
+acceptance evidence.
+
+Implementation adds expand-only `treasury.0005`–`0006`, `organizations.0061` and
+`audit.0043`. A synchronous service hashes opaque source bytes and retains
+canonical row evidence while requiring positive byte/row limits for every call;
+there is no default and no production caller. Exact account/direction/amount/date
+facts alone produce deterministic or ambiguous suggestions. Confirmation creates
+clearing evidence only; reversal preserves the bank row, Treasury movement and
+Accounting journal. Bank reconciliation retains exact unmatched/uncleared IDs,
+totals, exceptions and a hash and does not dispose, sign off, post or adjust.
+
+Validation passed: four focused PostgreSQL statement tests cover bounds,
+permissions, duplicate/idempotency and tamper controls, policy SoD, exact versus
+ambiguous matching, concurrent single-effect acceptance/clearing, reversal and
+bank reconciliation without Accounting mutation; one PostgreSQL migration
+rollback/reapply rehearsal and three retained Accounting regressions passed.
+Django system/migration-state checks and targeted Ruff passed. Two focused
+permission-registry checks and eleven role-default subtests passed; the two broad
+registry checks retain only their documented pre-existing namespace and
+`MATERIAL_DOCUMENTS_LINK` failures. The next package is P3-S23–S27 only after
+separate authorization. Provider adapters/formats, production bounds,
+source-file retention/storage, tolerances, UI, background work, external bank
+integration, legacy cutover/backfill and activation remain open gates.
+
+### P3-S23–S27 implementation contract and closeout
+
+The Product Owner authorized P3-S23–S27 on 2026-10-01 and required the contract
+to be finalized before application changes. The
+[P3-S23–S27 implementation contract](architecture/P3_S23_S27_IMPLEMENTATION_CONTRACT.md)
+records ownership/lifecycle, exact source lineage, Tenant/object scope,
+permissions/audit/SoD, lock order, idempotency, partial and over-allocation,
+Treasury/Accounting separation, exact as-of aging, correction/reversal,
+reconciliation, migration/rollback and focused acceptance.
+
+Implementation adds the expand-only `subledgers.0001`, `organizations.0062` and
+`audit.0044` boundary. It provides immutable AP/AR obligations, capped partial
+settlement allocations against exact posted Treasury receipts/disbursements,
+append-only reversal, Treasury reversal protection, retained per-item as-of aging
+without buckets, reconciliation exceptions and write-off proposals. Six focused
+PostgreSQL tests passed, including Tenant/direction/source-policy denial, partial/
+over-allocation, reversal/as-of behavior, no Accounting mutation, concurrent cap
+control and migration rollback/reapply. Six retained Treasury/Accounting
+regressions and three focused permission/catalog checks with eleven role-default
+subtests also passed. The broad registry audit remains limited to its pre-existing
+model/namespace and `MATERIAL_DOCUMENTS_LINK` gaps.
+
+No eligible source adapter or AP/AR Accounting producer is registered. The later
+accepted Q01/Q02 choices require staged AR source completion and explicit
+directional mappings; settlement must use the exact Treasury-created clearing
+roles and Subledgers must never select or mutate cash postings. Write-off
+approval/reversal remain catalogued but disabled pending implementation of
+accepted Q03 A-Revised; Q04 retains exact unbucketed aging. Legacy
+`Payment`/claim-settlement
+cutover/backfill, activation, UI, background/external work, P3-S28+ and
+`MATERIAL_DOCUMENTS_LINK` remain outside this package.
+
+The 2026-10-01
+[P3-S23–S27 activation decision packet](architecture/P3_S23_S27_ACTIVATION_DECISION_PACKET.md)
+records Q01 = A, Q02 = A with exact Treasury directional-clearing semantics,
+Q03 = A-Revised under the accepted Platform/Tenant Self-Approval policy, and
+Q04 = A. These Product Owner gates are closed without supplying numeric thresholds
+or changing application behavior. The decisions are not implementation,
+activation, legacy cutover/backfill or P3-S28+ authorization.
 
 ## 10. P4 session map — 38 sessions
 
@@ -3115,5 +3225,6 @@ before the effective date; posting remains fail-closed until both selections are
 active.
 
 The concise [accounting-policy activation decision packet](architecture/P2_ACCOUNTING_POLICY_ACTIVATION_DECISION_PACKET.md)
-records the adopted values and TINF-01, the independently confirmed full-project pytest DB bootstrap
-failure; targeted checks do not close that infrastructure issue.
+records the adopted values and the closed TINF-01 flush seed-loss correction. It
+does not claim a full-project pytest run; the independent `MATERIAL_DOCUMENTS_LINK`
+registry failure remains outside this tranche.

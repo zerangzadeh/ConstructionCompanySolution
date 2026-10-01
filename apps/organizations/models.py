@@ -321,6 +321,139 @@ class BusinessPermissionCode(models.TextChoices):
     ACCOUNTING_PERIODS_CLOSE = "accounting.periods_close", "بستن دوره مالی"
     ACCOUNTING_PERIODS_REOPEN = "accounting.periods_reopen", "بازگشایی دوره مالی"
 
+    TREASURY_VIEW = "treasury.view", "مشاهده خزانه‌داری"
+    TREASURY_ACCOUNTS_MANAGE = (
+        "treasury.accounts_manage",
+        "مدیریت حساب‌های خزانه‌داری",
+    )
+    TREASURY_SENSITIVE_VIEW = (
+        "treasury.sensitive_view",
+        "مشاهده شناسه‌های ماسک‌شده حساس خزانه‌داری",
+    )
+    TREASURY_MAPPINGS_MANAGE = (
+        "treasury.mappings_manage",
+        "مدیریت نگاشت حسابداری خزانه‌داری",
+    )
+    TREASURY_MOVEMENTS_CREATE = (
+        "treasury.movements_create",
+        "ایجاد حرکت خزانه‌داری",
+    )
+    TREASURY_MOVEMENTS_SUBMIT = (
+        "treasury.movements_submit",
+        "ارسال حرکت خزانه‌داری",
+    )
+    TREASURY_MOVEMENTS_APPROVE = (
+        "treasury.movements_approve",
+        "تأیید حرکت خزانه‌داری",
+    )
+    TREASURY_MOVEMENTS_POST = (
+        "treasury.movements_post",
+        "ثبت قطعی حرکت خزانه‌داری",
+    )
+    TREASURY_MOVEMENTS_REVERSE = (
+        "treasury.movements_reverse",
+        "برگشت حرکت خزانه‌داری",
+    )
+    TREASURY_CHEQUES_MANAGE = (
+        "treasury.cheques_manage",
+        "مدیریت چک‌های خزانه‌داری",
+    )
+    TREASURY_CHEQUES_CLEAR = (
+        "treasury.cheques_clear",
+        "ثبت وصول قطعی چک",
+    )
+    TREASURY_RECONCILIATIONS_RUN = (
+        "treasury.reconciliations_run",
+        "اجرای تطبیق خزانه‌داری با دفترکل",
+    )
+    TREASURY_RECONCILIATIONS_REVIEW = (
+        "treasury.reconciliations_review",
+        "بررسی مستقل تطبیق خزانه‌داری با دفترکل",
+    )
+    TREASURY_PAYMENT_REQUESTS_CREATE = (
+        "treasury.payment_requests_create",
+        "ایجاد درخواست پرداخت خزانه‌داری",
+    )
+    TREASURY_PAYMENT_REQUESTS_SUBMIT = (
+        "treasury.payment_requests_submit",
+        "ارسال درخواست پرداخت خزانه‌داری",
+    )
+    TREASURY_PAYMENT_REQUESTS_APPROVE = (
+        "treasury.payment_requests_approve",
+        "تأیید درخواست پرداخت خزانه‌داری",
+    )
+    TREASURY_PAYMENT_REQUESTS_RELEASE = (
+        "treasury.payment_requests_release",
+        "تخصیص پرداخت قطعی به درخواست",
+    )
+    TREASURY_ADVANCES_MANAGE = (
+        "treasury.advances_manage",
+        "مدیریت تنخواه کارمند و تأمین‌کننده",
+    )
+    TREASURY_ADVANCES_SETTLE = (
+        "treasury.advances_settle",
+        "ثبت و تأیید تسویه نقدی تنخواه",
+    )
+    TREASURY_ADVANCES_REVERSE = (
+        "treasury.advances_reverse",
+        "برگشت کنترل‌شده تنخواه یا تسویه",
+    )
+    TREASURY_STATEMENTS_IMPORT = (
+        "treasury.statements_import",
+        "پیش‌نمایش و لغو ورود صورتحساب بانکی",
+    )
+    TREASURY_STATEMENTS_ACCEPT = (
+        "treasury.statements_accept",
+        "پذیرش صورتحساب بانکی",
+    )
+    TREASURY_STATEMENT_MATCHES_MANAGE = (
+        "treasury.statement_matches_manage",
+        "مدیریت پیشنهاد و اصلاح تطبیق بانکی",
+    )
+    TREASURY_STATEMENT_MATCHES_CLEAR = (
+        "treasury.statement_matches_clear",
+        "تأیید تطبیق و تسویه بانکی",
+    )
+    TREASURY_BANK_RECONCILIATIONS_RUN = (
+        "treasury.bank_reconciliations_run",
+        "اجرای تطبیق بانکی",
+    )
+
+    SUBLEDGERS_VIEW = "subledgers.view", "مشاهده تعهدات AP/AR"
+    SUBLEDGERS_OBLIGATIONS_RECOGNIZE = (
+        "subledgers.obligations_recognize",
+        "شناسایی تعهد AP/AR از منبع ثبت‌شده",
+    )
+    SUBLEDGERS_SETTLEMENTS_ALLOCATE = (
+        "subledgers.settlements_allocate",
+        "تخصیص تسویه خزانه‌داری به تعهد AP/AR",
+    )
+    SUBLEDGERS_SETTLEMENTS_REVERSE = (
+        "subledgers.settlements_reverse",
+        "برگشت تخصیص تسویه AP/AR",
+    )
+    SUBLEDGERS_AGING_RUN = "subledgers.aging_run", "اجرای aging دقیق AP/AR"
+    SUBLEDGERS_RECONCILIATIONS_RUN = (
+        "subledgers.reconciliations_run",
+        "اجرای تطبیق زیر‌دفتر AP/AR",
+    )
+    SUBLEDGERS_RECONCILIATIONS_REVIEW = (
+        "subledgers.reconciliations_review",
+        "بررسی مستقل تطبیق زیر‌دفتر AP/AR",
+    )
+    SUBLEDGERS_WRITEOFFS_PROPOSE = (
+        "subledgers.writeoffs_propose",
+        "پیشنهاد سوخت مانده AP/AR",
+    )
+    SUBLEDGERS_WRITEOFFS_APPROVE = (
+        "subledgers.writeoffs_approve",
+        "تأیید سوخت مانده AP/AR (در انتظار سیاست)",
+    )
+    SUBLEDGERS_WRITEOFFS_REVERSE = (
+        "subledgers.writeoffs_reverse",
+        "برگشت سوخت AP/AR (در انتظار سیاست)",
+    )
+
     PARTIES_VIEW = "parties.view", "مشاهده طرف‌های تجاری"
     PARTIES_CREATE = "parties.create", "ایجاد طرف تجاری"
     PARTIES_CHANGE = "parties.change", "ویرایش طرف تجاری"
@@ -444,6 +577,23 @@ class BusinessPermissionCode(models.TextChoices):
     ESTIMATE_ITEMS_ADD = "estimate_items.add", "افزودن ردیف برآورد"
     ESTIMATES_APPROVE = "estimates.approve", "تأیید برآوردها"
     ESTIMATES_REVISE = "estimates.revise", "ایجاد بازنگری برآورد"
+    ESTIMATES_COMPARE = "estimates.compare", "مقایسه بازنگری‌های برآورد"
+    ESTIMATE_COMPOSITION_MANAGE = (
+        "estimate_composition.manage",
+        "مدیریت ترکیب منابع برآورد",
+    )
+    ESTIMATE_ASSUMPTIONS_MANAGE = (
+        "estimate_assumptions.manage",
+        "مدیریت فرض‌ها و ضرایب برآورد",
+    )
+    ESTIMATE_RATE_SOURCES_MANAGE = (
+        "estimate_rate_sources.manage",
+        "مدیریت منبع و نرخ برآورد",
+    )
+    ESTIMATE_IMPORTS_PREVIEW = (
+        "estimate_imports.preview",
+        "پیش‌نمایش ورود برآورد",
+    )
 
     EXPENSES_VIEW = "expenses.view", "مشاهده هزینه‌ها"
     EXPENSES_CREATE = "expenses.create", "ثبت هزینه"
@@ -1751,7 +1901,9 @@ class PlatformPolicy(UUIDModel, TimeStampedModel):
             or self.tenant_selectable != spec.tenant_selectable
             or self.requires_source_provenance
         ):
-            raise ValidationError("تعریف سیاست باید دقیقاً با کاتالوگ کد-محور هم‌خوان باشد.")
+            raise ValidationError(
+                "تعریف سیاست باید دقیقاً با کاتالوگ کد-محور هم‌خوان باشد."
+            )
         if not self._state.adding and self.versions.exists():
             original = PlatformPolicy.objects.get(pk=self.pk)
             stable_fields = (
@@ -1912,18 +2064,25 @@ class PlatformPolicyVersion(UUIDModel, TimeStampedModel):
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل ایجاد نسخه الزامی است."})
         if self.status == PolicyVersionStatus.RETIRED:
-            if not self.retired_by_id or not self.retired_at or not self.retirement_reason.strip():
+            if (
+                not self.retired_by_id
+                or not self.retired_at
+                or not self.retirement_reason.strip()
+            ):
                 raise ValidationError("بازنشستگی نسخه به عامل، زمان و دلیل نیاز دارد.")
         elif self.retired_by_id or self.retired_at or self.retirement_reason:
             raise ValidationError("جزئیات بازنشستگی فقط برای نسخه بازنشسته مجاز است.")
         if not self._state.adding:
             original = PlatformPolicyVersion.objects.get(pk=self.pk)
-            if original.status == PolicyVersionStatus.RETIRED and self.status != original.status:
-                raise ValidationError("نسخه بازنشسته قابل فعال‌سازی مجدد نیست.")
             if (
-                original.status == PolicyVersionStatus.PUBLISHED
-                and self.status not in {PolicyVersionStatus.PUBLISHED, PolicyVersionStatus.RETIRED}
+                original.status == PolicyVersionStatus.RETIRED
+                and self.status != original.status
             ):
+                raise ValidationError("نسخه بازنشسته قابل فعال‌سازی مجدد نیست.")
+            if original.status == PolicyVersionStatus.PUBLISHED and self.status not in {
+                PolicyVersionStatus.PUBLISHED,
+                PolicyVersionStatus.RETIRED,
+            }:
                 raise ValidationError("نسخه منتشرشده فقط می‌تواند بازنشسته شود.")
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -1984,7 +2143,10 @@ class PlatformPolicyVersionSource(UUIDModel, TimeStampedModel):
 
     def clean(self) -> None:
         super().clean()
-        if self.policy_version_id and self.policy_version.status != PolicyVersionStatus.DRAFT:
+        if (
+            self.policy_version_id
+            and self.policy_version.status != PolicyVersionStatus.DRAFT
+        ):
             raise ValidationError("منبع فقط به نسخه پیش‌نویس قابل پیوند است.")
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل پیوند منبع الزامی است."})

@@ -109,8 +109,8 @@ Names are descriptive and may change during an approved detailed design.
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
 | Project cost/control | BudgetBaseline/Version/Line, CBSNode, CostCenter, Commitment, Accrual, CostFact projection, ForecastVersion/Line, Risk/Change/Schedule baseline |
 | Accounting | FiscalYear/Period, Account, JournalEntry/Line, PostingRuleVersion, PostingSource, Reversal/Replacement/Adjustment links, immutable FinancialStatementRun/LineSnapshot, FiscalPeriodControlEvent close/reopen evidence |
-| AP/AR | Obligation/OpenItem, Credit/DebitAdjustment, Allocation, Aging projection, SubledgerReconciliation |
-| Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, Statement/Line, Match/Reconciliation, PaymentProposal |
+| AP/AR | Implemented immutable Obligation, Treasury-linked Allocation/Reversal, WriteOffProposal, exact AgingRun, SubledgerReconciliationRun and independent signed ReconciliationReview; source/posting activation, approved write-off decision/reversal and credit/debit adjustment policy remain gated |
+| Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, unscheduled PaymentRequest, Employee/VendorAdvance and cash-return Settlement, retained source-to-GL reconciliation plus independent signed review, BankStatementImport/Line, exact Match/Clearing/Reversal and BankReconciliationRun; PaymentProposal and provider adapters remain target concepts |
 | Procurement | RFQ/Invitation, Quote/Revision/Line, Comparison/Award, PO/Change, Receipt/ServiceAcceptance, SupplierInvoice/MatchException |
 | Contract/Billing | ContractTermVersion, Variation, Guarantee/Security, Measurement, Claim/Certificate, Adjustment, Retention/Advance balance projection, Settlement |
 | Payroll/insurance | WorkCalendar/Shift, Attendance, Timesheet, Leave, PayrollRuleVersion, PayrollRun/EmployeeResult/Component, InsuranceList, Tax/InsuranceSubmission |
@@ -220,6 +220,17 @@ alternate balances. The delivered Accounting boundary retains versioned run scop
 cutoff, input/result hashes, ordered exception and tie-out snapshots, one immutable
 disposition per exception and one independent protected review. Review pins the
 verified run/disposition hashes and cannot mutate source facts, journals or balances.
+The delivered Treasury bank boundary separately retains bounded synchronous
+statement/file/row identities, exact match and clearing/reversal lineage, and
+immutable as-of bank-reconciliation totals, unmatched/uncleared identifiers,
+exceptions and evidence hashes. It neither creates a second cash movement nor
+mutates Accounting history; provider parsing and independent review/sign-off are
+later gates.
+The delivered AP/AR foundation retains exact source/version/hash and party/object
+snapshots, capped Treasury allocation/reversal lineage, per-item as-of aging with
+undated evidence instead of invented buckets, and explicit missing-journal/control-
+mapping reconciliation exceptions. No source adapter, posting mapping or write-off
+approval is activated until the recorded Product Owner decisions are supplied.
 
 Required controls include estimate-to-budget, commitment, PO-receipt-invoice,
 inventory quantity/value, claim-to-subledger, AP/AR-to-GL, Treasury-to-bank,

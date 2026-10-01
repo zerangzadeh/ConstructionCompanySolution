@@ -1,4 +1,7 @@
-from decimal import Decimal
+import csv
+from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
+from io import StringIO
 
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
@@ -9,14 +12,19 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.contracts.models import Contract
+from apps.equipment.models import Equipment
 from apps.estimates.models import (
     Estimate,
+    EstimateAssumption,
     EstimateItem,
+    EstimatePriceSource,
+    EstimateRate,
+    EstimateResource,
     EstimateRevision,
     EstimateRevisionStatus,
     EstimateStatus,
 )
-from apps.materials.models import UnitOfMeasure
+from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
@@ -27,7 +35,7 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.projects.models import Project, ProjectPhase
+from apps.projects.models import Activity, Project, ProjectPhase
 from core.identifiers import canonicalize_upper_identifier
 
 
@@ -352,7 +360,7 @@ def create_estimate_revision(
         updated_by=actor,
     )
     for item in source.items.all():
-        EstimateItem.objects.create(
+        copied_item = EstimateItem.objects.create(
             organization=locked_estimate.organization,
             estimate=locked_estimate,
             revision=revision,
@@ -362,6 +370,31 @@ def create_estimate_revision(
             unit_of_measure=item.unit_of_measure,
             unit_price=item.unit_price,
             sort_order=item.sort_order,
+        )
+        for resource in item.resources.all():
+            EstimateResource.objects.create(
+                organization=locked_estimate.organization,
+                estimate_item=copied_item,
+                resource_type=resource.resource_type,
+                description=resource.description,
+                quantity=resource.quantity,
+                unit_of_measure=resource.unit_of_measure,
+                material=resource.material,
+                activity=resource.activity,
+                equipment=resource.equipment,
+                rate=resource.rate,
+            )
+    for assumption in source.assumptions.all():
+        EstimateAssumption.objects.create(
+            organization=locked_estimate.organization,
+            revision=revision,
+            kind=assumption.kind,
+            name=assumption.name,
+            decimal_value=assumption.decimal_value,
+            sequence=assumption.sequence,
+            rationale=assumption.rationale,
+            source_reference=assumption.source_reference,
+            created_by=actor,
         )
     (
         locked_estimate.current_revision,
@@ -383,6 +416,232 @@ def create_estimate_revision(
         },
     )
     return revision
+
+
+@dataclass(frozen=True, slots=True)
+class RevisionComparison:
+    left_revision_id: str
+    right_revision_id: str
+    left_total: Decimal
+    right_total: Decimal
+    difference: Decimal
+
+
+def compare_revisions(
+    *, estimate: Estimate, left: EstimateRevision, right: EstimateRevision, actor: User
+) -> RevisionComparison:
+    """Compare immutable planning evidence; it does not create a baseline."""
+    _validate_context(
+        actor=actor,
+        organization=estimate.organization,
+        project=estimate.project,
+        permission=BusinessPermissionCode.ESTIMATES_COMPARE,
+    )
+    if left.estimate_id != estimate.pk or right.estimate_id != estimate.pk:
+        raise PermissionDenied("بازنگری‌ها متعلق به همین برآورد نیستند.")
+    return RevisionComparison(
+        str(left.pk),
+        str(right.pk),
+        left.total_amount,
+        right.total_amount,
+        right.total_amount - left.total_amount,
+    )
+
+
+@transaction.atomic
+def add_estimate_resource(
+    *,
+    estimate_item: EstimateItem,
+    actor: User,
+    resource_type: str,
+    description: str,
+    quantity: Decimal,
+    unit_of_measure: UnitOfMeasure,
+    material: Material | None = None,
+    activity: Activity | None = None,
+    equipment: Equipment | None = None,
+    rate: EstimateRate | None = None,
+) -> EstimateResource:
+    estimate = Estimate.objects.select_for_update().get(pk=estimate_item.estimate_id)
+    _validate_context(
+        actor=actor,
+        organization=estimate.organization,
+        project=estimate.project,
+        permission=BusinessPermissionCode.ESTIMATE_COMPOSITION_MANAGE,
+    )
+    item = EstimateItem.objects.select_related("revision").get(
+        pk=estimate_item.pk, estimate=estimate
+    )
+    if not item.revision_id or item.revision.status != EstimateRevisionStatus.DRAFT:
+        raise ValueError("فقط ردیف بازنگری پیش‌نویس قابل ترکیب‌بندی است.")
+    return EstimateResource.objects.create(
+        organization=estimate.organization,
+        estimate_item=item,
+        resource_type=resource_type,
+        description=description.strip(),
+        quantity=quantity,
+        unit_of_measure=unit_of_measure,
+        material=material,
+        activity=activity,
+        equipment=equipment,
+        rate=rate,
+    )
+
+
+@transaction.atomic
+def add_estimate_assumption(
+    *,
+    revision: EstimateRevision,
+    actor: User,
+    kind: str,
+    name: str,
+    decimal_value: Decimal | None,
+    sequence: int,
+    rationale: str,
+    source_reference: str,
+) -> EstimateAssumption:
+    estimate = Estimate.objects.select_for_update().get(pk=revision.estimate_id)
+    _validate_context(
+        actor=actor,
+        organization=estimate.organization,
+        project=estimate.project,
+        permission=BusinessPermissionCode.ESTIMATE_ASSUMPTIONS_MANAGE,
+    )
+    revision = EstimateRevision.objects.select_for_update().get(pk=revision.pk)
+    if revision.status != EstimateRevisionStatus.DRAFT:
+        raise ValueError("فقط بازنگری پیش‌نویس فرض جدید می‌پذیرد.")
+    return EstimateAssumption.objects.create(
+        organization=estimate.organization,
+        revision=revision,
+        kind=kind,
+        name=name,
+        decimal_value=decimal_value,
+        sequence=sequence,
+        rationale=rationale,
+        source_reference=source_reference,
+        created_by=actor,
+    )
+
+
+@transaction.atomic
+def create_price_source(
+    *,
+    organization: Organization,
+    actor: User,
+    code: str,
+    name: str,
+    version: str,
+    source_reference: str,
+    license_reference: str,
+    is_external: bool = False,
+) -> EstimatePriceSource:
+    if (
+        not actor.is_authenticated
+        or not actor.is_active
+        or organization.status != OrganizationStatus.ACTIVE
+        or organization.deleted_at is not None
+        or not _has_estimate_permission(
+            actor,
+            organization,
+            BusinessPermissionCode.ESTIMATE_RATE_SOURCES_MANAGE,
+            allow_any_scope=True,
+        )
+    ):
+        raise PermissionDenied("اجازه مدیریت منابع نرخ این سازمان را ندارید.")
+    if is_external:
+        raise ValueError("P4-G03: منبع قیمت خارجی تا تصمیم مجوز و نسخه قابل ثبت نیست.")
+    return EstimatePriceSource.objects.create(
+        organization=organization,
+        code=code,
+        name=name,
+        version=version,
+        source_reference=source_reference,
+        license_reference=license_reference,
+        is_external=False,
+        created_by=actor,
+    )
+
+
+@transaction.atomic
+def record_estimate_rate(
+    *,
+    price_source: EstimatePriceSource,
+    actor: User,
+    resource_type: str,
+    code: str,
+    unit_of_measure: UnitOfMeasure,
+    rate: Decimal,
+) -> EstimateRate:
+    """Record provenance, without approving or applying a resource rate (P4-G02)."""
+    source = EstimatePriceSource.objects.select_for_update().get(pk=price_source.pk)
+    if source.is_external:
+        raise ValueError("P4-G03: منبع خارجی نرخ قابل استفاده نیست.")
+    if (
+        source.organization.status != OrganizationStatus.ACTIVE
+        or source.organization.deleted_at is not None
+        or not _has_estimate_permission(
+            actor,
+            source.organization,
+            BusinessPermissionCode.ESTIMATE_RATE_SOURCES_MANAGE,
+            allow_any_scope=True,
+        )
+    ):
+        raise PermissionDenied("اجازه مدیریت منابع نرخ این سازمان را ندارید.")
+    return EstimateRate.objects.create(
+        organization=source.organization,
+        price_source=source,
+        resource_type=resource_type,
+        code=code,
+        unit_of_measure=unit_of_measure,
+        rate=rate,
+        source_version_snapshot=source.version,
+        source_reference_snapshot=source.source_reference,
+        license_reference_snapshot=source.license_reference,
+        created_by=actor,
+    )
+
+
+@dataclass(frozen=True, slots=True)
+class ImportPreview:
+    valid_rows: int
+    errors: tuple[str, ...]
+
+
+def preview_estimate_csv(
+    *, estimate: Estimate, actor: User, content: str
+) -> ImportPreview:
+    """Validate the fixed internal CSV profile without any persistence."""
+    _validate_context(
+        actor=actor,
+        organization=estimate.organization,
+        project=estimate.project,
+        permission=BusinessPermissionCode.ESTIMATE_IMPORTS_PREVIEW,
+    )
+    reader = csv.DictReader(StringIO(content))
+    required = ("description", "quantity", "unit", "unit_price", "sort_order")
+    if tuple(reader.fieldnames or ()) != required:
+        return ImportPreview(0, ("P4-G04: نگاشت ستون‌های تأییدنشده یا ناقص است.",))
+    errors: list[str] = []
+    valid = 0
+    for number, row in enumerate(reader, start=2):
+        values = tuple((row.get(key) or "").strip() for key in required)
+        if any(value.startswith("=") for value in values):
+            errors.append(f"ردیف {number}: فرمول مجاز نیست.")
+            continue
+        try:
+            if (
+                not values[0]
+                or not values[2]
+                or Decimal(values[1]) <= 0
+                or Decimal(values[3]) < 0
+                or int(values[4]) < 0
+            ):
+                raise ValueError
+        except (InvalidOperation, ValueError):
+            errors.append(f"ردیف {number}: مقدار یا واحد معتبر نیست.")
+            continue
+        valid += 1
+    return ImportPreview(valid, tuple(errors))
 
 
 def get_organization_estimates(

@@ -346,5 +346,253 @@ class EstimateItem(UUIDModel, TimeStampedModel):
                 )
 
     def save(self, *args: object, **kwargs: object) -> None:
+        if (
+            self.pk
+            and not self._state.adding
+            and self.revision_id
+            and self.revision.status != EstimateRevisionStatus.DRAFT
+        ):
+            raise ValidationError("ردیف بازنگری نهایی‌شده قابل تغییر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class EstimateResourceType(models.TextChoices):
+    LABOR = "labor", "نیروی کار"
+    MATERIAL = "material", "مصالح"
+    EQUIPMENT = "equipment", "تجهیزات"
+
+
+class EstimatePriceSource(UUIDModel, TimeStampedModel):
+    """Versioned provenance only; it does not activate a price book."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE
+    )
+    code = models.CharField("کد منبع", max_length=50)
+    name = models.CharField("نام منبع", max_length=255)
+    version = models.CharField("نسخه منبع", max_length=80)
+    source_reference = models.CharField("مرجع منبع", max_length=255)
+    license_reference = models.CharField("مرجع مجوز", max_length=255)
+    is_external = models.BooleanField("منبع خارجی", default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="estimate_price_sources_created",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "code", "version"],
+                name="estimate_price_source_org_code_ver_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        self.code = canonicalize_upper_identifier(self.code)
+        self.name = self.name.strip()
+        self.version = self.version.strip()
+        self.source_reference = self.source_reference.strip()
+        self.license_reference = self.license_reference.strip()
+        if not all(
+            (
+                self.code,
+                self.name,
+                self.version,
+                self.source_reference,
+                self.license_reference,
+            )
+        ):
+            raise ValidationError("کد، نام، نسخه، مرجع و مجوز منبع قیمت الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("منبع قیمت قابل تغییر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class EstimateRate(UUIDModel, TimeStampedModel):
+    """Immutable rate-lineage record. Application awaits P4-G02."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE
+    )
+    price_source = models.ForeignKey(
+        EstimatePriceSource, on_delete=models.PROTECT, related_name="rates"
+    )
+    resource_type = models.CharField(
+        max_length=20, choices=EstimateResourceType.choices
+    )
+    code = models.CharField("کد نرخ", max_length=80)
+    unit_of_measure = models.ForeignKey(
+        "materials.UnitOfMeasure", on_delete=models.PROTECT
+    )
+    rate = models.DecimalField("نرخ", max_digits=18, decimal_places=4)
+    source_version_snapshot = models.CharField("نسخه ثبت‌شده", max_length=80)
+    source_reference_snapshot = models.CharField("مرجع ثبت‌شده", max_length=255)
+    license_reference_snapshot = models.CharField("مجوز ثبت‌شده", max_length=255)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="estimate_rates_created",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["price_source", "code"], name="estimate_rate_source_code_uq"
+            )
+        ]
+
+    def clean(self) -> None:
+        self.code = canonicalize_upper_identifier(self.code)
+        if (
+            self.organization_id != self.price_source.organization_id
+            or self.organization_id != self.unit_of_measure.organization_id
+        ):
+            raise ValidationError("منبع نرخ و واحد باید متعلق به همین سازمان باشند.")
+        if self.rate < Decimal(0):
+            raise ValidationError({"rate": "نرخ نمی‌تواند منفی باشد."})
+        if not all(
+            (
+                self.source_version_snapshot.strip(),
+                self.source_reference_snapshot.strip(),
+                self.license_reference_snapshot.strip(),
+            )
+        ):
+            raise ValidationError("نسخه، مرجع و مجوز ثبت‌شده نرخ الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("رکورد نرخ قابل تغییر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class EstimateResource(UUIDModel, TimeStampedModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE
+    )
+    estimate_item = models.ForeignKey(
+        EstimateItem, on_delete=models.CASCADE, related_name="resources"
+    )
+    resource_type = models.CharField(
+        max_length=20, choices=EstimateResourceType.choices
+    )
+    description = models.CharField("شرح منبع", max_length=255)
+    quantity = models.DecimalField("مقدار", max_digits=18, decimal_places=4)
+    unit_of_measure = models.ForeignKey(
+        "materials.UnitOfMeasure", on_delete=models.PROTECT
+    )
+    material = models.ForeignKey(
+        "materials.Material", null=True, blank=True, on_delete=models.PROTECT
+    )
+    activity = models.ForeignKey(
+        "projects.Activity", null=True, blank=True, on_delete=models.PROTECT
+    )
+    equipment = models.ForeignKey(
+        "equipment.Equipment", null=True, blank=True, on_delete=models.PROTECT
+    )
+    rate = models.ForeignKey(
+        EstimateRate, null=True, blank=True, on_delete=models.PROTECT
+    )
+
+    def clean(self) -> None:
+        item = self.estimate_item
+        if (
+            self.organization_id != item.organization_id
+            or self.organization_id != self.unit_of_measure.organization_id
+        ):
+            raise ValidationError("منبع و واحد باید متعلق به سازمان ردیف برآورد باشند.")
+        if item.revision_id and item.revision.status != EstimateRevisionStatus.DRAFT:
+            raise ValidationError("منابع بازنگری نهایی‌شده قابل تغییر نیستند.")
+        if self.quantity <= Decimal(0):
+            raise ValidationError({"quantity": "مقدار منبع باید مثبت باشد."})
+        if self.material_id and (
+            self.resource_type != EstimateResourceType.MATERIAL
+            or self.material.organization_id != self.organization_id
+            or self.material.unit_of_measure_id != self.unit_of_measure_id
+        ):
+            raise ValidationError(
+                "مصالح باید با نوع منبع، سازمان و واحد پایه سازگار باشد."
+            )
+        if self.equipment_id and (
+            self.resource_type != EstimateResourceType.EQUIPMENT
+            or self.equipment.organization_id != self.organization_id
+        ):
+            raise ValidationError("تجهیز باید با نوع منبع و سازمان سازگار باشد.")
+        if self.activity_id and (
+            self.activity.organization_id != self.organization_id
+            or self.activity.project_id != item.estimate.project_id
+        ):
+            raise ValidationError("فعالیت باید متعلق به پروژه همین برآورد باشد.")
+        if self.rate_id and (
+            self.rate.organization_id != self.organization_id
+            or self.rate.unit_of_measure_id != self.unit_of_measure_id
+        ):
+            raise ValidationError("نرخ باید متعلق به سازمان و واحد منبع باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if (
+            self.pk
+            and not self._state.adding
+            and self.estimate_item.revision.status != EstimateRevisionStatus.DRAFT
+        ):
+            raise ValidationError("منابع بازنگری نهایی‌شده قابل تغییر نیستند.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class EstimateAssumptionKind(models.TextChoices):
+    COEFFICIENT = "coefficient", "ضریب"
+    ASSUMPTION = "assumption", "فرض"
+
+
+class EstimateAssumption(UUIDModel, TimeStampedModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE
+    )
+    revision = models.ForeignKey(
+        EstimateRevision, on_delete=models.CASCADE, related_name="assumptions"
+    )
+    kind = models.CharField(max_length=20, choices=EstimateAssumptionKind.choices)
+    name = models.CharField("نام", max_length=255)
+    decimal_value = models.DecimalField(
+        "مقدار", max_digits=18, decimal_places=6, null=True, blank=True
+    )
+    sequence = models.PositiveIntegerField("ترتیب", default=0)
+    rationale = models.TextField("مبنای فرض")
+    source_reference = models.CharField("مرجع", max_length=255)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="estimate_assumptions_created",
+    )
+
+    def clean(self) -> None:
+        if self.organization_id != self.revision.organization_id:
+            raise ValidationError("فرض باید متعلق به سازمان بازنگری باشد.")
+        if self.revision.status != EstimateRevisionStatus.DRAFT:
+            raise ValidationError("فرض بازنگری نهایی‌شده قابل تغییر نیست.")
+        if not all(
+            (self.name.strip(), self.rationale.strip(), self.source_reference.strip())
+        ):
+            raise ValidationError("نام، مبنا و مرجع فرض الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if (
+            self.pk
+            and not self._state.adding
+            and self.revision.status != EstimateRevisionStatus.DRAFT
+        ):
+            raise ValidationError("فرض بازنگری نهایی‌شده قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)

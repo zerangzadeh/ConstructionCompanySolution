@@ -55,6 +55,10 @@ WORKFLOW_TYPE_CODE = "procurement.purchase_request_approval"
 SUBJECT_TYPE = "procurement.purchase_request"
 COMPATIBILITY_TEMPLATE_CODE = "purchase_request_legacy_compatibility"
 COMPATIBILITY_DEFINITION_CODE = "purchase-request-legacy-compatibility"
+COMPATIBILITY_TEMPLATE_NAME = "سازگاری گردش تأیید درخواست خرید"
+COMPATIBILITY_TEMPLATE_DESCRIPTION = (
+    "رفتار draft → submitted → approved/rejected موجود را حفظ می‌کند."
+)
 
 COMPATIBILITY_CONFIGURATION: dict[str, Any] = {
     "steps": [
@@ -310,6 +314,27 @@ def _write_configuration(
         )
 
 
+def _ensure_purchase_request_platform_catalog() -> tuple[
+    WorkflowType, WorkflowTemplate
+]:
+    """Restore the code-owned compatibility template when it is absent."""
+
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+    template, _ = WorkflowTemplate.objects.get_or_create(
+        workflow_type=workflow_type,
+        code=COMPATIBILITY_TEMPLATE_CODE,
+        defaults={
+            "name": COMPATIBILITY_TEMPLATE_NAME,
+            "description": COMPATIBILITY_TEMPLATE_DESCRIPTION,
+            "configuration": COMPATIBILITY_CONFIGURATION,
+            "is_active": True,
+        },
+    )
+    if not template.is_active:
+        raise ValidationError("قالب سازگاری درخواست خرید غیرفعال است.")
+    return workflow_type, template
+
+
 @transaction.atomic
 def ensure_purchase_request_compatibility_workflow(
     *, organization: Organization, actor: User
@@ -320,7 +345,7 @@ def ensure_purchase_request_compatibility_workflow(
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
     )
-    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
     _, default_scope_key = canonical_scope({})
     existing = (
         WorkflowVersion.objects.select_related("definition")
@@ -336,11 +361,6 @@ def ensure_purchase_request_compatibility_workflow(
         if validate_workflow_version(existing):
             raise ValidationError("گردش‌کار پیش‌فرض منتشرشده معتبر نیست.")
         return existing
-    template = WorkflowTemplate.objects.get(
-        workflow_type=workflow_type,
-        code=COMPATIBILITY_TEMPLATE_CODE,
-        is_active=True,
-    )
     definition, created = WorkflowDefinition.objects.get_or_create(
         organization=locked_organization,
         workflow_type=workflow_type,

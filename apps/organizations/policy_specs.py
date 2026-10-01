@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 
 ACCOUNTING_MONEY_PRECISION_POLICY_CODE = "accounting-money-precision"
 ACCOUNTING_ROUNDING_POLICY_CODE = "accounting-rounding"
+TREASURY_SELF_APPROVAL_POLICY_CODE = "treasury-self-approval"
 
 
 @dataclass(frozen=True)
@@ -61,6 +62,18 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
             PolicyFieldSpec("rounding_method", str, ("ROUND_HALF_UP",)),
             PolicyFieldSpec("output_boundary", str, ("final_monetary_line",)),
             PolicyFieldSpec("tie_behavior", str, ("ROUND_HALF_UP",)),
+        ),
+        value_schema_approved=True,
+    ),
+    TREASURY_SELF_APPROVAL_POLICY_CODE: PlatformPolicySpec(
+        code=TREASURY_SELF_APPROVAL_POLICY_CODE,
+        name="خودتأییدی عملیات خزانه‌داری",
+        category="other",
+        sensitivity="accounting",
+        tenant_selectable=True,
+        permitted_consumers=("treasury.operation.approve",),
+        fields=(
+            PolicyFieldSpec("allow_self_approval", bool, (False, True)),
         ),
         value_schema_approved=True,
     ),

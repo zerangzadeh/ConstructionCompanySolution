@@ -54,6 +54,16 @@ _CONTRACTS = {
         source_model="accounting.JournalEntry",
         source_line_model="accounting.JournalLine",
     ),
+    ("treasury", "movement_posted"): PostingContract(
+        source_kind="treasury",
+        event_kind="movement_posted",
+        rule_code="treasury.movement.posted.v1",
+        rule_version=1,
+        source_owner="treasury",
+        source_model="treasury.TreasuryMovement",
+        source_line_model="treasury.TreasuryMovementLeg",
+        operational_producer=True,
+    ),
 }
 
 

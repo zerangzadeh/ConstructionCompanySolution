@@ -8,6 +8,122 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    TREASURY_ACCOUNT_CREATED = "treasury.account_created", "حساب خزانه‌داری ایجاد شد"
+    TREASURY_ACCOUNT_TRANSITIONED = (
+        "treasury.account_transitioned",
+        "وضعیت حساب خزانه‌داری تغییر کرد",
+    )
+    TREASURY_MAPPING_VERSIONED = (
+        "treasury.mapping_versioned",
+        "نسخه نگاشت حسابداری خزانه‌داری ثبت شد",
+    )
+    TREASURY_MOVEMENT_CREATED = (
+        "treasury.movement_created",
+        "حرکت خزانه‌داری ایجاد شد",
+    )
+    TREASURY_MOVEMENT_TRANSITIONED = (
+        "treasury.movement_transitioned",
+        "وضعیت حرکت خزانه‌داری تغییر کرد",
+    )
+    TREASURY_MOVEMENT_REVERSED = (
+        "treasury.movement_reversed",
+        "حرکت خزانه‌داری برگشت خورد",
+    )
+    TREASURY_CHEQUE_CREATED = "treasury.cheque_created", "چک ثبت شد"
+    TREASURY_CHEQUE_TRANSITIONED = (
+        "treasury.cheque_transitioned",
+        "وضعیت چک تغییر کرد",
+    )
+    TREASURY_RECONCILIATION_RETAINED = (
+        "treasury.reconciliation_retained",
+        "تطبیق خزانه‌داری با دفترکل نگهداری شد",
+    )
+    TREASURY_RECONCILIATION_REVIEWED = (
+        "treasury.reconciliation_reviewed",
+        "تطبیق خزانه‌داری با دفترکل مستقل بررسی شد",
+    )
+    TREASURY_PAYMENT_REQUEST_CREATED = (
+        "treasury.payment_request_created",
+        "درخواست پرداخت خزانه‌داری ایجاد شد",
+    )
+    TREASURY_PAYMENT_REQUEST_TRANSITIONED = (
+        "treasury.payment_request_transitioned",
+        "وضعیت درخواست پرداخت تغییر کرد",
+    )
+    TREASURY_PAYMENT_REQUEST_RELEASED = (
+        "treasury.payment_request_released",
+        "پرداخت قطعی به درخواست متصل شد",
+    )
+    TREASURY_ADVANCE_OPENED = "treasury.advance_opened", "تنخواه باز شد"
+    TREASURY_ADVANCE_REVERSED = "treasury.advance_reversed", "تنخواه برگشت شد"
+    TREASURY_ADVANCE_SETTLEMENT_CREATED = (
+        "treasury.advance_settlement_created",
+        "تسویه نقدی تنخواه ثبت شد",
+    )
+    TREASURY_ADVANCE_SETTLEMENT_TRANSITIONED = (
+        "treasury.advance_settlement_transitioned",
+        "وضعیت تسویه تنخواه تغییر کرد",
+    )
+    TREASURY_ADVANCE_SETTLEMENT_REVERSED = (
+        "treasury.advance_settlement_reversed",
+        "تسویه تنخواه برگشت شد",
+    )
+    TREASURY_ADVANCE_RECONCILIATION_RETAINED = (
+        "treasury.advance_reconciliation_retained",
+        "شواهد تطبیق تنخواه نگهداری شد",
+    )
+    TREASURY_STATEMENT_IMPORT_PREVIEWED = (
+        "treasury.statement_import_previewed",
+        "پیش‌نمایش ورود صورتحساب بانکی نگهداری شد",
+    )
+    TREASURY_STATEMENT_IMPORT_DECIDED = (
+        "treasury.statement_import_decided",
+        "ورود صورتحساب بانکی تعیین تکلیف شد",
+    )
+    TREASURY_STATEMENT_MATCH_PROPOSED = (
+        "treasury.statement_match_proposed",
+        "پیشنهاد تطبیق بانکی نگهداری شد",
+    )
+    TREASURY_STATEMENT_MATCH_DECIDED = (
+        "treasury.statement_match_decided",
+        "پیشنهاد تطبیق بانکی تعیین تکلیف شد",
+    )
+    TREASURY_CLEARING_REVERSED = (
+        "treasury.clearing_reversed",
+        "تسویه بانکی برگشت شد",
+    )
+    TREASURY_BANK_RECONCILIATION_RETAINED = (
+        "treasury.bank_reconciliation_retained",
+        "شواهد تطبیق بانکی نگهداری شد",
+    )
+    SUBLEDGER_OBLIGATION_RECOGNIZED = (
+        "subledger.obligation_recognized",
+        "تعهد AP/AR شناسایی شد",
+    )
+    SUBLEDGER_SETTLEMENT_ALLOCATED = (
+        "subledger.settlement_allocated",
+        "تسویه AP/AR تخصیص یافت",
+    )
+    SUBLEDGER_SETTLEMENT_REVERSED = (
+        "subledger.settlement_reversed",
+        "تخصیص تسویه AP/AR برگشت خورد",
+    )
+    SUBLEDGER_WRITEOFF_PROPOSED = (
+        "subledger.writeoff_proposed",
+        "پیشنهاد سوخت AP/AR ثبت شد",
+    )
+    SUBLEDGER_AGING_RETAINED = (
+        "subledger.aging_retained",
+        "شواهد aging AP/AR نگهداری شد",
+    )
+    SUBLEDGER_RECONCILIATION_RETAINED = (
+        "subledger.reconciliation_retained",
+        "شواهد تطبیق AP/AR نگهداری شد",
+    )
+    SUBLEDGER_RECONCILIATION_REVIEWED = (
+        "subledger.reconciliation_reviewed",
+        "تطبیق AP/AR مستقل بررسی شد",
+    )
     ACCOUNTING_ACCOUNT_CREATED = "accounting.account_created", "حساب دفترکل ایجاد شد"
     ACCOUNTING_FISCAL_YEAR_CREATED = (
         "accounting.fiscal_year_created",

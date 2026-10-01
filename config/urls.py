@@ -13,6 +13,8 @@ urlpatterns = [
     path("organizations/", include("apps.organizations.urls")),
     path("audit/", include("apps.audit.urls")),
     path("accounting/", include("apps.accounting.urls")),
+    path("treasury/", include("apps.treasury.urls")),
+    path("subledgers/", include("apps.subledgers.urls")),
     path("parties/", include("apps.parties.urls")),
     path("materials/", include("apps.materials.urls")),
     path("projects/", include("apps.projects.urls")),

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.management import call_command
 from django.db import IntegrityError, models, transaction
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
@@ -22,6 +23,7 @@ from .models import (
     WorkflowVersion,
     WorkflowVersionStatus,
 )
+from .registry import registry
 from .services import (
     create_draft_version,
     create_workflow_draft,
@@ -72,6 +74,26 @@ def valid_configuration() -> dict:
             },
         ],
     }
+
+
+class WorkflowCatalogFlushTests(TransactionTestCase):
+    def test_flush_recreates_registered_workflow_types(self) -> None:
+        call_command("flush", verbosity=0, interactive=False)
+
+        self.assertEqual(
+            set(WorkflowType.objects.values_list("code", flat=True)),
+            set(registry.workflow_types),
+        )
+        for workflow_type in WorkflowType.objects.all():
+            specification = registry.workflow_types[workflow_type.code]
+            self.assertEqual(workflow_type.subject_type, specification.subject_type)
+            self.assertEqual(
+                workflow_type.subject_adapter, specification.subject_adapter
+            )
+            self.assertEqual(
+                set(workflow_type.allowed_scope_fields),
+                set(specification.allowed_scope_fields),
+            )
 
 
 class WorkflowFoundationTests(TestCase):

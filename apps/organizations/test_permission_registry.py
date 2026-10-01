@@ -4,12 +4,14 @@ from collections import Counter
 from pathlib import Path
 
 from django.apps import apps
-from django.test import SimpleTestCase, TestCase
+from django.core.management import call_command
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
+    OrganizationRole,
 )
 from apps.organizations.permission_registry import (
     GLOBAL_PERMISSION_MODEL_EXCLUSIONS,
@@ -135,6 +137,24 @@ class PermissionRegistryArchitectureTests(SimpleTestCase):
 
 class PermissionRegistryDatabaseTests(TestCase):
     def test_database_catalog_matches_registry(self) -> None:
+        self.assertEqual(
+            set(BusinessPermission.objects.values_list("code", flat=True)),
+            registered_permission_codes(),
+        )
+
+
+class AuthorizationCatalogFlushTests(TransactionTestCase):
+    def test_flush_recreates_code_owned_roles_and_permissions(self) -> None:
+        call_command("flush", verbosity=0, interactive=False)
+
+        self.assertEqual(
+            set(
+                OrganizationRole.objects.filter(organization__isnull=True).values_list(
+                    "code", flat=True
+                )
+            ),
+            set(DEFAULT_ROLE_PERMISSIONS),
+        )
         self.assertEqual(
             set(BusinessPermission.objects.values_list("code", flat=True)),
             registered_permission_codes(),

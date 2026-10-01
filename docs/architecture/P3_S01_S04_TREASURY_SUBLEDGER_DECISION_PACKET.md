@@ -2,14 +2,59 @@
 
 **Prepared:** 2026-10-01
 
-**Status:** D3-01 THROUGH D3-12 ACCEPTED; P3-S01–S04 COMPLETE
+**Status:** D3-01 THROUGH D3-12 ACCEPTED; P3-S01–S11 COMPLETE
 
 **Authority:** The Product Owner requested execution of P3-S01–S04 on 2026-10-01.
-That request authorized this bounded evidence and design tranche. On 2026-10-01
+That request authorized the bounded evidence and design tranche. On 2026-10-01
 the Product Owner accepted D3-01 through D3-08 = A, D3-09 = A-Revised, and D3-10
 through D3-12 = A. This closes P3-S01–S04 only. It does not authorize P3-S05
 implementation, register an operational Accounting producer, migrate a Tenant, or
-activate bank integration.
+activate bank integration. A separate Product Owner authorization on 2026-10-01
+subsequently authorized and completed P3-S05–S11. A further bounded Product Owner
+authorization completed P3-S12–S17 under its separate
+[implementation contract](P3_S12_S17_IMPLEMENTATION_CONTRACT.md); the original
+decision record below remains intact.
+
+### P3-S05–S11 implementation closeout
+
+The new `treasury` app owns Tenant accounts, mapping versions, movements and legs,
+cheque instruments, immutable transition/posting evidence and retained
+Treasury-to-GL reconciliation. The registered synchronous producer
+`treasury.movement.posted.v1` posts only through Accounting, pins source/version/
+line/event/rule/mapping/policy/period identities, and uses linked Accounting
+reversal for correction. Dedicated permissions, default grants, masking, active
+Tenant/membership/scope checks, explicit effective Self-Approval policy, protected
+Accounting maker-checker separation, deterministic Tenant locking and idempotency
+are enforced in services and constraints. Cheques affect bank cash only at
+confirmed clearing; a post-clear bounce creates the linked cash and journal
+reversal.
+
+Migrations are `accounting.0011`, `organizations.0059`, `audit.0041`, and
+`treasury.0001–0003`. Six focused PostgreSQL tests passed. TINF-01 was then
+resolved at its root: `post_migrate` reconstructs system-owned authorization and
+registered WorkflowType catalog rows after flush, while the official compatibility
+bootstrap restores a missing system template without a test fixture. The three
+previously blocked Accounting regressions and all 29 Accounting foundation tests
+passed after that correction. The independent `MATERIAL_DOCUMENTS_LINK` registry
+failure remains unchanged. No legacy Payment cutover/backfill, pilot, UI, statement import,
+requests/scheduling/advances, AP/AR, bank integration, background processing,
+multi-currency or tax/statutory behavior was added.
+
+### P3-S12–S17 implementation closeout
+
+The separately authorized P3-S12–S17 tranche delivered unscheduled payment
+requests, exact posted-disbursement release, employee/vendor advance custody,
+cash-return settlement, integrated protected correction and retained
+advance-to-Treasury-to-GL evidence. It uses the existing D3-09 Self-Approval policy
+and `treasury.movement.posted.v1`; no second posting producer or ledger was added.
+Migrations are `treasury.0004`, `organizations.0060`, and `audit.0042`.
+
+Nine focused PostgreSQL Treasury tests, three retained Accounting regressions and
+focused permission/catalog checks passed. Scheduling/proposals, every numeric
+threshold, non-cash substantiation, legacy migration/cutover, pilot activation,
+statements, AP/AR, external integration, UI, background work and P3-S18+ remain
+deferred/not authorized. `MATERIAL_DOCUMENTS_LINK` remains an independent known
+registry issue.
 
 ## 1. Bounded four-session contract
 

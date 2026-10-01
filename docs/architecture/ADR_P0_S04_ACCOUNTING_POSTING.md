@@ -206,8 +206,10 @@ approved contract/removal:
 These are proposal-review examples in one hypothetical approved currency `C`,
 using Decimal amounts, not certified accounting rules, an IRR decision, statutory
 advice or executed tests. Tax, retention, advances and FX are intentionally absent;
-their mappings require Q01/Q02 and versioned policy/source evidence. Account labels are roles,
-not an approved chart of accounts.
+their mappings still require versioned policy/source evidence. P3-S27-Q01/Q02 now
+accept staged approved-claim AR semantics and the explicit directional event/role
+contract, but do not authorize implementation or select actual Tenant accounts.
+Account labels are roles, not an approved chart of accounts.
 
 | Event | Illustrative balanced journal | Lineage and expected result |
 | --- | --- | --- |
@@ -217,6 +219,12 @@ not an approved chart of accounts.
 | Reverse that application | Dr AR control 60; Cr unapplied receipts 60 | Reversal links original allocation/journal and reason; outstanding 100, cash still 60, unapplied 60. Retry returns the same result. |
 | Correct a receipt that never occurred | Dr unapplied receipts 60; Cr cash 60, after reversing dependent application above | Integrated correction retains original receipt and linked reversal; cash/unapplied 0, outstanding 100. A real refund needs a distinct movement instead. |
 | Recognize payable 80, then pay/apply 30 | Recognition: Dr reviewed cost/asset 80, Cr AP 80. Movement: Dr outgoing clearing 30, Cr cash 30. Application: Dr AP 30, Cr outgoing clearing 30. | Supplier source/version -> AP item -> Treasury movement -> allocation, with separate event/journal identities; AP outstanding 50, cash decrease 30, clearing 0; cost/asset recognized only once. |
+
+Under accepted P3-S27-Q02, the AR application debit is the exact
+unapplied-receipt/settlement-clearing role created by the Treasury posting
+contract, never the cash/bank account. AP application uses the equivalent exact
+outgoing-clearing role. Subledgers never select or mutate Treasury cash-account
+postings.
 
 For every row: a repeated business event cannot create another journal; changed
 payload with the same key is rejected. Closed-period posting, unknown currency,

@@ -26,6 +26,47 @@ ACCOUNTING_RESTRICTED_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTING_PERIODS_CLOSE,
     BusinessPermissionCode.ACCOUNTING_PERIODS_REOPEN,
 )
+TREASURY_RESTRICTED_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.TREASURY_ACCOUNTS_MANAGE,
+    BusinessPermissionCode.TREASURY_SENSITIVE_VIEW,
+    BusinessPermissionCode.TREASURY_MAPPINGS_MANAGE,
+    BusinessPermissionCode.TREASURY_MOVEMENTS_CREATE,
+    BusinessPermissionCode.TREASURY_MOVEMENTS_SUBMIT,
+    BusinessPermissionCode.TREASURY_MOVEMENTS_APPROVE,
+    BusinessPermissionCode.TREASURY_MOVEMENTS_POST,
+    BusinessPermissionCode.TREASURY_MOVEMENTS_REVERSE,
+    BusinessPermissionCode.TREASURY_CHEQUES_MANAGE,
+    BusinessPermissionCode.TREASURY_CHEQUES_CLEAR,
+    BusinessPermissionCode.TREASURY_RECONCILIATIONS_RUN,
+    BusinessPermissionCode.TREASURY_RECONCILIATIONS_REVIEW,
+    BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_CREATE,
+    BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_SUBMIT,
+    BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_APPROVE,
+    BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_RELEASE,
+    BusinessPermissionCode.TREASURY_ADVANCES_MANAGE,
+    BusinessPermissionCode.TREASURY_ADVANCES_SETTLE,
+    BusinessPermissionCode.TREASURY_ADVANCES_REVERSE,
+    BusinessPermissionCode.TREASURY_STATEMENTS_IMPORT,
+    BusinessPermissionCode.TREASURY_STATEMENTS_ACCEPT,
+    BusinessPermissionCode.TREASURY_STATEMENT_MATCHES_MANAGE,
+    BusinessPermissionCode.TREASURY_STATEMENT_MATCHES_CLEAR,
+    BusinessPermissionCode.TREASURY_BANK_RECONCILIATIONS_RUN,
+)
+SUBLEDGER_RESTRICTED_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.SUBLEDGERS_OBLIGATIONS_RECOGNIZE,
+    BusinessPermissionCode.SUBLEDGERS_SETTLEMENTS_ALLOCATE,
+    BusinessPermissionCode.SUBLEDGERS_SETTLEMENTS_REVERSE,
+    BusinessPermissionCode.SUBLEDGERS_AGING_RUN,
+    BusinessPermissionCode.SUBLEDGERS_RECONCILIATIONS_RUN,
+    BusinessPermissionCode.SUBLEDGERS_RECONCILIATIONS_REVIEW,
+    BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_PROPOSE,
+    BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_APPROVE,
+    BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_REVERSE,
+)
+UNAUTHORIZED_WRITEOFF_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_APPROVE,
+    BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_REVERSE,
+)
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
     BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
@@ -108,6 +149,8 @@ OPERATIONS_MANAGER_EXCLUSIONS = (
         BusinessPermissionCode.CLAIMS_APPROVE,
     )
     | ACCOUNTING_RESTRICTED_PERMISSIONS
+    | TREASURY_RESTRICTED_PERMISSIONS
+    | SUBLEDGER_RESTRICTED_PERMISSIONS
 )
 
 
@@ -122,6 +165,8 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         ALL_PERMISSIONS
         - OWNER_ONLY_PERMISSIONS
         - ACCOUNTING_RESTRICTED_PERMISSIONS
+        - TREASURY_RESTRICTED_PERMISSIONS
+        - SUBLEDGER_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -137,6 +182,8 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         ALL_PERMISSIONS
         - OWNER_ONLY_PERMISSIONS
         - ACCOUNTING_RESTRICTED_PERMISSIONS
+        - TREASURY_RESTRICTED_PERMISSIONS
+        - SUBLEDGER_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -162,6 +209,37 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         BusinessPermissionCode.ACCOUNTING_STATEMENTS_RUN,
         BusinessPermissionCode.ACCOUNTING_ADJUSTMENTS_PREPARE,
         BusinessPermissionCode.ACCOUNTING_PERIODS_CLOSE,
+        BusinessPermissionCode.TREASURY_ACCOUNTS_MANAGE,
+        BusinessPermissionCode.TREASURY_SENSITIVE_VIEW,
+        BusinessPermissionCode.TREASURY_MAPPINGS_MANAGE,
+        BusinessPermissionCode.TREASURY_MOVEMENTS_CREATE,
+        BusinessPermissionCode.TREASURY_MOVEMENTS_SUBMIT,
+        BusinessPermissionCode.TREASURY_MOVEMENTS_APPROVE,
+        BusinessPermissionCode.TREASURY_MOVEMENTS_POST,
+        BusinessPermissionCode.TREASURY_MOVEMENTS_REVERSE,
+        BusinessPermissionCode.TREASURY_CHEQUES_MANAGE,
+        BusinessPermissionCode.TREASURY_CHEQUES_CLEAR,
+        BusinessPermissionCode.TREASURY_RECONCILIATIONS_RUN,
+        BusinessPermissionCode.TREASURY_RECONCILIATIONS_REVIEW,
+        BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_CREATE,
+        BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_SUBMIT,
+        BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_APPROVE,
+        BusinessPermissionCode.TREASURY_PAYMENT_REQUESTS_RELEASE,
+        BusinessPermissionCode.TREASURY_ADVANCES_MANAGE,
+        BusinessPermissionCode.TREASURY_ADVANCES_SETTLE,
+        BusinessPermissionCode.TREASURY_ADVANCES_REVERSE,
+        BusinessPermissionCode.TREASURY_STATEMENTS_IMPORT,
+        BusinessPermissionCode.TREASURY_STATEMENTS_ACCEPT,
+        BusinessPermissionCode.TREASURY_STATEMENT_MATCHES_MANAGE,
+        BusinessPermissionCode.TREASURY_STATEMENT_MATCHES_CLEAR,
+        BusinessPermissionCode.TREASURY_BANK_RECONCILIATIONS_RUN,
+        BusinessPermissionCode.SUBLEDGERS_OBLIGATIONS_RECOGNIZE,
+        BusinessPermissionCode.SUBLEDGERS_SETTLEMENTS_ALLOCATE,
+        BusinessPermissionCode.SUBLEDGERS_SETTLEMENTS_REVERSE,
+        BusinessPermissionCode.SUBLEDGERS_AGING_RUN,
+        BusinessPermissionCode.SUBLEDGERS_RECONCILIATIONS_RUN,
+        BusinessPermissionCode.SUBLEDGERS_RECONCILIATIONS_REVIEW,
+        BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_PROPOSE,
         BusinessPermissionCode.EXPENSES_CREATE,
         BusinessPermissionCode.EXPENSES_VOID,
         BusinessPermissionCode.PAYMENTS_CREATE,
@@ -186,6 +264,11 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     MembershipRole.MEMBER: READ_ONLY_PERMISSIONS | MEMBER_OPERATION_PERMISSIONS,
     MembershipRole.VIEWER: READ_ONLY_PERMISSIONS,
 }
+
+# P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
+# nor reversal to any default role until authority and SoD policy are accepted.
+for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    _default_permissions.difference_update(UNAUTHORIZED_WRITEOFF_PERMISSIONS)
 
 
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
