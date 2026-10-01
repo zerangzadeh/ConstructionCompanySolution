@@ -41,4 +41,22 @@
             </section>
         </div>
     </div>
+    {% if cost_projection %}
+    <section class="erp-surface mt-5 rounded-xl p-5" aria-labelledby="project-cost-heading">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <h2 id="project-cost-heading" class="font-bold text-slate-900">هزینه یکپارچه پروژه</h2>
+            {% if cost_projection.coverage_complete %}<span class="rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-700">پوشش کامل ثبت‌شده</span>{% else %}<span class="rounded-full bg-amber-50 px-3 py-1 text-xs text-amber-700">پوشش ناقص — مبلغ صفر به معنی نبود هزینه نیست</span>{% endif %}
+        </div>
+        <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <div><p class="text-xs text-slate-500">تعهد مجاز</p><p class="mt-1 font-bold tabular-nums" dir="ltr">{{ cost_projection.authorized_commitment|erp_number }}</p></div>
+            <div><p class="text-xs text-slate-500">تعهد رفع‌شده</p><p class="mt-1 font-bold tabular-nums" dir="ltr">{{ cost_projection.relieved_commitment|erp_number }}</p></div>
+            <div><p class="text-xs text-slate-500">تعهد باز</p><p class="mt-1 font-bold tabular-nums" dir="ltr">{{ cost_projection.open_commitment|erp_number }}</p></div>
+            <div><p class="text-xs text-slate-500">هزینه تحقق‌یافته</p><p class="mt-1 font-bold tabular-nums" dir="ltr">{{ cost_projection.accrual|erp_number }}</p></div>
+            <div><p class="text-xs text-slate-500">هزینه واقعی</p><p class="mt-1 font-bold tabular-nums" dir="ltr">{{ cost_projection.actual_cost|erp_number }}</p></div>
+        </div>
+        <details class="mt-4"><summary class="cursor-pointer text-sm font-medium text-blue-700">ردیابی منبع و پوشش</summary>
+            <div class="mt-3 overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-right text-xs text-slate-500"><th class="p-2">منبع</th><th class="p-2">رخداد</th><th class="p-2">نوع</th><th class="p-2">مبلغ</th></tr></thead><tbody>{% for fact in cost_projection.facts %}<tr class="border-t border-slate-100"><td class="p-2" dir="ltr">{{ fact.contract.producer_key }} v{{ fact.contract.version }}</td><td class="p-2" dir="ltr">{{ fact.economic_event_id }}</td><td class="p-2">{{ fact.get_kind_display }}</td><td class="p-2 tabular-nums" dir="ltr">{{ fact.amount|erp_number }}</td></tr>{% empty %}<tr><td class="p-3 text-slate-500" colspan="4">هنوز برون‌داد طبقه‌بندی‌شده‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
+        </details>
+    </section>
+    {% endif %}
 {% endblock %}

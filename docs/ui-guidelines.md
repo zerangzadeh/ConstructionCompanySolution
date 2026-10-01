@@ -143,6 +143,31 @@ Examples:
 
 Only presentation text is localized.
 
+### Receivables/payables terminology and financial navigation
+
+The Treasury landing page and browser title use `خزانه‌داری` without `میزکار`.
+Treasury reconciliation forms, table headings and retained-run labels use
+`تاریخ مبنای تطبیق` instead of `تاریخ برش` or `برش`; internal date fields and
+cutoff semantics remain unchanged.
+Treasury reconciliation exceptions use the Product Owner's terminology:
+`مغایرت بانکی` for bank-statement reconciliation and
+`مغایرت خزانه با حسابداری` for Treasury-to-ledger reconciliation. These are
+presentation labels; exception codes, counts and reconciliation rules are unchanged.
+
+The subledger workbench uses `دریافتنی‌ها و پرداختنی‌ها`, `گزارش سنی`,
+`تاریخ مبنا` and `نوع قلم` for AP/AR, aging, as-of and direction. Aging remains
+exact and unbucketed. Reconciliation exceptions are `موارد نیازمند بررسی`;
+write-off proposals are `پیشنهاد حذف حسابداری مانده`, with an explicit reminder
+that this does not delete history. Unimplemented approval/posting paths remain
+described as unavailable, without exposing internal decision codes.
+
+Financial navigation orders Accounting, Treasury, receivables/payables, expenses,
+claims, legacy receipts/payments and project financial reports. The existing
+Payment route is labelled `دریافت و پرداخت (سامانه قبلی)` and the existing
+financial projection `گزارش مالی پروژه‌ها`. These labels do not switch sources,
+retire Payment, or turn project reports into Accounting statements. Existing
+permission checks and routes apply identically on desktop and mobile.
+
 ---
 
 ## 5. UTF-8 and Persian Text Integrity
@@ -468,6 +493,25 @@ Validation errors must appear directly below the related field.
 Preserve Django validation and form binding.
 
 Do not rename underlying Django field names merely for localization.
+
+### 14.1 Form-field localization and terminology
+
+Every newly created or materially changed form must present all user-facing
+field labels, option labels, placeholders, helper text, validation messages,
+and action buttons in Persian. Use terminology familiar to users of Iranian
+accounting, project-management, procurement, and construction software; prefer
+the established product glossary and the wording already used in neighboring
+screens. For example, use `پروژه`, `توضیحات`, `مبلغ`, `نوع هزینه`, `دوره تکرار`,
+`تاریخ شروع`, `تاریخ پایان`, and `پیشوند مرجع سند` rather than their English
+equivalents.
+
+This is a presentation rule only. Keep Python field names, model fields,
+database columns, enum values, URLs, permission codes, and technical
+identifiers in English/canonical form. Set labels and choices at the form or
+shared presentation layer, and do not change domain values merely to translate
+the UI. A new form is not complete until its rendered labels and choice
+options have been checked for English leakage, mixed terminology, and correct
+RTL display.
 
 ---
 
@@ -981,6 +1025,12 @@ Use the shared Jalali formatter and picker behavior (`erp_jalali`) for both
 date and datetime inputs. It must convert a visible Jalali value, including its
 time, back to Gregorian/ISO-compatible form before the existing Django
 validation and storage flow.
+
+Django forms with `DateField` or `DateTimeField` must inherit
+`JalaliDateMixin`; it assigns the shared Jalali widgets and parses submitted
+Jalali values before Django validation. A manually authored template date input
+must use the shared `erp_jalali` input contract and must not introduce a native
+or page-specific Gregorian picker.
 
 ### Direction and Digits
 

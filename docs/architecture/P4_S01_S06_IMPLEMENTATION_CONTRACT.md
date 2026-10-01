@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-01  
 **Authority:** Product Owner authorization limited to P4-S01–S06.  
-**Status:** implementation complete; focused PostgreSQL verification pending. It does not authorize P4-S07+, P4.1,
+**Status:** implementation and focused PostgreSQL verification complete (3 tests passed on 2026-10-01). It did not authorize P4-S07+; that scope was separately authorized and is recorded in `P4_S07_S13_IMPLEMENTATION_CONTRACT.md`. It does not authorize P4-S14+,
 financial posting, activation, migration/backfill, or external integration.
 
 ## Bounded outcome
@@ -58,6 +58,10 @@ are limited to safe reads and CSRF-protected POST preview operations.
 | P4-G03 | external/Iranian price-book source, version and lawful license | no external source ingestion or activation |
 | P4-G04 | tenant spreadsheet templates/mappings and approval authority | only the fixed internal CSV preview profile is available; unrecognized/missing mappings reject |
 | P4-G05 | estimate-to-budget acceptance, CBS/cost-center and budget authority | no budget handoff, baseline or financial projection |
+
+P4-G05 was the fail-closed state for this historical slice. The separately
+authorized P4-S07–S13 contract later closes it only for the bounded planning
+handoff described there; P4-G06–G10 and all integrated-cost behavior remain open.
 
 ## Acceptance evidence
 

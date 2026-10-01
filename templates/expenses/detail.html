@@ -1,0 +1,25 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}جزئیات هزینه | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+<div class="mx-auto max-w-5xl">
+  <a class="text-sm font-semibold text-blue-700" href="{% url 'expenses:list' %}">بازگشت به هزینه‌ها</a>
+  <section class="erp-surface mt-4 rounded-xl p-6">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div><p class="text-xs text-slate-500">{{ expense.source_reference }}</p><h1 class="mt-1 text-2xl font-bold">{{ expense.description }}</h1><p class="mt-2 text-sm text-slate-600">{{ expense.project.name }} · {{ expense.get_classification_display }}</p></div>
+      <div class="text-left"><p class="text-xl font-bold" dir="ltr">{{ expense.amount|erp_number }} {{ request.organization.currency }}</p><span class="mt-2 inline-block rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold">{{ expense.get_status_display }}</span></div>
+    </div>
+    <div class="mt-5 flex flex-wrap gap-2 border-t pt-5">
+      {% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.submit" in business_permission_codes %}<form method="post" action="{% url 'expenses:submit' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white">ارسال برای تأیید</button></form>{% endif %}{% endif %}
+      {% if expense.status == "submitted" %}{% if "expenses.approve" in business_permission_codes %}<form method="post" action="{% url 'expenses:approve' expense.pk %}">{% csrf_token %}<button class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white">تأیید مستقل</button></form>{% endif %}{% endif %}
+      {% if expense.status != "void" and "expenses.void" in business_permission_codes %}<form class="flex gap-2" method="post" action="{% url 'expenses:void' expense.pk %}">{% csrf_token %}<input name="reason" required placeholder="دلیل ابطال"><button class="rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-700">ابطال</button></form>{% endif %}
+    </div>
+    {% if expense.status == "submitted" and "expenses.return" in business_permission_codes %}<form class="mt-4 flex gap-2" method="post" action="{% url 'expenses:return' expense.pk %}">{% csrf_token %}<input class="flex-1" name="reason" required placeholder="دلیل بازگشت برای اصلاح"><button class="rounded-lg border px-4 py-2 text-sm font-semibold">بازگردانی</button></form>{% endif %}
+  </section>
+  <section class="erp-surface mt-6 rounded-xl p-6">
+    <h2 class="text-lg font-bold">تخصیص و کدگذاری</h2>
+    <div class="mt-4 space-y-2">{% for allocation in expense.allocations.all %}<div class="rounded-lg bg-slate-50 p-3 text-sm"><span dir="ltr">{{ allocation.amount|erp_number }}</span> · {{ allocation.project.name }} · WBS {{ allocation.wbs_node.code }} · CBS {{ allocation.cbs_node.code }}{% if allocation.cost_center %} · {{ allocation.cost_center.code }}{% endif %}</div>{% empty %}<p class="text-sm text-slate-500">هنوز تخصیصی ثبت نشده است.</p>{% endfor %}</div>
+    {% if expense.status == "draft" or expense.status == "returned" %}{% if "expenses.allocate" in business_permission_codes %}<form class="mt-5 grid gap-4 sm:grid-cols-2" method="post" action="{% url 'expenses:allocate' expense.pk %}">{% csrf_token %}{% for field in allocation_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}<div class="sm:col-span-2"><button class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white">افزودن تخصیص</button></div></form>{% endif %}{% endif %}
+  </section>
+  {% if expense.budget_assessments.all %}<section class="erp-surface mt-6 rounded-xl p-6"><h2 class="text-lg font-bold">ارزیابی بودجه پذیرفته‌شده</h2><p class="mt-1 text-xs text-amber-700">حالت فقط اطلاعاتی است؛ سیاست هشدار یا توقف P4-G10 هنوز تصویب نشده است.</p>{% for assessment in expense.budget_assessments.all %}<div class="mt-3 rounded-lg bg-slate-50 p-3 text-sm">بودجه: {{ assessment.accepted_budget_amount|erp_number }} · پیشین: {{ assessment.prior_approved_expense_amount|erp_number }} · مانده پس از پیشنهاد: {{ assessment.remaining_after_proposal|erp_number }}</div>{% endfor %}</section>{% endif %}
+</div>
+{% endblock %}

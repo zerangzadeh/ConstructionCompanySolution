@@ -190,6 +190,21 @@ Typography is calibrated for enterprise RTL reading performance. **Vazirmatn** s
 - **Financial & Quantity Data:** Metric units (e.g., m³, kg, tonnes) remain on the logical left of numeric figures in Persian syntax, while transaction amounts leverage monospaced digit columns for vertical scanning alignment across data tables.
 - **Weight Strategy:** Restrict body text to `400` (Regular) and operational headers to `600` (SemiBold) and `700` (Bold). Avoid ultra-thin or hairline weights that degrade on low-contrast industrial monitors.
 
+## Date and Calendar Presentation
+
+All user-facing date fields and date filters use the Persian Jalali (Shamsi)
+calendar in the UI. Forms must provide a reusable Jalali date picker and show
+selected, existing, and validation-related dates in the `YYYY/MM/DD` Jalali
+format with Persian digits. Users must not be required to enter Gregorian dates
+manually in Persian-facing forms.
+
+This is a presentation and input-boundary rule only. Django model fields,
+database values, backend processing, and internal/API contracts remain
+Gregorian/ISO-compatible. Jalali input is converted to the canonical Gregorian
+value before existing validation and persistence; stored Gregorian values are
+converted to Jalali only when rendered for users. No schema change or data
+migration is permitted for this presentation behavior.
+
 ## Layout & Spacing
 
 The layout is grounded in a compact, industrial 4px base increment (`0.25rem`), optimized for enterprise screens where high vertical throughput reduces scroll fatigue.

@@ -51,7 +51,7 @@ def _as_of_date(request: HttpRequest) -> date:
     try:
         return date.fromisoformat(request.POST["as_of_date"])
     except (KeyError, ValueError) as exc:
-        raise ValidationError("تاریخ as-of معتبر الزامی است.") from exc
+        raise ValidationError("تاریخ مبنای معتبر الزامی است.") from exc
 
 
 def _amount(request: HttpRequest) -> Decimal:
@@ -74,7 +74,7 @@ def _scoped_obligation(request: HttpRequest, obligation_id) -> Obligation:
 def _direction(request: HttpRequest) -> str:
     direction = request.POST.get("direction", "")
     if direction not in ObligationDirection.values:
-        raise ValidationError("جهت AP/AR معتبر نیست.")
+        raise ValidationError("نوع قلم دریافتنی یا پرداختنی معتبر نیست.")
     return direction
 
 
@@ -167,7 +167,7 @@ def propose_writeoff(request: HttpRequest, obligation_id) -> HttpResponse:
             amount=_amount(request), effective_date=_date(request), reason=request.POST.get("reason", ""),
             idempotency_key=request.POST.get("idempotency_key") or str(uuid4()),
         )
-        messages.success(request, "پیشنهاد سوخت نگهداری شد؛ تأیید و برگشت هنوز فعال نیست.")
+        messages.success(request, "پیشنهاد حذف حسابداری مانده ثبت شد؛ تأیید و برگشت هنوز فعال نیست.")
     except (PermissionDenied, ValidationError) as exc:
         messages.error(request, str(exc))
     return redirect("subledgers:workbench")
@@ -182,7 +182,7 @@ def aging(request: HttpRequest) -> HttpResponse:
             organization=request.organization, actor=request.user, direction=_direction(request),
             as_of_date=_as_of_date(request), idempotency_key=request.POST.get("idempotency_key") or str(uuid4()),
         )
-        messages.success(request, "aging دقیق و بدون بازه‌بندی نگهداری شد.")
+        messages.success(request, "گزارش سنی دقیق و بدون بازه‌بندی ثبت شد.")
     except (PermissionDenied, ValidationError) as exc:
         messages.error(request, str(exc))
     return redirect("subledgers:workbench")
@@ -197,7 +197,7 @@ def reconcile(request: HttpRequest) -> HttpResponse:
             organization=request.organization, actor=request.user, direction=_direction(request),
             as_of_date=_as_of_date(request), idempotency_key=request.POST.get("idempotency_key") or str(uuid4()),
         )
-        messages.success(request, "تطبیق زیر‌دفتر با استثناهای نگهداری‌شده اجرا شد.")
+        messages.success(request, "تطبیق حساب‌های دریافتنی و پرداختنی اجرا و موارد نیازمند بررسی ثبت شد.")
     except (PermissionDenied, ValidationError) as exc:
         messages.error(request, str(exc))
     return redirect("subledgers:workbench")
@@ -221,7 +221,7 @@ def review_reconciliation(request: HttpRequest, run_id) -> HttpResponse:
             run=run,
             reason=request.POST.get("reason", ""),
         )
-        messages.success(request, "بررسی مستقل تطبیق AP/AR ثبت شد.")
+        messages.success(request, "بررسی مستقل تطبیق دریافتنی‌ها و پرداختنی‌ها ثبت شد.")
     except (PermissionDenied, ValidationError) as exc:
         messages.error(request, str(exc))
     return redirect("subledgers:workbench")

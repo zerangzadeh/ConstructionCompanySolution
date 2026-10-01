@@ -90,7 +90,7 @@ history retains actor, Tenant, role, timestamp and relevant reason/context.
 | Material/category | Materials | canonical tenant code, aliases, category-scoped declarative attributes, sourced observations, immutable relationships and technical approval evidence | Version-pinned governed documents and immutable definition/value/import/approval history; observations are not quotes or ledger facts |
 | UOM/conversion | Materials | Tenant family/dimension, one family base and directed conversion to base | Immutable effective version/rounding snapshots; legacy units begin isolated with no invented factor |
 | Project/site/WBS/activity | Projects | operational structure and location/context | Approved baseline/rebaseline history separate from current display |
-| CBS/cost center | Project Controls | financial cost classification and WBS/activity mapping | Mapping/version retained with budget and cost facts |
+| CBS/cost center | Project Controls | versioned planning cost classification and WBS mapping; integrated cost-fact use remains deferred | Locked structure and mapping/version retained with immutable accepted budget; later cost facts must pin the same evidence explicitly |
 | COA/dimensions | Accounting | account hierarchy and posting dimensions | Effective status; posted lines retain original account/dimensions |
 | Bank/cash account | Treasury | controlled account identity and accounting mapping | Sensitive, effective and approval-controlled |
 | Regulatory rule version | Compliance Configuration | jurisdiction, rule type, parameters/schema, source/reviewer | Immutable after activation; document snapshots applied version |
@@ -107,7 +107,7 @@ Names are descriptive and may change during an approved detailed design.
 | Materials | MaterialAlias, MaterialDuplicateCandidate, MaterialSupersession, UnitFamily, UnitConversionVersion, QuantityRoundingPolicyVersion, QuantityConversionSnapshot, MaterialAttributeDefinition/Value, MaterialRelationship, MaterialPriceObservation, MaterialTechnicalApproval, MaterialDocumentLink |
 | Workforce | Skill, CompetencyRequirement, EmployeeSkill, Certificate, Training, PerformanceEvaluation, LaborRateVersion |
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
-| Project cost/control | BudgetBaseline/Version/Line, CBSNode, CostCenter, Commitment, Accrual, CostFact projection, ForecastVersion/Line, Risk/Change/Schedule baseline |
+| Project cost/control | Implemented BudgetVersion/manifest/allocation, CBSNode, CostCenter, ProjectCostSourceContract, append-only ProjectCostFact, ProjectCostCoverage, immutable ProjectCostForecast draft, bounded non-persistent cost-evidence reconciliation, ProjectScheduleRevision/Item/Dependency, ProjectControlItem/StatusEvent, ProjectChangeProposal and ScheduleRebaselineProposal; producer activation and accepted schedule/change/rebaseline policy remain gated |
 | Accounting | FiscalYear/Period, Account, JournalEntry/Line, PostingRuleVersion, PostingSource, Reversal/Replacement/Adjustment links, immutable FinancialStatementRun/LineSnapshot, FiscalPeriodControlEvent close/reopen evidence |
 | AP/AR | Implemented immutable Obligation, Treasury-linked Allocation/Reversal, WriteOffProposal, exact AgingRun, SubledgerReconciliationRun and independent signed ReconciliationReview; source/posting activation, approved write-off decision/reversal and credit/debit adjustment policy remain gated |
 | Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, unscheduled PaymentRequest, Employee/VendorAdvance and cash-return Settlement, retained source-to-GL reconciliation plus independent signed review, BankStatementImport/Line, exact Match/Clearing/Reversal and BankReconciliationRun; PaymentProposal and provider adapters remain target concepts |
@@ -143,6 +143,12 @@ Names are descriptive and may change during an approved detailed design.
 | Project actual cost | Classified source posting/subledger facts | Project Cost read model and KPIs |
 | Knowledge claim | Reviewed publication version with source evidence | Search, checklist/training/control suggestion |
 | KPI | Governed metric definition over authoritative facts | Dashboard/report cache with drill-through |
+
+P4-S35–S37 does not change this authority matrix. Its reconciliation reads the
+governing accepted budget, identically pinned approved/recorded expense
+allocations and existing inert Project Cost facts as distinct evidence families.
+It persists only audit evidence, labels coverage incomplete, and does not infer
+source equivalence, completeness or zero from absence.
 
 ## 7. Financial posting model
 

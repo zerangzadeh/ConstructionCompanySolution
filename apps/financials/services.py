@@ -136,7 +136,7 @@ def get_project_financial_report(
             Prefetch(
                 "expenses",
                 queryset=Expense.objects.filter(
-                    status=ExpenseStatus.RECORDED,
+                    status__in=(ExpenseStatus.RECORDED, ExpenseStatus.APPROVED),
                     deleted_at__isnull=True,
                 ),
             ),
@@ -176,7 +176,7 @@ def get_organization_financial_reports(
             Prefetch(
                 "expenses",
                 queryset=Expense.objects.filter(
-                    status=ExpenseStatus.RECORDED,
+                    status__in=(ExpenseStatus.RECORDED, ExpenseStatus.APPROVED),
                     deleted_at__isnull=True,
                 ),
             ),

@@ -10,6 +10,31 @@ urlpatterns = [
     path("create/", views.project_create, name="create"),
     path("<uuid:project_id>/sites/", views.project_site_list, name="site_list"),
     path("<uuid:project_id>/controls/", views.project_controls, name="controls"),
+    path(
+        "<uuid:project_id>/controls/comparison/",
+        views.project_controls_comparison,
+        name="controls_comparison",
+    ),
+    path(
+        "<uuid:project_id>/controls/exceptions/",
+        views.project_controls_exceptions,
+        name="controls_exceptions",
+    ),
+    path(
+        "<uuid:project_id>/controls/export/",
+        views.project_controls_export,
+        name="controls_export",
+    ),
+    path(
+        "<uuid:project_id>/controls/cost-reconciliation/",
+        views.project_cost_reconciliation,
+        name="cost_reconciliation",
+    ),
+    path(
+        "<uuid:project_id>/controls/cost-reconciliation/export/",
+        views.project_cost_reconciliation_export,
+        name="cost_reconciliation_export",
+    ),
     path("<uuid:project_id>/controls/wbs/", views.wbs_node_create, name="wbs_create"),
     path(
         "<uuid:project_id>/controls/wbs/<uuid:node_id>/archive/",

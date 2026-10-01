@@ -532,6 +532,18 @@ class BusinessPermissionCode(models.TextChoices):
         "تغییر وضعیت فاز پروژه",
     )
     PROJECT_CONTROLS_VIEW = "project_controls.view", "مشاهده کنترل پروژه"
+    PROJECT_CONTROLS_COMPARE = (
+        "project_controls.compare",
+        "مقایسه بودجه پذیرفته‌شده و شواهد هزینه پروژه",
+    )
+    PROJECT_CONTROLS_EXCEPTIONS_VIEW = (
+        "project_controls.exceptions_view",
+        "مشاهده استثناهای محدود کنترل پروژه",
+    )
+    PROJECT_CONTROLS_EXPORT = (
+        "project_controls.export",
+        "خروجی ایمن کنترل پروژه",
+    )
     WBS_NODES_VIEW = "wbs_nodes.view", "مشاهده ساختار شکست"
     WBS_NODES_CREATE = "wbs_nodes.create", "ایجاد گره ساختار شکست"
     WBS_NODES_CHANGE = "wbs_nodes.change", "ویرایش گره ساختار شکست"
@@ -594,12 +606,98 @@ class BusinessPermissionCode(models.TextChoices):
         "estimate_imports.preview",
         "پیش‌نمایش ورود برآورد",
     )
+    COST_STRUCTURES_MANAGE = (
+        "cost_structures.manage",
+        "مدیریت نسخه‌های CBS و مرکز هزینه",
+    )
+    BUDGETS_VIEW = "budgets.view", "مشاهده بودجه‌های پروژه"
+    BUDGETS_PREPARE = "budgets.prepare", "آماده‌سازی بودجه پروژه"
+    BUDGETS_SUBMIT = "budgets.submit", "ارسال بودجه پروژه"
+    BUDGETS_ACCEPT = "budgets.accept", "پذیرش مستقل مبنای بودجه"
+    PROJECT_COST_SOURCES_MANAGE = (
+        "project_cost.sources_manage",
+        "مدیریت قراردادهای منبع هزینه پروژه",
+    )
+    PROJECT_COST_SOURCES_APPROVE = (
+        "project_cost.sources_approve",
+        "تأیید مستقل قراردادهای منبع هزینه پروژه",
+    )
+    PROJECT_COST_FACTS_RECORD = (
+        "project_cost.facts_record",
+        "ثبت برون‌داد طبقه‌بندی‌شده هزینه پروژه",
+    )
+    PROJECT_COSTS_VIEW = "project_cost.view", "مشاهده هزینه یکپارچه پروژه"
+    PROJECT_COST_RECONCILIATIONS_VIEW = (
+        "project_cost.reconciliations_view",
+        "مشاهده تطبیق محدود شواهد هزینه پروژه",
+    )
+    PROJECT_COST_RECONCILIATIONS_EXPORT = (
+        "project_cost.reconciliations_export",
+        "خروجی تطبیق محدود شواهد هزینه پروژه",
+    )
+    PROJECT_FORECASTS_PREPARE = (
+        "project_cost.forecasts_prepare",
+        "آماده‌سازی پیش‌نویس پیش‌بینی هزینه پروژه",
+    )
+    PROJECT_SCHEDULES_VIEW = (
+        "project_schedules.view",
+        "مشاهده برنامه زمان‌بندی و کنترل تغییر پروژه",
+    )
+    PROJECT_SCHEDULES_PREPARE = (
+        "project_schedules.prepare",
+        "آماده‌سازی نسخه برنامه زمان‌بندی پروژه",
+    )
+    PROJECT_CONTROL_REGISTERS_MANAGE = (
+        "project_control_registers.manage",
+        "مدیریت ثبت محدودیت، مسئله، ریسک و تأخیر پروژه",
+    )
+    PROJECT_CONTROL_REGISTERS_VIEW = (
+        "project_control_registers.view",
+        "مشاهده ثبت محدودیت، مسئله، ریسک و تأخیر پروژه",
+    )
+    PROJECT_CHANGES_PROPOSE = (
+        "project_changes.propose",
+        "ثبت پیشنهاد تغییر پروژه بدون اثر قراردادی یا مالی",
+    )
+    PROJECT_CHANGES_VIEW = (
+        "project_changes.view",
+        "مشاهده پیشنهادهای تغییر پروژه",
+    )
+    PROJECT_REBASELINES_PROPOSE = (
+        "project_rebaselines.propose",
+        "ثبت پیشنهاد بازخط‌مبنا بدون پذیرش",
+    )
+    PROJECT_REBASELINES_VIEW = (
+        "project_rebaselines.view",
+        "مشاهده پیشنهادهای بازخط‌مبنا",
+    )
+    PROJECT_SCHEDULE_BASELINES_ACCEPT = (
+        "project_schedules.accept",
+        "پذیرش مبنای زمان‌بندی (غیرفعال تا تصمیم مالک محصول)",
+    )
+    PROJECT_CHANGES_APPROVE = (
+        "project_changes.approve",
+        "تأیید تغییر پروژه (غیرفعال تا تصمیم مالک محصول)",
+    )
+    PROJECT_REBASELINES_ACCEPT = (
+        "project_rebaselines.accept",
+        "پذیرش بازخط‌مبنا (غیرفعال تا تصمیم مالک محصول)",
+    )
 
     EXPENSES_VIEW = "expenses.view", "مشاهده هزینه‌ها"
     EXPENSES_CREATE = "expenses.create", "ثبت هزینه"
+    EXPENSES_SUBMIT = "expenses.submit", "ارسال هزینه برای تأیید"
+    EXPENSES_APPROVE = "expenses.approve", "تأیید مستقل هزینه"
+    EXPENSES_RETURN = "expenses.return", "بازگردانی هزینه برای اصلاح"
+    EXPENSES_ALLOCATE = "expenses.allocate", "کدگذاری و تخصیص هزینه"
+    EXPENSE_RECURRENCES_MANAGE = (
+        "expenses.recurrences_manage",
+        "مدیریت پیشنهادهای هزینه تکرارشونده",
+    )
     EXPENSES_VOID = "expenses.void", "ابطال هزینه"
     EXPENSE_CATEGORIES_VIEW = "expense_categories.view", "مشاهده دسته‌های هزینه"
     EXPENSE_CATEGORIES_CREATE = "expense_categories.create", "ایجاد دسته هزینه"
+    EXPENSE_CATEGORIES_CHANGE = "expense_categories.change", "ویرایش دسته هزینه"
     EXPENSE_CATEGORIES_ARCHIVE = (
         "expense_categories.archive",
         "بایگانی دسته هزینه",

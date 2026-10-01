@@ -4,6 +4,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -26,6 +27,8 @@ from apps.projects.services import (
     create_project_phase,
     create_project_site,
     create_wbs_node,
+    export_project_control_snapshot,
+    export_project_cost_reconciliation,
     get_available_phase_statuses,
     get_organization_activities,
     get_organization_project,
@@ -36,6 +39,10 @@ from apps.projects.services import (
     get_organization_projects,
     get_organization_sites,
     get_organization_wbs_nodes,
+    get_project_control_comparison,
+    get_project_control_exceptions,
+    get_project_cost_projection,
+    get_project_cost_reconciliation,
     transition_activity_status,
     transition_project_phase_status,
 )
@@ -148,7 +155,23 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
         organization=request.organization,
         project_id=project_id,
     )
-    return render(request, "projects/detail.html", {"project": project})
+    cost_projection = None
+    if has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.PROJECT_COSTS_VIEW,
+        project=project,
+    ):
+        cost_projection = get_project_cost_projection(
+            organization=request.organization,
+            project=project,
+            actor=request.user,
+        )
+    return render(
+        request,
+        "projects/detail.html",
+        {"project": project, "cost_projection": cost_projection},
+    )
 
 
 @active_organization_required
@@ -492,6 +515,99 @@ def project_controls(request: HttpRequest, project_id: str) -> HttpResponse:
             "activity_form": ActivityForm(project=project),
         },
     )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_CONTROLS_COMPARE)
+@require_GET
+def project_controls_comparison(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    comparison = get_project_control_comparison(
+        organization=request.organization, project=project, actor=request.user
+    )
+    return render(
+        request,
+        "projects/control_comparison.html",
+        {"project": project, "comparison": comparison},
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_CONTROLS_EXCEPTIONS_VIEW)
+@require_GET
+def project_controls_exceptions(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    snapshot = get_project_control_exceptions(
+        organization=request.organization, project=project, actor=request.user
+    )
+    return render(
+        request,
+        "projects/control_exceptions.html",
+        {"project": project, "snapshot": snapshot},
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECT_CONTROLS_EXPORT)
+@require_GET
+def project_controls_export(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    payload = export_project_control_snapshot(
+        organization=request.organization, project=project, actor=request.user
+    )
+    response = HttpResponse(payload, content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = (
+        f'attachment; filename="project-controls-{project.code}.csv"'
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
+
+
+@active_organization_required
+@organization_permission_required(
+    BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_VIEW
+)
+@require_GET
+def project_cost_reconciliation(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    snapshot = get_project_cost_reconciliation(
+        organization=request.organization, project=project, actor=request.user
+    )
+    return render(
+        request,
+        "projects/cost_reconciliation.html",
+        {"project": project, "snapshot": snapshot},
+    )
+
+
+@active_organization_required
+@organization_permission_required(
+    BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_EXPORT
+)
+@require_GET
+def project_cost_reconciliation_export(
+    request: HttpRequest, project_id: str
+) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user, organization=request.organization, project_id=project_id
+    )
+    payload = export_project_cost_reconciliation(
+        organization=request.organization, project=project, actor=request.user
+    )
+    response = HttpResponse(payload, content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = (
+        f'attachment; filename="project-cost-reconciliation-{project.code}.csv"'
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    return response
 
 
 @active_organization_required

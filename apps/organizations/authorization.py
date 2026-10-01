@@ -34,6 +34,7 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "project_sites",
         "project_phases",
         "project_controls",
+        "project_cost",
         "wbs_nodes",
         "activities",
         "contracts",

@@ -864,17 +864,94 @@ activation, legacy cutover/backfill or P3-S28+ authorization.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P4-S01..S06 | 6 | `T-M` | Estimate/BOQ comparison, resources, coefficients and safe import slices |
-| P4-S07..S13 | 7 | `A-H` | Budget baseline/version, CBS/cost center and WBS mapping |
-| P4-S14..S20 | 7 | `A-H` | Commitment/accrual/actual/forecast cost facts and source lineage |
-| P4-S21..S25 | 5 | `A-H` | Schedule, milestones, constraints, risk, delay, change and rebaseline controls |
-| P4-S26..S30 | 5 | `A-H` | Expense lifecycle, allocation, recurrence proposals and budget controls |
-| P4-S31..S34 | 4 | `T-M` | Project-control UI, comparisons, exception views and exports |
-| P4-S35..S37 | 3 | `A-X` | Cost conservation, concurrency, performance and multi-source reconciliation |
-| P4-S38 | 1 | `L-M` | Documentation closeout and P5 handoff packet |
+| P4-S01..S06 | complete | `T-M` | Estimate/BOQ comparison, resources, coefficients and safe import slices; 3 focused PostgreSQL tests pass. |
+| P4-S07..S13 | complete | `A-H` | Planning-only accepted budget versions, complete Estimate manifests, versioned CBS/cost center and conserved WBS mapping; 7 focused service tests plus migration rollback/reapply pass. |
+| P4-S14..S20 | complete | `A-H` | Approved producer contracts, immutable commitment/accrual/actual projections, draft forecasts, incomplete coverage and drill-through; 12 focused/retained PostgreSQL service/UI tests plus rollback/reapply evidence pass. |
+| P4-S21..S25 | complete | `A-H` | Safe draft schedule/milestone/dependency and evidence-register/change/rebaseline foundations; acceptance, scoring, contractual impact, EV and integrations remain fail-closed. |
+| P4-S26..S30 | complete | `A-H` | Expense lifecycle, conserved allocation, recurrence proposals and advisory accepted-budget controls; P4-G10 remains fail-closed. |
+| P4-S31..S34 | complete | `T-M` | Permission-scoped RTL controls UI, accepted-budget/expense comparison, advisory exception evidence and audited bounded CSV; P4-G10 remains fail-closed. |
+| P4-S35..S37 | complete | `A-X` | Cost conservation, deterministic PostgreSQL locking, bounded-query safety and explicitly incomplete multi-source reconciliation. |
+| P4-S38 | complete | `L-M` | [P4 closeout and P5 handoff packet](architecture/P4_S38_CLOSEOUT_AND_P5_HANDOFF.md); no P5 implementation or activation authorized. |
 
 **Product Owner gates:** price-book licensing, budget authority, CBS policy,
 forecast cadence, schedule depth/integration, and budget warning versus hard stop.
+
+### P4-S21–S25 implementation contract and closeout
+
+The Product Owner authorized only P4-S21–S25 on 2026-10-01. The
+[implementation contract](architecture/P4_S21_S25_IMPLEMENTATION_CONTRACT.md)
+records the maximum independent safe slice: draft schedule revisions, milestones,
+cycle-safe dependencies, evidence-backed constraint/issue/risk/delay registers,
+append-only status history, and immutable change/rebaseline proposals. Dedicated
+permissions, audit, Tenant/object scope, independently permissioned read sections,
+idempotency, locking and PostgreSQL immutability are implemented. Seven focused
+service/concurrency tests and one migration
+rollback/reapply test pass.
+
+P4-G11–G18 remain open for schedule depth/integration, baseline authority, risk
+scoring, delay responsibility, change approval, contractual-impact handoff,
+rebaseline acceptance and earned value. Their action services fail closed and no
+default role receives their gated permissions. No external scheduler, source or
+financial mutation, UI tranche, legacy switch, production activation or P4-S26+
+behavior was introduced. The separately authorized P4-S26–S30 package is recorded
+below; completion of S25 did not itself authorize that package.
+
+### P4-S26–S30 implementation contract and closeout
+
+The Product Owner authorized only P4-S26–S30 on 2026-10-01. The
+[implementation contract](architecture/P4_S26_S30_IMPLEMENTATION_CONTRACT.md)
+records the delivered safe slice: compatible expense lifecycle, direct
+maker/checker, retained source identity, duplicate/idempotency controls, conserved
+multi-project coding, manual recurrence proposals and immutable advisory snapshots
+against the currently governing accepted budget. PostgreSQL, permission,
+cross-Tenant, regression and rollback/reapply checks are the acceptance evidence.
+
+P4-G01–G04, P4-G06–G10 and P4-G11–G18 remain fail-closed outside their already
+accepted bounded facts. In particular, P4-G10 supplies no warning/hard-stop rule:
+overruns are evidence only. No expense action creates AP, GL, Treasury, cash,
+contract, schedule, baseline, forecast, earned-value or Project Cost facts.
+P4-S31–S34 are separately implemented as the bounded presentation/export
+contract below. P4-S35–S37 are now separately authorized and implemented under
+their own contract. At the P4-S26–S30 package boundary, P4-S38 remained
+unauthorized; it was later completed as the documentation-only closeout below.
+
+### P4-S31–S34 implementation contract and closeout
+
+The Product Owner authorized only P4-S31–S34 on 2026-10-01. The
+[implementation contract](architecture/P4_S31_S34_IMPLEMENTATION_CONTRACT.md)
+records the bounded RTL control UI, governing accepted-budget versus identically
+coded approved/recorded-expense comparison, advisory-only exception evidence and
+audited CSV. No budget, expense, financial, Project Cost, schedule, forecast or
+contractual fact is mutated or newly activated; P4-G01–G04, unresolved P4-G06–G10
+and P4-G11–G18 remain fail-closed. At this package boundary P4-S35+ was not
+authorized; the separately authorized S35–S37 package is recorded below.
+
+### P4-S35–S37 implementation contract and closeout
+
+The Product Owner authorized only P4-S35–S37 on 2026-10-01. The
+[implementation contract](architecture/P4_S35_S37_IMPLEMENTATION_CONTRACT.md)
+records exact expense/source-contract idempotency, same-budget assessment, coded-dimension cost
+conservation, deterministic PostgreSQL locking, bounded query behavior and a
+separately permissioned/audited RTL reconciliation read model and CSV.
+
+Accepted budgets, approved/recorded expenses and inert Project Cost facts remain
+distinct evidence families. Coverage is always labelled incomplete, missing
+evidence is unknown rather than zero, Project Cost facts without retained budget
+lineage are uncomparable, and any displayed difference is unresolved. No producer,
+posting, AP/GL/Treasury/cash/settlement, recurrence processing, budget mutation,
+accepted forecast, schedule/change/EV authority or contractual effect is
+activated. P4-G01–G04, unresolved P4-G06–G10 and P4-G11–G18 remain
+fail-closed. P4-S38 documentation closeout is recorded below; P5 has not begun.
+
+### P4-S38 documentation closeout and P5 handoff
+
+P4-S38 is complete as a documentation-only session. The
+[closeout/handoff packet](architecture/P4_S38_CLOSEOUT_AND_P5_HANDOFF.md)
+reconciles P4-S01–S37 verified evidence, current-vs-target ownership,
+unresolved Product Owner gates, focused validation and P5 entry conditions.
+It changes no runtime, schema, data, permission, financial policy or production
+state. P5 remains planned and unstarted; P5-S01 requires separate Product Owner
+authorization and a new implementation contract.
 
 ## 11. P5 session map — 28 sessions
 

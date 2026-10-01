@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}تطبیق شواهد هزینه | سامانه مدیریت ساخت{% endblock %}
+
+{% block content %}
+    {% url "projects:controls" project.pk as controls_url %}
+    {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=controls_url page_eyebrow=project.code page_title="تطبیق محدود چندمنبعی" page_description="بودجه پذیرفته‌شده، شواهد هزینه و فکت‌های غیرفعال هزینه پروژه" only %}
+    <section class="erp-surface mt-6 rounded-xl p-5">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <p class="max-w-3xl rounded-lg bg-amber-50 p-3 text-sm leading-6 text-amber-900">پوشش همواره ناقص است. این نمایش هیچ منبعی را مرجع مالی نمی‌داند، فقدان شاهد را صفر تلقی نمی‌کند و هیچ هشدار، توقف، رزرو، ثبت مالی یا تغییر بودجه‌ای ایجاد نمی‌کند.</p>
+            {% if "project_cost.reconciliations_export" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'projects:cost_reconciliation_export' project.pk %}">خروجی CSV حسابرسی‌شده</a>{% endif %}
+        </div>
+        {% if snapshot %}
+            <div class="mt-4 flex flex-wrap gap-4 text-sm text-slate-600"><span>بودجه حاکم: <span dir="ltr">{{ snapshot.budget_id }}</span></span><span>ارز: <span dir="ltr">{{ snapshot.currency }}</span></span><span class="font-semibold text-amber-800">هم‌ارزی منابع اثبات نشده است</span></div>
+            <div class="mt-5 overflow-x-auto"><table class="w-full min-w-[920px] text-right text-sm"><thead class="border-b border-slate-200 text-xs text-slate-500"><tr><th class="p-3">CBS</th><th class="p-3">WBS</th><th class="p-3">مرکز هزینه</th><th class="p-3">بودجه</th><th class="p-3">هزینه تأیید/ثبت‌شده</th><th class="p-3">فکت غیرفعال هزینه واقعی</th><th class="p-3">اختلاف حل‌نشده</th></tr></thead><tbody>{% for line in snapshot.lines %}<tr class="border-b border-slate-100"><td class="p-3"><span dir="ltr">{{ line.cbs_code }}</span> · {{ line.cbs_name }}</td><td class="p-3"><span dir="ltr">{{ line.wbs_code }}</span> · {{ line.wbs_title }}</td><td class="p-3" dir="ltr">{{ line.cost_center_code }}</td><td class="p-3 tabular-nums" dir="ltr">{% if line.accepted_budget_amount is None %}نامشخص{% else %}{{ line.accepted_budget_amount|erp_number }}{% endif %}</td><td class="p-3 tabular-nums" dir="ltr">{% if line.approved_or_recorded_expense_amount is None %}نامشخص{% else %}{{ line.approved_or_recorded_expense_amount|erp_number }}{% endif %}</td><td class="p-3 tabular-nums" dir="ltr">{% if line.inert_project_cost_actual_amount is None %}نامشخص{% else %}{{ line.inert_project_cost_actual_amount|erp_number }}{% endif %}</td><td class="p-3 tabular-nums" dir="ltr">{% if line.unresolved_difference is None %}غیرقابل‌مقایسه{% else %}{{ line.unresolved_difference|erp_number }}{% endif %}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="7">شاهد کدگذاری‌شده‌ای برای نمایش وجود ندارد.</td></tr>{% endfor %}</tbody></table></div>
+            <div class="mt-6 grid gap-4 lg:grid-cols-2">
+                <section class="rounded-lg border border-slate-200 p-4"><h2 class="font-semibold">منابع و پوشش</h2><div class="mt-3 space-y-3 text-sm">{% for source in snapshot.sources %}<div class="border-b border-slate-100 pb-3"><p dir="ltr">{{ source.producer_key }} v{{ source.version }} · {{ source.source_model }}</p><p class="mt-1 text-slate-500">پوشش: {{ source.coverage_status }} · فکت: <span dir="ltr">{{ source.fact_count }}</span> · سیاست: <span dir="ltr">{{ source.reconciliation_policy_reference }}</span></p></div>{% empty %}<p class="text-slate-500">منبع فکت هزینه واقعی وجود ندارد؛ این وضعیت به‌معنای هزینه صفر نیست.</p>{% endfor %}</div></section>
+                <section class="rounded-lg border border-slate-200 p-4"><h2 class="font-semibold">شواهد حذف‌شده یا غیرقابل‌مقایسه</h2><div class="mt-3 space-y-3 text-sm">{% for exclusion in snapshot.exclusions %}{% if exclusion.count %}<div class="border-b border-slate-100 pb-3"><p><span class="font-semibold" dir="ltr">{{ exclusion.count }}</span> مورد · {{ exclusion.disposition }}</p><p class="mt-1 text-slate-500">{{ exclusion.note }}</p></div>{% endif %}{% empty %}<p class="text-slate-500">موردی ثبت نشده است.</p>{% endfor %}</div></section>
+            </div>
+        {% else %}
+            <p class="mt-4 text-slate-600">بودجه پذیرفته‌شده حاکم وجود ندارد؛ تطبیق ارائه نمی‌شود.</p>
+        {% endif %}
+    </section>
+{% endblock %}

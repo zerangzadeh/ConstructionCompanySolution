@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}مقایسه بودجه و هزینه | سامانه مدیریت ساخت{% endblock %}
+
+{% block content %}
+    {% url "projects:controls" project.pk as controls_url %}
+    {% include "components/page_header.html" with page_breadcrumb_label=project.name page_breadcrumb_url=controls_url page_eyebrow=project.code page_title="مقایسه بودجه پذیرفته‌شده و هزینه" page_description="شواهد محدود، فقط‌خواندنی و کدگذاری‌شده" only %}
+    <section class="erp-surface mt-6 rounded-xl p-5">
+        <p class="rounded-lg bg-amber-50 p-3 text-sm leading-6 text-amber-900">این نمایش فقط مقایسه شواهد است. سیاست هشدار، توقف، رزرو، پیش‌بینی، ثبت مالی و تغییر بودجه فعال نیست.</p>
+        {% if comparison %}
+            <div class="mt-4 flex flex-wrap gap-4 text-sm text-slate-600"><span>شناسه بودجه حاکم: <span dir="ltr">{{ comparison.budget_id }}</span></span><span>ارز: <span dir="ltr">{{ comparison.currency }}</span></span></div>
+            <div class="mt-5 overflow-x-auto"><table class="w-full min-w-[760px] text-right text-sm"><thead class="border-b border-slate-200 text-xs text-slate-500"><tr><th class="p-3">CBS</th><th class="p-3">WBS</th><th class="p-3">مرکز هزینه</th><th class="p-3">بودجه پذیرفته‌شده</th><th class="p-3">هزینه تأیید/ثبت‌شده</th><th class="p-3">مانده مشاهده‌ای</th></tr></thead><tbody>{% for line in comparison.lines %}<tr class="border-b border-slate-100"><td class="p-3"><span dir="ltr">{{ line.cbs_code }}</span> · {{ line.cbs_name }}</td><td class="p-3"><span dir="ltr">{{ line.wbs_code }}</span> · {{ line.wbs_title }}</td><td class="p-3" dir="ltr">{{ line.cost_center_code }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.accepted_budget_amount|erp_number }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.approved_or_recorded_expense_amount|erp_number }}</td><td class="p-3 tabular-nums" dir="ltr">{{ line.remaining_amount|erp_number }}</td></tr>{% empty %}<tr><td class="p-4 text-slate-500" colspan="6">برای بودجه حاکم، تخصیص قابل مقایسه‌ای ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div>
+            {% if comparison.unallocated_expense_count %}<p class="mt-4 rounded-lg bg-slate-50 p-3 text-sm text-slate-600"><span class="font-semibold" dir="ltr">{{ comparison.unallocated_expense_count }}</span> هزینه به مبلغ <span class="font-semibold tabular-nums" dir="ltr">{{ comparison.unallocated_expense_amount|erp_number }}</span> به‌دلیل نداشتن کدگذاری از مقایسه حذف شده است؛ این حذف به‌معنای صفر بودن یا تصمیم کنترلی نیست.</p>{% endif %}
+        {% else %}
+            <p class="mt-4 text-slate-600">بودجه پذیرفته‌شده حاکم برای این پروژه وجود ندارد؛ مقایسه ارائه نمی‌شود.</p>
+        {% endif %}
+    </section>
+{% endblock %}

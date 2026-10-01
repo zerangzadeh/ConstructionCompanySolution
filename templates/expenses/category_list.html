@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}دسته‌های هزینه | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% if "expense_categories.create" in business_permission_codes %}{% url "expenses:category_create" as create_url %}{% endif %}
+{% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="دسته‌های هزینه" page_description="دسته‌های هزینهٔ شرکت و گروه اصلی هر دسته" page_action_url=create_url page_action_label="دسته هزینه جدید" only %}
+<section class="erp-surface mt-6 overflow-hidden rounded-xl">
+  {% if categories %}<div class="divide-y divide-slate-100">{% for category in categories %}
+    <div class="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-blue-50/40"><div><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'expenses:category_detail' category.pk %}">{{ category.name }}</a><p class="mt-0.5 text-[11px] text-slate-500"><span dir="ltr">{{ category.code }}</span> · گروه اصلی: {{ category.primary_group.name }}</p></div>{% if "expense_categories.archive" in business_permission_codes %}<form method="post" action="{% url 'expenses:category_archive' category.pk %}">{% csrf_token %}<button class="text-xs font-semibold text-red-700">بایگانی</button></form>{% endif %}</div>
+  {% endfor %}</div>{% else %}<p class="p-12 text-center text-sm text-slate-500">هنوز دسته هزینه‌ای ثبت نشده است.</p>{% endif %}
+</section>
+{% endblock %}

@@ -440,10 +440,95 @@ class AuditAction(models.TextChoices):
         "estimate.revision_approved",
         "بازنگری برآورد تأیید شد",
     )
+    BUDGET_DRAFT_CREATED = "budget.draft_created", "پیش‌نویس بودجه ایجاد شد"
+    BUDGET_SUBMITTED = "budget.submitted", "بودجه ارسال شد"
+    BUDGET_ACCEPTED = "budget.accepted", "مبنای بودجه پذیرفته شد"
+    PROJECT_COST_SOURCE_DRAFTED = (
+        "project_cost.source_drafted",
+        "قرارداد منبع هزینه پروژه ایجاد شد",
+    )
+    PROJECT_COST_SOURCE_APPROVED = (
+        "project_cost.source_approved",
+        "قرارداد منبع هزینه پروژه تأیید شد",
+    )
+    PROJECT_COST_FACT_RECORDED = (
+        "project_cost.fact_recorded",
+        "برون‌داد هزینه پروژه ثبت شد",
+    )
+    PROJECT_COST_COVERAGE_CHANGED = (
+        "project_cost.coverage_changed",
+        "پوشش منبع هزینه پروژه تغییر کرد",
+    )
+    PROJECT_COST_FORECAST_DRAFTED = (
+        "project_cost.forecast_drafted",
+        "پیش‌نویس پیش‌بینی هزینه پروژه ایجاد شد",
+    )
+    PROJECT_COST_RECONCILIATION_VIEWED = (
+        "project_cost.reconciliation_viewed",
+        "تطبیق محدود شواهد هزینه پروژه مشاهده شد",
+    )
+    PROJECT_COST_RECONCILIATION_EXPORTED = (
+        "project_cost.reconciliation_exported",
+        "خروجی تطبیق محدود شواهد هزینه پروژه ایجاد شد",
+    )
+    PROJECT_SCHEDULE_DRAFTED = (
+        "project_schedule.drafted",
+        "پیش‌نویس برنامه زمان‌بندی پروژه ایجاد شد",
+    )
+    PROJECT_SCHEDULE_ITEM_ADDED = (
+        "project_schedule.item_added",
+        "فعالیت یا نقطه عطف برنامه زمان‌بندی افزوده شد",
+    )
+    PROJECT_SCHEDULE_DEPENDENCY_ADDED = (
+        "project_schedule.dependency_added",
+        "وابستگی برنامه زمان‌بندی افزوده شد",
+    )
+    PROJECT_CONTROL_ITEM_RECORDED = (
+        "project_control.item_recorded",
+        "مورد کنترل پروژه ثبت شد",
+    )
+    PROJECT_CONTROL_STATUS_RECORDED = (
+        "project_control.status_recorded",
+        "گذار وضعیت مورد کنترل پروژه ثبت شد",
+    )
+    PROJECT_CHANGE_PROPOSED = (
+        "project_change.proposed",
+        "پیشنهاد تغییر پروژه ثبت شد",
+    )
+    PROJECT_REBASELINE_PROPOSED = (
+        "project_rebaseline.proposed",
+        "پیشنهاد بازخط‌مبنا ثبت شد",
+    )
+    PROJECT_CONTROLS_EXPORTED = (
+        "project_controls.exported",
+        "خروجی ایمن کنترل پروژه ایجاد شد",
+    )
     EXPENSE_RECORDED = "expense.recorded", "هزینه ثبت شد"
+    EXPENSE_DRAFT_CREATED = "expense.draft_created", "پیش‌نویس هزینه ایجاد شد"
+    EXPENSE_ALLOCATION_ADDED = "expense.allocation_added", "تخصیص هزینه ثبت شد"
+    EXPENSE_SUBMITTED = "expense.submitted", "هزینه برای تأیید ارسال شد"
+    EXPENSE_APPROVED = "expense.approved", "هزینه تأیید شد"
+    EXPENSE_RETURNED = "expense.returned", "هزینه برای اصلاح بازگردانده شد"
+    EXPENSE_RECURRENCE_PROPOSED = (
+        "expense.recurrence_proposed",
+        "پیشنهاد هزینه تکرارشونده ایجاد شد",
+    )
     EXPENSE_VOIDED = "expense.voided", "هزینه باطل شد"
     EXPENSE_CATEGORY_CREATED = "expense_category.created", "دسته هزینه ایجاد شد"
+    EXPENSE_CATEGORY_UPDATED = "expense_category.updated", "دسته هزینه ویرایش شد"
     EXPENSE_CATEGORY_ARCHIVED = "expense_category.archived", "دسته هزینه بایگانی شد"
+    PLATFORM_EXPENSE_GROUP_CREATED = (
+        "platform_expense_group.created",
+        "گروه اصلی هزینه ایجاد شد",
+    )
+    PLATFORM_EXPENSE_GROUP_UPDATED = (
+        "platform_expense_group.updated",
+        "گروه اصلی هزینه ویرایش شد",
+    )
+    PLATFORM_EXPENSE_GROUP_ARCHIVED = (
+        "platform_expense_group.archived",
+        "گروه اصلی هزینه بایگانی شد",
+    )
     PAYMENT_RECORDED = "payment.recorded", "پرداخت ثبت شد"
     PAYMENT_VOIDED = "payment.voided", "پرداخت باطل شد"
     PAYMENT_ALLOCATION_CREATED = (

@@ -511,7 +511,10 @@ class SubledgerWorkbenchUiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dir="rtl"', html=False)
         self.assertContains(response, "بدون بازه‌بندی")
-        self.assertContains(response, "تأیید و برگشت سوخت فعال نیست")
+        self.assertContains(response, "تأیید و برگشت حذف حسابداری مانده هنوز فعال نشده‌اند")
+        self.assertContains(response, "میزکار دریافتنی‌ها و پرداختنی‌ها")
+        self.assertContains(response, "ثبت گزارش سنی")
+        self.assertContains(response, "تاریخ مبنا")
         self.assertNotContains(response, "حساب نقدی")
 
     def test_allocation_rejects_cross_tenant_movement(self) -> None:

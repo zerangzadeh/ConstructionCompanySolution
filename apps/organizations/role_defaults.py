@@ -63,6 +63,39 @@ SUBLEDGER_RESTRICTED_PERMISSIONS = permission_codes(
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_APPROVE,
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_REVERSE,
 )
+BUDGET_RESTRICTED_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.PROJECT_CONTROLS_COMPARE,
+    BusinessPermissionCode.PROJECT_CONTROLS_EXCEPTIONS_VIEW,
+    BusinessPermissionCode.PROJECT_CONTROLS_EXPORT,
+    BusinessPermissionCode.COST_STRUCTURES_MANAGE,
+    BusinessPermissionCode.BUDGETS_VIEW,
+    BusinessPermissionCode.BUDGETS_PREPARE,
+    BusinessPermissionCode.BUDGETS_SUBMIT,
+    BusinessPermissionCode.BUDGETS_ACCEPT,
+    BusinessPermissionCode.PROJECT_COST_SOURCES_MANAGE,
+    BusinessPermissionCode.PROJECT_COST_SOURCES_APPROVE,
+    BusinessPermissionCode.PROJECT_COST_FACTS_RECORD,
+    BusinessPermissionCode.PROJECT_COSTS_VIEW,
+    BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_VIEW,
+    BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_EXPORT,
+    BusinessPermissionCode.PROJECT_FORECASTS_PREPARE,
+    BusinessPermissionCode.PROJECT_SCHEDULES_VIEW,
+    BusinessPermissionCode.PROJECT_SCHEDULES_PREPARE,
+    BusinessPermissionCode.PROJECT_CONTROL_REGISTERS_VIEW,
+    BusinessPermissionCode.PROJECT_CONTROL_REGISTERS_MANAGE,
+    BusinessPermissionCode.PROJECT_CHANGES_VIEW,
+    BusinessPermissionCode.PROJECT_CHANGES_PROPOSE,
+    BusinessPermissionCode.PROJECT_REBASELINES_VIEW,
+    BusinessPermissionCode.PROJECT_REBASELINES_PROPOSE,
+    BusinessPermissionCode.PROJECT_SCHEDULE_BASELINES_ACCEPT,
+    BusinessPermissionCode.PROJECT_CHANGES_APPROVE,
+    BusinessPermissionCode.PROJECT_REBASELINES_ACCEPT,
+)
+UNAUTHORIZED_PROJECT_CONTROL_APPROVAL_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.PROJECT_SCHEDULE_BASELINES_ACCEPT,
+    BusinessPermissionCode.PROJECT_CHANGES_APPROVE,
+    BusinessPermissionCode.PROJECT_REBASELINES_ACCEPT,
+)
 UNAUTHORIZED_WRITEOFF_PERMISSIONS = permission_codes(
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_APPROVE,
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_REVERSE,
@@ -109,9 +142,10 @@ MANAGER_EXPLICIT_PERMISSIONS = permission_codes(
     BusinessPermissionCode.WORK_ITEMS_CLAIM,
     BusinessPermissionCode.WORK_ITEMS_ACT,
 )
-READ_ONLY_PERMISSIONS = permission_codes_with_suffix("view") | permission_codes(
-    BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
-)
+READ_ONLY_PERMISSIONS = (
+    permission_codes_with_suffix("view")
+    | permission_codes(BusinessPermissionCode.DOCUMENTS_DOWNLOAD)
+) - BUDGET_RESTRICTED_PERMISSIONS
 MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.DAILY_REPORTS_CREATE,
     BusinessPermissionCode.DAILY_REPORTS_ADD_LABOR,
@@ -151,6 +185,7 @@ OPERATIONS_MANAGER_EXCLUSIONS = (
     | ACCOUNTING_RESTRICTED_PERMISSIONS
     | TREASURY_RESTRICTED_PERMISSIONS
     | SUBLEDGER_RESTRICTED_PERMISSIONS
+    | BUDGET_RESTRICTED_PERMISSIONS
 )
 
 
@@ -167,6 +202,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         - ACCOUNTING_RESTRICTED_PERMISSIONS
         - TREASURY_RESTRICTED_PERMISSIONS
         - SUBLEDGER_RESTRICTED_PERMISSIONS
+        - BUDGET_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -184,6 +220,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
         - ACCOUNTING_RESTRICTED_PERMISSIONS
         - TREASURY_RESTRICTED_PERMISSIONS
         - SUBLEDGER_RESTRICTED_PERMISSIONS
+        - BUDGET_RESTRICTED_PERMISSIONS
         - permission_codes(
             BusinessPermissionCode.COMPANY_SETTINGS_CHANGE,
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
@@ -269,6 +306,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(UNAUTHORIZED_WRITEOFF_PERMISSIONS)
+    _default_permissions.difference_update(
+        UNAUTHORIZED_PROJECT_CONTROL_APPROVAL_PERMISSIONS
+    )
 
 
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {

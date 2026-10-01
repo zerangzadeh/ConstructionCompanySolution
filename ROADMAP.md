@@ -1098,6 +1098,26 @@ Stable masters + consent/privacy + support operations -> future network/AI
   required. **P3-S30–S31 are COMPLETE / ACCEPTED.** Activation, legacy
   cutover/backfill, external/background work and `MATERIAL_DOCUMENTS_LINK`
   remediation remain unauthorized.
+- **User-authorized financial UI terminology refinement (2026-10-01):**
+  localized the AP/AR workbench and feedback, clarified legacy Payment and
+  project-report navigation labels, and grouped Treasury beside Accounting and
+  receivables/payables. The subsequent requested Treasury page/browser title
+  simplification to `خزانه‌داری` passed a database-free template render check.
+  Follow-up Product Owner terminology (`مغایرت بانکی` and
+  `مغایرت خزانه با حسابداری`) is applied to Treasury and statement templates;
+  rendering checks passed for both, including the ledger-reconciliation row.
+  Treasury cutoff labels now use `تاریخ مبنای تطبیق` in the bank form, bank
+  results table and ledger-reconciliation history. Database-free rendering
+  verified all three labels and preservation of the `as_of_date` form field.
+  Routes, permissions, financial rules and activation gates
+  are unchanged; this is not acceptance of the pending P3-S28–S29 package.
+  Django checks, Ruff lint and database-free template/menu rendering passed.
+  Three focused workbench tests were blocked during test-database setup by a
+  duplicate `documents_documentdisposalintent` database type/table; no test body
+  ran. Ruff format check also reports existing formatting differences in the
+  touched view module; broad reformatting was left out of this copy-only change.
+  Browser visual acceptance remains outstanding. Terminology is recorded in
+  [UI guidelines](docs/ui-guidelines.md).
 - **P3-S32 documentation closeout and P4 handoff (2026-10-01):** the
   [closeout/handoff packet](docs/architecture/P3_S32_CLOSEOUT_AND_P4_HANDOFF.md)
   reconciles the verified P3 result and records the P4 consumption boundary:
@@ -1159,14 +1179,14 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P4.0 Estimate, BOQ, and budget-preparation depth
 
-- **Status / priority:** **P4-S01–S06 IMPLEMENTATION COMPLETE / VERIFICATION PENDING; P4-S07+ PLANNED; delivered approval/revision baseline retained**
+- **Status / priority:** **P4-S01–S38 SAFE AUTHORIZED SCOPE IMPLEMENTED; P5 NOT STARTED**
 - **P4-S01–S06 implementation boundary (2026-10-01):** immutable planning-only
   revision comparison, draft resource composition, recorded assumption/coefficient
   evidence, immutable internal price-source/rate lineage and a formula-free,
   non-persistent CSV preview profile are implemented. No coefficient/rate
   calculation or activation, external price-book ingestion, estimate-to-budget
   handoff, CBS/cost-center, financial fact, legacy cutover/backfill, or P4-S07+
-  behavior is implemented, pending focused PostgreSQL verification. “Planning-only”
+  behavior was included in that slice. Three focused PostgreSQL tests pass. “Planning-only”
   is a financial-ownership boundary: it does not mean the models, services,
   migrations or permissions are merely proposed. P4-G01 coefficient/calculation policy, P4-G02
   resource-rate ownership, P4-G03 lawful external price-book source/version,
@@ -1201,7 +1221,29 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P4.1 Budget/CBS/cost center and integrated project cost
 
-- **Status / priority:** **PLANNED / MUST**
+- **Status / priority:** **P4-S07–S38 SAFE COST, CONTROL, AND EXPENSE FOUNDATION IMPLEMENTED; P5 NOT STARTED**
+- **P4-S07–S13 implementation boundary (2026-10-01):** delivered the explicit
+  current-approved-Estimate handoff, complete source manifest, versioned/locked
+  CBS and cost centers, conserved leaf-CBS/project-WBS allocations, immutable
+  accepted budget versions, one governing project pointer, dedicated permissions,
+  direct SoD, audit, idempotency/stale-predecessor locking and a planning-only read
+  model. Seven focused PostgreSQL service tests and one rollback/reapply test pass.
+  No commitment, actual, payable, receivable, revenue, cash, Treasury, AP/AR,
+  journal, forecast, expense, payment or contract-value behavior is created or
+  mutated; legacy Project totals are unchanged. P4-G06–G10 remain fail-closed as
+  recorded in `docs/architecture/P4_S07_S13_IMPLEMENTATION_CONTRACT.md`.
+- **P4-S14–S20 implementation boundary (2026-10-01):** delivered versioned
+  producer-source contracts before dependent facts; independently approved,
+  immutable and idempotent commitment/accrual/actual projections; exact reversal
+  and accrual-replacement lineage; explicit producer coverage/watermarks; immutable
+  draft forecast snapshots; and permission-scoped project-detail source
+  drill-through. Twelve focused/retained PostgreSQL service/UI tests and the expanded
+  rollback/reapply migration suite pass. No operational producer is wired, no
+  production behavior or external integration is activated, no journal/source
+  record is mutated, and no backfill/cutover or legacy replacement occurs.
+  Forecast approval, real-producer recognition mappings, activation/cutoff and
+  warning-versus-hard-stop remain fail-closed; see
+  `docs/architecture/P4_S14_S20_IMPLEMENTATION_CONTRACT.md`.
 - **Outcome:** accepted estimate-to-budget handoff, explicit mapping among
   contractual BOQ/internal estimate/approved budget baseline, CBS/cost-center
   mappings, budget versions, commitments, accruals, actuals, forecast/ETC/EAC,
@@ -1221,7 +1263,16 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P4.2 Schedule, risk, change, and earned-value controls
 
-- **Status / priority:** **PLANNED later**
+- **Status / priority:** **P4-S21–S25 SAFE FOUNDATION IMPLEMENTED AND VERIFIED; ACCEPTANCE/SCORING/INTEGRATION GATES OPEN**
+- **P4-S21–S25 implementation boundary (2026-10-01):** delivered versioned
+  draft schedules, milestones, cycle-safe dependencies, constraint/issue/risk/delay
+  evidence with append-only lifecycle, and immutable change/rebaseline proposals.
+  Dedicated Tenant/object-scoped permissions, audit, idempotency, locking and
+  PostgreSQL immutability are enforced. Baseline/change/rebaseline acceptance,
+  risk scoring, delay responsibility, contractual impact, external schedulers and
+  earned value remain fail-closed under P4-G11–G18. Seven focused PostgreSQL tests
+  and one rollback/reapply test pass; see
+  `docs/architecture/P4_S21_S25_IMPLEMENTATION_CONTRACT.md`.
 - **Outcome:** schedule baseline/milestones/dependencies; issue, constraint, risk
   and delay registers; change control; approved rebaseline; distinct physical and
   financial progress; and earned metrics where input discipline supports them.
@@ -1237,7 +1288,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P4.3 Expense approval, allocation, and budget control
 
-- **Status / priority:** **PLANNED; delivered immutable Expense baseline retained**
+- **Status / priority:** **P4-S26–S38 SAFE AUTHORIZED SCOPE IMPLEMENTED; P5 NOT STARTED**
 - **Outcome:** workflow-backed draft/submission/approval/return/void; required
   invoice/source evidence; direct/indirect classification; recurring-expense
   templates that create reviewable drafts; allocation across projects; explicit
@@ -1257,6 +1308,52 @@ Stable masters + consent/privacy + support operations -> future network/AI
   duplicate evidence, budget race, recurrence idempotency, reversal/settlement,
   posting reconciliation and tenant/project isolation.
 - **Effort / risk:** **L / Critical**.
+
+- **P4-S26–S30 closeout (2026-10-01):** the legacy `recorded -> void`
+  history remains compatible while new expenses can use an audited
+  `draft -> submitted -> approved/returned -> void` lifecycle with direct
+  maker/checker enforcement. Tenant/object permissions, retained source
+  reference and fingerprint, request idempotency, active-source duplicate
+  rejection, explicit Project/WBS/optional Activity/leaf-CBS/required-cost-center
+  allocation, and exact amount conservation are enforced. Manual weekly/monthly
+  recurrence creates one idempotent reviewable draft per occurrence and never
+  approves or posts it. Submission snapshots matching accepted-budget facts and
+  prior coded approved expenses; P4-G10 remains open, so an overrun is retained as
+  `advisory_only` evidence and cannot warn, block, reserve, post, or mutate a
+  baseline. Approval creates no AP, GL, Treasury, cash, contract, schedule,
+  forecast, Project Cost, or other bounded-context fact. The Persian RTL expense
+  list, draft/detail, split-allocation, transition, budget-evidence and recurrence
+  proposal views are available under dedicated permissions. See
+  [P4-S26–S30 implementation contract](docs/architecture/P4_S26_S30_IMPLEMENTATION_CONTRACT.md).
+- **P4-S31–S34 closeout (2026-10-01):** Persian-first RTL Project Controls
+  screens now provide separately permissioned, object-scoped read-only comparison
+  of governing accepted-budget allocations with identically coded
+  approved/recorded expense evidence; clearly labelled advisory overrun evidence
+  and permitted open control-register observations; and a bounded UTF-8 CSV.
+  Each export retains an append-only audit manifest. Unallocated expense evidence,
+  schedule/risk/delay/change/rebaseline/earned-value/forecast data, Project Cost,
+  and all financial/source-producer facts are excluded. P4-G10 creates no warning,
+  stop, reservation or approval. See
+  [P4-S31–S34 implementation contract](docs/architecture/P4_S31_S34_IMPLEMENTATION_CONTRACT.md).
+- **P4-S35–S37 closeout (2026-10-01):** exact expense retry payloads,
+  same-budget expense assessment, coded-dimension Project Cost reversal/relief
+  conservation and deterministic PostgreSQL locking are hardened. A separately
+  permissioned and audited Persian RTL read model/CSV places the governing
+  accepted budget, approved/recorded expense allocations and existing inert
+  Project Cost actual facts side by side. Coverage and source equivalence remain
+  explicitly incomplete; excluded/uncomparable evidence and unresolved
+  differences are retained, and missing evidence is never presented as zero.
+  No producer, posting, AP/GL/Treasury/cash/settlement, policy enforcement,
+  accepted forecast, schedule/change/EV authority or contractual effect is
+  activated. See the
+  [P4-S35–S37 implementation contract](docs/architecture/P4_S35_S37_IMPLEMENTATION_CONTRACT.md).
+- **P4-S38 closeout (2026-10-01):** documentation closeout and the
+  [P4 closeout/P5 handoff packet](docs/architecture/P4_S38_CLOSEOUT_AND_P5_HANDOFF.md)
+  reconcile verified P4-S01–S37 evidence, current ownership boundaries,
+  unresolved Product Owner gates, validation status and P5 entry conditions.
+  P4-S38 changes no runtime, schema, data, permission, financial policy or
+  production state. P5 remains planned and unstarted; P5-S01 requires separate
+  Product Owner authorization.
 
 ## P5 — Source-to-pay
 
