@@ -109,16 +109,16 @@ Names are descriptive and may change during an approved detailed design.
 | Estimate/BOQ | EstimateScenario/Revision, ResourceAnalysis, Coefficient/Adjustment, RateSource, PriceBookVersion/Item, ImportRun/Row, BudgetHandoff |
 | Project cost/control | Implemented BudgetVersion/manifest/allocation, CBSNode, CostCenter, ProjectCostSourceContract, append-only ProjectCostFact, ProjectCostCoverage, immutable ProjectCostForecast draft, bounded non-persistent cost-evidence reconciliation, ProjectScheduleRevision/Item/Dependency, ProjectControlItem/StatusEvent, ProjectChangeProposal and ScheduleRebaselineProposal; producer activation and accepted schedule/change/rebaseline policy remain gated |
 | Accounting | FiscalYear/Period, Account, JournalEntry/Line, PostingRuleVersion, PostingSource, Reversal/Replacement/Adjustment links, immutable FinancialStatementRun/LineSnapshot, FiscalPeriodControlEvent close/reopen evidence |
-| AP/AR | Implemented immutable Obligation, Treasury-linked Allocation/Reversal, WriteOffProposal, exact AgingRun, SubledgerReconciliationRun and independent signed ReconciliationReview; source/posting activation, approved write-off decision/reversal and credit/debit adjustment policy remain gated |
+| AP/AR | Implemented immutable Obligation, Treasury-linked Allocation/Reversal, WriteOffProposal, exact AgingRun, SubledgerReconciliationRun and independent signed ReconciliationReview; target AP/Finance-owned SupplierInvoice/Revision/Line plus immutable derived MatchEvidence/Discrepancy/Exception; matching owns no source document; source/posting activation, approved write-off decision/reversal and credit/debit adjustment policy remain gated |
 | Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, unscheduled PaymentRequest, Employee/VendorAdvance and cash-return Settlement, retained source-to-GL reconciliation plus independent signed review, BankStatementImport/Line, exact Match/Clearing/Reversal and BankReconciliationRun; PaymentProposal and provider adapters remain target concepts |
-| Procurement | RFQ/Invitation, Quote/Revision/Line, Comparison/Award, PO/Change, Receipt/ServiceAcceptance, SupplierInvoice/MatchException |
+| Procurement | Implemented internal RFQ draft/version/line/invitation foundation, sealed `QuoteEnvelope`/immutable `QuoteRevision`/transition metadata, immutable metadata-only `RFQCloseManifest`, and P5-S08 immutable `QuoteRevisionEvidence`. Synchronous close custody pins the effective timely submitted revision; sealed-content custody pins one required original and up to 20 attachments to exact quarantined `DocumentVersion`/`SealedDocumentCustody` identities and hashes without changing the close manifest. P5-S09 adds immutable `QuoteEvidencePackageFreeze`/items, `QuoteOpeningRequest`, independently approved `QuoteOpeningEvent`, and exact-revision `QuoteConfidentialAccessGrant` plus append-only revocation. Controlled exact-version delivery is service-owned and creates audit evidence, not a generic document link or new content copy. Commercial admissibility, comparison and award remain absent. PO/Change and Receipt/ServiceAcceptance remain target concepts. |
 | Contract/Billing | ContractTermVersion, Variation, Guarantee/Security, Measurement, Claim/Certificate, Adjustment, Retention/Advance balance projection, Settlement |
 | Payroll/insurance | WorkCalendar/Shift, Attendance, Timesheet, Leave, PayrollRuleVersion, PayrollRun/EmployeeResult/Component, InsuranceList, Tax/InsuranceSubmission |
 | Inventory | Reservation, StockTransaction, Lot/Batch, Serial, Bin, Count/Line, TransferCustody, ValuationLayer |
 | Equipment/assets | Meter/Usage, Fuel, OperatorQualification, MaintenancePlan/Work, EquipmentCostRate, FixedAsset, DepreciationRun/Line, Disposal |
 | Field operations | DailyReport, WeatherObservation, WorkFront, Visit, Meeting, Instruction, media/evidence link, reviewed downstream proposal |
 | HSE/Quality | Risk, Inspection, Permit, Toolbox/PPE control, Incident/Investigation, ITP, InspectionRequest, Test/SampleApproval, Punch/NCR/Rework, CAPA |
-| DMS/media | Document, DocumentVersion, classification, domain link, OCR/TextExtraction, SignatureEvidence, Transmittal/RFI/Submittal/Drawing control, MediaAlbum view |
+| DMS/media | Document and immutable DocumentVersion are implemented, including P5-S08 protected quarantined sealed-supplier evidence and its non-disposable classification; broader classification, OCR/TextExtraction, SignatureEvidence, Transmittal/RFI/Submittal/Drawing control and MediaAlbum remain target concepts |
 | Knowledge | LessonLearned, BestPractice, TechnicalNote, Procedure, KnowledgeArticle, CaseStudy, Promotion/PublicationVersion, ReuseEvidence |
 | Partner | Qualification, Evidence/Expiry, CategoryApproval, ProjectEvaluation, PerformanceMetric/ScoreExplanation |
 | Support/AI | Notification, SupportCase, KnownIssue, FeatureRequest, ReleaseLink, DiagnosticConsent, Knowledge source, AIInteraction/Review evidence |
@@ -133,7 +133,8 @@ Names are descriptive and may change during an approved detailed design.
 | Approved project budget | Accepted BudgetBaseline version | Forecast/variance and commitment control |
 | Physical progress | Approved measurement/progress record and evidence | Claim eligibility and earned metrics |
 | Certified receivable/payable | Approved claim/certificate version | AR/AP, posting, cash forecast and settlement |
-| Supplier liability | Approved/matched supplier invoice or payable certificate | AP, Accounting and Treasury proposal |
+| Supplier invoice evidence | AP/Finance-owned approved invoice version/line | Immutable matching evidence and payable disposition |
+| Supplier liability | AP obligation linked to approved supplier-invoice/match evidence or payable certificate | Accounting and Treasury proposal |
 | Employee payroll liability | Finalized payroll run/result | AP-like liability, Accounting, Treasury and project labor cost |
 | Cash/instrument state | Treasury transaction/instrument plus clearing evidence | Accounting posting and cash position |
 | Accounting balance | Posted balanced journal lines | Statements, close and reconciliation |
@@ -143,6 +144,14 @@ Names are descriptive and may change during an approved detailed design.
 | Project actual cost | Classified source posting/subledger facts | Project Cost read model and KPIs |
 | Knowledge claim | Reviewed publication version with source evidence | Search, checklist/training/control suggestion |
 | KPI | Governed metric definition over authoritative facts | Dashboard/report cache with drill-through |
+
+A normal registered handoff pins one authoritative source owner, one consuming
+owner, one semantic event and one resulting fact family. A derived/composite
+calculation may pin immutable references from multiple authoritative domains but
+owns only its versioned derived result. It cannot mutate source evidence or serve
+as a generic cross-domain integration mechanism. Supplier-invoice matching follows
+this derived contract across Procurement-owned order/acceptance evidence and
+AP/Finance-owned invoice evidence.
 
 P4-S35–S37 does not change this authority matrix. Its reconciliation reads the
 governing accepted budget, identically pinned approved/recorded expense

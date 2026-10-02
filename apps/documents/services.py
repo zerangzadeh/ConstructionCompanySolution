@@ -36,6 +36,7 @@ from apps.documents.models import (
     DocumentProcessingVerdict,
     DocumentRecoveryManifest,
     DocumentRetentionApplication,
+    DocumentRetentionClassification,
     DocumentRetentionPolicy,
     DocumentRetentionPolicyVersion,
     DocumentSignatureEvidence,
@@ -180,6 +181,11 @@ def _validate_target_access(
 def _validate_document_context_access(
     *, document: Document, actor: User, permission: BusinessPermissionCode
 ) -> None:
+    if (
+        document.retention_classification
+        == DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+    ):
+        raise PermissionDenied("شاهد مهروموم‌شده پیش از گشایش قابل دسترسی نیست.")
     _validate_access(
         user=actor,
         organization=document.organization,
@@ -521,26 +527,32 @@ def get_organization_documents(
         organization=organization,
         permission=BusinessPermissionCode.DOCUMENTS_VIEW,
     )
-    documents = Document.objects.filter(
-        organization=organization,
-        archived_at__isnull=True,
-        current_version__isnull=False,
-    ).filter(Q(access_expires_at__isnull=True) | Q(access_expires_at__gt=timezone.now()))
+    documents = (
+        Document.objects.filter(
+            organization=organization,
+            archived_at__isnull=True,
+            current_version__isnull=False,
+        )
+        .exclude(
+            retention_classification=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+        )
+        .filter(
+            Q(access_expires_at__isnull=True) | Q(access_expires_at__gt=timezone.now())
+        )
+    )
     linked_documents = Q(pk__in=[])
     for link_type in DOCUMENT_LINK_TYPES:
         linked_documents |= Q(
-            pk__in=link_type.model.objects.filter(
-                organization=organization
-            ).values("document_id")
+            pk__in=link_type.model.objects.filter(organization=organization).values(
+                "document_id"
+            )
         )
     documents = documents.filter(linked_documents)
     membership = get_active_membership(user=user, organization=organization)
     for link_type in DOCUMENT_LINK_TYPES:
         registered_links = link_type.model.objects.filter(organization=organization)
         if not membership_has_permission(membership, link_type.view_permission):
-            documents = documents.exclude(
-                pk__in=registered_links.values("document_id")
-            )
+            documents = documents.exclude(pk__in=registered_links.values("document_id"))
     grants = effective_scope_grants(membership)
     if not membership_has_scope(membership):
         project_ids = list(
@@ -583,6 +595,8 @@ def get_organization_document(
             organization=organization,
             archived_at__isnull=True,
             current_version__isnull=False,
+        ).exclude(
+            retention_classification=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
         )
     ).first()
     if document is None:
@@ -641,6 +655,14 @@ def record_document_processing_assessment(
         .select_related("document", "organization")
         .get(pk=version.pk)
     )
+    if (
+        locked_version.document.retention_classification
+        == DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+        and (extracted_text or details or provider_reference)
+    ):
+        raise PermissionDenied(
+            "پردازش شاهد مهروموم‌شده فقط می‌تواند نتیجه فنی بدون محتوای مشتق ثبت کند."
+        )
     sequence = (
         locked_version.processing_assessments.aggregate(latest=Max("sequence"))[
             "latest"
@@ -694,6 +716,11 @@ def record_document_signature_evidence(
 
     if not has_platform_role(actor, PlatformRoleCode.PLATFORM_OPERATIONS):
         raise PermissionDenied("نقش فعال Platform Operations الزامی است.")
+    if (
+        version.document.retention_classification
+        == DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+    ):
+        raise PermissionDenied("شاهد امضای محتوای مهروموم‌شده در این مرحله مجاز نیست.")
     if verification_state not in SignatureVerificationState.values:
         raise ValueError("وضعیت راستی‌آزمایی امضا معتبر نیست.")
     signature = DocumentSignatureEvidence.objects.create(
@@ -940,6 +967,13 @@ def apply_document_retention_policy(
     )
     locked_document = Document.objects.select_for_update().get(pk=document.pk)
     if (
+        locked_document.retention_classification
+        == DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+    ):
+        raise PermissionDenied(
+            "سیاست عمومی نگهداری بر شاهد مهروموم‌شده قابل اعمال نیست."
+        )
+    if (
         policy_version.organization_id != locked_document.organization_id
         or policy_version.state != RetentionPolicyVersionState.APPROVED
         or policy_version.effective_from > timezone.now()
@@ -1070,6 +1104,11 @@ def request_document_disposal(
     if not reason.strip():
         raise ValueError("دلیل درخواست امحا الزامی است.")
     locked_document = Document.objects.select_for_update().get(pk=document.pk)
+    if (
+        locked_document.retention_classification
+        == DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+    ):
+        raise PermissionDenied("برای شاهد مهروموم‌شده فرایند امحا تعریف نشده است.")
     intent = DocumentDisposalIntent.objects.create(
         organization=locked_document.organization,
         document=locked_document,

@@ -5,6 +5,12 @@
 conditional handoff to P5 planning; it is not P5 implementation or production
 activation authority.
 
+**Current-status note (2026-10-01):** this packet records the historical P4 exit
+gate. P5-S01–S04 were later separately authorized and completed as planning/design
+only in the
+[P5-S01–S04 decision packet](P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md).
+P5-S05 and all runtime/activation work remain unauthorized.
+
 ## Purpose and boundary
 
 P4-S38 reconciles the verified P4-S01–S37 implementation record with the
@@ -60,8 +66,8 @@ reclassified as P4 acceptance.
 
 ## P5 entry gates
 
-P5 remains planned and unstarted. Before P5-S01, Product Owner authorization
-must name the approved source-to-pay slice and preserve these gates:
+At this P4 handoff boundary P5 remained planned and unstarted. The later
+P5-S01–S04 planning authorization preserved these gates:
 
 1. Sourcing SoD, confidentiality and bid-privacy rules, including requester,
    buyer, evaluator, award and receiving separation.
@@ -81,6 +87,8 @@ contract and consuming-domain authority exist.
 
 ## Recommended next action
 
-Keep P5 unchanged in the Roadmap until the Product Owner authorizes P5-S01 and
-its implementation contract. No follow-on runtime work is implied by this
-packet.
+This historical recommendation was satisfied only for the documentation-only
+P5-S01–S04 tranche. P5-D01–P5-D08 Option A were later accepted with clarification.
+P5-S05 was subsequently separately authorized and implemented only as the bounded
+internal RFQ foundation. P5-S06+ remains unauthorized. No follow-on runtime work
+is implied by this packet.

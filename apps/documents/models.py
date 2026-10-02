@@ -47,6 +47,18 @@ class RetentionTrigger(models.TextChoices):
     DOCUMENT_ARCHIVED = "document_archived", "بایگانی سند"
 
 
+class DocumentRetentionClassification(models.TextChoices):
+    STANDARD_DOCUMENT = "standard_document", "سند استاندارد"
+    SEALED_SUPPLIER_QUOTE_EVIDENCE = (
+        "sealed_supplier_quote_evidence",
+        "شاهد مهروموم‌شده پیشنهاد تأمین‌کننده",
+    )
+
+
+class SealedCustodyState(models.TextChoices):
+    QUARANTINED = "quarantined", "قرنطینه و غیرقابل دسترس"
+
+
 class RetentionPolicyVersionState(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     APPROVED = "approved", "تأییدشده"
@@ -187,6 +199,11 @@ class Document(UUIDModel, TimeStampedModel):
         max_length=20,
         choices=DocumentConfidentiality.choices,
         default=DocumentConfidentiality.INTERNAL,
+    )
+    retention_classification = models.CharField(
+        max_length=48,
+        choices=DocumentRetentionClassification.choices,
+        default=DocumentRetentionClassification.STANDARD_DOCUMENT,
     )
     access_expires_at = models.DateTimeField(null=True, blank=True)
     title = models.CharField("عنوان سند", max_length=255)
@@ -389,6 +406,102 @@ class DocumentVersion(UUIDModel, CreatedAtModel):
         return bool(
             assessment and assessment.verdict == DocumentProcessingVerdict.CLEAN
         )
+
+
+class ImmutableSealedCustodyQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("شاهد نگهداری مهروموم‌شده قابل تغییر نیست.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("شاهد نگهداری مهروموم‌شده قابل حذف نیست.")
+
+
+class ImmutableSealedCustodyManager(
+    models.Manager.from_queryset(ImmutableSealedCustodyQuerySet)
+):
+    pass
+
+
+class SealedDocumentCustody(UUIDModel, CreatedAtModel):
+    """Immutable DMS custody evidence; it never grants content retrieval."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="sealed_document_custody_records",
+    )
+    document_version = models.OneToOneField(
+        DocumentVersion,
+        on_delete=models.PROTECT,
+        related_name="sealed_custody",
+    )
+    retention_classification = models.CharField(
+        max_length=48,
+        choices=DocumentRetentionClassification.choices,
+        default=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE,
+    )
+    state = models.CharField(
+        max_length=16,
+        choices=SealedCustodyState.choices,
+        default=SealedCustodyState.QUARANTINED,
+    )
+    canonical_sha256 = models.CharField(max_length=64)
+    received_at = models.DateTimeField()
+    custodied_at = models.DateTimeField()
+    captured_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="sealed_document_custody_records",
+    )
+
+    objects = ImmutableSealedCustodyManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=Q(
+                    retention_classification=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+                ),
+                name="sealed_custody_retention_class",
+            ),
+            models.CheckConstraint(
+                condition=Q(state=SealedCustodyState.QUARANTINED),
+                name="sealed_custody_initial_quarantine",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            document_version=self.document_version
+            if self.document_version_id
+            else None,
+        )
+        self.canonical_sha256 = self.canonical_sha256.strip().lower()
+        if self.document_version_id and (
+            self.document_version.sha256 != self.canonical_sha256
+            or self.document_version.document.retention_classification
+            != DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+        ):
+            raise ValidationError("هویت بایت و طبقه‌بندی شاهد نگهداری معتبر نیست.")
+        if (
+            self.retention_classification
+            != DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+            or self.state != SealedCustodyState.QUARANTINED
+        ):
+            raise ValidationError("شاهد باید با طبقه‌بندی مهروموم‌شده در قرنطینه باشد.")
+        if self.received_at > self.custodied_at:
+            raise ValidationError("زمان نگهداری نمی‌تواند پیش از دریافت باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد نگهداری مهروموم‌شده قابل تغییر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("شاهد نگهداری مهروموم‌شده قابل حذف نیست.")
 
 
 class DocumentProcessingAssessment(UUIDModel, CreatedAtModel):

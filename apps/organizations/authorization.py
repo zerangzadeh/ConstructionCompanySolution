@@ -65,6 +65,7 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "safety_incidents",
         "quality_issues",
         "work_items",
+        "rfqs",
     }
 )
 

@@ -12,6 +12,8 @@ from apps.organizations.models import (
     BusinessPermissionCode,
     MembershipRole,
     OrganizationRole,
+    ProtectedOperation,
+    ProtectedOperationCode,
 )
 from apps.organizations.permission_registry import (
     GLOBAL_PERMISSION_MODEL_EXCLUSIONS,
@@ -141,10 +143,18 @@ class PermissionRegistryDatabaseTests(TestCase):
             set(BusinessPermission.objects.values_list("code", flat=True)),
             registered_permission_codes(),
         )
+        self.assertEqual(
+            set(
+                ProtectedOperation.objects.filter(version=1).values_list(
+                    "code", flat=True
+                )
+            ),
+            set(ProtectedOperationCode.values),
+        )
 
 
 class AuthorizationCatalogFlushTests(TransactionTestCase):
-    def test_flush_recreates_code_owned_roles_and_permissions(self) -> None:
+    def test_flush_recreates_code_owned_authorization_catalog(self) -> None:
         call_command("flush", verbosity=0, interactive=False)
 
         self.assertEqual(

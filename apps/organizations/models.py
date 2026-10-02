@@ -183,6 +183,10 @@ class ProtectedOperationCode(models.TextChoices):
         "accounting.reconciliation_sign_off",
         "تأیید نهایی تطبیق حسابداری",
     )
+    RFQ_QUOTE_REVEAL = (
+        "rfq_quotes.reveal",
+        "گشایش و افشای حفاظت‌شده پیشنهاد",
+    )
 
 
 class AccountConnectionRequestStatus(models.TextChoices):
@@ -828,6 +832,36 @@ class BusinessPermissionCode(models.TextChoices):
     GOODS_RECEIPT_ITEMS_ADD = "goods_receipt_items.add", "افزودن ردیف رسید کالا"
     GOODS_RECEIPTS_POST = "goods_receipts.post", "ثبت نهایی رسید کالا"
     GOODS_RECEIPTS_VOID = "goods_receipts.void", "ابطال رسید کالا"
+    RFQS_VIEW = "rfqs.view", "مشاهده استعلام‌ها"
+    RFQS_CREATE = "rfqs.create", "ایجاد استعلام"
+    RFQS_CHANGE = "rfqs.change", "ویرایش استعلام"
+    RFQS_SUBMIT = "rfqs.submit", "ارسال استعلام برای صدور"
+    RFQS_ISSUE = "rfqs.issue", "صدور استعلام"
+    RFQS_ADDENDUM = "rfqs.addendum", "افزودن الحاقیه استعلام"
+    RFQS_CANCEL = "rfqs.cancel", "لغو استعلام"
+    RFQS_CLOSE_CUSTODY = "rfqs.close_custody", "بستن ثبتی استعلام"
+    RFQS_CUSTODY_SEALED_EVIDENCE = (
+        "rfqs.custody_sealed_evidence",
+        "نگهداری شاهد مهروموم‌شده پیشنهاد",
+    )
+    RFQ_INVITATIONS_MANAGE = "rfq_invitations.manage", "مدیریت دعوت‌نامه‌های استعلام"
+    RFQ_QUOTES_VIEW_METADATA = "rfq_quotes.view_metadata", "مشاهده فراداده پیشنهادها"
+    RFQ_QUOTES_CAPTURE = "rfq_quotes.capture", "ثبت پیشنهادهای مهروموم‌شده"
+    RFQ_QUOTES_SUBMIT = "rfq_quotes.submit", "ثبت نهایی پیشنهاد مهروموم‌شده"
+    RFQ_QUOTES_WITHDRAW = "rfq_quotes.withdraw", "بازپس‌گیری پیشنهاد مهروموم‌شده"
+    RFQ_QUOTES_OPEN = "rfq_quotes.open", "گشایش حفاظت‌شده پیشنهاد"
+    RFQ_QUOTES_APPROVE_OPEN = (
+        "rfq_quotes.approve_open",
+        "تأیید مستقل گشایش پیشنهاد",
+    )
+    RFQ_QUOTES_VIEW_CONFIDENTIAL = (
+        "rfq_quotes.view_confidential",
+        "مشاهده محتوای محرمانه پیشنهاد گشوده‌شده",
+    )
+    RFQ_QUOTES_MANAGE_CONFIDENTIAL_ACCESS = (
+        "rfq_quotes.manage_confidential_access",
+        "مدیریت دسترسی محرمانه پیشنهاد",
+    )
 
     WAREHOUSES_VIEW = "warehouses.view", "مشاهده انبارها"
     WAREHOUSES_CREATE = "warehouses.create", "ایجاد انبار"

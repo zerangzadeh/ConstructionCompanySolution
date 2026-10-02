@@ -661,6 +661,67 @@ class AuditAction(models.TextChoices):
     PURCHASE_ORDER_ISSUED = "purchase_order.issued", "سفارش خرید صادر شد"
     PURCHASE_ORDER_COMPLETED = "purchase_order.completed", "سفارش خرید تکمیل شد"
     PURCHASE_ORDER_CANCELLED = "purchase_order.cancelled", "سفارش خرید لغو شد"
+    RFQ_CREATED = "rfq.created", "استعلام خرید ایجاد شد"
+    RFQ_LINE_ADDED = "rfq.line_added", "ردیف استعلام خرید افزوده شد"
+    RFQ_SUBMITTED = "rfq.submitted", "استعلام خرید برای صدور ارسال شد"
+    RFQ_ISSUED = "rfq.issued", "استعلام خرید صادر شد"
+    RFQ_ADDENDUM_ISSUED = "rfq.addendum_issued", "الحاقیه استعلام خرید صادر شد"
+    RFQ_CLOSED = "rfq.closed", "استعلام خرید بسته شد"
+    RFQ_CANCELLED = "rfq.cancelled", "استعلام خرید لغو شد"
+    RFQ_INVITATION_CREATED = "rfq.invitation_created", "دعوت‌نامه استعلام ایجاد شد"
+    RFQ_INVITATION_UPDATED = (
+        "rfq.invitation_updated",
+        "وضعیت دعوت‌نامه استعلام تغییر کرد",
+    )
+    RFQ_QUOTE_REVISION_CAPTURED = (
+        "rfq.quote_revision_captured",
+        "نسخه پیشنهاد مهروموم‌شده ثبت شد",
+    )
+    RFQ_QUOTE_REVISION_SUBMITTED = (
+        "rfq.quote_revision_submitted",
+        "نسخه پیشنهاد مهروموم‌شده نهایی شد",
+    )
+    RFQ_QUOTE_REVISION_WITHDRAWN = (
+        "rfq.quote_revision_withdrawn",
+        "نسخه پیشنهاد مهروموم‌شده بازپس‌گرفته شد",
+    )
+    RFQ_SEALED_EVIDENCE_CUSTODIED = (
+        "rfq.sealed_evidence_custodied",
+        "شاهد پیشنهاد در نگهداری مهروموم‌شده پذیرفته شد",
+    )
+    RFQ_SEALED_EVIDENCE_REJECTED = (
+        "rfq.sealed_evidence_rejected",
+        "تلاش نگهداری شاهد پیشنهاد رد شد",
+    )
+    RFQ_OPENING_REQUESTED = (
+        "rfq.opening_requested",
+        "درخواست گشایش پیشنهاد ثبت شد",
+    )
+    RFQ_OPENING_REQUEST_REJECTED = (
+        "rfq.opening_request_rejected",
+        "درخواست گشایش پیشنهاد رد شد",
+    )
+    RFQ_QUOTE_OPENED = "rfq.quote_opened", "پیشنهاد گشوده شد"
+    RFQ_OPENING_APPROVAL_REJECTED = (
+        "rfq.opening_approval_rejected",
+        "تأیید گشایش پیشنهاد رد شد",
+    )
+    RFQ_CONFIDENTIAL_ACCESS_GRANTED = (
+        "rfq.confidential_access_granted",
+        "دسترسی محرمانه پیشنهاد اعطا شد",
+    )
+    RFQ_CONFIDENTIAL_ACCESS_REVOKED = (
+        "rfq.confidential_access_revoked",
+        "دسترسی محرمانه پیشنهاد لغو شد",
+    )
+    RFQ_CONFIDENTIAL_CONTENT_ACCESSED = (
+        "rfq.confidential_content_accessed",
+        "محتوای محرمانه پیشنهاد دریافت شد",
+    )
+    RFQ_CONFIDENTIAL_CONTENT_DENIED = (
+        "rfq.confidential_content_denied",
+        "دسترسی به محتوای محرمانه پیشنهاد رد شد",
+    )
     GOODS_RECEIPT_CREATED = "goods_receipt.created", "رسید کالا ایجاد شد"
     GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "ردیف رسید کالا افزوده شد"
     GOODS_RECEIPT_POSTED = "goods_receipt.posted", "رسید کالا ثبت شد"

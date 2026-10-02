@@ -100,6 +100,18 @@ UNAUTHORIZED_WRITEOFF_PERMISSIONS = permission_codes(
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_APPROVE,
     BusinessPermissionCode.SUBLEDGERS_WRITEOFFS_REVERSE,
 )
+UNAUTHORIZED_RFQ_CLOSE_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.RFQS_CLOSE_CUSTODY,
+)
+UNAUTHORIZED_RFQ_CUSTODY_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE,
+)
+UNAUTHORIZED_RFQ_OPENING_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.RFQ_QUOTES_OPEN,
+    BusinessPermissionCode.RFQ_QUOTES_APPROVE_OPEN,
+    BusinessPermissionCode.RFQ_QUOTES_VIEW_CONFIDENTIAL,
+    BusinessPermissionCode.RFQ_QUOTES_MANAGE_CONFIDENTIAL_ACCESS,
+)
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
     BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
@@ -158,6 +170,12 @@ MEMBER_OPERATION_PERMISSIONS = permission_codes(
     BusinessPermissionCode.PURCHASE_REQUEST_ITEMS_ADD,
     BusinessPermissionCode.PURCHASE_REQUESTS_SUBMIT,
     BusinessPermissionCode.PURCHASE_REQUESTS_CANCEL,
+    BusinessPermissionCode.RFQS_CREATE,
+    BusinessPermissionCode.RFQS_CHANGE,
+    BusinessPermissionCode.RFQS_SUBMIT,
+    BusinessPermissionCode.RFQ_QUOTES_CAPTURE,
+    BusinessPermissionCode.RFQ_QUOTES_SUBMIT,
+    BusinessPermissionCode.RFQ_QUOTES_WITHDRAW,
     BusinessPermissionCode.GOODS_RECEIPTS_CREATE,
     BusinessPermissionCode.GOODS_RECEIPT_ITEMS_ADD,
     BusinessPermissionCode.GOODS_RECEIPTS_POST,
@@ -306,6 +324,9 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(UNAUTHORIZED_WRITEOFF_PERMISSIONS)
+    _default_permissions.difference_update(UNAUTHORIZED_RFQ_CLOSE_PERMISSIONS)
+    _default_permissions.difference_update(UNAUTHORIZED_RFQ_CUSTODY_PERMISSIONS)
+    _default_permissions.difference_update(UNAUTHORIZED_RFQ_OPENING_PERMISSIONS)
     _default_permissions.difference_update(
         UNAUTHORIZED_PROJECT_CONTROL_APPROVAL_PERMISSIONS
     )

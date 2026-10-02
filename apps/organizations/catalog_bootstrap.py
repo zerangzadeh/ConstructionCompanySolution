@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from django.db import connections, transaction
+from django.utils import timezone
 
 
 def synchronize_authorization_catalog(*, using: str, **kwargs: Any) -> None:
@@ -20,11 +21,17 @@ def synchronize_authorization_catalog(*, using: str, **kwargs: Any) -> None:
     required_tables = {
         "organizations_businesspermission",
         "organizations_organizationrole",
+        "organizations_protectedoperation",
     }
     if not required_tables.issubset(connection.introspection.table_names()):
         return
 
-    from apps.organizations.models import BusinessPermission, BusinessPermissionCode
+    from apps.organizations.models import (
+        BusinessPermission,
+        BusinessPermissionCode,
+        ProtectedOperation,
+        ProtectedOperationCode,
+    )
     from apps.organizations.role_defaults import (
         DEFAULT_ROLE_METADATA,
         DEFAULT_ROLE_PERMISSIONS,
@@ -58,4 +65,16 @@ def synchronize_authorization_catalog(*, using: str, **kwargs: Any) -> None:
             role.permissions.set(
                 permissions[code]
                 for code in sorted(DEFAULT_ROLE_PERMISSIONS[role_code])
+            )
+
+        for operation_code in ProtectedOperationCode:
+            ProtectedOperation.objects.using(using).get_or_create(
+                code=operation_code.value,
+                version=1,
+                defaults={
+                    "name": operation_code.label,
+                    "description": operation_code.label,
+                    "effective_at": timezone.now(),
+                    "reason": "Code-owned authorization catalog baseline",
+                },
             )

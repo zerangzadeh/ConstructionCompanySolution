@@ -13,6 +13,7 @@ from apps.documents.models import (
     DocumentProcessingAssessment,
     DocumentRecoveryManifest,
     DocumentRetentionApplication,
+    DocumentRetentionClassification,
     DocumentRetentionPolicy,
     DocumentRetentionPolicyVersion,
     DocumentSignatureEvidence,
@@ -31,8 +32,21 @@ class ImmutableAdminMixin:
         return False
 
 
+class HideSealedEvidenceAdminMixin:
+    def get_queryset(self, request: HttpRequest):
+        return (
+            super()
+            .get_queryset(request)
+            .exclude(
+                retention_classification=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+            )
+        )
+
+
 @admin.register(Document)
-class DocumentAdmin(ImmutableAdminMixin, admin.ModelAdmin):
+class DocumentAdmin(
+    HideSealedEvidenceAdminMixin, ImmutableAdminMixin, admin.ModelAdmin
+):
     list_display = (
         "title",
         "document_number",
@@ -76,6 +90,15 @@ class DocumentAdmin(ImmutableAdminMixin, admin.ModelAdmin):
 
 @admin.register(DocumentVersion)
 class DocumentVersionAdmin(ImmutableAdminMixin, admin.ModelAdmin):
+    def get_queryset(self, request: HttpRequest):
+        return (
+            super()
+            .get_queryset(request)
+            .exclude(
+                document__retention_classification=DocumentRetentionClassification.SEALED_SUPPLIER_QUOTE_EVIDENCE
+            )
+        )
+
     list_display = (
         "document",
         "version_number",

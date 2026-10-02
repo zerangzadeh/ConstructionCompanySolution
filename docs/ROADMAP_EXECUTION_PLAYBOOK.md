@@ -941,7 +941,8 @@ lineage are uncomparable, and any displayed difference is unresolved. No produce
 posting, AP/GL/Treasury/cash/settlement, recurrence processing, budget mutation,
 accepted forecast, schedule/change/EV authority or contractual effect is
 activated. P4-G01–G04, unresolved P4-G06–G10 and P4-G11–G18 remain
-fail-closed. P4-S38 documentation closeout is recorded below; P5 has not begun.
+fail-closed. At the P4-S35–S37 boundary P5 had not begun; the later P4-S38 and
+P5-S01–S04 documentation dispositions are recorded below.
 
 ### P4-S38 documentation closeout and P5 handoff
 
@@ -950,8 +951,63 @@ P4-S38 is complete as a documentation-only session. The
 reconciles P4-S01–S37 verified evidence, current-vs-target ownership,
 unresolved Product Owner gates, focused validation and P5 entry conditions.
 It changes no runtime, schema, data, permission, financial policy or production
-state. P5 remains planned and unstarted; P5-S01 requires separate Product Owner
-authorization and a new implementation contract.
+state. The later, separately authorized P5-S01–S04 documentation tranche is
+recorded below and did not activate any P5 runtime behavior.
+
+### P5-S01–S04 source-to-award planning/design disposition
+
+The Product Owner authorized P5-S01–S04 as one documentation-only tranche on
+2026-10-01. The
+[decision packet](architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
+defines internal RFQ-to-award ownership/lifecycles, immutable evidence and legacy
+containment; requester/buyer/evaluator/award/receiver separation and bid privacy;
+dormant Project Cost, AP/GL, Inventory and Treasury handoff envelopes; and the
+conditional P5-S05 implementation contract.
+
+P5-D01 Option A was accepted with clarification on 2026-10-02: separation is
+capability-based, while confidential reveal and award approval require distinct
+actors and cannot be self-approved; tightly controlled read-only break-glass grants
+no commercial decision authority, Owner/Admin grants no bypass, and unavailable
+independence leaves the operation pending. P5-D02 Option A was also accepted with
+clarification: no human sees commercial content before the effective RFQ/addendum
+opening time; manual closure cannot open early; technical failures remain
+content-blind; opening is immutable, revision-specific and limited to eligible
+revisions; all delivery/index/cache/API paths and future integrations preserve the
+boundary. P5-D03 Option A was accepted with clarification: capabilities are
+separate; closing freezes an explicit eligible revision against the effective RFQ/
+addenda; late bids have no Buyer override; material changes receive equitable
+addenda/deadline treatment; and post-close clarification cannot become commercial
+revision or material correction without a separately approved exception policy.
+All actions and downstream lineage pin immutable version/revision/evidence
+identities. P5-D04 Option A was accepted with clarification: permitted award
+structures must be defined before bidding; eligible materially conforming revisions
+and exact quantity lineage govern; non-lowest selection requires independent
+criterion-based approval; material nonconformance has no ordinary waiver; award
+proposal/approval/exception are separate; immutable award correction uses
+rescission/supersession; and award creates no downstream fact. P5-D05 Option A was
+accepted with an ownership correction: Procurement owns order/acceptance evidence,
+AP/Finance owns supplier-invoice evidence and payable disposition, Inventory owns
+stock facts, Accounting/tax owns financial policy, and matching owns only immutable
+derived evidence. Versioned fail-closed tolerance routes discrepancies without
+rewriting facts or activating downstream effects. P5-D06 Option A was accepted
+with clarification: tenant-local `BusinessParty` remains the sole supplier identity;
+identity, role, qualification, restriction, onboarding, participation and financial
+authority remain distinct; Procurement only snapshots eligibility and attributable
+internal capture; historical Party references are never rewritten; support remains
+technical; and P5-S05 creates no external principal, delivery, credential, provider
+or portal feature. P5-D07 Option A was accepted with an architectural correction:
+normal registered handoffs have one source owner, consumer, event and result family;
+multi-source derived calculations own only immutable results and cannot mutate
+sources or act as generic integrations. Every hop and activation remains separately
+authorized, with exact identities, fail-closed idempotency, consumer revalidation,
+atomic required handoffs and owner-controlled reversals. P5-D08 Option A was
+accepted with clarification: the prospective P5-S05 slice is the internal RFQ
+foundation only; it may persist closing and earliest permitted/scheduled opening
+boundaries but not an actual opening event/timestamp or substantive No-Award. No
+model, migration, permission, portal, supplier invoice, posting, stock receipt,
+downstream producer or production state changed. P5.2 remains deferred. The exact
+next possible action is separate explicit Product Owner authorization of P5-S05;
+decision acceptance alone does not authorize it.
 
 ## 11. P5 session map — 28 sessions
 
@@ -965,8 +1021,33 @@ authorization and a new implementation contract.
 | P5-S26..S27 | 2 | `A-X` | Bid privacy, impersonation, duplicate submission and match reconciliation review |
 | P5-S28 | 1 | `L-M` | Documentation closeout and P6 handoff packet |
 
-**Product Owner gates:** sourcing SoD, tolerance policy, portal onboarding,
-external identity, withdrawal rules, and supplier support ownership.
+**Product Owner gates:** P5-D01–P5-D08 are accepted with clarification. P5-S05–S08
+are complete under separate bounded authorizations. P5-S09 is complete under the
+accepted consolidated
+[P5-S09 Product Owner decisions](architecture/P5_S09_PRODUCT_OWNER_DECISIONS.md).
+P5-S10+ requires separate explicit implementation authorization.
+
+**Current P5 disposition (2026-10-02):** P5-S01–S04 are complete as planning and
+design, and the separately authorized P5-S05–S09 runtime slices are complete; see the
+[authoritative packet](architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md).
+P5-S05 owns the internal RFQ/version/invitation foundation, P5-S06 owns sealed quote
+metadata capture, P5-S07 owns synchronous deadline close custody, and P5-S08 owns
+pre-production sealed commercial-package custody. Closure uses
+the dedicated default-ungranted `rfqs.close_custody` capability and freezes one
+immutable metadata-only effective-version manifest with invitation entries; excluded
+and post-close evidence cannot mutate it. P5-S08 pins one required original and up to
+20 attachments to immutable quarantined Documents/DMS versions, canonical hashes and
+redacted audit under `rfqs.custody_sealed_evidence`, with no default grant or generic
+content path. It preserves the P5-S07 manifest unchanged. P5-S09 adds default-
+ungranted open, independent-approve, confidential-view and grant-management
+capabilities; immutable exact-package freeze/request/opening evidence; revision-
+scoped grants and append-only revocation; package-wide CLEAN/hash revalidation; and
+synchronous exact-version delivery with redacted access audit. Requester and
+approver are distinct, grants never follow from opening participation, self-grant
+fails closed, and generic DMS content paths remain denied. Commercial admissibility,
+break-glass, comparison, evaluation, award, No-Award, UI/portal, background work,
+production infrastructure and every downstream handoff remain absent. P5-S10+ and
+P5.2 remain unauthorized.
 
 ## 12. P6 session map — 42 sessions
 

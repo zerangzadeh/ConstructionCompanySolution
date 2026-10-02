@@ -1352,31 +1352,97 @@ Stable masters + consent/privacy + support operations -> future network/AI
   reconcile verified P4-S01–S37 evidence, current ownership boundaries,
   unresolved Product Owner gates, validation status and P5 entry conditions.
   P4-S38 changes no runtime, schema, data, permission, financial policy or
-  production state. P5 remains planned and unstarted; P5-S01 requires separate
-  Product Owner authorization.
+  production state. The separately authorized P5-S01–S04 planning/design tranche
+  is now complete as recorded below; it did not activate P5 runtime behavior.
 
 ## P5 — Source-to-pay
 
 ### P5.1 Sourcing and supplier invoice match
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P5-S01–S09 COMPLETE / P5-S10+ GATED**
+- **Planning disposition (2026-10-01):** the
+  [P5-S01–S04 decision packet](docs/architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
+  defines the internal RFQ-to-award lifecycle, SoD/confidentiality boundary,
+  immutable evidence, legacy containment, dormant downstream handoff envelopes
+  and a bounded conditional P5-S05 contract. P5-D01–P5-D08 Option A were accepted
+  with clarification on 2026-10-02. P5-S05 implemented the accepted internal RFQ
+  foundation: tenant/project-scoped RFQ drafts with approved-request lineage,
+  immutable issued/addendum snapshots, internal supplier invitations, deadlines,
+  permission/object scope, audit, locking and idempotency. P5-S06 adds only sealed,
+  internal supplier-attributed quote-envelope and immutable revision metadata,
+  linked to the effective RFQ/invitation version and retained with SHA-256 integrity
+  evidence, idempotency and supersession/withdrawal lineage. P5-S07 adds explicit
+  synchronous deadline closure under the dedicated, object-scoped and default-
+  ungranted `rfqs.close_custody` permission. It atomically freezes one immutable,
+  metadata-only manifest for the effective RFQ version with one entry per invitation
+  and at most one mechanically effective timely submitted revision. Captured but
+  unsubmitted, withdrawn, superseded, late, absent and post-close evidence remains
+  retained outside the effective selection; post-close evidence never changes the
+  manifest. P5-S08 adds synchronous pre-production custody for the permitted package
+  of an existing effective `QuoteRevision`: exactly one `supplier_original` followed
+  by zero to 20 distinct `supplier_attachment` items, each pinned to immutable
+  Documents/DMS identities and canonical hashes under the code-owned
+  `sealed_supplier_quote_evidence` retention classification. The dedicated object-
+  scoped `rfqs.custody_sealed_evidence` permission has no default-role, Owner/Admin,
+  platform, uploader or support bypass. Accepted bytes remain quarantined and
+  unavailable; generic document views, download, search, export and Admin paths deny
+  them. The locking transaction revalidates the P5-S07 effective-revision lineage,
+  permission and scope, enforces code-owned type/size/count/package limits, and commits
+  the immutable version, custody row, evidence link and redacted audit atomically with
+  evidence-item idempotency and protected temporary-byte cleanup. P5-S08 does not
+  mutate or supplement the P5-S07 manifest and creates no opening/reveal, comparison,
+  evaluation, award, portal, handoff or production activation. A bounded
+  clean-PostgreSQL migration review confirmed that Documents processing assessments
+  and Treasury cheque instruments are current, singly owned target-domain records;
+  earlier duplicate-table reports came from interrupted scratch migration runs, not
+  a migration-chain conflict. Full clean migration, P5-S05/P5-S06 rollback/reapply,
+  focused PostgreSQL RFQ/Procurement tests, P5-S07/P5-S08 rollback/reapply,
+  migration-drift checks, Django checks and Ruff pass. P5-D05 confirms
+  AP/Finance ownership of supplier-invoice evidence/payable disposition; P5-D06
+  retains tenant-local `BusinessParty` as the sole supplier identity and keeps
+  external identity/portal capability deferred. P5-D07 accepts owner-controlled
+  registered handoffs and source-read-only multi-source derived calculations;
+  every handoff and activation remains separately gated.
+  P5-S09 implements the accepted protected opening/reveal contract recorded in
+  [P5-S09 Product Owner decisions](docs/architecture/P5_S09_PRODUCT_OWNER_DECISIONS.md).
+  Default-ungranted `rfq_quotes.open`, `rfq_quotes.approve_open`,
+  `rfq_quotes.view_confidential` and `rfq_quotes.manage_confidential_access` have
+  no Owner/Admin/platform/support bypass. The first valid opening request permanently
+  freezes the exact P5-S08 evidence IDs, slots, pinned versions and hashes. A
+  different active actor must approve after locked boundary, lineage, scope, SoD,
+  package and package-wide current CLEAN/hash revalidation; approval atomically
+  creates one immutable revision-specific opening event. Viewing additionally needs
+  an active explicit revision grant, permission and project scope. Delivery returns
+  only one exact pinned version synchronously with attachment-only/no-sniff metadata,
+  per-access byte/hash revalidation and redacted success/denial audit. Revocation is
+  append-only. Generic Documents paths, preview/render/OCR/search/cache/derivatives,
+  bulk export, commercial admissibility and break-glass remain absent.
+  Beyond the bounded P5 foundations described above, this disposition creates no
+  supplier invoice, financial posting, Project Cost fact, Inventory receipt,
+  portal access or production activation.
 - **Outcome:** RFQ, invited suppliers, versioned quotes, normalized comparison,
   sourcing approval/award, PO changes, service acceptance, supplier invoice,
   two/three-way match, tolerance and discrepancy workflow.
 - **Prerequisites:** Parties/P1.2, P1.1, P4 cost coding; AP/GL for financial
   completion; workflow foundation already delivered.
-- **Integration:** commitment to Project Cost, receipt to Inventory, invoice to
-  AP/posting, payment proposal to Treasury, performance to partner profile.
+- **Integration:** commitment to Project Cost, receipt to Inventory, AP/Finance-
+  owned supplier invoice and payable to Accounting, payment proposal to Treasury,
+  and performance to partner profile.
 - **Compliance/UI:** tax/invoice snapshots, attachment evidence; comparison grid,
   bid confidentiality, line-level match and exception queue.
 - **Migration/testing:** existing PO/receipt remain valid; add links incrementally.
   Quote privacy, tolerance, duplicates, partial receipt/invoice, reversal and
   reconciliation tests.
 - **Effort / risk:** **XL / High**.
+  - **Exact next possible action:** separately bounded Product Owner authorization
+    of P5-S10. P5-S10+ remains unauthorized.
 
 ### P5.2 Controlled supplier and subcontractor portal
 
 - **Status / priority:** **PLANNED after internal source-to-pay boundaries stabilize**
+- **P5-S01–S04 disposition:** unchanged and deferred. The internal sourcing packet
+  creates no external identity, invitation delivery, supplier login, support model
+  or portal authority.
 - **Outcome:** invite-scoped external collaboration for party profile/document and
   qualification-evidence submission, RFQ participation, versioned quotation,
   supplier invoice/supporting documents, subcontractor claim/evidence submission,
