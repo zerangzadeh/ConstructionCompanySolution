@@ -59,6 +59,19 @@ class QuoteRevisionStatus(models.TextChoices):
 
 class QuoteEligibilityState(models.TextChoices):
     UNREVIEWED = "unreviewed", "بررسی‌نشده"
+    ADMISSIBLE = "admissible", "قابل پذیرش تجاری"
+    INADMISSIBLE = "inadmissible", "غیرقابل پذیرش تجاری"
+    REVIEW_REQUIRED = "review_required", "نیازمند بررسی"
+
+
+class QuoteAdmissibilityReasonCode(models.TextChoices):
+    """Closed v1 catalogue; details explain the instance without becoming policy."""
+
+    REQUIREMENTS_MET = "requirements_met", "الزامات کنترل‌شده احراز شد"
+    LATE_SUBMISSION = "late_submission", "ارسال پس از مهلت"
+    REQUIRED_EVIDENCE_MISSING = "required_evidence_missing", "شاهد الزامی ناکافی است"
+    COMMERCIAL_NONCONFORMANCE = "commercial_nonconformance", "عدم انطباق تجاری"
+    EXCEPTION_REVIEW_REQUIRED = "exception_review_required", "بررسی استثنا لازم است"
 
 
 class QuoteSourceChannel(models.TextChoices):
@@ -1655,6 +1668,1155 @@ class QuoteConfidentialAccessRevocation(UUIDModel, CreatedAtModel):
 
     def delete(self, *args: object, **kwargs: object) -> None:
         raise ValidationError("لغو دسترسی محرمانه حذف‌پذیر نیست.")
+
+
+class QuoteAdmissibilityPreparation(UUIDModel, CreatedAtModel):
+    """Immutable, revision-scoped commercial admissibility proposal."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    quote_revision = models.ForeignKey(
+        QuoteRevision,
+        on_delete=models.PROTECT,
+        related_name="admissibility_preparations",
+    )
+    opening_event = models.ForeignKey(
+        QuoteOpeningEvent,
+        on_delete=models.PROTECT,
+        related_name="admissibility_preparations",
+    )
+    prepared_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="quote_admissibility_preparations",
+    )
+    prepared_at = models.DateTimeField()
+    proposed_state = models.CharField(
+        max_length=20, choices=QuoteEligibilityState.choices
+    )
+    reason_code = models.CharField(
+        max_length=40, choices=QuoteAdmissibilityReasonCode.choices
+    )
+    rationale = models.CharField(max_length=500)
+    close_manifest = models.ForeignKey(
+        RFQCloseManifest,
+        on_delete=models.PROTECT,
+        related_name="admissibility_preparations",
+    )
+    package_fingerprint = models.CharField(max_length=64)
+    idempotency_key = models.CharField(max_length=128)
+    payload_fingerprint = models.CharField(max_length=64)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["quote_revision", "idempotency_key"],
+                name="uq_quote_admiss_prep_revision_idem",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    proposed_state__in=[
+                        QuoteEligibilityState.ADMISSIBLE,
+                        QuoteEligibilityState.INADMISSIBLE,
+                        QuoteEligibilityState.REVIEW_REQUIRED,
+                    ]
+                ),
+                name="quote_admiss_prep_decision_state",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "quote_revision", "created_at"],
+                name="quote_admiss_prep_org_rev_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+            opening_event=self.opening_event if self.opening_event_id else None,
+            close_manifest=self.close_manifest if self.close_manifest_id else None,
+        )
+        self.rationale = self.rationale.strip()
+        self.package_fingerprint = self.package_fingerprint.strip().lower()
+        self.idempotency_key = self.idempotency_key.strip()
+        self.payload_fingerprint = self.payload_fingerprint.strip().lower()
+        if self.proposed_state == QuoteEligibilityState.UNREVIEWED:
+            raise ValidationError("وضعیت بررسی‌نشده قابل آماده‌سازی نیست.")
+        if not self.rationale or not self.idempotency_key:
+            raise ValidationError("توضیح و کلید یکتای آماده‌سازی الزامی است.")
+        if not re.fullmatch(
+            r"[0-9a-f]{64}", self.package_fingerprint
+        ) or not re.fullmatch(r"[0-9a-f]{64}", self.payload_fingerprint):
+            raise ValidationError("اثر انگشت شواهد پذیرش معتبر نیست.")
+        if self.opening_event_id and (
+            self.opening_event.quote_revision_id != self.quote_revision_id
+            or self.opening_event.package_fingerprint != self.package_fingerprint
+        ):
+            raise ValidationError("رویداد گشایش و شواهد آماده‌سازی معتبر نیست.")
+        if self.close_manifest_id and (
+            self.close_manifest.rfq_id != self.quote_revision.envelope.rfq_id
+            or self.close_manifest.effective_version_id
+            != self.quote_revision.rfq_version_id
+        ):
+            raise ValidationError("مانیفست بسته‌شدن آماده‌سازی معتبر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("آماده‌سازی پذیرش تجاری تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("آماده‌سازی پذیرش تجاری حذف‌پذیر نیست.")
+
+
+class QuoteAdmissibilityWithdrawal(UUIDModel, CreatedAtModel):
+    """Append-only withdrawal that can exist only before a decision."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    preparation = models.OneToOneField(
+        QuoteAdmissibilityPreparation,
+        on_delete=models.PROTECT,
+        related_name="withdrawal",
+    )
+    withdrawn_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="quote_admissibility_withdrawals",
+    )
+    withdrawn_at = models.DateTimeField()
+    reason = models.CharField(max_length=500)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, preparation=self.preparation if self.preparation_id else None
+        )
+        self.reason = self.reason.strip()
+        if not self.reason:
+            raise ValidationError("دلیل پس‌گیری آماده‌سازی الزامی است.")
+        if self.preparation_id and hasattr(self.preparation, "decision"):
+            raise ValidationError("آماده‌سازی تأییدشده قابل پس‌گیری نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("پس‌گیری آماده‌سازی تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("پس‌گیری آماده‌سازی حذف‌پذیر نیست.")
+
+
+class QuoteAdmissibilityDecision(UUIDModel, CreatedAtModel):
+    """Immutable approved outcome; corrections supersede rather than mutate it."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    quote_revision = models.ForeignKey(
+        QuoteRevision, on_delete=models.PROTECT, related_name="admissibility_decisions"
+    )
+    preparation = models.OneToOneField(
+        QuoteAdmissibilityPreparation,
+        on_delete=models.PROTECT,
+        related_name="decision",
+    )
+    opening_event = models.ForeignKey(
+        QuoteOpeningEvent,
+        on_delete=models.PROTECT,
+        related_name="admissibility_decisions",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="quote_admissibility_decisions_approved",
+    )
+    approved_at = models.DateTimeField()
+    state = models.CharField(max_length=20, choices=QuoteEligibilityState.choices)
+    reason_code = models.CharField(
+        max_length=40, choices=QuoteAdmissibilityReasonCode.choices
+    )
+    rationale = models.CharField(max_length=500)
+    close_manifest = models.ForeignKey(
+        RFQCloseManifest,
+        on_delete=models.PROTECT,
+        related_name="admissibility_decisions",
+    )
+    package_fingerprint = models.CharField(max_length=64)
+    approval_policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="quote_admissibility_decisions",
+    )
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["quote_revision"],
+                condition=models.Q(supersedes__isnull=True),
+                name="uq_quote_admiss_initial_decision",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(
+                    state__in=[
+                        QuoteEligibilityState.ADMISSIBLE,
+                        QuoteEligibilityState.INADMISSIBLE,
+                        QuoteEligibilityState.REVIEW_REQUIRED,
+                    ]
+                ),
+                name="quote_admiss_decision_state",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "quote_revision", "created_at"],
+                name="quote_admiss_dec_org_rev_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+            preparation=self.preparation if self.preparation_id else None,
+            opening_event=self.opening_event if self.opening_event_id else None,
+            close_manifest=self.close_manifest if self.close_manifest_id else None,
+        )
+        self.rationale = self.rationale.strip()
+        self.package_fingerprint = self.package_fingerprint.strip().lower()
+        if self.state == QuoteEligibilityState.UNREVIEWED or not self.rationale:
+            raise ValidationError("وضعیت و توضیح تصمیم پذیرش معتبر نیست.")
+        if not re.fullmatch(r"[0-9a-f]{64}", self.package_fingerprint):
+            raise ValidationError("اثر انگشت شواهد تصمیم معتبر نیست.")
+        if self.preparation_id and (
+            self.preparation.quote_revision_id != self.quote_revision_id
+            or self.preparation.opening_event_id != self.opening_event_id
+            or self.preparation.proposed_state != self.state
+            or self.preparation.reason_code != self.reason_code
+            or self.preparation.rationale != self.rationale
+            or self.preparation.close_manifest_id != self.close_manifest_id
+            or self.preparation.package_fingerprint != self.package_fingerprint
+        ):
+            raise ValidationError("تصمیم باید دقیقاً آماده‌سازی پین‌شده را تأیید کند.")
+        if self.supersedes_id and (
+            self.supersedes.quote_revision_id != self.quote_revision_id
+            or self.supersedes.pk == self.pk
+        ):
+            raise ValidationError("تصحیح باید تصمیم پیشین همان نسخه را جانشین کند.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("تصمیم تأییدشده پذیرش تجاری تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("تصمیم تأییدشده پذیرش تجاری حذف‌پذیر نیست.")
+
+
+# P5-S11 is intentionally a separate immutable commercial layer.  It never writes
+# into QuoteRevision, its sealed evidence, or any downstream commitment model.
+class CommercialScopeType(models.TextChoices):
+    LINE = "line", "ردیف"
+    LOT = "lot", "بسته"
+
+
+class CommercialComparisonStatus(models.TextChoices):
+    PREPARED = "prepared", "آماده"
+    TIE_REVIEW_REQUIRED = "tie_review_required", "بررسی تساوی لازم است"
+    FINALIZED = "finalized", "نهایی‌شده"
+
+
+class CommercialExceptionStatus(models.TextChoices):
+    PROPOSED = "proposed", "پیشنهادشده"
+    APPROVED = "approved", "تأییدشده"
+    REJECTED = "rejected", "ردشده"
+    WITHDRAWN = "withdrawn", "پس‌گرفته‌شده"
+
+
+class CommercialExceptionCode(models.TextChoices):
+    NON_MATERIAL_METADATA_OMISSION = (
+        "non_material_metadata_omission",
+        "حذف فراداده غیرمادی",
+    )
+    DISPLAY_FORMAT_VARIANCE = "display_format_variance", "تفاوت قالب نمایش"
+    DUPLICATE_NON_GOVERNING_EVIDENCE = (
+        "duplicate_non_governing_evidence",
+        "شاهد تکراری غیرحاکم",
+    )
+    NON_MATERIAL_DOCUMENT_LABEL_VARIANCE = (
+        "non_material_document_label_variance",
+        "تفاوت برچسب غیرمادی",
+    )
+
+
+class SourcingAwardOutcome(models.TextChoices):
+    AWARDED = "awarded", "انتخاب‌شده"
+    NO_AWARD = "no_award", "بدون انتخاب"
+
+
+class RFQCommercialScope(UUIDModel, CreatedAtModel):
+    """Immutable explicit line/lot commercial applicability for one RFQ version."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    rfq_version = models.ForeignKey(
+        RequestForQuotationVersion,
+        on_delete=models.PROTECT,
+        related_name="commercial_scopes",
+    )
+    rfq_version_line = models.ForeignKey(
+        RequestForQuotationVersionLine,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="commercial_scopes",
+    )
+    scope_type = models.CharField(max_length=8, choices=CommercialScopeType.choices)
+    scope_code = models.CharField(max_length=80)
+    required_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    unit_of_measure = models.ForeignKey(
+        "materials.UnitOfMeasure", on_delete=models.PROTECT
+    )
+    independently_awardable = models.BooleanField(default=False)
+    allows_split_award = models.BooleanField(default=False)
+    allows_alternates = models.BooleanField(default=False)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="rfq_commercial_scopes_created",
+    )
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["rfq_version", "scope_code"],
+                name="uq_rfq_commercial_scope_code",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(required_quantity__gt=0),
+                name="rfq_commercial_scope_qty_positive",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            rfq_version=self.rfq_version if self.rfq_version_id else None,
+            rfq_version_line=self.rfq_version_line
+            if self.rfq_version_line_id
+            else None,
+            unit_of_measure=self.unit_of_measure if self.unit_of_measure_id else None,
+        )
+        self.scope_code = self.scope_code.strip()
+        if not self.scope_code:
+            raise ValidationError("شناسه خط یا بسته تجاری الزامی است.")
+        if self.scope_type == CommercialScopeType.LINE and not self.rfq_version_line_id:
+            raise ValidationError("دامنه ردیف باید ردیف نسخه استعلام را نگه دارد.")
+        if self.scope_type == CommercialScopeType.LOT and self.rfq_version_line_id:
+            raise ValidationError("دامنه بسته نباید به یک ردیف منفرد تقلیل یابد.")
+        if (
+            self.rfq_version_line_id
+            and self.rfq_version_line.rfq_version_id != self.rfq_version_id
+        ):
+            raise ValidationError("ردیف و نسخه دامنه تجاری باید یکسان باشند.")
+        if (
+            self.scope_type == CommercialScopeType.LINE
+            and self.allows_split_award
+            and not self.independently_awardable
+        ):
+            raise ValidationError("تقسیم ردیف فقط برای ردیف مستقل مجاز است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("دامنه تجاری RFQ تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("دامنه تجاری RFQ حذف‌پذیر نیست.")
+
+
+class QuoteCommercialAssertion(UUIDModel, CreatedAtModel):
+    """Exact asserted commercial values; these are not a mutation of quote evidence."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    quote_revision = models.ForeignKey(
+        QuoteRevision, on_delete=models.PROTECT, related_name="commercial_assertions"
+    )
+    commercial_scope = models.ForeignKey(
+        RFQCommercialScope, on_delete=models.PROTECT, related_name="assertions"
+    )
+    offered_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    unit_price = models.DecimalField(
+        max_digits=18, decimal_places=4, null=True, blank=True
+    )
+    line_amount = models.DecimalField(
+        max_digits=18, decimal_places=4, null=True, blank=True
+    )
+    currency = models.CharField(max_length=3)
+    explicit_discount = models.DecimalField(
+        max_digits=18, decimal_places=4, default=Decimal(0)
+    )
+    is_alternate = models.BooleanField(default=False)
+    alternate_basis = models.CharField(max_length=500, blank=True)
+    source_locator = models.CharField(max_length=500)
+    asserted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="quote_commercial_assertions",
+    )
+    idempotency_key = models.CharField(max_length=128)
+    payload_fingerprint = models.CharField(max_length=64)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["quote_revision", "commercial_scope", "idempotency_key"],
+                name="uq_quote_assertion_idem",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(offered_quantity__gt=0),
+                name="quote_assertion_qty_positive",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(explicit_discount__gte=0),
+                name="quote_assertion_discount_nonnegative",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+            commercial_scope=self.commercial_scope
+            if self.commercial_scope_id
+            else None,
+        )
+        self.currency = self.currency.strip().upper()
+        self.source_locator = self.source_locator.strip()
+        self.alternate_basis = self.alternate_basis.strip()
+        if not re.fullmatch(r"[A-Z]{3}", self.currency) or not self.source_locator:
+            raise ValidationError("ارز و مرجع دقیق منبع ادعا الزامی است.")
+        if self.unit_price is None and self.line_amount is None:
+            raise ValidationError("قیمت واحد یا مبلغ ردیف ادعاشده الزامی است.")
+        if (
+            self.unit_price is not None
+            and self.unit_price < 0
+            or self.line_amount is not None
+            and self.line_amount < 0
+        ):
+            raise ValidationError("مقادیر تجاری ادعاشده نمی‌تواند منفی باشد.")
+        if self.is_alternate and (
+            not self.commercial_scope.allows_alternates or not self.alternate_basis
+        ):
+            raise ValidationError(
+                "جایگزین فقط با اجازه دامنه و مبنای صریح قابل مقایسه است."
+            )
+        if not self.is_alternate and self.alternate_basis:
+            raise ValidationError("مبنای جایگزین برای پیشنهاد پایه مجاز نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("ورودی تجاری ادعاشده تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("ورودی تجاری ادعاشده حذف‌پذیر نیست.")
+
+
+class CommercialComparison(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    commercial_scope = models.ForeignKey(
+        RFQCommercialScope, on_delete=models.PROTECT, related_name="comparisons"
+    )
+    prepared_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="commercial_comparisons_prepared",
+    )
+    prepared_at = models.DateTimeField()
+    normalization_policy_code = models.CharField(
+        max_length=64, default="commercial-normalization-v1"
+    )
+    normalization_policy_version = models.PositiveSmallIntegerField(default=1)
+    status = models.CharField(
+        max_length=32,
+        choices=CommercialComparisonStatus.choices,
+        default=CommercialComparisonStatus.PREPARED,
+    )
+    finalized_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="commercial_comparisons_finalized",
+    )
+    finalized_at = models.DateTimeField(null=True, blank=True)
+    finalization_policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="commercial_comparisons_finalized",
+    )
+    finalization_reason = models.CharField(max_length=500, blank=True)
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+    idempotency_key = models.CharField(max_length=128)
+    payload_fingerprint = models.CharField(max_length=64)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["commercial_scope", "idempotency_key"],
+                name="uq_comparison_scope_idem",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            commercial_scope=self.commercial_scope
+            if self.commercial_scope_id
+            else None,
+        )
+        if (
+            self.normalization_policy_code != "commercial-normalization-v1"
+            or self.normalization_policy_version != 1
+        ):
+            raise ValidationError("فقط سیاست نرمال‌سازی بسته v1 مجاز است.")
+        if self.status != CommercialComparisonStatus.PREPARED and (
+            not self.finalized_by_id
+            or not self.finalized_at
+            or not self.finalization_policy_version_id
+            or not self.finalization_reason.strip()
+        ):
+            raise ValidationError("نهایی‌سازی مقایسه نیازمند عامل، سیاست و دلیل است.")
+        if (
+            self.supersedes_id
+            and self.supersedes.commercial_scope_id != self.commercial_scope_id
+        ):
+            raise ValidationError("مقایسه جانشین باید همان دامنه را داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("مقایسه تجاری تغییرپذیر نیست؛ جانشین ایجاد کنید.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("مقایسه تجاری حذف‌پذیر نیست.")
+
+
+class CommercialComparisonInput(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    comparison = models.ForeignKey(
+        CommercialComparison, on_delete=models.PROTECT, related_name="inputs"
+    )
+    assertion = models.ForeignKey(
+        QuoteCommercialAssertion,
+        on_delete=models.PROTECT,
+        related_name="comparison_inputs",
+    )
+    quote_revision = models.ForeignKey(QuoteRevision, on_delete=models.PROTECT)
+    admissibility_decision = models.ForeignKey(
+        QuoteAdmissibilityDecision, on_delete=models.PROTECT
+    )
+    opening_event = models.ForeignKey(QuoteOpeningEvent, on_delete=models.PROTECT)
+    # v1 retains the exact multiplication result; it must not introduce an
+    # unapproved rounding policy merely to fit the asserted-input scale.
+    normalized_amount = models.DecimalField(max_digits=24, decimal_places=8)
+    calculation_lineage = models.JSONField()
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["comparison", "quote_revision"],
+                name="uq_comparison_input_revision",
+            ),
+            models.UniqueConstraint(
+                fields=["comparison", "assertion"],
+                name="uq_comparison_input_assertion",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            comparison=self.comparison if self.comparison_id else None,
+            assertion=self.assertion if self.assertion_id else None,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+            admissibility_decision=self.admissibility_decision
+            if self.admissibility_decision_id
+            else None,
+            opening_event=self.opening_event if self.opening_event_id else None,
+        )
+        if self.assertion_id and (
+            self.assertion.quote_revision_id != self.quote_revision_id
+            or self.assertion.commercial_scope_id != self.comparison.commercial_scope_id
+        ):
+            raise ValidationError("ورودی مقایسه باید ادعای همان نسخه و دامنه باشد.")
+        if self.admissibility_decision_id and (
+            self.admissibility_decision.quote_revision_id != self.quote_revision_id
+            or self.admissibility_decision.state != QuoteEligibilityState.ADMISSIBLE
+        ):
+            raise ValidationError("فقط تصمیم پذیرش تجاری قابل‌قبول مجاز است.")
+        if (
+            self.opening_event_id
+            and self.opening_event.quote_revision_id != self.quote_revision_id
+        ):
+            raise ValidationError("گشایش ورودی مقایسه معتبر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("ورودی/محاسبه مقایسه تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class EvaluatorAppointment(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    comparison = models.ForeignKey(
+        CommercialComparison,
+        on_delete=models.PROTECT,
+        related_name="evaluator_appointments",
+    )
+    quote_revision = models.ForeignKey(
+        QuoteRevision, on_delete=models.PROTECT, null=True, blank=True
+    )
+    membership = models.ForeignKey(
+        "organizations.OrganizationMembership",
+        on_delete=models.PROTECT,
+        related_name="commercial_evaluator_appointments",
+    )
+    appointed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="evaluator_appointments_made",
+    )
+    appointed_at = models.DateTimeField()
+    revoked_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="evaluator_appointments_revoked",
+    )
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    revocation_reason = models.CharField(max_length=500, blank=True)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["comparison", "membership", "quote_revision"],
+                name="uq_comparison_evaluator_scope",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            comparison=self.comparison if self.comparison_id else None,
+            membership=self.membership if self.membership_id else None,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+        )
+        if (
+            self.quote_revision_id
+            and not self.comparison.inputs.filter(
+                quote_revision=self.quote_revision
+            ).exists()
+        ):
+            raise ValidationError("انتصاب نسخه‌ای باید به نسخه مقایسه تعلق داشته باشد.")
+        if bool(self.revoked_by_id) != bool(self.revoked_at):
+            raise ValidationError("عامل و زمان لغو باید با هم باشند.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.revoked_at or any(
+                getattr(previous, f) != getattr(self, f)
+                for f in (
+                    "organization_id",
+                    "comparison_id",
+                    "quote_revision_id",
+                    "membership_id",
+                    "appointed_by_id",
+                    "appointed_at",
+                )
+            ):
+                raise ValidationError(
+                    "انتصاب ارزیاب فقط یک‌بار و با لغو الحاقی قابل تغییر است."
+                )
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class EvaluatorConflictDeclaration(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    appointment = models.ForeignKey(
+        EvaluatorAppointment, on_delete=models.PROTECT, related_name="conflicts"
+    )
+    declared_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="evaluator_conflicts_declared",
+    )
+    declared_at = models.DateTimeField()
+    evidence = models.CharField(max_length=500)
+    disposition = models.CharField(
+        max_length=16,
+        choices=CommercialExceptionStatus.choices,
+        default=CommercialExceptionStatus.PROPOSED,
+    )
+    disposed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="evaluator_conflicts_disposed",
+    )
+    disposed_at = models.DateTimeField(null=True, blank=True)
+    disposition_reason = models.CharField(max_length=500, blank=True)
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, appointment=self.appointment if self.appointment_id else None
+        )
+        if (
+            self.appointment_id
+            and self.declared_by_id != self.appointment.membership.user_id
+        ):
+            raise ValidationError("فقط ارزیاب منصوب می‌تواند تعارض خود را اعلام کند.")
+        if self.disposition != CommercialExceptionStatus.PROPOSED and (
+            not self.disposed_by_id
+            or not self.disposed_at
+            or not self.disposition_reason.strip()
+        ):
+            raise ValidationError(
+                "تعیین تکلیف تعارض نیازمند عامل مستقل، زمان و دلیل است."
+            )
+        if self.disposed_by_id == self.declared_by_id:
+            raise ValidationError("ارزیاب نمی‌تواند تعارض خود را رفع کند.")
+        if self.supersedes_id and self.supersedes.appointment_id != self.appointment_id:
+            raise ValidationError("تعیین تکلیف تعارض باید همان انتصاب را جانشین کند.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("اعلام یا تعیین تکلیف تعارض تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class CommercialEvaluation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    comparison = models.ForeignKey(
+        CommercialComparison, on_delete=models.PROTECT, related_name="evaluations"
+    )
+    evaluator_appointment = models.ForeignKey(
+        EvaluatorAppointment, on_delete=models.PROTECT, related_name="evaluations"
+    )
+    input = models.ForeignKey(
+        CommercialComparisonInput, on_delete=models.PROTECT, related_name="evaluations"
+    )
+    recommendation = models.CharField(max_length=500)
+    evaluated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="commercial_evaluations",
+    )
+    evaluated_at = models.DateTimeField()
+    evidence = models.CharField(max_length=500)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["comparison", "evaluator_appointment", "input"],
+                name="uq_comparison_evaluation_once",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            comparison=self.comparison if self.comparison_id else None,
+            evaluator_appointment=self.evaluator_appointment
+            if self.evaluator_appointment_id
+            else None,
+            input=self.input if self.input_id else None,
+        )
+        if self.evaluator_appointment_id and (
+            self.evaluator_appointment.comparison_id != self.comparison_id
+            or self.evaluator_appointment.revoked_at
+        ):
+            raise ValidationError("انتصاب فعال همان مقایسه برای ارزیابی لازم است.")
+        if self.input_id and self.input.comparison_id != self.comparison_id:
+            raise ValidationError("ورودی ارزیابی باید متعلق به همان مقایسه باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("ارزیابی تجاری تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class CommercialException(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    quote_revision = models.ForeignKey(
+        QuoteRevision, on_delete=models.PROTECT, related_name="commercial_exceptions"
+    )
+    commercial_scope = models.ForeignKey(RFQCommercialScope, on_delete=models.PROTECT)
+    catalogue_version = models.PositiveSmallIntegerField(default=1)
+    code = models.CharField(max_length=64, choices=CommercialExceptionCode.choices)
+    evidence = models.CharField(max_length=500)
+    proposed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="commercial_exceptions_proposed",
+    )
+    proposed_at = models.DateTimeField()
+    status = models.CharField(
+        max_length=16,
+        choices=CommercialExceptionStatus.choices,
+        default=CommercialExceptionStatus.PROPOSED,
+    )
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="commercial_exceptions_decided",
+    )
+    decided_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.CharField(max_length=500, blank=True)
+    approval_policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="commercial_exceptions_approved",
+    )
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+            commercial_scope=self.commercial_scope
+            if self.commercial_scope_id
+            else None,
+        )
+        if (
+            self.catalogue_version != 1
+            or self.code not in CommercialExceptionCode.values
+        ):
+            raise ValidationError("استثنا خارج از کاتالوگ بسته v1 است.")
+        if self.status != CommercialExceptionStatus.PROPOSED and (
+            not self.decided_by_id
+            or not self.decided_at
+            or not self.decision_reason.strip()
+        ):
+            raise ValidationError("تصمیم استثنا نیازمند عامل، زمان و دلیل است.")
+        if (
+            self.supersedes_id
+            and self.supersedes.quote_revision_id != self.quote_revision_id
+        ):
+            raise ValidationError("جانشینی استثنا باید برای همان نسخه باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("استثنای تجاری تغییرپذیر نیست؛ جانشین ایجاد کنید.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class SourcingAwardPreparation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    comparison = models.ForeignKey(
+        CommercialComparison,
+        on_delete=models.PROTECT,
+        related_name="award_preparations",
+    )
+    outcome = models.CharField(max_length=16, choices=SourcingAwardOutcome.choices)
+    prepared_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="sourcing_awards_prepared",
+    )
+    prepared_at = models.DateTimeField()
+    reason = models.CharField(max_length=500)
+    evidence = models.CharField(max_length=500)
+    tie_resolution = models.BooleanField(default=False)
+    idempotency_key = models.CharField(max_length=128)
+    payload_fingerprint = models.CharField(max_length=64)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["comparison", "idempotency_key"],
+                name="uq_award_prep_comparison_idem",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, comparison=self.comparison if self.comparison_id else None
+        )
+        if not self.reason.strip() or not self.evidence.strip():
+            raise ValidationError("دلیل و شاهد تصمیم انتخاب الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("آماده‌سازی انتخاب تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class SourcingAwardPreparationAllocation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    preparation = models.ForeignKey(
+        SourcingAwardPreparation, on_delete=models.PROTECT, related_name="allocations"
+    )
+    comparison_input = models.ForeignKey(
+        CommercialComparisonInput, on_delete=models.PROTECT
+    )
+    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["preparation", "comparison_input"],
+                name="uq_award_prep_allocation_input",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0),
+                name="award_prep_allocation_qty_positive",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            preparation=self.preparation if self.preparation_id else None,
+            comparison_input=self.comparison_input
+            if self.comparison_input_id
+            else None,
+        )
+        if (
+            self.preparation_id
+            and self.comparison_input.comparison_id != self.preparation.comparison_id
+        ):
+            raise ValidationError("تخصیص باید از ورودی همان مقایسه باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("تخصیص انتخاب تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class SourcingAward(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    preparation = models.OneToOneField(
+        SourcingAwardPreparation, on_delete=models.PROTECT, related_name="final_award"
+    )
+    comparison = models.ForeignKey(
+        CommercialComparison, on_delete=models.PROTECT, related_name="sourcing_awards"
+    )
+    outcome = models.CharField(max_length=16, choices=SourcingAwardOutcome.choices)
+    finalized_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="sourcing_awards_finalized",
+    )
+    finalized_at = models.DateTimeField()
+    finalization_policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="sourcing_awards_finalized",
+    )
+    reason = models.CharField(max_length=500)
+    evidence = models.CharField(max_length=500)
+    unawarded_quantity = models.DecimalField(
+        max_digits=18, decimal_places=4, default=Decimal(0)
+    )
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            preparation=self.preparation if self.preparation_id else None,
+            comparison=self.comparison if self.comparison_id else None,
+        )
+        if self.preparation_id and (
+            self.preparation.comparison_id != self.comparison_id
+            or self.preparation.outcome != self.outcome
+        ):
+            raise ValidationError("انتخاب نهایی باید آماده‌سازی پین‌شده را حفظ کند.")
+        if (
+            self.supersedes_id
+            and self.supersedes.comparison.commercial_scope_id
+            != self.comparison.commercial_scope_id
+        ):
+            raise ValidationError("انتخاب جانشین باید همان دامنه را داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError(
+                "انتخاب نهایی تغییرپذیر نیست؛ انتخاب جانشین ایجاد کنید."
+            )
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class SourcingAwardAllocation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    award = models.ForeignKey(
+        SourcingAward, on_delete=models.PROTECT, related_name="allocations"
+    )
+    comparison_input = models.ForeignKey(
+        CommercialComparisonInput, on_delete=models.PROTECT
+    )
+    quote_revision = models.ForeignKey(QuoteRevision, on_delete=models.PROTECT)
+    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+
+    objects = ImmutableOpeningEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["award", "comparison_input"], name="uq_award_allocation_input"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0), name="award_allocation_qty_positive"
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            award=self.award if self.award_id else None,
+            comparison_input=self.comparison_input
+            if self.comparison_input_id
+            else None,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+        )
+        if self.comparison_input_id and (
+            self.comparison_input.comparison_id != self.award.comparison_id
+            or self.comparison_input.quote_revision_id != self.quote_revision_id
+        ):
+            raise ValidationError(
+                "تخصیص نهایی باید نسخه و ورودی مقایسه پین‌شده را حفظ کند."
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("تخصیص نهایی تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
 
 
 class PurchaseOrder(UUIDModel, TimeStampedModel):

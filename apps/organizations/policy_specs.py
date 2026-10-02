@@ -10,6 +10,12 @@ from django.core.exceptions import ValidationError
 ACCOUNTING_MONEY_PRECISION_POLICY_CODE = "accounting-money-precision"
 ACCOUNTING_ROUNDING_POLICY_CODE = "accounting-rounding"
 TREASURY_SELF_APPROVAL_POLICY_CODE = "treasury-self-approval"
+RFQ_ADMISSIBILITY_SELF_APPROVAL_POLICY_CODE = "rfq-admissibility-self-approval"
+RFQ_COMPARISON_SELF_FINALIZATION_POLICY_CODE = "rfq-comparison-self-finalization"
+RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE = "rfq-commercial-exception-self-approval"
+RFQ_SOURCING_AWARD_SELF_FINALIZATION_POLICY_CODE = (
+    "rfq-sourcing-award-self-finalization"
+)
 
 
 @dataclass(frozen=True)
@@ -72,9 +78,47 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         sensitivity="accounting",
         tenant_selectable=True,
         permitted_consumers=("treasury.operation.approve",),
-        fields=(
-            PolicyFieldSpec("allow_self_approval", bool, (False, True)),
-        ),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
+    RFQ_ADMISSIBILITY_SELF_APPROVAL_POLICY_CODE: PlatformPolicySpec(
+        code=RFQ_ADMISSIBILITY_SELF_APPROVAL_POLICY_CODE,
+        name="خودتأییدی پذیرش تجاری پیشنهاد",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("procurement.quote_admissibility.approve",),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
+    RFQ_COMPARISON_SELF_FINALIZATION_POLICY_CODE: PlatformPolicySpec(
+        code=RFQ_COMPARISON_SELF_FINALIZATION_POLICY_CODE,
+        name="خودنهایی‌سازی مقایسه تجاری",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("procurement.comparison.finalize",),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
+    RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE: PlatformPolicySpec(
+        code=RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE,
+        name="خودتأییدی استثنای تجاری غیرمادی",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("procurement.commercial_exception.approve",),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
+    RFQ_SOURCING_AWARD_SELF_FINALIZATION_POLICY_CODE: PlatformPolicySpec(
+        code=RFQ_SOURCING_AWARD_SELF_FINALIZATION_POLICY_CODE,
+        name="خودنهایی‌سازی انتخاب تأمین‌کننده",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("procurement.sourcing_award.finalize",),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
         value_schema_approved=True,
     ),
 }
@@ -118,7 +162,9 @@ def validate_policy_parameters(*, spec: PlatformPolicySpec, parameters: object) 
         raise ValidationError("پارامترهای سیاست باید یک شیء JSON باشند.")
     expected = {field.name for field in spec.fields}
     if set(parameters) != expected:
-        raise ValidationError("پارامترهای سیاست دقیقاً با قرارداد کد-محور هم‌خوان نیستند.")
+        raise ValidationError(
+            "پارامترهای سیاست دقیقاً با قرارداد کد-محور هم‌خوان نیستند."
+        )
     for field in spec.fields:
         value = parameters[field.name]
         if type(value) is not field.value_type or value not in field.allowed_values:

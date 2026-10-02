@@ -722,6 +722,45 @@ class AuditAction(models.TextChoices):
         "rfq.confidential_content_denied",
         "دسترسی به محتوای محرمانه پیشنهاد رد شد",
     )
+    RFQ_ADMISSIBILITY_PREPARED = (
+        "rfq.admissibility_prepared",
+        "آماده‌سازی پذیرش تجاری پیشنهاد ثبت شد",
+    )
+    RFQ_ADMISSIBILITY_WITHDRAWN = (
+        "rfq.admissibility_withdrawn",
+        "آماده‌سازی پذیرش تجاری پیشنهاد پس‌گرفته شد",
+    )
+    RFQ_ADMISSIBILITY_APPROVED = (
+        "rfq.admissibility_approved",
+        "تصمیم پذیرش تجاری پیشنهاد تأیید شد",
+    )
+    RFQ_ADMISSIBILITY_REJECTED = (
+        "rfq.admissibility_rejected",
+        "عملیات پذیرش تجاری پیشنهاد رد شد",
+    )
+    RFQ_COMPARISON_PREPARED = "rfq.comparison_prepared", "مقایسه تجاری آماده شد"
+    RFQ_COMPARISON_EVALUATED = "rfq.comparison_evaluated", "مقایسه تجاری ارزیابی شد"
+    RFQ_COMPARISON_FINALIZED = "rfq.comparison_finalized", "مقایسه تجاری نهایی شد"
+    RFQ_EVALUATOR_CONFLICT_DECLARED = (
+        "rfq.evaluator_conflict_declared",
+        "تعارض ارزیاب اعلام شد",
+    )
+    RFQ_EVALUATOR_CONFLICT_DISPOSED = (
+        "rfq.evaluator_conflict_disposed",
+        "تعارض ارزیاب تعیین تکلیف شد",
+    )
+    RFQ_COMMERCIAL_EXCEPTION_DECIDED = (
+        "rfq.commercial_exception_decided",
+        "استثنای تجاری تعیین تکلیف شد",
+    )
+    RFQ_SOURCING_AWARD_PREPARED = (
+        "rfq.sourcing_award_prepared",
+        "انتخاب تأمین‌کننده آماده شد",
+    )
+    RFQ_SOURCING_AWARD_FINALIZED = (
+        "rfq.sourcing_award_finalized",
+        "انتخاب تأمین‌کننده نهایی شد",
+    )
     GOODS_RECEIPT_CREATED = "goods_receipt.created", "رسید کالا ایجاد شد"
     GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "ردیف رسید کالا افزوده شد"
     GOODS_RECEIPT_POSTED = "goods_receipt.posted", "رسید کالا ثبت شد"

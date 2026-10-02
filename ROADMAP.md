@@ -1359,7 +1359,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P5.1 Sourcing and supplier invoice match
 
-- **Status / priority:** **P5-S01–S09 COMPLETE / P5-S10+ GATED**
+- **Status / priority:** **P5-S01–S11 IMPLEMENTED AND PRODUCT OWNER ACCEPTED**
 - **Planning disposition (2026-10-01):** the
   [P5-S01–S04 decision packet](docs/architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
   defines the internal RFQ-to-award lifecycle, SoD/confidentiality boundary,
@@ -1417,6 +1417,26 @@ Stable masters + consent/privacy + support operations -> future network/AI
   per-access byte/hash revalidation and redacted success/denial audit. Revocation is
   append-only. Generic Documents paths, preview/render/OCR/search/cache/derivatives,
   bulk export, commercial admissibility and break-glass remain absent.
+  P5-S10 implements the accepted revision-specific commercial-admissibility
+  contract in [P5-S10 Product Owner decisions](docs/architecture/P5_S10_PRODUCT_OWNER_DECISIONS.md):
+  immutable `prepare -> approve` evidence yields only `ADMISSIBLE`,
+  `INADMISSIBLE` or `REVIEW_REQUIRED`; controlled v1 reasons, the P5-S07 close
+  manifest, P5-S09 opening/package fingerprint and confidential rationale remain
+  pinned per revision. Dedicated default-ungranted prepare/approve permissions,
+  active revision-specific confidential grants, scope and prerequisite revalidation
+  are mandatory. The code-owned Platform/Tenant self-approval policy is pinned to
+  each decision and missing policy fails closed. Pending preparations can be
+  append-only withdrawn; approved decisions are immutable and corrections explicitly
+  supersede the previous decision. P5-S11 adds the accepted, sourcing-only
+  commercial layer: immutable asserted line/lot inputs, closed normalization-v1
+  calculation lineage, explicit evaluator appointments/conflicts and independent
+  disposition, closed non-material exception-v1 lifecycle, separate comparison/
+  exception/finalization permissions, and policy-pinned self-finalization only
+  where explicitly enabled. Final comparisons and sourcing awards are immutable
+  successor records; explicit ties require `TIE_REVIEW_REQUIRED`, `NO_AWARD`
+  retains evidence, and single/multi-award allocations are conserved against the
+  explicit scope. S11 creates no PO, contract, AP, GL, Treasury, cash, budget or
+  other downstream fact, no portal and no production activation.
   Beyond the bounded P5 foundations described above, this disposition creates no
   supplier invoice, financial posting, Project Cost fact, Inventory receipt,
   portal access or production activation.
@@ -1434,8 +1454,17 @@ Stable masters + consent/privacy + support operations -> future network/AI
   Quote privacy, tolerance, duplicates, partial receipt/invoice, reversal and
   reconciliation tests.
 - **Effort / risk:** **XL / High**.
-  - **Exact next possible action:** separately bounded Product Owner authorization
-    of P5-S10. P5-S10+ remains unauthorized.
+  - **Verification (2026-10-02):** a clean disposable PostgreSQL migration apply,
+    rollback and reapply completed. The final focused acceptance run passed all
+    9 P5-S11 cases (including two admitted/opened revisions, ties, `NO_AWARD`,
+    permitted/denied split allocations, policy enabled/disabled self-finalization,
+    PostgreSQL contention/idempotency, correction lineage and downstream
+    non-mutation) and 10 retained P5-S07–S10 custody/opening/admissibility
+    regressions. The demonstrated normalized-amount precision issue was corrected
+    without a rounding policy; PostgreSQL governing-award lock selection was made
+    compatible with its outer-join locking restriction. P5-S11 was Product Owner
+    accepted as implemented and PostgreSQL-verified on 2026-10-02; P5-S12+
+    remains out of scope.
 
 ### P5.2 Controlled supplier and subcontractor portal
 

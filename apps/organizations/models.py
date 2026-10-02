@@ -862,6 +862,42 @@ class BusinessPermissionCode(models.TextChoices):
         "rfq_quotes.manage_confidential_access",
         "مدیریت دسترسی محرمانه پیشنهاد",
     )
+    RFQ_QUOTES_PREPARE_ADMISSIBILITY = (
+        "rfq_quotes.prepare_admissibility",
+        "آماده‌سازی پذیرش تجاری پیشنهاد",
+    )
+    RFQ_QUOTES_APPROVE_ADMISSIBILITY = (
+        "rfq_quotes.approve_admissibility",
+        "تأیید پذیرش تجاری پیشنهاد",
+    )
+    RFQ_QUOTES_PREPARE_COMPARISON = (
+        "rfq_quotes.prepare_comparison",
+        "آماده‌سازی مقایسه تجاری پیشنهاد",
+    )
+    RFQ_QUOTES_EVALUATE_COMPARISON = (
+        "rfq_quotes.evaluate_comparison",
+        "ارزیابی مقایسه تجاری پیشنهاد",
+    )
+    RFQ_QUOTES_APPROVE_EXCEPTION = (
+        "rfq_quotes.approve_exception",
+        "تأیید استثنای غیرمادی پیشنهاد",
+    )
+    RFQ_QUOTES_FINALIZE_COMPARISON = (
+        "rfq_quotes.finalize_comparison",
+        "نهایی‌سازی مقایسه تجاری پیشنهاد",
+    )
+    RFQ_QUOTES_DISPOSE_CONFLICT = (
+        "rfq_quotes.dispose_conflict",
+        "تعیین تکلیف تعارض ارزیاب پیشنهاد",
+    )
+    RFQ_QUOTES_PREPARE_SOURCING_AWARD = (
+        "rfq_quotes.prepare_sourcing_award",
+        "آماده‌سازی انتخاب تأمین‌کننده",
+    )
+    RFQ_QUOTES_FINALIZE_SOURCING_AWARD = (
+        "rfq_quotes.finalize_sourcing_award",
+        "نهایی‌سازی انتخاب تأمین‌کننده",
+    )
 
     WAREHOUSES_VIEW = "warehouses.view", "مشاهده انبارها"
     WAREHOUSES_CREATE = "warehouses.create", "ایجاد انبار"

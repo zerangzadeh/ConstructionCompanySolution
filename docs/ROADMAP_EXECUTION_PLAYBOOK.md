@@ -966,7 +966,8 @@ conditional P5-S05 implementation contract.
 
 P5-D01 Option A was accepted with clarification on 2026-10-02: separation is
 capability-based, while confidential reveal and award approval require distinct
-actors and cannot be self-approved; tightly controlled read-only break-glass grants
+actors and cannot be self-approved, except for the later explicitly scoped P5-S11
+sourcing-only award finalization supersession; tightly controlled read-only break-glass grants
 no commercial decision authority, Owner/Admin grants no bypass, and unavailable
 independence leaves the operation pending. P5-D02 Option A was also accepted with
 clarification: no human sees commercial content before the effective RFQ/addendum
@@ -1025,7 +1026,9 @@ decision acceptance alone does not authorize it.
 are complete under separate bounded authorizations. P5-S09 is complete under the
 accepted consolidated
 [P5-S09 Product Owner decisions](architecture/P5_S09_PRODUCT_OWNER_DECISIONS.md).
-P5-S10+ requires separate explicit implementation authorization.
+P5-S10 is separately authorized, implemented and PostgreSQL-verified in the
+current roadmap state; P5-S11 is subsequently implemented, PostgreSQL-verified
+and Product Owner accepted. P5-S12+ remains separately gated.
 
 **Current P5 disposition (2026-10-02):** P5-S01–S04 are complete as planning and
 design, and the separately authorized P5-S05–S09 runtime slices are complete; see the
@@ -1044,10 +1047,13 @@ capabilities; immutable exact-package freeze/request/opening evidence; revision-
 scoped grants and append-only revocation; package-wide CLEAN/hash revalidation; and
 synchronous exact-version delivery with redacted access audit. Requester and
 approver are distinct, grants never follow from opening participation, self-grant
-fails closed, and generic DMS content paths remain denied. Commercial admissibility,
-break-glass, comparison, evaluation, award, No-Award, UI/portal, background work,
-production infrastructure and every downstream handoff remain absent. P5-S10+ and
-P5.2 remain unauthorized.
+fails closed, and generic DMS content paths remain denied. P5-S10 adds
+revision-specific commercial admissibility only: separate default-ungranted
+prepare/approve permissions, controlled reason/evidence, active confidential grant
+and a pinned fail-closed Tenant policy. Break-glass, comparison, evaluation, award,
+No-Award, UI/portal, background work, production infrastructure and every downstream
+handoff remain absent. P5-S11 is subsequently implemented, PostgreSQL-verified
+and Product Owner accepted; P5.2 and later work remain unauthorized.
 
 ## 12. P6 session map — 42 sessions
 

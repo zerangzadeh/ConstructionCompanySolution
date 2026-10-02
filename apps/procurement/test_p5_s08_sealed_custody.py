@@ -116,7 +116,7 @@ class SealedCustodyFixtureMixin(ProcurementFixtureMixin):
             BusinessPermission.objects.get(code=code)
         )
 
-    def _closed_revision(self):
+    def _closed_revision(self, *, suppliers=None):
         OrganizationSettings.objects.get_or_create(organization=self.organization)
         request, item = self.create_approved_request()
         now = timezone.now()
@@ -142,23 +142,28 @@ class SealedCustodyFixtureMixin(ProcurementFixtureMixin):
             organization=self.organization,
             actor=self.owner,
             rfq=rfq,
-            suppliers=[self.supplier],
+            suppliers=suppliers or [self.supplier],
             idempotency_key="custody-issue",
         )
-        revision = capture_quote_revision(
-            organization=self.organization,
-            actor=self.member,
-            invitation=version.invitations.get(),
-            integrity_fingerprint="a" * 64,
-            source_channel="manual_capture",
-            idempotency_key="custody-capture",
-        )
-        submit_quote_revision(
-            organization=self.organization,
-            actor=self.member,
-            revision=revision,
-            idempotency_key="custody-submit",
-        )
+        revisions = []
+        for sequence, invitation in enumerate(
+            version.invitations.order_by("created_at"), 1
+        ):
+            revision = capture_quote_revision(
+                organization=self.organization,
+                actor=self.member,
+                invitation=invitation,
+                integrity_fingerprint=f"{sequence:x}" * 64,
+                source_channel="manual_capture",
+                idempotency_key=f"custody-capture-{sequence}",
+            )
+            submit_quote_revision(
+                organization=self.organization,
+                actor=self.member,
+                revision=revision,
+                idempotency_key=f"custody-submit-{sequence}",
+            )
+            revisions.append(revision)
         self._grant(BusinessPermissionCode.RFQS_CLOSE_CUSTODY)
         with patch(
             "apps.procurement.rfq_services.timezone.now",
@@ -170,7 +175,9 @@ class SealedCustodyFixtureMixin(ProcurementFixtureMixin):
                 rfq=rfq,
                 idempotency_key="custody-close",
             )
-        return revision, manifest
+        return (
+            (revisions[0], manifest) if len(revisions) == 1 else (revisions, manifest)
+        )
 
     def _accept_original(self, revision, *, key="original-001", actor=None):
         return custody_sealed_quote_evidence(

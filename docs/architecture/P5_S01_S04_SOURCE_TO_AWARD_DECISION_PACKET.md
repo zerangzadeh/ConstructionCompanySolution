@@ -7,7 +7,12 @@ P5-S06 sealed internal quote-capture tranche, P5-S07 bounded close-custody tranc
 P5-S08 pre-production sealed commercial-content custody tranche were implemented and
 accepted on 2026-10-02. P5-S09 was subsequently authorized, its consolidated
 decisions accepted, and its bounded protected-opening runtime accepted on 2026-10-02.
-P5-S10+ remains unauthorized.
+P5-S10 is subsequently authorized, implemented, PostgreSQL-verified and Product
+Owner accepted under the separately accepted
+[P5-S10 decisions](P5_S10_PRODUCT_OWNER_DECISIONS.md). P5-S11 is subsequently
+implemented, PostgreSQL-verified and Product Owner accepted under its
+[P5-S11 decision packet](P5_S11_PRODUCT_OWNER_DECISION_PACKET.md); its scoped
+award self-finalization supersession of P5-D01 is recorded in section 8.
 
 **Authority:** The Product Owner authorized P5-S01–S04 as one documentation-only
 planning-and-design tranche on 2026-10-01. This packet is the authoritative result.
@@ -244,7 +249,7 @@ prospective P5-S05 contract but is not implementation authority.
 
 | Option | Consequence |
 | --- | --- |
-| **A — Protected reveal and award with independent actors; controlled read-only break-glass (ACCEPTED WITH CLARIFICATION)** | Requester/buyer/evaluator/award/receiver capabilities remain distinct. Confidential reveal and award approval are Protected Operations and never self-approved. An emergency actor may receive independently approved, time-bound, narrowly scoped, read-only access, but cannot modify bids/evaluations, approve awards or exercise commercial decision authority. |
+| **A — Protected reveal and award with independent actors; controlled read-only break-glass (ACCEPTED WITH CLARIFICATION)** | Requester/buyer/evaluator/award/receiver capabilities remain distinct. Confidential reveal and award approval are Protected Operations and never self-approved, except for the later explicitly scoped P5-S11 sourcing-only award finalization supersession recorded below. An emergency actor may receive independently approved, time-bound, narrowly scoped, read-only access, but cannot modify bids/evaluations, approve awards or exercise commercial decision authority. |
 | B — Policy-configurable sourcing self-approval | Fits very small Tenants but materially raises collusion/conflict risk and requires threshold/scope policy plus conspicuous exception evidence. |
 | C — Owner/Admin bypass | Rejected: role is not authority and bypass defeats deny-by-default control. |
 
@@ -252,11 +257,30 @@ prospective P5-S05 contract but is not implementation authority.
 Separation is primarily capability/permission separation and does not require five
 different people. Distinct-user enforcement is mandatory for Protected sourcing
 operations, especially confidential bid reveal and award approval; neither may be
-self-approved. Break-glass access must be independently approved, time-bound,
+self-approved, subject only to the later narrowly scoped P5-S11 sourcing-only award
+supersession recorded below. Break-glass access must be independently approved, time-bound,
 narrowly scoped, read-only and fully audited, and it grants no bid/evaluation
 modification, award approval or other commercial decision authority. Tenant
 Owner/Admin status provides no bypass. If an independent actor is unavailable,
 the Protected operation remains pending rather than weakening the control.
+
+**Later scoped supersession — P5-S11 sourcing-only award (2026-10-02):** The
+Product Owner explicitly supersedes P5-D01's no-self-approval rule only for the
+P5-S11 immutable sourcing-only award business operation. Award preparation and
+finalization remain separate permissions and self-finalization is disabled by
+default. An explicit Tenant business-operation self-approval policy may allow the
+same authorized user to prepare and finalize that award, including for a small or
+single-user Tenant. The applied policy version, actor, exact Tenant/object/revision
+scope, decision and evidence must be retained in audit history. Without that active
+policy, the authorized preparer and finalizer must differ.
+
+This scoped exception never permits conflict self-clearance: an actor with an
+unresolved conflict cannot prepare or finalize the affected award. It does not
+extend to confidential reveal, break-glass, system/security/access operations, any
+other Protected operation, or downstream PO, contract, AP, GL, Treasury/cash,
+budget, access-grant or cross-domain action. It does not create automatic downstream
+execution; downstream handoff remains separately authorized. Apart from this precise
+P5-S11 sourcing-only award exception, P5-D01 remains fully controlling.
 
 ### P5-D02 — Quote visibility and bid privacy
 
@@ -635,11 +659,17 @@ Focused PostgreSQL closure/RFQ/quote tests passed permission denial, Tenant isol
 deadline, immutability, idempotency, effective-selection/exclusion, post-close capture,
 concurrency, rollback and regression coverage. P5-S07 migration rollback/reapply,
 migration drift, Django checks and Ruff also passed. P5-D01's future distinct-user
-requirements for reveal and award approval remain unchanged; closure adds no new
-distinct-human rule. P5-S08 was subsequently authorized and completed only under the
+requirements for reveal and award approval remain unchanged except for the later
+narrowly scoped P5-S11 sourcing-only award self-finalization supersession; closure
+adds no new distinct-human rule. P5-S08 was subsequently authorized and completed only under the
 bounded contract in section 12. At the P5-S07 acceptance boundary P5-S09 remained
 unauthorized; section 13 records its later separate authorization and acceptance.
-P5-S10+ remains unauthorized.
+P5-S10 is subsequently authorized, implemented, PostgreSQL-verified and Product
+Owner accepted under the separately accepted
+[P5-S10 decisions](P5_S10_PRODUCT_OWNER_DECISIONS.md). P5-S11 is subsequently
+implemented, PostgreSQL-verified and Product Owner accepted under its
+[P5-S11 decision packet](P5_S11_PRODUCT_OWNER_DECISION_PACKET.md); its scoped
+award self-finalization supersession of P5-D01 is recorded in section 8.
 
 ## 12. P5-S08 sealed commercial-content custody decisions
 
@@ -988,7 +1018,8 @@ attachment-only/no-sniff semantics, exposes no storage path or URL, and records
 redacted successful and denied access. Generic DMS download, preview, rendering,
 OCR/extraction/index/search/cache/derivatives, bulk export and application execution
 remain absent. P5-S07's close manifest is unchanged; CLEAN has technical-openability
-meaning only. Commercial admissibility and break-glass are not implemented.
+meaning only. Commercial admissibility is subsequently implemented by P5-S10 under
+its separate accepted contract; break-glass remains absent.
 
 Focused PostgreSQL tests cover tenant/object scope, no-bypass permissions, earliest-
 opening boundary, exact permanent freeze, custody prohibition, SoD, immutable
@@ -996,7 +1027,10 @@ opening evidence, CLEAN/hash/storage checks, request/approval idempotency and
 concurrency, grant/self-grant/revocation, exact delivery, redacted access denial and
 atomic audit rollback. P5-S05–S08 regression, migration rollback/reapply, migration
 drift, Django check and Ruff pass. This is pre-production application acceptance,
-not production readiness or activation. P5-S10 and later remain unauthorized.
+not production readiness or activation. P5-S10 is subsequently implemented under
+its separate accepted contract; P5-S11 is subsequently implemented,
+PostgreSQL-verified and Product Owner accepted under its separate packet. P5.2 and
+later work remain unauthorized.
 
 ### Proposed separate P5-S05 authorization text — not granted
 
