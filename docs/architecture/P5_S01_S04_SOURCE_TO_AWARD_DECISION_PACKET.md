@@ -19,8 +19,10 @@ accepted on 2026-10-02. P5-S18–S22 were subsequently authorized as one bounded
 portal-foundation batch, implemented and PostgreSQL-verified; Product Owner
 acceptance is complete. P5-S23–S25 are accepted as one bounded UI batch.
 P5-S26–S27 are subsequently authorized, implemented, PostgreSQL-verified and
-Product Owner accepted under section 16. P5-S01–S27 is the current accepted
-baseline; P5-S28+ remains unauthorized.
+Product Owner accepted under section 16. P5-S28 documentation closeout and P6
+handoff are accepted under the [P5-S28 closeout packet](P5_S28_CLOSEOUT_AND_P6_HANDOFF.md).
+P5-S01–S28 is the current accepted P5 baseline; P5-S29+ remains unauthorized /
+undefined.
 
 **Authority:** The Product Owner authorized P5-S01–S04 as one documentation-only
 planning-and-design tranche on 2026-10-01. This packet is the authoritative result
@@ -1042,8 +1044,8 @@ PostgreSQL-verified and Product Owner accepted under its separate packet. P5-S12
 are subsequently implemented and verified under section 14. P5-S18–S22 are
 subsequently implemented under section 15. P5-S23–S25 are subsequently implemented
 as bounded UI adapters under section 15. P5-S26–S27 are subsequently implemented
-under section 16; P5-S28, production activation and downstream financial/stock/
-cost/cash handoffs remain unauthorized.
+under section 16; P5-S28 is documentation closeout only. Production activation,
+P5-S29+ and downstream financial/stock/cost/cash handoffs remain unauthorized.
 
 ## 14. P5-S12–S17 internal source-to-pay implementation record
 
@@ -1090,8 +1092,8 @@ only the listed HTTP/template adapters and are Product Owner accepted as
 PostgreSQL-verified on 2026-10-02. Five focused UI tests, seven retained P5-S18–S22 tests, six
 bounded P5-S12–S17 regressions and one retained sealed-content-denial test passed
 on one clean disposable database. No migration is introduced. The separately
-authorized P5-S26–S27 disposition is recorded in section 16; P5-S28 is not
-authorized.
+authorized P5-S26–S27 disposition is recorded in section 16; P5-S28 closeout is
+recorded in the separate closeout packet.
 
 | Session | Implemented boundary |
 | --- | --- |
@@ -1145,8 +1147,8 @@ P5-S12–S17 match regressions. Eighteen passed in the corrected combined run an
 the one corrected no-permission fixture passed on focused rerun. Test-schema
 migration apply/disposal, Django checks and focused Ruff pass; no migration was
 introduced. The Product Owner accepted P5-S26–S27 as implemented and
-PostgreSQL-verified on 2026-10-02. P5-S01–S27 is the current accepted baseline;
-P5-S28+ remains unauthorized.
+PostgreSQL-verified on 2026-10-02. P5-S01–S28 is the current accepted baseline;
+P5-S29+ remains unauthorized / undefined.
 
 Verification used one reusable disposable PostgreSQL database. Seven focused tests
 passed, covering default-ungranted management, token hashing, identity/email binding,

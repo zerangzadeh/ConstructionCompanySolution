@@ -1359,7 +1359,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P5.1 Sourcing and supplier invoice match
 
-- **Status / priority:** **P5-S01–S27 COMPLETE / ACCEPTED; P5-S28+ UNAUTHORIZED**
+- **Status / priority:** **P5-S01–S28 COMPLETE / ACCEPTED; P5-S29+ UNAUTHORIZED / UNDEFINED**
 - **Planning disposition (2026-10-01):** the
   [P5-S01–S04 decision packet](docs/architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
   defines the internal RFQ-to-award lifecycle, SoD/confidentiality boundary,
@@ -1461,7 +1461,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
   membership impersonation; keep browser retries on one hidden stable idempotency
   key; apply private/no-cache delivery; and add a permissioned, project-scoped,
   read-only invoice-match evidence review. They add no override, approval or
-  downstream mutation. P5-S28 and production activation remain unauthorized.
+  downstream mutation. P5-S28 adds documentation closeout only; P5-S29+ and
+  production activation remain unauthorized.
 - **Outcome:** RFQ, invited suppliers, versioned quotes, normalized comparison,
   sourcing approval/award, PO changes, service acceptance, supplier invoice,
   two/three-way match, tolerance and discrepancy workflow.
@@ -1507,7 +1508,9 @@ Stable masters + consent/privacy + support operations -> future network/AI
     rerun; all 19 scoped cases are green. Full test-schema migration apply and
     disposal succeeded; no migration was added. The Product Owner accepted
     P5-S26–S27 as implemented and PostgreSQL-verified on 2026-10-02. P5-S01–S27
-    is the current accepted baseline; P5-S28+ remains unauthorized.
+    is the current accepted baseline. P5-S28 documentation closeout and P6
+    handoff are recorded in the [P5-S28 closeout packet](docs/architecture/P5_S28_CLOSEOUT_AND_P6_HANDOFF.md);
+    P5-S29+ remains unauthorized/undefined.
 
 ### P5.2 Controlled supplier and subcontractor portal
 
@@ -1524,7 +1527,11 @@ Stable masters + consent/privacy + support operations -> future network/AI
   review immutable, Tenant/project-scoped match lines and discrepancies through a
   read-only Persian RTL screen; no force-match or discrepancy override exists.
   The Product Owner accepted this PostgreSQL-verified scope on 2026-10-02;
-  P5-S28+ remains unauthorized.
+  P5-S28 is documentation closeout only; P5-S29+ remains unauthorized/undefined.
+- **P5-S28 closeout (2026-10-02):** the [P5-S28 closeout and P6 handoff packet](docs/architecture/P5_S28_CLOSEOUT_AND_P6_HANDOFF.md)
+  reconciles the accepted P5-S01–S28 baseline, verified PostgreSQL evidence,
+  ownership, deferred/fail-closed behavior and P6 entry conditions. It changes
+  no runtime, schema, data, permission, financial policy or production state.
 - **Outcome:** invite-scoped external collaboration for party profile/document and
   qualification-evidence submission, RFQ participation, versioned quotation,
   supplier invoice/supporting documents, subcontractor claim/evidence submission,

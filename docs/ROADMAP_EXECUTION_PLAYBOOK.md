@@ -1020,7 +1020,7 @@ decision acceptance alone does not authorize it.
 | P5-S18..S22 | 5 | `A-H` | External portal identity, invitation, submission and least-privilege boundary |
 | P5-S23..S25 | 3 | `T-M` | Internal/external UI journeys, correction loops and evidence handling |
 | P5-S26..S27 | 2 | `A-X` | Product Owner accepted and PostgreSQL-verified bid privacy, portal identity/impersonation and duplicate-retry hardening plus permissioned read-only match reconciliation review |
-| P5-S28 | 1 | `L-M` | Documentation closeout and P6 handoff packet |
+| P5-S28 | 1 | `L-M` | Documentation closeout and P6 handoff packet; Product Owner accepted |
 
 **Product Owner gates:** P5-D01–P5-D08 are accepted with clarification. P5-S05–S08
 are complete under separate bounded authorizations. P5-S09 is complete under the
@@ -1032,8 +1032,10 @@ and Product Owner accepted. P5-S12–S17 were then authorized as one bounded bat
 implemented, PostgreSQL-verified and Product Owner accepted on 2026-10-02.
 P5-S18–S25 were subsequently accepted. P5-S26–S27 are Product Owner accepted as
 implemented and PostgreSQL-verified under the bounded contract in the authoritative
-packet. The authoritative status is **P5-S01–S27 COMPLETE / ACCEPTED; P5-S28+
-UNAUTHORIZED**.
+packet. P5-S28 documentation closeout and the P6 handoff are accepted under the
+[P5-S28 closeout packet](architecture/P5_S28_CLOSEOUT_AND_P6_HANDOFF.md). The
+authoritative status is **P5-S01–S28 COMPLETE / ACCEPTED; P5-S29+
+UNAUTHORIZED / UNDEFINED**.
 
 **Current P5 disposition (2026-10-02):** P5-S01–S04 are complete as planning and
 design, and the separately authorized P5-S05–S09 runtime slices are complete; see the
@@ -1072,8 +1074,18 @@ custody intake. P5-S26–S27 subsequently harden exact external identity and opa
 browser retry semantics and add permissioned read-only match review. Nineteen
 scoped PostgreSQL cases are green with full test-schema migration apply/disposal;
 no migration was added. The Product Owner accepted P5-S26–S27 as implemented and
-PostgreSQL-verified; P5-S01–S27 is the current accepted baseline and P5-S28+
-remains unauthorized.
+PostgreSQL-verified; P5-S01–S27 was the accepted implementation baseline. S28
+now closes the documentation and handoff gate without runtime change, so
+P5-S01–S28 is the current accepted baseline and P5-S29+ remains unauthorized /
+undefined.
+
+### P5-S28 documentation closeout and P6 handoff
+
+P5-S28 is complete and accepted. The [closeout packet](architecture/P5_S28_CLOSEOUT_AND_P6_HANDOFF.md)
+records the verified S01–S27 evidence, commit/worktree verification, ownership,
+deferred/fail-closed behavior and P6 entry conditions. It creates no runtime,
+schema, data, permission, integration or production state. P6 work remains
+separately authorized by tranche; P5-S29+ is not defined or authorized.
 
 ## 12. P6 session map — 42 sessions
 
