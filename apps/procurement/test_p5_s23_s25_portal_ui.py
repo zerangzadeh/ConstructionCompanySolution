@@ -68,11 +68,15 @@ class SupplierPortalUiTests(
             HTTP_X_CSRFTOKEN=client.cookies["csrftoken"].value,
         )
         context_url = accepted.url
+        context_response = client.get(context_url)
         self.assertContains(
-            client.get(context_url),
+            context_response,
             invitation.rfq_invitation.rfq_version.rfq.rfq_number,
         )
-        self.assertNotContains(client.get(context_url), "یادداشت داخلی")
+        self.assertNotContains(context_response, "یادداشت داخلی")
+        self.assertContains(context_response, 'name="idempotency_key"', html=False)
+        self.assertNotContains(context_response, "کلید یکتای ارسال")
+        self.assertIn("no-cache", context_response.headers["Cache-Control"])
         submit_url = context_url + "submit/"
         payload = {
             "integrity_fingerprint": "a" * 64,

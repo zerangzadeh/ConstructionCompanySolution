@@ -1359,7 +1359,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P5.1 Sourcing and supplier invoice match
 
-- **Status / priority:** **P5-S01–S25 COMPLETE / ACCEPTED; P5-S26+ UNAUTHORIZED**
+- **Status / priority:** **P5-S01–S27 COMPLETE / ACCEPTED; P5-S28+ UNAUTHORIZED**
 - **Planning disposition (2026-10-01):** the
   [P5-S01–S04 decision packet](docs/architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
   defines the internal RFQ-to-award lifecycle, SoD/confidentiality boundary,
@@ -1456,8 +1456,12 @@ Stable masters + consent/privacy + support operations -> future network/AI
   and receipt/audit evidence. They create no Tenant membership, account, outbound
   delivery, UI, upload/content-custody path or downstream fact. P5-S23–S25 add
   only thin HTTP/template adapters to those services plus internal sealed-custody
-  intake; no new lifecycle or external upload authority exists. P5-S26+ and
-  production activation remain unauthorized.
+  intake; no new lifecycle or external upload authority exists. P5-S26–S27 harden
+  accepted portal identity against ambiguous-email, email-rebind and internal-
+  membership impersonation; keep browser retries on one hidden stable idempotency
+  key; apply private/no-cache delivery; and add a permissioned, project-scoped,
+  read-only invoice-match evidence review. They add no override, approval or
+  downstream mutation. P5-S28 and production activation remain unauthorized.
 - **Outcome:** RFQ, invited suppliers, versioned quotes, normalized comparison,
   sourcing approval/award, PO changes, service acceptance, supplier invoice,
   two/three-way match, tolerance and discrepancy workflow.
@@ -1495,16 +1499,32 @@ Stable masters + consent/privacy + support operations -> future network/AI
     7 retained P5-S18–S22 tests, 6 bounded P5-S12–S17 regressions and one retained
     sealed-content denial test on one clean disposable PostgreSQL database. No new
     migration was added. The Product Owner accepted P5-S23–S25 as implemented and
-    PostgreSQL-verified on 2026-10-02. P5-S26+ remains unauthorized.
+    PostgreSQL-verified on 2026-10-02. The authorized P5-S26–S27 slice then ran
+    19 PostgreSQL cases on the same uniquely named disposable database: 9 retained
+    P5-S18–S22 cases, 5 retained P5-S23–S25 cases, 2 focused read-only match-review
+    cases and 3 minimum P5-S12–S17 match regressions. Eighteen passed in the final
+    combined run and the one corrected authorization-test fixture passed on focused
+    rerun; all 19 scoped cases are green. Full test-schema migration apply and
+    disposal succeeded; no migration was added. The Product Owner accepted
+    P5-S26–S27 as implemented and PostgreSQL-verified on 2026-10-02. P5-S01–S27
+    is the current accepted baseline; P5-S28+ remains unauthorized.
 
 ### P5.2 Controlled supplier and subcontractor portal
 
-- **Status / priority:** **P5-S18–S25 COMPLETE / ACCEPTED; broader collaboration remains planned**
+- **Status / priority:** **P5-S18–S27 COMPLETE / ACCEPTED; broader collaboration remains planned**
 - **P5-S18–S25 disposition:** P5-S18–S22 are accepted service/model foundation.
   P5-S23–S25 add invitation acceptance, exact-RFQ context, idempotent submission
   receipt, internal invitation/grant revocation and internal sealed-evidence custody
   views. They create no outbound invitation delivery, account provisioning,
   external upload path, portal withdrawal or support bypass.
+- **P5-S26–S27 disposition:** portal use now fails closed for ambiguous active
+  email ownership, changed invited email or an active internal membership; exact
+  supplier/RFQ privacy and sealed isolation remain unchanged. Duplicate browser
+  submissions reuse a hidden stable retry key. Authorized internal users can
+  review immutable, Tenant/project-scoped match lines and discrepancies through a
+  read-only Persian RTL screen; no force-match or discrepancy override exists.
+  The Product Owner accepted this PostgreSQL-verified scope on 2026-10-02;
+  P5-S28+ remains unauthorized.
 - **Outcome:** invite-scoped external collaboration for party profile/document and
   qualification-evidence submission, RFQ participation, versioned quotation,
   supplier invoice/supporting documents, subcontractor claim/evidence submission,

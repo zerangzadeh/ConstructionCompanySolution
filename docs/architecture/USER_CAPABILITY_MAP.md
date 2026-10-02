@@ -82,7 +82,7 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 | Executive/Portfolio Manager | Projects, delivered financial read views, workbench and operational records as permitted | Portfolio cost/cash/forecast/KPI, risk/change, governed management queries | KPI drill-through, project scope, no unrestricted SQL/AI |
 | Project Manager | Project/site/WBS/activity, contracts, estimates, daily/operational records, assigned workflow | Budget/commitment/forecast, schedule/risk/change, claims/payables and reconciliations | Project/site scope and configured approval limits |
 | Commercial/Quantity Surveyor | Contracts/amendments, estimate revisions, baselines/progress/receivable claims | BOQ/resource/coefficient/scenario, subcontract certificates, variations, guarantees | Contract term/rule versions, claim SoD and source evidence |
-| Procurement/Buyer | Requests, orders, receipts and procurement work items | RFQ, quotes/comparison/award, supplier invoice/match and portal collaboration | Bid confidentiality, sourcing SoD, project/cost coding |
+| Procurement/Buyer | Requests, orders, receipts, procurement work items and scoped immutable supplier-invoice match review | RFQ, broader supplier invoice operations and portal collaboration | Bid confidentiality, sourcing SoD, project/cost coding; review grants no force-match or discrepancy override |
 | Storekeeper | Warehouses, draft/post/reverse stock movements and balances | Reservations, barcode/QR, traceability, counts, transfer acceptance and valuation evidence | Warehouse/project scope, posting/reversal controls |
 | Equipment Manager | Equipment, assignments and maintenance | Usage/meter/fuel/operator, plans/cost allocation and asset link | Project/site scope; operational equipment is not the asset ledger |
 | Workforce/HR | Employees, departments, positions, teams and effective assignments | Skills/certificates/training/performance, attendance/leave and labor rates | Personal/compensation privacy and effective dates |
@@ -102,7 +102,7 @@ scheduled roadmap scope; **Controlled** means sensitive or separation-dependent.
 
 | Participant | Scheduled capability | Access model |
 | --- | --- | --- |
-| Supplier | Invited qualification documents, RFQ/quote and invoice/evidence submission, status/correction | Private tenant invitation; least privilege; no competitor/internal-note visibility |
+| Supplier | Invite-scoped issued-RFQ read and versioned quote submission/correction are implemented; qualification, invoice/evidence submission and broader status remain scheduled | Private Tenant invitation bound to one unambiguous active account/email and no internal membership; least privilege; no competitor/internal-note visibility |
 | Subcontractor | Profile/qualification, tender/quote, claim/progress/evidence submission and status | Bilateral portal; contract/project-limited; no ordinary tenant membership by default |
 | Consultant/Client reviewer | Selected transmittal/RFI/submittal/drawing/claim review when approved | Explicit record/workflow assignment and expiring external scope |
 | Employee self-service | Optional payslip, personal profile/certificate/leave/time interactions | Product Owner decision; employee-to-user link, privacy and dedicated permission |

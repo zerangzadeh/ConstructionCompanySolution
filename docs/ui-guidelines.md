@@ -168,6 +168,24 @@ financial projection `گزارش مالی پروژه‌ها`. These labels do no
 retire Payment, or turn project reports into Accounting statements. Existing
 permission checks and routes apply identically on desktop and mobile.
 
+### Supplier portal and invoice-match review
+
+The bounded supplier portal always displays the exact supplier, organization,
+project and RFQ context without peer-bid or internal-note content. Submission retry
+keys are hidden implementation controls; the visible immutable receipt uses its
+receipt identifier. Portal acceptance, RFQ context, submission and receipt
+responses are private/non-cacheable. Correction is described as a new superseding
+submission; withdrawal, support impersonation and account provisioning are not
+offered.
+
+Supplier-invoice match review is Persian-first RTL and read-only. It shows the
+invoice and match versions, supplier/project context, governing tolerance-policy
+version, source fingerprint, ordered/accepted/previously invoiced/current
+quantities, prices, outcome and discrepancy labels. Blocked or incomplete evidence
+must direct the user to correct the owned source and run a later match version; the
+UI must not offer force-match, material discrepancy override or any downstream
+financial/inventory action.
+
 ---
 
 ## 5. UTF-8 and Persian Text Integrity

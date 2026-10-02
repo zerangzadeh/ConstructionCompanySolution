@@ -12,6 +12,8 @@ from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
+    MembershipRole,
+    MembershipStatus,
 )
 from apps.procurement.models import (
     QuoteRevisionStatus,
@@ -119,6 +121,38 @@ class SupplierPortalFoundationTests(SupplierPortalFixtureMixin, TestCase):
                 invited_email=self.external.email,
                 expires_at=timezone.now() + timedelta(hours=1),
             )
+
+    def test_ambiguous_email_and_internal_membership_fail_closed(self):
+        self._grant_internal_management()
+        rfq_invitation = self._issued_invitation()
+        _, token = create_supplier_portal_invitation(
+            organization=self.organization,
+            actor=self.owner,
+            rfq_invitation=rfq_invitation,
+            invited_email=self.external.email,
+            expires_at=timezone.now() + timedelta(days=1),
+        )
+        User.objects.create_user(
+            username="same-email-impostor", email=self.external.email.upper()
+        )
+        with self.assertRaises(PermissionDenied):
+            accept_supplier_portal_invitation(actor=self.external, token=token)
+
+        User.objects.filter(username="same-email-impostor").update(is_active=False)
+        self.organization.memberships.create(
+            user=self.external,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        with self.assertRaises(PermissionDenied):
+            accept_supplier_portal_invitation(actor=self.external, token=token)
+
+    def test_accepted_identity_is_denied_after_email_rebind(self):
+        _, _, grant = self._accepted_grant()
+        self.external.email = "changed@example.test"
+        self.external.save(update_fields=["email"])
+        with self.assertRaises(PermissionDenied):
+            get_supplier_portal_rfq_context(actor=self.external, grant=grant)
 
     def test_submission_reuses_quote_revision_and_is_idempotent(self):
         _, _, grant = self._accepted_grant()

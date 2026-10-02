@@ -17,14 +17,17 @@ P5-S12–S17 were subsequently authorized as one bounded implementation batch,
 implemented and PostgreSQL-verified as recorded in section 14, and Product Owner
 accepted on 2026-10-02. P5-S18–S22 were subsequently authorized as one bounded
 portal-foundation batch, implemented and PostgreSQL-verified; Product Owner
-acceptance is complete. P5-S23–S25 are authorized as one bounded UI batch;
-P5-S26+ remains unauthorized.
+acceptance is complete. P5-S23–S25 are accepted as one bounded UI batch.
+P5-S26–S27 are subsequently authorized, implemented, PostgreSQL-verified and
+Product Owner accepted under section 16. P5-S01–S27 is the current accepted
+baseline; P5-S28+ remains unauthorized.
 
 **Authority:** The Product Owner authorized P5-S01–S04 as one documentation-only
-planning-and-design tranche on 2026-10-01. This packet is the authoritative result.
-It creates no runtime feature, model, migration, permission, portal access,
-financial posting, inventory receipt, supplier invoice, producer registration or
-production activation. P5.2 remains deferred.
+planning-and-design tranche on 2026-10-01. This packet is the authoritative result
+and also records later separately authorized tranches. The original S01–S04 work
+created no runtime feature. The bounded P5.2 foundation/UI/privacy controls are now
+implemented under sections 15–16; broader portal collaboration, financial posting,
+inventory effects, producer registration and production activation remain deferred.
 
 ## 1. Four-session disposition and boundary
 
@@ -1038,9 +1041,9 @@ its separate accepted contract; P5-S11 is subsequently implemented,
 PostgreSQL-verified and Product Owner accepted under its separate packet. P5-S12–S17
 are subsequently implemented and verified under section 14. P5-S18–S22 are
 subsequently implemented under section 15. P5-S23–S25 are subsequently implemented
-as bounded UI adapters under section 15; P5-S26+,
-production activation and downstream financial/stock/cost/cash handoffs remain
-unauthorized.
+as bounded UI adapters under section 15. P5-S26–S27 are subsequently implemented
+under section 16; P5-S28, production activation and downstream financial/stock/
+cost/cash handoffs remain unauthorized.
 
 ## 14. P5-S12–S17 internal source-to-pay implementation record
 
@@ -1086,7 +1089,8 @@ recorded in section 15.
 only the listed HTTP/template adapters and are Product Owner accepted as
 PostgreSQL-verified on 2026-10-02. Five focused UI tests, seven retained P5-S18–S22 tests, six
 bounded P5-S12–S17 regressions and one retained sealed-content-denial test passed
-on one clean disposable database. No migration is introduced. P5-S26+ is not
+on one clean disposable database. No migration is introduced. The separately
+authorized P5-S26–S27 disposition is recorded in section 16; P5-S28 is not
 authorized.
 
 | Session | Implemented boundary |
@@ -1115,6 +1119,34 @@ production activation are not included. No payable, GL, Project
 Cost, Inventory, Treasury/cash or contract-value mutation is introduced. Existing
 tax/charge, supplier-invoice self-approval and material discrepancy gates remain
 fail-closed.
+
+## 16. P5-S26–S27 privacy, identity, retry and match-review acceptance contract
+
+**Authorization boundary:** P5-S26–S27 only. P5-S28, account provisioning,
+outbound communications, MFA/support bypass, generic Documents access, payable,
+GL, Inventory, Project Cost, Treasury effects, force-match and material
+discrepancy override are not authorized.
+
+| Session | Exact acceptance wording |
+| --- | --- |
+| P5-S26 | An external portal action must remain bound to one active pre-existing account, the exact normalized invited email, one Tenant-local supplier and one issued RFQ version. Ambiguous active email ownership, later email rebinding, an active internal Tenant membership, another user, Tenant, supplier, RFQ or version fails closed. Portal responses remain private/non-cacheable and reveal no peer bid, internal note, generic Document or sealed evidence. An identical browser retry reuses one opaque stable idempotency key and immutable receipt; different content on that key is denied, while an intentional correction creates the existing superseding quote revision. |
+| P5-S27 | A holder of `invoice_matches.view` may review only Tenant- and current project-scope immutable match runs, line calculations, policy/version lineage and discrepancy classifications in Persian RTL. The review is read-only: it creates no disposition, approval, force-match, material override, payable, journal, stock/Inventory, Project Cost, Treasury/cash or payment fact. Missing permission/scope/evidence returns no object and existing fail-closed match outcomes remain authoritative. |
+
+Implementation reuses the accepted S18–S25 portal services and S12–S17 match
+evidence. No new lifecycle, permission code, default-role grant, model or migration
+was required. `supplier_invoices` and `invoice_matches` are explicitly recognized
+as object-scoped authorization namespaces so HTTP prechecks and service querysets
+apply the same project-scope rule.
+
+Verification used the single clean disposable PostgreSQL database
+`test_p5_s26_s27_accept_20261002_01`. The scoped evidence is 19 green cases:
+9 retained P5-S18–S22, 5 retained P5-S23–S25, 2 focused match-review and 3 minimum
+P5-S12–S17 match regressions. Eighteen passed in the corrected combined run and
+the one corrected no-permission fixture passed on focused rerun. Test-schema
+migration apply/disposal, Django checks and focused Ruff pass; no migration was
+introduced. The Product Owner accepted P5-S26–S27 as implemented and
+PostgreSQL-verified on 2026-10-02. P5-S01–S27 is the current accepted baseline;
+P5-S28+ remains unauthorized.
 
 Verification used one reusable disposable PostgreSQL database. Seven focused tests
 passed, covering default-ungranted management, token hashing, identity/email binding,

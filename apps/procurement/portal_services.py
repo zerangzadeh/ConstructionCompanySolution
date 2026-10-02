@@ -16,7 +16,12 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission
-from apps.organizations.models import BusinessPermissionCode, Organization
+from apps.organizations.models import (
+    BusinessPermissionCode,
+    MembershipStatus,
+    Organization,
+    OrganizationMembership,
+)
 from apps.procurement.models import (
     QuoteEnvelope,
     QuoteRevision,
@@ -69,6 +74,33 @@ def _validate_open_rfq_invitation(invitation: RequestForQuotationInvitation) -> 
         }
     ):
         raise ValueError("فقط دعوت‌نامه فعال نسخه مؤثر استعلام باز قابل استفاده است.")
+
+
+def _validate_portal_actor_identity(
+    *, invitation: SupplierPortalInvitation, actor: User
+) -> None:
+    if not actor.is_authenticated or not actor.is_active:
+        raise PermissionDenied("حساب کاربری فعال الزامی است.")
+    if actor.email.strip().lower() != invitation.invited_email:
+        raise PermissionDenied("هویت یا زمان دعوت‌نامه معتبر نیست.")
+    matching_accounts = list(
+        User.objects.filter(
+            email__iexact=invitation.invited_email,
+            is_active=True,
+        ).values_list("pk", flat=True)[:2]
+    )
+    if matching_accounts != [actor.pk]:
+        raise PermissionDenied(
+            "ایمیل دعوت‌شده باید فقط به همین حساب کاربری فعال تعلق داشته باشد."
+        )
+    if OrganizationMembership.objects.filter(
+        organization=invitation.organization,
+        user=actor,
+        status=MembershipStatus.ACTIVE,
+    ).exists():
+        raise PermissionDenied(
+            "هویت داخلی سازمان نمی‌تواند به‌جای هویت تأمین‌کننده وارد درگاه شود."
+        )
 
 
 @transaction.atomic
@@ -155,6 +187,7 @@ def accept_supplier_portal_invitation(
         )
     except SupplierPortalInvitation.DoesNotExist as exc:
         raise PermissionDenied("دعوت‌نامه معتبر نیست.") from exc
+    _validate_portal_actor_identity(invitation=invitation, actor=actor)
     if invitation.status == SupplierPortalInvitationStatus.ACCEPTED:
         if invitation.accepted_principal.user_id != actor.pk:
             raise PermissionDenied("دعوت‌نامه قبلاً به هویت دیگری متصل شده است.")
@@ -167,7 +200,6 @@ def accept_supplier_portal_invitation(
     if (
         not invitation.organization.is_active
         or now >= invitation.expires_at
-        or actor.email.strip().lower() != invitation.invited_email
     ):
         raise PermissionDenied("هویت یا زمان دعوت‌نامه معتبر نیست.")
     _validate_open_rfq_invitation(invitation.rfq_invitation)
@@ -226,6 +258,7 @@ def _locked_active_grant(
         )
     except SupplierPortalGrant.DoesNotExist as exc:
         raise PermissionDenied("مجوز درگاه معتبر نیست.") from exc
+    _validate_portal_actor_identity(invitation=locked.portal_invitation, actor=actor)
     if (
         not actor.is_authenticated
         or not actor.is_active

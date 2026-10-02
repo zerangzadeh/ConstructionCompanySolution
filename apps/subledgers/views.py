@@ -22,6 +22,7 @@ from apps.subledgers.models import (
     ObligationDirection,
     SettlementAllocation,
     SubledgerReconciliationRun,
+    SupplierInvoiceMatch,
     WriteOffProposal,
 )
 from apps.subledgers.services import (
@@ -32,6 +33,7 @@ from apps.subledgers.services import (
     review_subledger_reconciliation,
     run_aging,
     run_subledger_reconciliation,
+    supplier_invoice_match_queryset,
 )
 from apps.treasury.models import (
     TreasuryMovement,
@@ -104,6 +106,43 @@ def workbench(request: HttpRequest) -> HttpResponse:
                 organization=request.organization,
                 permission=BusinessPermissionCode.SUBLEDGERS_RECONCILIATIONS_REVIEW,
             ),
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.INVOICE_MATCHES_VIEW)
+@require_GET
+def supplier_invoice_match_review(
+    request: HttpRequest, match_id=None
+) -> HttpResponse:
+    """Read immutable match evidence; this endpoint has no override or mutation path."""
+
+    matches = supplier_invoice_match_queryset(
+        organization=request.organization,
+        actor=request.user,
+    ).select_related(
+        "invoice_version__invoice__supplier",
+        "invoice_version__invoice__project",
+        "tolerance_policy",
+        "matched_by",
+        "supersedes",
+    )
+    selected: SupplierInvoiceMatch | None = None
+    if match_id is not None:
+        selected = get_object_or_404(
+            matches.prefetch_related(
+                "lines__invoice_line",
+                "lines__discrepancies",
+            ),
+            pk=match_id,
+        )
+    return render(
+        request,
+        "subledgers/supplier_invoice_match_review.html",
+        {
+            "matches": matches.order_by("-matched_at")[:75],
+            "selected_match": selected,
         },
     )
 

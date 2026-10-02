@@ -1,8 +1,11 @@
+from uuid import uuid4
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.organizations.authorization import require_business_permission
@@ -141,6 +144,7 @@ def _portal_invitation_for_management(
 
 
 @login_required
+@never_cache
 @require_http_methods(["GET", "POST"])
 def supplier_portal_accept(request: HttpRequest) -> HttpResponse:
     """Accept only an existing token-bound invitation; no account provisioning."""
@@ -156,6 +160,7 @@ def supplier_portal_accept(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+@never_cache
 @require_GET
 def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse:
     grant = _portal_grant(grant_id)
@@ -169,12 +174,15 @@ def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse
         {
             "portal": context,
             "grant": grant,
-            "submission_form": SupplierPortalSubmissionForm(),
+            "submission_form": SupplierPortalSubmissionForm(
+                initial={"idempotency_key": str(uuid4())}
+            ),
         },
     )
 
 
 @login_required
+@never_cache
 @require_POST
 def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
     grant = _portal_grant(grant_id)
@@ -201,6 +209,7 @@ def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
 
 
 @login_required
+@never_cache
 @require_GET
 def supplier_portal_receipt(request: HttpRequest, receipt_id: str) -> HttpResponse:
     try:

@@ -238,7 +238,10 @@ class SupplierPortalSubmissionForm(_StyledForm):
     source_reference = forms.CharField(
         label="مرجع تأمین‌کننده", required=False, max_length=255
     )
-    idempotency_key = forms.CharField(label="کلید یکتای ارسال", max_length=128)
+    idempotency_key = forms.CharField(
+        max_length=128,
+        widget=forms.HiddenInput(),
+    )
 
     def clean_integrity_fingerprint(self):
         value = self.cleaned_data["integrity_fingerprint"].strip().lower()

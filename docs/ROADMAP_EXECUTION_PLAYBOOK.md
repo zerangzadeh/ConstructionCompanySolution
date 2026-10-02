@@ -1019,7 +1019,7 @@ decision acceptance alone does not authorize it.
 | P5-S12..S17 | 6 | `A-H` | PO change, service acceptance, supplier invoice and match/tolerance |
 | P5-S18..S22 | 5 | `A-H` | External portal identity, invitation, submission and least-privilege boundary |
 | P5-S23..S25 | 3 | `T-M` | Internal/external UI journeys, correction loops and evidence handling |
-| P5-S26..S27 | 2 | `A-X` | Bid privacy, impersonation, duplicate submission and match reconciliation review |
+| P5-S26..S27 | 2 | `A-X` | Product Owner accepted and PostgreSQL-verified bid privacy, portal identity/impersonation and duplicate-retry hardening plus permissioned read-only match reconciliation review |
 | P5-S28 | 1 | `L-M` | Documentation closeout and P6 handoff packet |
 
 **Product Owner gates:** P5-D01–P5-D08 are accepted with clarification. P5-S05–S08
@@ -1029,8 +1029,11 @@ accepted consolidated
 P5-S10 is separately authorized, implemented and PostgreSQL-verified in the
 current roadmap state; P5-S11 is subsequently implemented, PostgreSQL-verified
 and Product Owner accepted. P5-S12–S17 were then authorized as one bounded batch,
-implemented, PostgreSQL-verified and Product Owner accepted on 2026-10-02. The
-authoritative status is **P5-S01–S17 COMPLETE / ACCEPTED; P5-S18+ UNAUTHORIZED**.
+implemented, PostgreSQL-verified and Product Owner accepted on 2026-10-02.
+P5-S18–S25 were subsequently accepted. P5-S26–S27 are Product Owner accepted as
+implemented and PostgreSQL-verified under the bounded contract in the authoritative
+packet. The authoritative status is **P5-S01–S27 COMPLETE / ACCEPTED; P5-S28+
+UNAUTHORIZED**.
 
 **Current P5 disposition (2026-10-02):** P5-S01–S04 are complete as planning and
 design, and the separately authorized P5-S05–S09 runtime slices are complete; see the
@@ -1060,7 +1063,17 @@ versions, version-pinned receipt/service acceptance, AP-owned supplier-invoice
 versions, independently approved effective-dated tolerance policy, and immutable
 match/discrepancy evidence. They activate no payable, posting, cost, stock, cash,
 portal or production handoff. The Product Owner accepted this verified boundary on
-2026-10-02; P5-S18+ remains unauthorized.
+2026-10-02. P5-S18–S22 subsequently implement only the invite-scoped external
+portal foundation: expiring token-hash invitations, authenticated existing-user
+acceptance without Tenant membership, immutable invitation-specific capability
+grants/revocation, minimal issued-RFQ context and idempotent submissions reusing
+the sealed `QuoteRevision` lifecycle. P5-S23–S25 add the accepted bounded UI and
+custody intake. P5-S26–S27 subsequently harden exact external identity and opaque
+browser retry semantics and add permissioned read-only match review. Nineteen
+scoped PostgreSQL cases are green with full test-schema migration apply/disposal;
+no migration was added. The Product Owner accepted P5-S26–S27 as implemented and
+PostgreSQL-verified; P5-S01–S27 is the current accepted baseline and P5-S28+
+remains unauthorized.
 
 ## 12. P6 session map — 42 sessions
 
