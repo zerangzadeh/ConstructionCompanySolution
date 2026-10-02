@@ -661,6 +661,18 @@ class AuditAction(models.TextChoices):
     PURCHASE_ORDER_ISSUED = "purchase_order.issued", "سفارش خرید صادر شد"
     PURCHASE_ORDER_COMPLETED = "purchase_order.completed", "سفارش خرید تکمیل شد"
     PURCHASE_ORDER_CANCELLED = "purchase_order.cancelled", "سفارش خرید لغو شد"
+    PURCHASE_ORDER_CREATED_FROM_AWARD = (
+        "purchase_order.created_from_award",
+        "سفارش خرید از انتخاب منبع ایجاد شد",
+    )
+    PURCHASE_ORDER_CHANGE_REQUESTED = (
+        "purchase_order.change_requested",
+        "تغییر سفارش خرید درخواست شد",
+    )
+    PURCHASE_ORDER_CHANGE_DECIDED = (
+        "purchase_order.change_decided",
+        "تغییر سفارش خرید تعیین تکلیف شد",
+    )
     RFQ_CREATED = "rfq.created", "استعلام خرید ایجاد شد"
     RFQ_LINE_ADDED = "rfq.line_added", "ردیف استعلام خرید افزوده شد"
     RFQ_SUBMITTED = "rfq.submitted", "استعلام خرید برای صدور ارسال شد"
@@ -765,6 +777,22 @@ class AuditAction(models.TextChoices):
     GOODS_RECEIPT_ITEM_ADDED = "goods_receipt.item_added", "ردیف رسید کالا افزوده شد"
     GOODS_RECEIPT_POSTED = "goods_receipt.posted", "رسید کالا ثبت شد"
     GOODS_RECEIPT_VOIDED = "goods_receipt.voided", "رسید کالا باطل شد"
+    SERVICE_ACCEPTANCE_ACCEPTED = (
+        "service_acceptance.accepted",
+        "پذیرش خدمت نهایی شد",
+    )
+    SUPPLIER_INVOICE_PREPARED = (
+        "supplier_invoice.prepared",
+        "صورتحساب تأمین‌کننده آماده شد",
+    )
+    SUPPLIER_INVOICE_DECIDED = (
+        "supplier_invoice.decided",
+        "صورتحساب تأمین‌کننده تعیین تکلیف شد",
+    )
+    SUPPLIER_INVOICE_MATCH_RETAINED = (
+        "supplier_invoice.match_retained",
+        "شاهد تطبیق صورتحساب نگهداری شد",
+    )
     WAREHOUSE_CREATED = "warehouse.created", "انبار ایجاد شد"
     WAREHOUSE_ARCHIVED = "warehouse.archived", "انبار بایگانی شد"
     STOCK_TRANSACTION_CREATED = (

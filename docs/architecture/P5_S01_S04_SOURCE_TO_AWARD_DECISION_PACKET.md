@@ -13,6 +13,10 @@ Owner accepted under the separately accepted
 implemented, PostgreSQL-verified and Product Owner accepted under its
 [P5-S11 decision packet](P5_S11_PRODUCT_OWNER_DECISION_PACKET.md); its scoped
 award self-finalization supersession of P5-D01 is recorded in section 8.
+P5-S12–S17 were subsequently authorized as one bounded implementation batch,
+implemented and PostgreSQL-verified as recorded in section 14, and Product Owner
+accepted on 2026-10-02. P5-S01–S17 are complete/accepted; P5-S18+ remains
+unauthorized.
 
 **Authority:** The Product Owner authorized P5-S01–S04 as one documentation-only
 planning-and-design tranche on 2026-10-01. This packet is the authoritative result.
@@ -1029,8 +1033,46 @@ atomic audit rollback. P5-S05–S08 regression, migration rollback/reapply, migr
 drift, Django check and Ruff pass. This is pre-production application acceptance,
 not production readiness or activation. P5-S10 is subsequently implemented under
 its separate accepted contract; P5-S11 is subsequently implemented,
-PostgreSQL-verified and Product Owner accepted under its separate packet. P5.2 and
-later work remain unauthorized.
+PostgreSQL-verified and Product Owner accepted under its separate packet. P5-S12–S17
+are subsequently implemented and verified under section 14. P5-S18+, P5.2,
+production activation and downstream financial/stock/cost/cash handoffs remain
+unauthorized.
+
+## 14. P5-S12–S17 internal source-to-pay implementation record
+
+**Acceptance:** Product Owner accepted P5-S12–S17 as implemented and
+PostgreSQL-verified on 2026-10-02. The authoritative state is **P5-S01–S17
+COMPLETE / ACCEPTED; P5-S18+ UNAUTHORIZED**.
+
+| Session | Implemented boundary |
+| --- | --- |
+| P5-S12 | Explicit award-allocation consumption into a supplier-specific draft PO; issue freezes immutable version/line evidence and legacy issued orders receive an expand-only version snapshot. |
+| P5-S13 | Independently requested/approved append-only PO changes create a superseding governing version; accepted quantities and S11 allocations cannot be exceeded or rewritten. |
+| P5-S14 | Goods receipts pin the governing PO version; service acceptance has draft/accepted/void history, exact version-line scope and cumulative quantity conservation. It creates no stock fact. |
+| P5-S15 | AP/Finance-owned supplier-invoice identity, immutable version/line assertions, duplicate/idempotency controls, independent approval and explicit correction lineage. It creates no obligation or journal. |
+| P5-S16 | Tenant-scoped, effective-dated quantity and unit-price tolerance versions require separate preparation/approval; there is no platform default threshold and missing/overlapping policy fails closed. |
+| P5-S17 | Immutable two/three-way and cumulative-coverage match evidence classifies exact, within-tolerance, blocked and incomplete outcomes with discrepancy evidence. No force-match or financial release exists. |
+
+All S01–S11 custody, confidentiality, admissibility, comparison, conflict,
+exception, tie/no-award, allocation and sourcing-only boundaries remain unchanged.
+The S11 award never auto-creates a PO. PO creation is an explicit permissioned
+command, and unsupported lot-to-PO mapping fails closed. Supplier invoices and
+matching remain AP/Finance-owned evidence; Procurement owns only PO/change and
+receipt/service-acceptance sources. Only IRR is active.
+
+Exact tax/freight/other-charge matching policy, invoice self-approval policy,
+material discrepancy exception catalogue/approval, payable recognition, GL,
+Project Cost, Inventory, Treasury, external integrations, UI/portal and production
+activation were not authorized. Non-zero unsupported charges therefore produce an
+`INCOMPLETE` blocking result; no ordinary actor can override it.
+
+Verification used one reusable disposable PostgreSQL database. Migration apply,
+rollback to Procurement 0013/Subledgers 0002/Organizations 0081, and reapply passed.
+Six focused P5-S12–S17 tests passed, followed by 40 retained Procurement and
+P5-S09–S11 regressions plus 9 subtests. Two nullable-outer-join lock selections,
+one variance-evidence scale defect and one exact source-price representation defect
+were corrected and rerun. Django checks, migration drift and Ruff checks pass. The
+runtime is service/model available only; P5-S23–S25 UI remains outside this batch.
 
 ### Proposed separate P5-S05 authorization text — not granted
 

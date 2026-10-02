@@ -5,12 +5,13 @@ import json
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from datetime import date
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
+from django.db import models, transaction
 from django.db.models import Sum
+from django.utils import timezone
 
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
@@ -23,12 +24,23 @@ from apps.organizations.models import (
 )
 from apps.subledgers.models import (
     AgingRun,
+    InvoiceMatchStatus,
+    MatchDiscrepancy,
+    MatchDiscrepancyCode,
+    MatchTolerancePolicy,
     Obligation,
     ObligationDirection,
     SettlementAllocation,
     SettlementReversal,
     SubledgerReconciliationReview,
     SubledgerReconciliationRun,
+    SupplierInvoice,
+    SupplierInvoiceLine,
+    SupplierInvoiceLineKind,
+    SupplierInvoiceMatch,
+    SupplierInvoiceMatchLine,
+    SupplierInvoiceStatus,
+    SupplierInvoiceVersion,
     WriteOffDecisionKind,
     WriteOffProposal,
 )
@@ -872,9 +884,7 @@ def review_subledger_reconciliation(
 def verify_subledger_reconciliation_review(
     *, organization: Organization, run: SubledgerReconciliationRun
 ) -> SubledgerReconciliationReview:
-    run = SubledgerReconciliationRun.objects.get(
-        pk=run.pk, organization=organization
-    )
+    run = SubledgerReconciliationRun.objects.get(pk=run.pk, organization=organization)
     try:
         review = run.review
     except SubledgerReconciliationReview.DoesNotExist as exc:
@@ -885,3 +895,605 @@ def verify_subledger_reconciliation_review(
     ):
         raise ValidationError("بررسی مستقل با شواهد نگهداری‌شده سازگار نیست.")
     return review
+
+
+def _invoice_payload_hash(payload: object) -> str:
+    return _canonical_hash(payload)
+
+
+def supplier_invoice_queryset(*, organization: Organization, actor):
+    membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SUPPLIER_INVOICES_VIEW,
+        message="اختیار مشاهده صورتحساب تأمین‌کننده را ندارید.",
+        allow_any_scope=True,
+    )
+    from apps.organizations.authorization import scope_queryset
+
+    return scope_queryset(
+        SupplierInvoice.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="project_id",
+    )
+
+
+def supplier_invoice_match_queryset(*, organization: Organization, actor):
+    membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.INVOICE_MATCHES_VIEW,
+        message="اختیار مشاهده تطبیق صورتحساب را ندارید.",
+        allow_any_scope=True,
+    )
+    from apps.organizations.authorization import scope_queryset
+
+    return scope_queryset(
+        SupplierInvoiceMatch.objects.filter(organization=organization),
+        membership=membership,
+        project_lookup="invoice_version__invoice__project_id",
+    )
+
+
+@transaction.atomic
+def prepare_supplier_invoice(
+    *,
+    organization: Organization,
+    actor,
+    supplier,
+    project,
+    invoice_number: str,
+    invoice_date: date,
+    due_date: date | None,
+    lines: list[dict[str, object]],
+    idempotency_key: str,
+    supersedes: SupplierInvoiceVersion | None = None,
+) -> SupplierInvoiceVersion:
+    """Retain AP-owned asserted invoice evidence without creating a payable."""
+
+    organization = _lock_organization(organization)
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SUPPLIER_INVOICES_PREPARE,
+        message="اختیار آماده‌سازی صورتحساب تأمین‌کننده را ندارید.",
+        project=project,
+    )
+    if (
+        supplier.organization_id != organization.pk
+        or project.organization_id != organization.pk
+    ):
+        raise PermissionDenied("تأمین‌کننده و پروژه باید متعلق به همین Tenant باشند.")
+    number = invoice_number.strip().upper()
+    key = idempotency_key.strip()
+    if not number or not key or not lines:
+        raise ValidationError("شماره، ردیف و کلید idempotency صورتحساب الزامی است.")
+    invoice, _ = SupplierInvoice.objects.get_or_create(
+        organization=organization,
+        supplier=supplier,
+        invoice_number=number,
+        defaults={"project": project, "created_by": actor},
+    )
+    if invoice.project_id != project.pk:
+        raise ValidationError("هویت صورتحساب قبلاً برای پروژه دیگری ثبت شده است.")
+    locked_invoice = SupplierInvoice.objects.select_for_update().get(pk=invoice.pk)
+    normalized_lines = []
+    for position, raw in enumerate(lines, start=1):
+        po_line = raw["purchase_order_version_line"]
+        quantity = Decimal(raw["quantity"])
+        unit_price = Decimal(raw["unit_price"])
+        kind = str(raw["kind"])
+        if kind not in SupplierInvoiceLineKind.values:
+            raise ValidationError("نوع ردیف صورتحساب معتبر نیست.")
+        if (
+            po_line.organization_id != organization.pk
+            or po_line.version.purchase_order.supplier_id != supplier.pk
+            or po_line.version.purchase_order.project_id != project.pk
+        ):
+            raise PermissionDenied("ردیف سفارش با صورتحساب هم‌دامنه نیست.")
+        normalized_lines.append(
+            {
+                "line_number": int(raw.get("line_number", position)),
+                "kind": kind,
+                "purchase_order_version_line": str(po_line.pk),
+                "description": str(raw.get("description", po_line.description)).strip(),
+                "quantity": str(quantity),
+                "unit_price": str(unit_price),
+                "tax_amount": str(Decimal(raw.get("tax_amount", 0))),
+                "freight_amount": str(Decimal(raw.get("freight_amount", 0))),
+                "other_charge_amount": str(Decimal(raw.get("other_charge_amount", 0))),
+            }
+        )
+    payload = {
+        "invoice": str(locked_invoice.pk),
+        "invoice_date": str(invoice_date),
+        "due_date": str(due_date or ""),
+        "currency": "IRR",
+        "supersedes": str(supersedes.pk) if supersedes else "",
+        "lines": normalized_lines,
+    }
+    fingerprint = _invoice_payload_hash(payload)
+    existing = SupplierInvoiceVersion.objects.filter(
+        organization=organization, idempotency_key=key
+    ).first()
+    if existing:
+        if existing.source_hash != fingerprint:
+            raise ValidationError(
+                "کلید idempotency صورتحساب با محتوای متفاوت استفاده شده است."
+            )
+        return existing
+    latest = locked_invoice.versions.order_by("-version_number").first()
+    if supersedes:
+        supersedes = SupplierInvoiceVersion.objects.select_for_update().get(
+            pk=supersedes.pk, invoice=locked_invoice, organization=organization
+        )
+        if latest and latest.pk != supersedes.pk:
+            raise ValidationError("اصلاح باید آخرین نسخه صورتحساب را جانشین کند.")
+    elif latest:
+        raise ValidationError("صورتحساب موجود فقط با اصلاح جانشین قابل نسخه‌گذاری است.")
+    version = SupplierInvoiceVersion.objects.create(
+        organization=organization,
+        invoice=locked_invoice,
+        version_number=(supersedes.version_number + 1 if supersedes else 1),
+        supersedes=supersedes,
+        invoice_date=invoice_date,
+        due_date=due_date,
+        currency="IRR",
+        source_hash=fingerprint,
+        idempotency_key=key,
+        prepared_by=actor,
+    )
+    from apps.procurement.models import PurchaseOrderVersionLine
+
+    po_lines = {
+        str(item.pk): item
+        for item in PurchaseOrderVersionLine.objects.select_for_update()
+        .select_related("version__purchase_order")
+        .filter(pk__in=[row["purchase_order_version_line"] for row in normalized_lines])
+    }
+    if len(po_lines) != len(
+        {row["purchase_order_version_line"] for row in normalized_lines}
+    ):
+        raise PermissionDenied("یک یا چند ردیف سفارش معتبر نیست.")
+    for row in normalized_lines:
+        SupplierInvoiceLine.objects.create(
+            organization=organization,
+            invoice_version=version,
+            line_number=row["line_number"],
+            kind=row["kind"],
+            purchase_order_version_line=po_lines[row["purchase_order_version_line"]],
+            description=row["description"],
+            quantity=Decimal(row["quantity"]),
+            unit_price=Decimal(row["unit_price"]),
+            tax_amount=Decimal(row["tax_amount"]),
+            freight_amount=Decimal(row["freight_amount"]),
+            other_charge_amount=Decimal(row["other_charge_amount"]),
+        )
+    record_audit_event(
+        action="supplier_invoice.prepared",
+        entity_type="subledgers.SupplierInvoiceVersion",
+        entity_id=version.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "invoice_id": str(locked_invoice.pk),
+            "version": version.version_number,
+        },
+    )
+    return version
+
+
+@transaction.atomic
+def submit_supplier_invoice(
+    *, organization: Organization, actor, invoice_version: SupplierInvoiceVersion
+) -> SupplierInvoiceVersion:
+    version = (
+        SupplierInvoiceVersion.objects.select_for_update()
+        .select_related("invoice__project")
+        .get(pk=invoice_version.pk, organization=organization)
+    )
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SUPPLIER_INVOICES_PREPARE,
+        message="اختیار ارسال صورتحساب تأمین‌کننده را ندارید.",
+        project=version.invoice.project,
+    )
+    if version.prepared_by_id != actor.pk:
+        raise PermissionDenied("فقط آماده‌کننده می‌تواند نسخه پیش‌نویس را ارسال کند.")
+    if version.status != SupplierInvoiceStatus.DRAFT or not version.lines.exists():
+        raise ValidationError("فقط نسخه پیش‌نویس دارای ردیف قابل ارسال است.")
+    version.status = SupplierInvoiceStatus.SUBMITTED
+    version.submitted_at = timezone.now()
+    version.save(update_fields=["status", "submitted_at"])
+    return version
+
+
+@transaction.atomic
+def decide_supplier_invoice(
+    *,
+    organization: Organization,
+    actor,
+    invoice_version: SupplierInvoiceVersion,
+    approve: bool,
+    reason: str,
+) -> SupplierInvoiceVersion:
+    version = (
+        SupplierInvoiceVersion.objects.select_for_update()
+        .select_related("invoice__project")
+        .get(pk=invoice_version.pk, organization=organization)
+    )
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.SUPPLIER_INVOICES_APPROVE,
+        message="اختیار تعیین تکلیف صورتحساب تأمین‌کننده را ندارید.",
+        project=version.invoice.project,
+    )
+    if version.status != SupplierInvoiceStatus.SUBMITTED:
+        if version.status in {
+            SupplierInvoiceStatus.APPROVED,
+            SupplierInvoiceStatus.REJECTED,
+        }:
+            return version
+        raise ValidationError("فقط صورتحساب ارسال‌شده قابل تعیین تکلیف است.")
+    if version.prepared_by_id == actor.pk:
+        raise PermissionDenied(
+            "خودتأییدی صورتحساب تا تصمیم سیاستی جداگانه fail-closed است."
+        )
+    if not reason.strip():
+        raise ValidationError("دلیل تصمیم صورتحساب الزامی است.")
+    version.status = (
+        SupplierInvoiceStatus.APPROVED if approve else SupplierInvoiceStatus.REJECTED
+    )
+    version.approved_by = actor
+    version.approved_at = timezone.now()
+    version.decision_reason = reason.strip()
+    version.save(
+        update_fields=["status", "approved_by", "approved_at", "decision_reason"]
+    )
+    record_audit_event(
+        action="supplier_invoice.decided",
+        entity_type="subledgers.SupplierInvoiceVersion",
+        entity_id=version.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"approved": approve},
+    )
+    return version
+
+
+@transaction.atomic
+def prepare_match_tolerance_policy(
+    *,
+    organization: Organization,
+    actor,
+    effective_from: date,
+    effective_to: date | None,
+    quantity_tolerance_bps: int,
+    unit_price_tolerance_bps: int,
+    reason: str,
+) -> MatchTolerancePolicy:
+    organization = _lock_organization(organization)
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.INVOICE_MATCH_POLICIES_MANAGE,
+        message="اختیار آماده‌سازی سیاست رواداری تطبیق را ندارید.",
+        allow_any_scope=True,
+    )
+    if (
+        not 0 <= quantity_tolerance_bps <= 10000
+        or not 0 <= unit_price_tolerance_bps <= 10000
+    ):
+        raise ValidationError("رواداری باید بر حسب basis point بین صفر و ده‌هزار باشد.")
+    version_number = (
+        MatchTolerancePolicy.objects.select_for_update()
+        .filter(organization=organization)
+        .order_by("-version_number")
+        .values_list("version_number", flat=True)
+        .first()
+        or 0
+    ) + 1
+    payload = {
+        "version": version_number,
+        "effective_from": str(effective_from),
+        "effective_to": str(effective_to or ""),
+        "quantity_tolerance_bps": quantity_tolerance_bps,
+        "unit_price_tolerance_bps": unit_price_tolerance_bps,
+    }
+    return MatchTolerancePolicy.objects.create(
+        organization=organization,
+        version_number=version_number,
+        effective_from=effective_from,
+        effective_to=effective_to,
+        quantity_tolerance_bps=quantity_tolerance_bps,
+        unit_price_tolerance_bps=unit_price_tolerance_bps,
+        prepared_by=actor,
+        reason=reason.strip(),
+        payload_hash=_canonical_hash(payload),
+    )
+
+
+@transaction.atomic
+def approve_match_tolerance_policy(
+    *, organization: Organization, actor, policy: MatchTolerancePolicy
+) -> MatchTolerancePolicy:
+    policy = MatchTolerancePolicy.objects.select_for_update().get(
+        pk=policy.pk, organization=organization
+    )
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.INVOICE_MATCH_POLICIES_APPROVE,
+        message="اختیار تأیید سیاست رواداری تطبیق را ندارید.",
+        allow_any_scope=True,
+    )
+    if policy.is_approved:
+        return policy
+    if policy.prepared_by_id == actor.pk:
+        raise PermissionDenied("سیاست رواداری نیازمند تأییدکننده مستقل است.")
+    overlap = MatchTolerancePolicy.objects.filter(
+        organization=organization,
+        is_approved=True,
+        effective_from__lte=policy.effective_to or date.max,
+    ).filter(effective_to__isnull=True) | MatchTolerancePolicy.objects.filter(
+        organization=organization,
+        is_approved=True,
+        effective_from__lte=policy.effective_to or date.max,
+        effective_to__gte=policy.effective_from,
+    )
+    if overlap.exists():
+        raise ValidationError("بازه اثر سیاست رواداری با نسخه تأییدشده هم‌پوشانی دارد.")
+    policy.is_approved = True
+    policy.approved_by = actor
+    policy.approved_at = timezone.now()
+    policy.save(update_fields=["is_approved", "approved_by", "approved_at"])
+    return policy
+
+
+def _variance_bps(*, actual: Decimal, baseline: Decimal) -> Decimal:
+    if actual <= baseline:
+        return ZERO
+    if baseline == 0:
+        return Decimal(10000)
+    return ((actual - baseline) * Decimal(10000)) / baseline
+
+
+@transaction.atomic
+def run_supplier_invoice_match(
+    *,
+    organization: Organization,
+    actor,
+    invoice_version: SupplierInvoiceVersion,
+    idempotency_key: str,
+) -> SupplierInvoiceMatch:
+    version = (
+        SupplierInvoiceVersion.objects.select_for_update()
+        .select_related("invoice__project")
+        .get(pk=invoice_version.pk, organization=organization)
+    )
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.INVOICE_MATCHES_RUN,
+        message="اختیار اجرای تطبیق صورتحساب را ندارید.",
+        project=version.invoice.project,
+    )
+    if version.status != SupplierInvoiceStatus.APPROVED:
+        raise ValidationError("فقط صورتحساب تأییدشده قابل تطبیق است.")
+    policies = (
+        MatchTolerancePolicy.objects.select_for_update()
+        .filter(
+            organization=organization,
+            is_approved=True,
+            effective_from__lte=version.invoice_date,
+        )
+        .filter(
+            models.Q(effective_to__isnull=True)
+            | models.Q(effective_to__gte=version.invoice_date)
+        )
+    )
+    if policies.count() != 1:
+        raise ValidationError("دقیقاً یک سیاست رواداری مؤثر برای تطبیق لازم است.")
+    policy = policies.get()
+    key = idempotency_key.strip()
+    if not key:
+        raise ValidationError("کلید idempotency تطبیق الزامی است.")
+    from apps.procurement.models import (
+        GoodsReceiptItem,
+        GoodsReceiptStatus,
+        ServiceAcceptanceItem,
+        ServiceAcceptanceStatus,
+    )
+
+    invoice_lines = list(
+        version.lines.select_for_update().select_related(
+            "purchase_order_version_line__source_item"
+        )
+    )
+    source_payload = {
+        "invoice_hash": version.source_hash,
+        "policy_hash": policy.payload_hash,
+        "lines": [str(line.pk) for line in invoice_lines],
+    }
+    fingerprint = _canonical_hash(source_payload)
+    existing = SupplierInvoiceMatch.objects.filter(
+        organization=organization, idempotency_key=key
+    ).first()
+    if existing:
+        if existing.source_fingerprint != fingerprint:
+            raise ValidationError(
+                "کلید idempotency تطبیق با منبع متفاوت استفاده شده است."
+            )
+        return existing
+    previous_match = version.matches.order_by("-version_number").first()
+    match = SupplierInvoiceMatch.objects.create(
+        organization=organization,
+        invoice_version=version,
+        tolerance_policy=policy,
+        version_number=(previous_match.version_number + 1 if previous_match else 1),
+        supersedes=previous_match,
+        status=InvoiceMatchStatus.MATCHED,
+        source_fingerprint=fingerprint,
+        idempotency_key=key,
+        matched_by=actor,
+        matched_at=timezone.now(),
+    )
+    overall = InvoiceMatchStatus.MATCHED
+    for invoice_line in invoice_lines:
+        po_line = invoice_line.purchase_order_version_line
+        if invoice_line.kind == SupplierInvoiceLineKind.GOODS:
+            accepted = (
+                GoodsReceiptItem.objects.filter(
+                    purchase_order_item=po_line.source_item,
+                    goods_receipt__status=GoodsReceiptStatus.POSTED,
+                ).aggregate(total=Sum("quantity"))["total"]
+                or ZERO
+            )
+        else:
+            accepted = (
+                ServiceAcceptanceItem.objects.filter(
+                    purchase_order_version_line__source_item=po_line.source_item,
+                    acceptance__status=ServiceAcceptanceStatus.ACCEPTED,
+                ).aggregate(total=Sum("quantity"))["total"]
+                or ZERO
+            )
+        previous_quantity = (
+            SupplierInvoiceMatchLine.objects.filter(
+                invoice_line__purchase_order_version_line=po_line,
+                match__status__in=[
+                    InvoiceMatchStatus.MATCHED,
+                    InvoiceMatchStatus.WITHIN_TOLERANCE,
+                ],
+                match__superseded_by__isnull=True,
+                invoice_line__invoice_version__status=SupplierInvoiceStatus.APPROVED,
+                invoice_line__invoice_version__superseded_by__isnull=True,
+            )
+            .exclude(invoice_line__invoice_version=version)
+            .aggregate(total=Sum("invoiced_quantity"))["total"]
+            or ZERO
+        )
+        cumulative = previous_quantity + invoice_line.quantity
+        qty_variance = _variance_bps(actual=cumulative, baseline=accepted)
+        price_variance = _variance_bps(
+            actual=invoice_line.unit_price, baseline=po_line.unit_price
+        )
+        status = InvoiceMatchStatus.MATCHED
+        discrepancies: list[tuple[str, bool, dict[str, object]]] = []
+        if accepted == 0:
+            status = InvoiceMatchStatus.INCOMPLETE
+            discrepancies.append(
+                (MatchDiscrepancyCode.MISSING_ACCEPTANCE, True, {"accepted": "0"})
+            )
+        elif cumulative > po_line.quantity:
+            status = InvoiceMatchStatus.BLOCKED
+            discrepancies.append(
+                (
+                    MatchDiscrepancyCode.CUMULATIVE_OVERBILLING,
+                    True,
+                    {"cumulative": str(cumulative), "ordered": str(po_line.quantity)},
+                )
+            )
+        elif qty_variance > policy.quantity_tolerance_bps:
+            status = InvoiceMatchStatus.BLOCKED
+            discrepancies.append(
+                (
+                    MatchDiscrepancyCode.QUANTITY_VARIANCE,
+                    True,
+                    {"bps": str(qty_variance)},
+                )
+            )
+        elif qty_variance > 0:
+            status = InvoiceMatchStatus.WITHIN_TOLERANCE
+            discrepancies.append(
+                (
+                    MatchDiscrepancyCode.QUANTITY_VARIANCE,
+                    False,
+                    {"bps": str(qty_variance)},
+                )
+            )
+        if price_variance > policy.unit_price_tolerance_bps:
+            status = InvoiceMatchStatus.BLOCKED
+            discrepancies.append(
+                (
+                    MatchDiscrepancyCode.UNIT_PRICE_VARIANCE,
+                    True,
+                    {"bps": str(price_variance)},
+                )
+            )
+        elif price_variance > 0 and status == InvoiceMatchStatus.MATCHED:
+            status = InvoiceMatchStatus.WITHIN_TOLERANCE
+            discrepancies.append(
+                (
+                    MatchDiscrepancyCode.UNIT_PRICE_VARIANCE,
+                    False,
+                    {"bps": str(price_variance)},
+                )
+            )
+        if any(
+            value > 0
+            for value in (
+                invoice_line.tax_amount,
+                invoice_line.freight_amount,
+                invoice_line.other_charge_amount,
+            )
+        ):
+            status = InvoiceMatchStatus.INCOMPLETE
+            discrepancies.append(
+                (MatchDiscrepancyCode.UNSUPPORTED_CHARGES, True, {"policy": "missing"})
+            )
+        line_evidence = SupplierInvoiceMatchLine.objects.create(
+            organization=organization,
+            match=match,
+            invoice_line=invoice_line,
+            ordered_quantity=po_line.quantity,
+            accepted_quantity=accepted,
+            previously_invoiced_quantity=previous_quantity,
+            invoiced_quantity=invoice_line.quantity,
+            ordered_unit_price=po_line.unit_price,
+            invoiced_unit_price=invoice_line.unit_price,
+            quantity_variance_bps=qty_variance.quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            ),
+            unit_price_variance_bps=price_variance.quantize(
+                Decimal("0.000001"), rounding=ROUND_HALF_UP
+            ),
+            status=status,
+            calculation_lineage={
+                "policy_version": policy.version_number,
+                "po_version_line": str(po_line.pk),
+                "source_item": str(po_line.source_item_id),
+            },
+        )
+        for code, blocking, evidence in discrepancies:
+            MatchDiscrepancy.objects.create(
+                organization=organization,
+                match_line=line_evidence,
+                code=code,
+                blocking=blocking,
+                evidence=evidence,
+            )
+        if status == InvoiceMatchStatus.INCOMPLETE:
+            overall = InvoiceMatchStatus.INCOMPLETE
+        elif (
+            status == InvoiceMatchStatus.BLOCKED
+            and overall != InvoiceMatchStatus.INCOMPLETE
+        ):
+            overall = InvoiceMatchStatus.BLOCKED
+        elif (
+            status == InvoiceMatchStatus.WITHIN_TOLERANCE
+            and overall == InvoiceMatchStatus.MATCHED
+        ):
+            overall = InvoiceMatchStatus.WITHIN_TOLERANCE
+    SupplierInvoiceMatch.objects.filter(pk=match.pk).update(status=overall)
+    match.status = overall
+    record_audit_event(
+        action="supplier_invoice.match_retained",
+        entity_type="subledgers.SupplierInvoiceMatch",
+        entity_id=match.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"status": overall},
+    )
+    return match

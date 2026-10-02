@@ -827,11 +827,45 @@ class BusinessPermissionCode(models.TextChoices):
     )
     PURCHASE_ORDERS_ISSUE = "purchase_orders.issue", "صدور سفارش خرید"
     PURCHASE_ORDERS_CANCEL = "purchase_orders.cancel", "لغو سفارش خرید"
+    PURCHASE_ORDER_CHANGES_REQUEST = (
+        "purchase_order_changes.request",
+        "درخواست تغییر سفارش خرید",
+    )
+    PURCHASE_ORDER_CHANGES_APPROVE = (
+        "purchase_order_changes.approve",
+        "تأیید مستقل تغییر سفارش خرید",
+    )
     GOODS_RECEIPTS_VIEW = "goods_receipts.view", "مشاهده رسیدهای کالا"
     GOODS_RECEIPTS_CREATE = "goods_receipts.create", "ایجاد رسید کالا"
     GOODS_RECEIPT_ITEMS_ADD = "goods_receipt_items.add", "افزودن ردیف رسید کالا"
     GOODS_RECEIPTS_POST = "goods_receipts.post", "ثبت نهایی رسید کالا"
     GOODS_RECEIPTS_VOID = "goods_receipts.void", "ابطال رسید کالا"
+    SERVICE_ACCEPTANCES_VIEW = "service_acceptances.view", "مشاهده پذیرش خدمت"
+    SERVICE_ACCEPTANCES_CREATE = "service_acceptances.create", "ایجاد پذیرش خدمت"
+    SERVICE_ACCEPTANCES_ACCEPT = (
+        "service_acceptances.accept",
+        "نهایی‌سازی پذیرش خدمت",
+    )
+    SERVICE_ACCEPTANCES_VOID = "service_acceptances.void", "ابطال پذیرش خدمت"
+    SUPPLIER_INVOICES_VIEW = "supplier_invoices.view", "مشاهده صورتحساب تأمین‌کننده"
+    SUPPLIER_INVOICES_PREPARE = (
+        "supplier_invoices.prepare",
+        "آماده‌سازی صورتحساب تأمین‌کننده",
+    )
+    SUPPLIER_INVOICES_APPROVE = (
+        "supplier_invoices.approve",
+        "تأیید مستقل صورتحساب تأمین‌کننده",
+    )
+    INVOICE_MATCH_POLICIES_MANAGE = (
+        "invoice_match_policies.manage",
+        "آماده‌سازی سیاست رواداری تطبیق",
+    )
+    INVOICE_MATCH_POLICIES_APPROVE = (
+        "invoice_match_policies.approve",
+        "تأیید مستقل سیاست رواداری تطبیق",
+    )
+    INVOICE_MATCHES_VIEW = "invoice_matches.view", "مشاهده تطبیق صورتحساب"
+    INVOICE_MATCHES_RUN = "invoice_matches.run", "اجرای تطبیق صورتحساب"
     RFQS_VIEW = "rfqs.view", "مشاهده استعلام‌ها"
     RFQS_CREATE = "rfqs.create", "ایجاد استعلام"
     RFQS_CHANGE = "rfqs.change", "ویرایش استعلام"

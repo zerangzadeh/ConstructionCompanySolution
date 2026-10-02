@@ -630,6 +630,18 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "procurement.QuoteAdmissibilityPreparation",
             "procurement.QuoteAdmissibilityWithdrawal",
             "procurement.QuoteAdmissibilityDecision",
+            "procurement.RFQCommercialScope",
+            "procurement.QuoteCommercialAssertion",
+            "procurement.CommercialComparison",
+            "procurement.CommercialComparisonInput",
+            "procurement.EvaluatorAppointment",
+            "procurement.EvaluatorConflictDeclaration",
+            "procurement.CommercialEvaluation",
+            "procurement.CommercialException",
+            "procurement.SourcingAwardPreparation",
+            "procurement.SourcingAwardPreparationAllocation",
+            "procurement.SourcingAward",
+            "procurement.SourcingAwardAllocation",
         ),
         (
             P.RFQ_QUOTES_VIEW_METADATA,
@@ -718,7 +730,11 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "purchase_orders",
         "سفارش‌های خرید",
-        ("procurement.PurchaseOrder",),
+        (
+            "procurement.PurchaseOrder",
+            "procurement.PurchaseOrderVersion",
+            "procurement.PurchaseOrderVersionLine",
+        ),
         (
             P.PURCHASE_ORDERS_VIEW,
             P.PURCHASE_ORDERS_CREATE,
@@ -726,6 +742,20 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.PURCHASE_ORDERS_CANCEL,
         ),
         ("apps.procurement.services",),
+    ),
+    PermissionResource(
+        "purchase_order_changes",
+        "تغییرات سفارش خرید",
+        (
+            "procurement.PurchaseOrderChangeRequest",
+            "procurement.PurchaseOrderChangeLine",
+            "procurement.PurchaseOrderChangeDecisionEvidence",
+        ),
+        (
+            P.PURCHASE_ORDER_CHANGES_REQUEST,
+            P.PURCHASE_ORDER_CHANGES_APPROVE,
+        ),
+        ("apps.procurement.source_to_pay_services",),
     ),
     PermissionResource(
         "purchase_order_items",
@@ -752,6 +782,21 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("procurement.GoodsReceiptItem",),
         (P.GOODS_RECEIPT_ITEMS_ADD,),
         ("apps.procurement.services",),
+    ),
+    PermissionResource(
+        "service_acceptances",
+        "پذیرش خدمت",
+        (
+            "procurement.ServiceAcceptance",
+            "procurement.ServiceAcceptanceItem",
+        ),
+        (
+            P.SERVICE_ACCEPTANCES_VIEW,
+            P.SERVICE_ACCEPTANCES_CREATE,
+            P.SERVICE_ACCEPTANCES_ACCEPT,
+            P.SERVICE_ACCEPTANCES_VOID,
+        ),
+        ("apps.procurement.source_to_pay_services",),
     ),
     PermissionResource(
         "warehouses",
@@ -975,6 +1020,42 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.SUBLEDGERS_WRITEOFFS_APPROVE,
             P.SUBLEDGERS_WRITEOFFS_REVERSE,
         ),
+        ("apps.subledgers.services",),
+    ),
+    PermissionResource(
+        "supplier_invoices",
+        "صورتحساب‌های تأمین‌کننده",
+        (
+            "subledgers.SupplierInvoice",
+            "subledgers.SupplierInvoiceVersion",
+            "subledgers.SupplierInvoiceLine",
+        ),
+        (
+            P.SUPPLIER_INVOICES_VIEW,
+            P.SUPPLIER_INVOICES_PREPARE,
+            P.SUPPLIER_INVOICES_APPROVE,
+        ),
+        ("apps.subledgers.services",),
+    ),
+    PermissionResource(
+        "invoice_match_policies",
+        "سیاست‌های رواداری تطبیق",
+        ("subledgers.MatchTolerancePolicy",),
+        (
+            P.INVOICE_MATCH_POLICIES_MANAGE,
+            P.INVOICE_MATCH_POLICIES_APPROVE,
+        ),
+        ("apps.subledgers.services",),
+    ),
+    PermissionResource(
+        "invoice_matches",
+        "تطبیق صورتحساب‌های تأمین‌کننده",
+        (
+            "subledgers.SupplierInvoiceMatch",
+            "subledgers.SupplierInvoiceMatchLine",
+            "subledgers.MatchDiscrepancy",
+        ),
+        (P.INVOICE_MATCHES_VIEW, P.INVOICE_MATCHES_RUN),
         ("apps.subledgers.services",),
     ),
     PermissionResource(

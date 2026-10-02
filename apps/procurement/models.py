@@ -32,6 +32,17 @@ class GoodsReceiptStatus(models.TextChoices):
     VOID = "void", "باطل‌شده"
 
 
+class PurchaseOrderChangeDecision(models.TextChoices):
+    APPROVED = "approved", "تأییدشده"
+    REJECTED = "rejected", "ردشده"
+
+
+class ServiceAcceptanceStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    ACCEPTED = "accepted", "پذیرفته‌شده"
+    VOID = "void", "باطل‌شده"
+
+
 class RequestForQuotationStatus(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     SUBMITTED_FOR_ISSUE = "submitted_for_issue", "ارسال‌شده برای صدور"
@@ -2842,6 +2853,14 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="purchase_orders",
     )
+    source_award = models.ForeignKey(
+        SourcingAward,
+        verbose_name="انتخاب منبع",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="purchase_orders",
+    )
     supplier = models.ForeignKey(
         "parties.BusinessParty",
         verbose_name="تأمین‌کننده",
@@ -2888,6 +2907,14 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="purchase_orders_updated",
     )
+    current_version = models.ForeignKey(
+        "PurchaseOrderVersion",
+        verbose_name="نسخه حاکم سفارش",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="governing_orders",
+    )
 
     class Meta:
         verbose_name = "سفارش خرید"
@@ -2930,6 +2957,7 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
             "purchase_request": self.purchase_request
             if self.purchase_request_id
             else None,
+            "source_award": self.source_award if self.source_award_id else None,
         }
         validate_related_organizations(self, **relations)
         if (
@@ -2958,6 +2986,7 @@ class PurchaseOrder(UUIDModel, TimeStampedModel):
                 for field in (
                     "project_id",
                     "purchase_request_id",
+                    "source_award_id",
                     "supplier_id",
                     "order_number",
                     "order_date",
@@ -2991,6 +3020,14 @@ class PurchaseOrderItem(UUIDModel, TimeStampedModel):
     purchase_request_item = models.ForeignKey(
         PurchaseRequestItem,
         verbose_name="ردیف درخواست خرید",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="purchase_order_items",
+    )
+    source_award_allocation = models.ForeignKey(
+        SourcingAwardAllocation,
+        verbose_name="تخصیص انتخاب منبع",
         on_delete=models.PROTECT,
         null=True,
         blank=True,
@@ -3047,6 +3084,11 @@ class PurchaseOrderItem(UUIDModel, TimeStampedModel):
             purchase_request_item=(
                 self.purchase_request_item if self.purchase_request_item_id else None
             ),
+            source_award_allocation=(
+                self.source_award_allocation
+                if self.source_award_allocation_id
+                else None
+            ),
             material=self.material if self.material_id else None,
             unit_of_measure=self.unit_of_measure if self.unit_of_measure_id else None,
         )
@@ -3074,6 +3116,16 @@ class PurchaseOrderItem(UUIDModel, TimeStampedModel):
                     {
                         "purchase_request_item": "ردیف درخواست باید متعلق به درخواست خرید مرتبط باشد."
                     }
+                )
+        if self.source_award_allocation_id:
+            if (
+                self.purchase_order.source_award_id
+                != self.source_award_allocation.award_id
+                or self.purchase_order.supplier_id
+                != self.source_award_allocation.quote_revision.envelope.supplier_id
+            ):
+                raise ValidationError(
+                    "تخصیص انتخاب باید با انتخاب و تأمین‌کننده سفارش یکسان باشد."
                 )
             if self.purchase_request_item.material_id != self.material_id:
                 raise ValidationError(
@@ -3167,6 +3219,14 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
         blank=True,
         related_name="goods_receipts_updated",
     )
+    purchase_order_version = models.ForeignKey(
+        "PurchaseOrderVersion",
+        verbose_name="نسخه پین‌شده سفارش",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="goods_receipts",
+    )
 
     class Meta:
         verbose_name = "رسید کالا"
@@ -3201,6 +3261,9 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
         validate_related_organizations(
             self,
             purchase_order=self.purchase_order if self.purchase_order_id else None,
+            purchase_order_version=self.purchase_order_version
+            if self.purchase_order_version_id
+            else None,
             project=self.project if self.project_id else None,
         )
         if (
@@ -3212,6 +3275,12 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
                 {
                     "project": "پروژه رسید کالا باید با پروژه سفارش خرید مطابقت داشته باشد."
                 }
+            )
+        if self.purchase_order_version_id and (
+            self.purchase_order_version.purchase_order_id != self.purchase_order_id
+        ):
+            raise ValidationError(
+                {"purchase_order_version": "نسخه رسید باید متعلق به همان سفارش باشد."}
             )
 
     def save(self, *args: object, **kwargs: object) -> None:
@@ -3225,6 +3294,7 @@ class GoodsReceipt(UUIDModel, TimeStampedModel):
                     "receipt_number",
                     "received_at",
                     "notes",
+                    "purchase_order_version_id",
                 )
             ):
                 raise ValidationError("جزئیات رسید کالای ثبت‌شده قابل تغییر نیست.")
@@ -3344,5 +3414,459 @@ class GoodsReceiptItem(UUIDModel, TimeStampedModel):
             raise ValidationError(
                 "فقط ردیف‌های رسید کالا در وضعیت پیش‌نویس قابل تغییر هستند."
             )
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class ImmutablePurchaseEvidenceManager(models.Manager):
+    def bulk_create(self, *args: object, **kwargs: object) -> list[models.Model]:
+        raise ValidationError(
+            "شواهد خرید باید به‌صورت جداگانه و اعتبارسنجی‌شده ایجاد شوند."
+        )
+
+
+class ImmutablePurchaseEvidence:
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد نهایی خرید تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object):
+        raise ValidationError("شاهد نهایی خرید حذف‌پذیر نیست.")
+
+
+class PurchaseOrderVersion(ImmutablePurchaseEvidence, UUIDModel, CreatedAtModel):
+    """Immutable commercial commitment snapshot; award consumption is explicit."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    purchase_order = models.ForeignKey(
+        PurchaseOrder, on_delete=models.PROTECT, related_name="versions"
+    )
+    version_number = models.PositiveIntegerField()
+    source_award = models.ForeignKey(
+        SourcingAward,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="purchase_order_versions",
+    )
+    supersedes = models.ForeignKey(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+    effective_at = models.DateTimeField()
+    reason = models.CharField(max_length=500)
+    payload_hash = models.CharField(max_length=64)
+    idempotency_key = models.CharField(max_length=128)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="purchase_order_versions_created",
+    )
+
+    objects = ImmutablePurchaseEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["purchase_order", "version_number"],
+                name="uq_po_version_number",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "idempotency_key"],
+                name="uq_po_version_idempotency",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            purchase_order=self.purchase_order if self.purchase_order_id else None,
+            source_award=self.source_award if self.source_award_id else None,
+            supersedes=self.supersedes if self.supersedes_id else None,
+        )
+        if self.version_number < 1 or not self.reason.strip():
+            raise ValidationError("شماره نسخه و دلیل نسخه سفارش الزامی است.")
+        if self.version_number == 1 and self.supersedes_id:
+            raise ValidationError("نسخه نخست سفارش نمی‌تواند جانشین داشته باشد.")
+        if self.version_number > 1 and (
+            not self.supersedes_id
+            or self.supersedes.purchase_order_id != self.purchase_order_id
+            or self.supersedes.version_number + 1 != self.version_number
+        ):
+            raise ValidationError("زنجیره نسخه سفارش نامعتبر است.")
+
+
+class PurchaseOrderVersionLine(ImmutablePurchaseEvidence, UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    version = models.ForeignKey(
+        PurchaseOrderVersion, on_delete=models.PROTECT, related_name="lines"
+    )
+    source_item = models.ForeignKey(
+        PurchaseOrderItem, on_delete=models.PROTECT, related_name="version_lines"
+    )
+    award_allocation = models.ForeignKey(
+        SourcingAwardAllocation,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="purchase_order_version_lines",
+    )
+    material = models.ForeignKey("materials.Material", on_delete=models.PROTECT)
+    unit_of_measure = models.ForeignKey(
+        "materials.UnitOfMeasure", on_delete=models.PROTECT
+    )
+    description = models.CharField(max_length=255)
+    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    unit_price = models.DecimalField(max_digits=18, decimal_places=2)
+    sort_order = models.PositiveIntegerField(default=0)
+
+    objects = ImmutablePurchaseEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["version", "source_item"], name="uq_po_version_source_item"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0), name="po_version_line_qty_positive"
+            ),
+            models.CheckConstraint(
+                condition=models.Q(unit_price__gte=0),
+                name="po_version_line_price_nonnegative",
+            ),
+        ]
+
+    @property
+    def line_total(self) -> Decimal:
+        return self.quantity * self.unit_price
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            version=self.version if self.version_id else None,
+            source_item=self.source_item if self.source_item_id else None,
+            award_allocation=self.award_allocation
+            if self.award_allocation_id
+            else None,
+            material=self.material if self.material_id else None,
+            unit_of_measure=self.unit_of_measure if self.unit_of_measure_id else None,
+        )
+        if self.source_item_id and (
+            self.source_item.purchase_order_id != self.version.purchase_order_id
+            or self.source_item.material_id != self.material_id
+            or self.source_item.unit_of_measure_id != self.unit_of_measure_id
+        ):
+            raise ValidationError("ردیف نسخه باید ردیف پایه همان سفارش را پین کند.")
+        if self.award_allocation_id and (
+            self.version.source_award_id != self.award_allocation.award_id
+            or self.award_allocation.quote_revision.envelope.supplier_id
+            != self.version.purchase_order.supplier_id
+        ):
+            raise ValidationError(
+                "تخصیص انتخاب با نسخه سفارش یا تأمین‌کننده هم‌راستا نیست."
+            )
+
+
+class PurchaseOrderChangeRequest(ImmutablePurchaseEvidence, UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    purchase_order = models.ForeignKey(
+        PurchaseOrder, on_delete=models.PROTECT, related_name="change_requests"
+    )
+    base_version = models.ForeignKey(
+        PurchaseOrderVersion, on_delete=models.PROTECT, related_name="change_requests"
+    )
+    reason = models.CharField(max_length=500)
+    evidence = models.CharField(max_length=500)
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="purchase_order_changes_requested",
+    )
+    requested_at = models.DateTimeField()
+    idempotency_key = models.CharField(max_length=128)
+    payload_hash = models.CharField(max_length=64)
+
+    objects = ImmutablePurchaseEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["purchase_order", "idempotency_key"],
+                name="uq_po_change_idempotency",
+            )
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            purchase_order=self.purchase_order if self.purchase_order_id else None,
+            base_version=self.base_version if self.base_version_id else None,
+        )
+        if self.base_version_id and (
+            self.base_version.purchase_order_id != self.purchase_order_id
+        ):
+            raise ValidationError("نسخه پایه تغییر باید متعلق به همان سفارش باشد.")
+        if not self.reason.strip() or not self.evidence.strip():
+            raise ValidationError("دلیل و شاهد تغییر سفارش الزامی است.")
+
+
+class PurchaseOrderChangeLine(ImmutablePurchaseEvidence, UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    change_request = models.ForeignKey(
+        PurchaseOrderChangeRequest, on_delete=models.PROTECT, related_name="lines"
+    )
+    base_line = models.ForeignKey(
+        PurchaseOrderVersionLine, on_delete=models.PROTECT, related_name="change_lines"
+    )
+    revised_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    revised_unit_price = models.DecimalField(max_digits=18, decimal_places=2)
+
+    objects = ImmutablePurchaseEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["change_request", "base_line"],
+                name="uq_po_change_base_line",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(revised_quantity__gt=0),
+                name="po_change_qty_positive",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(revised_unit_price__gte=0),
+                name="po_change_price_nonnegative",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            change_request=self.change_request if self.change_request_id else None,
+            base_line=self.base_line if self.base_line_id else None,
+        )
+        if self.base_line_id and (
+            self.base_line.version_id != self.change_request.base_version_id
+        ):
+            raise ValidationError("ردیف تغییر باید از نسخه پایه پین‌شده باشد.")
+
+
+class PurchaseOrderChangeDecisionEvidence(
+    ImmutablePurchaseEvidence, UUIDModel, CreatedAtModel
+):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    change_request = models.OneToOneField(
+        PurchaseOrderChangeRequest, on_delete=models.PROTECT, related_name="decision"
+    )
+    decision = models.CharField(
+        max_length=16, choices=PurchaseOrderChangeDecision.choices
+    )
+    decided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="purchase_order_changes_decided",
+    )
+    decided_at = models.DateTimeField()
+    reason = models.CharField(max_length=500)
+    resulting_version = models.OneToOneField(
+        PurchaseOrderVersion,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="change_decision",
+    )
+
+    objects = ImmutablePurchaseEvidenceManager()
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            change_request=self.change_request if self.change_request_id else None,
+            resulting_version=self.resulting_version
+            if self.resulting_version_id
+            else None,
+        )
+        if self.decided_by_id == self.change_request.requested_by_id:
+            raise ValidationError("درخواست‌کننده تغییر نمی‌تواند آن را تأیید کند.")
+        if (self.decision == PurchaseOrderChangeDecision.APPROVED) != bool(
+            self.resulting_version_id
+        ):
+            raise ValidationError("تأیید تغییر باید دقیقاً یک نسخه نتیجه داشته باشد.")
+        if not self.reason.strip():
+            raise ValidationError("دلیل تصمیم تغییر سفارش الزامی است.")
+
+
+class ServiceAcceptance(UUIDModel, TimeStampedModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    purchase_order = models.ForeignKey(
+        PurchaseOrder, on_delete=models.PROTECT, related_name="service_acceptances"
+    )
+    purchase_order_version = models.ForeignKey(
+        PurchaseOrderVersion,
+        on_delete=models.PROTECT,
+        related_name="service_acceptances",
+    )
+    project = models.ForeignKey("projects.Project", on_delete=models.PROTECT)
+    acceptance_number = models.CharField(max_length=80)
+    accepted_on = models.DateField()
+    status = models.CharField(
+        max_length=16,
+        choices=ServiceAcceptanceStatus.choices,
+        default=ServiceAcceptanceStatus.DRAFT,
+    )
+    notes = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="service_acceptances_created",
+    )
+    accepted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="service_acceptances_finalized",
+    )
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    voided_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="service_acceptances_voided",
+    )
+    voided_at = models.DateTimeField(null=True, blank=True)
+    void_reason = models.CharField(max_length=500, blank=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "acceptance_number"],
+                name="uq_service_acceptance_number",
+            )
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            purchase_order=self.purchase_order if self.purchase_order_id else None,
+            purchase_order_version=self.purchase_order_version
+            if self.purchase_order_version_id
+            else None,
+            project=self.project if self.project_id else None,
+        )
+        if self.purchase_order_version_id and (
+            self.purchase_order_version.purchase_order_id != self.purchase_order_id
+            or self.purchase_order.project_id != self.project_id
+        ):
+            raise ValidationError(
+                "پذیرش خدمت باید سفارش، نسخه و پروژه هم‌راستا داشته باشد."
+            )
+        if not canonicalize_upper_identifier(self.acceptance_number):
+            raise ValidationError("شماره پذیرش خدمت الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            immutable = (
+                "organization_id",
+                "purchase_order_id",
+                "purchase_order_version_id",
+                "project_id",
+                "acceptance_number",
+                "accepted_on",
+                "created_by_id",
+            )
+            if any(getattr(previous, f) != getattr(self, f) for f in immutable):
+                raise ValidationError("هویت پذیرش خدمت تغییرپذیر نیست.")
+            if previous.status == ServiceAcceptanceStatus.DRAFT:
+                if self.status != ServiceAcceptanceStatus.ACCEPTED:
+                    raise ValidationError("گذار پذیرش خدمت از پیش‌نویس نامعتبر است.")
+            elif previous.status == ServiceAcceptanceStatus.ACCEPTED:
+                if self.status != ServiceAcceptanceStatus.VOID:
+                    raise ValidationError(
+                        "پذیرش نهایی فقط با ابطال کنترل‌شده اصلاح می‌شود."
+                    )
+            else:
+                raise ValidationError("پذیرش خدمت باطل‌شده تغییرپذیر نیست.")
+            if previous.status != ServiceAcceptanceStatus.DRAFT and (
+                previous.notes != self.notes
+                or previous.accepted_by_id != self.accepted_by_id
+                or previous.accepted_at != self.accepted_at
+            ):
+                raise ValidationError("شواهد پذیرش نهایی تغییرپذیر نیست.")
+        self.acceptance_number = canonicalize_upper_identifier(self.acceptance_number)
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+
+class ServiceAcceptanceItem(UUIDModel, TimeStampedModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    acceptance = models.ForeignKey(
+        ServiceAcceptance, on_delete=models.PROTECT, related_name="items"
+    )
+    purchase_order_version_line = models.ForeignKey(
+        PurchaseOrderVersionLine,
+        on_delete=models.PROTECT,
+        related_name="service_acceptance_items",
+    )
+    quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    evidence = models.CharField(max_length=500)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["acceptance", "purchase_order_version_line"],
+                name="uq_service_acceptance_line",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(quantity__gt=0),
+                name="service_acceptance_qty_positive",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            acceptance=self.acceptance if self.acceptance_id else None,
+            purchase_order_version_line=self.purchase_order_version_line
+            if self.purchase_order_version_line_id
+            else None,
+        )
+        if self.purchase_order_version_line_id and (
+            self.purchase_order_version_line.version_id
+            != self.acceptance.purchase_order_version_id
+        ):
+            raise ValidationError("ردیف پذیرش باید از نسخه پین‌شده سفارش باشد.")
+        if not self.evidence.strip():
+            raise ValidationError("شاهد پذیرش خدمت الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if (
+            self.acceptance_id
+            and self.acceptance.status != ServiceAcceptanceStatus.DRAFT
+        ):
+            raise ValidationError("ردیف پذیرش نهایی تغییرپذیر نیست.")
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)

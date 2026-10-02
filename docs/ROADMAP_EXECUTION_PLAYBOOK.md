@@ -1028,7 +1028,9 @@ accepted consolidated
 [P5-S09 Product Owner decisions](architecture/P5_S09_PRODUCT_OWNER_DECISIONS.md).
 P5-S10 is separately authorized, implemented and PostgreSQL-verified in the
 current roadmap state; P5-S11 is subsequently implemented, PostgreSQL-verified
-and Product Owner accepted. P5-S12+ remains separately gated.
+and Product Owner accepted. P5-S12–S17 were then authorized as one bounded batch,
+implemented, PostgreSQL-verified and Product Owner accepted on 2026-10-02. The
+authoritative status is **P5-S01–S17 COMPLETE / ACCEPTED; P5-S18+ UNAUTHORIZED**.
 
 **Current P5 disposition (2026-10-02):** P5-S01–S04 are complete as planning and
 design, and the separately authorized P5-S05–S09 runtime slices are complete; see the
@@ -1053,7 +1055,12 @@ prepare/approve permissions, controlled reason/evidence, active confidential gra
 and a pinned fail-closed Tenant policy. Break-glass, comparison, evaluation, award,
 No-Award, UI/portal, background work, production infrastructure and every downstream
 handoff remain absent. P5-S11 is subsequently implemented, PostgreSQL-verified
-and Product Owner accepted; P5.2 and later work remain unauthorized.
+and Product Owner accepted. P5-S12–S17 subsequently add immutable issued-PO/change
+versions, version-pinned receipt/service acceptance, AP-owned supplier-invoice
+versions, independently approved effective-dated tolerance policy, and immutable
+match/discrepancy evidence. They activate no payable, posting, cost, stock, cash,
+portal or production handoff. The Product Owner accepted this verified boundary on
+2026-10-02; P5-S18+ remains unauthorized.
 
 ## 12. P6 session map — 42 sessions
 

@@ -1,3 +1,5 @@
+import hashlib
+import json
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -28,9 +30,14 @@ from apps.procurement.models import (
     PurchaseOrder,
     PurchaseOrderItem,
     PurchaseOrderStatus,
+    PurchaseOrderVersion,
+    PurchaseOrderVersionLine,
     PurchaseRequest,
     PurchaseRequestItem,
     PurchaseRequestStatus,
+    SourcingAward,
+    SourcingAwardAllocation,
+    SourcingAwardOutcome,
 )
 from apps.projects.models import Project
 from core.identifiers import canonicalize_upper_identifier
@@ -126,6 +133,83 @@ def _save_validated(instance: object, message: str) -> None:
         instance.save()
     except (IntegrityError, ValidationError) as exc:
         raise ValueError(message) from exc
+
+
+def _canonical_hash(payload: object) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
+    ).hexdigest()
+
+
+def _snapshot_purchase_order_version(
+    *, order: PurchaseOrder, actor: User, reason: str, idempotency_key: str
+) -> PurchaseOrderVersion:
+    """Create one immutable governing version from the draft/base order lines."""
+
+    items = list(
+        order.items.select_for_update(of=("self",))
+        .select_related(
+            "material",
+            "unit_of_measure",
+            "source_award_allocation__quote_revision__envelope",
+        )
+        .order_by("sort_order", "created_at")
+    )
+    if not items:
+        raise ValueError("سفارش خرید باید حداقل یک ردیف داشته باشد.")
+    payload = [
+        {
+            "source_item": str(item.pk),
+            "award_allocation": str(item.source_award_allocation_id or ""),
+            "material": str(item.material_id),
+            "unit": str(item.unit_of_measure_id),
+            "description": item.description,
+            "quantity": str(item.quantity),
+            "unit_price": str(item.unit_price),
+            "sort_order": item.sort_order,
+        }
+        for item in items
+    ]
+    fingerprint = _canonical_hash(payload)
+    existing = PurchaseOrderVersion.objects.filter(
+        organization=order.organization, idempotency_key=idempotency_key
+    ).first()
+    if existing:
+        if (
+            existing.purchase_order_id != order.pk
+            or existing.payload_hash != fingerprint
+        ):
+            raise ValueError(
+                "کلید idempotency نسخه سفارش با محتوای متفاوت استفاده شده است."
+            )
+        return existing
+    version = PurchaseOrderVersion.objects.create(
+        organization=order.organization,
+        purchase_order=order,
+        version_number=1,
+        source_award=order.source_award,
+        effective_at=timezone.now(),
+        reason=reason.strip(),
+        payload_hash=fingerprint,
+        idempotency_key=idempotency_key.strip(),
+        created_by=actor,
+    )
+    for item in items:
+        PurchaseOrderVersionLine.objects.create(
+            organization=order.organization,
+            version=version,
+            source_item=item,
+            award_allocation=item.source_award_allocation,
+            material=item.material,
+            unit_of_measure=item.unit_of_measure,
+            description=item.description,
+            quantity=item.quantity,
+            unit_price=item.unit_price,
+            sort_order=item.sort_order,
+        )
+    order.current_version = version
+    order.save(update_fields=["current_version", "updated_at"])
+    return version
 
 
 def _get_locked_request(
@@ -611,6 +695,132 @@ def create_purchase_order(
 
 
 @transaction.atomic
+def create_purchase_order_from_award(
+    *,
+    organization: Organization,
+    actor: User,
+    award: SourcingAward,
+    allocation_ids: list[str],
+    order_number: str,
+    order_date: date,
+    expected_delivery_date: date | None = None,
+    notes: str = "",
+) -> PurchaseOrder:
+    """Consume only explicit S11 allocations; no award creates a PO automatically."""
+
+    locked_award = (
+        SourcingAward.objects.select_for_update()
+        .select_related(
+            "comparison__commercial_scope__rfq_version__rfq__project",
+            "comparison__commercial_scope__rfq_version__rfq__purchase_request",
+        )
+        .get(pk=award.pk, organization=organization)
+    )
+    if locked_award.outcome != SourcingAwardOutcome.AWARDED:
+        raise ValueError("فقط انتخاب نهایی برنده می‌تواند به سفارش تبدیل شود.")
+    if locked_award.superseded_by.exists():
+        raise ValueError("انتخاب جانشین‌شده قابل مصرف نیست.")
+    scope = locked_award.comparison.commercial_scope
+    project = scope.rfq_version.rfq.project
+    _require_role(
+        organization=organization,
+        actor=actor,
+        permission=BusinessPermissionCode.PURCHASE_ORDERS_CREATE,
+        message="اجازه ایجاد سفارش خرید از انتخاب منبع را ندارید.",
+        project=project,
+    )
+    requested_ids = {str(value) for value in allocation_ids}
+    allocations = list(
+        SourcingAwardAllocation.objects.select_for_update(of=("self",))
+        .select_related(
+            "quote_revision__envelope__supplier",
+            "comparison_input__assertion__commercial_scope__rfq_version_line__purchase_request_item",
+            "comparison_input__assertion__commercial_scope__rfq_version_line__material",
+            "comparison_input__assertion__commercial_scope__rfq_version_line__unit_of_measure",
+        )
+        .filter(award=locked_award, pk__in=requested_ids)
+    )
+    if not requested_ids or {str(item.pk) for item in allocations} != requested_ids:
+        raise PermissionDenied("تخصیص انتخاب‌شده متعلق به این انتخاب منبع نیست.")
+    suppliers = {item.quote_revision.envelope.supplier_id for item in allocations}
+    if len(suppliers) != 1:
+        raise ValueError("هر سفارش خرید باید دقیقاً یک تأمین‌کننده داشته باشد.")
+    supplier = allocations[0].quote_revision.envelope.supplier
+    _validate_supplier(organization=organization, supplier=supplier)
+    normalized_number = canonicalize_upper_identifier(order_number)
+    existing = PurchaseOrder.objects.filter(
+        organization=organization, order_number=normalized_number
+    ).first()
+    if existing:
+        if (
+            existing.source_award_id != locked_award.pk
+            or existing.supplier_id != supplier.pk
+        ):
+            raise ValueError("شماره سفارش با منبع متفاوت قبلاً استفاده شده است.")
+        return existing
+    order = PurchaseOrder.objects.create(
+        organization=organization,
+        project=project,
+        purchase_request=scope.rfq_version.rfq.purchase_request,
+        source_award=locked_award,
+        supplier=supplier,
+        order_number=normalized_number,
+        order_date=order_date,
+        expected_delivery_date=expected_delivery_date,
+        notes=notes.strip(),
+        created_by=actor,
+        updated_by=actor,
+    )
+    for sort_order, allocation in enumerate(allocations):
+        assertion = allocation.comparison_input.assertion
+        line = assertion.commercial_scope.rfq_version_line
+        if line is None:
+            raise ValueError(
+                "بسته تجاری بدون نگاشت ردیف صریح برای ایجاد سفارش fail-closed است."
+            )
+        po_unit_price = (
+            assertion.unit_price.quantize(Decimal("0.01"))
+            if assertion.unit_price is not None
+            else None
+        )
+        if assertion.unit_price is None or assertion.unit_price != po_unit_price:
+            raise ValueError(
+                "قیمت انتخاب باید با دقت ذخیره‌سازی فعلی سفارش سازگار باشد."
+            )
+        consumed = PurchaseOrderItem.objects.filter(
+            source_award_allocation=allocation,
+            purchase_order__status__in={
+                PurchaseOrderStatus.DRAFT,
+                PurchaseOrderStatus.ISSUED,
+                PurchaseOrderStatus.COMPLETED,
+            },
+        ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
+        if consumed + allocation.quantity > allocation.quantity:
+            raise ValueError("تخصیص انتخاب منبع قبلاً مصرف شده است.")
+        PurchaseOrderItem.objects.create(
+            organization=organization,
+            purchase_order=order,
+            purchase_request_item=line.purchase_request_item,
+            source_award_allocation=allocation,
+            material=line.material,
+            unit_of_measure=line.unit_of_measure,
+            description=line.description,
+            quantity=allocation.quantity,
+            unit_price=po_unit_price,
+            sort_order=sort_order,
+        )
+    record_audit_event(
+        action="purchase_order.created_from_award",
+        entity_type="procurement.PurchaseOrder",
+        entity_id=order.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"award_id": str(locked_award.pk)},
+    )
+    return order
+
+
+@transaction.atomic
 def add_purchase_order_item(
     *,
     organization: Organization,
@@ -717,6 +927,12 @@ def issue_purchase_order(
     _validate_supplier(organization=organization, supplier=order.supplier)
     if not order.items.exists():
         raise ValueError("سفارش خرید باید حداقل یک ردیف داشته باشد.")
+    version = _snapshot_purchase_order_version(
+        order=order,
+        actor=actor,
+        reason="صدور اولیه سفارش خرید",
+        idempotency_key=f"issue:{order.pk}",
+    )
     order.status = PurchaseOrderStatus.ISSUED
     order.issued_at = timezone.now()
     order.issued_by = actor
@@ -730,7 +946,10 @@ def issue_purchase_order(
         entity_id=order.pk,
         organization=organization,
         actor=actor,
-        metadata={"total_amount": str(order.total_amount)},
+        metadata={
+            "total_amount": str(order.total_amount),
+            "purchase_order_version_id": str(version.pk),
+        },
     )
     return order
 
@@ -837,6 +1056,8 @@ def create_goods_receipt(
     )
     if order.status != PurchaseOrderStatus.ISSUED:
         raise ValueError("دریافت کالا فقط در برابر سفارش صادرشده امکان‌پذیر است.")
+    if order.current_version_id is None:
+        raise ValueError("نسخه حاکم سفارش برای دریافت کالا الزامی است.")
     if timezone.is_naive(received_at):
         raise ValueError("زمان رسید باید دارای منطقه زمانی باشد.")
     normalized_number = canonicalize_upper_identifier(receipt_number)
@@ -845,6 +1066,7 @@ def create_goods_receipt(
     receipt = GoodsReceipt(
         organization=organization,
         purchase_order=order,
+        purchase_order_version=order.current_version,
         project=order.project,
         receipt_number=normalized_number,
         received_at=received_at,
@@ -937,6 +1159,12 @@ def _order_is_fully_received(order: PurchaseOrder) -> bool:
         .values("purchase_order_item_id")
         .annotate(total=Sum("quantity"))
     }
+    if order.current_version_id:
+        lines = order.current_version.lines.all()
+        return lines.exists() and all(
+            received.get(line.source_item_id, Decimal(0)) >= line.quantity
+            for line in lines
+        )
     return order.items.exists() and all(
         received.get(item.pk, Decimal(0)) >= item.quantity for item in order.items.all()
     )
@@ -973,7 +1201,13 @@ def post_goods_receipt(
             purchase_order_item=item.purchase_order_item,
             goods_receipt__status=GoodsReceiptStatus.POSTED,
         ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
-        if already_received + item.quantity > item.purchase_order_item.quantity:
+        governing_line = PurchaseOrderVersionLine.objects.filter(
+            version=receipt.purchase_order_version,
+            source_item=item.purchase_order_item,
+        ).first()
+        if governing_line is None:
+            raise ValueError("ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.")
+        if already_received + item.quantity > governing_line.quantity:
             raise ValueError("مقدار دریافتی نمی‌تواند از مقدار سفارش بیشتر باشد.")
     receipt.status = GoodsReceiptStatus.POSTED
     receipt.posted_at = timezone.now()
