@@ -200,7 +200,9 @@ def _validate_document_context_access(
     typed_link_ids = {
         link.pk
         for link in links
-        if next(item for item in DOCUMENT_LINK_TYPES if item.key == link.target_type).legacy_compatible
+        if next(
+            item for item in DOCUMENT_LINK_TYPES if item.key == link.target_type
+        ).legacy_compatible
     }
     if legacy_link_ids != typed_link_ids:
         raise PermissionDenied("نگاشت لینک‌های سند کامل و قابل اتکا نیست.")
@@ -678,7 +680,9 @@ def record_document_processing_assessment(
         adapter_code=adapter_code.strip(),
         adapter_version=adapter_version.strip(),
         provider_reference=provider_reference.strip(),
-        extracted_text=extracted_text if verdict == DocumentProcessingVerdict.CLEAN else "",
+        extracted_text=extracted_text
+        if verdict == DocumentProcessingVerdict.CLEAN
+        else "",
         details=details or {},
         recorded_by=actor,
     )
@@ -1409,9 +1413,7 @@ def approve_document_restore_evidence(
     locked.state = RecoveryEvidenceState.APPROVED
     locked.approved_at = timezone.now()
     locked.approved_by = actor
-    locked.save(
-        update_fields=["state", "approved_at", "approved_by", "updated_at"]
-    )
+    locked.save(update_fields=["state", "approved_at", "approved_by", "updated_at"])
     record_audit_event(
         action=AuditAction.DOCUMENT_RESTORE_EVIDENCE_APPROVED,
         entity_type="document_recovery_manifest",

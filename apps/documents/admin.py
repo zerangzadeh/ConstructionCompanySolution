@@ -178,4 +178,7 @@ for model in (
     DocumentKeyCustodyAttestation,
     DocumentRecoveryManifest,
 ):
-    admin.site.register(model, type(f"{model.__name__}Admin", (ImmutableAdminMixin, admin.ModelAdmin), {}))
+    admin.site.register(
+        model,
+        type(f"{model.__name__}Admin", (ImmutableAdminMixin, admin.ModelAdmin), {}),
+    )

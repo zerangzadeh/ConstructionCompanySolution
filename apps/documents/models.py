@@ -302,7 +302,8 @@ class Document(UUIDModel, TimeStampedModel):
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:
             original_number = (
-                type(self).objects.filter(pk=self.pk)
+                type(self)
+                .objects.filter(pk=self.pk)
                 .values_list("document_number", flat=True)
                 .first()
             )
@@ -518,9 +519,7 @@ class DocumentProcessingAssessment(UUIDModel, CreatedAtModel):
         related_name="processing_assessments",
     )
     sequence = models.PositiveIntegerField()
-    verdict = models.CharField(
-        max_length=20, choices=DocumentProcessingVerdict.choices
-    )
+    verdict = models.CharField(max_length=20, choices=DocumentProcessingVerdict.choices)
     input_sha256 = models.CharField(max_length=64)
     adapter_code = models.CharField(max_length=80)
     adapter_version = models.CharField(max_length=80, blank=True)
@@ -736,7 +735,10 @@ class DocumentRetentionPolicyVersion(UUIDModel, TimeStampedModel):
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:
             original_state = (
-                type(self).objects.filter(pk=self.pk).values_list("state", flat=True).first()
+                type(self)
+                .objects.filter(pk=self.pk)
+                .values_list("state", flat=True)
+                .first()
             )
             if original_state == RetentionPolicyVersionState.APPROVED:
                 raise ValidationError("نسخه تأییدشده سیاست نگهداری تغییرپذیر نیست.")
@@ -884,9 +886,7 @@ class DocumentExportManifest(UUIDModel, CreatedAtModel):
         on_delete=models.PROTECT,
         related_name="document_export_manifests",
     )
-    completeness = models.CharField(
-        max_length=20, choices=ManifestCompleteness.choices
-    )
+    completeness = models.CharField(max_length=20, choices=ManifestCompleteness.choices)
     manifest = models.JSONField(default=dict)
     original_bytes = models.PositiveBigIntegerField(default=0)
     quarantine_bytes = models.PositiveBigIntegerField(default=0)

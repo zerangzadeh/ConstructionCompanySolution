@@ -229,6 +229,8 @@ class ExpenseServiceTests(TestCase):
         self.assertEqual(expense.expense_category, category)
         self.assertEqual(expense.vendor_name, "Concrete Supplier")
         self.assertEqual(expense.category, ExpenseCategory.OTHER)
+        self.assertEqual(expense.primary_group.code, ExpenseCategory.OTHER)
+        self.assertEqual(category.primary_group.code, ExpenseCategory.OTHER)
 
     def test_expense_rejects_phase_from_another_project(self) -> None:
         other_project = self.organization.projects.create(

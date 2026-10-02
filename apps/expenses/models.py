@@ -209,6 +209,14 @@ class Expense(UUIDModel, TimeStampedModel):
         default=LegacyExpenseCategory.OTHER,
         db_index=True,
     )
+    primary_group = models.ForeignKey(
+        PlatformExpenseGroup,
+        verbose_name="گروه اصلی هزینه",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="expenses",
+    )
     description = models.CharField("شرح هزینه", max_length=255)
     vendor_name = models.CharField("نام فروشنده", max_length=255, blank=True)
     party = models.ForeignKey(
@@ -376,6 +384,10 @@ class Expense(UUIDModel, TimeStampedModel):
         validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
             raise ValidationError({"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."})
+        if self.primary_group_id and self.primary_group.code != self.category:
+            raise ValidationError(
+                {"primary_group": "گروه اصلی هزینه باید با کد گروه ثبت‌شده سازگار باشد."}
+            )
         if self.party_id and self.party.archived_at is not None:
             raise ValidationError({"party": "طرف تجاری باید فعال باشد."})
         if self.expense_category_id and (
@@ -407,6 +419,7 @@ class Expense(UUIDModel, TimeStampedModel):
                 "project_id",
                 "phase_id",
                 "category",
+                "primary_group_id",
                 "description",
                 "vendor_name",
                 "party_id",

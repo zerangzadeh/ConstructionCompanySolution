@@ -130,6 +130,7 @@ def create_expense(
         code=category, is_active=True, archived_at__isnull=True
     ).exists():
         raise ValueError("گروه اصلی هزینه معتبر نیست.")
+    primary_group = PlatformExpenseGroup.objects.get(code=category)
     if status not in ExpenseStatus.values:
         raise ValueError("وضعیت هزینه معتبر نیست.")
     if status != ExpenseStatus.RECORDED:
@@ -147,6 +148,7 @@ def create_expense(
         project=project,
         phase=phase,
         category=category,
+        primary_group=primary_group,
         description=description.strip(),
         vendor_name=vendor_name.strip() or (party.display_name if party else ""),
         party=party,
@@ -278,6 +280,7 @@ def create_expense_draft(
         code=category, is_active=True, archived_at__isnull=True
     ).exists():
         raise ValueError("Invalid primary expense group.")
+    primary_group = PlatformExpenseGroup.objects.get(code=category)
     if classification not in ExpenseClassification.values:
         raise ValueError("Invalid direct/indirect classification.")
     if party and (party.organization_id != organization.pk or party.archived_at):
@@ -341,6 +344,7 @@ def create_expense_draft(
                 project=project,
                 phase=phase,
                 category=category,
+                primary_group=primary_group,
                 description=description.strip(),
                 vendor_name=normalized_vendor,
                 party=party,
@@ -804,6 +808,7 @@ def get_organization_expenses(
             "phase",
             "party",
             "expense_category",
+            "primary_group",
             "created_by",
             "updated_by",
             "voided_by",

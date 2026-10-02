@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 from django.urls import reverse
 
+from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.expenses.services import (
     add_expense_allocation,
@@ -129,6 +130,63 @@ class ProjectControlPresentationTests(TestCase):
             reverse("projects:controls_export", args=[self.project.pk])
         )
         self.assertEqual(response.status_code, 403)
+
+    def test_controls_panel_is_visible_with_base_controls_view_only(self) -> None:
+        manager = User.objects.create_user(username="p4-controls-view-only")
+        self.organization.memberships.create(
+            user=manager,
+            role=MembershipRole.PROJECT_MANAGER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.client.force_login(manager)
+        session = self.client.session
+        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
+        session.save()
+
+        response = self.client.get(
+            reverse("projects:controls", args=[self.project.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "شواهد محدود کنترل پروژه")
+        self.assertContains(response, "برای مشاهدهٔ این شواهد")
+        self.assertNotContains(response, "مشاهده انحرافات بودجه‌ای")
+
+    def test_reconciliation_ui_renders_budget_dimensions_and_localized_variance_label(
+        self,
+    ) -> None:
+        self.client.force_login(self.preparer)
+        session = self.client.session
+        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
+        session.save()
+
+        controls_response = self.client.get(
+            reverse("projects:controls", args=[self.project.pk])
+        )
+        self.assertContains(controls_response, "مشاهده انحرافات بودجه‌ای")
+        self.assertNotContains(controls_response, "استثناهای محدود")
+
+        exceptions_response = self.client.get(
+            reverse("projects:controls_exceptions", args=[self.project.pk])
+        )
+        self.assertContains(exceptions_response, "انحرافات بودجه‌ای کنترل پروژه")
+        self.assertContains(exceptions_response, "شواهد انحراف بودجه")
+
+        reconciliation_response = self.client.get(
+            reverse("projects:cost_reconciliation", args=[self.project.pk])
+        )
+        for heading in (
+            "CBS",
+            "WBS",
+            "مرکز هزینه",
+            "بودجه",
+            "هزینه تأیید/ثبت‌شده",
+            "فکت غیرفعال هزینه واقعی",
+            "اختلاف حل‌نشده",
+            "منابع و پوشش",
+            "شواهد حذف‌شده یا غیرقابل‌مقایسه",
+        ):
+            self.assertContains(reconciliation_response, heading)
 
     def test_project_scope_cannot_read_another_project_control_export(self) -> None:
         scoped_user = self.preparer.__class__.objects.create_user(

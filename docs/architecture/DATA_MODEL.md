@@ -66,8 +66,11 @@ are not implemented by these generic records.
 
 Target identity additions include MFA/SSO evidence, invitation/onboarding history,
 time-limited support-access grants, entitlements/quotas and project/site scope.
-External portal identity must be explicitly invitation-scoped and cannot expose
-the tenant user directory or imply ordinary membership.
+External portal identity is explicitly invitation-scoped and cannot expose the
+tenant user directory or imply ordinary membership. P5-S18–S22 implement an
+immutable `SupplierPortalPrincipal` bound to a Tenant-local `BusinessParty` and an
+existing authenticated `User`, with token-hash-only invitations, exact RFQ-
+invitation capability grants, append-only revocation and submission receipts.
 
 Tenant/business role assignment is membership-scoped. The same User may hold
 Tenant Owner plus Tenant Admin plus Project Manager in one Tenant and only Project

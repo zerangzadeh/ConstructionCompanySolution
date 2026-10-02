@@ -18,7 +18,6 @@ from apps.expenses.forms import (
 )
 from apps.expenses.models import (
     ExpenseCategory,
-    LegacyExpenseCategory,
     PlatformExpenseGroup,
 )
 from apps.expenses.services import (
@@ -71,7 +70,15 @@ def expense_list(request: HttpRequest) -> HttpResponse:
             "description": ("description", "vendor_name", "receipt_reference"),
             "project": ("project__name", "phase__name"),
         },
-        choice_fields={"category": ("category", LegacyExpenseCategory.values)},
+        choice_fields={
+            "category": (
+                "category",
+                PlatformExpenseGroup.objects.filter(
+                    is_active=True,
+                    archived_at__isnull=True,
+                ).values_list("code", flat=True),
+            )
+        },
         date_fields={"incurred_on": "incurred_on"},
     )
     page = paginate_table(
@@ -101,8 +108,14 @@ def expense_list(request: HttpRequest) -> HttpResponse:
                     {
                         "name": "category",
                         "kind": "select",
-                        "label": "دسته‌بندی",
-                        "choices": LegacyExpenseCategory.choices,
+                        "label": "گروه اصلی هزینه",
+                        "choices": [
+                            (group.code, group.name)
+                            for group in PlatformExpenseGroup.objects.filter(
+                                is_active=True,
+                                archived_at__isnull=True,
+                            ).order_by("name")
+                        ],
                     },
                     {"name": "incurred_on", "kind": "date_range", "label": "تاریخ"},
                     None,
