@@ -1,14 +1,17 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import HttpRequest, HttpResponse, HttpResponseNotFound
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseNotFound
 from django.shortcuts import redirect, render
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from apps.organizations.authorization import require_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from apps.procurement.custody_services import custody_sealed_quote_evidence
 from apps.procurement.forms import (
     GoodsReceiptForm,
     OrderItemForm,
@@ -17,6 +20,9 @@ from apps.procurement.forms import (
     ReasonForm,
     ReceiptItemForm,
     RequestItemForm,
+    SealedEvidenceUploadForm,
+    SupplierPortalInvitationForm,
+    SupplierPortalSubmissionForm,
 )
 from apps.procurement.models import (
     GoodsReceipt,
@@ -25,6 +31,17 @@ from apps.procurement.models import (
     PurchaseOrderStatus,
     PurchaseRequest,
     PurchaseRequestStatus,
+    QuoteRevision,
+    RequestForQuotationInvitation,
+    SupplierPortalGrant,
+    SupplierPortalSubmissionReceipt,
+)
+from apps.procurement.portal_services import (
+    accept_supplier_portal_invitation,
+    create_supplier_portal_invitation,
+    get_supplier_portal_rfq_context,
+    revoke_supplier_portal_grant,
+    submit_supplier_portal_quote,
 )
 from apps.procurement.services import (
     add_goods_receipt_item,
@@ -96,6 +113,209 @@ def _receipt_record(
         )
     except PermissionDenied:
         return HttpResponseNotFound("رسید کالا یافت نشد.")
+
+
+def _portal_grant(grant_id: str) -> SupplierPortalGrant:
+    try:
+        return SupplierPortalGrant.objects.get(pk=grant_id)
+    except SupplierPortalGrant.DoesNotExist as exc:
+        raise Http404("مجوز درگاه یافت نشد.") from exc
+
+
+def _portal_invitation_for_management(
+    request: HttpRequest, invitation_id: str
+) -> RequestForQuotationInvitation:
+    try:
+        invitation = RequestForQuotationInvitation.objects.select_related(
+            "rfq_version__rfq__project", "supplier"
+        ).get(pk=invitation_id, organization=request.organization)
+    except RequestForQuotationInvitation.DoesNotExist as exc:
+        raise Http404("دعوت‌نامه استعلام یافت نشد.") from exc
+    require_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE,
+        project=invitation.rfq_version.rfq.project,
+    )
+    return invitation
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def supplier_portal_accept(request: HttpRequest) -> HttpResponse:
+    """Accept only an existing token-bound invitation; no account provisioning."""
+    if request.method == "GET":
+        return render(request, "procurement/portal_accept.html")
+    token = request.POST.get("token", "")
+    try:
+        grant = accept_supplier_portal_invitation(actor=request.user, token=token)
+    except (PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+        return redirect("procurement:portal_accept")
+    return redirect("procurement:portal_context", grant_id=grant.pk)
+
+
+@login_required
+@require_GET
+def supplier_portal_context(request: HttpRequest, grant_id: str) -> HttpResponse:
+    grant = _portal_grant(grant_id)
+    try:
+        context = get_supplier_portal_rfq_context(actor=request.user, grant=grant)
+    except (PermissionDenied, ValueError) as exc:
+        raise Http404("زمینه مجاز درگاه یافت نشد.") from exc
+    return render(
+        request,
+        "procurement/portal_context.html",
+        {
+            "portal": context,
+            "grant": grant,
+            "submission_form": SupplierPortalSubmissionForm(),
+        },
+    )
+
+
+@login_required
+@require_POST
+def supplier_portal_submit(request: HttpRequest, grant_id: str) -> HttpResponse:
+    grant = _portal_grant(grant_id)
+    form = SupplierPortalSubmissionForm(request.POST)
+    if form.is_valid():
+        try:
+            receipt = submit_supplier_portal_quote(
+                actor=request.user, grant=grant, **form.cleaned_data
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return redirect("procurement:portal_receipt", receipt_id=receipt.pk)
+    try:
+        context = get_supplier_portal_rfq_context(actor=request.user, grant=grant)
+    except PermissionDenied as exc:
+        raise Http404("زمینه مجاز درگاه یافت نشد.") from exc
+    return render(
+        request,
+        "procurement/portal_context.html",
+        {"portal": context, "grant": grant, "submission_form": form},
+        status=400,
+    )
+
+
+@login_required
+@require_GET
+def supplier_portal_receipt(request: HttpRequest, receipt_id: str) -> HttpResponse:
+    try:
+        receipt = SupplierPortalSubmissionReceipt.objects.select_related(
+            "grant", "quote_revision"
+        ).get(pk=receipt_id)
+    except SupplierPortalSubmissionReceipt.DoesNotExist as exc:
+        raise Http404("رسید ارسال یافت نشد.") from exc
+    try:
+        get_supplier_portal_rfq_context(actor=request.user, grant=receipt.grant)
+    except PermissionDenied as exc:
+        raise Http404("رسید ارسال یافت نشد.") from exc
+    return render(request, "procurement/portal_receipt.html", {"receipt": receipt})
+
+
+@active_organization_required
+@organization_permission_required(
+    BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE
+)
+def portal_invitation_manage(request: HttpRequest, invitation_id: str) -> HttpResponse:
+    invitation = _portal_invitation_for_management(request, invitation_id)
+    token = None
+    form = SupplierPortalInvitationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            created, token = create_supplier_portal_invitation(
+                organization=request.organization,
+                actor=request.user,
+                rfq_invitation=invitation,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            return render(
+                request,
+                "procurement/portal_invitation_manage.html",
+                {
+                    "invitation": invitation,
+                    "form": SupplierPortalInvitationForm(),
+                    "portal_invitation": created,
+                    "plaintext_token": token,
+                },
+            )
+    portal_invitations = invitation.portal_invitations.select_related(
+        "accepted_principal__user"
+    ).prefetch_related("grants__revocation")
+    return render(
+        request,
+        "procurement/portal_invitation_manage.html",
+        {
+            "invitation": invitation,
+            "form": form,
+            "portal_invitations": portal_invitations,
+            "plaintext_token": token,
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(
+    BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE
+)
+@require_POST
+def portal_grant_revoke(
+    request: HttpRequest, invitation_id: str, grant_id: str
+) -> HttpResponse:
+    invitation = _portal_invitation_for_management(request, invitation_id)
+    try:
+        grant = SupplierPortalGrant.objects.get(pk=grant_id, rfq_invitation=invitation)
+        revoke_supplier_portal_grant(
+            organization=request.organization,
+            actor=request.user,
+            grant=grant,
+            reason=request.POST.get("reason", ""),
+        )
+        messages.success(request, "مجوز درگاه لغو شد.")
+    except (SupplierPortalGrant.DoesNotExist, PermissionDenied, ValueError) as exc:
+        messages.error(request, str(exc))
+    return redirect("procurement:portal_invitation_manage", invitation_id=invitation.pk)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.RFQS_CUSTODY_SEALED_EVIDENCE)
+def sealed_evidence_custody(request: HttpRequest, revision_id: str) -> HttpResponse:
+    try:
+        revision = QuoteRevision.objects.get(
+            pk=revision_id, organization=request.organization
+        )
+    except QuoteRevision.DoesNotExist as exc:
+        raise Http404("نسخه پیشنهاد یافت نشد.") from exc
+    form = SealedEvidenceUploadForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            custody_sealed_quote_evidence(
+                organization=request.organization,
+                actor=request.user,
+                quote_revision=revision,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(
+                request,
+                "شاهد مهروموم‌شده در نگهداری قرنطینه ثبت شد؛ محتوا قابل مشاهده نیست.",
+            )
+            return redirect(
+                "procurement:sealed_evidence_custody", revision_id=revision.pk
+            )
+    return render(
+        request,
+        "procurement/sealed_evidence_custody.html",
+        {"revision": revision, "form": form},
+    )
 
 
 @active_organization_required

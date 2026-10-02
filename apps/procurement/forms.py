@@ -218,3 +218,48 @@ class ReceiptItemForm(_StyledForm):
 
 class ReasonForm(_StyledForm):
     reason = forms.CharField(label="دلیل", widget=forms.Textarea(attrs={"rows": 3}))
+
+
+class SupplierPortalInvitationForm(_StyledForm):
+    invited_email = forms.EmailField(label="ایمیل نماینده تأمین‌کننده")
+    expires_at = forms.DateTimeField(
+        label="زمان انقضا", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+    )
+
+    def clean_expires_at(self):
+        value = self.cleaned_data["expires_at"]
+        return timezone.make_aware(value) if timezone.is_naive(value) else value
+
+
+class SupplierPortalSubmissionForm(_StyledForm):
+    integrity_fingerprint = forms.CharField(
+        label="هش یکپارچگی SHA-256", min_length=64, max_length=64
+    )
+    source_reference = forms.CharField(
+        label="مرجع تأمین‌کننده", required=False, max_length=255
+    )
+    idempotency_key = forms.CharField(label="کلید یکتای ارسال", max_length=128)
+
+    def clean_integrity_fingerprint(self):
+        value = self.cleaned_data["integrity_fingerprint"].strip().lower()
+        if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+            raise forms.ValidationError("هش SHA-256 باید شامل ۶۴ نویسهٔ شانزدهی باشد.")
+        return value
+
+
+class SealedEvidenceUploadForm(_StyledForm):
+    evidence_type = forms.ChoiceField(
+        label="نوع شاهد",
+        choices=(
+            ("supplier_original", "اصل پیشنهاد تأمین‌کننده"),
+            ("supplier_attachment", "پیوست تأمین‌کننده"),
+        ),
+    )
+    evidence_slot = forms.CharField(
+        label="شناسه فنی پیوست", required=False, max_length=80
+    )
+    upload = forms.FileField(label="فایل شاهد")
+    idempotency_key = forms.CharField(label="کلید یکتای نگهداری", max_length=128)
+    expected_sha256 = forms.CharField(
+        label="هش مورد انتظار SHA-256", required=False, max_length=64
+    )

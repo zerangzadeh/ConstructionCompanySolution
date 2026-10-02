@@ -89,6 +89,17 @@ class QuoteSourceChannel(models.TextChoices):
     INTERNAL_EMAIL = "internal_email", "ایمیل داخلی"
     MANUAL_CAPTURE = "manual_capture", "ثبت داخلی"
     SECURE_DROP = "secure_drop", "دریافت امن"
+    EXTERNAL_PORTAL = "external_portal", "درگاه خارجی دعوت‌محور"
+
+
+class SupplierPortalInvitationStatus(models.TextChoices):
+    PENDING = "pending", "در انتظار پذیرش"
+    ACCEPTED = "accepted", "پذیرفته‌شده"
+    REVOKED = "revoked", "لغوشده"
+
+
+class SupplierPortalCapability(models.TextChoices):
+    RFQ_QUOTE_SUBMIT = "rfq_quote.submit", "ثبت و نهایی‌سازی پیشنهاد همان دعوت‌نامه"
 
 
 class QuoteEvidenceType(models.TextChoices):
@@ -704,6 +715,314 @@ class RequestForQuotationInvitation(UUIDModel, TimeStampedModel):
                 raise ValidationError("هویت دعوت‌نامه صادرشده تغییرناپذیر است.")
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
+
+
+class ImmutablePortalEvidenceQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("شواهد درگاه خارجی تغییرپذیر نیست.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("شواهد درگاه خارجی حذف‌پذیر نیست.")
+
+
+class ImmutablePortalEvidenceManager(
+    models.Manager.from_queryset(ImmutablePortalEvidenceQuerySet)
+):
+    pass
+
+
+class SupplierPortalPrincipal(UUIDModel, CreatedAtModel):
+    """Invitation-established external identity; never a Tenant membership."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    supplier = models.ForeignKey("parties.BusinessParty", on_delete=models.PROTECT)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    objects = ImmutablePortalEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "supplier", "user"],
+                name="uq_supplier_portal_principal_identity",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "user"], name="portal_principal_org_user_idx"
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, supplier=self.supplier if self.supplier_id else None
+        )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("هویت خارجی پذیرفته‌شده تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("هویت خارجی حذف‌پذیر نیست.")
+
+
+class SupplierPortalInvitation(UUIDModel, CreatedAtModel):
+    """Expiring, token-hash-only invitation for one existing RFQ invitation."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    rfq_invitation = models.ForeignKey(
+        RequestForQuotationInvitation,
+        on_delete=models.PROTECT,
+        related_name="portal_invitations",
+    )
+    invited_email = models.EmailField()
+    token_hash = models.CharField(max_length=64, unique=True)
+    token_prefix = models.CharField(max_length=12)
+    expires_at = models.DateTimeField()
+    status = models.CharField(
+        max_length=16,
+        choices=SupplierPortalInvitationStatus.choices,
+        default=SupplierPortalInvitationStatus.PENDING,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="supplier_portal_invitations_created",
+    )
+    accepted_principal = models.ForeignKey(
+        SupplierPortalPrincipal,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="accepted_invitations",
+    )
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["rfq_invitation"],
+                condition=models.Q(status=SupplierPortalInvitationStatus.PENDING),
+                name="uq_supplier_portal_pending_invitation",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        status=SupplierPortalInvitationStatus.ACCEPTED,
+                        accepted_principal__isnull=False,
+                        accepted_at__isnull=False,
+                    )
+                    | models.Q(
+                        status__in=[
+                            SupplierPortalInvitationStatus.PENDING,
+                            SupplierPortalInvitationStatus.REVOKED,
+                        ],
+                        accepted_principal__isnull=True,
+                        accepted_at__isnull=True,
+                    )
+                    | models.Q(
+                        status=SupplierPortalInvitationStatus.REVOKED,
+                        accepted_principal__isnull=False,
+                        accepted_at__isnull=False,
+                    )
+                ),
+                name="portal_invitation_acceptance_consistent",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "expires_at"],
+                name="portal_inv_org_status_exp_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            rfq_invitation=self.rfq_invitation
+            if self.rfq_invitation_id
+            else None,
+            accepted_principal=self.accepted_principal
+            if self.accepted_principal_id
+            else None,
+        )
+        self.invited_email = self.invited_email.strip().lower()
+        self.token_hash = self.token_hash.strip().lower()
+        self.token_prefix = self.token_prefix.strip()
+        if not re.fullmatch(r"[0-9a-f]{64}", self.token_hash):
+            raise ValidationError("هش دعوت‌نامه معتبر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("هویت دعوت‌نامه خارجی تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("دعوت‌نامه خارجی حذف‌پذیر نیست.")
+
+
+class SupplierPortalGrant(UUIDModel, CreatedAtModel):
+    """Immutable least-privilege grant for exactly one RFQ invitation."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    principal = models.ForeignKey(
+        SupplierPortalPrincipal, on_delete=models.PROTECT, related_name="grants"
+    )
+    portal_invitation = models.ForeignKey(
+        SupplierPortalInvitation, on_delete=models.PROTECT, related_name="grants"
+    )
+    rfq_invitation = models.ForeignKey(
+        RequestForQuotationInvitation,
+        on_delete=models.PROTECT,
+        related_name="portal_grants",
+    )
+    capability = models.CharField(
+        max_length=32, choices=SupplierPortalCapability.choices
+    )
+
+    objects = ImmutablePortalEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["portal_invitation", "capability"],
+                name="uq_supplier_portal_invitation_capability",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "principal", "capability"],
+                name="portal_grant_org_principal_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            principal=self.principal if self.principal_id else None,
+            portal_invitation=self.portal_invitation
+            if self.portal_invitation_id
+            else None,
+            rfq_invitation=self.rfq_invitation
+            if self.rfq_invitation_id
+            else None,
+        )
+        if self.portal_invitation_id and (
+            self.portal_invitation.rfq_invitation_id != self.rfq_invitation_id
+            or self.portal_invitation.accepted_principal_id != self.principal_id
+        ):
+            raise ValidationError("مجوز درگاه باید دقیقاً از همان دعوت‌نامه پذیرفته‌شده بیاید.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("مجوز درگاه خارجی تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("مجوز درگاه خارجی حذف‌پذیر نیست.")
+
+
+class SupplierPortalGrantRevocation(UUIDModel, CreatedAtModel):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    grant = models.OneToOneField(
+        SupplierPortalGrant, on_delete=models.PROTECT, related_name="revocation"
+    )
+    revoked_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+
+    objects = ImmutablePortalEvidenceManager()
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, grant=self.grant if self.grant_id else None
+        )
+        self.reason = self.reason.strip()
+        if not self.reason:
+            raise ValidationError("دلیل لغو مجوز الزامی است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد لغو تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("شاهد لغو حذف‌پذیر نیست.")
+
+
+class SupplierPortalSubmissionReceipt(UUIDModel, CreatedAtModel):
+    """Immutable portal receipt pointing to the existing sealed quote revision."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    grant = models.ForeignKey(
+        SupplierPortalGrant, on_delete=models.PROTECT, related_name="submission_receipts"
+    )
+    quote_revision = models.OneToOneField(
+        "QuoteRevision", on_delete=models.PROTECT, related_name="portal_receipt"
+    )
+    idempotency_key = models.CharField(max_length=128)
+    payload_fingerprint = models.CharField(max_length=64)
+
+    objects = ImmutablePortalEvidenceManager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["grant", "idempotency_key"],
+                name="uq_supplier_portal_submission_idem",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "grant", "created_at"],
+                name="portal_receipt_org_grant_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            grant=self.grant if self.grant_id else None,
+            quote_revision=self.quote_revision if self.quote_revision_id else None,
+        )
+        self.idempotency_key = self.idempotency_key.strip()
+        self.payload_fingerprint = self.payload_fingerprint.strip().lower()
+        if not self.idempotency_key:
+            raise ValidationError("کلید یکتای رسید الزامی است.")
+        if not re.fullmatch(r"[0-9a-f]{64}", self.payload_fingerprint):
+            raise ValidationError("اثر انگشت رسید معتبر نیست.")
+        if self.grant_id and self.quote_revision_id and (
+            self.grant.rfq_invitation_id != self.quote_revision.invitation_id
+        ):
+            raise ValidationError("رسید باید به پیشنهاد همان مجوز درگاه اشاره کند.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("رسید ارسال تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("رسید ارسال حذف‌پذیر نیست.")
 
 
 class QuoteEnvelope(UUIDModel, TimeStampedModel):

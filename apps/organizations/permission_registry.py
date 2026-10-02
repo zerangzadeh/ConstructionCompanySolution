@@ -707,6 +707,19 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("apps.procurement.rfq_services",),
     ),
     PermissionResource(
+        "supplier_portal",
+        "درگاه دعوت‌محور تأمین‌کننده",
+        (
+            "procurement.SupplierPortalPrincipal",
+            "procurement.SupplierPortalInvitation",
+            "procurement.SupplierPortalGrant",
+            "procurement.SupplierPortalGrantRevocation",
+            "procurement.SupplierPortalSubmissionReceipt",
+        ),
+        (P.SUPPLIER_PORTAL_INVITATIONS_MANAGE,),
+        ("apps.procurement.portal_services",),
+    ),
+    PermissionResource(
         "purchase_requests",
         "درخواست‌های خرید",
         ("procurement.PurchaseRequest",),

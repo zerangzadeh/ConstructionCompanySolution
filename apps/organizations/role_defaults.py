@@ -119,6 +119,9 @@ UNAUTHORIZED_RFQ_OPENING_PERMISSIONS = permission_codes(
     BusinessPermissionCode.RFQ_QUOTES_VIEW_CONFIDENTIAL,
     BusinessPermissionCode.RFQ_QUOTES_MANAGE_CONFIDENTIAL_ACCESS,
 )
+UNAUTHORIZED_SUPPLIER_PORTAL_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.SUPPLIER_PORTAL_INVITATIONS_MANAGE,
+)
 OWNER_ONLY_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTS_CREATE,
     BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
@@ -343,6 +346,7 @@ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CLOSE_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CUSTODY_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_OPENING_PERMISSIONS)
+    _default_permissions.difference_update(UNAUTHORIZED_SUPPLIER_PORTAL_PERMISSIONS)
     _default_permissions.difference_update(
         UNAUTHORIZED_PROJECT_CONTROL_APPROVAL_PERMISSIONS
     )

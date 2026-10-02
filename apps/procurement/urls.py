@@ -5,6 +5,37 @@ from apps.procurement import views
 app_name = "procurement"
 
 urlpatterns = [
+    path("portal/accept/", views.supplier_portal_accept, name="portal_accept"),
+    path(
+        "portal/grants/<uuid:grant_id>/",
+        views.supplier_portal_context,
+        name="portal_context",
+    ),
+    path(
+        "portal/grants/<uuid:grant_id>/submit/",
+        views.supplier_portal_submit,
+        name="portal_submit",
+    ),
+    path(
+        "portal/receipts/<uuid:receipt_id>/",
+        views.supplier_portal_receipt,
+        name="portal_receipt",
+    ),
+    path(
+        "rfq-invitations/<uuid:invitation_id>/portal/",
+        views.portal_invitation_manage,
+        name="portal_invitation_manage",
+    ),
+    path(
+        "rfq-invitations/<uuid:invitation_id>/portal/revoke/<uuid:grant_id>/",
+        views.portal_grant_revoke,
+        name="portal_grant_revoke",
+    ),
+    path(
+        "quote-revisions/<uuid:revision_id>/sealed-evidence/",
+        views.sealed_evidence_custody,
+        name="sealed_evidence_custody",
+    ),
     path("", views.purchase_request_list, name="request_list"),
     path("requests/create/", views.purchase_request_create, name="request_create"),
     path(

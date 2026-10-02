@@ -15,8 +15,10 @@ implemented, PostgreSQL-verified and Product Owner accepted under its
 award self-finalization supersession of P5-D01 is recorded in section 8.
 P5-S12–S17 were subsequently authorized as one bounded implementation batch,
 implemented and PostgreSQL-verified as recorded in section 14, and Product Owner
-accepted on 2026-10-02. P5-S01–S17 are complete/accepted; P5-S18+ remains
-unauthorized.
+accepted on 2026-10-02. P5-S18–S22 were subsequently authorized as one bounded
+portal-foundation batch, implemented and PostgreSQL-verified; Product Owner
+acceptance is complete. P5-S23–S25 are authorized as one bounded UI batch;
+P5-S26+ remains unauthorized.
 
 **Authority:** The Product Owner authorized P5-S01–S04 as one documentation-only
 planning-and-design tranche on 2026-10-01. This packet is the authoritative result.
@@ -1034,15 +1036,18 @@ drift, Django check and Ruff pass. This is pre-production application acceptance
 not production readiness or activation. P5-S10 is subsequently implemented under
 its separate accepted contract; P5-S11 is subsequently implemented,
 PostgreSQL-verified and Product Owner accepted under its separate packet. P5-S12–S17
-are subsequently implemented and verified under section 14. P5-S18+, P5.2,
+are subsequently implemented and verified under section 14. P5-S18–S22 are
+subsequently implemented under section 15. P5-S23–S25 are subsequently implemented
+as bounded UI adapters under section 15; P5-S26+,
 production activation and downstream financial/stock/cost/cash handoffs remain
 unauthorized.
 
 ## 14. P5-S12–S17 internal source-to-pay implementation record
 
 **Acceptance:** Product Owner accepted P5-S12–S17 as implemented and
-PostgreSQL-verified on 2026-10-02. The authoritative state is **P5-S01–S17
-COMPLETE / ACCEPTED; P5-S18+ UNAUTHORIZED**.
+PostgreSQL-verified on 2026-10-02. At that acceptance boundary the state was
+**P5-S01–S17 COMPLETE / ACCEPTED**; the later P5-S18–S22 disposition is recorded
+in section 15.
 
 | Session | Implemented boundary |
 | --- | --- |
@@ -1072,7 +1077,53 @@ Six focused P5-S12–S17 tests passed, followed by 40 retained Procurement and
 P5-S09–S11 regressions plus 9 subtests. Two nullable-outer-join lock selections,
 one variance-evidence scale defect and one exact source-price representation defect
 were corrected and rerun. Django checks, migration drift and Ruff checks pass. The
-runtime is service/model available only; P5-S23–S25 UI remains outside this batch.
+runtime is service/model available only; the later P5-S23–S25 UI adapter batch is
+recorded in section 15.
+
+## 15. P5-S18–S25 controlled external portal foundation and bounded UI
+
+**Disposition:** P5-S18–S22 are Product Owner accepted. P5-S23–S25 implement
+only the listed HTTP/template adapters and are Product Owner accepted as
+PostgreSQL-verified on 2026-10-02. Five focused UI tests, seven retained P5-S18–S22 tests, six
+bounded P5-S12–S17 regressions and one retained sealed-content-denial test passed
+on one clean disposable database. No migration is introduced. P5-S26+ is not
+authorized.
+
+| Session | Implemented boundary |
+| --- | --- |
+| P5-S18 | Immutable external principal tied to the existing authenticated `User`, Tenant-local supplier `BusinessParty` and organization, explicitly without `OrganizationMembership`. |
+| P5-S19 | Default-ungranted internal invitation-management permission and expiring token-hash-only invitation for one existing RFQ invitation; no outbound provider or account provisioning. |
+| P5-S20 | Atomic invitation acceptance requires an active existing account and exact normalized invited email; it creates one immutable invitation-specific least-privilege quote-submission grant. |
+| P5-S21 | The grant reads only organization/supplier/project labels and the issued RFQ version/lines; it exposes no peer invitations, competitor data, internal notes or generic Documents content. |
+| P5-S22 | Idempotent external submission atomically creates/supersedes the existing sealed `QuoteRevision`, transition and immutable portal receipt; append-only revocation immediately denies later reads/submissions. |
+| P5-S23 | Persian-first internal invitation/grant management and external invitation acceptance use the existing permissioned services; tokens are shown only once at creation and are never persisted by the UI. |
+| P5-S24 | The external journey displays only existing exact-scope RFQ context, submits/revises through the existing idempotent service, and displays the immutable receipt. Resubmission is the supported correction loop; portal withdrawal remains unavailable. |
+| P5-S25 | Internal sealed-evidence custody provides only the existing quarantined intake path. It does not reveal, preview, download, list, search or export sealed content. |
+
+The foundation preserves P5-S05–S17 tenant/project/version, confidentiality,
+immutability, audit, idempotency and concurrency contracts. External actors receive
+no internal business permission and no Tenant membership. `BusinessParty` remains
+the supplier authority; the portal principal is only an authentication binding.
+Invitation tokens are never persisted in plaintext, accepted invitations cannot be
+rebound, and the dedicated internal management capability has no default role grant.
+
+P5-S23–S25 add the narrowly listed portal HTTP/UI and internal evidence-custody
+intake only. External safe-upload, evidence delivery, outbound email/SMS, account
+creation/password recovery, MFA/risk policy, support impersonation,
+qualification/profile/document/invoice/claim submission, portal withdrawal and
+production activation are not included. No payable, GL, Project
+Cost, Inventory, Treasury/cash or contract-value mutation is introduced. Existing
+tax/charge, supplier-invoice self-approval and material discrepancy gates remain
+fail-closed.
+
+Verification used one reusable disposable PostgreSQL database. Seven focused tests
+passed, covering default-ungranted management, token hashing, identity/email binding,
+absence of membership, exact-scope reads, cross-Tenant/impersonation denial,
+idempotent and superseding submission, immutable receipt/revocation and real
+PostgreSQL concurrent retry. Sixty-two retained P5-S05–S17 tests plus four subtests
+passed. Procurement 0015 and Organizations 0083 rollback/reapply passed. PostgreSQL
+identified one nullable-outer-join `FOR UPDATE` defect; locking was corrected to the
+invitation row and the affected suite reran green.
 
 ### Proposed separate P5-S05 authorization text — not granted
 

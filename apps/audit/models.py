@@ -685,6 +685,22 @@ class AuditAction(models.TextChoices):
         "rfq.invitation_updated",
         "وضعیت دعوت‌نامه استعلام تغییر کرد",
     )
+    SUPPLIER_PORTAL_INVITATION_CREATED = (
+        "supplier_portal.invitation_created",
+        "دعوت‌نامه درگاه تأمین‌کننده ایجاد شد",
+    )
+    SUPPLIER_PORTAL_INVITATION_ACCEPTED = (
+        "supplier_portal.invitation_accepted",
+        "دعوت‌نامه درگاه تأمین‌کننده پذیرفته شد",
+    )
+    SUPPLIER_PORTAL_GRANT_REVOKED = (
+        "supplier_portal.grant_revoked",
+        "مجوز درگاه تأمین‌کننده لغو شد",
+    )
+    SUPPLIER_PORTAL_QUOTE_SUBMITTED = (
+        "supplier_portal.quote_submitted",
+        "پیشنهاد درگاه تأمین‌کننده ثبت شد",
+    )
     RFQ_QUOTE_REVISION_CAPTURED = (
         "rfq.quote_revision_captured",
         "نسخه پیشنهاد مهروموم‌شده ثبت شد",

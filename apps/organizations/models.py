@@ -879,6 +879,10 @@ class BusinessPermissionCode(models.TextChoices):
         "نگهداری شاهد مهروموم‌شده پیشنهاد",
     )
     RFQ_INVITATIONS_MANAGE = "rfq_invitations.manage", "مدیریت دعوت‌نامه‌های استعلام"
+    SUPPLIER_PORTAL_INVITATIONS_MANAGE = (
+        "supplier_portal.invitations_manage",
+        "مدیریت دعوت و لغو دسترسی درگاه تأمین‌کننده",
+    )
     RFQ_QUOTES_VIEW_METADATA = "rfq_quotes.view_metadata", "مشاهده فراداده پیشنهادها"
     RFQ_QUOTES_CAPTURE = "rfq_quotes.capture", "ثبت پیشنهادهای مهروموم‌شده"
     RFQ_QUOTES_SUBMIT = "rfq_quotes.submit", "ثبت نهایی پیشنهاد مهروموم‌شده"

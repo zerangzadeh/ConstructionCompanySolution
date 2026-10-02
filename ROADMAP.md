@@ -51,7 +51,7 @@ compliance, security, migration, and integration consequences.
 | ID | Status | Delivered boundary |
 | --- | --- | --- |
 | F1 Workforce | **DELIVERED** | Employees, departments, positions, teams, effective position/project assignments, optional `User` link, images, permission/audit/tenant checks. Attendance, time, payroll, skills, and rates are not delivered. |
-| F2 Procurement | **DELIVERED expanding baseline** | Purchase request/order/goods receipt and the Product Owner-accepted P5-S01–S17 source-to-award, versioned PO/change, service acceptance, AP-owned supplier invoice and match/tolerance baseline are implemented. UI, payable/GL/Treasury/Inventory activation and P5-S18+ remain deferred. |
+| F2 Procurement | **DELIVERED expanding baseline** | Purchase request/order/goods receipt and the Product Owner-accepted P5-S01–S22 baseline are implemented. P5-S23–S25 add bounded Persian-first internal/external UI adapters over the portal and sealed-evidence services; broader portal collaboration, payable/GL/Treasury/Inventory activation remain deferred. |
 | F3 Inventory | **DELIVERED baseline** | Warehouse and posted/reversible stock-quantity ledger. Valuation, reservations, bins/lots/serials, and accounting are not delivered. |
 | F4 Equipment | **DELIVERED baseline** | Equipment, conflict-safe assignments, maintenance. Usage/fuel/cost/fixed-asset integration is not delivered. |
 | F5 Workflow & Work Management | **DELIVERED** | Versioned definitions, bounded registries, runtime, candidate/assignment/delegation history, work items/workbench with due/overdue and escalation routing, position routing, domain adoption, PostgreSQL acceptance gates. |
@@ -1359,7 +1359,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P5.1 Sourcing and supplier invoice match
 
-- **Status / priority:** **P5-S01–S17 COMPLETE / ACCEPTED; P5-S18+ UNAUTHORIZED**
+- **Status / priority:** **P5-S01–S25 COMPLETE / ACCEPTED; P5-S26+ UNAUTHORIZED**
 - **Planning disposition (2026-10-01):** the
   [P5-S01–S04 decision packet](docs/architecture/P5_S01_S04_SOURCE_TO_AWARD_DECISION_PACKET.md)
   defines the internal RFQ-to-award lifecycle, SoD/confidentiality boundary,
@@ -1448,8 +1448,16 @@ Stable masters + consent/privacy + support operations -> future network/AI
   `BLOCKED` or `INCOMPLETE` outcomes. Missing policy/acceptance, unsupported tax or
   charge policy, cross-Tenant scope, overbilling and out-of-tolerance evidence fail
   closed. No match creates a payable, journal, stock/cost fact, payment or exception
-  override. Supplier-invoice self-approval and force-match remain absent. P5-S18+,
-  UI/portal and production activation remain unauthorized.
+  override. Supplier-invoice self-approval and force-match remain absent. P5-S18–S22
+  add only the controlled portal foundation: token-hash-only expiring invitations,
+  authenticated pre-existing-user acceptance bound to Tenant-local `BusinessParty`,
+  immutable invitation-specific grants and revocation, least-privilege issued-RFQ
+  reads, and idempotent external submissions that reuse `QuoteRevision` succession
+  and receipt/audit evidence. They create no Tenant membership, account, outbound
+  delivery, UI, upload/content-custody path or downstream fact. P5-S23–S25 add
+  only thin HTTP/template adapters to those services plus internal sealed-custody
+  intake; no new lifecycle or external upload authority exists. P5-S26+ and
+  production activation remain unauthorized.
 - **Outcome:** RFQ, invited suppliers, versioned quotes, normalized comparison,
   sourcing approval/award, PO changes, service acceptance, supplier invoice,
   two/three-way match, tolerance and discrepancy workflow.
@@ -1480,14 +1488,23 @@ Stable masters + consent/privacy + support operations -> future network/AI
     nullable-outer-join locking defects, one variance-evidence scale defect and one
     exact source-price representation defect were corrected and rerun. The Product
     Owner accepted P5-S12–S17 as implemented and PostgreSQL-verified on 2026-10-02.
-    P5-S18+ remains unauthorized.
+    The authorized P5-S18–S22 batch then passed 7 focused PostgreSQL tests, 62
+    retained P5-S05–S17 tests plus 4 subtests, and one migration rollback/reapply
+    boundary. A nullable-outer-join locking defect found by PostgreSQL was corrected.
+    P5-S18–S22 are Product Owner accepted. P5-S23–S25 passed 5 focused UI tests,
+    7 retained P5-S18–S22 tests, 6 bounded P5-S12–S17 regressions and one retained
+    sealed-content denial test on one clean disposable PostgreSQL database. No new
+    migration was added. The Product Owner accepted P5-S23–S25 as implemented and
+    PostgreSQL-verified on 2026-10-02. P5-S26+ remains unauthorized.
 
 ### P5.2 Controlled supplier and subcontractor portal
 
-- **Status / priority:** **PLANNED after internal source-to-pay boundaries stabilize**
-- **P5-S01–S04 disposition:** unchanged and deferred. The internal sourcing packet
-  creates no external identity, invitation delivery, supplier login, support model
-  or portal authority.
+- **Status / priority:** **P5-S18–S25 COMPLETE / ACCEPTED; broader collaboration remains planned**
+- **P5-S18–S25 disposition:** P5-S18–S22 are accepted service/model foundation.
+  P5-S23–S25 add invitation acceptance, exact-RFQ context, idempotent submission
+  receipt, internal invitation/grant revocation and internal sealed-evidence custody
+  views. They create no outbound invitation delivery, account provisioning,
+  external upload path, portal withdrawal or support bypass.
 - **Outcome:** invite-scoped external collaboration for party profile/document and
   qualification-evidence submission, RFQ participation, versioned quotation,
   supplier invoice/supporting documents, subcontractor claim/evidence submission,
