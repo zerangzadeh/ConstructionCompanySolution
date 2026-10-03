@@ -7,6 +7,14 @@ implementation or activation.
 
 **Date:** 2026-10-01
 
+**Subsequent reconciliation (2026-10-03):** authorized P6-S07–S13 now stores an
+explicit claim due date from pinned contract `payment_due_days` and registers
+`billing.progress_claim.v1` for separately permissioned AR recognition. Approval
+does not recognize AR. Because obligation/journal reversal orchestration remains
+deferred, claims with recognized AR fail closed for correction. AP, automatic
+recognition, posting production, write-offs and production activation remain
+closed. The decision narrative below is retained as historical gate evidence.
+
 This packet resolves only the four bounded gates retained by the accepted
 [P3-S23–S27 implementation contract](P3_S23_S27_IMPLEMENTATION_CONTRACT.md).
 It does not change application code, register an AP/AR source or Accounting
@@ -49,7 +57,7 @@ become a competing source of truth. It also keeps missing due dates visible and
 fail-closed instead of deriving them from approval, period end, or contract end.
 
 **Still deferred:** the AP invoice/certificate domain and its recognition policy;
-payment terms and any grace days; credit notes, debit notes and tax/legal
+grace-day policy; credit notes, debit notes and tax/legal
 treatment; legacy `Payment`/`ClaimSettlementAllocation` backfill or cutover;
 production activation; and any source other than the explicitly accepted adapter.
 

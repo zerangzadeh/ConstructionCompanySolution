@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, timedelta
 from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -20,6 +20,8 @@ from apps.contracts.models import (
     ContractDirection,
     ContractItem,
     ContractStatus,
+    ContractTermVersion,
+    ContractTermVersionStatus,
 )
 from apps.organizations.authorization import (
     get_active_membership,
@@ -27,11 +29,25 @@ from apps.organizations.authorization import (
     scope_queryset,
 )
 from apps.organizations.models import (
+    SUPPORTED_BASE_CURRENCY,
     BusinessPermissionCode,
     MembershipStatus,
     Organization,
     OrganizationMembership,
+    OrganizationSettings,
+    PlatformPolicyVersion,
+    PolicyReviewDisposition,
+    PolicySourceBasis,
+    PolicyVersionStatus,
 )
+from apps.organizations.policy_services import (
+    resolve_effective_platform_regulatory_policy,
+)
+from apps.organizations.policy_specs import (
+    RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+    validate_policy_for_consumer,
+)
+from apps.parties.models import PartyIdentitySnapshot
 from apps.payments.models import (
     Payment,
     PaymentAllocation,
@@ -45,7 +61,6 @@ from .models import (
     MONEY_QUANTUM,
     QUANTITY_QUANTUM,
     BaselineItem,
-    BillingPolicy,
     ClaimAdjustment,
     ClaimAdjustmentType,
     ClaimNumberScope,
@@ -53,12 +68,14 @@ from .models import (
     ClaimSettlementAllocation,
     ClaimSettlementAllocationStatus,
     ProgressClaim,
+    ProgressClaimCorrectionKind,
     ProgressClaimItem,
     ProgressClaimSource,
     ProgressRecord,
     ProgressRecordStatus,
     ProjectBaseline,
     ProjectBaselineStatus,
+    TenantBillingConfiguration,
 )
 
 
@@ -662,7 +679,11 @@ def _locked_progress_record(
 
 
 def _locked_progress_baseline_item(
-    *, organization: Organization, baseline: ProjectBaseline, item: BaselineItem
+    *,
+    organization: Organization,
+    baseline: ProjectBaseline,
+    item: BaselineItem,
+    allow_superseded: bool = False,
 ) -> tuple[ProjectBaseline, BaselineItem]:
     locked_baseline = _locked_baseline(organization=organization, baseline=baseline)
     try:
@@ -673,7 +694,10 @@ def _locked_progress_baseline_item(
         raise PermissionDenied(
             "ردیف مبنا متعلق به این سازمان یا مبنای انتخابی نیست."
         ) from exc
-    if locked_baseline.status != ProjectBaselineStatus.APPROVED:
+    allowed_statuses = {ProjectBaselineStatus.APPROVED}
+    if allow_superseded:
+        allowed_statuses.add(ProjectBaselineStatus.SUPERSEDED)
+    if locked_baseline.status not in allowed_statuses:
         raise ValidationError("ثبت پیشرفت فقط بر مبنای تأییدشده مجاز است.")
     return locked_baseline, locked_item
 
@@ -733,6 +757,7 @@ def get_progress_claims(
         "submitted_by",
         "approved_by",
         "returned_revision",
+        "corrects",
     )
 
 
@@ -890,10 +915,12 @@ def _latest_verified_progress_locked(
         ProgressRecord.objects.select_for_update()
         .filter(
             organization=organization,
-            baseline_item=item,
+            baseline__contract=item.baseline.contract,
+            baseline__effective_date__lte=item.baseline.effective_date,
+            baseline_item__line_key=item.line_key,
             status=ProgressRecordStatus.VERIFIED,
         )
-        .order_by("-verified_at", "-created_at")
+        .order_by("-measured_on", "-verified_at", "-created_at")
         .first()
     )
 
@@ -913,7 +940,10 @@ def _verify_progress_record_domain(
     if locked.status != ProgressRecordStatus.SUBMITTED:
         raise ValidationError("فقط رکورد ارسال‌شده قابل راستی‌آزمایی است.")
     _, item = _locked_progress_baseline_item(
-        organization=organization, baseline=locked.baseline, item=locked.baseline_item
+        organization=organization,
+        baseline=locked.baseline,
+        item=locked.baseline_item,
+        allow_superseded=bool(locked.corrects_id),
     )
     latest = _latest_verified_progress_locked(organization=organization, item=item)
     if locked.corrects_id:
@@ -1043,29 +1073,22 @@ def reject_progress_record(
     )
 
 
-def _policy_snapshot(policy: BillingPolicy) -> dict[str, str | bool | int]:
+def _billing_configuration_snapshot(
+    configuration: TenantBillingConfiguration,
+) -> dict[str, str | bool | int]:
     return {
-        "claim_number_scope": policy.claim_number_scope,
-        "period_boundary": policy.period_boundary,
-        "allow_partial_periods": policy.allow_partial_periods,
-        "allow_late_measurements": policy.allow_late_measurements,
-        "money_decimal_places": policy.money_decimal_places,
-        "tax_rate": str(policy.tax_rate),
-        "tax_basis": policy.tax_basis,
-        "insurance_rate": str(policy.insurance_rate),
-        "insurance_basis": policy.insurance_basis,
-        "retention_rate": str(policy.retention_rate),
-        "retention_cap": str(policy.retention_cap),
-        "advance_recovery_rate": str(policy.advance_recovery_rate),
-        "advance_recovery_cap": str(policy.advance_recovery_cap),
-        "allow_negative_corrective_claims": policy.allow_negative_corrective_claims,
+        "claim_number_scope": configuration.claim_number_scope,
+        "period_boundary": configuration.period_boundary,
+        "allow_partial_periods": configuration.allow_partial_periods,
+        "allow_late_measurements": configuration.allow_late_measurements,
+        "currency_decimal_places": configuration.currency_decimal_places,
     }
 
 
 @transaction.atomic
-def update_billing_policy(
+def update_billing_configuration(
     *, organization: Organization, actor: User, **values: object
-) -> BillingPolicy:
+) -> TenantBillingConfiguration:
     require_business_permission(
         user=actor,
         organization=organization,
@@ -1073,25 +1096,73 @@ def update_billing_policy(
         message="اجازه تغییر سیاست تجاری این سازمان را ندارید.",
     )
     locked = Organization.objects.select_for_update().get(pk=organization.pk)
-    policy, _ = BillingPolicy.objects.select_for_update().get_or_create(
-        organization=locked
+    configuration, _ = (
+        TenantBillingConfiguration.objects.select_for_update().get_or_create(
+            organization=locked
+        )
     )
-    allowed = set(_policy_snapshot(policy))
+    allowed = set(_billing_configuration_snapshot(configuration))
     unknown = set(values) - allowed
     if unknown:
         raise ValidationError(
             f"تنظیمات تجاری ناشناخته‌اند: {', '.join(sorted(unknown))}"
         )
     for name, value in values.items():
-        setattr(policy, name, value)
-    policy.updated_by = actor
-    policy.full_clean()
-    policy.save()
-    return policy
+        setattr(configuration, name, value)
+    configuration.updated_by = actor
+    configuration.full_clean()
+    configuration.save()
+    return configuration
 
 
-def get_billing_policy(*, organization: Organization) -> BillingPolicy:
-    return BillingPolicy.objects.get_or_create(organization=organization)[0]
+def get_billing_configuration(
+    *, organization: Organization
+) -> TenantBillingConfiguration:
+    return TenantBillingConfiguration.objects.get_or_create(organization=organization)[
+        0
+    ]
+
+
+def _resolve_contract_term_version(
+    *, organization: Organization, contract: Contract, on_date: date
+) -> ContractTermVersion:
+    version = (
+        ContractTermVersion.objects.select_for_update()
+        .filter(
+            organization=organization,
+            contract=contract,
+            status__in=(
+                ContractTermVersionStatus.APPROVED,
+                ContractTermVersionStatus.SUPERSEDED,
+            ),
+            effective_from__lte=on_date,
+        )
+        .order_by("-effective_from", "-version")
+        .first()
+    )
+    if version is None:
+        raise ValidationError("نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.")
+    return version
+
+
+def _resolve_regulatory_rule_version(
+    *, organization: Organization, on_date: date
+) -> PlatformPolicyVersion:
+    del organization
+    return resolve_effective_platform_regulatory_policy(
+        code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+        consumer="billing.progress_claim.calculate",
+        on_date=on_date,
+    )
+
+
+def _party_identity_snapshot(contract: Contract) -> PartyIdentitySnapshot:
+    if contract.party_id is None:
+        raise ValidationError("قرارداد دریافتنی باید طرف تجاری مرجع داشته باشد.")
+    snapshot = contract.party.identity_snapshots.order_by("-sequence").first()
+    if snapshot is None:
+        raise ValidationError("طرف قرارداد تصویر هویت قابل استناد ندارد.")
+    return snapshot
 
 
 def _money(value: Decimal, places: int) -> Decimal:
@@ -1116,22 +1187,23 @@ def create_progress_claim(
     locked = _locked_baseline(organization=organization, baseline=baseline)
     if locked.status != ProjectBaselineStatus.APPROVED:
         raise ValidationError("صورت‌وضعیت فقط بر مبنای تأییدشده ساخته می‌شود.")
-    policy = get_billing_policy(organization=organization)
+    configuration = get_billing_configuration(organization=organization)
     if (
         period_end < period_start
         or not period_start <= measurement_cutoff <= period_end
     ):
         raise ValidationError("دوره و تاریخ قطع اندازه‌گیری معتبر نیست.")
+    if locked.effective_date > measurement_cutoff:
+        raise ValidationError("تاریخ اثر مبنا نمی‌تواند پس از تاریخ قطع باشد.")
     if ProgressClaim.objects.filter(
         organization=organization,
         contract=locked.contract,
-        baseline=locked,
         revision_number=1,
         period_start__lte=period_end,
         period_end__gte=period_start,
     ).exists():
         raise ValidationError("دوره صورت‌وضعیت پیش‌نویس با دوره موجود هم‌پوشانی دارد.")
-    if policy.period_boundary == ClaimPeriodBoundary.CALENDAR and (
+    if configuration.period_boundary == ClaimPeriodBoundary.CALENDAR and (
         period_start.day != 1
         or period_end.month == period_start.month
         and period_end.day < 28
@@ -1139,7 +1211,7 @@ def create_progress_claim(
         raise ValidationError("سیاست سازمان دوره تقویمی کامل را الزامی می‌کند.")
     scope = (
         {"organization": organization}
-        if policy.claim_number_scope == ClaimNumberScope.ORGANIZATION
+        if configuration.claim_number_scope == ClaimNumberScope.ORGANIZATION
         else {"organization": organization, "contract": locked.contract}
     )
     number = (
@@ -1148,6 +1220,20 @@ def create_progress_claim(
         ]
         or 0
     ) + 1
+    term_version = _resolve_contract_term_version(
+        organization=organization,
+        contract=locked.contract,
+        on_date=measurement_cutoff,
+    )
+    regulatory_version = _resolve_regulatory_rule_version(
+        organization=organization,
+        on_date=measurement_cutoff,
+    )
+    identity_snapshot = _party_identity_snapshot(locked.contract)
+    organization_settings, _ = OrganizationSettings.objects.get_or_create(
+        organization=organization,
+        defaults={"currency": SUPPORTED_BASE_CURRENCY},
+    )
     claim = ProgressClaim.objects.create(
         organization=organization,
         project=locked.project,
@@ -1157,7 +1243,11 @@ def create_progress_claim(
         period_start=period_start,
         period_end=period_end,
         measurement_cutoff=measurement_cutoff,
-        policy_snapshot=_policy_snapshot(policy),
+        billing_configuration_snapshot=_billing_configuration_snapshot(configuration),
+        contract_term_version=term_version,
+        regulatory_rule_version=regulatory_version,
+        party_identity_snapshot=identity_snapshot,
+        currency_code=organization_settings.currency,
         created_by=actor,
         updated_by=actor,
     )
@@ -1178,100 +1268,445 @@ def recalculate_progress_claim(
     try:
         locked = (
             ProgressClaim.objects.select_for_update()
-            .select_related("baseline", "contract")
+            .select_related(
+                "baseline",
+                "contract_term_version",
+                "regulatory_rule_version",
+            )
             .get(pk=claim.pk, organization=organization)
         )
     except ProgressClaim.DoesNotExist as exc:
         raise PermissionDenied("صورت‌وضعیت متعلق به این سازمان نیست.") from exc
     if locked.status != "draft":
         raise ValidationError("فقط صورت‌وضعیت پیش‌نویس قابل محاسبه مجدد است.")
-    policy = locked.policy_snapshot
-    places = int(policy["money_decimal_places"])
+    configuration = locked.billing_configuration_snapshot
+    places = int(configuration["currency_decimal_places"])
+    term = locked.contract_term_version
+    regulatory = locked.regulatory_rule_version
+    if (
+        term.status
+        not in {
+            ContractTermVersionStatus.APPROVED,
+            ContractTermVersionStatus.SUPERSEDED,
+        }
+        or term.effective_from > locked.measurement_cutoff
+    ):
+        raise ValidationError("نسخه شرایط پین‌شده برای این صورت‌وضعیت معتبر نیست.")
+    if (
+        regulatory.status
+        not in {PolicyVersionStatus.PUBLISHED, PolicyVersionStatus.RETIRED}
+        or regulatory.effective_from > locked.measurement_cutoff
+        or (
+            regulatory.effective_to is not None
+            and regulatory.effective_to <= locked.measurement_cutoff
+        )
+    ):
+        raise ValidationError("نسخه مقرراتی پین‌شده برای این صورت‌وضعیت معتبر نیست.")
+    validate_policy_for_consumer(
+        policy_version=regulatory,
+        consumer="billing.progress_claim.calculate",
+        expected_policy_code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+    )
+    if (
+        regulatory.source_basis != PolicySourceBasis.EXTERNAL_AUTHORITY
+        or not regulatory.source_links.exists()
+        or not regulatory.review_evidence.filter(
+            disposition=PolicyReviewDisposition.ACCEPTED
+        ).exists()
+    ):
+        raise ValidationError("نسخه مقرراتی پین‌شده شواهد معتبر ندارد.")
+    regulatory_parameters = regulatory.parameters
     ProgressClaimSource.objects.filter(claim_item__claim=locked).delete()
     ProgressClaimItem.objects.filter(claim=locked).delete()
-    records = (
-        ProgressRecord.objects.select_related("baseline_item")
+    ClaimAdjustment.objects.filter(claim=locked).delete()
+
+    prior_claims = list(
+        ProgressClaim.objects.select_for_update()
         .filter(
             organization=organization,
-            baseline=locked.baseline,
+            contract=locked.contract,
+            status="approved",
+        )
+        .exclude(claim_number=locked.claim_number)
+        .order_by("claim_number", "revision_number")
+    )
+    prior_claim_ids = [item.pk for item in prior_claims]
+    prior_gross = sum((item.gross_amount for item in prior_claims), Decimal(0))
+    prior_net = sum((item.net_amount for item in prior_claims), Decimal(0))
+    remaining_ceiling = locked.baseline.effective_ceiling - prior_gross
+    if remaining_ceiling < 0:
+        raise ValidationError("سوابق تأییدشده از سقف مؤثر مبنای فعلی بیشتر است.")
+    prior_by_line = {
+        row["baseline_item__line_key"]: {
+            "quantity": row["quantity"] or Decimal(0),
+            "amount": row["amount"] or Decimal(0),
+        }
+        for row in ProgressClaimItem.objects.filter(claim_id__in=prior_claim_ids)
+        .values("baseline_item__line_key")
+        .annotate(quantity=Sum("current_quantity"), amount=Sum("current_amount"))
+    }
+
+    if locked.correction_kind == ProgressClaimCorrectionKind.CANCELLATION:
+        cancellation_snapshot = {
+            "calculation_order": ["linked_cancellation", "zero_final_amount"],
+            "correction_kind": locked.correction_kind,
+            "corrects_claim_id": str(locked.corrects_id),
+            "currency": locked.currency_code,
+            "currency_decimal_places": places,
+            "prior_active_approved_claim_ids": [str(item.pk) for item in prior_claims],
+            "prior_approved_gross": str(prior_gross),
+            "prior_approved_net": str(prior_net),
+            "gross_final": "0",
+            "adjustment_final": "0",
+            "net_final": "0",
+        }
+        locked.gross_amount = Decimal(0)
+        locked.adjustment_amount = Decimal(0)
+        locked.net_amount = Decimal(0)
+        locked.calculation_snapshot = cancellation_snapshot
+        locked.updated_by = actor
+        locked.save(
+            update_fields=[
+                "gross_amount",
+                "adjustment_amount",
+                "net_amount",
+                "calculation_snapshot",
+                "updated_by",
+                "updated_at",
+            ]
+        )
+        return locked
+
+    records = (
+        ProgressRecord.objects.select_related("baseline", "baseline_item")
+        .filter(
+            organization=organization,
+            baseline__contract=locked.contract,
+            baseline__effective_date__lte=locked.measurement_cutoff,
             status=ProgressRecordStatus.VERIFIED,
-            measured_on__gte=locked.period_start,
             measured_on__lte=locked.measurement_cutoff,
         )
-        .order_by("baseline_item_id", "verified_at")
+        .order_by("baseline_item__line_key", "measured_on", "verified_at", "created_at")
     )
-    latest: dict[object, ProgressRecord] = {}
+    latest: dict[str, ProgressRecord] = {}
     for record in records:
-        latest[record.baseline_item_id] = record
-    gross = Decimal(0)
-    for item_id, record in latest.items():
-        previous = record.previous_cumulative_quantity
+        latest[record.baseline_item.line_key] = record
+    gross_intermediate = Decimal(0)
+    line_calculations: list[dict[str, str]] = []
+    for baseline_item in locked.baseline.items.order_by("sort_order", "created_at"):
+        record = latest.get(baseline_item.line_key)
+        if record is None:
+            continue
+        previous = prior_by_line.get(baseline_item.line_key, {}).get(
+            "quantity", Decimal(0)
+        )
+        if record.cumulative_quantity < previous:
+            raise ValidationError(
+                "مقدار تجمعی منبع از مقدار تجمعی قبلاً تأییدشده کمتر است."
+            )
+        if record.cumulative_quantity > baseline_item.planned_quantity:
+            raise ValidationError("مقدار تجمعی از مقدار مبنای فعلی بیشتر است.")
         current = record.cumulative_quantity - previous
-        amount = _money(current * record.baseline_item.unit_rate, places)
+        if current == 0:
+            continue
+        amount = (current * baseline_item.unit_rate).quantize(
+            Decimal("0.0001"), rounding=ROUND_HALF_UP
+        )
         item = ProgressClaimItem.objects.create(
             claim=locked,
-            baseline_item_id=item_id,
+            baseline_item=baseline_item,
             previous_cumulative_quantity=previous,
             current_quantity=current,
             new_cumulative_quantity=record.cumulative_quantity,
-            unit_rate_snapshot=record.baseline_item.unit_rate,
+            unit_rate_snapshot=baseline_item.unit_rate,
             current_amount=amount,
         )
         ProgressClaimSource.objects.create(claim_item=item, progress_record=record)
-        gross += amount
-    gross = _money(gross, places)
-    adjustments = []
-    for adjustment_type, rate_key, cap_key, sign in (
-        (ClaimAdjustmentType.RETENTION, "retention_rate", "retention_cap", -1),
-        (ClaimAdjustmentType.TAX, "tax_rate", None, 1),
-        (ClaimAdjustmentType.INSURANCE, "insurance_rate", None, -1),
-        (
-            ClaimAdjustmentType.ADVANCE_RECOVERY,
-            "advance_recovery_rate",
-            "advance_recovery_cap",
-            -1,
-        ),
-    ):
-        rate = Decimal(str(policy[rate_key]))
-        amount = _money(gross * rate / Decimal(100), places)
-        if cap_key:
-            amount = min(amount, Decimal(str(policy[cap_key])))
+        gross_intermediate += amount
+        line_calculations.append(
+            {
+                "line_key": baseline_item.line_key,
+                "baseline_item_id": str(baseline_item.pk),
+                "progress_record_id": str(record.pk),
+                "previous_certified_quantity": str(previous),
+                "current_quantity": str(current),
+                "new_cumulative_quantity": str(record.cumulative_quantity),
+                "unit_rate": str(baseline_item.unit_rate),
+                "current_amount": str(amount),
+                "prior_certified_amount": str(
+                    prior_by_line.get(baseline_item.line_key, {}).get(
+                        "amount", Decimal(0)
+                    )
+                ),
+            }
+        )
+
+    def remaining_cap(adjustment_type: str, cap: Decimal) -> Decimal:
+        consumed = ClaimAdjustment.objects.filter(
+            claim__organization=organization,
+            claim__contract=locked.contract,
+            claim__status="approved",
+            adjustment_type=adjustment_type,
+        ).exclude(claim__claim_number=locked.claim_number).aggregate(
+            total=Sum("amount")
+        )["total"] or Decimal(0)
+        return max(cap - abs(consumed), Decimal(0))
+
+    adjustments: list[ClaimAdjustment] = []
+
+    def add_adjustment(
+        *,
+        adjustment_type: str,
+        description: str,
+        rate: Decimal,
+        base: Decimal,
+        sign: int,
+        cap: Decimal | None = None,
+    ) -> None:
+        amount = base * rate / Decimal(100)
+        if cap is not None:
+            amount = min(amount, remaining_cap(adjustment_type, cap))
+        amount = amount.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
         if amount:
             adjustments.append(
                 ClaimAdjustment(
                     claim=locked,
                     adjustment_type=adjustment_type,
-                    description=adjustment_type,
+                    description=description,
                     sequence=len(adjustments) + 1,
                     rate_snapshot=rate,
-                    base_amount_snapshot=gross,
+                    base_amount_snapshot=base.quantize(
+                        Decimal("0.0001"), rounding=ROUND_HALF_UP
+                    ),
                     amount=amount * sign,
                 )
             )
-    ClaimAdjustment.objects.filter(claim=locked).delete()
+
+    add_adjustment(
+        adjustment_type=ClaimAdjustmentType.RETENTION,
+        description="contract_term.retention",
+        rate=term.retention_rate,
+        base=gross_intermediate,
+        sign=-1,
+        cap=term.retention_cap,
+    )
+    add_adjustment(
+        adjustment_type=ClaimAdjustmentType.ADVANCE_RECOVERY,
+        description="contract_term.advance_recovery",
+        rate=term.advance_recovery_rate,
+        base=gross_intermediate,
+        sign=-1,
+        cap=term.advance_recovery_cap,
+    )
+    add_adjustment(
+        adjustment_type=ClaimAdjustmentType.CONTRACTUAL_INSURANCE,
+        description="contract_term.insurance",
+        rate=term.contractual_insurance_rate,
+        base=gross_intermediate,
+        sign=-1,
+        cap=term.contractual_insurance_cap,
+    )
+    contractual_total = sum((item.amount for item in adjustments), Decimal(0))
+    after_contractual = gross_intermediate + contractual_total
+    tax_base = (
+        gross_intermediate
+        if regulatory_parameters["tax_basis"] == "gross"
+        else after_contractual
+    )
+    insurance_base = (
+        gross_intermediate
+        if regulatory_parameters["insurance_basis"] == "gross"
+        else after_contractual
+    )
+    add_adjustment(
+        adjustment_type=ClaimAdjustmentType.TAX,
+        description="regulatory.tax",
+        rate=Decimal(regulatory_parameters["tax_rate"]),
+        base=tax_base,
+        sign=1,
+    )
+    add_adjustment(
+        adjustment_type=ClaimAdjustmentType.STATUTORY_INSURANCE,
+        description="regulatory.insurance",
+        rate=Decimal(regulatory_parameters["insurance_rate"]),
+        base=insurance_base,
+        sign=-1,
+    )
     ClaimAdjustment.objects.bulk_create(adjustments)
-    total_adjustments = sum((item.amount for item in adjustments), Decimal(0))
-    net = _money(gross + total_adjustments, places)
-    if net < 0 and not policy["allow_negative_corrective_claims"]:
-        raise ValidationError("سیاست سازمان صورت‌وضعیت خالص منفی را مجاز نمی‌داند.")
-    if gross > locked.baseline.effective_ceiling:
-        raise ValidationError("جمع ناخالص از سقف مبنای تأییدشده بیشتر است.")
+    total_adjustments_intermediate = sum(
+        (item.amount for item in adjustments), Decimal(0)
+    )
+    net_intermediate = gross_intermediate + total_adjustments_intermediate
+    if net_intermediate < 0:
+        raise ValidationError("صورت‌وضعیت عادی با مبلغ خالص منفی مجاز نیست.")
+    if gross_intermediate > remaining_ceiling:
+        raise ValidationError("جمع تجمعی تأییدشده از سقف مؤثر قرارداد بیشتر است.")
+    gross = _money(gross_intermediate, places)
+    net = _money(net_intermediate, places)
+    total_adjustments = net - gross
+    calculation_snapshot = {
+        "calculation_order": [
+            "gross",
+            "contractual_deductions",
+            "statutory_adjustments",
+            "final_monetary_rounding",
+        ],
+        "currency": locked.currency_code,
+        "currency_decimal_places": places,
+        "correction_kind": locked.correction_kind,
+        "corrects_claim_id": str(locked.corrects_id) if locked.corrects_id else None,
+        "baseline_id": str(locked.baseline_id),
+        "baseline_version": locked.baseline.version,
+        "contract_value_snapshot": str(locked.baseline.contract_value_snapshot),
+        "approved_amendments_snapshot": str(
+            locked.baseline.approved_amendments_snapshot
+        ),
+        "effective_ceiling": str(locked.baseline.effective_ceiling),
+        "prior_active_approved_claim_ids": [str(item.pk) for item in prior_claims],
+        "prior_approved_gross": str(prior_gross),
+        "prior_approved_net": str(prior_net),
+        "remaining_ceiling_before_claim": str(remaining_ceiling),
+        "contract_term_version_id": str(term.pk),
+        "contract_term_version": term.version,
+        "payment_due_days": term.payment_due_days,
+        "regulatory_rule_version_id": str(regulatory.pk),
+        "regulatory_rule_version": regulatory.version,
+        "gross_intermediate": str(gross_intermediate),
+        "contractual_adjustments_intermediate": str(contractual_total),
+        "statutory_adjustments_intermediate": str(
+            total_adjustments_intermediate - contractual_total
+        ),
+        "net_intermediate": str(net_intermediate),
+        "gross_final": str(gross),
+        "adjustment_final": str(total_adjustments),
+        "net_final": str(net),
+        "line_calculations": line_calculations,
+    }
     (
         locked.gross_amount,
         locked.adjustment_amount,
         locked.net_amount,
+        locked.calculation_snapshot,
         locked.updated_by,
-    ) = gross, total_adjustments, net, actor
+    ) = gross, total_adjustments, net, calculation_snapshot, actor
     locked.save(
         update_fields=[
             "gross_amount",
             "adjustment_amount",
             "net_amount",
+            "calculation_snapshot",
             "updated_by",
             "updated_at",
         ]
     )
     return locked
+
+
+def _assert_claim_correction_downstream_clear(
+    *, organization: Organization, claim: ProgressClaim
+) -> None:
+    if claim.settlement_allocations.filter(
+        status=ClaimSettlementAllocationStatus.ACTIVE
+    ).exists():
+        raise ValidationError("صورت‌وضعیت دارای تسویه فعال ابتدا باید تسویه معکوس شود.")
+
+    from apps.billing.handoffs import PROGRESS_CLAIM_SOURCE_KIND
+    from apps.subledgers.models import Obligation
+
+    if Obligation.objects.filter(
+        organization=organization,
+        source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+        source_uuid=claim.pk,
+        source_version=claim.revision_number,
+    ).exists():
+        raise ValidationError(
+            "تعهد AR شناسایی‌شده باید پیش از اصلاح از مسیر کنترل‌شده تعیین تکلیف شود."
+        )
+
+
+@transaction.atomic
+def create_progress_claim_correction(
+    *,
+    organization: Organization,
+    actor: User,
+    claim: ProgressClaim,
+    correction_kind: str,
+    reason: str,
+) -> ProgressClaim:
+    """Create a linked full replacement or zero-value cancellation draft."""
+
+    _require_progress_permission(
+        actor=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.CLAIMS_REVISE,
+    )
+    if correction_kind not in {
+        ProgressClaimCorrectionKind.REPLACEMENT,
+        ProgressClaimCorrectionKind.CANCELLATION,
+    }:
+        raise ValidationError("نوع اصلاح صورت‌وضعیت معتبر نیست.")
+    if not reason.strip():
+        raise ValidationError("دلیل اصلاح یا ابطال الزامی است.")
+    try:
+        original = (
+            ProgressClaim.objects.select_for_update()
+            .select_related("contract", "baseline", "contract_term_version")
+            .get(pk=claim.pk, organization=organization)
+        )
+    except ProgressClaim.DoesNotExist as exc:
+        raise PermissionDenied("صورت‌وضعیت متعلق به این سازمان نیست.") from exc
+    if original.status != "approved":
+        raise ValidationError("فقط صورت‌وضعیت تأییدشده فعال قابل اصلاح یا ابطال است.")
+    if original.correction_kind == ProgressClaimCorrectionKind.CANCELLATION:
+        raise ValidationError("سند ابطال تأییدشده از این مسیر قابل بازگردانی نیست.")
+    if ProgressClaim.objects.filter(corrects=original).exists():
+        raise ValidationError("برای این صورت‌وضعیت قبلاً سند اصلاحی ایجاد شده است.")
+    _assert_claim_correction_downstream_clear(organization=organization, claim=original)
+    revision = (
+        ProgressClaim.objects.filter(
+            organization=organization,
+            contract=original.contract,
+            claim_number=original.claim_number,
+        ).aggregate(value=Max("revision_number"))["value"]
+        or 0
+    ) + 1
+    correction = ProgressClaim.objects.create(
+        organization=organization,
+        project=original.project,
+        contract=original.contract,
+        baseline=original.baseline,
+        claim_number=original.claim_number,
+        revision_number=revision,
+        correction_kind=correction_kind,
+        corrects=original,
+        correction_reason=reason.strip(),
+        period_start=original.period_start,
+        period_end=original.period_end,
+        measurement_cutoff=original.measurement_cutoff,
+        billing_configuration_snapshot=original.billing_configuration_snapshot,
+        contract_term_version=original.contract_term_version,
+        regulatory_rule_version=original.regulatory_rule_version,
+        party_identity_snapshot=original.party_identity_snapshot,
+        currency_code=original.currency_code,
+        created_by=actor,
+        updated_by=actor,
+    )
+    correction = recalculate_progress_claim(
+        organization=organization, actor=actor, claim=correction
+    )
+    record_audit_event(
+        action=AuditAction.PROGRESS_CLAIM_CORRECTION_CREATED,
+        entity_type="billing.ProgressClaim",
+        entity_id=str(correction.pk),
+        organization=organization,
+        actor=actor,
+        metadata={
+            "corrects_id": str(original.pk),
+            "correction_kind": correction_kind,
+            "reason": correction.correction_reason,
+        },
+    )
+    return correction
 
 
 @transaction.atomic
@@ -1286,6 +1721,10 @@ def create_progress_claim_revision(
     original = ProgressClaim.objects.select_for_update().get(
         pk=claim.pk, organization=organization
     )
+    if original.status not in {"draft", "returned"}:
+        raise ValidationError(
+            "سند ارسال‌شده یا تأییدشده فقط از مسیر بازگشت یا اصلاح پیوندخورده تغییر می‌کند."
+        )
     revision = (
         ProgressClaim.objects.filter(
             organization=organization,
@@ -1301,10 +1740,18 @@ def create_progress_claim_revision(
         baseline=original.baseline,
         claim_number=original.claim_number,
         revision_number=revision,
+        correction_kind=original.correction_kind,
+        corrects=original.corrects,
+        correction_reason=original.correction_reason,
         period_start=original.period_start,
         period_end=original.period_end,
         measurement_cutoff=original.measurement_cutoff,
-        policy_snapshot=original.policy_snapshot,
+        billing_configuration_snapshot=original.billing_configuration_snapshot,
+        calculation_snapshot=original.calculation_snapshot,
+        contract_term_version=original.contract_term_version,
+        regulatory_rule_version=original.regulatory_rule_version,
+        party_identity_snapshot=original.party_identity_snapshot,
+        currency_code=original.currency_code,
         created_by=actor,
         updated_by=actor,
     )
@@ -1327,7 +1774,7 @@ def _approve_progress_claim_domain(
     try:
         locked = (
             ProgressClaim.objects.select_for_update()
-            .select_related("contract", "baseline")
+            .select_related("contract", "baseline", "contract_term_version")
             .get(pk=claim.pk, organization=organization)
         )
     except ProgressClaim.DoesNotExist as exc:
@@ -1352,8 +1799,30 @@ def _approve_progress_claim_domain(
         )
     _locked_contract(organization=organization, contract=locked.contract)
     baseline = _locked_baseline(organization=organization, baseline=locked.baseline)
-    if baseline.status != ProjectBaselineStatus.APPROVED:
+    permitted_baseline_statuses = {ProjectBaselineStatus.APPROVED}
+    if locked.corrects_id:
+        permitted_baseline_statuses.add(ProjectBaselineStatus.SUPERSEDED)
+    if baseline.status not in permitted_baseline_statuses:
         raise ValidationError("مبنای صورت‌وضعیت در زمان تأیید باید تأییدشده باشد.")
+    corrected_claim: ProgressClaim | None = None
+    if locked.corrects_id:
+        corrected_claim = ProgressClaim.objects.select_for_update().get(
+            pk=locked.corrects_id,
+            organization=organization,
+            contract=locked.contract,
+        )
+        if corrected_claim.status != "approved":
+            raise ValidationError("فقط صورت‌وضعیت تأییدشده فعال قابل جایگزینی است.")
+        if locked.correction_kind not in {
+            ProgressClaimCorrectionKind.REPLACEMENT,
+            ProgressClaimCorrectionKind.CANCELLATION,
+        }:
+            raise ValidationError("نوع سند اصلاحی معتبر نیست.")
+        _assert_claim_correction_downstream_clear(
+            organization=organization, claim=corrected_claim
+        )
+    elif locked.correction_kind != ProgressClaimCorrectionKind.ORDINARY:
+        raise ValidationError("سند اصلاحی باید به صورت‌وضعیت پیشین متصل باشد.")
     list(
         ProgressClaim.objects.select_for_update().filter(
             organization=organization,
@@ -1368,15 +1837,27 @@ def _approve_progress_claim_domain(
             claim_number=locked.claim_number,
             status="approved",
         )
-        .exclude(pk=locked.pk)
+        .exclude(pk__in=[locked.pk, locked.corrects_id])
         .exists()
     ):
         raise ValidationError(
             "برای این شماره صورت‌وضعیت یک revision تأییدشده وجود دارد."
         )
+    if corrected_claim is not None:
+        disposition = (
+            "cancelled"
+            if locked.correction_kind == ProgressClaimCorrectionKind.CANCELLATION
+            else "superseded"
+        )
+        ProgressClaim.objects.filter(pk=corrected_claim.pk, status="approved").update(
+            status=disposition, updated_by=actor, updated_at=timezone.now()
+        )
     locked.status = "approved"
     locked.approved_by = actor
     locked.approved_at = timezone.now()
+    locked.due_date = timezone.localdate(locked.approved_at) + timedelta(
+        days=locked.contract_term_version.payment_due_days
+    )
     locked.approval_reason = reason.strip()
     locked.updated_by = actor
     locked.save(
@@ -1384,6 +1865,7 @@ def _approve_progress_claim_domain(
             "status",
             "approved_by",
             "approved_at",
+            "due_date",
             "approval_reason",
             "updated_by",
             "updated_at",
@@ -1401,6 +1883,23 @@ def _approve_progress_claim_domain(
             "reason": locked.approval_reason,
         },
     )
+    if corrected_claim is not None:
+        record_audit_event(
+            action=(
+                AuditAction.PROGRESS_CLAIM_CANCELLED
+                if locked.correction_kind == ProgressClaimCorrectionKind.CANCELLATION
+                else AuditAction.PROGRESS_CLAIM_SUPERSEDED
+            ),
+            entity_type="billing.ProgressClaim",
+            entity_id=str(corrected_claim.pk),
+            organization=organization,
+            actor=actor,
+            metadata={
+                "successor_id": str(locked.pk),
+                "correction_kind": locked.correction_kind,
+                "reason": locked.correction_reason,
+            },
+        )
     return locked
 
 
@@ -1422,10 +1921,18 @@ def _copy_returned_claim_revision(
         baseline=original.baseline,
         claim_number=original.claim_number,
         revision_number=revision,
+        correction_kind=original.correction_kind,
+        corrects=original.corrects,
+        correction_reason=original.correction_reason,
         period_start=original.period_start,
         period_end=original.period_end,
         measurement_cutoff=original.measurement_cutoff,
-        policy_snapshot=original.policy_snapshot,
+        billing_configuration_snapshot=original.billing_configuration_snapshot,
+        calculation_snapshot=original.calculation_snapshot,
+        contract_term_version=original.contract_term_version,
+        regulatory_rule_version=original.regulatory_rule_version,
+        party_identity_snapshot=original.party_identity_snapshot,
+        currency_code=original.currency_code,
         gross_amount=original.gross_amount,
         adjustment_amount=original.adjustment_amount,
         net_amount=original.net_amount,

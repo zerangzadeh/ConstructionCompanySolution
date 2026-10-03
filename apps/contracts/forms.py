@@ -1,6 +1,12 @@
 from django import forms
 
-from apps.contracts.models import Contract, ContractStatus
+from apps.contracts.models import (
+    Contract,
+    ContractStatus,
+    ContractualRecord,
+    ContractualRecordKind,
+    ContractualRevisionAction,
+)
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
 from core.forms import JalaliDateMixin
@@ -62,3 +68,86 @@ class ContractForm(JalaliDateMixin, forms.ModelForm):
                 "تاریخ پایان قرارداد نمی‌تواند پیش از تاریخ شروع باشد."
             )
         return cleaned_data
+
+
+class ContractualRecordForm(JalaliDateMixin, forms.ModelForm):
+    class Meta:
+        model = ContractualRecord
+        fields = [  # noqa: RUF012
+            "contract",
+            "kind",
+            "record_number",
+            "title",
+            "description",
+            "notice_reference",
+            "notice_date",
+            "requested_amount",
+            "requested_eot_days",
+            "valuation_assumptions",
+            "cost_impact_assumptions",
+            "schedule_impact_assumptions",
+            "contract_value_impact_assumptions",
+        ]
+
+    def __init__(self, *args, organization=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contract"].queryset = Contract.objects.filter(
+            organization=organization,
+            deleted_at__isnull=True,
+            status=ContractStatus.ACTIVE,
+            party__isnull=False,
+        ).select_related("project", "party")
+
+    def clean_kind(self) -> str:
+        kind = self.cleaned_data["kind"]
+        if kind not in ContractualRecordKind.values:
+            raise forms.ValidationError("نوع رکورد قراردادی معتبر نیست.")
+        return kind
+
+
+class ContractualDecisionForm(forms.Form):
+    outcome = forms.ChoiceField(
+        label="تصمیم",
+        choices=(("approved", "تأیید"), ("returned", "بازگردانی")),
+    )
+    reason = forms.CharField(label="دلیل تصمیم", widget=forms.Textarea)
+    entitlement_approved = forms.TypedChoiceField(
+        label="تصمیم صریح استحقاق",
+        choices=(("true", "استحقاق تأیید شد"), ("false", "استحقاق تأیید نشد")),
+        coerce=lambda value: value == "true",
+        required=False,
+    )
+    approved_amount = forms.DecimalField(
+        label="مبلغ صریحاً تأییدشده", max_digits=18, decimal_places=4, required=False
+    )
+    approved_eot_days = forms.IntegerField(
+        label="روزهای صریحاً تأییدشده تمدید مدت", min_value=0, required=False
+    )
+    delay_responsibility = forms.CharField(
+        label="مسئولیت تأخیر صریحاً تأییدشده", widget=forms.Textarea, required=False
+    )
+
+    def clean(self):
+        values = super().clean()
+        if values.get("outcome") == "approved" and "entitlement_approved" not in values:
+            raise forms.ValidationError("برای تأیید، تصمیم صریح استحقاق الزامی است.")
+        return values
+
+
+class ContractualRevisionForm(forms.Form):
+    revision_action = forms.ChoiceField(
+        label="نوع بازنگری",
+        choices=(
+            (ContractualRevisionAction.CORRECTION, "اصلاح / جایگزینی"),
+            (ContractualRevisionAction.CANCELLATION, "ابطال پیوندخورده"),
+        ),
+    )
+    reason = forms.CharField(label="دلیل", widget=forms.Textarea)
+    title = forms.CharField(label="عنوان نسخه جدید", required=False)
+    description = forms.CharField(
+        label="شرح نسخه جدید", widget=forms.Textarea, required=False
+    )
+
+
+class ContractualWithdrawalForm(forms.Form):
+    reason = forms.CharField(label="دلیل استرداد", widget=forms.Textarea)

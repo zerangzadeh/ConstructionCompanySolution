@@ -1,3 +1,6 @@
+import json
+from datetime import date
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -61,13 +64,21 @@ from apps.organizations.models import (
     OrganizationRole,
     PlatformPolicy,
     PlatformPolicyVersion,
+    PolicySource,
     ProtectedOperation,
 )
 from apps.organizations.policy_services import (
     apply_tenant_policy_selection,
     create_platform_policy,
+    create_platform_policy_version,
+    link_policy_version_source,
     list_tenant_policy_selections,
+    publish_platform_policy_version,
+    record_optional_policy_review,
+    record_policy_source,
+    retire_platform_policy_version,
     select_tenant_policy_version,
+    update_platform_policy_version,
 )
 from apps.organizations.policy_specs import (
     PLATFORM_POLICY_SPECS,
@@ -611,7 +622,16 @@ def member_authorization(request: HttpRequest, membership_id: str) -> HttpRespon
                 return redirect(
                     "organizations:member_authorization", membership_id=membership.pk
                 )
-        except (PermissionDenied, ValidationError, ValueError) as exc:
+        except (
+            PlatformPolicy.DoesNotExist,
+            PlatformPolicyVersion.DoesNotExist,
+            PolicySource.DoesNotExist,
+            PermissionDenied,
+            ValidationError,
+            ValueError,
+            KeyError,
+            json.JSONDecodeError,
+        ) as exc:
             if action in {"assign_role", "revoke_role"}:
                 role_form.add_error(None, str(exc))
             else:
@@ -834,34 +854,136 @@ def protected_operation_catalog(request: HttpRequest) -> HttpResponse:
 @login_required
 @require_http_methods(["GET", "POST"])
 def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
-    """Expose only the closed accounting-policy catalogue to Platform Admins."""
+    """Platform Admin lifecycle UI for closed, versioned policy contracts."""
 
     if not is_platform_admin(request.user):
         return HttpResponseForbidden("فقط Platform Admin به این بخش دسترسی دارد.")
     if request.method == "POST":
         try:
-            create_platform_policy(
-                actor=request.user,
-                code=request.POST.get("code", ""),
-                reason="ثبت تعریف کد-محور سیاست حسابداری در کاتالوگ Platform.",
-            )
+            action = request.POST.get("action", "create_definition")
+            if action == "create_definition":
+                create_platform_policy(
+                    actor=request.user,
+                    code=request.POST.get("code", ""),
+                    reason=request.POST.get(
+                        "reason", "ثبت تعریف کد-محور سیاست Platform."
+                    ),
+                )
+            elif action in {"create_version", "update_version"}:
+                version = (
+                    PlatformPolicyVersion.objects.select_related("policy").get(
+                        pk=request.POST["policy_version_id"]
+                    )
+                    if action == "update_version"
+                    else None
+                )
+                policy = (
+                    version.policy
+                    if version is not None
+                    else PlatformPolicy.objects.get(pk=request.POST["policy_id"])
+                )
+                supersedes_id = request.POST.get("supersedes_id")
+                supersedes = (
+                    PlatformPolicyVersion.objects.get(pk=supersedes_id)
+                    if supersedes_id
+                    else None
+                )
+                kwargs = {
+                    "actor": request.user,
+                    "parameters": json.loads(request.POST["parameters"]),
+                    "effective_from": date.fromisoformat(
+                        request.POST["effective_from"]
+                    ),
+                    "effective_to": (
+                        date.fromisoformat(request.POST["effective_to"])
+                        if request.POST.get("effective_to")
+                        else None
+                    ),
+                    "source_basis": request.POST["source_basis"],
+                    "supersedes": supersedes,
+                    "reason": request.POST["reason"],
+                }
+                if version is None:
+                    create_platform_policy_version(
+                        policy=policy,
+                        version=int(request.POST["version"]),
+                        **kwargs,
+                    )
+                else:
+                    update_platform_policy_version(policy_version=version, **kwargs)
+            elif action == "record_source":
+                record_policy_source(
+                    actor=request.user,
+                    issuer=request.POST["issuer"],
+                    title=request.POST["title"],
+                    source_identifier=request.POST["source_identifier"],
+                    version=request.POST["source_version"],
+                    applicability=request.POST["applicability"],
+                    reason=request.POST["reason"],
+                    source_location=request.POST.get("source_location", ""),
+                )
+            elif action == "link_source":
+                link_policy_version_source(
+                    actor=request.user,
+                    policy_version=PlatformPolicyVersion.objects.get(
+                        pk=request.POST["policy_version_id"]
+                    ),
+                    source=PolicySource.objects.get(pk=request.POST["source_id"]),
+                    reason=request.POST["reason"],
+                )
+            elif action == "record_review":
+                record_optional_policy_review(
+                    actor=request.user,
+                    policy_version=PlatformPolicyVersion.objects.get(
+                        pk=request.POST["policy_version_id"]
+                    ),
+                    reviewer_identity=request.POST["reviewer_identity"],
+                    qualification_summary=request.POST["qualification_summary"],
+                    independence_statement=request.POST["independence_statement"],
+                    evidence_reference=request.POST["evidence_reference"],
+                    reviewed_on=date.fromisoformat(request.POST["reviewed_on"]),
+                    review_scope=request.POST["review_scope"],
+                    disposition=request.POST["disposition"],
+                    conditions=request.POST.get("conditions", ""),
+                )
+            elif action == "publish":
+                publish_platform_policy_version(
+                    actor=request.user,
+                    policy_version=PlatformPolicyVersion.objects.get(
+                        pk=request.POST["policy_version_id"]
+                    ),
+                    reason=request.POST["reason"],
+                )
+            elif action == "retire":
+                retire_platform_policy_version(
+                    actor=request.user,
+                    policy_version=PlatformPolicyVersion.objects.get(
+                        pk=request.POST["policy_version_id"]
+                    ),
+                    reason=request.POST["reason"],
+                )
+            else:
+                raise ValidationError("عملیات سیاست معتبر نیست.")
         except (PermissionDenied, ValidationError, ValueError) as exc:
             messages.error(request, str(exc))
         else:
-            messages.success(request, "تعریف کد-محور سیاست ثبت شد؛ هیچ مقدار مالی فعال نشده است.")
+            messages.success(request, "عملیات چرخهٔ سیاست پلتفرم ثبت شد.")
         return redirect("organizations:platform_policy_catalog")
 
     policies = {
         policy.code: policy
         for policy in PlatformPolicy.objects.filter(code__in=PLATFORM_POLICY_SPECS)
     }
-    versions = PlatformPolicyVersion.objects.filter(
-        policy__code__in=PLATFORM_POLICY_SPECS
-    ).select_related("policy")
+    versions = (
+        PlatformPolicyVersion.objects.filter(policy__code__in=PLATFORM_POLICY_SPECS)
+        .select_related("policy")
+        .prefetch_related("source_links__source", "review_evidence")
+    )
     versions_by_code: dict[str, list[PlatformPolicyVersion]] = {
         code: [] for code in PLATFORM_POLICY_SPECS
     }
     for version in versions:
+        version.parameters_json = json.dumps(version.parameters, ensure_ascii=False)
         versions_by_code[version.policy.code].append(version)
     return render(
         request,
@@ -874,7 +996,8 @@ def platform_policy_catalog(request: HttpRequest) -> HttpResponse:
                     "versions": versions_by_code[code],
                 }
                 for code, spec in PLATFORM_POLICY_SPECS.items()
-            ]
+            ],
+            "policy_sources": PolicySource.objects.all(),
         },
     )
 
@@ -910,7 +1033,11 @@ def tenant_policy_configuration(request: HttpRequest) -> HttpResponse:
                 messages.success(request, "نسخه سیاست اعمال شد.")
             else:
                 raise ValidationError("عملیات سیاست معتبر نیست.")
-        except (PlatformPolicyVersion.DoesNotExist, PermissionDenied, ValidationError) as exc:
+        except (
+            PlatformPolicyVersion.DoesNotExist,
+            PermissionDenied,
+            ValidationError,
+        ) as exc:
             messages.error(request, str(exc))
         return redirect("organizations:tenant_policy_configuration")
 
@@ -936,7 +1063,8 @@ def tenant_policy_configuration(request: HttpRequest) -> HttpResponse:
     upcoming_versions = [
         version
         for version in published_versions
-        if version.effective_from > today and policy_version_is_configuration_ready(version)
+        if version.effective_from > today
+        and policy_version_is_configuration_ready(version)
     ]
     return render(
         request,

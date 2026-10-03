@@ -246,6 +246,54 @@ registry.register_domain_command(
 )
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="contracts.contractual_record",
+        subject_type="contracts.contractual_record",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "contract_id",
+                "status",
+                "kind",
+                "created_by_id",
+                "submitted_by_id",
+            }
+        ),
+        start_permission="contractual_records.submit",
+        view_permission="contractual_records.view",
+        detail_url_name="contracts:contractual_detail",
+        detail_url_kwarg="record_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="contracts.contractual_record_approval",
+        subject_type="contracts.contractual_record",
+        subject_adapter="contracts.contractual_record",
+        allowed_scope_fields=frozenset({"project_id", "contract_id"}),
+        domain_commands=frozenset(
+            {
+                "contracts.contractual_record.approve",
+                "contracts.contractual_record.return",
+                "contracts.contractual_record.withdraw",
+            }
+        ),
+    )
+)
+for command_key, to_state in (
+    ("contracts.contractual_record.approve", "approved"),
+    ("contracts.contractual_record.return", "returned"),
+    ("contracts.contractual_record.withdraw", "withdrawn"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="contracts.contractual_record_approval",
+            from_states=frozenset({"submitted"}),
+            to_state=to_state,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="billing.project_baseline",
         subject_type="billing.project_baseline",
         exposed_attributes=frozenset(
@@ -327,6 +375,9 @@ registry.register_subject_adapter(
                 "status",
                 "claim_number",
                 "revision_number",
+                "correction_kind",
+                "corrects_claim_id",
+                "correction_reason",
                 "created_by_id",
                 "submitted_by_id",
             }
@@ -358,6 +409,145 @@ for command_key, to_state in (
             to_state=to_state,
         )
     )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="billing.payable_certificate",
+        subject_type="billing.payable_certificate",
+        exposed_attributes=frozenset(
+            {
+                "project_id",
+                "contract_id",
+                "status",
+                "certificate_number",
+                "revision_number",
+                "correction_kind",
+                "corrects_certificate_id",
+                "created_by_id",
+                "submitted_by_id",
+            }
+        ),
+        start_permission="payable_certificates.submit",
+        view_permission="payable_certificates.view",
+        detail_url_name="billing:payable_certificate_detail",
+        detail_url_kwarg="certificate_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="billing.payable_certificate_approval",
+        subject_type="billing.payable_certificate",
+        subject_adapter="billing.payable_certificate",
+        allowed_scope_fields=frozenset({"project_id", "contract_id"}),
+        domain_commands=frozenset(
+            {
+                "billing.payable_certificate.approve",
+                "billing.payable_certificate.return",
+            }
+        ),
+    )
+)
+for command_key, to_state in (
+    ("billing.payable_certificate.approve", "approved"),
+    ("billing.payable_certificate.return", "returned"),
+):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=command_key,
+            workflow_type="billing.payable_certificate_approval",
+            from_states=frozenset({"submitted"}),
+            to_state=to_state,
+        )
+    )
+for (
+    subject_type,
+    workflow_type,
+    start_permission,
+    view_permission,
+    detail_url_name,
+    detail_url_kwarg,
+) in (
+    (
+        "billing.contract_guarantee",
+        "billing.guarantee_approval",
+        "guarantees.submit",
+        "guarantees.view",
+        "billing:guarantee_detail",
+        "guarantee_id",
+    ),
+    (
+        "billing.contract_compliance_evidence",
+        "billing.compliance_evidence_approval",
+        "compliance_evidence.submit",
+        "compliance_evidence.view",
+        "billing:compliance_evidence_detail",
+        "evidence_id",
+    ),
+    (
+        "billing.retention_release",
+        "billing.retention_release_approval",
+        "retention_releases.submit",
+        "retention_releases.view",
+        "billing:retention_release_detail",
+        "release_id",
+    ),
+    (
+        "billing.taxpayer_invoice",
+        "billing.taxpayer_invoice_approval",
+        "taxpayer_invoices.submit",
+        "taxpayer_invoices.view",
+        "billing:taxpayer_invoice_detail",
+        "invoice_id",
+    ),
+    (
+        "billing.contractor_compliance_assessment",
+        "billing.contractor_compliance_approval",
+        "contractor_compliance.submit",
+        "contractor_compliance.view",
+        "billing:contractor_compliance_detail",
+        "assessment_id",
+    ),
+):
+    registry.register_subject_adapter(
+        SubjectAdapterSpec(
+            key=subject_type,
+            subject_type=subject_type,
+            exposed_attributes=frozenset(
+                {
+                    "project_id",
+                    "contract_id",
+                    "status",
+                    "created_by_id",
+                    "submitted_by_id",
+                }
+            ),
+            start_permission=start_permission,
+            view_permission=view_permission,
+            detail_url_name=detail_url_name,
+            detail_url_kwarg=detail_url_kwarg,
+        )
+    )
+    commands = frozenset({f"{subject_type}.approve", f"{subject_type}.return"})
+    registry.register_workflow_type(
+        WorkflowTypeSpec(
+            code=workflow_type,
+            subject_type=subject_type,
+            subject_adapter=subject_type,
+            allowed_scope_fields=frozenset({"project_id", "contract_id"}),
+            domain_commands=commands,
+        )
+    )
+    for command_key, to_state in (
+        (f"{subject_type}.approve", "approved"),
+        (f"{subject_type}.return", "returned"),
+    ):
+        registry.register_domain_command(
+            DomainCommandSpec(
+                key=command_key,
+                workflow_type=workflow_type,
+                from_states=frozenset({"submitted"}),
+                to_state=to_state,
+            )
+        )
 registry.register_subject_adapter(
     SubjectAdapterSpec(
         key="inventory.stock_transaction",

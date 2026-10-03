@@ -6,10 +6,7 @@ from apps.organizations.permission_catalog import (
 from apps.organizations.permission_registry import registered_permission_codes
 
 ALL_PERMISSIONS = registered_permission_codes()
-DEPRECATED_PERMISSION_CODES = permission_codes(
-    BusinessPermissionCode.TENANT_POLICIES_APPROVE,
-)
-ACTIVE_DEFAULT_PERMISSIONS = ALL_PERMISSIONS - DEPRECATED_PERMISSION_CODES
+ACTIVE_DEFAULT_PERMISSIONS = ALL_PERMISSIONS
 ACCOUNTING_RESTRICTED_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,

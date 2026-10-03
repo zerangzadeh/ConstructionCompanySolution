@@ -38,10 +38,10 @@ Source eligibility is closed and code-registered. Registration must validate the
 live locked source, Tenant, direction, final source version/status, amount,
 currency, party and object scope and return the complete canonical snapshot.
 Retries reuse the same source identity only when the payload hash is identical.
-No source producer is registered in this tranche because the current approved
-Billing claim has no approved recognition timing/due-date/posting contract and no
-approved AP invoice/certificate source exists. This bounded source-activation
-item therefore remains fail-closed rather than guessing policy.
+No source producer was registered in this tranche. Subsequent authorized
+P6-S07–S13 work added the complete approved-claim snapshot and explicit AR source
+resolver; recognition remains an explicit permissioned call and no AP source or
+automatic producer exists.
 
 Settlement allocation is immutable evidence linking one obligation to one exact
 posted, unreversed Treasury receipt for AR or disbursement for AP. Reversal is a
@@ -169,7 +169,7 @@ mandatory.
 
 | ID | Accepted decision (2026-10-01) | Runtime effect until separately authorized and implemented |
 | --- | --- | --- |
-| P3-S27-Q01 | **A:** stage AR from an approved immutable `ProgressClaim` revision only after its explicit immutable due-date, party/tax/currency snapshot and linked post-approval correction facts exist; recognize on the Tenant-local date of `approved_at`; reverse dependent evidence and original recognition before replacement. No AP source is eligible yet. | No source adapter is registered; obligation recognition remains fail-closed. |
+| P3-S27-Q01 | **A:** stage AR from an approved immutable `ProgressClaim` revision only after its explicit immutable due-date, party/tax/currency snapshot and linked post-approval correction facts exist; recognize on the Tenant-local date of `approved_at`; reverse dependent evidence and original recognition before replacement. No AP source is eligible yet. | P6-S07–S13 registers the exact AR source adapter for explicit recognition. Automatic recognition remains absent; correction fails closed after recognition until reversal/replacement orchestration is authorized. |
 | P3-S27-Q02 | **A, clarified:** use explicit directional subledger event kinds and versioned source-specific mappings. AR settlement uses the exact Treasury-created unapplied-receipt/settlement-clearing role, never cash/bank; AP uses equivalent outgoing-clearing semantics. Subledgers never select or mutate cash postings. | No AP/AR Accounting producer is registered; journal-required actions remain fail-closed. |
 | P3-S27-Q03 | **A-Revised:** proposal retains its Accountant default; approval/reversal have no default grant and require explicit scoped assignment. Existing Platform/Tenant Self-Approval policy governs; independent memberships are required where that policy says so. Absolute prohibition applies only to explicitly classified Protected Operations; write-off/reversal are not implicitly classified. No threshold is introduced. Missing policy/authority fails closed; decisions retain versioned audit and exact lineage. | Write-off approval and reversal remain disabled pending separately authorized implementation; no threshold or Protected-Operation classification is inferred. |
 | P3-S27-Q04 | **A:** retain exact unbucketed as-of aging; no bucket boundaries are authorized. | Exact aging remains available; bucketed aging remains absent. |

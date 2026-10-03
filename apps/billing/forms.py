@@ -1,11 +1,306 @@
 from django import forms
 
+from apps.contracts.models import (
+    Contract,
+    ContractDirection,
+    ContractItem,
+    ContractStatus,
+    ContractType,
+)
+from apps.documents.models import DocumentVersion
 from apps.payments.models import (
     PaymentAllocation,
     PaymentAllocationStatus,
     PaymentDirection,
     PaymentStatus,
 )
+
+from .models import (
+    AssuranceRevisionAction,
+    ComplianceEvidenceKind,
+    ContractComplianceEvidence,
+    EvidenceExpiryKind,
+    GuaranteeExposureSide,
+    GuaranteeType,
+    PayableCertificate,
+    ProgressClaim,
+    RetentionReleaseCorrectionKind,
+    StatutoryRecordKind,
+    SubmissionResolutionAction,
+    TaxpayerInvoice,
+)
+
+
+class _CommercialEvidenceForm(forms.Form):
+    def _configure(self, organization) -> None:
+        if "contract" in self.fields:
+            self.fields["contract"].queryset = Contract.objects.filter(
+                organization=organization,
+                status=ContractStatus.ACTIVE,
+                deleted_at__isnull=True,
+                party__isnull=False,
+            ).select_related("project", "party")
+        for name in ("document_version", "evidence_document_version"):
+            if name in self.fields:
+                self.fields[name].queryset = DocumentVersion.objects.filter(
+                    organization=organization,
+                    document__archived_at__isnull=True,
+                ).select_related("document")
+
+
+class GuaranteeForm(_CommercialEvidenceForm):
+    contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
+    guarantee_type = forms.ChoiceField(
+        label="نوع ضمانت‌نامه", choices=GuaranteeType.choices
+    )
+    exposure_side = forms.ChoiceField(
+        label="سمت مواجهه", choices=GuaranteeExposureSide.choices
+    )
+    instrument_reference = forms.CharField(label="شماره/مرجع ابزار", max_length=120)
+    issuer_name = forms.CharField(label="صادرکننده", max_length=255)
+    amount = forms.DecimalField(label="مبلغ اسمی", max_digits=18, decimal_places=4)
+    issued_on = forms.DateField(
+        label="تاریخ صدور", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    effective_from = forms.DateField(
+        label="تاریخ اثر", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    expiry_kind = forms.ChoiceField(
+        label="نوع انقضا", choices=EvidenceExpiryKind.choices
+    )
+    expires_on = forms.DateField(
+        label="تاریخ انقضا",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    evidence_document_version = forms.ModelChoiceField(
+        label="نسخه سند شاهد", queryset=DocumentVersion.objects.none()
+    )
+    reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._configure(organization)
+
+
+class GuaranteeRevisionForm(_CommercialEvidenceForm):
+    revision_action = forms.ChoiceField(
+        label="نوع اقدام",
+        choices=[
+            (AssuranceRevisionAction.CORRECTION, "اصلاح"),
+            (AssuranceRevisionAction.RENEWAL, "تمدید"),
+            (AssuranceRevisionAction.RELEASE, "آزادسازی"),
+        ],
+    )
+    amount = forms.DecimalField(
+        label="مبلغ اسمی جدید", max_digits=18, decimal_places=4, required=False
+    )
+    instrument_reference = forms.CharField(
+        label="مرجع جدید", max_length=120, required=False
+    )
+    issuer_name = forms.CharField(
+        label="صادرکننده جدید", max_length=255, required=False
+    )
+    issued_on = forms.DateField(
+        label="تاریخ صدور جدید",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    effective_from = forms.DateField(
+        label="تاریخ اثر جدید",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    expiry_kind = forms.ChoiceField(
+        label="نوع انقضای جدید", choices=EvidenceExpiryKind.choices, required=False
+    )
+    expires_on = forms.DateField(
+        label="تاریخ انقضای جدید",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    evidence_document_version = forms.ModelChoiceField(
+        label="نسخه سند شاهد", queryset=DocumentVersion.objects.none()
+    )
+    reason = forms.CharField(
+        label="دلیل اقدام", widget=forms.Textarea(attrs={"rows": 3})
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._configure(organization)
+
+
+class ComplianceEvidenceForm(_CommercialEvidenceForm):
+    contract = forms.ModelChoiceField(label="قرارداد", queryset=Contract.objects.none())
+    evidence_kind = forms.ChoiceField(
+        label="نوع شاهد", choices=ComplianceEvidenceKind.choices
+    )
+    reference = forms.CharField(label="شماره/مرجع شاهد", max_length=120)
+    issuing_authority = forms.CharField(label="مرجع صادرکننده", max_length=255)
+    effective_from = forms.DateField(
+        label="تاریخ اثر", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    expiry_kind = forms.ChoiceField(
+        label="نوع انقضا", choices=EvidenceExpiryKind.choices
+    )
+    expires_on = forms.DateField(
+        label="تاریخ انقضا",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    document_version = forms.ModelChoiceField(
+        label="نسخه سند شاهد", queryset=DocumentVersion.objects.none()
+    )
+    reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._configure(organization)
+
+
+class ComplianceEvidenceRevisionForm(ComplianceEvidenceForm):
+    contract = None
+    evidence_kind = None
+    revision_action = forms.ChoiceField(
+        label="نوع اقدام",
+        choices=[
+            (AssuranceRevisionAction.CORRECTION, "اصلاح"),
+            (AssuranceRevisionAction.RENEWAL, "تمدید"),
+        ],
+    )
+
+
+class RetentionReleaseForm(_CommercialEvidenceForm):
+    contract = forms.ModelChoiceField(
+        label="پیمان جزء", queryset=Contract.objects.none()
+    )
+    release_date = forms.DateField(
+        label="تاریخ آزادسازی", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    amount = forms.DecimalField(label="مبلغ آزادسازی", max_digits=18, decimal_places=4)
+    evidence_document_version = forms.ModelChoiceField(
+        label="نسخه سند مجوز/شاهد", queryset=DocumentVersion.objects.none()
+    )
+    clearance_evidence = forms.ModelChoiceField(
+        label="مفاصاحساب تأییدشده",
+        queryset=ContractComplianceEvidence.objects.none(),
+        required=False,
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._configure(organization)
+        self.fields["contract"].queryset = self.fields["contract"].queryset.filter(
+            direction=ContractDirection.PAYABLE, contract_type=ContractType.SUBCONTRACT
+        )
+        self.fields[
+            "clearance_evidence"
+        ].queryset = ContractComplianceEvidence.objects.filter(
+            organization=organization,
+            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
+            status="approved",
+        ).select_related("contract")
+
+
+class RetentionReleaseCorrectionForm(_CommercialEvidenceForm):
+    correction_kind = forms.ChoiceField(
+        label="نوع اصلاح",
+        choices=[
+            (RetentionReleaseCorrectionKind.REPLACEMENT, "اصلاح جایگزین"),
+            (RetentionReleaseCorrectionKind.CANCELLATION, "ابطال"),
+        ],
+    )
+    amount = forms.DecimalField(
+        label="مبلغ جایگزین", max_digits=18, decimal_places=4, required=False
+    )
+    evidence_document_version = forms.ModelChoiceField(
+        label="نسخه سند شاهد", queryset=DocumentVersion.objects.none()
+    )
+    clearance_evidence = forms.ModelChoiceField(
+        label="مفاصاحساب تأییدشده",
+        queryset=ContractComplianceEvidence.objects.none(),
+        required=False,
+    )
+    reason = forms.CharField(
+        label="دلیل اصلاح", widget=forms.Textarea(attrs={"rows": 3})
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._configure(organization)
+        self.fields[
+            "clearance_evidence"
+        ].queryset = ContractComplianceEvidence.objects.filter(
+            organization=organization,
+            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
+            status="approved",
+        )
+
+
+class TaxpayerInvoiceForm(forms.Form):
+    source_claim = forms.ModelChoiceField(
+        label="صورت‌وضعیت تأییدشده", queryset=ProgressClaim.objects.none()
+    )
+    record_kind = forms.ChoiceField(
+        label="نوع صورتحساب", choices=StatutoryRecordKind.choices
+    )
+    corrects = forms.ModelChoiceField(
+        label="نسخه پیشین",
+        queryset=TaxpayerInvoice.objects.none(),
+        required=False,
+    )
+    reason = forms.CharField(label="دلیل ثبت", widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["source_claim"].queryset = ProgressClaim.objects.filter(
+            organization=organization, status="approved"
+        ).select_related("contract")
+        self.fields["corrects"].queryset = TaxpayerInvoice.objects.filter(
+            organization=organization, status="approved"
+        ).select_related("contract")
+
+
+class ContractorComplianceAssessmentForm(forms.Form):
+    source_certificate = forms.ModelChoiceField(
+        label="گواهی پرداخت تأییدشده", queryset=PayableCertificate.objects.none()
+    )
+    clearance_evidence = forms.ModelChoiceField(
+        label="مفاصاحساب تأییدشده",
+        queryset=ContractComplianceEvidence.objects.none(),
+        required=False,
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["source_certificate"].queryset = PayableCertificate.objects.filter(
+            organization=organization, status="approved"
+        ).select_related("contract")
+        self.fields[
+            "clearance_evidence"
+        ].queryset = ContractComplianceEvidence.objects.filter(
+            organization=organization,
+            evidence_kind=ComplianceEvidenceKind.CLEARANCE,
+            status="approved",
+        ).select_related("contract")
+
+
+class StatutorySubmissionForm(forms.Form):
+    idempotency_key = forms.CharField(label="کلید تکرارناپذیری", max_length=255)
+    correlation_id = forms.UUIDField(label="شناسه همبستگی")
+
+
+class SubmissionResolutionForm(forms.Form):
+    action = forms.ChoiceField(
+        label="اقدام", choices=SubmissionResolutionAction.choices
+    )
+    note = forms.CharField(
+        label="شرح بررسی انسانی", widget=forms.Textarea(attrs={"rows": 3})
+    )
+    provider_reference = forms.CharField(
+        label="مرجع provider", max_length=255, required=False
+    )
 
 
 class ClaimSettlementAllocationForm(forms.Form):
@@ -42,3 +337,75 @@ class ClaimSettlementAllocationForm(forms.Form):
 
     def clean_reason(self) -> str:
         return self.cleaned_data["reason"].strip()
+
+
+class PayableMeasurementForm(forms.Form):
+    contract_item = forms.ModelChoiceField(
+        label="ردیف پیمان جزء", queryset=ContractItem.objects.none()
+    )
+    measured_on = forms.DateField(
+        label="تاریخ اندازه‌گیری", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    period_quantity = forms.DecimalField(
+        label="مقدار دوره", max_digits=18, decimal_places=4
+    )
+    cumulative_quantity = forms.DecimalField(
+        label="مقدار تجمعی", max_digits=18, decimal_places=4
+    )
+    evidence_reference = forms.CharField(label="مرجع شواهد", max_length=255)
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contract_item"].queryset = (
+            ContractItem.objects.filter(
+                organization=organization,
+                contract__direction=ContractDirection.PAYABLE,
+                contract__contract_type=ContractType.SUBCONTRACT,
+                contract__status=ContractStatus.ACTIVE,
+                contract__deleted_at__isnull=True,
+            )
+            .select_related("contract")
+            .order_by("contract__contract_number", "sort_order")
+        )
+
+
+class PayableCertificateForm(forms.Form):
+    contract = forms.ModelChoiceField(
+        label="پیمان جزء", queryset=Contract.objects.none()
+    )
+    period_start = forms.DateField(
+        label="شروع دوره", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    period_end = forms.DateField(
+        label="پایان دوره", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    measurement_cutoff = forms.DateField(
+        label="تاریخ قطع اندازه‌گیری",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contract"].queryset = Contract.objects.filter(
+            organization=organization,
+            direction=ContractDirection.PAYABLE,
+            contract_type=ContractType.SUBCONTRACT,
+            status=ContractStatus.ACTIVE,
+            deleted_at__isnull=True,
+        ).order_by("contract_number")
+
+
+class PayableBackChargeForm(forms.Form):
+    amount = forms.DecimalField(label="مبلغ کسر", max_digits=18, decimal_places=2)
+    description = forms.CharField(label="شرح", max_length=255)
+    evidence = forms.CharField(label="مرجع شواهد", max_length=1000)
+
+
+class PayableCertificateCorrectionForm(forms.Form):
+    correction_kind = forms.ChoiceField(
+        label="نوع اصلاح",
+        choices=(("replacement", "اصلاح جایگزین"), ("cancellation", "ابطال")),
+    )
+    reason = forms.CharField(
+        label="دلیل", max_length=1000, widget=forms.Textarea(attrs={"rows": 3})
+    )

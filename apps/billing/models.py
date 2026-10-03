@@ -1,3 +1,4 @@
+import uuid
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
@@ -587,7 +588,9 @@ class ClaimAdjustmentType(models.TextChoices):
     RETENTION = "retention", "کسور تضمین"
     RETENTION_RELEASE = "retention_release", "آزادسازی تضمین"
     TAX = "tax", "مالیات"
-    INSURANCE = "insurance", "بیمه"
+    CONTRACTUAL_INSURANCE = "contractual_insurance", "کسور بیمه قراردادی"
+    STATUTORY_INSURANCE = "statutory_insurance", "کسور بیمه مقرراتی"
+    INSURANCE = "insurance", "بیمه قدیمی"
     ADVANCE_RECOVERY = "advance_recovery", "بازیافت پیش‌پرداخت"
     PENALTY = "penalty", "جرایم"
     OTHER = "other", "سایر"
@@ -598,13 +601,19 @@ class ClaimSettlementAllocationStatus(models.TextChoices):
     REVERSED = "reversed", "برگشت‌خورده"
 
 
-class BillingPolicy(UUIDModel, TimeStampedModel):
-    """Tenant-owned, explicit rules used to produce draft commercial claims."""
+class ProgressClaimCorrectionKind(models.TextChoices):
+    ORDINARY = "ordinary", "عادی"
+    REPLACEMENT = "replacement", "اصلاح جایگزین"
+    CANCELLATION = "cancellation", "ابطال"
+
+
+class TenantBillingConfiguration(UUIDModel, TimeStampedModel):
+    """Tenant-owned presentation and numbering defaults, never commercial rules."""
 
     organization = models.OneToOneField(
         "organizations.Organization",
         on_delete=models.CASCADE,
-        related_name="billing_policy",
+        related_name="billing_configuration",
     )
     claim_number_scope = models.CharField(
         max_length=20,
@@ -618,61 +627,23 @@ class BillingPolicy(UUIDModel, TimeStampedModel):
     )
     allow_partial_periods = models.BooleanField(default=True)
     allow_late_measurements = models.BooleanField(default=False)
-    money_decimal_places = models.PositiveSmallIntegerField(default=2)
-    tax_rate = models.DecimalField(max_digits=9, decimal_places=6, default=Decimal(0))
-    tax_basis = models.CharField(max_length=20, default="gross")
-    insurance_rate = models.DecimalField(
-        max_digits=9, decimal_places=6, default=Decimal(0)
-    )
-    insurance_basis = models.CharField(max_length=20, default="gross")
-    retention_rate = models.DecimalField(
-        max_digits=9, decimal_places=6, default=Decimal(0)
-    )
-    retention_cap = models.DecimalField(
-        max_digits=18, decimal_places=4, default=Decimal(0)
-    )
-    advance_recovery_rate = models.DecimalField(
-        max_digits=9, decimal_places=6, default=Decimal(0)
-    )
-    advance_recovery_cap = models.DecimalField(
-        max_digits=18, decimal_places=4, default=Decimal(0)
-    )
-    allow_negative_corrective_claims = models.BooleanField(default=False)
+    currency_decimal_places = models.PositiveSmallIntegerField(default=0)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
-        related_name="billing_policies_updated",
+        related_name="billing_configurations_updated",
     )
 
     class Meta:
         constraints = [  # noqa: RUF012
             models.CheckConstraint(
-                condition=Q(money_decimal_places__gte=0)
-                & Q(money_decimal_places__lte=4),
-                name="billing_policy_money_places_range",
-            ),
-            models.CheckConstraint(
-                condition=Q(tax_rate__gte=0)
-                & Q(insurance_rate__gte=0)
-                & Q(retention_rate__gte=0)
-                & Q(advance_recovery_rate__gte=0),
-                name="billing_policy_rates_nonnegative",
-            ),
-            models.CheckConstraint(
-                condition=Q(retention_cap__gte=0) & Q(advance_recovery_cap__gte=0),
-                name="billing_policy_caps_nonnegative",
+                condition=Q(currency_decimal_places__gte=0)
+                & Q(currency_decimal_places__lte=4),
+                name="billing_config_currency_places_range",
             ),
         ]
-
-    def clean(self) -> None:
-        super().clean()
-        if self.tax_basis not in {
-            "gross",
-            "net_before_tax",
-        } or self.insurance_basis not in {"gross", "net_before_tax"}:
-            raise ValidationError("مبنای مالیات و بیمه باید صریحاً معتبر باشد.")
 
 
 class ProgressClaim(UUIDModel, TimeStampedModel):
@@ -692,10 +663,41 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
     )
     claim_number = models.PositiveIntegerField()
     revision_number = models.PositiveIntegerField(default=1)
+    correction_kind = models.CharField(
+        max_length=20,
+        choices=ProgressClaimCorrectionKind.choices,
+        default=ProgressClaimCorrectionKind.ORDINARY,
+    )
+    corrects = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="correction_claims",
+    )
+    correction_reason = models.TextField(blank=True)
     period_start = models.DateField()
     period_end = models.DateField()
     measurement_cutoff = models.DateField()
-    policy_snapshot = models.JSONField(default=dict)
+    billing_configuration_snapshot = models.JSONField(default=dict)
+    calculation_snapshot = models.JSONField(default=dict, blank=True)
+    contract_term_version = models.ForeignKey(
+        "contracts.ContractTermVersion",
+        on_delete=models.PROTECT,
+        related_name="progress_claims",
+    )
+    regulatory_rule_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="progress_claims",
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="progress_claims",
+    )
+    currency_code = models.CharField(max_length=3)
+    due_date = models.DateField(null=True, blank=True)
     gross_amount = models.DecimalField(
         max_digits=18, decimal_places=4, default=Decimal(0)
     )
@@ -712,6 +714,8 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
             ("submitted", "ارسال‌شده برای تأیید"),
             ("approved", "تأییدشده"),
             ("returned", "بازگردانده‌شده برای اصلاح"),
+            ("superseded", "جایگزین‌شده با اصلاح"),
+            ("cancelled", "باطل‌شده با سند پیوندخورده"),
         ),
         default="draft",
         db_index=True,
@@ -793,7 +797,13 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
     def clean(self) -> None:
         super().clean()
         validate_related_organizations(
-            self, project=self.project, contract=self.contract, baseline=self.baseline
+            self,
+            project=self.project,
+            contract=self.contract,
+            baseline=self.baseline,
+            contract_term_version=self.contract_term_version,
+            party_identity_snapshot=self.party_identity_snapshot,
+            corrects=self.corrects if self.corrects_id else None,
         )
         if (
             self.contract.project_id != self.project_id
@@ -802,6 +812,39 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
             raise ValidationError(
                 "پروژه، قرارداد و مبنای صورت‌وضعیت باید هم‌راستا باشند."
             )
+        if (
+            not self.contract_term_version_id
+            or self.contract_term_version.contract_id != self.contract_id
+        ):
+            raise ValidationError("نسخه شرایط باید متعلق به قرارداد صورت‌وضعیت باشد.")
+        if (
+            not self.regulatory_rule_version_id
+            or not self.party_identity_snapshot_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError("تصویر هویت باید متعلق به طرف قرارداد باشد.")
+        if not self.currency_code or len(self.currency_code) != 3:
+            raise ValidationError("کد ارز تصویرشده باید سه‌حرفی باشد.")
+        if self.correction_kind == ProgressClaimCorrectionKind.ORDINARY:
+            if self.corrects_id or self.correction_reason:
+                raise ValidationError("صورت‌وضعیت عادی نباید پیوند اصلاح داشته باشد.")
+        elif not self.corrects_id or not self.correction_reason.strip():
+            raise ValidationError("اصلاح یا ابطال باید به سند پیشین و دلیل متصل باشد.")
+        elif (
+            self.corrects_id == self.pk
+            or self.corrects.organization_id != self.organization_id
+            or self.corrects.contract_id != self.contract_id
+            or self.corrects.claim_number != self.claim_number
+            or self.corrects.revision_number >= self.revision_number
+        ):
+            raise ValidationError("زنجیره اصلاح صورت‌وضعیت نامعتبر است.")
+        if self.correction_kind == ProgressClaimCorrectionKind.CANCELLATION and any(
+            value != 0
+            for value in (self.gross_amount, self.adjustment_amount, self.net_amount)
+        ):
+            raise ValidationError("سند ابطال باید مبالغ صفر داشته باشد.")
+        if self.net_amount < 0:
+            raise ValidationError("صورت‌وضعیت عادی نمی‌تواند مبلغ خالص منفی داشته باشد.")
         if self.status == "submitted" and (
             not self.submitted_by_id
             or not self.submitted_at
@@ -811,7 +854,10 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
                 "صورت‌وضعیت ارسالی باید تصویر و شواهد ارسال داشته باشد."
             )
         if self.status == "approved" and (
-            not self.approved_by_id or not self.approved_at or not self.approval_reason
+            not self.approved_by_id
+            or not self.approved_at
+            or not self.approval_reason
+            or not self.due_date
         ):
             raise ValidationError(
                 "صورت‌وضعیت تأییدشده باید شواهد کامل تأیید داشته باشد."
@@ -838,13 +884,19 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:
             previous = type(self).objects.get(pk=self.pk)
-            if previous.status in {"approved", "returned"}:
+            if previous.status in {
+                "approved",
+                "returned",
+                "superseded",
+                "cancelled",
+            }:
                 raise ValidationError("صورت‌وضعیت نهایی‌شده قابل تغییر نیست.")
             if previous.status == "submitted":
                 permitted = {
                     "status",
                     "approved_by_id",
                     "approved_at",
+                    "due_date",
                     "approval_reason",
                     "returned_by_id",
                     "returned_at",
@@ -1081,3 +1133,1770 @@ class ClaimAdjustment(UUIDModel, TimeStampedModel):
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
         self._assert_draft()
         return super().delete(*args, **kwargs)
+
+
+class PayableMeasurementStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    VERIFIED = "verified", "راستی‌آزمایی‌شده"
+    REJECTED = "rejected", "ردشده"
+
+
+class PayableCertificateStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده برای تأیید"
+    APPROVED = "approved", "تأییدشده"
+    RETURNED = "returned", "بازگردانده‌شده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+    CANCELLED = "cancelled", "باطل‌شده"
+
+
+class PayableCertificateCorrectionKind(models.TextChoices):
+    ORDINARY = "ordinary", "عادی"
+    REPLACEMENT = "replacement", "اصلاح جایگزین"
+    CANCELLATION = "cancellation", "ابطال پیوندخورده"
+
+
+class PayableCertificateAdjustmentType(models.TextChoices):
+    RETENTION = "retention", "کسور تضمین"
+    ADVANCE_RECOVERY = "advance_recovery", "بازیافت پیش‌پرداخت"
+    BACK_CHARGE = "back_charge", "کسر هزینه قابل برگشت"
+
+
+class PayableMeasurement(UUIDModel, TimeStampedModel):
+    """Subcontractor measured-work evidence; separate from receivable progress."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="payable_measurements",
+    )
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        related_name="payable_measurements",
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="payable_measurements",
+    )
+    contract_item = models.ForeignKey(
+        "contracts.ContractItem",
+        on_delete=models.PROTECT,
+        related_name="payable_measurements",
+    )
+    measured_on = models.DateField()
+    period_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    cumulative_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    evidence_reference = models.CharField(max_length=255)
+    status = models.CharField(
+        max_length=20,
+        choices=PayableMeasurementStatus.choices,
+        default=PayableMeasurementStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payable_measurements_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    verified_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payable_measurements_verified",
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="payable_measurements_created",
+    )
+
+    class Meta:
+        ordering = ["contract_item_id", "measured_on", "created_at"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=Q(period_quantity__gt=0) & Q(cumulative_quantity__gt=0),
+                name="pay_measure_quantities_positive",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "contract_item", "measured_on"],
+                condition=Q(status=PayableMeasurementStatus.VERIFIED),
+                name="pay_measure_one_verified_per_day",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "contract", "status", "measured_on"],
+                name="pay_measure_ct_status_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            contract_item=self.contract_item,
+        )
+        if (
+            self.contract.direction != ContractDirection.PAYABLE
+            or self.contract.contract_type != "subcontract"
+            or self.contract.project_id != self.project_id
+            or self.contract_item.contract_id != self.contract_id
+        ):
+            raise ValidationError("اندازه‌گیری بای ردیف پیمان جزء هم‌راست نیست.")
+        if self.period_quantity <= 0 or self.cumulative_quantity <= 0:
+            raise ValidationError("مقدار اندازه‌گیری باید مثبت باشد.")
+        if self.cumulative_quantity > self.contract_item.quantity:
+            raise ValidationError("مقدار تجمعی از مقدار ردیف پیمان بیشتر است.")
+        if not self.evidence_reference.strip():
+            raise ValidationError("مرجع شواهد اندازه‌گیری الزامی است.")
+        if self.verified_by_id == self.created_by_id and self.verified_by_id:
+            raise ValidationError(
+                "ثبت‌کننده نمی‌تواند اندازه‌گیری خود را راستی‌آزمایی کند."
+            )
+        if self.status == PayableMeasurementStatus.SUBMITTED and (
+            not self.submitted_by_id or not self.submitted_at
+        ):
+            raise ValidationError("اندازه‌گیری ارسالی باید شواهد ارسال داشته باشد.")
+        if self.status in {
+            PayableMeasurementStatus.VERIFIED,
+            PayableMeasurementStatus.REJECTED,
+        } and (
+            not self.verified_by_id or not self.verified_at or not self.decision_reason
+        ):
+            raise ValidationError("تصمیم اندازه‌گیری باید شواهد کامل داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                PayableMeasurementStatus.VERIFIED,
+                PayableMeasurementStatus.REJECTED,
+            }:
+                raise ValidationError("شواهد اندازه‌گیری نهایی تغییرناپذیر است.")
+            if previous.status == PayableMeasurementStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "verified_by_id",
+                    "verified_at",
+                    "decision_reason",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("شواهد ارسال‌شده قابل ویرایش نیست.")
+        self.evidence_reference = self.evidence_reference.strip()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != PayableMeasurementStatus.DRAFT:
+            raise ValidationError("اندازه‌گیری ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class PayableCertificate(UUIDModel, TimeStampedModel):
+    """Cumulative subcontract payable certification, never a receivable claim."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="payable_certificates",
+    )
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        related_name="payable_certificates",
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="payable_certificates",
+    )
+    contract_term_version = models.ForeignKey(
+        "contracts.ContractTermVersion",
+        on_delete=models.PROTECT,
+        related_name="payable_certificates",
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="payable_certificates",
+    )
+    certificate_number = models.PositiveIntegerField()
+    revision_number = models.PositiveIntegerField(default=1)
+    correction_kind = models.CharField(
+        max_length=20,
+        choices=PayableCertificateCorrectionKind.choices,
+        default=PayableCertificateCorrectionKind.ORDINARY,
+    )
+    corrects = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="correction_certificates",
+    )
+    correction_reason = models.TextField(blank=True)
+    period_start = models.DateField()
+    period_end = models.DateField()
+    measurement_cutoff = models.DateField()
+    currency_code = models.CharField(max_length=3)
+    due_date = models.DateField(null=True, blank=True)
+    gross_amount = models.DecimalField(
+        max_digits=18, decimal_places=4, default=Decimal(0)
+    )
+    adjustment_amount = models.DecimalField(
+        max_digits=18, decimal_places=4, default=Decimal(0)
+    )
+    net_amount = models.DecimalField(
+        max_digits=18, decimal_places=4, default=Decimal(0)
+    )
+    calculation_snapshot = models.JSONField(default=dict, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=PayableCertificateStatus.choices,
+        default=PayableCertificateStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payable_certificates_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payable_certificates_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approval_reason = models.TextField(blank=True)
+    returned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payable_certificates_returned",
+    )
+    returned_at = models.DateTimeField(null=True, blank=True)
+    return_reason = models.TextField(blank=True)
+    returned_revision = models.OneToOneField(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="returned_from",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="payable_certificates_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="payable_certificates_updated",
+    )
+
+    class Meta:
+        ordering = ["contract_id", "certificate_number", "revision_number"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=[
+                    "organization",
+                    "contract",
+                    "certificate_number",
+                    "revision_number",
+                ],
+                name="pay_cert_contract_number_revision_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "contract", "certificate_number"],
+                condition=Q(status=PayableCertificateStatus.APPROVED),
+                name="pay_cert_one_approved_revision_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(period_end__gte=F("period_start"))
+                & Q(measurement_cutoff__gte=F("period_start"))
+                & Q(measurement_cutoff__lte=F("period_end")),
+                name="pay_cert_period_cutoff_valid",
+            ),
+            models.CheckConstraint(
+                condition=Q(net_amount__gte=0),
+                name="pay_cert_net_nonnegative",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "contract", "status"],
+                name="pay_cert_contract_status_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            contract_term_version=self.contract_term_version,
+            party_identity_snapshot=self.party_identity_snapshot,
+            corrects=self.corrects if self.corrects_id else None,
+        )
+        if (
+            self.contract.direction != ContractDirection.PAYABLE
+            or self.contract.contract_type != "subcontract"
+            or self.contract.project_id != self.project_id
+            or self.contract_term_version.contract_id != self.contract_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError(
+                "پروژه، پیمان، طرف و نسخه شرایط گواهی پرداخت هم‌راست نیست."
+            )
+        if len(self.currency_code) != 3:
+            raise ValidationError("کد ارز باید سه‌حرفی باشد.")
+        if self.correction_kind == PayableCertificateCorrectionKind.ORDINARY:
+            if self.corrects_id or self.correction_reason:
+                raise ValidationError("گواهی عادی نباید پیوند اصلاح داشته باشد.")
+        elif not self.corrects_id or not self.correction_reason.strip():
+            raise ValidationError(
+                "اصلاح یا ابطال باید به گواهی پیشین و دلیل متصل باشد."
+            )
+        elif (
+            self.corrects_id == self.pk
+            or self.corrects.contract_id != self.contract_id
+            or self.corrects.certificate_number != self.certificate_number
+            or self.corrects.revision_number >= self.revision_number
+        ):
+            raise ValidationError("زنجیره اصلاح گواهی پرداخت نامعتبر است.")
+        if (
+            self.correction_kind == PayableCertificateCorrectionKind.CANCELLATION
+            and any(
+                value != 0
+                for value in (
+                    self.gross_amount,
+                    self.adjustment_amount,
+                    self.net_amount,
+                )
+            )
+        ):
+            raise ValidationError("سند ابطال باید مبالغ صفر داشته باشد.")
+        if self.status == PayableCertificateStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.submission_snapshot
+        ):
+            raise ValidationError("گواهی ارسالی باید تصویر و شواهد ارسال داشته باشد.")
+        if self.status == PayableCertificateStatus.APPROVED and (
+            not self.approved_by_id
+            or not self.approved_at
+            or not self.approval_reason
+            or not self.due_date
+        ):
+            raise ValidationError("گواهی تأییدشده باید شواهد کامل تصمیم داشته باشد.")
+        if self.status == PayableCertificateStatus.RETURNED and (
+            not self.returned_by_id
+            or not self.returned_at
+            or not self.return_reason
+            or not self.returned_revision_id
+        ):
+            raise ValidationError(
+                "بازگردانی باید به نسخه بعدی و شواهد تصمیم متصل باشد."
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                PayableCertificateStatus.APPROVED,
+                PayableCertificateStatus.RETURNED,
+                PayableCertificateStatus.SUPERSEDED,
+                PayableCertificateStatus.CANCELLED,
+            }:
+                raise ValidationError("گواهی پرداخت نهایی تغییرناپذیر است.")
+            if previous.status == PayableCertificateStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "approval_reason",
+                    "due_date",
+                    "returned_by_id",
+                    "returned_at",
+                    "return_reason",
+                    "returned_revision_id",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("تصویر گواهی ارسال‌شده قابل ویرایش نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != PayableCertificateStatus.DRAFT:
+            raise ValidationError("گواهی پرداخت ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class PayableCertificateItem(UUIDModel, TimeStampedModel):
+    certificate = models.ForeignKey(
+        PayableCertificate, on_delete=models.CASCADE, related_name="items"
+    )
+    contract_item = models.ForeignKey(
+        "contracts.ContractItem",
+        on_delete=models.PROTECT,
+        related_name="payable_certificate_items",
+    )
+    measurement = models.ForeignKey(
+        PayableMeasurement,
+        on_delete=models.PROTECT,
+        related_name="certificate_items",
+    )
+    stable_line_id = models.UUIDField()
+    previous_cumulative_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    current_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    new_cumulative_quantity = models.DecimalField(max_digits=18, decimal_places=4)
+    unit_rate_snapshot = models.DecimalField(max_digits=18, decimal_places=4)
+    current_amount = models.DecimalField(max_digits=18, decimal_places=4)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["certificate", "stable_line_id"],
+                name="pay_cert_stable_line_uq",
+            )
+        ]
+
+    def _assert_draft(self) -> None:
+        if (
+            self.certificate_id
+            and self.certificate.status != PayableCertificateStatus.DRAFT
+        ):
+            raise ValidationError("ردیف گواهی نهایی قابل تغییر نیست.")
+
+    def clean(self) -> None:
+        super().clean()
+        if (
+            self.contract_item_id
+            and self.certificate_id
+            and self.contract_item.contract_id != self.certificate.contract_id
+        ):
+            raise ValidationError("ردیف پیمان و گواهی پرداخت هم‌راستا نیستند.")
+        if self.measurement_id and (
+            self.measurement.contract_item_id != self.contract_item_id
+            or self.measurement.contract_id != self.certificate.contract_id
+            or self.measurement.status != PayableMeasurementStatus.VERIFIED
+        ):
+            raise ValidationError("شاهد اندازه‌گیری ردیف گواهی معتبر نیست.")
+        if self.stable_line_id != self.contract_item_id:
+            raise ValidationError("شناسه پایدار ردیف باید شناسه ردیف پیمان باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self._assert_draft()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        self._assert_draft()
+        return super().delete(*args, **kwargs)
+
+
+class PayableCertificateAdjustment(UUIDModel, TimeStampedModel):
+    certificate = models.ForeignKey(
+        PayableCertificate, on_delete=models.CASCADE, related_name="adjustments"
+    )
+    adjustment_type = models.CharField(
+        max_length=30, choices=PayableCertificateAdjustmentType.choices
+    )
+    description = models.CharField(max_length=255)
+    sequence = models.PositiveIntegerField(default=0)
+    rate_snapshot = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True
+    )
+    base_amount_snapshot = models.DecimalField(
+        max_digits=18, decimal_places=4, null=True, blank=True
+    )
+    amount = models.DecimalField(max_digits=18, decimal_places=4)
+    evidence = models.TextField(blank=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["certificate", "sequence"],
+                name="pay_cert_adjustment_sequence_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(amount__lt=0),
+                name="pay_cert_adjustment_negative",
+            ),
+        ]
+
+    def _assert_draft(self) -> None:
+        if (
+            self.certificate_id
+            and self.certificate.status != PayableCertificateStatus.DRAFT
+        ):
+            raise ValidationError("کسر گواهی نهایی قابل تغییر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self._assert_draft()
+        if self.amount >= 0:
+            raise ValidationError("کسر گواهی باید منفی باشد.")
+        if (
+            self.adjustment_type == PayableCertificateAdjustmentType.BACK_CHARGE
+            and not self.evidence.strip()
+        ):
+            raise ValidationError("کسر هزینه بدون مرجع شواهد مجاز نیست.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        self._assert_draft()
+        return super().delete(*args, **kwargs)
+
+
+class GuaranteeType(models.TextChoices):
+    BID = "bid", "ضمانت‌نامه شرکت در مناقصه"
+    PERFORMANCE = "performance", "ضمانت‌نامه حسن انجام تعهدات"
+    ADVANCE_PAYMENT = "advance_payment", "ضمانت‌نامه پیش‌پرداخت"
+    RETENTION = "retention", "ضمانت‌نامه کسور تضمین"
+
+
+class GuaranteeExposureSide(models.TextChoices):
+    ISSUED = "issued", "صادرشده از طرف سازمان"
+    RECEIVED = "received", "دریافت‌شده به نفع سازمان"
+
+
+class EvidenceExpiryKind(models.TextChoices):
+    DATED = "dated", "دارای تاریخ انقضا"
+    OPEN_ENDED = "open_ended", "بدون تاریخ انقضای قراردادی"
+
+
+class AssuranceRevisionAction(models.TextChoices):
+    ORIGINAL = "original", "ثبت اولیه"
+    CORRECTION = "correction", "اصلاح"
+    RENEWAL = "renewal", "تمدید"
+    RELEASE = "release", "آزادسازی"
+
+
+class GuaranteeStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    ACTIVE = "active", "فعال"
+    RETURNED = "returned", "بازگردانده‌شده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+    EXPIRED = "expired", "منقضی‌شده"
+    RELEASED = "released", "آزادشده"
+
+
+class ContractGuarantee(UUIDModel, TimeStampedModel):
+    """Versioned contract guarantee and explicit operational exposure evidence."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="guarantees",
+    )
+    project = models.ForeignKey(
+        "projects.Project", on_delete=models.PROTECT, related_name="guarantees"
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract", on_delete=models.PROTECT, related_name="guarantees"
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="guarantees",
+    )
+    series_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    version = models.PositiveIntegerField(default=1)
+    revision_action = models.CharField(
+        max_length=20,
+        choices=AssuranceRevisionAction.choices,
+        default=AssuranceRevisionAction.ORIGINAL,
+    )
+    predecessor = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="successor_versions",
+    )
+    revision_reason = models.TextField()
+    guarantee_type = models.CharField(max_length=24, choices=GuaranteeType.choices)
+    exposure_side = models.CharField(
+        max_length=16, choices=GuaranteeExposureSide.choices
+    )
+    instrument_reference = models.CharField(max_length=120)
+    issuer_name = models.CharField(max_length=255)
+    currency_code = models.CharField(max_length=3)
+    amount = models.DecimalField(max_digits=18, decimal_places=4)
+    issued_on = models.DateField()
+    effective_from = models.DateField()
+    expiry_kind = models.CharField(max_length=20, choices=EvidenceExpiryKind.choices)
+    expires_on = models.DateField(null=True, blank=True)
+    evidence_document_version = models.ForeignKey(
+        "documents.DocumentVersion",
+        on_delete=models.PROTECT,
+        related_name="contract_guarantee_versions",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=GuaranteeStatus.choices,
+        default=GuaranteeStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="guarantees_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="guarantees_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="guarantees_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="guarantees_updated",
+    )
+
+    class Meta:
+        ordering = ["contract_id", "series_id", "version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "contract", "series_id", "version"],
+                name="guarantee_series_version_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "series_id"],
+                condition=Q(status=GuaranteeStatus.ACTIVE),
+                name="guarantee_one_active_version_uq",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(revision_action=AssuranceRevisionAction.RELEASE, amount=0)
+                    | (
+                        ~Q(revision_action=AssuranceRevisionAction.RELEASE)
+                        & Q(amount__gt=0)
+                    )
+                ),
+                name="guarantee_amount_action_valid",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "expires_on"],
+                name="guarantee_expiry_work_idx",
+            ),
+            models.Index(
+                fields=["organization", "project", "exposure_side", "status"],
+                name="guarantee_exposure_idx",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            party_identity_snapshot=self.party_identity_snapshot,
+            evidence_document_version=self.evidence_document_version,
+            predecessor=self.predecessor if self.predecessor_id else None,
+        )
+        if (
+            self.contract.project_id != self.project_id
+            or not self.contract.party_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError("دامنه پروژه، قرارداد و طرف ضمانت‌نامه هم‌راستا نیست.")
+        if len(self.currency_code) != 3:
+            raise ValidationError("کد ارز ضمانت‌نامه باید سه‌حرفی باشد.")
+        if self.expiry_kind == EvidenceExpiryKind.DATED:
+            if not self.expires_on or self.expires_on < self.effective_from:
+                raise ValidationError("تاریخ انقضای ضمانت‌نامه معتبر نیست.")
+        elif self.expires_on is not None:
+            raise ValidationError("ضمانت‌نامه بدون انقضا نباید تاریخ انقضا داشته باشد.")
+        if self.revision_action == AssuranceRevisionAction.ORIGINAL:
+            if self.predecessor_id or self.version != 1:
+                raise ValidationError(
+                    "ثبت اولیه ضمانت‌نامه نباید نسخه پیشین داشته باشد."
+                )
+        elif not self.predecessor_id or not self.revision_reason.strip():
+            raise ValidationError(
+                "نسخه اصلاح، تمدید یا آزادسازی به سابقه و دلیل نیاز دارد."
+            )
+        elif (
+            self.predecessor.series_id != self.series_id
+            or self.predecessor.contract_id != self.contract_id
+            or self.predecessor.version >= self.version
+        ):
+            raise ValidationError("زنجیره نسخه ضمانت‌نامه معتبر نیست.")
+        if self.status == GuaranteeStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.submission_snapshot
+        ):
+            raise ValidationError("ضمانت‌نامه ارسالی باید شواهد ارسال داشته باشد.")
+        if self.status in {GuaranteeStatus.ACTIVE, GuaranteeStatus.RELEASED} and (
+            not self.approved_by_id or not self.approved_at or not self.decision_reason
+        ):
+            raise ValidationError("نسخه نهایی ضمانت‌نامه باید شواهد تصمیم داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                GuaranteeStatus.ACTIVE,
+                GuaranteeStatus.RETURNED,
+                GuaranteeStatus.SUPERSEDED,
+                GuaranteeStatus.EXPIRED,
+                GuaranteeStatus.RELEASED,
+            }:
+                raise ValidationError("سابقه نهایی ضمانت‌نامه تغییرناپذیر است.")
+            if previous.status == GuaranteeStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "decision_reason",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("تصویر ضمانت‌نامه ارسالی قابل ویرایش نیست.")
+        self.instrument_reference = self.instrument_reference.strip()
+        self.issuer_name = self.issuer_name.strip()
+        self.revision_reason = self.revision_reason.strip()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != GuaranteeStatus.DRAFT:
+            raise ValidationError("ضمانت‌نامه ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class ComplianceEvidenceKind(models.TextChoices):
+    INSURANCE = "insurance", "شاهد بیمه قراردادی"
+    CLEARANCE = "clearance", "شاهد مفاصاحساب"
+
+
+class ComplianceEvidenceStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    APPROVED = "approved", "تأییدشده"
+    RETURNED = "returned", "بازگردانده‌شده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+    EXPIRED = "expired", "منقضی‌شده"
+
+
+class ContractComplianceEvidence(UUIDModel, TimeStampedModel):
+    """Versioned insurance or clearance evidence without inferred statutory effect."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence",
+    )
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence",
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="compliance_evidence",
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence",
+    )
+    series_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    version = models.PositiveIntegerField(default=1)
+    revision_action = models.CharField(
+        max_length=20,
+        choices=AssuranceRevisionAction.choices,
+        default=AssuranceRevisionAction.ORIGINAL,
+    )
+    predecessor = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="successor_versions",
+    )
+    revision_reason = models.TextField()
+    evidence_kind = models.CharField(
+        max_length=20, choices=ComplianceEvidenceKind.choices
+    )
+    reference = models.CharField(max_length=120)
+    issuing_authority = models.CharField(max_length=255)
+    effective_from = models.DateField()
+    expiry_kind = models.CharField(max_length=20, choices=EvidenceExpiryKind.choices)
+    expires_on = models.DateField(null=True, blank=True)
+    document_version = models.ForeignKey(
+        "documents.DocumentVersion",
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=ComplianceEvidenceStatus.choices,
+        default=ComplianceEvidenceStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="contract_compliance_evidence_updated",
+    )
+
+    class Meta:
+        ordering = ["contract_id", "series_id", "version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "contract", "series_id", "version"],
+                name="compliance_evidence_series_version_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "series_id"],
+                condition=Q(status=ComplianceEvidenceStatus.APPROVED),
+                name="compliance_evidence_one_approved_uq",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "expires_on"],
+                name="compliance_expiry_work_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            party_identity_snapshot=self.party_identity_snapshot,
+            document_version=self.document_version,
+            predecessor=self.predecessor if self.predecessor_id else None,
+        )
+        if (
+            self.contract.project_id != self.project_id
+            or not self.contract.party_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError(
+                "دامنه پروژه، قرارداد و طرف شاهد انطباق هم‌راستا نیست."
+            )
+        if self.expiry_kind == EvidenceExpiryKind.DATED:
+            if not self.expires_on or self.expires_on < self.effective_from:
+                raise ValidationError("تاریخ انقضای شاهد انطباق معتبر نیست.")
+        elif self.expires_on is not None:
+            raise ValidationError("شاهد بدون انقضا نباید تاریخ انقضا داشته باشد.")
+        if self.revision_action == AssuranceRevisionAction.ORIGINAL:
+            if self.predecessor_id or self.version != 1:
+                raise ValidationError("ثبت اولیه شاهد نباید نسخه پیشین داشته باشد.")
+        elif (
+            self.revision_action == AssuranceRevisionAction.RELEASE
+            or not self.predecessor_id
+            or not self.revision_reason.strip()
+        ):
+            raise ValidationError("نسخه شاهد فقط می‌تواند اصلاح یا تمدید مستند باشد.")
+        elif (
+            self.predecessor.series_id != self.series_id
+            or self.predecessor.contract_id != self.contract_id
+            or self.predecessor.version >= self.version
+        ):
+            raise ValidationError("زنجیره نسخه شاهد انطباق معتبر نیست.")
+        if self.status == ComplianceEvidenceStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.submission_snapshot
+        ):
+            raise ValidationError("شاهد ارسالی باید شواهد ارسال داشته باشد.")
+        if self.status == ComplianceEvidenceStatus.APPROVED and (
+            not self.approved_by_id or not self.approved_at or not self.decision_reason
+        ):
+            raise ValidationError("شاهد تأییدشده باید شواهد تصمیم داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                ComplianceEvidenceStatus.APPROVED,
+                ComplianceEvidenceStatus.RETURNED,
+                ComplianceEvidenceStatus.SUPERSEDED,
+                ComplianceEvidenceStatus.EXPIRED,
+            }:
+                raise ValidationError("شاهد نهایی انطباق تغییرناپذیر است.")
+            if previous.status == ComplianceEvidenceStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "decision_reason",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("تصویر شاهد ارسالی قابل ویرایش نیست.")
+        self.reference = self.reference.strip()
+        self.issuing_authority = self.issuing_authority.strip()
+        self.revision_reason = self.revision_reason.strip()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != ComplianceEvidenceStatus.DRAFT:
+            raise ValidationError("شاهد ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class RetentionReleaseStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    APPROVED = "approved", "تأییدشده"
+    RETURNED = "returned", "بازگردانده‌شده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+    CANCELLED = "cancelled", "باطل‌شده"
+
+
+class RetentionReleaseCorrectionKind(models.TextChoices):
+    ORDINARY = "ordinary", "عادی"
+    REPLACEMENT = "replacement", "اصلاح جایگزین"
+    CANCELLATION = "cancellation", "ابطال پیوندخورده"
+
+
+class RetentionRelease(UUIDModel, TimeStampedModel):
+    """Controlled release of retained payable-certificate value; never AP or GL."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="retention_releases",
+    )
+    project = models.ForeignKey(
+        "projects.Project", on_delete=models.PROTECT, related_name="retention_releases"
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="retention_releases",
+    )
+    contract_term_version = models.ForeignKey(
+        "contracts.ContractTermVersion",
+        on_delete=models.PROTECT,
+        related_name="retention_releases",
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="retention_releases",
+    )
+    release_number = models.PositiveIntegerField()
+    revision_number = models.PositiveIntegerField(default=1)
+    correction_kind = models.CharField(
+        max_length=20,
+        choices=RetentionReleaseCorrectionKind.choices,
+        default=RetentionReleaseCorrectionKind.ORDINARY,
+    )
+    corrects = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="correction_releases",
+    )
+    correction_reason = models.TextField(blank=True)
+    release_date = models.DateField()
+    currency_code = models.CharField(max_length=3)
+    amount = models.DecimalField(max_digits=18, decimal_places=4)
+    retained_total_snapshot = models.DecimalField(max_digits=18, decimal_places=4)
+    prior_release_total_snapshot = models.DecimalField(max_digits=18, decimal_places=4)
+    available_amount_snapshot = models.DecimalField(max_digits=18, decimal_places=4)
+    calculation_snapshot = models.JSONField(default=dict)
+    evidence_document_version = models.ForeignKey(
+        "documents.DocumentVersion",
+        on_delete=models.PROTECT,
+        related_name="retention_release_evidence",
+    )
+    clearance_evidence = models.ForeignKey(
+        ContractComplianceEvidence,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="retention_releases",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=RetentionReleaseStatus.choices,
+        default=RetentionReleaseStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="retention_releases_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="retention_releases_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="retention_releases_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="retention_releases_updated",
+    )
+
+    class Meta:
+        ordering = ["contract_id", "release_number", "revision_number"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=[
+                    "organization",
+                    "contract",
+                    "release_number",
+                    "revision_number",
+                ],
+                name="retention_release_number_revision_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "contract", "release_number"],
+                condition=Q(status=RetentionReleaseStatus.APPROVED),
+                name="retention_release_one_approved_uq",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        correction_kind=RetentionReleaseCorrectionKind.CANCELLATION,
+                        amount=0,
+                    )
+                    | (
+                        ~Q(correction_kind=RetentionReleaseCorrectionKind.CANCELLATION)
+                        & Q(amount__gt=0)
+                    )
+                ),
+                name="retention_release_amount_kind_valid",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(retained_total_snapshot__gte=0)
+                    & Q(prior_release_total_snapshot__gte=0)
+                    & Q(available_amount_snapshot__gte=0)
+                ),
+                name="retention_release_snapshots_nonnegative",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "contract", "status"],
+                name="retention_release_status_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            contract_term_version=self.contract_term_version,
+            party_identity_snapshot=self.party_identity_snapshot,
+            evidence_document_version=self.evidence_document_version,
+            clearance_evidence=self.clearance_evidence
+            if self.clearance_evidence_id
+            else None,
+            corrects=self.corrects if self.corrects_id else None,
+        )
+        if (
+            self.contract.project_id != self.project_id
+            or not self.contract.party_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+            or self.contract_term_version.contract_id != self.contract_id
+        ):
+            raise ValidationError(
+                "دامنه پروژه، قرارداد، طرف و شرایط آزادسازی هم‌راستا نیست."
+            )
+        if len(self.currency_code) != 3:
+            raise ValidationError("کد ارز آزادسازی باید سه‌حرفی باشد.")
+        if self.clearance_evidence_id and (
+            self.clearance_evidence.contract_id != self.contract_id
+            or self.clearance_evidence.evidence_kind != ComplianceEvidenceKind.CLEARANCE
+            or self.clearance_evidence.status != ComplianceEvidenceStatus.APPROVED
+        ):
+            raise ValidationError("شاهد مفاصاحساب آزادسازی معتبر نیست.")
+        if self.correction_kind == RetentionReleaseCorrectionKind.ORDINARY:
+            if self.corrects_id or self.correction_reason:
+                raise ValidationError("آزادسازی عادی نباید پیوند اصلاح داشته باشد.")
+        elif not self.corrects_id or not self.correction_reason.strip():
+            raise ValidationError("اصلاح آزادسازی باید به سابقه و دلیل متصل باشد.")
+        elif (
+            self.corrects.contract_id != self.contract_id
+            or self.corrects.release_number != self.release_number
+            or self.corrects.revision_number >= self.revision_number
+        ):
+            raise ValidationError("زنجیره اصلاح آزادسازی معتبر نیست.")
+        if self.status == RetentionReleaseStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.submission_snapshot
+        ):
+            raise ValidationError("آزادسازی ارسالی باید شواهد ارسال داشته باشد.")
+        if self.status == RetentionReleaseStatus.APPROVED and (
+            not self.approved_by_id or not self.approved_at or not self.decision_reason
+        ):
+            raise ValidationError("آزادسازی تأییدشده باید شواهد تصمیم داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                RetentionReleaseStatus.APPROVED,
+                RetentionReleaseStatus.RETURNED,
+                RetentionReleaseStatus.SUPERSEDED,
+                RetentionReleaseStatus.CANCELLED,
+            }:
+                raise ValidationError("سابقه نهایی آزادسازی تغییرناپذیر است.")
+            if previous.status == RetentionReleaseStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "decision_reason",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("تصویر آزادسازی ارسالی قابل ویرایش نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != RetentionReleaseStatus.DRAFT:
+            raise ValidationError("آزادسازی ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class StatutoryRecordKind(models.TextChoices):
+    ORIGINAL = "original", "اصلی"
+    CORRECTION = "correction", "اصلاحی"
+    CANCELLATION = "cancellation", "ابطالی"
+
+
+class StatutoryRecordStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده برای تأیید"
+    APPROVED = "approved", "آماده خروجی/ارسال"
+    RETURNED = "returned", "بازگردانده‌شده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+    CANCELLED = "cancelled", "باطل‌شده"
+
+
+class TaxpayerInvoice(UUIDModel, TimeStampedModel):
+    """Immutable approved statutory derivative of one commercial claim revision."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices",
+    )
+    project = models.ForeignKey(
+        "projects.Project", on_delete=models.PROTECT, related_name="taxpayer_invoices"
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract", on_delete=models.PROTECT, related_name="taxpayer_invoices"
+    )
+    source_claim = models.OneToOneField(
+        ProgressClaim, on_delete=models.PROTECT, related_name="taxpayer_invoice"
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices",
+    )
+    policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices",
+    )
+    series_id = models.UUIDField(default=uuid.uuid4, editable=False)
+    version = models.PositiveIntegerField(default=1)
+    record_kind = models.CharField(max_length=20, choices=StatutoryRecordKind.choices)
+    corrects = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="corrections",
+    )
+    reason = models.TextField()
+    schema_identifier = models.CharField(max_length=255)
+    tax_code = models.CharField(max_length=120)
+    currency_code = models.CharField(max_length=3)
+    taxable_amount = models.DecimalField(max_digits=18, decimal_places=4)
+    tax_amount = models.DecimalField(max_digits=18, decimal_places=4)
+    total_amount = models.DecimalField(max_digits=18, decimal_places=4)
+    payload_snapshot = models.JSONField(default=dict)
+    preflight_snapshot = models.JSONField(default=dict)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=StatutoryRecordStatus.choices,
+        default=StatutoryRecordStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="taxpayer_invoices_updated",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "series_id", "version"],
+                name="taxpayer_invoice_series_version_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "series_id"],
+                condition=Q(status=StatutoryRecordStatus.APPROVED),
+                name="taxpayer_invoice_one_approved_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(taxable_amount__gte=0)
+                & Q(tax_amount__gte=0)
+                & Q(total_amount__gte=0),
+                name="taxpayer_invoice_amounts_nonnegative",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "created_at"],
+                name="taxpayer_invoice_work_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            source_claim=self.source_claim,
+            party_identity_snapshot=self.party_identity_snapshot,
+            corrects=self.corrects if self.corrects_id else None,
+        )
+        if (
+            self.contract.project_id != self.project_id
+            or self.source_claim.contract_id != self.contract_id
+            or self.source_claim.project_id != self.project_id
+            or not self.contract.party_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError(
+                "دامنه Tenant، پروژه، قرارداد، سند و طرف صورتحساب هم‌راستا نیست."
+            )
+        if len(self.currency_code) != 3:
+            raise ValidationError("کد ارز صورتحساب باید سه‌حرفی باشد.")
+        if self.record_kind == StatutoryRecordKind.ORIGINAL:
+            if self.corrects_id or self.version != 1:
+                raise ValidationError("صورتحساب اصلی نباید سابقه اصلاح داشته باشد.")
+        elif (
+            not self.corrects_id
+            or not self.reason.strip()
+            or self.corrects.series_id != self.series_id
+            or self.corrects.version >= self.version
+            or self.corrects.contract_id != self.contract_id
+        ):
+            raise ValidationError("زنجیره اصلاح/ابطال صورتحساب معتبر نیست.")
+        if self.record_kind == StatutoryRecordKind.CANCELLATION and any(
+            value != 0
+            for value in (self.taxable_amount, self.tax_amount, self.total_amount)
+        ):
+            raise ValidationError("صورتحساب ابطالی باید مبالغ صفر داشته باشد.")
+        if self.total_amount != self.taxable_amount + self.tax_amount:
+            raise ValidationError("جمع صورتحساب با مبلغ مشمول و مالیات هم‌خوان نیست.")
+        if self.status == StatutoryRecordStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.preflight_snapshot
+        ):
+            raise ValidationError("صورتحساب ارسالی باید شواهد preflight داشته باشد.")
+        if self.status == StatutoryRecordStatus.APPROVED and (
+            not self.approved_by_id or not self.approved_at or not self.decision_reason
+        ):
+            raise ValidationError("صورتحساب آماده باید شواهد تصمیم داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                StatutoryRecordStatus.APPROVED,
+                StatutoryRecordStatus.RETURNED,
+                StatutoryRecordStatus.SUPERSEDED,
+                StatutoryRecordStatus.CANCELLED,
+            }:
+                raise ValidationError("سابقه نهایی صورتحساب مؤدیان تغییرناپذیر است.")
+            if previous.status == StatutoryRecordStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "decision_reason",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError(
+                        "تصویر preflight صورتحساب ارسالی قابل تغییر نیست."
+                    )
+        self.reason = self.reason.strip()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        if self.status != StatutoryRecordStatus.DRAFT:
+            raise ValidationError("صورتحساب ارسالی یا نهایی‌شده حذف نمی‌شود.")
+        return super().delete(*args, **kwargs)
+
+
+class ContractorComplianceAssessment(UUIDModel, TimeStampedModel):
+    """Reviewed-policy contractor insurance fact; it has no AP/GL effect."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessments",
+    )
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessments",
+    )
+    contract = models.ForeignKey(
+        "contracts.Contract",
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessments",
+    )
+    source_certificate = models.OneToOneField(
+        PayableCertificate,
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessment",
+    )
+    party_identity_snapshot = models.ForeignKey(
+        "parties.PartyIdentitySnapshot",
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessments",
+    )
+    policy_version = models.ForeignKey(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_assessments",
+    )
+    clearance_evidence = models.ForeignKey(
+        ContractComplianceEvidence,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contractor_assessments",
+    )
+    period_start = models.DateField()
+    period_end = models.DateField()
+    basis_amount = models.DecimalField(max_digits=18, decimal_places=4)
+    deduction_rate = models.DecimalField(max_digits=9, decimal_places=6)
+    deduction_amount = models.DecimalField(max_digits=18, decimal_places=4)
+    currency_code = models.CharField(max_length=3)
+    clearance_required = models.BooleanField()
+    calculation_snapshot = models.JSONField(default=dict)
+    submission_snapshot = models.JSONField(default=dict, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=StatutoryRecordStatus.choices,
+        default=StatutoryRecordStatus.DRAFT,
+        db_index=True,
+    )
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_submitted",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    decision_reason = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_created",
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="contractor_compliance_updated",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=Q(period_end__gte=F("period_start")),
+                name="contractor_compliance_period_valid",
+            ),
+            models.CheckConstraint(
+                condition=Q(basis_amount__gte=0)
+                & Q(deduction_rate__gte=0)
+                & Q(deduction_amount__gte=0),
+                name="contractor_compliance_values_nonnegative",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "period_end"],
+                name="contractor_compliance_work_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            project=self.project,
+            contract=self.contract,
+            source_certificate=self.source_certificate,
+            party_identity_snapshot=self.party_identity_snapshot,
+            clearance_evidence=self.clearance_evidence
+            if self.clearance_evidence_id
+            else None,
+        )
+        if (
+            self.contract.project_id != self.project_id
+            or self.source_certificate.contract_id != self.contract_id
+            or self.source_certificate.project_id != self.project_id
+            or not self.contract.party_id
+            or self.party_identity_snapshot.party_id != self.contract.party_id
+        ):
+            raise ValidationError("دامنه ارزیابی بیمه پیمانکار هم‌راستا نیست.")
+        if len(self.currency_code) != 3 or self.period_end < self.period_start:
+            raise ValidationError("ارز یا دوره ارزیابی معتبر نیست.")
+        if self.clearance_evidence_id and (
+            self.clearance_evidence.contract_id != self.contract_id
+            or self.clearance_evidence.evidence_kind != ComplianceEvidenceKind.CLEARANCE
+            or self.clearance_evidence.status != ComplianceEvidenceStatus.APPROVED
+        ):
+            raise ValidationError("شاهد مفاصاحساب ارزیابی معتبر نیست.")
+        if self.clearance_required and not self.clearance_evidence_id:
+            raise ValidationError(
+                "سیاست بررسی‌شده برای این ارزیابی مفاصاحساب معتبر می‌خواهد."
+            )
+        if self.status == StatutoryRecordStatus.SUBMITTED and (
+            not self.submitted_by_id
+            or not self.submitted_at
+            or not self.submission_snapshot
+        ):
+            raise ValidationError("ارزیابی ارسالی باید تصویر محاسبه داشته باشد.")
+        if self.status == StatutoryRecordStatus.APPROVED and (
+            not self.approved_by_id or not self.approved_at or not self.decision_reason
+        ):
+            raise ValidationError("ارزیابی نهایی باید شواهد تصمیم داشته باشد.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if previous.status in {
+                StatutoryRecordStatus.APPROVED,
+                StatutoryRecordStatus.RETURNED,
+            }:
+                raise ValidationError("ارزیابی نهایی بیمه پیمانکار تغییرناپذیر است.")
+            if previous.status == StatutoryRecordStatus.SUBMITTED:
+                permitted = {
+                    "status",
+                    "approved_by_id",
+                    "approved_at",
+                    "decision_reason",
+                    "updated_by_id",
+                    "updated_at",
+                }
+                changed = {
+                    field.attname
+                    for field in self._meta.concrete_fields
+                    if getattr(previous, field.attname) != getattr(self, field.attname)
+                }
+                if changed - permitted:
+                    raise ValidationError("تصویر ارزیابی ارسالی قابل تغییر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class StatutorySubmissionStatus(models.TextChoices):
+    EXPORTED = "exported", "خروجی ثبت‌شده"
+    ACCEPTED = "accepted", "پذیرفته‌شده توسط adapter آزمون"
+    REJECTED = "rejected", "ردشده توسط adapter آزمون"
+    PROVIDER_ERROR = "provider_error", "خطای adapter/ارائه‌دهنده"
+
+
+class StatutorySubmissionEvidence(UUIDModel):
+    """Append-only export/test-adapter attempt; contains no credentials."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="statutory_submission_evidence",
+    )
+    taxpayer_invoice = models.ForeignKey(
+        TaxpayerInvoice,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="submission_evidence",
+    )
+    contractor_assessment = models.ForeignKey(
+        ContractorComplianceAssessment,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="submission_evidence",
+    )
+    retry_of = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT, related_name="retries"
+    )
+    attempt_number = models.PositiveIntegerField()
+    idempotency_key = models.CharField(max_length=255)
+    correlation_id = models.UUIDField()
+    schema_identifier = models.CharField(max_length=255)
+    provider_key = models.CharField(max_length=120, blank=True)
+    request_payload = models.JSONField()
+    request_sha256 = models.CharField(max_length=64)
+    response_payload = models.JSONField(default=dict, blank=True)
+    status = models.CharField(max_length=30, choices=StatutorySubmissionStatus.choices)
+    provider_reference = models.CharField(max_length=255, blank=True)
+    error_code = models.CharField(max_length=120, blank=True)
+    error_message = models.TextField(blank=True)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="statutory_submission_evidence_recorded",
+    )
+    recorded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "idempotency_key"],
+                name="statutory_submission_idempotency_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "correlation_id"],
+                name="statutory_submission_correlation_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["taxpayer_invoice", "attempt_number"],
+                name="taxpayer_submission_attempt_uq",
+            ),
+            models.UniqueConstraint(
+                fields=["contractor_assessment", "attempt_number"],
+                name="contractor_submission_attempt_uq",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        taxpayer_invoice__isnull=False,
+                        contractor_assessment__isnull=True,
+                    )
+                    | Q(
+                        taxpayer_invoice__isnull=True,
+                        contractor_assessment__isnull=False,
+                    )
+                ),
+                name="statutory_submission_exactly_one_target",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "status", "recorded_at"],
+                name="statutory_submission_queue_idx",
+            )
+        ]
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("شاهد خروجی/ارسال تغییرناپذیر است.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("شاهد خروجی/ارسال قابل حذف نیست.")
+
+
+class SubmissionResolutionAction(models.TextChoices):
+    RETRY_AUTHORIZED = "retry_authorized", "اجازه تلاش مجدد"
+    CLOSED_NO_RETRY = "closed_no_retry", "بسته‌شده بدون تلاش مجدد"
+    OUTCOME_NOTED = "outcome_noted", "نتیجه بیرونی ثبت شد"
+
+
+class StatutorySubmissionResolution(UUIDModel):
+    submission = models.ForeignKey(
+        StatutorySubmissionEvidence,
+        on_delete=models.PROTECT,
+        related_name="resolutions",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="statutory_submission_resolutions",
+    )
+    action = models.CharField(max_length=30, choices=SubmissionResolutionAction.choices)
+    note = models.TextField()
+    provider_reference = models.CharField(max_length=255, blank=True)
+    resolved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="statutory_submission_resolutions",
+    )
+    resolved_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("شاهد حل انسانی تغییرناپذیر است.")
+        if (
+            self.submission_id
+            and self.organization_id != self.submission.organization_id
+        ):
+            raise ValidationError("حل انسانی و ارسال باید متعلق به یک Tenant باشند.")
+        if not self.note.strip():
+            raise ValidationError("شرح حل انسانی الزامی است.")
+        self.note = self.note.strip()
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+        raise ValidationError("شاهد حل انسانی قابل حذف نیست.")

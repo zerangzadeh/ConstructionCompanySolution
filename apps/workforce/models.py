@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from pathlib import Path
 
 from django.conf import settings
@@ -7,6 +8,7 @@ from django.db import models
 from django.db.models import Q
 
 from apps.accounts.models import validate_profile_image
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
@@ -37,6 +39,24 @@ class AssignmentStatus(models.TextChoices):
 class PositionAssignmentStatus(models.TextChoices):
     ACTIVE = "active", "فعال"
     ENDED = "ended", "پایان‌یافته"
+
+
+class QualificationKind(models.TextChoices):
+    QUALIFICATION = "qualification", "صلاحیت"
+    CERTIFICATE = "certificate", "گواهی"
+    LICENSE = "license", "مجوز"
+
+
+class QualificationLifecycleEventKind(models.TextChoices):
+    ISSUED = "issued", "ثبت‌شده"
+    REVOKED = "revoked", "لغوشده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+
+
+class TrainingOutcome(models.TextChoices):
+    ATTENDED = "attended", "شرکت‌کرده"
+    COMPLETED = "completed", "تکمیل‌شده"
+    NOT_COMPLETED = "not_completed", "تکمیل‌نشده"
 
 
 class Department(UUIDModel, TimeStampedModel):

@@ -1555,14 +1555,52 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P6.1 Correct receivable Billing terms and accounting integration
 
-- **Status / priority:** **PLANNED / MUST correction**
+- **Status / priority:** **P6-S01–S42 PRODUCT OWNER ACCEPTED; P7+ UNAUTHORIZED / MUST
+  correction**
+- **P6-S01–S06 implementation (2026-10-02):** the
+  [authoritative implementation packet](docs/architecture/P6_S01_S06_BILLING_TERMS_REGULATORY_IMPLEMENTATION.md)
+  records the Product Owner-approved ownership and calculation decisions. The
+  mixed `BillingPolicy` is replaced by Tenant-only billing configuration,
+  immutable approved/superseded contract-term versions, reuse of reviewed/
+  published effective `PlatformPolicyVersion` resolved directly by document date,
+  without Tenant selection or override, and
+  claims that pin party, currency,
+  term/rule/configuration and calculation evidence. Dedicated permissions, SoD,
+  audit, Tenant/project scope, contract-level caps, canonical calculation order,
+  final currency rounding, nonnegative ordinary claims and fail-closed missing
+  regulatory evidence are implemented. Because the product is pre-production
+  and every row is disposable seed/test data, migration `billing.0008`
+  deliberately resets existing claim/settlement seed rows; no compatibility
+  backfill was created. No Iranian statutory value, AR/GL/Treasury/taxpayer-
+  invoice/payable/guarantee/external or production behavior is activated.
+- **P6-S07–S13 implementation (2026-10-03):** the
+  [claim/handoff packet](docs/architecture/P6_S07_S13_CLAIM_HARDENING_AND_HANDOFF.md)
+  records amendment-aware cumulative certification by stable line key, detailed
+  calculation snapshots, linked immutable replacement/cancellation history,
+  corrected claim UI evidence, and the explicit `billing.progress_claim.v1` AR
+  source adapter. Accounting has a code-owned non-operational posting contract;
+  claim approval creates no obligation, proposal or journal. Corrections fail
+  closed after settlement or AR recognition until a separately authorized
+  downstream reversal path exists.
+- **Product Owner acceptance (2026-10-03):** P6-S01–S13 is accepted based on
+  the verified implementation, validation evidence, current runtime behavior and
+  the accepted P6-S26–S32 regulatory-governance correction. Direct effective-date
+  Platform resolution supersedes the earlier national-rule Tenant-selection
+  assumption, and the current source/review-evidence-governed Platform Admin
+  lifecycle supersedes mandatory Platform maker-checker publication. The seed
+  reset is accepted only as a pre-production development decision. Actual Iranian
+  legal/regulatory content, Article 38 effects, automatic AR/reversal, posting,
+  Treasury/cash, live provider behavior, production migration and activation,
+  the six obsolete assertions, two serialized-test restore errors and existing
+  permission-registry gaps remain outside acceptance. P6-S39–S42 is separately
+  accepted; P7+ remains unauthorized.
 - **Outcome:** move retention/advance/insurance/other commercial rules to approved
   contract-term versions; apply effective regulatory versions; snapshot party,
   currency and rules; generate AR/posting proposals and taxpayer-invoice status.
 - **Prerequisites:** P1.2; P2/P3 for posting/settlement; legal/accounting decision.
-- **Migration:** map current `BillingPolicy` deliberately; pre-production claim
-  data may be discarded/recreated, but finalized behavior changes need explicit
-  migration and tests.
+- **Migration:** P6-S01–S06 deliberately removes disposable pre-production
+  claim/settlement rows and creates the final clean-schema authorities; this is
+  not precedent for migrating finalized production history.
 - **UI/testing:** calculation explanation and sources, amendment impact, prior
   certified quantities, deductions, correction/cancellation states; golden,
   rounding, cap, concurrency, version and reconciliation tests.
@@ -1570,7 +1608,45 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P6.2 Subcontracts, payable certificates, and guarantees
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P6-S14–S42 PRODUCT OWNER ACCEPTED; P7+ UNAUTHORIZED**
+- **P6-S14–S20 implementation (2026-10-03):** the
+  [implementation and closeout packet](docs/architecture/P6_S14_S20_PAYABLE_CERTIFICATION_IMPLEMENTATION.md)
+  records payable-subcontract ownership through the existing `Contract` and
+  `BusinessParty` authorities, payable `ContractTermVersion` support, independent
+  measured-work evidence, cumulative certificates, running retention/advance
+  caps, evidence-backed back-charges, immutable linked corrections/cancellations,
+  shared-workflow approval, RTL operational UI and the explicit dormant
+  `billing.payable_certificate.v1` AP/non-operational Accounting boundary.
+  Approval creates no AP obligation, journal, Project Cost fact, Treasury action
+  or cash movement.
+- **Product Owner acceptance (2026-10-03):** P6-S14–S20 is accepted based on
+  the verified implementation, validation evidence and boundaries in the
+  authoritative implementation packet. That acceptance did not itself authorize
+  P6-S21+ or any gated production, Accounting, Treasury, statutory, guarantee,
+  clearance, retention-release, claims/EOT or taxpayer-integration behavior;
+  P6-S21–S25 proceeded only under the later bounded authorization recorded here.
+- **P6-S21–S25 implementation (2026-10-03):** the
+  [implementation and closeout packet](docs/architecture/P6_S21_S25_GUARANTEE_CLEARANCE_RELEASE_IMPLEMENTATION.md)
+  records contract-linked bid, performance, advance-payment and retention
+  guarantees; version-pinned insurance/clearance evidence; explicit dated or
+  open-ended expiry facts; linked correction, renewal and release history;
+  non-netted issued/received exposure views; and retention release limited by
+  approved payable-term authority, retained balances, explicit caps and any
+  configured clearance requirement. Dedicated permissions, strict workflow
+  candidacy/SoD, row locking, audit atomicity and RTL lifecycle UI are verified.
+  These records create no AP/AR obligation, journal, Project Cost fact, Treasury
+  action, statutory interpretation, external call or notification.
+- **Product Owner acceptance (2026-10-03):** P6-S21–S25 is accepted based on the
+  verified implementation, validation evidence and documented boundaries in its
+  authoritative packet. Acceptance covers only the implemented guarantee,
+  insurance/clearance evidence, exposure reporting and retention-release scope.
+  The documented materials/document-link/platform-policy permission-registry gaps
+  remain separate unresolved issues and are neither accepted nor resolved. This
+  acceptance did not itself authorize P6-S26+. P6-S26–S32 later proceeded under
+  its own bounded authorization; neither acceptance authorizes AP/AR obligation creation, Accounting
+  journals or automatic posting, Treasury/cash actions, statutory/legal
+  interpretation, FX conversion, invented exposure/risk rules, external
+  integrations, notification infrastructure or production activation.
 - **Outcome:** subcontract administration, measured work, payable certificate,
   retention/advance recovery, back-charge, insurance clearance, bid/performance/
   advance/retention guarantees, expiry/renewal/release and exposure.
@@ -1587,7 +1663,32 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P6.3 Iranian tax and contractor-compliance integration
 
-- **Status / priority:** **PLANNED / legally gated**
+- **Status / priority:** **P6-S26–S42 PRODUCT OWNER ACCEPTED; LIVE PROVIDER,
+  LEGAL/ACCOUNTING ACTIVATION AND P7+ UNAUTHORIZED**
+- **P6-S26–S32 implementation (2026-10-03):** the
+  [implementation and closeout packet](docs/architecture/P6_S26_S32_TAXPAYER_CONTRACTOR_COMPLIANCE_IMPLEMENTATION.md)
+  records policy-pinned taxpayer-invoice original/correction/cancellation
+  history, contractor-insurance deduction and clearance facts, provider-neutral
+  export/test-attempt evidence, schema preflight, idempotent retry and human
+  resolution, correlation/reconciliation evidence, shared workflow SoD and
+  Persian-first RTL operations. No official Iranian value, schema, provider,
+  credential, Article 38 effect, live transmission or financial/source-document
+  mutation is activated.
+- **Regulatory-governance correction (2026-10-03):** national regulatory policy
+  versions are now Platform-resolved by effective date rather than Tenant-selected.
+  Platform Admin manages the complete draft/source/review/publish/retire/
+  supersession lifecycle, with same-admin publication permitted and immutable
+  published history retained.
+- **Product Owner acceptance (2026-10-03):** P6-S26–S32 is accepted based on
+  the verified implementation and focused validation. Acceptance covers
+  Platform-owned national rules, direct effective-date runtime resolution,
+  Tenant non-override, same-admin lifecycle management, immutable/superseding
+  history, historical pins, Tenant Owner/Admin access only to separately
+  Tenant-configurable policies, and the bounded receivable, taxpayer-invoice
+  and contractor-compliance behavior. It does not accept or activate actual
+  Iranian legal values/thresholds, Article 38 effects, official schemas or
+  identifiers, provider credentials/transmission, production behavior, or the
+  separate materials/document-link/platform-policy permission-registry gaps.
 - **Outcome:** apply effective VAT/tax codes; produce and track سامانه مؤدیان
   electronic-invoice original/correction/cancellation submissions where approved;
   manage contractor-insurance facts, deductions, مفاصاحساب/clearance evidence and
@@ -1613,7 +1714,29 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P6.4 Contractual changes, claims, and extension of time
 
-- **Status / priority:** **PLANNED after contract-term and project-control boundaries stabilize**
+- **Status / priority:** **P6-S33–S42 PRODUCT OWNER ACCEPTED; P7+ UNAUTHORIZED EXCEPT
+  DOCUMENTED HANDOFF**
+- **P6-S33–S38 implementation (2026-10-03):** the
+  [implementation and closeout packet](docs/architecture/P6_S33_S38_CONTRACTUAL_CHANGE_CLAIM_EOT_IMPLEMENTATION.md)
+  records Contracts-owned, versioned Site Instruction, Variation/Change Order,
+  contractual Claim and EOT evidence; draft/submit/approve/return workflow;
+  withdrawal and linked correction/cancellation lineage; explicit approved
+  entitlement, amount, delay-responsibility and EOT-day facts; typed DMS,
+  measurement, schedule and Project Controls references; dedicated permissions,
+  SoD, atomic audit and immutable history. Approval has no automatic contract,
+  amendment, budget, schedule, Billing, subledger, Accounting, Treasury or cash
+  effect.
+- **Product Owner acceptance (2026-10-03):** P6-S33–S38 is accepted based on
+  the completed implementation, focused validation, retained P6 regression
+  evidence and documented boundaries in the authoritative packet. Acceptance
+  covers only the implemented Contracts-owned records, lifecycle, explicit
+  approved facts, evidence/lineage, permissions, SoD, scope, locking,
+  idempotency, audit, immutable history and Persian-first RTL operations. It
+  does not resolve the recorded permission-registry gaps, obsolete P6-S01–S13
+  assertions or serialized-test restore errors, and does not authorize any
+  automatic contract/amendment, budget, schedule, Billing, financial or
+  production effect. P6-S39–S42 later proceeded only under their bounded
+  authorization; P7+ remains unauthorized.
 - **Outcome:** governed Site Instruction, Variation Order/Change Order,
   contractual Claim and Extension of Time lifecycles with versioned evidence,
   entitlement/approval, valuation and cost impact, schedule impact, contract-value
@@ -1628,6 +1751,27 @@ Stable masters + consent/privacy + support operations -> future network/AI
   impact comparison; duplicate claim, concurrent change, rejected/withdrawn claim,
   cap, approval, amendment, baseline and posting-handoff tests.
 - **Effort / risk:** **L-XL / High**.
+
+- **P6-S39–S42 implementation (2026-10-03):** the
+  [final P6 closeout and P7 handoff](docs/architecture/P6_FINAL_CLOSEOUT_AND_P7_HANDOFF.md)
+  adds a Contracts-owned, Persian-first, read-only commercial review per contract.
+  It presents ordered contractual, claim and payable-certificate reference events,
+  typed contractual evidence, recorded requested/approved facts and advisory
+  evidence/lifecycle exceptions only. Existing source permissions remain enforced
+  and unavailable sources are not disclosed. The review creates no commercial,
+  schedule, budget, Billing, AP/AR, subledger, GL, Treasury or cash mutation.
+  P7 functionality and production activation remain unauthorized.
+  Five focused PostgreSQL tests passed for timeline ordering, evidence lineage,
+  reference comparison, advisory exceptions, permission handling, Tenant scope,
+  RTL presentation and downstream non-effects. Django check, migration-drift,
+  targeted Ruff and whitespace checks also passed.
+- **Product Owner acceptance (2026-10-03):** P6-S39–S42 is accepted based on
+  the completed read-only implementation, focused PostgreSQL validation and the
+  final closeout/handoff packet. Acceptance covers timeline, evidence lineage,
+  recorded-fact comparison, advisory exceptions, unavailable-source behavior,
+  scope isolation, RTL UI, final P6 boundary verification and the documented P7
+  handoff only. It does not authorize any automatic commercial, schedule, budget,
+  Billing, AP/AR, subledger, GL, Treasury, cash, provider or production effect.
 
 ## P7 — Time, payroll, and employee insurance
 

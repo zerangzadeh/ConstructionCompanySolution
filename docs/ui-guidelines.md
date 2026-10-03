@@ -1331,6 +1331,10 @@ The list page is a work surface, not just a database dump.
 - Activity/audit sections show actor, capacity where material, timestamp in tenant
   timezone, action, previous/new status, reason, and source. Sensitive metadata is
   permission filtered.
+- Contractual Site Instruction, Variation/Change Order, Claim and EOT pages must
+  visibly distinguish requested assumptions from explicitly approved entitlement,
+  amount, delay responsibility and EOT days. They must also state that approval
+  has no automatic contract-value, schedule-baseline, Billing or financial effect.
 
 ## 43. Workflow Actions and My Cartable
 

@@ -1,9 +1,9 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import Max, QuerySet
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
@@ -15,12 +15,16 @@ from apps.contracts.models import (
     ContractDirection,
     ContractItem,
     ContractStatus,
+    ContractTermVersion,
+    ContractTermVersionStatus,
     ContractType,
+    RetentionReleaseRequirement,
 )
 from apps.materials.models import UnitOfMeasure
 from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
+    require_business_permission,
     scope_queryset,
 )
 from apps.organizations.models import (
@@ -51,6 +55,169 @@ def can_manage_contracts(user: User, organization: Organization) -> bool:
         permission=BusinessPermissionCode.CONTRACTS_CREATE,
         allow_any_scope=True,
     )
+
+
+@transaction.atomic
+def create_contract_term_version(
+    *,
+    organization: Organization,
+    actor: User,
+    contract: Contract,
+    effective_from: date,
+    reason: str,
+    payment_due_days: int = 0,
+    retention_rate: Decimal = Decimal(0),
+    retention_cap: Decimal = Decimal(0),
+    advance_recovery_rate: Decimal = Decimal(0),
+    advance_recovery_cap: Decimal = Decimal(0),
+    contractual_insurance_rate: Decimal = Decimal(0),
+    contractual_insurance_cap: Decimal = Decimal(0),
+    retention_release_requirement: str = RetentionReleaseRequirement.UNCONFIGURED,
+    retention_release_cap: Decimal = Decimal(0),
+) -> ContractTermVersion:
+    try:
+        locked_contract = (
+            Contract.objects.select_for_update()
+            .select_related("project")
+            .get(pk=contract.pk, organization=organization)
+        )
+    except Contract.DoesNotExist as exc:
+        raise PermissionDenied("قرارداد متعلق به این سازمان نیست.") from exc
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.CONTRACT_TERMS_MANAGE,
+        project=locked_contract.project,
+        message="اجازه تهیه نسخه شرایط این قرارداد را ندارید.",
+    )
+    if locked_contract.direction not in {
+        ContractDirection.RECEIVABLE,
+        ContractDirection.PAYABLE,
+    }:
+        raise ValidationError("جهت قرارداد برای شرایط تجاری باید مشخص باشد.")
+    if (
+        locked_contract.direction == ContractDirection.PAYABLE
+        and locked_contract.contract_type != ContractType.SUBCONTRACT
+    ):
+        raise ValidationError("شرایط پرداختنی فقط برای پیمان جزء مجاز است.")
+    version = (
+        ContractTermVersion.objects.filter(contract=locked_contract).aggregate(
+            value=Max("version")
+        )["value"]
+        or 0
+    ) + 1
+    term = ContractTermVersion(
+        organization=organization,
+        contract=locked_contract,
+        version=version,
+        effective_from=effective_from,
+        payment_due_days=payment_due_days,
+        retention_rate=retention_rate,
+        retention_cap=retention_cap,
+        advance_recovery_rate=advance_recovery_rate,
+        advance_recovery_cap=advance_recovery_cap,
+        contractual_insurance_rate=contractual_insurance_rate,
+        contractual_insurance_cap=contractual_insurance_cap,
+        retention_release_requirement=retention_release_requirement,
+        retention_release_cap=retention_release_cap,
+        reason=reason.strip(),
+        created_by=actor,
+    )
+    term.save()
+    record_audit_event(
+        action=AuditAction.CONTRACT_TERM_VERSION_CREATED,
+        entity_type="contracts.ContractTermVersion",
+        entity_id=term.pk,
+        organization=organization,
+        actor=actor,
+        metadata={"contract_id": str(locked_contract.pk), "version": version},
+    )
+    return term
+
+
+@transaction.atomic
+def approve_contract_term_version(
+    *,
+    organization: Organization,
+    actor: User,
+    term_version: ContractTermVersion,
+    reason: str,
+) -> ContractTermVersion:
+    from django.utils import timezone
+
+    from apps.organizations.authorization import require_business_permission
+
+    try:
+        locked = (
+            ContractTermVersion.objects.select_for_update()
+            .select_related("contract__project")
+            .get(pk=term_version.pk, organization=organization)
+        )
+    except ContractTermVersion.DoesNotExist as exc:
+        raise PermissionDenied("نسخه شرایط متعلق به این سازمان نیست.") from exc
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.CONTRACT_TERMS_APPROVE,
+        project=locked.contract.project,
+        message="اجازه تأیید نسخه شرایط این قرارداد را ندارید.",
+    )
+    if locked.status != ContractTermVersionStatus.DRAFT:
+        raise ValidationError("فقط نسخه پیش‌نویس شرایط قابل تأیید است.")
+    if locked.created_by_id == actor.pk:
+        raise PermissionDenied("تهیه‌کننده نمی‌تواند همان نسخه شرایط را تأیید کند.")
+    if not reason.strip():
+        raise ValidationError("دلیل تأیید نسخه شرایط الزامی است.")
+    if (
+        ContractTermVersion.objects.filter(
+            contract=locked.contract,
+            effective_from=locked.effective_from,
+            status__in=(
+                ContractTermVersionStatus.APPROVED,
+                ContractTermVersionStatus.SUPERSEDED,
+            ),
+        )
+        .exclude(pk=locked.pk)
+        .exists()
+    ):
+        raise ValidationError("برای این تاریخ اثر قبلاً نسخه شرایط تأیید شده است.")
+    previous = list(
+        ContractTermVersion.objects.select_for_update().filter(
+            contract=locked.contract,
+            status=ContractTermVersionStatus.APPROVED,
+            effective_from__lt=locked.effective_from,
+        )
+    )
+    locked.status = ContractTermVersionStatus.APPROVED
+    locked.approved_by = actor
+    locked.approved_at = timezone.now()
+    locked.approval_reason = reason.strip()
+    locked.save(
+        update_fields=[
+            "status",
+            "approved_by",
+            "approved_at",
+            "approval_reason",
+            "updated_at",
+        ]
+    )
+    for old in previous:
+        old.status = ContractTermVersionStatus.SUPERSEDED
+        old.superseded_by = locked
+        old.save(update_fields=["status", "superseded_by", "updated_at"])
+    record_audit_event(
+        action=AuditAction.CONTRACT_TERM_VERSION_APPROVED,
+        entity_type="contracts.ContractTermVersion",
+        entity_id=locked.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "contract_id": str(locked.contract_id),
+            "version": locked.version,
+            "reason": locked.approval_reason,
+        },
+    )
+    return locked
 
 
 def _has_contract_permission(

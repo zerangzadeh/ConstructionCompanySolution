@@ -21,6 +21,7 @@ from apps.organizations.models import (
     OrganizationMembership,
     OrganizationRole,
     PlatformPolicyVersionSource,
+    PolicyReviewDisposition,
     PolicySourceBasis,
     PolicyVersionStatus,
     TenantPolicySelectionStatus,
@@ -32,13 +33,17 @@ from apps.organizations.policy_services import (
     deactivate_platform_policy,
     link_policy_version_source,
     publish_platform_policy_version,
+    record_optional_policy_review,
     record_policy_source,
     resolve_active_tenant_policy,
+    resolve_effective_platform_regulatory_policy,
     retire_platform_policy_version,
     select_tenant_policy_version,
+    update_platform_policy_version,
 )
 from apps.organizations.policy_specs import (
     ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+    RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
     initial_accounting_policy_parameters,
     validate_policy_for_consumer,
 )
@@ -53,7 +58,9 @@ class AccountingPolicyFoundationTests(TestCase):
         approver = User.objects.create_superuser(
             username="policy-approver", password="x", email="approver@example.test"
         )
-        self.platform_admin = User.objects.create_user(username="policy-platform", password="x")
+        self.platform_admin = User.objects.create_user(
+            username="policy-platform", password="x"
+        )
         assign_platform_admin(
             actor=self.root,
             approver=approver,
@@ -65,16 +72,19 @@ class AccountingPolicyFoundationTests(TestCase):
             owner=self.owner, name="Policy Tenant", slug="policy-tenant"
         )
         self.tenant_admin = self._tenant_admin("policy-admin")
-
-    def _tenant_admin(self, username: str) -> User:
-        user = User.objects.create_user(username=username, password="x")
-        role = OrganizationRole.objects.get(
-            code=MembershipRole.TENANT_ADMIN, organization__isnull=True
+        self.tenant_owner = self._tenant_admin(
+            "policy-tenant-owner", role_code=MembershipRole.TENANT_OWNER
         )
+
+    def _tenant_admin(
+        self, username: str, *, role_code: str = MembershipRole.TENANT_ADMIN
+    ) -> User:
+        user = User.objects.create_user(username=username, password="x")
+        role = OrganizationRole.objects.get(code=role_code, organization__isnull=True)
         membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=user,
-            role=MembershipRole.TENANT_ADMIN,
+            role=role_code,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
             authorization_migrated_at=timezone.now(),
@@ -125,7 +135,64 @@ class AccountingPolicyFoundationTests(TestCase):
             reason="Publish policy version for Tenant selection tests.",
         )
 
-    def test_only_closed_catalog_codes_and_exact_approved_values_are_accepted(self) -> None:
+    def _published_regulatory_version(
+        self, *, version: int, effective_from, supersedes=None
+    ):
+        policy = create_platform_policy(
+            actor=self.platform_admin,
+            code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+            reason="Create national regulatory policy definition.",
+        )
+        draft = create_platform_policy_version(
+            actor=self.platform_admin,
+            policy=policy,
+            version=version,
+            parameters={
+                "tax_rate": "10",
+                "tax_basis": "gross",
+                "insurance_rate": "0",
+                "insurance_basis": "gross",
+            },
+            effective_from=effective_from,
+            supersedes=supersedes,
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            reason="Create reviewed national-rule version.",
+        )
+        source = record_policy_source(
+            actor=self.platform_admin,
+            issuer="Test authority",
+            title=f"National rule version {version}",
+            source_identifier=f"NATIONAL-TEST-{version}",
+            version=str(version),
+            applicability="Test-only provenance.",
+            reason="Record national-rule source.",
+        )
+        link_policy_version_source(
+            actor=self.platform_admin,
+            policy_version=draft,
+            source=source,
+            reason="Link national-rule source.",
+        )
+        record_optional_policy_review(
+            actor=self.platform_admin,
+            policy_version=draft,
+            reviewer_identity="Platform Admin",
+            qualification_summary="Test lifecycle review",
+            independence_statement="Same-user review is Product Owner permitted.",
+            evidence_reference=f"NATIONAL-REVIEW-{version}",
+            reviewed_on=timezone.localdate(),
+            review_scope="Test regulatory rule contract.",
+            disposition=PolicyReviewDisposition.ACCEPTED,
+        )
+        return publish_platform_policy_version(
+            actor=self.platform_admin,
+            policy_version=draft,
+            reason="Publish same-user-reviewed national rule.",
+        )
+
+    def test_only_closed_catalog_codes_and_exact_approved_values_are_accepted(
+        self,
+    ) -> None:
         with self.assertRaises(PermissionDenied):
             create_platform_policy(
                 actor=self.owner,
@@ -189,7 +256,9 @@ class AccountingPolicyFoundationTests(TestCase):
                 expected_policy_code="accounting-rounding",
             )
 
-        unknown = SimpleNamespace(policy=SimpleNamespace(code="unknown-policy"), parameters={})
+        unknown = SimpleNamespace(
+            policy=SimpleNamespace(code="unknown-policy"), parameters={}
+        )
         with self.assertRaisesMessage(ValidationError, "کاتالوگ کد-محور"):
             validate_policy_for_consumer(
                 policy_version=unknown, consumer="accounting.journal.submit"
@@ -249,7 +318,9 @@ class AccountingPolicyFoundationTests(TestCase):
             selection=selection,
         )
         self.assertEqual(applied.status, TenantPolicySelectionStatus.ACTIVE)
-        other_owner = User.objects.create_user(username="other-policy-owner", password="x")
+        other_owner = User.objects.create_user(
+            username="other-policy-owner", password="x"
+        )
         other_organization = create_organization_with_owner(
             owner=other_owner,
             name="Other policy tenant",
@@ -292,14 +363,20 @@ class AccountingPolicyFoundationTests(TestCase):
     def test_policy_ui_exposes_only_safe_catalog_and_empty_tenant_state(self) -> None:
         self.client.force_login(self.owner)
         self.assertEqual(
-            self.client.get(reverse("organizations:platform_policy_catalog")).status_code,
+            self.client.get(
+                reverse("organizations:platform_policy_catalog")
+            ).status_code,
             403,
         )
         self.client.force_login(self.platform_admin)
-        platform_page = self.client.get(reverse("organizations:platform_policy_catalog"))
+        platform_page = self.client.get(
+            reverse("organizations:platform_policy_catalog")
+        )
         self.assertEqual(platform_page.status_code, 200)
         self.assertContains(platform_page, "ثبت تعریف")
-        self.assertNotContains(platform_page, "انتشار نسخه")
+        self.assertContains(platform_page, "ایجاد پیش‌نویس")
+        self.assertContains(platform_page, "ثبت منبع")
+        self.assertContains(platform_page, "ثبت بررسی")
         self.assertEqual(
             self.client.post(
                 reverse("organizations:platform_policy_catalog"),
@@ -307,7 +384,9 @@ class AccountingPolicyFoundationTests(TestCase):
             ).status_code,
             302,
         )
-        platform_page = self.client.get(reverse("organizations:platform_policy_catalog"))
+        platform_page = self.client.get(
+            reverse("organizations:platform_policy_catalog")
+        )
         self.assertContains(platform_page, "مقادیر فقط از نسخهٔ منتشرشده قابل اعمال‌اند.")
 
         self._activate_client(self.tenant_admin)
@@ -335,32 +414,17 @@ class AccountingPolicyFoundationTests(TestCase):
         self.assertEqual(tenant_page.context["ready_versions"], [])
         self.assertEqual(tenant_page.context["upcoming_versions"], [future_version])
 
-    def test_tenant_admin_uses_apply_permission_not_legacy_approval_permission(self) -> None:
+    def test_tenant_owner_and_admin_can_select_only_tenant_configurable_policies(
+        self,
+    ) -> None:
         published = self._published_policy_version(effective_from=timezone.localdate())
-        legacy_permission = BusinessPermission.objects.get(
-            code=BusinessPermissionCode.TENANT_POLICIES_APPROVE
-        )
         tenant_admin_membership = OrganizationMembership.objects.get(
             organization=self.organization, user=self.tenant_admin
         )
-        owner_membership = OrganizationMembership.objects.get(
-            organization=self.organization, user=self.owner
-        )
-
-        self.assertFalse(legacy_permission.is_active)
         self.assertIn(
             BusinessPermissionCode.TENANT_POLICIES_APPLY,
             membership_permission_codes(tenant_admin_membership),
         )
-        self.assertNotIn(
-            BusinessPermissionCode.TENANT_POLICIES_APPROVE,
-            membership_permission_codes(tenant_admin_membership),
-        )
-        self.assertNotIn(
-            BusinessPermissionCode.TENANT_POLICIES_APPROVE,
-            membership_permission_codes(owner_membership),
-        )
-
         selection = select_tenant_policy_version(
             organization=self.organization,
             actor=self.tenant_admin,
@@ -368,10 +432,57 @@ class AccountingPolicyFoundationTests(TestCase):
             reason="Tenant Admin selects the effective version.",
         )
         self.assertEqual(selection.status, TenantPolicySelectionStatus.APPROVED)
-        with self.assertRaises(PermissionDenied):
+        owner_selection = select_tenant_policy_version(
+            organization=self.organization,
+            actor=self.tenant_owner,
+            policy_version=published,
+            reason="Tenant Owner selects the same Tenant-configurable option.",
+        )
+        self.assertEqual(owner_selection.status, TenantPolicySelectionStatus.APPROVED)
+        self.assertFalse(
+            BusinessPermission.objects.filter(code="tenant_policies.approve").exists()
+        )
+
+    def test_tenant_cannot_select_national_rule_and_runtime_pins_platform_history(
+        self,
+    ) -> None:
+        current = self._published_regulatory_version(
+            version=1, effective_from=timezone.localdate()
+        )
+        with self.assertRaises(ValidationError):
+            update_platform_policy_version(
+                actor=self.platform_admin,
+                policy_version=current,
+                parameters=current.parameters,
+                effective_from=current.effective_from,
+                source_basis=current.source_basis,
+                reason="Published national history must remain immutable.",
+            )
+        with self.assertRaisesMessage(ValidationError, "توسط Tenant قابل انتخاب نیست"):
             select_tenant_policy_version(
                 organization=self.organization,
-                actor=self.owner,
-                policy_version=published,
-                reason="Tenant Owner has no separate approval route.",
+                actor=self.tenant_admin,
+                policy_version=current,
+                reason="National values cannot be overridden by a Tenant.",
             )
+        future = self._published_regulatory_version(
+            version=2,
+            effective_from=timezone.localdate() + timedelta(days=1),
+            supersedes=current,
+        )
+        self.assertEqual(
+            resolve_effective_platform_regulatory_policy(
+                code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+                consumer="billing.progress_claim.calculate",
+                on_date=timezone.localdate(),
+            ).pk,
+            current.pk,
+        )
+        self.assertEqual(
+            resolve_effective_platform_regulatory_policy(
+                code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+                consumer="billing.progress_claim.calculate",
+                on_date=timezone.localdate() + timedelta(days=1),
+            ).pk,
+            future.pk,
+        )

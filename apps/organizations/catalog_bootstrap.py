@@ -35,7 +35,6 @@ def synchronize_authorization_catalog(*, using: str, **kwargs: Any) -> None:
     from apps.organizations.role_defaults import (
         DEFAULT_ROLE_METADATA,
         DEFAULT_ROLE_PERMISSIONS,
-        DEPRECATED_PERMISSION_CODES,
     )
 
     with transaction.atomic(using=using):
@@ -49,7 +48,7 @@ def synchronize_authorization_catalog(*, using: str, **kwargs: Any) -> None:
                 defaults={
                     "name": permission_code.label,
                     "description": permission_code.label,
-                    "is_active": code not in DEPRECATED_PERMISSION_CODES,
+                    "is_active": True,
                 },
             )
             permissions[code] = permission

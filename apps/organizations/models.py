@@ -279,10 +279,6 @@ class BusinessPermissionCode(models.TextChoices):
     COMPANY_SETTINGS_VIEW = "company.settings.view", "مشاهده تنظیمات شرکت"
     COMPANY_SETTINGS_CHANGE = "company.settings.change", "ویرایش تنظیمات شرکت"
     TENANT_POLICIES_VIEW = "tenant_policies.view", "مشاهده سیاست‌های Tenant"
-    TENANT_POLICIES_APPROVE = (
-        "tenant_policies.approve",
-        "منسوخ — تأیید انتخاب سیاست‌های Tenant (بدون مسیر اجرایی)",
-    )
     TENANT_POLICIES_APPLY = (
         "tenant_policies.apply",
         "اعمال سیاست‌های تأییدشده Tenant",
@@ -566,6 +562,27 @@ class BusinessPermissionCode(models.TextChoices):
         "contract_amendments.approve",
         "تأیید الحاقیه قرارداد",
     )
+    CONTRACT_TERMS_MANAGE = "contract_terms.manage", "تهیه نسخه شرایط تجاری قرارداد"
+    CONTRACT_TERMS_APPROVE = (
+        "contract_terms.approve",
+        "تأیید مستقل نسخه شرایط تجاری قرارداد",
+    )
+    CONTRACTUAL_RECORDS_VIEW = (
+        "contractual_records.view",
+        "مشاهده دستورها، تغییرات، ادعاها و تمدید مدت قراردادی",
+    )
+    CONTRACTUAL_RECORDS_PREPARE = (
+        "contractual_records.prepare",
+        "تهیه و اصلاح رکورد قراردادی",
+    )
+    CONTRACTUAL_RECORDS_SUBMIT = (
+        "contractual_records.submit",
+        "ارسال رکورد قراردادی برای تأیید",
+    )
+    CONTRACTUAL_RECORDS_APPROVE = (
+        "contractual_records.approve",
+        "تأیید یا بازگرداندن رکورد قراردادی",
+    )
 
     BASELINES_VIEW = "baselines.view", "مشاهده مبناهای تجاری"
     BASELINES_MANAGE = "baselines.manage", "مدیریت مبناهای تجاری"
@@ -586,6 +603,114 @@ class BusinessPermissionCode(models.TextChoices):
     CLAIM_SETTLEMENTS_REVERSE = (
         "claim_settlements.reverse",
         "برگشت تسویه صورت‌وضعیت",
+    )
+    PAYABLE_MEASUREMENTS_VIEW = (
+        "payable_measurements.view",
+        "مشاهده اندازه‌گیری پیمان جزء",
+    )
+    PAYABLE_MEASUREMENTS_RECORD = (
+        "payable_measurements.record",
+        "ثبت و ارسال اندازه‌گیری پیمان جزء",
+    )
+    PAYABLE_MEASUREMENTS_VERIFY = (
+        "payable_measurements.verify",
+        "راستی‌آزمایی اندازه‌گیری پیمان جزء",
+    )
+    PAYABLE_CERTIFICATES_VIEW = (
+        "payable_certificates.view",
+        "مشاهده گواهی‌های پرداخت پیمان جزء",
+    )
+    PAYABLE_CERTIFICATES_CREATE = (
+        "payable_certificates.create",
+        "تهیه گواهی پرداخت پیمان جزء",
+    )
+    PAYABLE_CERTIFICATES_REVISE = (
+        "payable_certificates.revise",
+        "بازنگری و اصلاح گواهی پرداخت",
+    )
+    PAYABLE_CERTIFICATES_SUBMIT = (
+        "payable_certificates.submit",
+        "ارسال گواهی پرداخت",
+    )
+    PAYABLE_CERTIFICATES_APPROVE = (
+        "payable_certificates.approve",
+        "تأیید یا بازگرداندن گواهی پرداخت",
+    )
+    GUARANTEES_VIEW = "guarantees.view", "مشاهده ضمانت‌نامه‌ها و مواجهه"
+    GUARANTEES_MANAGE = "guarantees.manage", "ثبت و اصلاح ضمانت‌نامه"
+    GUARANTEES_SUBMIT = "guarantees.submit", "ارسال ضمانت‌نامه"
+    GUARANTEES_APPROVE = "guarantees.approve", "تأیید ضمانت‌نامه یا آزادسازی"
+    COMPLIANCE_EVIDENCE_VIEW = (
+        "compliance_evidence.view",
+        "مشاهده شواهد بیمه و مفاصاحساب",
+    )
+    COMPLIANCE_EVIDENCE_MANAGE = (
+        "compliance_evidence.manage",
+        "ثبت و اصلاح شواهد بیمه و مفاصاحساب",
+    )
+    COMPLIANCE_EVIDENCE_SUBMIT = (
+        "compliance_evidence.submit",
+        "ارسال شواهد بیمه و مفاصاحساب",
+    )
+    COMPLIANCE_EVIDENCE_APPROVE = (
+        "compliance_evidence.approve",
+        "تأیید شواهد بیمه و مفاصاحساب",
+    )
+    RETENTION_RELEASES_VIEW = (
+        "retention_releases.view",
+        "مشاهده آزادسازی کسور تضمین",
+    )
+    RETENTION_RELEASES_CREATE = (
+        "retention_releases.create",
+        "تهیه آزادسازی کسور تضمین",
+    )
+    RETENTION_RELEASES_SUBMIT = (
+        "retention_releases.submit",
+        "ارسال آزادسازی کسور تضمین",
+    )
+    RETENTION_RELEASES_APPROVE = (
+        "retention_releases.approve",
+        "تأیید یا بازگرداندن آزادسازی کسور تضمین",
+    )
+    TAXPAYER_INVOICES_VIEW = (
+        "taxpayer_invoices.view",
+        "مشاهده صورتحساب‌های مؤدیان",
+    )
+    TAXPAYER_INVOICES_PREPARE = (
+        "taxpayer_invoices.prepare",
+        "تهیه و اصلاح صورتحساب مؤدیان",
+    )
+    TAXPAYER_INVOICES_SUBMIT = (
+        "taxpayer_invoices.submit",
+        "ارسال صورتحساب مؤدیان برای تأیید",
+    )
+    TAXPAYER_INVOICES_APPROVE = (
+        "taxpayer_invoices.approve",
+        "تأیید یا بازگرداندن صورتحساب مؤدیان",
+    )
+    CONTRACTOR_COMPLIANCE_VIEW = (
+        "contractor_compliance.view",
+        "مشاهده ارزیابی انطباق بیمه پیمانکار",
+    )
+    CONTRACTOR_COMPLIANCE_PREPARE = (
+        "contractor_compliance.prepare",
+        "تهیه ارزیابی انطباق بیمه پیمانکار",
+    )
+    CONTRACTOR_COMPLIANCE_SUBMIT = (
+        "contractor_compliance.submit",
+        "ارسال ارزیابی انطباق بیمه پیمانکار",
+    )
+    CONTRACTOR_COMPLIANCE_APPROVE = (
+        "contractor_compliance.approve",
+        "تأیید ارزیابی انطباق بیمه پیمانکار",
+    )
+    STATUTORY_SUBMISSIONS_EXECUTE = (
+        "statutory_submissions.execute",
+        "ثبت خروجی یا اجرای adapter آزمون مقرراتی",
+    )
+    STATUTORY_SUBMISSIONS_RESOLVE = (
+        "statutory_submissions.resolve",
+        "ثبت حل انسانی خطای ارسال مقرراتی",
     )
 
     ESTIMATES_VIEW = "estimates.view", "مشاهده برآوردها"

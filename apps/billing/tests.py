@@ -10,20 +10,29 @@ from django.test import Client, TestCase, TransactionTestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from apps.accounting.posting_registry import get_posting_contract
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
+from apps.billing.handoffs import (
+    PROGRESS_CLAIM_POSTING_EVENT_KIND,
+    PROGRESS_CLAIM_SOURCE_KIND,
+    resolve_progress_claim_obligation_source,
+)
 from apps.billing.models import (
     ClaimSettlementAllocation,
     ProgressClaim,
+    ProgressClaimCorrectionKind,
     ProgressRecordStatus,
     ProjectBaselineStatus,
 )
 from apps.billing.services import (
+    _resolve_regulatory_rule_version,
     add_baseline_item,
     allocate_progress_claim_settlement,
     approve_progress_claim,
     approve_project_baseline,
     create_progress_claim,
+    create_progress_claim_correction,
     create_progress_claim_revision,
     create_progress_correction,
     create_progress_record,
@@ -35,7 +44,7 @@ from apps.billing.services import (
     return_progress_claim,
     reverse_progress_claim_settlement,
     submit_progress_claim,
-    update_billing_policy,
+    update_billing_configuration,
     verify_progress_record,
 )
 from apps.contracts.models import (
@@ -43,12 +52,38 @@ from apps.contracts.models import (
     ContractAmendmentStatus,
     ContractDirection,
     ContractStatus,
+    ContractTermVersionStatus,
 )
-from apps.contracts.services import create_contract
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.contracts.services import (
+    approve_contract_term_version,
+    create_contract,
+    create_contract_term_version,
+)
+from apps.organizations.access_services import assign_platform_admin
+from apps.organizations.models import (
+    MembershipRole,
+    MembershipStatus,
+    Organization,
+    PlatformPolicyVersion,
+    PolicyReviewDisposition,
+    PolicySourceBasis,
+    PolicyVersionStatus,
+    TenantPolicySelection,
+)
+from apps.organizations.policy_services import (
+    apply_tenant_policy_selection,
+    create_platform_policy,
+    link_policy_version_source,
+    publish_platform_policy_version,
+    record_optional_policy_review,
+    record_policy_source,
+    retire_platform_policy_version,
+    select_tenant_policy_version,
+)
+from apps.organizations.policy_specs import RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE
 from apps.organizations.services import set_active_organization
 from apps.parties.models import PartyKind
-from apps.parties.services import create_business_party
+from apps.parties.services import create_business_party, update_business_party
 from apps.payments.models import PaymentAllocationStatus, PaymentDirection
 from apps.payments.services import (
     allocate_payment,
@@ -57,12 +92,12 @@ from apps.payments.services import (
     void_payment,
 )
 from apps.projects.services import create_project
+from apps.subledgers.services import recognize_obligation
 from apps.workflows.models import (
     WorkflowInstanceStatus,
     WorkItemCandidate,
     WorkItemStatus,
 )
-from apps.workflows.runtime import WorkflowConflict
 from apps.workforce.models import Employee, EmployeePositionAssignment, Position
 
 
@@ -71,6 +106,31 @@ class ProjectBaselineWorkflowTests(TestCase):
         self.owner = User.objects.create_user(username="f61-owner")
         self.manager = User.objects.create_user(username="f61-manager")
         self.member = User.objects.create_user(username="f61-member")
+        self.tenant_admin = User.objects.create_user(username="f61-tenant-admin")
+        self.policy_author = User.objects.create_superuser(
+            username="f61-policy-author", password="unused"
+        )
+        self.policy_approver = User.objects.create_superuser(
+            username="f61-policy-approver", password="unused"
+        )
+        policy_grantor = User.objects.create_superuser(
+            username="f61-policy-grantor", password="unused"
+        )
+        policy_grant_approver = User.objects.create_superuser(
+            username="f61-policy-grant-approver", password="unused"
+        )
+        assign_platform_admin(
+            actor=policy_grantor,
+            approver=policy_grant_approver,
+            target=self.policy_author,
+            reason="Billing policy test author authority",
+        )
+        assign_platform_admin(
+            actor=policy_grantor,
+            approver=policy_grant_approver,
+            target=self.policy_approver,
+            reason="Billing policy test approver authority",
+        )
         self.organization = Organization.objects.create(name="F61", slug="f61")
         self.organization.memberships.create(
             user=self.owner,
@@ -85,6 +145,11 @@ class ProjectBaselineWorkflowTests(TestCase):
         self.organization.memberships.create(
             user=self.member,
             role=MembershipRole.MEMBER,
+            status=MembershipStatus.ACTIVE,
+        )
+        self.organization.memberships.create(
+            user=self.tenant_admin,
+            role=MembershipRole.TENANT_ADMIN,
             status=MembershipStatus.ACTIVE,
         )
         self.project = create_project(
@@ -121,6 +186,92 @@ class ProjectBaselineWorkflowTests(TestCase):
             status=ContractAmendmentStatus.APPROVED,
             created_by=self.owner,
         )
+        self.contract_terms = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2026, 1, 1),
+            reason="Initial receivable claim terms",
+        )
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=self.contract_terms,
+            reason="Independent commercial approval",
+        )
+        self.regulatory_rules = self._publish_regulatory_rules(
+            effective_from=date(2026, 1, 1),
+            tax_rate="0",
+            insurance_rate="0",
+        )
+
+    def _publish_regulatory_rules(
+        self,
+        *,
+        effective_from: date,
+        tax_rate: str,
+        insurance_rate: str,
+    ) -> PlatformPolicyVersion:
+        policy = create_platform_policy(
+            actor=self.policy_author,
+            code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+            reason="Test-only regulatory schema fixture",
+        )
+        current = policy.versions.filter(status=PolicyVersionStatus.PUBLISHED).first()
+        if current is not None:
+            retire_platform_policy_version(
+                actor=self.policy_approver,
+                policy_version=current,
+                reason="Superseded by test fixture",
+            )
+        version_number = policy.versions.count() + 1
+        draft = PlatformPolicyVersion.objects.create(
+            policy=policy,
+            version=version_number,
+            parameters={
+                "tax_rate": tax_rate,
+                "tax_basis": "gross",
+                "insurance_rate": insurance_rate,
+                "insurance_basis": "gross",
+            },
+            effective_from=effective_from,
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            created_by=self.policy_author,
+            reason="Test-only values; no product statutory assertion",
+        )
+        source = record_policy_source(
+            actor=self.policy_author,
+            issuer="Test authority",
+            title="Test-only calculation evidence",
+            source_identifier=f"TEST-CLAIM-RULE-{version_number}",
+            version=str(version_number),
+            applicability="Automated test fixture only",
+            reason="No legal or production meaning",
+            effective_from=effective_from,
+        )
+        link_policy_version_source(
+            actor=self.policy_author,
+            policy_version=draft,
+            source=source,
+            reason="Test provenance",
+        )
+        record_optional_policy_review(
+            actor=self.policy_approver,
+            policy_version=draft,
+            reviewer_identity="Automated test reviewer",
+            qualification_summary="Test fixture only",
+            independence_statement="Different test actor from author",
+            evidence_reference=f"TEST-REVIEW-{version_number}",
+            reviewed_on=effective_from,
+            review_scope="Parameter shape and arithmetic only",
+            disposition=PolicyReviewDisposition.ACCEPTED,
+        )
+        published = publish_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=draft,
+            reason="Independent test-only publication",
+        )
+        return published
 
     def _baseline(self, total: Decimal = Decimal("120.00")):
         baseline = create_project_baseline(
@@ -530,18 +681,34 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
         self.assertEqual(claim.gross_amount, Decimal("60.0000"))
         self.assertEqual(claim.net_amount, Decimal("60.0000"))
 
-    def test_policy_drives_rounding_and_adjustments(self) -> None:
+    def test_pinned_terms_and_rules_drive_rounding_and_adjustments(self) -> None:
         record = self._verified_record()
-        update_billing_policy(
+        update_billing_configuration(
             organization=self.organization,
             actor=self.owner,
-            money_decimal_places=2,
-            tax_rate=Decimal(10),
-            insurance_rate=Decimal(5),
+            currency_decimal_places=2,
+        )
+        terms = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2026, 9, 1),
+            reason="September commercial terms",
             retention_rate=Decimal(10),
             retention_cap=Decimal(3),
             advance_recovery_rate=Decimal(10),
             advance_recovery_cap=Decimal(2),
+        )
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=terms,
+            reason="Independent commercial approval",
+        )
+        rules = self._publish_regulatory_rules(
+            effective_from=date(2026, 9, 1),
+            tax_rate="10",
+            insurance_rate="5",
         )
         claim = create_progress_claim(
             organization=self.organization,
@@ -554,6 +721,8 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
         self.assertEqual(claim.adjustment_amount, Decimal("-2.0000"))
         self.assertEqual(claim.net_amount, Decimal("58.0000"))
         self.assertEqual(claim.adjustments.count(), 4)
+        self.assertEqual(claim.contract_term_version_id, terms.pk)
+        self.assertEqual(claim.regulatory_rule_version_id, rules.pk)
 
     def test_claim_revision_reuses_sources_without_rewriting_history(self) -> None:
         claim = self._claim()
@@ -564,13 +733,153 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
         self.assertEqual(revision.items.get().sources.count(), 1)
         self.assertEqual(claim.items.get().sources.count(), 1)
 
-    def test_overlapping_draft_period_and_negative_net_are_rejected(self) -> None:
-        record = self._verified_record()
-        update_billing_policy(
+    def test_term_and_regulatory_approval_enforce_sod_and_immutability(self) -> None:
+        term = create_contract_term_version(
             organization=self.organization,
             actor=self.owner,
-            retention_rate=Decimal(200),
+            contract=self.contract,
+            effective_from=date(2027, 1, 1),
+            reason="Future commercial version",
+        )
+        with self.assertRaises(PermissionDenied):
+            approve_contract_term_version(
+                organization=self.organization,
+                actor=self.owner,
+                term_version=term,
+                reason="Self approval is prohibited",
+            )
+        approved_term = approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent approval",
+        )
+        self.assertEqual(approved_term.status, ContractTermVersionStatus.APPROVED)
+        approved_term.retention_rate = Decimal(1)
+        with self.assertRaises(ValidationError):
+            approved_term.save()
+
+        retire_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=self.regulatory_rules,
+            reason="Prepare isolated SoD test version",
+        )
+        policy = self.regulatory_rules.policy
+        rule = PlatformPolicyVersion.objects.create(
+            policy=policy,
+            version=2,
+            parameters={
+                "tax_rate": "0",
+                "tax_basis": "gross",
+                "insurance_rate": "0",
+                "insurance_basis": "gross",
+            },
+            effective_from=date(2027, 1, 1),
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            created_by=self.policy_author,
+            reason="Future test-only regulatory version",
+        )
+        source = record_policy_source(
+            actor=self.policy_author,
+            issuer="Test authority",
+            title="Future test rule",
+            source_identifier="TEST-CLAIM-RULE-SOD",
+            version="2",
+            applicability="Automated test fixture only",
+            reason="No legal or production meaning",
+        )
+        link_policy_version_source(
+            actor=self.policy_author,
+            policy_version=rule,
+            source=source,
+            reason="Test provenance",
+        )
+        with self.assertRaises(PermissionDenied):
+            publish_platform_policy_version(
+                actor=self.policy_author,
+                policy_version=rule,
+                reason="Self publication is prohibited",
+            )
+        with self.assertRaises(ValidationError):
+            publish_platform_policy_version(
+                actor=self.policy_approver,
+                policy_version=rule,
+                reason="Unreviewed rule fails closed",
+            )
+        record_optional_policy_review(
+            actor=self.policy_approver,
+            policy_version=rule,
+            reviewer_identity="Independent test reviewer",
+            qualification_summary="Test fixture only",
+            independence_statement="Different actor from author",
+            evidence_reference="TEST-CLAIM-RULE-SOD-REVIEW",
+            reviewed_on=date(2026, 10, 2),
+            review_scope="Parameter schema and arithmetic only",
+            disposition=PolicyReviewDisposition.ACCEPTED,
+        )
+        approved_rule = publish_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=rule,
+            reason="Independent reviewed publication",
+        )
+        self.assertEqual(approved_rule.status, PolicyVersionStatus.PUBLISHED)
+        approved_rule.parameters = {**approved_rule.parameters, "tax_rate": "1"}
+        with self.assertRaises(ValidationError):
+            approved_rule.save()
+
+    def test_claim_creation_fails_closed_without_eligible_regulatory_rule(self) -> None:
+        TenantPolicySelection.objects.all().delete()
+        with self.assertRaises(ValidationError):
+            _resolve_regulatory_rule_version(
+                organization=self.organization,
+                on_date=date(2026, 9, 30),
+            )
+
+    def test_claim_snapshots_ignore_later_party_and_configuration_changes(self) -> None:
+        claim = self._claim()
+        party_snapshot_id = claim.party_identity_snapshot_id
+        configuration_snapshot = claim.billing_configuration_snapshot.copy()
+        update_business_party(
+            organization=self.organization,
+            actor=self.owner,
+            party=self.party,
+            party_kind=PartyKind.COMPANY,
+            display_name="Renamed client",
+            legal_name="Renamed legal client",
+        )
+        update_billing_configuration(
+            organization=self.organization,
+            actor=self.owner,
+            currency_decimal_places=2,
+        )
+        refreshed = recalculate_progress_claim(
+            organization=self.organization,
+            actor=self.owner,
+            claim=claim,
+        )
+        self.assertEqual(refreshed.party_identity_snapshot_id, party_snapshot_id)
+        self.assertEqual(
+            refreshed.billing_configuration_snapshot, configuration_snapshot
+        )
+
+    def test_overlapping_draft_period_and_negative_net_are_rejected(self) -> None:
+        record = self._verified_record()
+        terms = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2026, 9, 1),
+            reason="Negative-net rejection fixture",
+            retention_rate=Decimal(100),
             retention_cap=Decimal(999),
+            advance_recovery_rate=Decimal(100),
+            advance_recovery_cap=Decimal(999),
+        )
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=terms,
+            reason="Independent commercial approval",
         )
         with self.assertRaises(ValidationError):
             create_progress_claim(
@@ -581,21 +890,35 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
                 period_end=date(2026, 9, 30),
                 measurement_cutoff=date(2026, 9, 30),
             )
-        update_billing_policy(
+        safe_terms = create_contract_term_version(
             organization=self.organization,
             actor=self.owner,
-            retention_rate=Decimal(0),
-            retention_cap=Decimal(0),
+            contract=self.contract,
+            effective_from=date(2026, 10, 1),
+            reason="Safe October terms",
         )
-        self._claim(record)
+        approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=safe_terms,
+            reason="Independent commercial approval",
+        )
+        create_progress_claim(
+            organization=self.organization,
+            actor=self.owner,
+            baseline=record.baseline,
+            period_start=date(2026, 10, 1),
+            period_end=date(2026, 10, 31),
+            measurement_cutoff=date(2026, 10, 31),
+        )
         with self.assertRaises(ValidationError):
             create_progress_claim(
                 organization=self.organization,
                 actor=self.owner,
                 baseline=record.baseline,
-                period_start=date(2026, 9, 15),
-                period_end=date(2026, 10, 15),
-                measurement_cutoff=date(2026, 9, 30),
+                period_start=date(2026, 10, 15),
+                period_end=date(2026, 11, 15),
+                measurement_cutoff=date(2026, 10, 31),
             )
 
 
@@ -645,6 +968,195 @@ class ProgressClaimApprovalWorkflowTests(ProgressClaimCalculationTests):
             start_date=date(2020, 1, 1),
             is_primary=True,
         )
+
+    def _approve_claim(self, claim: ProgressClaim) -> ProgressClaim:
+        submit_progress_claim(
+            organization=self.organization, actor=self.owner, claim=claim
+        )
+        return approve_progress_claim(
+            organization=self.organization,
+            actor=self.manager,
+            claim=claim,
+            reason="Independent claim approval",
+        )
+
+    def test_cumulative_claim_uses_prior_certified_quantity_across_amended_baseline(
+        self,
+    ) -> None:
+        self._configure_reporting_line()
+        first = self._approve_claim(self._claim_for_approval())
+        second_baseline = self._baseline()
+        request_project_baseline_approval(
+            organization=self.organization, actor=self.owner, baseline=second_baseline
+        )
+        second_baseline = approve_project_baseline(
+            organization=self.organization,
+            actor=self.manager,
+            baseline=second_baseline,
+            reason="Approved amendment baseline",
+        )
+        record = create_progress_record(
+            organization=self.organization,
+            actor=self.owner,
+            baseline=second_baseline,
+            baseline_item=second_baseline.items.get(),
+            period_start=date(2026, 10, 1),
+            period_end=date(2026, 10, 31),
+            measured_on=date(2026, 10, 20),
+            source_type="site_report",
+            source_reference="DR-002",
+            period_quantity=Decimal("0.3000"),
+            cumulative_quantity=Decimal("0.8000"),
+            evidence="amendment-aware cumulative evidence",
+        )
+        request_progress_verification(
+            organization=self.organization, actor=self.owner, record=record
+        )
+        verify_progress_record(
+            organization=self.organization,
+            actor=self.manager,
+            record=record,
+            reason="Verified amended-baseline progress",
+        )
+        second = create_progress_claim(
+            organization=self.organization,
+            actor=self.owner,
+            baseline=second_baseline,
+            period_start=date(2026, 10, 1),
+            period_end=date(2026, 10, 31),
+            measurement_cutoff=date(2026, 10, 31),
+        )
+        item = second.items.get()
+        self.assertEqual(item.previous_cumulative_quantity, Decimal("0.5000"))
+        self.assertEqual(item.current_quantity, Decimal("0.3000"))
+        self.assertEqual(item.current_amount, Decimal("36.0000"))
+        self.assertEqual(second.calculation_snapshot["prior_approved_gross"], "60.0000")
+        self.assertEqual(
+            second.calculation_snapshot["prior_active_approved_claim_ids"],
+            [str(first.pk)],
+        )
+
+    def test_replacement_correction_supersedes_without_rewriting_original(self) -> None:
+        self._configure_reporting_line()
+        original = self._approve_claim(self._claim_for_approval())
+        source = original.items.get().sources.get().progress_record
+        corrected = create_progress_correction(
+            organization=self.organization,
+            actor=self.owner,
+            record=source,
+            source_type="site_report_correction",
+            source_reference="DR-001-C1",
+            period_quantity=Decimal("0.4000"),
+            cumulative_quantity=Decimal("0.4000"),
+            evidence="signed correction",
+        )
+        request_progress_verification(
+            organization=self.organization, actor=self.owner, record=corrected
+        )
+        verify_progress_record(
+            organization=self.organization,
+            actor=self.manager,
+            record=corrected,
+            reason="Verified measurement correction",
+        )
+        replacement = create_progress_claim_correction(
+            organization=self.organization,
+            actor=self.owner,
+            claim=original,
+            correction_kind=ProgressClaimCorrectionKind.REPLACEMENT,
+            reason="Replace certified quantity with corrected evidence",
+        )
+        self.assertEqual(replacement.net_amount, Decimal("48.0000"))
+        replacement = self._approve_claim(replacement)
+        original.refresh_from_db()
+        self.assertEqual(original.status, "superseded")
+        self.assertEqual(replacement.status, "approved")
+        self.assertEqual(replacement.corrects_id, original.pk)
+        self.assertEqual(original.net_amount, Decimal("60.0000"))
+
+    def test_returned_correction_revision_preserves_lineage(self) -> None:
+        self._configure_reporting_line()
+        original = self._approve_claim(self._claim_for_approval())
+        correction = create_progress_claim_correction(
+            organization=self.organization,
+            actor=self.owner,
+            claim=original,
+            correction_kind=ProgressClaimCorrectionKind.REPLACEMENT,
+            reason="Correct certification evidence",
+        )
+        submit_progress_claim(
+            organization=self.organization, actor=self.owner, claim=correction
+        )
+        returned = return_progress_claim(
+            organization=self.organization,
+            actor=self.manager,
+            claim=correction,
+            reason="Provide stronger correction evidence",
+        )
+        revision = returned.returned_revision
+        self.assertEqual(returned.status, "returned")
+        self.assertEqual(revision.status, "draft")
+        self.assertEqual(revision.corrects_id, original.pk)
+        self.assertEqual(revision.correction_kind, ProgressClaimCorrectionKind.REPLACEMENT)
+        approved = self._approve_claim(revision)
+        original.refresh_from_db()
+        self.assertEqual(approved.status, "approved")
+        self.assertEqual(original.status, "superseded")
+
+    def test_linked_cancellation_is_zero_and_closes_active_claim(self) -> None:
+        self._configure_reporting_line()
+        original = self._approve_claim(self._claim_for_approval())
+        cancellation = create_progress_claim_correction(
+            organization=self.organization,
+            actor=self.owner,
+            claim=original,
+            correction_kind=ProgressClaimCorrectionKind.CANCELLATION,
+            reason="Cancel certification with retained evidence",
+        )
+        self.assertEqual(cancellation.net_amount, Decimal(0))
+        self.assertFalse(cancellation.items.exists())
+        cancellation = self._approve_claim(cancellation)
+        original.refresh_from_db()
+        self.assertEqual(original.status, "cancelled")
+        self.assertEqual(cancellation.status, "approved")
+
+    def test_approved_claim_exposes_dormant_ar_and_posting_contracts(self) -> None:
+        self._configure_reporting_line()
+        claim = self._approve_claim(self._claim_for_approval())
+        source = resolve_progress_claim_obligation_source(
+            self.organization, claim.pk, claim.revision_number, ""
+        )
+        self.assertEqual(source.source_kind, PROGRESS_CLAIM_SOURCE_KIND)
+        self.assertEqual(source.amount, claim.net_amount)
+        self.assertEqual(source.due_date, claim.due_date)
+        self.assertIsNotNone(source.due_date)
+        self.assertEqual(source.source_snapshot["claim_id"], str(claim.pk))
+        posting = get_posting_contract(
+            source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+            event_kind=PROGRESS_CLAIM_POSTING_EVENT_KIND,
+        )
+        self.assertEqual(posting.source_owner, "billing")
+        self.assertFalse(posting.operational_producer)
+
+    def test_recognized_ar_obligation_blocks_claim_correction(self) -> None:
+        self._configure_reporting_line()
+        claim = self._approve_claim(self._claim_for_approval())
+        recognize_obligation(
+            organization=self.organization,
+            actor=self.owner,
+            source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+            source_uuid=claim.pk,
+            source_version=claim.revision_number,
+            idempotency_key=f"CLAIM-{claim.pk}",
+        )
+        with self.assertRaises(ValidationError):
+            create_progress_claim_correction(
+                organization=self.organization,
+                actor=self.owner,
+                claim=claim,
+                correction_kind=ProgressClaimCorrectionKind.CANCELLATION,
+                reason="Blocked until AR is resolved",
+            )
 
     def test_hierarchy_route_requires_permission_and_completes_shared_work_item(self):
         self._configure_reporting_line()
@@ -736,16 +1248,28 @@ class ProgressClaimApprovalWorkflowTests(ProgressClaimCalculationTests):
                 reason="Self approval is separated",
             )
 
-    def test_small_tenant_submitter_is_allowed_only_without_another_approver(self):
+    def test_small_tenant_submitter_is_excluded_when_fallback_approver_exists(self):
         fallback_claim = self._claim_for_approval()
         self.manager_membership.status = MembershipStatus.SUSPENDED
         self.manager_membership.save(update_fields=["status", "updated_at"])
-        with self.assertRaises(WorkflowConflict):
-            submit_progress_claim(
-                organization=self.organization,
-                actor=self.owner,
-                claim=fallback_claim,
-            )
+        instance = submit_progress_claim(
+            organization=self.organization,
+            actor=self.owner,
+            claim=fallback_claim,
+        )
+        item = instance.work_items.get()
+        self.assertFalse(
+            WorkItemCandidate.objects.filter(
+                work_item=item,
+                membership__user=self.owner,
+                is_active=True,
+            ).exists()
+        )
+        self.assertTrue(
+            WorkItemCandidate.objects.filter(work_item=item, is_active=True)
+            .exclude(membership__user=self.owner)
+            .exists()
+        )
 
     def test_submission_and_decision_retries_are_idempotent(self):
         self._configure_reporting_line()
@@ -1152,6 +1676,9 @@ class ProgressClaimSettlementTests(ProgressClaimApprovalWorkflowTests):
         with CaptureQueriesContext(connection) as detail_queries:
             detail_response = self.client.get(detail_url)
         self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, "مقادیر تجمعی")
+        self.assertContains(detail_response, "0.5000")
+        self.assertContains(detail_response, "60.0000")
         self.assertLessEqual(
             len(detail_queries),
             40,
@@ -1237,6 +1764,9 @@ class ProgressClaimApprovalWorkflowConcurrencyTests(TransactionTestCase):
 
     def setUp(self) -> None:
         ProjectBaselineWorkflowTests.setUp(self)
+
+    def _publish_regulatory_rules(self, **kwargs):
+        return ProjectBaselineWorkflowTests._publish_regulatory_rules(self, **kwargs)
 
     def _approved_baseline(self):
         return ProgressRecordWorkflowTests._approved_baseline(self)

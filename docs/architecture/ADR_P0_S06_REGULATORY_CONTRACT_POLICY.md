@@ -1,7 +1,21 @@
 # ADR P0-S06: Regulatory rules, contract terms and tenant billing settings
 
 **Date:** 2026-09-25. **Status: ACCEPTED AS TARGET ARCHITECTURE ON 2026-09-28;
-P1-S14 GOVERNANCE CLOSED 2026-09-29; RULE VALUES/ACTIVATION STILL GATED.**
+P1-S14 GOVERNANCE CLOSED 2026-09-29; P6-S01–S06 OWNERSHIP/SNAPSHOT CORRECTION
+IMPLEMENTED 2026-10-02 WITH ACCEPTANCE PENDING; P6-S26–S32 BOUNDED CONSUMERS
+IMPLEMENTED 2026-10-03 WITH ACCEPTANCE PENDING; RULE VALUES/LIVE ACTIVATION STILL
+GATED.**
+
+> Implementation reconciliation: P6-S01–S06 replaces the historical
+> `BillingPolicy` evidence described below with `TenantBillingConfiguration`,
+> `ContractTermVersion`, the existing reviewed `PlatformPolicyVersion` plus active
+> Tenant selection, and pinned claim evidence. See
+> [the implementation packet](P6_S01_S06_BILLING_TERMS_REGULATORY_IMPLEMENTATION.md).
+> P6-S26–S32 now reuses the same authority for policy-pinned taxpayer invoices,
+> contractor-compliance assessments and provider-neutral export/test evidence;
+> see the [bounded implementation packet](P6_S26_S32_TAXPAYER_CONTRACTOR_COMPLIANCE_IMPLEMENTATION.md).
+> Sections describing the former schema remain historical rationale, not current
+> runtime behavior.
 
 Scope: P0.1/PPC-01/PPC-06, following the
 [S05 handoff](../ROADMAP_EXECUTION_PLAYBOOK.md#compact-p0-s06-handoff).
@@ -249,5 +263,7 @@ regulated policy explicitly declares provenance mandatory or makes a source-back
 claim. Professional evidence is optional and
 creates no application role or global development gate. Unknown precision or
 rounding facts remain unset/inactive and **«نیازمند بررسی قانونی/حسابداری»**. This
-acceptance authorizes no statutory rate, precedence result, rule activation,
-filing, implementation or migration.
+acceptance authorized no statutory rate, precedence result, rule activation,
+filing, implementation or migration. P6-S26–S32 later received separate bounded
+implementation authority; it still supplies no official value, live provider or
+production activation.

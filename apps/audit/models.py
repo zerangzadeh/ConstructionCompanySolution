@@ -255,6 +255,10 @@ class AuditAction(models.TextChoices):
         "policy.version_created",
         "نسخه سیاست پلتفرم ایجاد شد",
     )
+    PLATFORM_POLICY_VERSION_UPDATED = (
+        "policy.version_updated",
+        "نسخه پیش‌نویس سیاست پلتفرم به‌روزرسانی شد",
+    )
     PLATFORM_POLICY_VERSION_PUBLISHED = (
         "policy.version_published",
         "نسخه سیاست پلتفرم منتشر شد",
@@ -396,6 +400,46 @@ class AuditAction(models.TextChoices):
         "contract.amendment_approved",
         "الحاقیه قرارداد تأیید شد",
     )
+    CONTRACT_TERM_VERSION_CREATED = (
+        "contract.term_version_created",
+        "نسخه شرایط تجاری قرارداد ایجاد شد",
+    )
+    CONTRACT_TERM_VERSION_APPROVED = (
+        "contract.term_version_approved",
+        "نسخه شرایط تجاری قرارداد تأیید شد",
+    )
+    CONTRACTUAL_RECORD_CREATED = (
+        "contractual_record.created",
+        "نسخه رکورد قراردادی ایجاد شد",
+    )
+    CONTRACTUAL_RECORD_SUBMITTED = (
+        "contractual_record.submitted",
+        "رکورد قراردادی ارسال شد",
+    )
+    CONTRACTUAL_RECORD_APPROVED = (
+        "contractual_record.approved",
+        "نتیجه رکورد قراردادی تأیید شد",
+    )
+    CONTRACTUAL_RECORD_RETURNED = (
+        "contractual_record.returned",
+        "رکورد قراردادی بازگردانده شد",
+    )
+    CONTRACTUAL_RECORD_WITHDRAWN = (
+        "contractual_record.withdrawn",
+        "رکورد قراردادی مسترد شد",
+    )
+    CONTRACTUAL_RECORD_SUPERSEDED = (
+        "contractual_record.superseded",
+        "رکورد قراردادی جایگزین شد",
+    )
+    CONTRACTUAL_RECORD_CANCELLED = (
+        "contractual_record.cancelled",
+        "رکورد قراردادی با نسخه پیوندخورده باطل شد",
+    )
+    CONTRACTUAL_EVIDENCE_LINKED = (
+        "contractual_record.evidence_linked",
+        "شاهد به رکورد قراردادی پیوند خورد",
+    )
     PROJECT_BASELINE_CREATED = "project_baseline.created", "مبنای تجاری پروژه ایجاد شد"
     PROJECT_BASELINE_UPDATED = "project_baseline.updated", "مبنای تجاری پروژه ویرایش شد"
     PROJECT_BASELINE_ITEM_ADDED = (
@@ -424,6 +468,18 @@ class AuditAction(models.TextChoices):
         "progress_claim.revision_created",
         "revision صورت‌وضعیت ایجاد شد",
     )
+    PROGRESS_CLAIM_CORRECTION_CREATED = (
+        "progress_claim.correction_created",
+        "اصلاح پیوندخورده صورت‌وضعیت ایجاد شد",
+    )
+    PROGRESS_CLAIM_SUPERSEDED = (
+        "progress_claim.superseded",
+        "صورت‌وضعیت با اصلاح جایگزین شد",
+    )
+    PROGRESS_CLAIM_CANCELLED = (
+        "progress_claim.cancelled",
+        "صورت‌وضعیت با سند پیوندخورده باطل شد",
+    )
     CLAIM_SETTLEMENT_ALLOCATED = (
         "claim_settlement.allocated",
         "دریافت به صورت‌وضعیت تخصیص یافت",
@@ -431,6 +487,145 @@ class AuditAction(models.TextChoices):
     CLAIM_SETTLEMENT_REVERSED = (
         "claim_settlement.reversed",
         "تسویه صورت‌وضعیت برگشت داده شد",
+    )
+    PAYABLE_MEASUREMENT_RECORDED = (
+        "payable_measurement.recorded",
+        "اندازه‌گیری پیمان جزء ثبت شد",
+    )
+    PAYABLE_MEASUREMENT_SUBMITTED = (
+        "payable_measurement.submitted",
+        "اندازه‌گیری پیمان جزء ارسال شد",
+    )
+    PAYABLE_MEASUREMENT_VERIFIED = (
+        "payable_measurement.verified",
+        "اندازه‌گیری پیمان جزء راستی‌آزمایی شد",
+    )
+    PAYABLE_MEASUREMENT_REJECTED = (
+        "payable_measurement.rejected",
+        "اندازه‌گیری پیمان جزء رد شد",
+    )
+    PAYABLE_CERTIFICATE_CREATED = (
+        "payable_certificate.created",
+        "گواهی پرداخت ایجاد شد",
+    )
+    PAYABLE_CERTIFICATE_SUBMITTED = (
+        "payable_certificate.submitted",
+        "گواهی پرداخت ارسال شد",
+    )
+    PAYABLE_CERTIFICATE_APPROVED = (
+        "payable_certificate.approved",
+        "گواهی پرداخت تأیید شد",
+    )
+    PAYABLE_CERTIFICATE_RETURNED = (
+        "payable_certificate.returned",
+        "گواهی پرداخت بازگردانده شد",
+    )
+    PAYABLE_CERTIFICATE_CORRECTION_CREATED = (
+        "payable_certificate.correction_created",
+        "اصلاح پیوندخورده گواهی پرداخت ایجاد شد",
+    )
+    PAYABLE_CERTIFICATE_SUPERSEDED = (
+        "payable_certificate.superseded",
+        "گواهی پرداخت با اصلاح جایگزین شد",
+    )
+    PAYABLE_CERTIFICATE_CANCELLED = (
+        "payable_certificate.cancelled",
+        "گواهی پرداخت با سند پیوندخورده باطل شد",
+    )
+    GUARANTEE_CREATED = "guarantee.created", "نسخه ضمانت‌نامه ایجاد شد"
+    GUARANTEE_SUBMITTED = "guarantee.submitted", "ضمانت‌نامه ارسال شد"
+    GUARANTEE_APPROVED = "guarantee.approved", "ضمانت‌نامه تأیید شد"
+    GUARANTEE_RETURNED = "guarantee.returned", "ضمانت‌نامه بازگردانده شد"
+    GUARANTEE_SUPERSEDED = "guarantee.superseded", "ضمانت‌نامه جایگزین شد"
+    GUARANTEE_EXPIRED = "guarantee.expired", "ضمانت‌نامه منقضی شد"
+    GUARANTEE_RELEASED = "guarantee.released", "ضمانت‌نامه آزاد شد"
+    COMPLIANCE_EVIDENCE_CREATED = (
+        "compliance_evidence.created",
+        "شاهد بیمه یا مفاصاحساب ایجاد شد",
+    )
+    COMPLIANCE_EVIDENCE_SUBMITTED = (
+        "compliance_evidence.submitted",
+        "شاهد بیمه یا مفاصاحساب ارسال شد",
+    )
+    COMPLIANCE_EVIDENCE_APPROVED = (
+        "compliance_evidence.approved",
+        "شاهد بیمه یا مفاصاحساب تأیید شد",
+    )
+    COMPLIANCE_EVIDENCE_RETURNED = (
+        "compliance_evidence.returned",
+        "شاهد بیمه یا مفاصاحساب بازگردانده شد",
+    )
+    COMPLIANCE_EVIDENCE_SUPERSEDED = (
+        "compliance_evidence.superseded",
+        "شاهد بیمه یا مفاصاحساب جایگزین شد",
+    )
+    COMPLIANCE_EVIDENCE_EXPIRED = (
+        "compliance_evidence.expired",
+        "شاهد بیمه یا مفاصاحساب منقضی شد",
+    )
+    RETENTION_RELEASE_CREATED = (
+        "retention_release.created",
+        "آزادسازی کسور تضمین ایجاد شد",
+    )
+    RETENTION_RELEASE_SUBMITTED = (
+        "retention_release.submitted",
+        "آزادسازی کسور تضمین ارسال شد",
+    )
+    RETENTION_RELEASE_APPROVED = (
+        "retention_release.approved",
+        "آزادسازی کسور تضمین تأیید شد",
+    )
+    RETENTION_RELEASE_RETURNED = (
+        "retention_release.returned",
+        "آزادسازی کسور تضمین بازگردانده شد",
+    )
+    RETENTION_RELEASE_SUPERSEDED = (
+        "retention_release.superseded",
+        "آزادسازی کسور تضمین جایگزین شد",
+    )
+    RETENTION_RELEASE_CANCELLED = (
+        "retention_release.cancelled",
+        "آزادسازی کسور تضمین باطل شد",
+    )
+    TAXPAYER_INVOICE_CREATED = (
+        "taxpayer_invoice.created",
+        "نسخه صورتحساب مؤدیان ایجاد شد",
+    )
+    TAXPAYER_INVOICE_SUBMITTED = (
+        "taxpayer_invoice.submitted",
+        "صورتحساب مؤدیان برای تأیید ارسال شد",
+    )
+    TAXPAYER_INVOICE_APPROVED = (
+        "taxpayer_invoice.approved",
+        "صورتحساب مؤدیان تأیید شد",
+    )
+    TAXPAYER_INVOICE_RETURNED = (
+        "taxpayer_invoice.returned",
+        "صورتحساب مؤدیان بازگردانده شد",
+    )
+    CONTRACTOR_COMPLIANCE_CREATED = (
+        "contractor_compliance.created",
+        "ارزیابی انطباق بیمه پیمانکار ایجاد شد",
+    )
+    CONTRACTOR_COMPLIANCE_SUBMITTED = (
+        "contractor_compliance.submitted",
+        "ارزیابی انطباق بیمه پیمانکار ارسال شد",
+    )
+    CONTRACTOR_COMPLIANCE_APPROVED = (
+        "contractor_compliance.approved",
+        "ارزیابی انطباق بیمه پیمانکار تأیید شد",
+    )
+    CONTRACTOR_COMPLIANCE_RETURNED = (
+        "contractor_compliance.returned",
+        "ارزیابی انطباق بیمه پیمانکار بازگردانده شد",
+    )
+    STATUTORY_SUBMISSION_RECORDED = (
+        "statutory_submission.recorded",
+        "شاهد خروجی یا ارسال مقرراتی ثبت شد",
+    )
+    STATUTORY_SUBMISSION_RESOLVED = (
+        "statutory_submission.resolved",
+        "شاهد حل انسانی ارسال مقرراتی ثبت شد",
     )
     ESTIMATE_CREATED = "estimate.created", "برآورد ایجاد شد"
     ESTIMATE_ITEM_ADDED = "estimate.item_added", "ردیف برآورد افزوده شد"

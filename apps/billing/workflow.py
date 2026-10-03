@@ -288,6 +288,9 @@ def load_progress_claim_subject(
             "status": claim.status,
             "claim_number": claim.claim_number,
             "revision_number": claim.revision_number,
+            "correction_kind": claim.correction_kind,
+            "corrects_claim_id": str(claim.corrects_id) if claim.corrects_id else None,
+            "correction_reason": claim.correction_reason,
             "created_by_id": str(claim.created_by_id) if claim.created_by_id else None,
             "submitted_by_id": (
                 str(claim.submitted_by_id) if claim.submitted_by_id else None
@@ -1033,13 +1036,31 @@ def _claim_submission_snapshot(claim: ProgressClaim) -> dict[str, Any]:
             "id": str(claim.pk),
             "claim_number": claim.claim_number,
             "revision_number": claim.revision_number,
+            "correction_kind": claim.correction_kind,
+            "corrects_claim_id": (
+                str(claim.corrects_id) if claim.corrects_id else None
+            ),
+            "correction_reason": claim.correction_reason,
             "period_start": claim.period_start.isoformat(),
             "period_end": claim.period_end.isoformat(),
             "measurement_cutoff": claim.measurement_cutoff.isoformat(),
             "gross_amount": str(claim.gross_amount),
             "adjustment_amount": str(claim.adjustment_amount),
             "net_amount": str(claim.net_amount),
-            "policy": claim.policy_snapshot,
+            "billing_configuration": claim.billing_configuration_snapshot,
+            "calculation": claim.calculation_snapshot,
+            "contract_term_version_id": str(claim.contract_term_version_id),
+            "regulatory_rule_version_id": str(claim.regulatory_rule_version_id),
+            "party_identity_snapshot_id": str(claim.party_identity_snapshot_id),
+            "party_identity": {
+                "party_id": str(claim.party_identity_snapshot.party_id),
+                "sequence": claim.party_identity_snapshot.sequence,
+                "party_kind": claim.party_identity_snapshot.party_kind,
+                "display_name": claim.party_identity_snapshot.display_name,
+                "legal_name": claim.party_identity_snapshot.legal_name,
+                "tax_identifier": claim.party_identity_snapshot.tax_identifier,
+            },
+            "currency_code": claim.currency_code,
         },
         "items": [
             {
@@ -1091,7 +1112,14 @@ def submit_progress_claim_with_workflow(
     try:
         locked = (
             ProgressClaim.objects.select_for_update()
-            .select_related("project", "contract", "baseline")
+            .select_related(
+                "project",
+                "contract",
+                "baseline",
+                "party_identity_snapshot",
+                "contract_term_version",
+                "regulatory_rule_version",
+            )
             .get(pk=claim.pk, organization=organization)
         )
     except ProgressClaim.DoesNotExist as exc:
@@ -1107,7 +1135,10 @@ def submit_progress_claim_with_workflow(
             return instance
     if locked.status != "draft":
         raise ValidationError("فقط صورت‌وضعیت پیش‌نویس قابل ارسال است.")
-    if not locked.items.exists():
+    if (
+        locked.correction_kind != "cancellation"
+        and not locked.items.exists()
+    ):
         raise ValidationError("صورت‌وضعیت بدون ردیف محاسباتی قابل ارسال نیست.")
     # The shared runtime snapshots the submitter when it starts. Persist this
     # provisional provenance inside the enclosing transaction before loading it.

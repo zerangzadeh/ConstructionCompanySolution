@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from django.core.exceptions import ValidationError
@@ -16,6 +17,9 @@ RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE = "rfq-commercial-exception-self-approva
 RFQ_SOURCING_AWARD_SELF_FINALIZATION_POLICY_CODE = (
     "rfq-sourcing-award-self-finalization"
 )
+RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE = "receivable-claim-regulatory"
+TAXPAYER_INVOICE_REGULATORY_POLICY_CODE = "taxpayer-invoice-regulatory"
+CONTRACTOR_COMPLIANCE_REGULATORY_POLICY_CODE = "contractor-compliance-regulatory"
 
 
 @dataclass(frozen=True)
@@ -24,7 +28,7 @@ class PolicyFieldSpec:
 
     name: str
     value_type: type[object]
-    allowed_values: tuple[object, ...]
+    allowed_values: tuple[object, ...] | None
 
 
 @dataclass(frozen=True)
@@ -121,6 +125,60 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
         value_schema_approved=True,
     ),
+    RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE: PlatformPolicySpec(
+        code=RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE,
+        name="قواعد مقرراتی صورت‌وضعیت دریافتنی",
+        category="regulatory_rule_set",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("billing.progress_claim.calculate",),
+        fields=(
+            # None approves only the Decimal-string schema/range below, not a
+            # statutory value. Publication still requires external provenance
+            # and accepted professional review evidence.
+            PolicyFieldSpec("tax_rate", str, None),
+            PolicyFieldSpec("tax_basis", str, ("gross", "after_contractual")),
+            PolicyFieldSpec("insurance_rate", str, None),
+            PolicyFieldSpec("insurance_basis", str, ("gross", "after_contractual")),
+        ),
+        value_schema_approved=True,
+    ),
+    TAXPAYER_INVOICE_REGULATORY_POLICY_CODE: PlatformPolicySpec(
+        code=TAXPAYER_INVOICE_REGULATORY_POLICY_CODE,
+        name="قواعد صورتحساب مؤدیان",
+        category="filing_export",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("billing.taxpayer_invoice.prepare",),
+        fields=(
+            # Values are never seeded. A reviewed external-authority version must
+            # supply the statutory schema identity, exact field mapping and code.
+            PolicyFieldSpec("schema_identifier", str, None),
+            PolicyFieldSpec("submission_mode", str, ("export_only", "test_adapter")),
+            PolicyFieldSpec("provider_key", str, None),
+            PolicyFieldSpec("tax_code", str, None),
+            PolicyFieldSpec("field_mapping", dict, None),
+            PolicyFieldSpec("required_fields", list, None),
+        ),
+        value_schema_approved=True,
+    ),
+    CONTRACTOR_COMPLIANCE_REGULATORY_POLICY_CODE: PlatformPolicySpec(
+        code=CONTRACTOR_COMPLIANCE_REGULATORY_POLICY_CODE,
+        name="قواعد انطباق بیمه پیمانکار",
+        category="insurance_regulatory",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("billing.contractor_compliance.calculate",),
+        fields=(
+            # The code validates shape only. Rates and clearance effects exist
+            # solely in reviewed/published external-authority policy versions.
+            PolicyFieldSpec("deduction_rate", str, None),
+            PolicyFieldSpec("deduction_basis", str, ("gross", "net")),
+            PolicyFieldSpec("clearance_required", bool, (False, True)),
+            PolicyFieldSpec("schema_identifier", str, None),
+        ),
+        value_schema_approved=True,
+    ),
 }
 
 ACCOUNTING_INITIAL_POLICY_PARAMETERS: dict[str, dict[str, object]] = {
@@ -167,8 +225,43 @@ def validate_policy_parameters(*, spec: PlatformPolicySpec, parameters: object) 
         )
     for field in spec.fields:
         value = parameters[field.name]
-        if type(value) is not field.value_type or value not in field.allowed_values:
+        if type(value) is not field.value_type or (
+            field.allowed_values is not None and value not in field.allowed_values
+        ):
             raise ValidationError(f"مقدار «{field.name}» در قرارداد سیاست مجاز نیست.")
+        if field.allowed_values is None and field.name.endswith("_rate"):
+            try:
+                rate = Decimal(value)
+            except (InvalidOperation, ValueError) as exc:
+                raise ValidationError(
+                    f"مقدار «{field.name}» باید رشته Decimal معتبر باشد."
+                ) from exc
+            if not rate.is_finite() or rate < 0 or rate > 100:
+                raise ValidationError(f"مقدار «{field.name}» باید بین صفر و صد باشد.")
+    if spec.code == TAXPAYER_INVOICE_REGULATORY_POLICY_CODE:
+        _validate_taxpayer_invoice_parameters(parameters)
+
+
+def _validate_taxpayer_invoice_parameters(parameters: dict[str, object]) -> None:
+    for name in ("schema_identifier", "provider_key", "tax_code"):
+        if not str(parameters[name]).strip():
+            raise ValidationError(f"مقدار «{name}» نمی‌تواند خالی باشد.")
+    mapping = parameters["field_mapping"]
+    required = parameters["required_fields"]
+    if not mapping or not all(
+        isinstance(key, str)
+        and key.strip()
+        and isinstance(value, str)
+        and value.strip()
+        for key, value in mapping.items()
+    ):
+        raise ValidationError("نگاشت فیلد صورتحساب باید رشته‌های غیرخالی داشته باشد.")
+    if not required or not all(
+        isinstance(value, str) and value.strip() for value in required
+    ):
+        raise ValidationError("فهرست فیلدهای الزامی صورتحساب معتبر نیست.")
+    if len(set(required)) != len(required) or not set(required).issubset(mapping):
+        raise ValidationError("فیلدهای الزامی باید یکتا و در نگاشت schema موجود باشند.")
 
 
 def validate_policy_for_consumer(

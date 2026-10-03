@@ -277,7 +277,7 @@ class SubledgerFoundationTests(TestCase):
             recognize_obligation(
                 organization=self.organization,
                 actor=self.owner,
-                source_kind="billing.progress_claim.v1",
+                source_kind="test.unregistered-source.v1",
                 source_uuid=uuid4(),
                 source_version=1,
                 idempotency_key="UNREGISTERED",

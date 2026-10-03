@@ -317,7 +317,7 @@ it authorizes no inference of missing accounting/legal decisions.
 | Organization configuration ownership | **ACCEPTED** | `OrganizationSettings` is the sole authority for all organization-level configurable settings; `Organization` retains only identity/core domain attributes. This is architectural authority, not migration authority. |
 | Accepted affected S04-S06 decisions | **SATISFIED AS TARGET ARCHITECTURE** | D14-02 and D14-03 selected Option A. D14-01's pending condition was satisfied when D14-04-D14-11 were incorporated; the contradiction review found none, so S04 Option A applies. These dispositions authorize no implementation or regulated/accounting value. |
 | Q01 product/accounting decisions | **PRODUCT POLICY RECORDED / VALUES UNSET** | D14-04-D14-07 record IRR initial base/storage/display, no Toman/FX behavior, UTC/ISO persistence with Jalali UI, explicit fiscal calendar, versioned precision categories and no current financial inventory valuation. Unknown method, scale and rounding points remain unset until an authorized, effective policy/configuration supplies them; source provenance is mandatory only when explicitly required. |
-| Q02 legal/accounting source gate | **POLICY RECORDED / AFFECTED ACTIVATION FAILS CLOSED** | D14-08 records export-only initial scope; D14-09 records official versioned sources plus limited interpretation. Revised D14-10 makes professional evidence optional metadata; revised D14-11 closes the global development gate. Platform/Tenant roles may maintain authorized field-specific values; only policies explicitly marked source-required fail publication/application without provenance. Current `BillingPolicy` rates remain uncertified. |
+| Q02 legal/accounting source gate | **POLICY RECORDED / AFFECTED ACTIVATION FAILS CLOSED** | D14-08 records export-only initial scope; D14-09 records official versioned sources plus limited interpretation. Revised D14-10 makes professional evidence optional metadata; revised D14-11 closes the global development gate. Platform/Tenant roles may maintain authorized field-specific values; only policies explicitly marked source-required fail publication/application without provenance. The then-current `BillingPolicy` rates remained uncertified. |
 
 #### Current configuration and compatibility inventory
 
@@ -342,7 +342,7 @@ new authority.
   consumer remains for legacy `Organization.timezone`/`currency`; the columns are
   retained as inert compatibility data. Fiscal/language/prefix settings remain in
   the authoritative row; prefixes are not statutory numbering schemes.
-- `BillingPolicy` remains a separate compatibility hotspot combining claim
+- At the P1-S14 recording date, `BillingPolicy` remained a separate compatibility hotspot combining claim
   numbering/precision/period controls with tax, insurance, retention and advance
   recovery. It is inventory evidence only: P1-S14 must not split, certify or move
   those regulated/commercial values without applicable versioned policy/source and
@@ -1091,19 +1091,102 @@ separately authorized by tranche; P5-S29+ is not defined or authorized.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P6-S01..S06 | 6 | `A-X` | BillingPolicy correction, term/regulatory ownership and safe migration design |
-| P6-S07..S13 | 7 | `A-H` | Receivable claim recalculation, snapshots, corrections and AR/posting handoff |
-| P6-S14..S20 | 7 | `A-H` | Subcontracts, measurement, payable certificates and recoveries |
-| P6-S21..S25 | 5 | `A-H` | Guarantees, insurance/clearance, expiry, exposure and release |
-| P6-S26..S32 | 7 | `A-X` | Taxpayer invoice and Iranian contractor-compliance integration/failure handling |
-| P6-S33..S38 | 6 | `A-H` | Site Instruction, Variation/Change Order, contractual Claim and EOT |
-| P6-S39..S40 | 2 | `T-M` | Commercial timelines, evidence, impact comparison and exception UI |
-| P6-S41 | 1 | `A-X` | Financial/legal lineage, idempotency, tenant and workflow final review |
-| P6-S42 | 1 | `L-M` | Documentation closeout and P7 handoff packet |
+| P6-S01..S06 | 6 | `A-X` | **Product Owner accepted:** mixed BillingPolicy removed; Tenant configuration, immutable term versions, direct effective-date reviewed/published Platform national-policy resolution, and pinned claim calculation/identity/currency evidence implemented under the pre-production seed-reset authority |
+| P6-S07..S13 | 7 | `A-H` | **Product Owner accepted:** amendment-aware cumulative certification, snapshots, linked corrections/cancellations, claim evidence UI, explicit AR resolver and non-operational posting contract |
+| P6-S14..S20 | 7 | `A-H` | **Product Owner accepted:** payable-subcontract terms, measured-work evidence, cumulative payable certificates, capped retention/advance recovery, evidence-backed back-charges, linked corrections, RTL lifecycle UI and dormant AP/Accounting handoffs |
+| P6-S21..S25 | 5 | `A-H` | **Product Owner accepted:** contract-linked guarantees, versioned insurance/clearance evidence, expiry/renewal/release, separated exposure and contract-authorized retention release |
+| P6-S26..S32 | 7 | `A-X` | **Product Owner accepted:** Platform-owned, direct effective-date regulatory resolution; immutable taxpayer-invoice/contractor-compliance evidence; schema preflight, export/test-adapter evidence, idempotent retry/error resolution, correlation/reconciliation and RTL operations. Legal values, official schemas, provider credentials/transmission and production remain gated. |
+| P6-S33..S38 | 6 | `A-H` | **Product Owner accepted:** Contracts-owned Site Instruction, Variation/Change Order, contractual Claim and EOT evidence with explicit approved facts and no automatic downstream effects |
+| P6-S39..S40 | 2 | `T-M` | **Product Owner accepted:** read-only Contracts commercial timeline, typed evidence, recorded-fact comparison and advisory exception UI |
+| P6-S41 | 1 | `A-X` | **Product Owner accepted:** final P6 lineage, isolation, workflow, history, audit and non-effect verification retained in the closeout packet |
+| P6-S42 | 1 | `L-M` | **Product Owner accepted:** P6 documentation closeout and bounded P7 handoff packet; no P7 implementation |
 
 **Product Owner gates:** contract-term policy, payable/receivable separation,
 claim/EOT governance, statutory launch scope, provider credentials, guarantee and
 insurance-clearance rules, all with legal/accounting review.
+
+### P6-S01–S42 implementation and P7 gate
+
+The Product Owner authorized this tranche and fixed version lifecycle,
+cutoff-date applicability, prospective amendment, calculation order, precision/
+rounding, nonnegative ordinary claims, correction lineage, SoD and snapshot rules.
+The [implementation packet](architecture/P6_S01_S06_BILLING_TERMS_REGULATORY_IMPLEMENTATION.md)
+records the verified code, migrations, focused tests and explicit pre-production
+seed reset. Regulatory ownership reuses the existing `PlatformPolicyVersion`
+governance rather than adding a parallel rule authority. The accepted
+P6-S26–S32 correction supersedes the original national-rule Tenant-selection and
+mandatory Platform maker-checker publication assumptions: national rules resolve
+directly by effective date, cannot be selected or overridden by Tenants, and
+require external source plus accepted review evidence under the current Platform
+Admin lifecycle.
+Actual Iranian statutory values and legal interpretations remain
+evidence-gated; no downstream integration or production behavior is active.
+
+P6-S07–S13 are implemented under the separately authorized bounded continuation.
+The [claim/handoff packet](architecture/P6_S07_S13_CLAIM_HARDENING_AND_HANDOFF.md)
+records cumulative certification, immutable correction lineage, UI evidence and
+the explicit opt-in AR/non-operational Accounting contracts. No automatic AR,
+journal, taxpayer transmission, Treasury or production behavior is active.
+The Product Owner accepted P6-S01–S13 on 2026-10-03 based on the verified
+implementation, validation evidence, current runtime behavior and the accepted
+P6-S26–S32 correction. Acceptance does not include real legal/regulatory content,
+Article 38 effects, downstream financial/production behavior, production-history
+migration, obsolete-test remediation, serialized-test restore repair or existing
+permission-registry gaps.
+
+P6-S14–S20 are implemented under the separately authorized bounded continuation.
+The [payable-certification packet](architecture/P6_S14_S20_PAYABLE_CERTIFICATION_IMPLEMENTATION.md)
+records subcontract ownership, versioned terms, measured-work/cumulative
+calculation evidence, recoveries, correction history, workflow/RTL UI and the
+explicit dormant AP/non-operational Accounting contracts. No automatic AP,
+journal, Project Cost, Treasury, cash or statutory behavior is active.
+The Product Owner accepted P6-S14–S20 on 2026-10-03 based on that verified
+implementation and its documented boundaries; that acceptance did not itself
+grant P6-S21+ or downstream production, financial, statutory or contractual
+authority. P6-S21–S25 proceeded only under its later bounded authorization.
+
+P6-S21–S25 are implemented under the separately authorized bounded continuation.
+The [guarantee/clearance/release packet](architecture/P6_S21_S25_GUARANTEE_CLEARANCE_RELEASE_IMPLEMENTATION.md)
+records versioned contract guarantees and insurance/clearance evidence,
+effective expiry/renewal/release history, separated operational exposure,
+contract-authorized retention release, workflow/SoD/audit controls and RTL
+operational views. No legal rate or Article 38 effect is inferred, and no AP/AR,
+Accounting, Project Cost, Treasury, provider, notification or production behavior
+is activated. The Product Owner accepted P6-S21–S25 on 2026-10-03 based on the
+verified implementation, validation evidence and documented boundaries in that
+packet. Acceptance covers only those guarantee, insurance/clearance evidence,
+exposure-reporting and retention-release controls. The documented
+materials/document-link/platform-policy permission-registry gaps remain separate
+unresolved issues and are neither accepted nor resolved.
+
+P6-S26–S32 are Product Owner accepted under their later bounded authorization.
+The
+[taxpayer/contractor-compliance packet](architecture/P6_S26_S32_TAXPAYER_CONTRACTOR_COMPLIANCE_IMPLEMENTATION.md)
+records direct effective-date Platform regulatory resolution, immutable original/correction/
+cancellation lineage, contractor deduction and clearance facts, schema
+preflight, export/test-adapter attempts, idempotent retry/error resolution,
+correlation/reconciliation evidence, workflow/SoD/audit controls and RTL views.
+Acceptance includes Platform Admin same-user lifecycle control, Tenant prohibition
+from national-rule selection/override, immutable superseding history and historical
+version pins. No official Iranian value or schema, Article 38 effect, live provider,
+credential, financial mutation or production behavior is activated. The documented
+materials/document-link/platform-policy permission-registry gaps remain unresolved.
+P6-S33–S38 are implemented under the Product Owner's bounded authorization and
+recorded in the
+[contractual-change/claim/EOT packet](architecture/P6_S33_S38_CONTRACTUAL_CHANGE_CLAIM_EOT_IMPLEMENTATION.md).
+The Product Owner accepted P6-S33–S38 on 2026-10-03 based on the completed
+implementation, focused validation, retained P6 regression evidence and packet
+boundaries. Acceptance is limited to the implemented Contracts-owned records,
+lifecycle, explicit approved facts, evidence/lineage, controls and RTL operations.
+Contracts owns the versioned evidence and shared workflow lifecycle. Approved
+entitlement, amount, delay responsibility and EOT days are retained only as
+explicit human decisions; no contract value, amendment, budget, schedule
+baseline, Billing, AP/AR, subledger, GL, Treasury or cash mutation occurs. The
+retained P6 regression gate passed 153 tests; six legacy P6-S01–S13 assertions
+and two serialized-test setup errors remain outside this tranche and are recorded
+in the packet; acceptance neither resolves nor accepts them. P6-S39–S42 later
+proceeded only under their bounded authorization; P7 functionality and production
+activation remain unauthorized.
 
 ## 13. P7 session map — 36 sessions
 
@@ -1379,6 +1462,11 @@ planning so unresolved dependencies cannot become accidental scope or authority.
 P0-S02 decision preparation. This is not P0 entry-gate acceptance, completion of
 P0.1, Product Owner approval, or production certification.
 
+**Historical reconciliation (2026-10-02):** BillingPolicy symbols and findings in
+this recorded baseline describe the repository at S01. P6-S01–S06 later removed
+that model and implemented the authority split recorded in section 12 and the
+linked P6 implementation packet; the chronology below is not current code status.
+
 **Objective/scope:** verify the five requested entry concerns using static
 repository evidence. The supplied S01 request was the session contract; no prior
 implementation handoff was assumed. C0/C1 comprised the applicable repository
@@ -1397,7 +1485,7 @@ Classifications apply to the stated claims: **confirmed** by inspected evidence,
 **contradicted** by inspected evidence, or **unverified** where evidence is
 insufficient. Static confirmation is not a passing runtime test.
 
-1. **BillingPolicy ownership — confirmed.**
+1. **BillingPolicy ownership — confirmed at the S01 baseline (historical).**
    [BillingPolicy](../apps/billing/models.py) is one mutable row per organization,
    combining numbering/precision/period controls, tax/insurance rates and
    retention/advance-recovery terms. In
@@ -1819,7 +1907,7 @@ licensed price-book imports, portal identity and notification channels) retains 
 phase-specific approval requirement. S03 neither promotes optional integrations to
 mandatory launch scope nor removes their parent core capabilities. Selecting
 native finance does not certify statutory filing behavior or assign legal validity
-to current BillingPolicy rates.
+to the then-current BillingPolicy rates.
 
 ### S03 verification and documentation closeout
 
@@ -2069,6 +2157,10 @@ by this suggested sequence.
 **Recorded:** 2026-09-25. **Authorization:** Product Owner: "continue and do S06".
 Execute section 30's handoff within P0.1/PPC-01/PPC-06; prepare a proposal, not
 application changes or certification of legal rules.
+
+**Historical reconciliation (2026-10-02):** this proposal-only handoff was later
+implemented by authorized P6-S01–S06. Current authority and status are in section
+12 and the linked P6 implementation packet; the original card remains chronology.
 
 | Card | Contract |
 | --- | --- |

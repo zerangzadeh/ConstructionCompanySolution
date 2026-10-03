@@ -74,7 +74,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             "organizations.Organization",
             "organizations.OrganizationSettings",
-            "billing.BillingPolicy",
+            "billing.TenantBillingConfiguration",
         ),
         (P.COMPANY_SETTINGS_VIEW, P.COMPANY_SETTINGS_CHANGE),
         (
@@ -89,7 +89,6 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("organizations.TenantPolicySelection",),
         (
             P.TENANT_POLICIES_VIEW,
-            P.TENANT_POLICIES_APPROVE,
             P.TENANT_POLICIES_APPLY,
         ),
         ("apps.organizations.policy_services", "apps.organizations.role_defaults"),
@@ -273,6 +272,25 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("apps.contracts.services",),
     ),
     PermissionResource(
+        "contract_terms",
+        "نسخه‌های شرایط تجاری قرارداد",
+        ("contracts.ContractTermVersion",),
+        (P.CONTRACT_TERMS_MANAGE, P.CONTRACT_TERMS_APPROVE),
+        ("apps.contracts.services",),
+    ),
+    PermissionResource(
+        "contractual_records",
+        "دستورها، تغییرات، ادعاها و تمدید مدت قراردادی",
+        ("contracts.ContractualRecord", "contracts.ContractualRecordEvidence"),
+        (
+            P.CONTRACTUAL_RECORDS_VIEW,
+            P.CONTRACTUAL_RECORDS_PREPARE,
+            P.CONTRACTUAL_RECORDS_SUBMIT,
+            P.CONTRACTUAL_RECORDS_APPROVE,
+        ),
+        ("apps.contracts.contractual_services", "apps.contracts.contractual_workflow"),
+    ),
+    PermissionResource(
         "baselines",
         "مبناهای تجاری پروژه",
         ("billing.ProjectBaseline", "billing.BaselineItem"),
@@ -314,6 +332,104 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.CLAIM_SETTLEMENTS_REVERSE,
         ),
         ("apps.billing.services", "apps.payments.services"),
+    ),
+    PermissionResource(
+        "payable_measurements",
+        "اندازه‌گیری پیمان جزء",
+        ("billing.PayableMeasurement",),
+        (
+            P.PAYABLE_MEASUREMENTS_VIEW,
+            P.PAYABLE_MEASUREMENTS_RECORD,
+            P.PAYABLE_MEASUREMENTS_VERIFY,
+        ),
+        ("apps.billing.payable_services",),
+    ),
+    PermissionResource(
+        "payable_certificates",
+        "گواهی‌های پرداخت پیمان جزء",
+        (
+            "billing.PayableCertificate",
+            "billing.PayableCertificateItem",
+            "billing.PayableCertificateAdjustment",
+        ),
+        (
+            P.PAYABLE_CERTIFICATES_VIEW,
+            P.PAYABLE_CERTIFICATES_CREATE,
+            P.PAYABLE_CERTIFICATES_REVISE,
+            P.PAYABLE_CERTIFICATES_SUBMIT,
+            P.PAYABLE_CERTIFICATES_APPROVE,
+        ),
+        ("apps.billing.payable_services", "apps.billing.payable_workflow"),
+    ),
+    PermissionResource(
+        "guarantees",
+        "ضمانت‌نامه‌های قراردادی",
+        ("billing.ContractGuarantee",),
+        (
+            P.GUARANTEES_VIEW,
+            P.GUARANTEES_MANAGE,
+            P.GUARANTEES_SUBMIT,
+            P.GUARANTEES_APPROVE,
+        ),
+        ("apps.billing.commercial_services", "apps.billing.commercial_workflow"),
+    ),
+    PermissionResource(
+        "compliance_evidence",
+        "شواهد بیمه و مفاصاحساب قراردادی",
+        ("billing.ContractComplianceEvidence",),
+        (
+            P.COMPLIANCE_EVIDENCE_VIEW,
+            P.COMPLIANCE_EVIDENCE_MANAGE,
+            P.COMPLIANCE_EVIDENCE_SUBMIT,
+            P.COMPLIANCE_EVIDENCE_APPROVE,
+        ),
+        ("apps.billing.commercial_services", "apps.billing.commercial_workflow"),
+    ),
+    PermissionResource(
+        "retention_releases",
+        "آزادسازی کسور تضمین",
+        ("billing.RetentionRelease",),
+        (
+            P.RETENTION_RELEASES_VIEW,
+            P.RETENTION_RELEASES_CREATE,
+            P.RETENTION_RELEASES_SUBMIT,
+            P.RETENTION_RELEASES_APPROVE,
+        ),
+        ("apps.billing.commercial_services", "apps.billing.commercial_workflow"),
+    ),
+    PermissionResource(
+        "taxpayer_invoices",
+        "صورتحساب‌های مؤدیان",
+        ("billing.TaxpayerInvoice",),
+        (
+            P.TAXPAYER_INVOICES_VIEW,
+            P.TAXPAYER_INVOICES_PREPARE,
+            P.TAXPAYER_INVOICES_SUBMIT,
+            P.TAXPAYER_INVOICES_APPROVE,
+        ),
+        ("apps.billing.statutory_services", "apps.billing.commercial_workflow"),
+    ),
+    PermissionResource(
+        "contractor_compliance",
+        "ارزیابی انطباق بیمه پیمانکار",
+        ("billing.ContractorComplianceAssessment",),
+        (
+            P.CONTRACTOR_COMPLIANCE_VIEW,
+            P.CONTRACTOR_COMPLIANCE_PREPARE,
+            P.CONTRACTOR_COMPLIANCE_SUBMIT,
+            P.CONTRACTOR_COMPLIANCE_APPROVE,
+        ),
+        ("apps.billing.statutory_services", "apps.billing.commercial_workflow"),
+    ),
+    PermissionResource(
+        "statutory_submissions",
+        "شواهد خروجی و ارسال مقرراتی",
+        (
+            "billing.StatutorySubmissionEvidence",
+            "billing.StatutorySubmissionResolution",
+        ),
+        (P.STATUTORY_SUBMISSIONS_EXECUTE, P.STATUTORY_SUBMISSIONS_RESOLVE),
+        ("apps.billing.statutory_services",),
     ),
     PermissionResource(
         "estimates",

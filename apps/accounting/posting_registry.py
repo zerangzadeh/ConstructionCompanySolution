@@ -64,6 +64,28 @@ _CONTRACTS = {
         source_line_model="treasury.TreasuryMovementLeg",
         operational_producer=True,
     ),
+    ("billing.progress_claim.v1", "claim_approved"): PostingContract(
+        source_kind="billing.progress_claim.v1",
+        event_kind="claim_approved",
+        rule_code="billing.receivable-claim.approved.v1",
+        rule_version=1,
+        source_owner="billing",
+        source_model="billing.ProgressClaim",
+        source_line_model="billing.ProgressClaimItem|billing.ClaimAdjustment",
+        operational_producer=False,
+    ),
+    ("billing.payable_certificate.v1", "certificate_approved"): PostingContract(
+        source_kind="billing.payable_certificate.v1",
+        event_kind="certificate_approved",
+        rule_code="billing.payable-certificate.approved.v1",
+        rule_version=1,
+        source_owner="billing",
+        source_model="billing.PayableCertificate",
+        source_line_model=(
+            "billing.PayableCertificateItem|billing.PayableCertificateAdjustment"
+        ),
+        operational_producer=False,
+    ),
 }
 
 

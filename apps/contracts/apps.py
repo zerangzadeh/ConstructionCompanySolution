@@ -7,6 +7,8 @@ class ContractsConfig(AppConfig):
     verbose_name = "قراردادها"
 
     def ready(self) -> None:
+        from .contractual_workflow import register_contractual_record_workflow
         from .workflow import register_contract_amendment_workflow
 
         register_contract_amendment_workflow()
+        register_contractual_record_workflow()
