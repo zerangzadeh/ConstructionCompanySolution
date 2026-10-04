@@ -116,7 +116,8 @@ Names are descriptive and may change during an approved detailed design.
 | Treasury | Bank/CashAccount, Receipt/Payment/Transfer, Cheque/Instrument, unscheduled PaymentRequest, Employee/VendorAdvance and cash-return Settlement, retained source-to-GL reconciliation plus independent signed review, BankStatementImport/Line, exact Match/Clearing/Reversal and BankReconciliationRun; PaymentProposal and provider adapters remain target concepts |
 | Procurement | Implemented internal RFQ/version/invitation, sealed quote custody/opening/admissibility, P5-S11 comparison and immutable sourcing-only award/allocation successors, plus P5-S12–S17 explicit award-to-PO consumption, immutable issued-PO/change versions and version-pinned goods receipt/service acceptance. AP/Finance-owned supplier-invoice versions and immutable match/tolerance/discrepancy evidence consume these sources without mutating them. Controlled exact-version delivery remains service-owned and generic document paths remain denied. Payable/GL/cost/stock/cash handoffs remain dormant. |
 | Contract/Billing | Implemented Billing authorities remain distinct from Contracts-owned `ContractualRecord`/`ContractualRecordEvidence`. P6-S33–S38 retains versioned Site Instruction, Variation/Change Order, contractual Claim and EOT evidence, explicit approved entitlement/amount/delay-responsibility/EOT-day facts, typed source references and linked withdrawal/correction/cancellation history. Existing term, claim/certificate, guarantee/compliance and statutory records remain unchanged. Automatic contract/amendment, budget, schedule, AP/AR, subledger, GL, Treasury/cash and production effects remain gated. |
-| Payroll/insurance | WorkCalendar/Shift, Attendance, Timesheet, Leave, PayrollRuleVersion, PayrollRun/EmployeeResult/Component, InsuranceList, Tax/InsuranceSubmission |
+| Time and attendance | Implemented WorkCalendar/Holiday/Shift/Break, Attendance/Import/Adjustment/Reconciliation, LeaveMissionRequest, OvertimeRequest, Timesheet/Entry/Review and minute-only LaborDistributionPreview |
+| Payroll/insurance | P7-S01–S36 is Product Owner accepted and complete within its documented non-production boundary. Immutable `FinancialHandoffProposal` envelopes and lines, review, downstream acknowledgment and reconciliation evidence pin finalized run/result, currency and monetary-policy lineage; Project Cost lines additionally pin approved timesheet entry and coding. Final assurance preserves immutable retention, rule/policy/source version history, explicit retroactivity and family-minimized sensitive access. No recognized obligation, journal, payment/cash movement, Project Cost actual, P8 behavior or production activation exists. |
 | Inventory | Reservation, StockTransaction, Lot/Batch, Serial, Bin, Count/Line, TransferCustody, ValuationLayer |
 | Equipment/assets | Meter/Usage, Fuel, OperatorQualification, MaintenancePlan/Work, EquipmentCostRate, FixedAsset, DepreciationRun/Line, Disposal |
 | Field operations | DailyReport, WeatherObservation, WorkFront, Visit, Meeting, Instruction, media/evidence link, reviewed downstream proposal |
@@ -138,7 +139,7 @@ Names are descriptive and may change during an approved detailed design.
 | Certified receivable/payable | Approved claim/certificate version | AR/AP, posting, cash forecast and settlement |
 | Supplier invoice evidence | AP/Finance-owned approved invoice version/line | Immutable matching evidence and payable disposition |
 | Supplier liability | AP obligation linked to approved supplier-invoice/match evidence or payable certificate | Accounting and Treasury proposal |
-| Employee payroll liability | Finalized payroll run/result | AP-like liability, Accounting, Treasury and project labor cost |
+| Employee payroll liability | Finalized payroll run/result and immutable Payroll handoff proposal | AP-like liability, Accounting, Treasury and project labor cost; each consumer recognizes independently and acknowledges without Payroll mutation |
 | Cash/instrument state | Treasury transaction/instrument plus clearing evidence | Accounting posting and cash position |
 | Accounting balance | Posted balanced journal lines | Statements, close and reconciliation |
 | Inventory quantity | Posted/reversed stock ledger | On-hand/reservation and valuation |
@@ -194,8 +195,9 @@ For the closed accounting-policy catalogue, only
 selection. They use code-owned schemas (not free-form JSON) and their published v1
 Product-defined contract is money scale `0`, intermediate scale `6`, unrounded
 intermediate preservation and `ROUND_HALF_UP` only at the final monetary-line
-boundary. Both policy versions are pinned on each posted journal. A published
-version and its append-only source links are immutable; correction is a
+boundary. Both policy versions are pinned on each posted journal and, for
+P7-S13–S22, each locked Payroll run. A published version and its append-only source
+links are immutable; correction is a
 superseding version. Until a valid effective version is selected, accounting
 posting fails closed. These values claim no statutory, legal or external
 accounting authority.

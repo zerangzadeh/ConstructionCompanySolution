@@ -6,7 +6,76 @@ from apps.organizations.permission_catalog import (
 from apps.organizations.permission_registry import registered_permission_codes
 
 ALL_PERMISSIONS = registered_permission_codes()
-ACTIVE_DEFAULT_PERMISSIONS = ALL_PERMISSIONS
+WORKFORCE_GENERAL_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.WORKFORCE_SKILLS_VIEW,
+    BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE,
+    BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+    BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+    BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_REVOKE,
+)
+WORKFORCE_SENSITIVE_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
+    BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE,
+    BusinessPermissionCode.WORKFORCE_LABOR_RATES_VIEW,
+    BusinessPermissionCode.WORKFORCE_LABOR_RATES_MANAGE,
+)
+TIME_ATTENDANCE_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.TIME_CALENDARS_VIEW,
+    BusinessPermissionCode.TIME_CALENDARS_MANAGE,
+    BusinessPermissionCode.ATTENDANCE_VIEW,
+    BusinessPermissionCode.ATTENDANCE_CAPTURE,
+    BusinessPermissionCode.ATTENDANCE_REVIEW,
+    BusinessPermissionCode.ATTENDANCE_CORRECT,
+    BusinessPermissionCode.ATTENDANCE_IMPORT,
+    BusinessPermissionCode.LEAVE_MISSION_VIEW,
+    BusinessPermissionCode.LEAVE_MISSION_REQUEST,
+    BusinessPermissionCode.LEAVE_MISSION_REVIEW,
+    BusinessPermissionCode.OVERTIME_VIEW,
+    BusinessPermissionCode.OVERTIME_REQUEST,
+    BusinessPermissionCode.OVERTIME_REVIEW,
+    BusinessPermissionCode.TIMESHEETS_VIEW,
+    BusinessPermissionCode.TIMESHEETS_PREPARE,
+    BusinessPermissionCode.TIMESHEETS_REVIEW,
+    BusinessPermissionCode.TIMESHEETS_PREVIEW,
+)
+PAYROLL_SENSITIVE_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.PAYROLL_CONFIGURATION_VIEW,
+    BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE,
+    BusinessPermissionCode.PAYROLL_PREPARE,
+    BusinessPermissionCode.PAYROLL_REVIEW,
+    BusinessPermissionCode.PAYROLL_FINALIZE,
+    BusinessPermissionCode.PAYROLL_ADJUST,
+    BusinessPermissionCode.PAYROLL_RESULTS_VIEW,
+    BusinessPermissionCode.PAYSLIPS_VIEW,
+    BusinessPermissionCode.PAYSLIPS_EXPORT,
+    BusinessPermissionCode.PAYROLL_AUDIT_VIEW,
+    BusinessPermissionCode.PAYROLL_STATUTORY_CONFIGURATION_VIEW,
+    BusinessPermissionCode.PAYROLL_STATUTORY_PREPARE,
+    BusinessPermissionCode.PAYROLL_STATUTORY_REVIEW,
+    BusinessPermissionCode.PAYROLL_STATUTORY_OUTPUT_GENERATE,
+    BusinessPermissionCode.PAYROLL_STATUTORY_EXPORT,
+    BusinessPermissionCode.PAYROLL_STATUTORY_CORRECT,
+    BusinessPermissionCode.PAYROLL_STATUTORY_AUDIT_VIEW,
+    BusinessPermissionCode.PAYROLL_LIABILITY_HANDOFF_PREPARE,
+    BusinessPermissionCode.PAYROLL_LIABILITY_HANDOFF_REVIEW,
+    BusinessPermissionCode.PAYROLL_ACCOUNTING_HANDOFF_PREPARE,
+    BusinessPermissionCode.PAYROLL_ACCOUNTING_HANDOFF_REVIEW,
+    BusinessPermissionCode.PAYROLL_PAYMENT_HANDOFF_PREPARE,
+    BusinessPermissionCode.PAYROLL_PAYMENT_HANDOFF_REVIEW,
+    BusinessPermissionCode.PAYROLL_PROJECT_COST_HANDOFF_PREPARE,
+    BusinessPermissionCode.PAYROLL_PROJECT_COST_HANDOFF_REVIEW,
+    BusinessPermissionCode.PAYROLL_HANDOFF_RECONCILIATION_PREPARE,
+    BusinessPermissionCode.PAYROLL_HANDOFF_RECONCILIATION_REVIEW,
+)
+# P7-S01–S05: sensitive performance and labor-rate data is deny-by-default.
+# General capability records are granted only to explicitly selected management roles.
+ACTIVE_DEFAULT_PERMISSIONS = (
+    ALL_PERMISSIONS
+    - WORKFORCE_GENERAL_PERMISSIONS
+    - WORKFORCE_SENSITIVE_PERMISSIONS
+    - TIME_ATTENDANCE_PERMISSIONS
+    - PAYROLL_SENSITIVE_PERMISSIONS
+)
 ACCOUNTING_RESTRICTED_PERMISSIONS = permission_codes(
     BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,
@@ -217,12 +286,13 @@ OPERATIONS_MANAGER_EXCLUSIONS = (
 
 
 DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
-    MembershipRole.TENANT_OWNER: ACTIVE_DEFAULT_PERMISSIONS,
+    MembershipRole.TENANT_OWNER: ACTIVE_DEFAULT_PERMISSIONS | WORKFORCE_GENERAL_PERMISSIONS,
     MembershipRole.TENANT_ADMIN: ACTIVE_DEFAULT_PERMISSIONS
     - {
         str(BusinessPermissionCode.AUTHORIZATION_UNRESOLVED_RECOVER),
         str(BusinessPermissionCode.DOCUMENT_RETENTION_APPROVE),
-    },
+    }
+    | WORKFORCE_GENERAL_PERMISSIONS,
     MembershipRole.TENANT_MANAGER: (
         ALL_PERMISSIONS
         - OWNER_ONLY_PERMISSIONS
@@ -240,6 +310,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
             BusinessPermissionCode.AUTHORIZATION_ROLES_VIEW,
             BusinessPermissionCode.AUTHORIZATION_GRANTS_VIEW,
         )
+        | WORKFORCE_GENERAL_PERMISSIONS
     ),
     MembershipRole.PROJECT_MANAGER: (
         ALL_PERMISSIONS
@@ -257,6 +328,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
             BusinessPermissionCode.ACCOUNTS_RESET_PASSWORD,
             BusinessPermissionCode.AUDIT_VIEW,
         )
+        | WORKFORCE_GENERAL_PERMISSIONS
     ),
     MembershipRole.ACCOUNTANT: READ_ONLY_PERMISSIONS
     | permission_codes(
@@ -336,9 +408,47 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     MembershipRole.VIEWER: READ_ONLY_PERMISSIONS,
 }
 
+# P7-S06–S12 grants are deliberate. Tenant administrators own calendar/import
+# configuration; scoped operational roles capture and prepare; review/correction
+# permissions remain separate so services can enforce maker-checker.
+_time_view = permission_codes(
+    BusinessPermissionCode.TIME_CALENDARS_VIEW,
+    BusinessPermissionCode.ATTENDANCE_VIEW,
+    BusinessPermissionCode.LEAVE_MISSION_VIEW,
+    BusinessPermissionCode.OVERTIME_VIEW,
+    BusinessPermissionCode.TIMESHEETS_VIEW,
+)
+_time_prepare = permission_codes(
+    BusinessPermissionCode.ATTENDANCE_CAPTURE,
+    BusinessPermissionCode.LEAVE_MISSION_REQUEST,
+    BusinessPermissionCode.OVERTIME_REQUEST,
+    BusinessPermissionCode.TIMESHEETS_PREPARE,
+)
+_time_review = permission_codes(
+    BusinessPermissionCode.ATTENDANCE_REVIEW,
+    BusinessPermissionCode.LEAVE_MISSION_REVIEW,
+    BusinessPermissionCode.OVERTIME_REVIEW,
+    BusinessPermissionCode.TIMESHEETS_REVIEW,
+    BusinessPermissionCode.TIMESHEETS_PREVIEW,
+)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.TENANT_OWNER].update(TIME_ATTENDANCE_PERMISSIONS)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.TENANT_ADMIN].update(TIME_ATTENDANCE_PERMISSIONS)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.TENANT_MANAGER].update(_time_view | _time_prepare | _time_review)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.PROJECT_MANAGER].update(_time_view | _time_prepare | _time_review)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.SUPERVISOR].update(_time_view | _time_prepare)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.COMPANY_OWNER].update(TIME_ATTENDANCE_PERMISSIONS)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.COMPANY_MANAGER].update(_time_view | _time_prepare | _time_review)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.OPERATIONS_MANAGER].update(_time_view | _time_prepare | _time_review)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.MEMBER].update(_time_view)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.VIEWER].update(_time_view)
+
 # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    # P7-S01–S05 sensitive employee data is deny-by-default.  It may be granted
+    # only through an explicit, organization-specific role assignment.
+    _default_permissions.difference_update(WORKFORCE_SENSITIVE_PERMISSIONS)
+    _default_permissions.difference_update(PAYROLL_SENSITIVE_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_WRITEOFF_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CLOSE_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CUSTODY_PERMISSIONS)

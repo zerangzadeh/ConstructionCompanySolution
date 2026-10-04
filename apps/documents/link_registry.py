@@ -86,6 +86,33 @@ DOCUMENT_LINK_TYPES = (
         project_lookup="daily_report__project_id",
         site_lookup="daily_report__site_id",
     ),
+    DocumentLinkType(
+        key="employee_qualification",
+        owner="workforce",
+        model_label="workforce.EmployeeQualificationDocumentLink",
+        target_field="qualification",
+        view_permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+        project_lookup=None,
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="employee_training",
+        owner="workforce",
+        model_label="workforce.EmployeeTrainingDocumentLink",
+        target_field="training_record",
+        view_permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+        project_lookup=None,
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="performance_evaluation",
+        owner="workforce",
+        model_label="workforce.PerformanceEvaluationDocumentLink",
+        target_field="performance_evaluation",
+        view_permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
+        project_lookup=None,
+        legacy_compatible=False,
+    ),
 )
 
 _BY_KEY = {link_type.key: link_type for link_type in DOCUMENT_LINK_TYPES}
@@ -123,9 +150,11 @@ def create_typed_link(
     }
     if legacy_link is not None:
         link_fields.update(id=legacy_link.pk, legacy_link_id=legacy_link.pk)
-    # Material technical evidence is version-specific.  Later document versions
-    # must not silently change the version reviewed for a material.
-    if link_type.key == "material":
+    # Version-aware typed evidence must not silently begin to point at a later
+    # revision of the underlying DMS document.
+    if any(
+        field.name == "document_version" for field in link_type.model._meta.fields
+    ):
         link_fields["document_version"] = document_version or document.current_version
     return link_type.model.objects.create(
         **link_fields,

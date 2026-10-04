@@ -20,6 +20,10 @@ RFQ_SOURCING_AWARD_SELF_FINALIZATION_POLICY_CODE = (
 RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE = "receivable-claim-regulatory"
 TAXPAYER_INVOICE_REGULATORY_POLICY_CODE = "taxpayer-invoice-regulatory"
 CONTRACTOR_COMPLIANCE_REGULATORY_POLICY_CODE = "contractor-compliance-regulatory"
+PAYROLL_TAX_REGULATORY_POLICY_CODE = "payroll-tax-regulatory"
+EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE = "employee-insurance-regulatory"
+PAYROLL_TAX_OUTPUT_SCHEMA_POLICY_CODE = "payroll-tax-output-schema"
+EMPLOYEE_INSURANCE_OUTPUT_SCHEMA_POLICY_CODE = "employee-insurance-output-schema"
 
 
 @dataclass(frozen=True)
@@ -53,9 +57,9 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="precision",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit",),
+        permitted_consumers=("accounting.journal.submit", "payroll.run.lock"),
         fields=(
-            PolicyFieldSpec("money_scale", int, (0,)),
+            PolicyFieldSpec("money_scale", int, (0, 2)),
             PolicyFieldSpec("intermediate_calculation_scale", int, (6,)),
             PolicyFieldSpec("preserve_unrounded_intermediates", bool, (True,)),
         ),
@@ -67,7 +71,7 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="rounding",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit",),
+        permitted_consumers=("accounting.journal.submit", "payroll.run.lock"),
         fields=(
             PolicyFieldSpec("rounding_method", str, ("ROUND_HALF_UP",)),
             PolicyFieldSpec("output_boundary", str, ("final_monetary_line",)),
@@ -176,6 +180,78 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
             PolicyFieldSpec("deduction_basis", str, ("gross", "net")),
             PolicyFieldSpec("clearance_required", bool, (False, True)),
             PolicyFieldSpec("schema_identifier", str, None),
+        ),
+        value_schema_approved=True,
+    ),
+    PAYROLL_TAX_REGULATORY_POLICY_CODE: PlatformPolicySpec(
+        code=PAYROLL_TAX_REGULATORY_POLICY_CODE,
+        name="قواعد مقرراتی مالیات حقوق",
+        category="regulatory_rule_set",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("payroll.statutory_tax.calculate",),
+        fields=(
+            PolicyFieldSpec("component_mappings", list, None),
+            PolicyFieldSpec("calculation_basis", str, None),
+            PolicyFieldSpec("exemptions", list, None),
+            PolicyFieldSpec("brackets", list, None),
+            PolicyFieldSpec("thresholds", dict, None),
+            PolicyFieldSpec("rounding", dict, None),
+            PolicyFieldSpec("correction_mode", str, None),
+        ),
+        value_schema_approved=True,
+    ),
+    EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE: PlatformPolicySpec(
+        code=EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE,
+        name="قواعد مقرراتی بیمه کارکنان",
+        category="insurance_regulatory",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("payroll.employee_insurance.calculate",),
+        fields=(
+            PolicyFieldSpec("component_mappings", list, None),
+            PolicyFieldSpec("contribution_categories", list, None),
+            PolicyFieldSpec("basis_mode", str, None),
+            PolicyFieldSpec("thresholds", dict, None),
+            PolicyFieldSpec("exemptions", list, None),
+            PolicyFieldSpec("rounding", dict, None),
+            PolicyFieldSpec("correction_mode", str, None),
+        ),
+        value_schema_approved=True,
+    ),
+    PAYROLL_TAX_OUTPUT_SCHEMA_POLICY_CODE: PlatformPolicySpec(
+        code=PAYROLL_TAX_OUTPUT_SCHEMA_POLICY_CODE,
+        name="طرح رسمی خروجی مالیات حقوق",
+        category="filing_export",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("payroll.statutory_tax.output",),
+        fields=(
+            PolicyFieldSpec("schema_identifier", str, None),
+            PolicyFieldSpec("official_identifiers", list, None),
+            PolicyFieldSpec("calendar_mapping", dict, None),
+            PolicyFieldSpec("monetary_scale", int, None),
+            PolicyFieldSpec("field_mapping", dict, None),
+            PolicyFieldSpec("required_fields", list, None),
+            PolicyFieldSpec("encoding", str, None),
+        ),
+        value_schema_approved=True,
+    ),
+    EMPLOYEE_INSURANCE_OUTPUT_SCHEMA_POLICY_CODE: PlatformPolicySpec(
+        code=EMPLOYEE_INSURANCE_OUTPUT_SCHEMA_POLICY_CODE,
+        name="طرح رسمی فهرست بیمه کارکنان",
+        category="filing_export",
+        sensitivity="regulatory",
+        tenant_selectable=False,
+        permitted_consumers=("payroll.employee_insurance.output",),
+        fields=(
+            PolicyFieldSpec("schema_identifier", str, None),
+            PolicyFieldSpec("official_identifiers", list, None),
+            PolicyFieldSpec("calendar_mapping", dict, None),
+            PolicyFieldSpec("monetary_scale", int, None),
+            PolicyFieldSpec("field_mapping", dict, None),
+            PolicyFieldSpec("required_fields", list, None),
+            PolicyFieldSpec("encoding", str, None),
         ),
         value_schema_approved=True,
     ),

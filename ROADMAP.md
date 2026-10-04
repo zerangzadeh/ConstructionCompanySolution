@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-09-30
+**Status date:** 2026-10-04
 
 **Product stage:** pre-production
 
@@ -50,7 +50,7 @@ compliance, security, migration, and integration consequences.
 
 | ID | Status | Delivered boundary |
 | --- | --- | --- |
-| F1 Workforce | **DELIVERED** | Employees, departments, positions, teams, effective position/project assignments, optional `User` link, images, permission/audit/tenant checks. Attendance, time, payroll, skills, and rates are not delivered. |
+| F1 Workforce | **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION BOUNDARIES** | Employees, structures, effective assignments, capability/evidence/rate history, bounded timekeeping, non-posting Core Payroll, fail-closed statutory outputs, immutable Payroll-owned downstream proposals, and final privacy/version/reconciliation assurance. No AP recognition, journal/GL, Treasury/cash, Project Cost actual, P8 functionality, production activation, or live filing is introduced. |
 | F2 Procurement | **DELIVERED expanding baseline** | Purchase request/order/goods receipt and the Product Owner-accepted P5-S01–S22 baseline are implemented. P5-S23–S25 add bounded Persian-first internal/external UI adapters over the portal and sealed-evidence services; broader portal collaboration, payable/GL/Treasury/Inventory activation remain deferred. |
 | F3 Inventory | **DELIVERED baseline** | Warehouse and posted/reversible stock-quantity ledger. Valuation, reservations, bins/lots/serials, and accounting are not delivered. |
 | F4 Equipment | **DELIVERED baseline** | Equipment, conflict-safe assignments, maintenance. Usage/fuel/cost/fixed-asset integration is not delivered. |
@@ -1593,7 +1593,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
   Treasury/cash, live provider behavior, production migration and activation,
   the six obsolete assertions, two serialized-test restore errors and existing
   permission-registry gaps remain outside acceptance. P6-S39–S42 is separately
-  accepted; P7+ remains unauthorized.
+  accepted; P7 is subsequently accepted and complete within documented
+  non-production boundaries. P8 remains planning-only.
 - **Outcome:** move retention/advance/insurance/other commercial rules to approved
   contract-term versions; apply effective regulatory versions; snapshot party,
   currency and rules; generate AR/posting proposals and taxpayer-invoice status.
@@ -1736,7 +1737,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
   assertions or serialized-test restore errors, and does not authorize any
   automatic contract/amendment, budget, schedule, Billing, financial or
   production effect. P6-S39–S42 later proceeded only under their bounded
-  authorization; P7+ remains unauthorized.
+  authorization; P7 is subsequently accepted and complete within documented
+  non-production boundaries. P8 remains planning-only.
 - **Outcome:** governed Site Instruction, Variation Order/Change Order,
   contractual Claim and Extension of Time lifecycles with versioned evidence,
   entitlement/approval, valuation and cost impact, schedule impact, contract-value
@@ -1777,7 +1779,10 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P7.0 Workforce skills, qualifications, development, and labor rates
 
-- **Status / priority:** **PLANNED; delivered workforce structure retained**
+- **Status / priority:** **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN
+  DOCUMENTED NON-PRODUCTION BOUNDARIES; P8 PLANNING ONLY / UNAUTHORIZED.** Delivered workforce structure is
+  retained and P7-S01–S05 adds the bounded Workforce foundation recorded in
+  `docs/architecture/P7_S01_S05_WORKFORCE_FOUNDATION_IMPLEMENTATION.md`.
 - **Outcome:** governed skill/competency catalogue; employee proficiency and
   evidence; certificates/licenses with issuer, validity and expiry escalation;
   required/attended training; role/project competency requirements; explainable
@@ -1800,7 +1805,9 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P7.1 Attendance, timesheets, and labor costing
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN
+  DOCUMENTED NON-PRODUCTION BOUNDARIES; P8 PLANNING ONLY / UNAUTHORIZED.** The bounded timekeeping implementation record is
+  `docs/architecture/P7_S06_S12_TIME_AND_ATTENDANCE_IMPLEMENTATION.md`.
 - **Outcome:** holiday/work calendars, shifts, site `AttendanceRecord`, device/file
   import and controlled manual correction; leave, mission and overtime; plus
   project/site/activity timesheets, approval and labor-cost distribution.
@@ -1810,6 +1817,13 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **Boundary:** attendance records when a person was present; timesheets record
   where/how approved time was consumed. Payroll consumes approved time/attendance
   facts and adjustments rather than inventing or rewriting attendance history.
+- **Implemented boundary:** Tenant-timezone calendars, holidays, cross-midnight
+  shifts and explicit breaks; manual/import attendance and retained correction/
+  reconciliation; leave, mission and overtime request evidence; immutable
+  submitted/reviewed timesheets; and conserved minute-only labor-distribution
+  preview. Payroll now consumes only explicit approved/final or Payroll-owned
+  inputs through immutable snapshots; Timekeeping still creates no rate, Payroll,
+  Project Cost or financial fact and no provider adapter or self-service is active.
 - **UI/security:** mobile/site entry, supervisor bulk review, exception queue,
   employee privacy and scope.
 - **Testing:** overlapping time, calendar/timezone, approval locks, import
@@ -1818,7 +1832,9 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P7.2 Payroll, payroll tax, and employee insurance list
 
-- **Status / priority:** **PLANNED / retained target scope**
+- **Status / priority:** **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN
+  DOCUMENTED NON-PRODUCTION BOUNDARIES; P8 PLANNING ONLY / UNAUTHORIZED.** The bounded Core Payroll record is
+  `docs/architecture/P7_S13_S22_CORE_PAYROLL_IMPLEMENTATION.md`.
 - **Outcome:** effective employment/pay components, payroll run, arrears/
   adjustments, payslip, allocations, tax/insurance calculations, employee
   insurance-list generation/validation/status, liabilities and posting/payment.
@@ -1827,6 +1843,65 @@ Stable masters + consent/privacy + support operations -> future network/AI
 - **Compliance:** annual values and schemas are effective-dated data with source,
   review and applied-version snapshot; no constants. Confirm current Tax, Labor,
   Social Security, and filing requirements before release.
+- **Implemented Core boundary:** effective employment/pay configurations, typed
+  component catalogue, bounded versioned rules, explicit periods/runs, immutable
+  input snapshots, deterministic Decimal results and lineage, review/finalization,
+  restricted payslips, arrears/off-cycle adjustment, reversal/replacement
+  history. Payroll permissions are default-denied; one user may perform multiple
+  Payroll duties only when that user independently holds every required permission.
+  Locked runs pin the authoritative versioned monetary precision and rounding
+  policies, including their snapshot, for reproducible final rounding.
+  P7-S23–S28 adds Platform-owned, source/review-gated national tax, employee-
+  insurance and official-schema versions; deterministic version-pinned Decimal
+  calculations; statutory identity evidence; immutable tax/insurance outputs;
+  correction/replacement lineage; provider-neutral export/status/error/retry
+  evidence; and output reconciliation. No statutory value or schema is seeded,
+  so unavailable authority fails closed. No AP/liability, journal, Treasury/cash,
+  Project Cost, live provider, employee self-service or production effect is active.
+  The bounded record is
+  `docs/architecture/P7_S23_S28_STATUTORY_PAYROLL_INSURANCE_IMPLEMENTATION.md`.
+  P7-S29–S32 adds immutable, idempotent Payroll-owned proposals for AP-like
+  liability, Accounting source, Treasury payment and Project Cost labor
+  distribution; separate review and evidence-only reconciliation; explicit
+  correction/reversal/replacement lineage; and conserved approved-timesheet
+  allocation. Missing mapping, payment/statutory payee authority, allocation or
+  acknowledgment remains an explicit fail-closed exception. No downstream
+  balance, journal, payment, cash movement or Project Cost actual is created.
+  The bounded record is
+  `docs/architecture/P7_S29_S32_FINANCIAL_HANDOFF_IMPLEMENTATION.md`.
+- **Product Owner acceptance (2026-10-04):** P7-S23–S28 is accepted based on
+  the completed bounded implementation, focused PostgreSQL statutory validation,
+  Core Payroll regression validation and the statutory implementation packet.
+  Acceptance preserves every fail-closed legal, schema, identifier, calendar,
+  provider and production gate. It authorizes neither real Iranian statutory
+  values nor cumulative/YTD treatment, Article 38 effects, live filing,
+  credentials, automation, liability recognition, Accounting/GL, Treasury/cash,
+  Project Cost or production activation. P7-S29–S32 subsequently proceeded only
+  under their separately accepted proposal-only boundary; P7-S33+ remained
+  unauthorized at that acceptance point.
+- **Product Owner acceptance (2026-10-04):** P7-S29–S32 is accepted based on
+  the completed implementation, focused PostgreSQL coverage, clean-schema
+  migration validation, and
+  `docs/architecture/P7_S29_S32_FINANCIAL_HANDOFF_IMPLEMENTATION.md`.
+  Acceptance covers immutable finalized-Payroll liability, Accounting-source,
+  Treasury-payment and Project Cost distribution proposals; source/version and
+  monetary-policy lineage; correction/reversal/replacement lineage; idempotency,
+  mismatch/reconciliation evidence, default-denied preparation/review permissions
+  and Persian-first RTL operations. AP/Subledger, Accounting, Treasury and
+  Project Controls retain exclusive recognition/execution authority. No automatic
+  liability recognition, subledger, journal/GL, payment/bank/cash or Project Cost
+  actual mutation, cross-domain approval, live filing/provider, notification,
+  scheduler/queue or production activation was authorized. P7-S33+ remained
+  unauthorized at that acceptance point.
+- **Product Owner acceptance (2026-10-04): P7-S33–S36 and consolidated
+  P7-S01–S36 are accepted.** The
+  [final assurance and P8 handoff packet](docs/architecture/P7_FINAL_ASSURANCE_CLOSEOUT_AND_P8_HANDOFF.md)
+  records accepted default-denied privacy/export/retention review, separated
+  Core/statutory audit visibility, handoff-family minimization, POST-only audited
+  payslip export, historical version/retroactivity assurance, golden and
+  concurrency evidence, preserved downstream no-effects, unresolved production
+  gates, and the bounded P8 entry questions. P7 is complete only within these
+  non-production boundaries; P8 remains planning-only and unauthorized.
 - **UI/security:** restricted payroll workspace, calculation explanation,
   preflight exceptions, dual approval, employee self-service only if approved.
 - **Migration/testing:** no real history exists; prefer correct opening design.

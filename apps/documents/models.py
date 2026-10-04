@@ -980,29 +980,33 @@ class AbstractTypedDocumentLink(UUIDModel, CreatedAtModel):
         super().clean()
         target = self.target
         validate_related_organizations(self, document=self.document, target=target)
+        if (
+            hasattr(self, "document_version_id")
+            and self.document_version.document_id != self.document_id
+        ):
+            raise ValidationError(
+                {"document_version": "نسخه سند باید متعلق به همان سند پیوندشده باشد."}
+            )
 
     def save(self, *args: object, **kwargs: object) -> None:
         if self.pk and not self._state.adding:
             target_id_field = f"{self.target_field_name}_id"
+            immutable_fields = [
+                "organization_id",
+                "document_id",
+                target_id_field,
+                "created_by_id",
+                "legacy_link_id",
+            ]
+            if hasattr(self, "document_version_id"):
+                immutable_fields.append("document_version_id")
             original = (
                 type(self)
                 .objects.filter(pk=self.pk)
-                .values(
-                    "organization_id",
-                    "document_id",
-                    target_id_field,
-                    "created_by_id",
-                    "legacy_link_id",
-                )
+                .values(*immutable_fields)
                 .first()
             )
-            current = {
-                "organization_id": self.organization_id,
-                "document_id": self.document_id,
-                target_id_field: getattr(self, target_id_field),
-                "created_by_id": self.created_by_id,
-                "legacy_link_id": self.legacy_link_id,
-            }
+            current = {field: getattr(self, field) for field in immutable_fields}
             if original is not None and original != current:
                 raise ValidationError("لینک نوع‌دار سند تغییرپذیر نیست.")
         self.full_clean()

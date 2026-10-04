@@ -836,6 +836,48 @@ class AuditAction(models.TextChoices):
         "employee_project_assignment.status_changed",
         "وضعیت تخصیص کارمند به پروژه تغییر کرد",
     )
+    WORKFORCE_SKILL_RECORDED = "workforce_skill.recorded", "مهارت نیروی انسانی ثبت شد"
+    WORKFORCE_COMPETENCY_RECORDED = (
+        "workforce_competency.recorded",
+        "شایستگی نیروی انسانی ثبت شد",
+    )
+    EMPLOYEE_SKILL_RECORDED = "employee_skill.recorded", "سابقه مهارت کارمند ثبت شد"
+    EMPLOYEE_QUALIFICATION_RECORDED = (
+        "employee_qualification.recorded",
+        "صلاحیت کارمند ثبت شد",
+    )
+    EMPLOYEE_QUALIFICATION_REVOKED = (
+        "employee_qualification.revoked",
+        "صلاحیت کارمند ابطال شد",
+    )
+    EMPLOYEE_QUALIFICATION_EVIDENCE_LINKED = (
+        "employee_qualification.evidence_linked",
+        "شاهد صلاحیت کارمند پیوند خورد",
+    )
+    TRAINING_REQUIREMENT_RECORDED = (
+        "training_requirement.recorded",
+        "الزام آموزشی ثبت شد",
+    )
+    EMPLOYEE_TRAINING_RECORDED = (
+        "employee_training.recorded",
+        "سابقه آموزش کارمند ثبت شد",
+    )
+    EMPLOYEE_TRAINING_EVIDENCE_LINKED = (
+        "employee_training.evidence_linked",
+        "شاهد آموزش کارمند پیوند خورد",
+    )
+    PERFORMANCE_EVALUATION_RECORDED = (
+        "performance_evaluation.recorded",
+        "ارزیابی عملکرد ثبت شد",
+    )
+    PERFORMANCE_EVALUATION_EVIDENCE_LINKED = (
+        "performance_evaluation.evidence_linked",
+        "شاهد ارزیابی عملکرد پیوند خورد",
+    )
+    LABOR_RATE_VERSION_RECORDED = (
+        "labor_rate_version.recorded",
+        "نسخه نرخ نیروی کار ثبت شد",
+    )
     PURCHASE_REQUEST_CREATED = "purchase_request.created", "درخواست خرید ایجاد شد"
     PURCHASE_REQUEST_ITEM_ADDED = (
         "purchase_request.item_added",
@@ -1139,6 +1181,76 @@ class AuditAction(models.TextChoices):
         "employee.profile_image_updated",
         "عکس پرسنلی کارمند به‌روزرسانی شد",
     )
+    TIME_CALENDAR_CONFIGURED = "time.calendar_configured", "تقویم یا شیفت ثبت شد"
+    TIME_ATTENDANCE_CAPTURED = "time.attendance_captured", "حضور ثبت شد"
+    TIME_ATTENDANCE_FINALIZED = "time.attendance_finalized", "حضور قطعی شد"
+    TIME_ATTENDANCE_CORRECTED = "time.attendance_corrected", "حضور اصلاح یا برگشت شد"
+    TIME_ATTENDANCE_IMPORTED = "time.attendance_imported", "ورودی حضور نگهداری شد"
+    TIME_REQUEST_TRANSITIONED = "time.request_transitioned", "درخواست زمانی تعیین تکلیف شد"
+    TIME_TIMESHEET_SUBMITTED = "time.timesheet_submitted", "کارکرد ارسال شد"
+    TIME_TIMESHEET_REVIEWED = "time.timesheet_reviewed", "کارکرد بررسی شد"
+    TIME_DISTRIBUTION_PREVIEWED = "time.distribution_previewed", "پیش‌نمایش توزیع کار نگهداری شد"
+    PAYROLL_CONFIGURATION_RECORDED = (
+        "payroll.configuration_recorded",
+        "نسخه پیکربندی پرداخت ثبت شد",
+    )
+    PAYROLL_CONFIGURATION_ACTIVATED = (
+        "payroll.configuration_activated",
+        "نسخه پیکربندی پرداخت فعال شد",
+    )
+    PAYROLL_CONFIGURATION_RETIRED = (
+        "payroll.configuration_retired",
+        "نسخه پیکربندی پرداخت بازنشسته شد",
+    )
+    PAYROLL_COMPONENT_CONFIGURED = (
+        "payroll.component_configured",
+        "جزء حقوق پیکربندی شد",
+    )
+    PAYROLL_RULE_RECORDED = "payroll.rule_recorded", "نسخه قاعده حقوق ثبت شد"
+    PAYROLL_RULE_ACTIVATED = "payroll.rule_activated", "نسخه قاعده حقوق فعال شد"
+    PAYROLL_RULE_RETIRED = "payroll.rule_retired", "نسخه قاعده حقوق بازنشسته شد"
+    PAYROLL_PERIOD_CREATED = "payroll.period_created", "دوره حقوق ایجاد شد"
+    PAYROLL_RUN_CREATED = "payroll.run_created", "اجرای حقوق ایجاد شد"
+    PAYROLL_INPUT_RECORDED = "payroll.input_recorded", "ورودی حقوق ثبت شد"
+    PAYROLL_ADJUSTMENT_RECORDED = "payroll.adjustment_recorded", "تعدیل حقوق ثبت شد"
+    PAYROLL_PREFLIGHT_FAILED = "payroll.preflight_failed", "پیش‌بررسی حقوق ناموفق بود"
+    PAYROLL_INPUTS_LOCKED = "payroll.inputs_locked", "ورودی‌های حقوق قفل شد"
+    PAYROLL_RUN_CALCULATED = "payroll.run_calculated", "اجرای حقوق محاسبه شد"
+    PAYROLL_RUN_SUBMITTED = "payroll.run_submitted", "اجرای حقوق برای بررسی ارسال شد"
+    PAYROLL_RUN_APPROVED = "payroll.run_approved", "اجرای حقوق تأیید شد"
+    PAYROLL_RUN_FINALIZED = "payroll.run_finalized", "اجرای حقوق قطعی شد"
+    PAYROLL_EXCEPTION_RESOLVED = "payroll.exception_resolved", "استثنای حقوق رفع شد"
+    PAYROLL_RUN_REVERSED = "payroll.run_reversed", "اجرای حقوق برگشت و مرتبط شد"
+    PAYROLL_STATUTORY_CALCULATED = (
+        "payroll.statutory_calculated",
+        "محاسبه مقرراتی حقوق ثبت شد",
+    )
+    PAYROLL_STATUTORY_REVIEWED = (
+        "payroll.statutory_reviewed",
+        "محاسبه مقرراتی حقوق بررسی شد",
+    )
+    PAYROLL_STATUTORY_IDENTITY_RECORDED = (
+        "payroll.statutory_identity_recorded",
+        "شاهد هویت مقرراتی حقوق ثبت شد",
+    )
+    PAYROLL_STATUTORY_OUTPUT_GENERATED = (
+        "payroll.statutory_output_generated",
+        "خروجی مقرراتی حقوق تولید شد",
+    )
+    PAYROLL_STATUTORY_EXPORT_RECORDED = (
+        "payroll.statutory_export_recorded",
+        "شاهد خروجی مقرراتی حقوق ثبت شد",
+    )
+    PAYROLL_STATUTORY_RESOLVED = (
+        "payroll.statutory_resolved",
+        "خطای خروجی مقرراتی حقوق تعیین تکلیف شد",
+    )
+    PAYROLL_FINANCIAL_HANDOFF_PREPARED = "payroll.financial_handoff_prepared", "پیشنهاد تحویل مالی حقوق تهیه شد"
+    PAYROLL_FINANCIAL_HANDOFF_REVIEWED = "payroll.financial_handoff_reviewed", "پیشنهاد تحویل مالی حقوق بررسی شد"
+    PAYROLL_FINANCIAL_HANDOFF_ACKNOWLEDGED = "payroll.financial_handoff_acknowledged", "شاهد دریافت تحویل مالی حقوق ثبت شد"
+    PAYROLL_FINANCIAL_HANDOFF_RECONCILED = "payroll.financial_handoff_reconciled", "تطبیق تحویل مالی حقوق ثبت شد"
+    PAYSLIP_VIEWED = "payroll.payslip_viewed", "فیش حقوق مشاهده شد"
+    PAYSLIP_EXPORTED = "payroll.payslip_exported", "فیش حقوق خروجی گرفته شد"
     USER_PASSWORD_INITIALIZED = (
         "user.password_initialized",
         "گذرواژه شخصی کاربر تعیین شد",

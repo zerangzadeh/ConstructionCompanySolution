@@ -6,6 +6,17 @@ app_name = "workforce"
 
 urlpatterns = [
     path("", views.employee_list, name="employee_list"),
+    path("foundation/", views.workforce_foundation, name="foundation"),
+    path("foundation/skills/create/", views.workforce_skill_create, name="skill_create"),
+    path("foundation/competencies/create/", views.workforce_competency_create, name="competency_create"),
+    path("foundation/employee-skills/create/", views.workforce_employee_skill_create, name="employee_skill_create"),
+    path("foundation/qualifications/create/", views.workforce_qualification_create, name="qualification_create"),
+    path("foundation/qualifications/<uuid:qualification_id>/revoke/", views.workforce_qualification_revoke, name="qualification_revoke"),
+    path("foundation/training-requirements/create/", views.workforce_training_requirement_create, name="training_requirement_create"),
+    path("foundation/training-records/create/", views.workforce_training_record_create, name="training_record_create"),
+    path("foundation/performance/create/", views.workforce_performance_create, name="performance_create"),
+    path("foundation/evidence/<str:target_type>/<uuid:target_id>/upload/", views.workforce_evidence_upload, name="evidence_upload"),
+    path("foundation/labor-rates/create/", views.workforce_labor_rate_create, name="labor_rate_create"),
     path("employees/create/", views.employee_create, name="employee_create"),
     path(
         "employees/positions/",

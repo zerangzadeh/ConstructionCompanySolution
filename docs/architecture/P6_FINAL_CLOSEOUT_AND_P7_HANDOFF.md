@@ -1,7 +1,11 @@
 # P6 Final Closeout and P7 Handoff
 
-**Status:** P6-S39–S42 Product Owner accepted on 2026-10-03. P7 functionality
-and production activation remain unauthorized.
+**Status:** P6-S39–S42 Product Owner accepted on 2026-10-03. P7-S01–S05 is
+subsequently Product Owner accepted as a bounded Workforce foundation; P7-S06–S12
+is subsequently Product Owner accepted; P7-S13–S22 is subsequently Product Owner
+accepted. P7-S01–S36 is subsequently Product Owner accepted and complete within
+its documented non-production boundaries. P8 remains planning-only and production
+activation remains unauthorized.
 
 ## Delivered P6-S39–S40 review boundary
 
@@ -30,11 +34,15 @@ GL/journals, Treasury or cash.
 
 ## P6-S42 handoff
 
-P7 remains a separate future workforce/time/payroll/insurance domain. Future P7
-authorization must define ownership, lifecycle, permissions, SoD, evidence,
-legal/insurance values, integrations, posting/cash boundaries and production
-criteria. P6 supplies only retained read-only references; it does not authorize
-P7 to mutate or infer P6 entitlement, commercial or financial facts.
+P7 remains a separate workforce/time/payroll/insurance domain. P7-S01–S05
+delivered Workforce capability/evidence/rate history and P7-S06–S12 later added
+bounded Timekeeping evidence; their exact boundaries are recorded in the two P7
+implementation records. P7-S13–S22 defines the bounded non-posting Core Payroll
+authority; P7-S23–S28 defines the bounded fail-closed statutory payroll/insurance
+framework; P7-S29–S32 adds proposal-only financial handoffs; and P7-S33–S36
+closes assurance without activating consumers. P6 supplies only
+retained read-only references; P7-S06–S12 does not mutate or infer P6 entitlement,
+commercial or financial facts.
 
 ## Validation
 

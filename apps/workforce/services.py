@@ -3,12 +3,14 @@ from datetime import date
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import QuerySet
+from django.db.models import Q, QuerySet
 from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.documents.link_registry import create_typed_link
+from apps.documents.models import Document
 from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import (
     BusinessPermissionCode,
@@ -20,13 +22,25 @@ from apps.organizations.models import (
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import (
     AssignmentStatus,
+    Competency,
     Department,
     Employee,
     EmployeePositionAssignment,
     EmployeeProjectAssignment,
+    EmployeeQualification,
+    EmployeeQualificationLifecycleEvent,
+    EmployeeSkillRecord,
     EmployeeStatus,
+    EmployeeTrainingRecord,
+    LaborRateVersion,
+    PerformanceEvaluation,
     Position,
     PositionAssignmentStatus,
+    QualificationKind,
+    QualificationLifecycleEventKind,
+    Skill,
+    TrainingOutcome,
+    TrainingRequirement,
     WorkTeam,
 )
 
@@ -1264,3 +1278,234 @@ def archive_work_team(
         entity_type="work_team",
         permission=BusinessPermissionCode.WORK_TEAMS_ARCHIVE,
     )
+
+
+def _require_workforce_permission(
+    *, organization: Organization, actor: User, permission: BusinessPermissionCode, project: Project | None = None
+) -> None:
+    _require_active_access(organization=organization, user=actor, permission=permission)
+    if project is not None:
+        require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=permission,
+            project=project,
+            message="اجازه انجام عملیات نیروی انسانی در این پروژه را ندارید.",
+        )
+
+
+def _record_workforce_audit(
+    *, action: AuditAction, entity_type: str, entity_id: object, organization: Organization, actor: User, metadata: Mapping[str, object]
+) -> None:
+    record_audit_event(
+        action=action,
+        entity_type=entity_type,
+        entity_id=entity_id,
+        organization=organization,
+        actor=actor,
+        metadata=dict(metadata),
+    )
+
+
+@transaction.atomic
+def create_skill(*, organization: Organization, actor: User, code: str, name: str, description: str = "") -> Skill:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+    skill = Skill(organization=organization, code=code, name=name, description=description.strip(), created_by=actor)
+    _save_validated(skill, "مهارت معتبر نیست یا کد آن تکراری است.")
+    _record_workforce_audit(action=AuditAction.WORKFORCE_SKILL_RECORDED, entity_type="workforce_skill", entity_id=skill.pk, organization=organization, actor=actor, metadata={"code": skill.code})
+    return skill
+
+
+@transaction.atomic
+def create_competency(*, organization: Organization, actor: User, code: str, name: str, description: str = "") -> Competency:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+    competency = Competency(organization=organization, code=code, name=name, description=description.strip(), created_by=actor)
+    _save_validated(competency, "شایستگی معتبر نیست یا کد آن تکراری است.")
+    _record_workforce_audit(action=AuditAction.WORKFORCE_COMPETENCY_RECORDED, entity_type="workforce_competency", entity_id=competency.pk, organization=organization, actor=actor, metadata={"code": competency.code})
+    return competency
+
+
+def _require_effective_interval_available(*, queryset: QuerySet, effective_from: date, effective_to: date | None, message: str) -> None:
+    interval_end = effective_to or date.max
+    if queryset.select_for_update().filter(effective_from__lte=interval_end).filter(Q(effective_to__isnull=True) | Q(effective_to__gte=effective_from)).exists():
+        raise ValueError(message)
+
+
+@transaction.atomic
+def record_employee_skill(
+    *, organization: Organization, actor: User, employee: Employee, skill: Skill, competency: Competency | None,
+    proficiency_level: int, effective_from: date, effective_to: date | None = None, notes: str = "",
+) -> EmployeeSkillRecord:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+    _require_same_organization(organization, employee=employee)
+    if skill.organization_id != organization.pk or (competency and competency.organization_id != organization.pk):
+        raise PermissionDenied("مهارت یا شایستگی متعلق به این سازمان نیست.")
+    _require_effective_interval_available(
+        queryset=EmployeeSkillRecord.objects.filter(organization=organization, employee=employee, skill=skill),
+        effective_from=effective_from, effective_to=effective_to,
+        message="برای این مهارت، سابقه مؤثر هم‌پوشان وجود دارد.",
+    )
+    record = EmployeeSkillRecord(organization=organization, employee=employee, skill=skill, competency=competency, proficiency_level=proficiency_level, effective_from=effective_from, effective_to=effective_to, notes=notes.strip(), recorded_by=actor)
+    _save_validated(record, "سابقه مهارت کارمند معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.EMPLOYEE_SKILL_RECORDED, entity_type="employee_skill_record", entity_id=record.pk, organization=organization, actor=actor, metadata={"employee_id": str(employee.pk), "skill_id": str(skill.pk), "effective_from": effective_from.isoformat()})
+    return record
+
+
+@transaction.atomic
+def record_employee_qualification(
+    *, organization: Organization, actor: User, employee: Employee, kind: str, title: str, issuer: str = "", reference_number: str = "", issued_on: date | None = None, valid_until: date | None = None,
+) -> EmployeeQualification:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
+    _require_same_organization(organization, employee=employee)
+    if kind not in QualificationKind.values:
+        raise ValueError("نوع صلاحیت معتبر نیست.")
+    qualification = EmployeeQualification(organization=organization, employee=employee, kind=kind, title=title, issuer=issuer, reference_number=reference_number, issued_on=issued_on, valid_until=valid_until, recorded_by=actor)
+    _save_validated(qualification, "صلاحیت کارمند معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.EMPLOYEE_QUALIFICATION_RECORDED, entity_type="employee_qualification", entity_id=qualification.pk, organization=organization, actor=actor, metadata={"employee_id": str(employee.pk), "kind": kind, "valid_until": valid_until.isoformat() if valid_until else None})
+    return qualification
+
+
+@transaction.atomic
+def revoke_employee_qualification(*, organization: Organization, actor: User, qualification: EmployeeQualification, occurred_on: date, reason: str) -> EmployeeQualificationLifecycleEvent:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_REVOKE)
+    _require_same_organization(organization, employee=qualification.employee)
+    locked = EmployeeQualification.objects.select_for_update().get(pk=qualification.pk, organization=organization)
+    if locked.lifecycle_events.filter(kind__in=[QualificationLifecycleEventKind.REVOKED, QualificationLifecycleEventKind.SUPERSEDED]).exists():
+        raise ValueError("صلاحیت قبلاً ابطال یا جایگزین شده است.")
+    event = EmployeeQualificationLifecycleEvent(organization=organization, qualification=locked, kind=QualificationLifecycleEventKind.REVOKED, occurred_on=occurred_on, reason=reason, recorded_by=actor)
+    _save_validated(event, "رویداد ابطال صلاحیت معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.EMPLOYEE_QUALIFICATION_REVOKED, entity_type="employee_qualification", entity_id=locked.pk, organization=organization, actor=actor, metadata={"event_id": str(event.pk), "occurred_on": occurred_on.isoformat()})
+    return event
+
+
+@transaction.atomic
+def create_training_requirement(
+    *, organization: Organization, actor: User, code: str, name: str, competency: Competency | None = None, position: Position | None = None, project: Project | None = None, description: str = "",
+) -> TrainingRequirement:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE, project=project)
+    if (competency and competency.organization_id != organization.pk) or (position and position.organization_id != organization.pk) or (project and project.organization_id != organization.pk):
+        raise PermissionDenied("دامنه الزام آموزشی متعلق به این سازمان نیست.")
+    requirement = TrainingRequirement(organization=organization, code=code, name=name, description=description.strip(), competency=competency, position=position, project=project, created_by=actor)
+    _save_validated(requirement, "الزام آموزشی معتبر نیست یا کد آن تکراری است.")
+    _record_workforce_audit(action=AuditAction.TRAINING_REQUIREMENT_RECORDED, entity_type="training_requirement", entity_id=requirement.pk, organization=organization, actor=actor, metadata={"code": requirement.code, "project_id": str(project.pk) if project else None})
+    return requirement
+
+
+@transaction.atomic
+def record_employee_training(*, organization: Organization, actor: User, employee: Employee, requirement: TrainingRequirement, occurred_on: date, outcome: str, notes: str = "") -> EmployeeTrainingRecord:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE, project=requirement.project)
+    _require_same_organization(organization, employee=employee)
+    if requirement.organization_id != organization.pk:
+        raise PermissionDenied("الزام آموزشی متعلق به این سازمان نیست.")
+    if outcome not in TrainingOutcome.values:
+        raise ValueError("نتیجه آموزش معتبر نیست.")
+    record = EmployeeTrainingRecord(organization=organization, employee=employee, requirement=requirement, occurred_on=occurred_on, outcome=outcome, notes=notes.strip(), recorded_by=actor)
+    _save_validated(record, "سابقه آموزش کارمند معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.EMPLOYEE_TRAINING_RECORDED, entity_type="employee_training_record", entity_id=record.pk, organization=organization, actor=actor, metadata={"employee_id": str(employee.pk), "requirement_id": str(requirement.pk), "outcome": outcome})
+    return record
+
+
+@transaction.atomic
+def record_performance_evaluation(*, organization: Organization, actor: User, employee: Employee, period_start: date, period_end: date, criteria_snapshot: Mapping[str, object], result_summary: str) -> PerformanceEvaluation:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE)
+    _require_same_organization(organization, employee=employee)
+    evaluation = PerformanceEvaluation(organization=organization, employee=employee, period_start=period_start, period_end=period_end, criteria_snapshot=dict(criteria_snapshot), result_summary=result_summary, evaluated_by=actor, recorded_by=actor)
+    _save_validated(evaluation, "ارزیابی عملکرد معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.PERFORMANCE_EVALUATION_RECORDED, entity_type="performance_evaluation", entity_id=evaluation.pk, organization=organization, actor=actor, metadata={"employee_id": str(employee.pk), "period_start": period_start.isoformat(), "period_end": period_end.isoformat()})
+    return evaluation
+
+
+@transaction.atomic
+def record_labor_rate_version(*, organization: Organization, actor: User, employee: Employee, component_name: str, unit_label: str, currency_code: str, rate_amount, effective_from: date, effective_to: date | None = None, notes: str = "") -> LaborRateVersion:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_LABOR_RATES_MANAGE)
+    _require_same_organization(organization, employee=employee)
+    _require_effective_interval_available(queryset=LaborRateVersion.objects.filter(organization=organization, employee=employee, component_name=component_name.strip()), effective_from=effective_from, effective_to=effective_to, message="برای این جزء هزینه، نسخه نرخ مؤثر هم‌پوشان وجود دارد.")
+    version = LaborRateVersion(organization=organization, employee=employee, component_name=component_name, unit_label=unit_label, currency_code=currency_code, rate_amount=rate_amount, effective_from=effective_from, effective_to=effective_to, notes=notes.strip(), recorded_by=actor)
+    _save_validated(version, "نسخه نرخ نیروی کار معتبر نیست.")
+    _record_workforce_audit(action=AuditAction.LABOR_RATE_VERSION_RECORDED, entity_type="labor_rate_version", entity_id=version.pk, organization=organization, actor=actor, metadata={"employee_id": str(employee.pk), "component_name": version.component_name, "effective_from": effective_from.isoformat()})
+    return version
+
+
+def get_workforce_skills(*, organization: Organization, actor: User) -> QuerySet[Skill]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_SKILLS_VIEW)
+    return Skill.objects.filter(organization=organization, archived_at__isnull=True).order_by("name")
+
+
+def get_workforce_competencies(*, organization: Organization, actor: User) -> QuerySet[Competency]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_SKILLS_VIEW)
+    return Competency.objects.filter(organization=organization, archived_at__isnull=True).order_by("name")
+
+
+def get_employee_qualifications(*, organization: Organization, actor: User, employee: Employee) -> QuerySet[EmployeeQualification]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW)
+    _require_same_organization(organization, employee=employee)
+    return EmployeeQualification.objects.filter(organization=organization, employee=employee).prefetch_related("lifecycle_events", "typed_document_links")
+
+
+def get_employee_training_records(*, organization: Organization, actor: User, employee: Employee) -> QuerySet[EmployeeTrainingRecord]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW)
+    _require_same_organization(organization, employee=employee)
+    return EmployeeTrainingRecord.objects.filter(organization=organization, employee=employee).select_related("requirement").prefetch_related("typed_document_links")
+
+
+def get_performance_evaluations(*, organization: Organization, actor: User, employee: Employee) -> QuerySet[PerformanceEvaluation]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW)
+    _require_same_organization(organization, employee=employee)
+    return PerformanceEvaluation.objects.filter(organization=organization, employee=employee).prefetch_related("typed_document_links")
+
+
+def get_labor_rate_versions(*, organization: Organization, actor: User, employee: Employee) -> QuerySet[LaborRateVersion]:
+    _require_workforce_permission(organization=organization, actor=actor, permission=BusinessPermissionCode.WORKFORCE_LABOR_RATES_VIEW)
+    _require_same_organization(organization, employee=employee)
+    return LaborRateVersion.objects.filter(organization=organization, employee=employee)
+
+
+@transaction.atomic
+def link_workforce_evidence(
+    *, organization: Organization, actor: User, document: Document,
+    target: EmployeeQualification | EmployeeTrainingRecord | PerformanceEvaluation,
+) -> object:
+    """Append a typed DMS evidence link after both domain and document checks."""
+
+    if isinstance(target, PerformanceEvaluation):
+        permission = BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE
+        target_type = "performance_evaluation"
+        action = AuditAction.PERFORMANCE_EVALUATION_EVIDENCE_LINKED
+        entity_type = "performance_evaluation"
+    elif isinstance(target, EmployeeTrainingRecord):
+        permission = BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE
+        target_type = "employee_training"
+        action = AuditAction.EMPLOYEE_TRAINING_EVIDENCE_LINKED
+        entity_type = "employee_training_record"
+    elif isinstance(target, EmployeeQualification):
+        permission = BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE
+        target_type = "employee_qualification"
+        action = AuditAction.EMPLOYEE_QUALIFICATION_EVIDENCE_LINKED
+        entity_type = "employee_qualification"
+    else:
+        raise TypeError("نوع شاهد نیروی انسانی پشتیبانی نمی‌شود.")
+    _require_workforce_permission(organization=organization, actor=actor, permission=permission)
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.DOCUMENTS_VIEW,
+        message="اجازه استفاده از سند موجود را ندارید.",
+    )
+    # The DMS service repeats complete-context authorization for every retained
+    # existing link before a Workforce record may reference the document.
+    from apps.documents.services import get_organization_document
+
+    document = get_organization_document(
+        user=actor, organization=organization, document_id=str(document.pk)
+    )
+    if document.organization_id != organization.pk or target.organization_id != organization.pk:
+        raise PermissionDenied("سند یا رکورد نیروی انسانی متعلق به این سازمان نیست.")
+    link = create_typed_link(
+        organization=organization,
+        document=document,
+        created_by=actor,
+        target_type=target_type,
+        target=target,
+    )
+    _record_workforce_audit(action=action, entity_type=entity_type, entity_id=target.pk, organization=organization, actor=actor, metadata={"document_id": str(document.pk), "link_id": str(link.pk)})
+    return link

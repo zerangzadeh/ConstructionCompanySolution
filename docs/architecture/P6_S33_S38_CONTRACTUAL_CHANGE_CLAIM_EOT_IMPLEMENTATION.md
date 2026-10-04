@@ -91,8 +91,9 @@ contract amendment/value consumption, schedule rebaseline, cost/forecast impact,
 Billing or financial handoff, legal/notice/valuation/delay rules, notifications,
 external transmission, scheduler/queue behavior and production activation require
 separate authorization. P6-S39–S42 later proceeded under bounded authorization
-and is implementation complete / Product Owner acceptance pending; P7+ remains
-unauthorized.
+and is implementation complete / Product Owner acceptance pending; P7 is
+subsequently Product Owner accepted and complete within documented non-production
+boundaries. P8 remains planning-only.
 
 The previously documented materials/document-link/platform-policy permission-
 registry gaps remain unresolved and unchanged; the validation above preserves

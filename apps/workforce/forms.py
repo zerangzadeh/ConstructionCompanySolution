@@ -1,9 +1,24 @@
 from django import forms
 
 from apps.accounts.models import User
+from apps.documents.models import (
+    DocumentCategory,
+    DocumentConfidentiality,
+    DocumentType,
+)
 from apps.organizations.models import MembershipStatus, Organization
 from apps.projects.models import Project, ProjectSite
-from apps.workforce.models import Department, Employee, Position, WorkTeam
+from apps.workforce.models import (
+    Competency,
+    Department,
+    Employee,
+    Position,
+    QualificationKind,
+    Skill,
+    TrainingOutcome,
+    TrainingRequirement,
+    WorkTeam,
+)
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
 
@@ -126,6 +141,100 @@ class EmployeeProfileImageInput(forms.ClearableFileInput):
 
     template_name = "widgets/profile_image_input.html"
     clear_checkbox_label = "حذف عکس فعلی"
+
+
+class WorkforceCatalogueForm(_StyledForm):
+    code = forms.CharField(label="کد", max_length=50)
+    name = forms.CharField(label="نام", max_length=255)
+    description = forms.CharField(label="شرح", required=False, widget=forms.Textarea(attrs={"rows": 3}))
+
+    def clean_code(self) -> str:
+        return canonicalize_upper_identifier(self.cleaned_data["code"])
+
+
+class EmployeeSkillRecordForm(_StyledForm):
+    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    skill = forms.ModelChoiceField(label="مهارت", queryset=Skill.objects.none())
+    competency = forms.ModelChoiceField(label="شایستگی مرتبط", queryset=Competency.objects.none(), required=False)
+    proficiency_level = forms.IntegerField(label="سطح مهارت", min_value=1, max_value=5)
+    effective_from = forms.DateField(label="مؤثر از", widget=forms.DateInput(attrs={"type": "date"}))
+    effective_to = forms.DateField(label="مؤثر تا", required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    notes = forms.CharField(label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
+        self.fields["skill"].queryset = Skill.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+        self.fields["competency"].queryset = Competency.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+
+
+class EmployeeQualificationForm(_StyledForm):
+    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    kind = forms.ChoiceField(label="نوع", choices=QualificationKind.choices)
+    title = forms.CharField(label="عنوان", max_length=255)
+    issuer = forms.CharField(label="مرجع صادرکننده", max_length=255, required=False)
+    reference_number = forms.CharField(label="شماره مرجع", max_length=100, required=False)
+    issued_on = forms.DateField(label="تاریخ صدور", required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    valid_until = forms.DateField(label="تاریخ اعتبار", required=False, widget=forms.DateInput(attrs={"type": "date"}))
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
+
+
+class TrainingRequirementForm(WorkforceCatalogueForm):
+    competency = forms.ModelChoiceField(label="شایستگی مرتبط", queryset=Competency.objects.none(), required=False)
+    position = forms.ModelChoiceField(label="سمت مرتبط", queryset=Position.objects.none(), required=False)
+    project = forms.ModelChoiceField(label="پروژه مرتبط", queryset=Project.objects.none(), required=False)
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["competency"].queryset = Competency.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+        self.fields["position"].queryset = Position.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+        self.fields["project"].queryset = Project.objects.filter(organization=organization, deleted_at__isnull=True)
+
+
+class EmployeeTrainingRecordForm(_StyledForm):
+    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    requirement = forms.ModelChoiceField(label="الزام آموزشی", queryset=TrainingRequirement.objects.none())
+    occurred_on = forms.DateField(label="تاریخ", widget=forms.DateInput(attrs={"type": "date"}))
+    outcome = forms.ChoiceField(label="نتیجه", choices=TrainingOutcome.choices)
+    notes = forms.CharField(label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
+        self.fields["requirement"].queryset = TrainingRequirement.objects.filter(organization=organization, is_active=True, archived_at__isnull=True)
+
+
+class PerformanceEvaluationForm(_StyledForm):
+    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    period_start = forms.DateField(label="شروع دوره", widget=forms.DateInput(attrs={"type": "date"}))
+    period_end = forms.DateField(label="پایان دوره", widget=forms.DateInput(attrs={"type": "date"}))
+    criteria_snapshot = forms.JSONField(label="شواهد معیارها", widget=forms.Textarea(attrs={"rows": 5}), help_text="یک شیء JSON غیرخالی وارد کنید.")
+    result_summary = forms.CharField(label="نتیجه", widget=forms.Textarea(attrs={"rows": 4}))
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
+
+
+class LaborRateVersionForm(_StyledForm):
+    employee = forms.ModelChoiceField(label="کارمند", queryset=Employee.objects.none())
+    component_name = forms.CharField(label="جزء هزینه", max_length=255)
+    unit_label = forms.CharField(label="واحد", max_length=50)
+    currency_code = forms.CharField(label="کد ارز", max_length=3)
+    rate_amount = forms.DecimalField(label="نرخ", max_digits=18, decimal_places=2, min_value=0)
+    effective_from = forms.DateField(label="مؤثر از", widget=forms.DateInput(attrs={"type": "date"}))
+    effective_to = forms.DateField(label="مؤثر تا", required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    notes = forms.CharField(label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 3}))
+
+    def __init__(self, *args: object, organization: Organization, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["employee"].queryset = Employee.objects.filter(organization=organization, archived_at__isnull=True)
+
+    def clean_currency_code(self) -> str:
+        return self.cleaned_data["currency_code"].strip().upper()
 
 
 class EmployeeForm(_StyledForm):
@@ -375,3 +484,48 @@ class AssignmentStatusTransitionForm(_StyledForm):
     ) -> None:
         super().__init__(*args, **kwargs)
         self.fields["target_status"].choices = choices
+
+
+class WorkforceEvidenceUploadForm(_StyledForm):
+    """First DMS version for an immutable Workforce evidence record."""
+
+    document_type = forms.ChoiceField(label="نوع سند", choices=DocumentType.choices)
+    title = forms.CharField(label="عنوان سند", max_length=255)
+    category = forms.ModelChoiceField(
+        label="دسته‌بندی", queryset=DocumentCategory.objects.none(), required=False
+    )
+    confidentiality = forms.ChoiceField(
+        label="سطح محرمانگی",
+        choices=DocumentConfidentiality.choices,
+        initial=DocumentConfidentiality.INTERNAL,
+    )
+    access_expires_at = forms.DateTimeField(
+        label="پایان دسترسی",
+        required=False,
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+    )
+    reference = forms.CharField(label="شماره مرجع", max_length=120, required=False)
+    description = forms.CharField(
+        label="توضیحات", required=False, widget=forms.Textarea(attrs={"rows": 3})
+    )
+    file = forms.FileField(label="فایل نسخه اول")
+
+    def __init__(
+        self, *args: object, organization: Organization, **kwargs: object
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["category"].queryset = DocumentCategory.objects.filter(
+            organization=organization, archived_at__isnull=True
+        ).order_by("name")
+
+
+class QualificationRevocationForm(_StyledForm):
+    occurred_on = forms.DateField(
+        label="تاریخ ابطال",
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    reason = forms.CharField(
+        label="علت ابطال",
+        max_length=1000,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )

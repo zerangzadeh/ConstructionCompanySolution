@@ -1192,13 +1192,13 @@ activation remain unauthorized.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P7-S01..S05 | 5 | `T-M` | Skills, qualifications, training, labor-rate versions and privacy UI |
-| P7-S06..S12 | 7 | `A-H` | Calendars/shifts, attendance, leave, mission, overtime and timesheets |
-| P7-S13..S22 | 10 | `A-X` | Payroll rule/run/result engine, locks, adjustments and reversal |
-| P7-S23..S28 | 6 | `A-X` | Payroll tax and employee-insurance list generation/submission evidence |
-| P7-S29..S32 | 4 | `A-H` | Payroll liability, Treasury payment, Accounting posting and Project Cost distribution |
-| P7-S33..S35 | 3 | `A-X` | Privacy, retroactivity, rule-version, reconciliation and golden-case review |
-| P7-S36 | 1 | `L-M` | Documentation closeout and P8 handoff packet |
+| P7-S01..S05 | 5 | `T-M` | Product Owner accepted. Skills, qualifications, training, immutable DMS evidence, labor-rate versions and privacy UI; no financial consumer |
+| P7-S06..S12 | 7 | `A-H` | Product Owner accepted. Tenant-timezone calendars/shifts, controlled attendance/import/correction, leave/mission/overtime evidence, immutable timesheets and conserved minute-only non-posting distribution preview; P7-S23–S32 are subsequently Product Owner accepted |
+| P7-S13..S22 | 10 | `A-X` | Product Owner accepted. Default-denied non-posting Core Payroll rule/run/result engine, immutable snapshots, version-pinned monetary-policy snapshots, locks, payslips, adjustments and reversal/replacement lineage; statutory and financial consumers remain gated |
+| P7-S23..S28 | 6 | `A-X` | Product Owner accepted: source/review-gated Payroll tax and employee-insurance calculation, schema-pinned lists, statutory identity/export/submission evidence, correction lineage and reconciliation; no seeded statutory value/schema, live filing or financial effect |
+| P7-S29..S32 | 4 | `A-H` | Product Owner accepted: immutable Payroll liability, Accounting-source, Treasury-payment and Project Cost distribution proposals with lineage and reconciliation; no downstream financial execution |
+| P7-S33..S35 | 3 | `A-X` | Product Owner accepted. Privacy/minimization and audited export review, separated sensitive audit/family access, historical version/retroactivity, reconciliation, golden-case, concurrency and downstream no-effect assurance |
+| P7-S36 | 1 | `L-M` | Product Owner accepted. Final closeout/readiness record and bounded P8 planning handoff; no P8 implementation or production activation |
 
 **Product Owner gates:** employment/pay models, attendance providers, overtime and
 leave policy, payroll privacy/SoD, statutory schemas and professional sign-off.

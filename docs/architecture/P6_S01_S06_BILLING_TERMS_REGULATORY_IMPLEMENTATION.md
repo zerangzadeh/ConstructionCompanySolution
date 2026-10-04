@@ -4,7 +4,8 @@
 **Status:** Product Owner accepted on 2026-10-03 together with P6-S07–S13,
 subject to the current P6-S26–S32 regulatory-governance correction and the open
 gates below. P6-S01–S38 is accepted; P6-S39–S42 is implementation complete /
-Product Owner acceptance pending; P7+ remains unauthorized.
+Product Owner acceptance pending; P7 is subsequently Product Owner accepted and
+complete within documented non-production boundaries. P8 remains planning-only.
 
 ## Authorized boundary
 

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}نسخه‌های مقرراتی حقوق | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="مالکیت پلتفرم" page_title="قواعد و طرح‌های رسمی مالیات و بیمه" page_description="Tenant فقط نسخه‌های ملی منتشرشده و مؤثر را مشاهده می‌کند؛ انتخاب، تغییر یا override محلی مجاز نیست." only %}
+<div class="mt-5 flex gap-2"><a class="erp-btn erp-btn--secondary" href="{% url 'payroll:workbench' %}">بازگشت به حقوق</a></div>
+{% if missing_codes %}<div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">برخی authorityهای کد-محور هنوز توسط Platform Admin ایجاد/منتشر نشده‌اند؛ قابلیت مربوطه fail-closed باقی می‌ماند.</div>{% endif %}
+<section class="mt-5 grid gap-4 xl:grid-cols-2">
+  <article class="erp-surface rounded-2xl p-5"><h2 class="font-black">authorityهای پلتفرم</h2><ul class="mt-3 space-y-2 text-sm">{% for item in policies %}<li class="rounded-lg bg-slate-50 p-3"><b dir="ltr">{{ item.code }}</b><span class="block">{{ item.name }}</span><span class="text-xs text-slate-500">ملی · غیرقابل انتخاب Tenant · {{ item.get_sensitivity_display }}</span></li>{% empty %}<li class="text-slate-500">هنوز authority منتشرشده‌ای وجود ندارد.</li>{% endfor %}</ul></article>
+  <article class="erp-surface rounded-2xl p-5"><h2 class="font-black">نسخه و شواهد انتشار</h2><div class="mt-3 overflow-x-auto"><table class="min-w-full text-sm"><thead><tr class="text-right text-xs text-slate-500"><th class="p-2">سیاست</th><th class="p-2">نسخه</th><th class="p-2">اثر</th><th class="p-2">وضعیت</th></tr></thead><tbody>{% for item in versions %}<tr class="border-t"><td class="p-2" dir="ltr">{{ item.policy.code }}</td><td class="p-2">v{{ item.version }}</td><td class="p-2">{{ item.effective_from|jalali_date }} تا {{ item.effective_to|jalali_date|default:"باز" }}</td><td class="p-2">{{ item.get_status_display }}</td></tr>{% empty %}<tr><td colspan="4" class="p-4 text-slate-500">نسخه‌ای وجود ندارد؛ محاسبه و خروجی متوقف است.</td></tr>{% endfor %}</tbody></table></div></article>
+</section>
+{% endblock %}

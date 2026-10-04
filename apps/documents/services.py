@@ -18,6 +18,7 @@ from apps.daily_reports.models import DailyReport
 from apps.documents.link_registry import (
     DOCUMENT_LINK_TYPES,
     create_typed_link,
+    registered_link_type,
     typed_links_for_document,
 )
 from apps.documents.models import (
@@ -72,6 +73,11 @@ from apps.organizations.models import (
 )
 from apps.payments.models import Payment
 from apps.projects.models import Project
+from apps.workforce.models import (
+    EmployeeQualification,
+    EmployeeTrainingRecord,
+    PerformanceEvaluation,
+)
 
 if TYPE_CHECKING:
     from django.core.files.uploadedfile import UploadedFile
@@ -100,6 +106,9 @@ TARGET_MODELS = {
     "expense": Expense,
     "payment": Payment,
     "daily_report": DailyReport,
+    "employee_qualification": EmployeeQualification,
+    "employee_training": EmployeeTrainingRecord,
+    "performance_evaluation": PerformanceEvaluation,
 }
 TARGET_VIEW_PERMISSIONS = {
     "material": BusinessPermissionCode.MATERIALS_VIEW,
@@ -109,6 +118,9 @@ TARGET_VIEW_PERMISSIONS = {
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
     "payment": BusinessPermissionCode.PAYMENTS_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
+    "employee_qualification": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+    "employee_training": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+    "performance_evaluation": BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
 }
 LINK_PREFETCHES = tuple(
     f"links__{field_name}" for field_name in DOCUMENT_LINK_TARGET_FIELDS
@@ -327,7 +339,8 @@ def create_document(
     )
     document.current_version = version
     document.save(update_fields=["current_version", "updated_at"])
-    if target_field == "material":
+    link_type = registered_link_type(target_field)
+    if not link_type.legacy_compatible or target_field == "material":
         create_typed_link(
             organization=organization,
             document=document,

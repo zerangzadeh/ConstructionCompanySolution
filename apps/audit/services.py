@@ -6,7 +6,10 @@ from django.db.models import QuerySet
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
-from apps.organizations.authorization import require_business_permission
+from apps.organizations.authorization import (
+    membership_has_permission,
+    require_business_permission,
+)
 from apps.organizations.models import (
     BusinessPermissionCode,
     MembershipStatus,
@@ -15,6 +18,17 @@ from apps.organizations.models import (
 
 _SENSITIVE_METADATA_KEY_PARTS = frozenset(
     {"password", "token", "secret", "credential", "authorization"}
+)
+
+_STATUTORY_PAYROLL_AUDIT_ACTIONS = frozenset(
+    action
+    for action in AuditAction.values
+    if action.startswith("payroll.statutory_")
+)
+_CORE_PAYROLL_AUDIT_ACTIONS = frozenset(
+    action
+    for action in AuditAction.values
+    if action.startswith("payroll.") and action not in _STATUTORY_PAYROLL_AUDIT_ACTIONS
 )
 
 
@@ -83,14 +97,23 @@ def get_organization_audit_events(
 ) -> QuerySet[AuditEvent]:
     """Return audit events only for an active organization membership."""
 
-    require_business_permission(
+    membership = require_business_permission(
         user=user,
         organization=organization,
         permission=BusinessPermissionCode.AUDIT_VIEW,
         message="اجازه مشاهده گزارش رویدادهای این شرکت را ندارید.",
     )
-    return (
+    queryset = (
         AuditEvent.objects.filter(organization=organization)
         .select_related("actor")
         .order_by("-created_at")
     )
+    if not membership_has_permission(
+        membership, BusinessPermissionCode.PAYROLL_AUDIT_VIEW
+    ):
+        queryset = queryset.exclude(action__in=_CORE_PAYROLL_AUDIT_ACTIONS)
+    if not membership_has_permission(
+        membership, BusinessPermissionCode.PAYROLL_STATUTORY_AUDIT_VIEW
+    ):
+        queryset = queryset.exclude(action__in=_STATUTORY_PAYROLL_AUDIT_ACTIONS)
+    return queryset

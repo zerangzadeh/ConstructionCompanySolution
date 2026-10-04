@@ -10,6 +10,8 @@ from django.http import (
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.documents.models import DocumentConfidentiality
+from apps.documents.services import create_document
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
@@ -26,16 +28,29 @@ from apps.workforce.forms import (
     EmployeePositionAssignmentForm,
     EmployeePositionEndForm,
     EmployeeProfileImageForm,
+    EmployeeQualificationForm,
+    EmployeeSkillRecordForm,
+    EmployeeTrainingRecordForm,
+    LaborRateVersionForm,
+    PerformanceEvaluationForm,
     PositionForm,
+    QualificationRevocationForm,
     StatusTransitionForm,
+    TrainingRequirementForm,
+    WorkforceCatalogueForm,
+    WorkforceEvidenceUploadForm,
     WorkTeamForm,
 )
 from apps.workforce.models import (
     AssignmentStatus,
     Department,
     EmployeePositionAssignment,
+    EmployeeQualification,
     EmployeeStatus,
+    EmployeeTrainingRecord,
+    PerformanceEvaluation,
     Position,
+    TrainingRequirement,
 )
 from apps.workforce.services import (
     archive_department,
@@ -44,20 +59,35 @@ from apps.workforce.services import (
     archive_work_team,
     assign_employee_position,
     assign_employee_to_project,
+    create_competency,
     create_department,
     create_employee,
     create_employee_from_member,
     create_position,
+    create_skill,
+    create_training_requirement,
     create_work_team,
     end_employee_position,
     get_active_department_position_assignments,
     get_employee_position_assignments,
+    get_employee_qualifications,
+    get_employee_training_records,
+    get_labor_rate_versions,
     get_organization_departments,
     get_organization_employees,
     get_organization_positions,
     get_organization_project_assignments,
     get_organization_work_teams,
+    get_performance_evaluations,
+    get_workforce_competencies,
+    get_workforce_skills,
     link_employee_account,
+    record_employee_qualification,
+    record_employee_skill,
+    record_employee_training,
+    record_labor_rate_version,
+    record_performance_evaluation,
+    revoke_employee_qualification,
     transition_employee_status,
     transition_project_assignment_status,
     unlink_employee_account,
@@ -257,6 +287,37 @@ def employee_detail(request: HttpRequest, employee_id: str) -> HttpResponse:
         organization=request.organization,
         permission=BusinessPermissionCode.EMPLOYEES_CHANGE_PROFILE_IMAGE,
     )
+    qualifications = []
+    training_records = []
+    performance_evaluations = []
+    labor_rate_versions = []
+    if has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+    ):
+        qualifications = get_employee_qualifications(
+            organization=request.organization, actor=request.user, employee=employee
+        )
+        training_records = get_employee_training_records(
+            organization=request.organization, actor=request.user, employee=employee
+        )
+    if has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
+    ):
+        performance_evaluations = get_performance_evaluations(
+            organization=request.organization, actor=request.user, employee=employee
+        )
+    if has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_LABOR_RATES_VIEW,
+    ):
+        labor_rate_versions = get_labor_rate_versions(
+            organization=request.organization, actor=request.user, employee=employee
+        )
     return render(
         request,
         "workforce/employee_detail.html",
@@ -275,6 +336,30 @@ def employee_detail(request: HttpRequest, employee_id: str) -> HttpResponse:
                 EmployeeProfileImageForm(instance=employee)
                 if can_change_profile_image
                 else None
+            ),
+            "qualifications": qualifications,
+            "training_records": training_records,
+            "performance_evaluations": performance_evaluations,
+            "labor_rate_versions": labor_rate_versions,
+            "can_manage_qualifications": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+            ),
+            "can_revoke_qualifications": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_REVOKE,
+            ),
+            "can_manage_performance": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE,
+            ),
+            "can_upload_documents": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.DOCUMENTS_UPLOAD,
             ),
         },
     )
@@ -1309,3 +1394,277 @@ def assignment_status_change(request: HttpRequest, assignment_id: str) -> HttpRe
     else:
         messages.error(request, "اطلاعات وضعیت تخصیص معتبر نیست.")
     return redirect("workforce:assignment_list")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_VIEW)
+@require_GET
+def workforce_foundation(request: HttpRequest) -> HttpResponse:
+    """Permission-scoped P7-S01–S05 operational workbench."""
+
+    can_manage_skills = has_business_permission(
+        user=request.user, organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE,
+    )
+    can_manage_qualifications = has_business_permission(
+        user=request.user, organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+    )
+    can_view_qualifications = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
+    )
+    return render(
+        request,
+        "workforce/foundation.html",
+        {
+            "skills": get_workforce_skills(organization=request.organization, actor=request.user),
+            "competencies": get_workforce_competencies(organization=request.organization, actor=request.user),
+            "requirements": (
+                TrainingRequirement.objects.filter(
+                    organization=request.organization, archived_at__isnull=True
+                ).select_related("competency", "position", "project")
+                if can_view_qualifications
+                else []
+            ),
+            "can_manage_skills": can_manage_skills,
+            "can_manage_qualifications": can_manage_qualifications,
+            "can_view_performance": has_business_permission(user=request.user, organization=request.organization, permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW),
+            "can_view_labor_rates": has_business_permission(user=request.user, organization=request.organization, permission=BusinessPermissionCode.WORKFORCE_LABOR_RATES_VIEW),
+        },
+    )
+
+
+def _foundation_form(request: HttpRequest, *, form, title: str, description: str, action: str) -> HttpResponse:
+    return render(request, "workforce/foundation_form.html", {"form": form, "title": title, "description": description, "action": action})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+def workforce_skill_create(request: HttpRequest) -> HttpResponse:
+    form = WorkforceCatalogueForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            create_skill(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "مهارت ثبت شد.")
+            return redirect("workforce:foundation")
+    return _foundation_form(request, form=form, title="ثبت مهارت", description="مهارت فقط یک واقعیت منابع انسانی است و مجوز دسترسی ایجاد نمی‌کند.", action="workforce:skill_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+def workforce_competency_create(request: HttpRequest) -> HttpResponse:
+    form = WorkforceCatalogueForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            create_competency(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "شایستگی ثبت شد.")
+            return redirect("workforce:foundation")
+    return _foundation_form(request, form=form, title="ثبت شایستگی", description="شایستگی منبع اختیار یا نقش سیستم نیست.", action="workforce:competency_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE)
+def workforce_employee_skill_create(request: HttpRequest) -> HttpResponse:
+    form = EmployeeSkillRecordForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            record_employee_skill(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "سابقه مهارت ثبت شد.")
+            return redirect("workforce:employee_detail", employee_id=form.cleaned_data["employee"].pk)
+    return _foundation_form(request, form=form, title="ثبت سابقه مهارت", description="سابقه ثبت‌شده تغییرپذیر نیست و اصلاح با سابقه مؤثر جدید انجام می‌شود.", action="workforce:employee_skill_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
+def workforce_qualification_create(request: HttpRequest) -> HttpResponse:
+    form = EmployeeQualificationForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            qualification = record_employee_qualification(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "صلاحیت ثبت شد. شاهد آن را از پرونده کارمند در DMS اضافه کنید.")
+            return redirect("workforce:employee_detail", employee_id=qualification.employee_id)
+    return _foundation_form(request, form=form, title="ثبت صلاحیت یا گواهی", description="صلاحیت ثبت‌شده تغییرپذیر نیست؛ اعتبار و ابطال آن در سابقه حفظ می‌شود.", action="workforce:qualification_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_REVOKE)
+def workforce_qualification_revoke(
+    request: HttpRequest, qualification_id: str
+) -> HttpResponse:
+    qualification = EmployeeQualification.objects.filter(
+        organization=request.organization, pk=qualification_id
+    ).first()
+    if qualification is None:
+        raise Http404
+    form = QualificationRevocationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        try:
+            revoke_employee_qualification(
+                organization=request.organization,
+                actor=request.user,
+                qualification=qualification,
+                **form.cleaned_data,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "ابطال صلاحیت با سابقه غیرقابل‌ویرایش ثبت شد.")
+            return redirect("workforce:employee_detail", employee_id=qualification.employee_id)
+    return _foundation_form(
+        request,
+        form=form,
+        title="ابطال صلاحیت",
+        description="صلاحیت حذف یا بازنویسی نمی‌شود؛ علت و تاریخ ابطال به‌عنوان رویداد تاریخی ثبت می‌شود.",
+        action="workforce:qualification_revoke",
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
+def workforce_training_requirement_create(request: HttpRequest) -> HttpResponse:
+    form = TrainingRequirementForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            create_training_requirement(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "الزام آموزشی ثبت شد.")
+            return redirect("workforce:foundation")
+    return _foundation_form(request, form=form, title="ثبت الزام آموزشی", description="الزام آموزشی، صلاحیت یا دسترسی سیستم ایجاد نمی‌کند.", action="workforce:training_requirement_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE)
+def workforce_training_record_create(request: HttpRequest) -> HttpResponse:
+    form = EmployeeTrainingRecordForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            record = record_employee_training(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "سابقه آموزش ثبت شد.")
+            return redirect("workforce:employee_detail", employee_id=record.employee_id)
+    return _foundation_form(request, form=form, title="ثبت سابقه آموزش", description="حضور یا تکمیل آموزش یک واقعیت تاریخی غیرقابل‌ویرایش است.", action="workforce:training_record_create")
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE)
+def workforce_performance_create(request: HttpRequest) -> HttpResponse:
+    form = PerformanceEvaluationForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            evaluation = record_performance_evaluation(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "ارزیابی عملکرد حساس ثبت شد.")
+            return redirect("workforce:employee_detail", employee_id=evaluation.employee_id)
+    return _foundation_form(request, form=form, title="ثبت ارزیابی عملکرد", description="ارزیابی به‌تنهایی هیچ اثر دسترسی، حقوق، ارتقا یا انضباطی ایجاد نمی‌کند.", action="workforce:performance_create")
+
+
+_WORKFORCE_EVIDENCE_TARGETS = {
+    "employee_qualification": (
+        EmployeeQualification,
+        BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+    ),
+    "employee_training": (
+        EmployeeTrainingRecord,
+        BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_MANAGE,
+    ),
+    "performance_evaluation": (
+        PerformanceEvaluation,
+        BusinessPermissionCode.WORKFORCE_PERFORMANCE_MANAGE,
+    ),
+}
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)
+def workforce_evidence_upload(
+    request: HttpRequest, target_type: str, target_id: str
+) -> HttpResponse:
+    """Upload immutable DMS evidence for an allowed P7 Workforce fact."""
+
+    target_specification = _WORKFORCE_EVIDENCE_TARGETS.get(target_type)
+    if target_specification is None:
+        raise Http404
+    target_model, required_permission = target_specification
+    target = target_model.objects.filter(
+        organization=request.organization, pk=target_id
+    ).first()
+    if target is None:
+        raise Http404
+    project = getattr(getattr(target, "requirement", None), "project", None)
+    if not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=required_permission,
+        project=project,
+    ):
+        raise PermissionDenied("اجازه ثبت شاهد این سابقه نیروی انسانی را ندارید.")
+
+    form = WorkforceEvidenceUploadForm(
+        request.POST or None,
+        request.FILES or None,
+        organization=request.organization,
+    )
+    if request.method == "POST" and form.is_valid():
+        data = form.cleaned_data
+        try:
+            create_document(
+                organization=request.organization,
+                actor=request.user,
+                document_type=data["document_type"],
+                title=data["title"],
+                category=data["category"],
+                confidentiality=data["confidentiality"]
+                or DocumentConfidentiality.INTERNAL,
+                access_expires_at=data["access_expires_at"],
+                reference=data["reference"],
+                description=data["description"],
+                upload=data["file"],
+                target=target,
+            )
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "شاهد سندی در DMS ثبت و به سابقه پیوند شد.")
+            return redirect("workforce:employee_detail", employee_id=target.employee_id)
+    return _foundation_form(
+        request,
+        form=form,
+        title="ثبت شاهد سندی",
+        description="فایل در DMS نسخه‌بندی‌شده نگهداری می‌شود و فقط پیوند نوع‌دار به سابقه Workforce ایجاد می‌شود.",
+        action="workforce:evidence_upload",
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.WORKFORCE_LABOR_RATES_MANAGE)
+def workforce_labor_rate_create(request: HttpRequest) -> HttpResponse:
+    form = LaborRateVersionForm(request.POST or None, organization=request.organization)
+    if request.method == "POST" and form.is_valid():
+        try:
+            version = record_labor_rate_version(organization=request.organization, actor=request.user, **form.cleaned_data)
+        except (PermissionDenied, ValueError) as exc:
+            form.add_error(None, str(exc))
+        else:
+            messages.success(request, "نسخه نرخ حساس ثبت شد.")
+            return redirect("workforce:employee_detail", employee_id=version.employee_id)
+    return _foundation_form(request, form=form, title="ثبت نسخه نرخ نیروی کار", description="این نرخ صرفاً مرجع Workforce است و اثری در حقوق، پروژه، حسابداری یا تعهد مالی ندارد.", action="workforce:labor_rate_create")

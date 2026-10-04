@@ -36,10 +36,12 @@ class AccountingRoundingPolicy:
 
 def money_precision_policy_from_version(
     version: PlatformPolicyVersion,
+    *,
+    consumer: str = ACCOUNTING_JOURNAL_SUBMIT_CONSUMER,
 ) -> MoneyPrecisionPolicy:
     validate_policy_for_consumer(
         policy_version=version,
-        consumer=ACCOUNTING_JOURNAL_SUBMIT_CONSUMER,
+        consumer=consumer,
         expected_policy_code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
     )
     return MoneyPrecisionPolicy(
@@ -56,10 +58,12 @@ def money_precision_policy_from_version(
 
 def accounting_rounding_policy_from_version(
     version: PlatformPolicyVersion,
+    *,
+    consumer: str = ACCOUNTING_JOURNAL_SUBMIT_CONSUMER,
 ) -> AccountingRoundingPolicy:
     validate_policy_for_consumer(
         policy_version=version,
-        consumer=ACCOUNTING_JOURNAL_SUBMIT_CONSUMER,
+        consumer=consumer,
         expected_policy_code=ACCOUNTING_ROUNDING_POLICY_CODE,
     )
     return AccountingRoundingPolicy(
@@ -86,6 +90,25 @@ def resolve_accounting_posting_policies(
     return (
         money_precision_policy_from_version(precision_version),
         accounting_rounding_policy_from_version(rounding_version),
+    )
+
+
+def resolve_monetary_policies(
+    *, organization: Organization, consumer: str
+) -> tuple[MoneyPrecisionPolicy, AccountingRoundingPolicy]:
+    """Resolve the versioned shared money contract for an authorized consumer."""
+
+    precision_version = resolve_active_tenant_policy(
+        organization=organization,
+        policy_code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
+    )
+    rounding_version = resolve_active_tenant_policy(
+        organization=organization,
+        policy_code=ACCOUNTING_ROUNDING_POLICY_CODE,
+    )
+    return (
+        money_precision_policy_from_version(precision_version, consumer=consumer),
+        accounting_rounding_policy_from_version(rounding_version, consumer=consumer),
     )
 
 

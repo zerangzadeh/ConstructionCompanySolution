@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}ممیزی حقوق | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="دسترسی حساس" page_title="تاریخچه ممیزی حقوق" page_description="اقدامات پیکربندی، محاسبه، بررسی، قطعی‌سازی، مشاهده فیش و اصلاحات به‌صورت append-only ثبت می‌شوند." only %}
+<section class="erp-surface mt-5 rounded-2xl p-5"><div class="overflow-x-auto"><table class="min-w-full text-sm"><thead><tr class="text-right text-xs text-slate-500"><th class="p-2">زمان</th><th class="p-2">عملیات</th><th class="p-2">عامل</th><th class="p-2">نوع/شناسه</th><th class="p-2">همبستگی</th></tr></thead><tbody>{% for event in events %}<tr class="border-t"><td class="p-2">{{ event.created_at|jalali_datetime }}</td><td class="p-2">{{ event.get_action_display }}</td><td class="p-2">{{ event.actor|default:"سامانه" }}</td><td class="p-2" dir="ltr">{{ event.entity_type }} / {{ event.entity_id }}</td><td class="p-2 text-xs" dir="ltr">{{ event.correlation_id }}</td></tr>{% empty %}<tr><td colspan="5" class="p-4 text-slate-500">رویدادی ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>
+{% endblock %}

@@ -933,6 +933,107 @@ class BusinessPermissionCode(models.TextChoices):
         "project_assignments.change_status",
         "تغییر وضعیت تخصیص نیروی پروژه",
     )
+    WORKFORCE_SKILLS_VIEW = "workforce_skills.view", "مشاهده مهارت‌ها و شایستگی‌ها"
+    WORKFORCE_SKILLS_MANAGE = "workforce_skills.manage", "مدیریت مهارت‌ها و شایستگی‌ها"
+    WORKFORCE_QUALIFICATIONS_VIEW = (
+        "workforce_qualifications.view",
+        "مشاهده صلاحیت‌ها و آموزش کارکنان",
+    )
+    WORKFORCE_QUALIFICATIONS_MANAGE = (
+        "workforce_qualifications.manage",
+        "مدیریت صلاحیت‌ها و آموزش کارکنان",
+    )
+    WORKFORCE_QUALIFICATIONS_REVOKE = (
+        "workforce_qualifications.revoke",
+        "ابطال یا جایگزینی صلاحیت کارکنان",
+    )
+    WORKFORCE_PERFORMANCE_VIEW = (
+        "workforce_performance.view",
+        "مشاهده ارزیابی عملکرد حساس",
+    )
+    WORKFORCE_PERFORMANCE_MANAGE = (
+        "workforce_performance.manage",
+        "ثبت ارزیابی عملکرد حساس",
+    )
+    WORKFORCE_LABOR_RATES_VIEW = (
+        "workforce_labor_rates.view",
+        "مشاهده نرخ حساس نیروی کار",
+    )
+    WORKFORCE_LABOR_RATES_MANAGE = (
+        "workforce_labor_rates.manage",
+        "ثبت نسخه نرخ حساس نیروی کار",
+    )
+    TIME_CALENDARS_VIEW = "time_calendars.view", "مشاهده تقویم و شیفت"
+    TIME_CALENDARS_MANAGE = "time_calendars.manage", "مدیریت تقویم و شیفت"
+    ATTENDANCE_VIEW = "attendance.view", "مشاهده حضور"
+    ATTENDANCE_CAPTURE = "attendance.capture", "ثبت دستی حضور"
+    ATTENDANCE_REVIEW = "attendance.review", "قطعی‌سازی و رسیدگی حضور"
+    ATTENDANCE_CORRECT = "attendance.correct", "اصلاح مستقل حضور قطعی"
+    ATTENDANCE_IMPORT = "attendance.import", "درون‌ریزی حضور"
+    LEAVE_MISSION_VIEW = "leave_mission.view", "مشاهده مرخصی و مأموریت"
+    LEAVE_MISSION_REQUEST = "leave_mission.request", "ثبت مرخصی و مأموریت"
+    LEAVE_MISSION_REVIEW = "leave_mission.review", "بررسی مرخصی و مأموریت"
+    OVERTIME_VIEW = "overtime.view", "مشاهده اضافه‌کاری"
+    OVERTIME_REQUEST = "overtime.request", "ثبت درخواست اضافه‌کاری"
+    OVERTIME_REVIEW = "overtime.review", "بررسی اضافه‌کاری"
+    TIMESHEETS_VIEW = "timesheets.view", "مشاهده کارکرد"
+    TIMESHEETS_PREPARE = "timesheets.prepare", "تهیه و ارسال کارکرد"
+    TIMESHEETS_REVIEW = "timesheets.review", "بررسی مستقل کارکرد"
+    TIMESHEETS_PREVIEW = "timesheets.preview", "پیش‌نمایش غیرمالی توزیع کار"
+    PAYROLL_CONFIGURATION_VIEW = (
+        "payroll_configuration.view",
+        "مشاهده پیکربندی و قواعد حقوق",
+    )
+    PAYROLL_CONFIGURATION_MANAGE = (
+        "payroll_configuration.manage",
+        "مدیریت پیکربندی و قواعد حقوق",
+    )
+    PAYROLL_PREPARE = "payroll.prepare", "تهیه ورودی و محاسبه حقوق"
+    PAYROLL_REVIEW = "payroll.review", "بررسی اجرای حقوق"
+    PAYROLL_FINALIZE = "payroll.finalize", "قطعی‌سازی اجرای حقوق"
+    PAYROLL_ADJUST = "payroll.adjust", "تعدیل، برگشت و جایگزینی حقوق"
+    PAYROLL_RESULTS_VIEW = "payroll_results.view", "مشاهده نتایج حساس حقوق"
+    PAYSLIPS_VIEW = "payslips.view", "مشاهده فیش حقوق"
+    PAYSLIPS_EXPORT = "payslips.export", "خروجی فیش حقوق"
+    PAYROLL_AUDIT_VIEW = "payroll_audit.view", "مشاهده ممیزی حساس حقوق"
+    PAYROLL_STATUTORY_CONFIGURATION_VIEW = (
+        "payroll_statutory_configuration.view",
+        "مشاهده قواعد مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_PREPARE = (
+        "payroll_statutory.prepare",
+        "تهیه محاسبات مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_REVIEW = (
+        "payroll_statutory.review",
+        "بررسی محاسبات مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_OUTPUT_GENERATE = (
+        "payroll_statutory_outputs.generate",
+        "تولید خروجی مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_EXPORT = (
+        "payroll_statutory_outputs.export",
+        "ثبت خروجی و شاهد ارسال مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_CORRECT = (
+        "payroll_statutory.correct",
+        "اصلاح و جایگزینی سابقه مقرراتی حقوق",
+    )
+    PAYROLL_STATUTORY_AUDIT_VIEW = (
+        "payroll_statutory_audit.view",
+        "مشاهده ممیزی حساس مقرراتی حقوق",
+    )
+    PAYROLL_LIABILITY_HANDOFF_PREPARE = ("payroll_liability_handoff.prepare", "تهیه پیشنهاد بدهی حقوق")
+    PAYROLL_LIABILITY_HANDOFF_REVIEW = ("payroll_liability_handoff.review", "بررسی پیشنهاد بدهی حقوق")
+    PAYROLL_ACCOUNTING_HANDOFF_PREPARE = ("payroll_accounting_handoff.prepare", "تهیه پیشنهاد حسابداری حقوق")
+    PAYROLL_ACCOUNTING_HANDOFF_REVIEW = ("payroll_accounting_handoff.review", "بررسی پیشنهاد حسابداری حقوق")
+    PAYROLL_PAYMENT_HANDOFF_PREPARE = ("payroll_payment_handoff.prepare", "تهیه پیشنهاد پرداخت حقوق")
+    PAYROLL_PAYMENT_HANDOFF_REVIEW = ("payroll_payment_handoff.review", "بررسی پیشنهاد پرداخت حقوق")
+    PAYROLL_PROJECT_COST_HANDOFF_PREPARE = ("payroll_project_cost_handoff.prepare", "تهیه پیشنهاد هزینه کار حقوق")
+    PAYROLL_PROJECT_COST_HANDOFF_REVIEW = ("payroll_project_cost_handoff.review", "بررسی پیشنهاد هزینه کار حقوق")
+    PAYROLL_HANDOFF_RECONCILIATION_PREPARE = ("payroll_handoff_reconciliation.prepare", "تهیه تطبیق تحویل مالی حقوق")
+    PAYROLL_HANDOFF_RECONCILIATION_REVIEW = ("payroll_handoff_reconciliation.review", "بررسی تطبیق تحویل مالی حقوق")
 
     PURCHASE_REQUESTS_VIEW = "purchase_requests.view", "مشاهده درخواست‌های خرید"
     PURCHASE_REQUESTS_CREATE = "purchase_requests.create", "ایجاد درخواست خرید"

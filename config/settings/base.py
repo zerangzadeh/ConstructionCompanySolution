@@ -40,6 +40,8 @@ INSTALLED_APPS: list[str] = [
     "apps.financials",
     "apps.daily_reports",
     "apps.workforce",
+    "apps.timekeeping",
+    "apps.payroll",
     "apps.procurement",
     "apps.inventory",
     "apps.equipment",
