@@ -900,7 +900,7 @@ Avoid:
 
 ---
 
-## 29. Visual Tokens
+## 29. Visual Tokens and Canonical Color System
 
 Keep these consistent:
 
@@ -914,6 +914,41 @@ Keep these consistent:
 - compact enterprise spacing
 - consistent focus rings
 - semantic status colors only
+
+### Canonical color authority
+
+The authoritative BONIRA color system is maintained separately at:
+
+`design/BONIRA_UI_COLOR_SYSTEM.md`
+
+That file is the **single source of truth** for:
+
+- approved brand colors
+- neutral colors
+- semantic success/warning/danger colors
+- CSS color tokens and aliases
+- Tailwind color mapping
+- component color rules
+- alpha/transparency rules
+- approved hexadecimal registry
+
+All UI implementation must use the approved tokens from
+`design/BONIRA_UI_COLOR_SYSTEM.md`.
+
+Do not duplicate the full palette in this document. If this document and the
+color-system file ever appear to conflict on a color value or color-usage rule,
+`design/BONIRA_UI_COLOR_SYSTEM.md` governs color decisions.
+
+Do not introduce arbitrary or near-duplicate colors when an approved BONIRA
+token already covers the same semantic purpose. If a genuinely new color is
+required, treat it as a Design System change and update the canonical color
+system explicitly rather than silently adding a page-local value.
+
+For Tailwind and shared CSS, map the canonical colors once and reuse semantic
+tokens/components. Avoid page-specific hard-coded color values.
+
+Official BONIRA logo assets must not be recolored or traced merely to fit a
+page-level palette variation.
 
 ---
 
@@ -1125,6 +1160,9 @@ Also:
 - verify existing Gregorian records render correctly without data migration
 - verify desktop/mobile behavior
 - verify no corrupted Persian literals remain
+- verify modified UI/CSS/templates against `design/BONIRA_UI_COLOR_SYSTEM.md`
+- search for newly introduced hard-coded colors and confirm each is an approved
+  BONIRA token/derived alpha or a documented Design System change
 
 Database test-permission problems are environment issues and must not trigger UI/domain changes.
 
@@ -1134,7 +1172,7 @@ Database test-permission problems are environment issues and must not trigger UI
 
 At the start of a new UI/UX session:
 
-> Follow applicable `AGENTS.md` instructions and read `docs/ui-guidelines.md`. Treat the approved Application Shell, Dashboard, Project List, Project Detail, and customized Django Admin patterns as the authoritative visual reference. Reuse established components and do not modify backend/domain behavior.
+> Follow applicable `AGENTS.md` instructions and read both `docs/ui-guidelines.md` and `design/BONIRA_UI_COLOR_SYSTEM.md` before UI/UX work. Treat the approved Application Shell, Dashboard, Project List, Project Detail, customized Django Admin patterns, and the canonical BONIRA color tokens as authoritative references. Reuse established components, do not invent near-duplicate colors, and do not modify backend/domain behavior.
 
 In the same session, do not repeat the entire UI specification. Keep prompts task-specific and concise.
 
@@ -1167,6 +1205,10 @@ In the same session, do not repeat the entire UI specification. Keep prompts tas
 **All user date entry/filter controls use the approved Jalali date picker.**
 
 **Admin keeps native behavior while matching the ERP design language.**
+
+**`design/BONIRA_UI_COLOR_SYSTEM.md` is the single source of truth for UI colors.**
+
+**Canonical color tokens before arbitrary colors.**
 
 **Consistency before novelty.**
 
@@ -1528,6 +1570,7 @@ Before a new or materially changed screen is accepted, verify:
 - audit/source lineage, document evidence, reversal/void wording, and calculation
   explanation where relevant;
 - template reuse and absence of page-local inline styles or duplicated components;
-  and
+- compliance with `design/BONIRA_UI_COLOR_SYSTEM.md`, including absence of new
+  arbitrary or near-duplicate color values; and
 - representative browser verification plus applicable Django/template/tests and
   Ruff checks.

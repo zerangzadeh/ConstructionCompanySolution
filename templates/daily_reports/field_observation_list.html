@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}مشاهدات میدانی | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+<div dir="rtl">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div><p class="text-sm font-medium text-blue-600">عملیات میدانی</p><h1 class="mt-1 text-2xl font-bold text-slate-950">مشاهدات میدانی</h1><p class="mt-1 text-sm text-slate-500">شواهد ثبت‌شده با زمینه پروژه و کارگاه</p></div>
+    <a class="inline-flex rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" href="{% url 'daily_reports:field_observation_create' %}">مشاهده جدید</a>
+  </div>
+  <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست مشاهدات">
+    {% if observations %}<div class="erp-table-wrap"><table class="w-full min-w-[780px] text-right"><thead><tr><th class="px-4 py-3">عنوان</th><th class="px-4 py-3">پروژه / کارگاه</th><th class="px-4 py-3">نوع</th><th class="px-4 py-3">وضعیت</th><th class="px-4 py-3">زمان</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in observations %}<tr><td class="px-4 py-3"><a class="font-semibold text-blue-700" href="{% url 'daily_reports:field_observation_detail' item.id %}">{{ item.title }}</a></td><td class="px-4 py-3">{{ item.project.name }}{% if item.site %}<span class="text-slate-500"> · {{ item.site.name }}</span>{% endif %}</td><td class="px-4 py-3">{{ item.get_kind_display }}</td><td class="px-4 py-3">{{ item.get_status_display }}</td><td class="px-4 py-3" dir="ltr">{{ item.created_at|date:"Y-m-d H:i" }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="p-8 text-center text-sm text-slate-500">هنوز مشاهده میدانی ثبت نشده است.</div>{% endif %}
+  </section>
+</div>
+{% endblock %}

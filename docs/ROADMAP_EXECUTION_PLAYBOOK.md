@@ -1207,16 +1207,23 @@ leave policy, payroll privacy/SoD, statutory schemas and professional sign-off.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P8-S01..S04 | 4 | `A-H` | Inventory/equipment/asset ownership and valuation-policy design |
-| P8-S05..S11 | 7 | `T-M` | Reservations, bins, lots/serials, count and transfer custody |
-| P8-S12..S17 | 6 | `A-H` | Valuation layers, issue/return costing and GL/Project Cost handoff |
-| P8-S18..S23 | 6 | `T-M` | Equipment meters, operator qualification, expiry, fuel, downtime and maintenance |
-| P8-S24..S27 | 4 | `A-H` | Equipment cost allocation and fixed-asset lifecycle/depreciation |
-| P8-S28..S29 | 2 | `A-X` | Quantity/value conservation, depreciation and reconciliation review |
-| P8-S30 | 1 | `L-M` | Documentation closeout and P9 handoff packet |
+| P8-S01..S04 | 4 | `A-H` | **Product Owner accepted.** P8-D01–D06=A and the section 10 boundary were explicitly accepted on 2026-10-04. |
+| P8-S05..S11 | 7 | `T-M` | **Product Owner accepted.** Inventory-owned reservations, bins, versioned risk-based lot/serial/expiry evidence, count controls, two-sided transfer custody, reconciliation and RTL adapters are accepted without valuation, Equipment/asset, financial, Payroll-consumer or production effects. |
+| P8-S12..S17 | 6 | `A-H` | **Product Owner accepted.** Moving-WAC valuation evidence, source/version/policy pins, missing-cost exceptions, immutable reversal and authoritative transfer lineage, proposal-only downstream envelopes, read-only reconciliation and RTL workbench are accepted within the non-production boundary. |
+| P8-S18..S23 | 6 | `T-M` | **Product Owner accepted.** Equipment meters/readings and corrections, operator qualification references, usage/fuel evidence, downtime, maintenance plans/work/evidence, reference-only Inventory spare linkage, RTL workbench and no-effect controls are accepted within the non-production boundary. |
+| P8-S24..S27 | 4 | `A-H` | **Product Owner accepted.** P8-C01–C38=A governs accepted non-production Equipment cost-allocation proposals and the distinct source-backed Fixed Assets lifecycle/depreciation authority, with proposal-only downstream handoffs and no Accounting/Project Cost activation. |
+| P8-S28..S29 | 2 | `A-X` | **Product Owner accepted.** Quantity/value conservation, depreciation and reconciliation review recorded in `architecture/P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md`. |
+| P8-S30 | 1 | `L-M` | **Product Owner accepted.** Documentation closeout and bounded P9 handoff packet recorded in `architecture/P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md`; P9 remains planning-only. |
 
 **Product Owner gates:** valuation method, traceability depth, capitalization and
 depreciation policy, maintenance ownership, expiry policy, and spare-parts usage.
+P8-D01–D06=A are recorded in
+`architecture/P8_S01_S04_ENTRY_AND_ARCHITECTURE_DECISION_PACKET.md`. P8-S01–S23
+is Product Owner accepted within documented non-production boundaries. P8-C01–C38=A
+and the bounded P8-S24–S27 runtime are Product Owner accepted; P8-S28–S30 is
+Product Owner accepted based on the final assurance/closeout packet. Consolidated
+P8-S01–S30 is Product Owner accepted and complete within documented
+non-production boundaries. All production activation remains unauthorized.
 
 ## 15. P9 core session map — 26 sessions
 
@@ -1226,22 +1233,32 @@ track.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P9-S01..S05 | 5 | `T-M` | Mobile/context field capture, media/evidence and reviewed downstream proposals |
-| P9-S06..S11 | 6 | `A-H` | HSE/QA inspections, permits, tests, CAPA and verification lifecycles |
-| P9-S12..S15 | 4 | `T-M` | BusinessParty qualification/performance evidence and explainable evaluation |
-| P9-S16..S20 | 5 | `A-H` | In-app/email/SMS policy, reminders, calendar, supervisory workbench and support cases |
-| P9-S21..S24 | 4 | `A-H` | Reviewed knowledge publication, provenance, recurrence and reuse evidence |
-| P9-S25 | 1 | `A-X` | Field privacy, evidence integrity, notification/workflow and knowledge final review |
-| P9-S26 | 1 | `L-M` | Documentation closeout and P10 handoff packet |
+| P9-S01..S05 | 5 | `T-M` | **Product Owner accepted.** The authoritative `architecture/P9_S01_S05_FIELD_OPERATIONS_AND_PAPERLESS_EVIDENCE_DECISION_PACKET.md` records `P9-D01`–`P9-D12=A`, bounded implementation, and focused PostgreSQL/migration validation. It governs field ownership, DMS custody, location/privacy, connectivity, immutable review/correction and proposal-only downstream boundaries. Subsequent P9 sessions through S26 are separately accepted/closed; P10 runtime remains planning-only. |
+| P9-S06..S11 | 6 | `A-H` | **Product Owner accepted.** `P9-Q01`–`P9-Q18=A` and the exact bounded runtime were accepted on 2026-10-06. The packet records the shared typed-profile kernel, preserved HSE/QA ownership, lifecycles, exact DMS evidence, permissions, RTL UI, scoped assurance, no-effect gates, and 10 clean-schema PostgreSQL cases including migration rollback/reapply. |
+| P9-S12..S15 | 4 | `T-M` | **Product Owner accepted.** `P9-P01`–`P9-P18=A`; focused PostgreSQL tests and bounded rollback/reapply passed. The accepted scope remains bounded to BusinessParty qualification/performance, exact DMS evidence, explainable evaluation and source-only proposals. |
+| P9-S16..S20 | 5 | `A-H` | **Product Owner accepted.** `P9-N01`–`P9-N18=A`; clean-schema migration, 11 focused PostgreSQL cases, bounded rollback/reapply and final repository checks passed. In-app-only notifications, derived calendar, support cases/access, consent/DMS/privacy and no-scheduler/provider boundaries remain authoritative. |
+| P9-S21..S24 | 4 | `A-H` | **Product Owner accepted.** `architecture/P9_S21_S24_KNOWLEDGE_PUBLICATION_AND_REUSE_DECISION_PACKET.md` is the accepted architecture and implementation contract for S21 reviewed publication, S22 exact provenance/discovery, S23 recurrence evidence and S24 reuse evidence/acceptance. `P9-K01`–`P9-K24=A`; clean-schema PostgreSQL migration, 13 focused acceptance cases, dependency-safe rollback/reapply and final repository checks pass. |
+| P9-S25 | 1 | `A-X` | **Product Owner accepted.** `P9-F01`–`P9-F18=A`; notification/source and private-cache hardening is complete; 15/15 focused cross-domain PostgreSQL cases plus three directly affected retained cases pass. No schema migration was introduced. `test_construction_erp` is non-authoritative, excluded from P9 acceptance evidence, and preserved/isolated by Product Owner direction. |
+| P9-S26 | 1 | `L-M` | **Closeout complete.** Final P9 acceptance reconciliation and bounded P10 handoff are recorded in `architecture/P9_FINAL_ASSURANCE_CLOSEOUT_AND_P10_HANDOFF.md`; P10 remains planning-only. |
 
 **Product Owner gates:** offline boundary, media policy, HSE/QA ownership,
 evaluation privacy, notification/SMS channels, support SLA and knowledge roles.
+For `P9-S06–S11`, `P9-Q01`–`P9-Q18=A` and bounded runtime authorization are
+recorded in the authoritative packet. The bounded implementation is Product Owner
+accepted. `P9-S12+`, downstream effects and production activation remain
+unauthorized.
+For `P9-S12–S15`, `P9-P01`–`P9-P18=A` and the bounded implementation are Product
+Owner accepted. `P9-S16–S20` is Product Owner accepted with `P9-N01`–`P9-N18=A`.
+Consolidated `P9-S01–S25 = Product Owner accepted`. The S25 packet records the
+accepted decisions, bounded hardening, validation and `test_construction_erp`
+preserve/isolate disposition. P9-S26 closeout is complete. P10 runtime,
+downstream effects and production activation remain unauthorized.
 
 ## 16. P10 session map — 24 sessions
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P10-S01..S06 | 6 | `A-H` | Metric catalogue, governed read models, dashboards and source drill-through |
+| P10-S01..S06 | 6 | `A-H` | **S01 planning/decision preparation complete; runtime decisions pending.** Metric catalogue, governed read models, dashboards and source drill-through |
 | P10-S07..S13 | 7 | `A-X` | Financial/operational reconciliation pairs, exception evidence and rebuild checks |
 | P10-S14..S17 | 4 | `A-H` | Project-closeout coordination across contracts, claims, documents, assets and knowledge |
 | P10-S18..S21 | 4 | `A-X` | Release certification: migration, restore, performance, tenant and security gates |
@@ -1251,6 +1268,26 @@ evaluation privacy, notification/SMS channels, support SLA and knowledge roles.
 
 **Product Owner gates:** metric definitions/owners, selected first-release scope,
 closeout acceptance ownership, tolerated open risks, release and rollback decision.
+
+### P10-S01 planning result and bounded S02–S06 handoff
+
+The authoritative
+[`P10-S01–S06` decision packet](architecture/P10_S01_S06_GOVERNED_METRICS_AND_REPORTING_DECISION_PACKET.md)
+verifies the P9 phase-close prerequisite and preserves the official six-session
+envelope without guessing a later endpoint. It decomposes S01 decision preparation,
+S02 catalogue governance, S03 governed synchronous read models, S04 dashboards and
+source drill-through, S05 bounded on-demand export, and S06 focused assurance and
+closeout. It also contains the authority-collision register, complete proposed
+permission catalogue, lifecycle/concurrency contracts, `P10-M01`–`P10-M24`
+decision register, focused PostgreSQL plan and exact bounded runtime-authorization
+wording.
+
+P10-S01 is documentation only and complete as decision preparation. The proposed
+choices are not accepted decisions. P10-S02–S06 require explicit Product Owner
+disposition, named metric/source owners, acceptance owner, release/rollback
+executor, tolerated-risk disposition and bounded authorization. P10-S07–S24,
+queues/schedulers/providers, external integrations, automatic downstream effects,
+production certification, cutover and activation remain unauthorized.
 
 ## 17. Future-trigger planning envelopes
 

@@ -161,6 +161,23 @@ class DailyReport(UUIDModel, TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+# P9-S01–S05 keeps the Field Operations models separate while registering them
+# under the existing Daily Reports app and its established project scope boundary.
+from apps.daily_reports.field_models import (  # noqa: F401
+    FieldDownstreamProposal,
+    FieldLocationPermission,
+    FieldObservation,
+    FieldObservationDraftRevision,
+    FieldObservationEvidenceLink,
+    FieldObservationKind,
+    FieldObservationStatus,
+    FieldObservationTransition,
+    FieldProposalFamily,
+    FieldProposalStatus,
+    FieldProposalTransition,
+)
+
+
 class DailyReportLaborEntry(UUIDModel, CreatedAtModel):
     """Labor recorded against a daily report while it is still a draft."""
 

@@ -87,6 +87,16 @@ DOCUMENT_LINK_TYPES = (
         site_lookup="daily_report__site_id",
     ),
     DocumentLinkType(
+        key="field_observation",
+        owner="daily_reports",
+        model_label="daily_reports.FieldObservationEvidenceLink",
+        target_field="field_observation",
+        view_permission=BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
+        project_lookup="field_observation__project_id",
+        site_lookup="field_observation__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
         key="employee_qualification",
         owner="workforce",
         model_label="workforce.EmployeeQualificationDocumentLink",
@@ -110,6 +120,85 @@ DOCUMENT_LINK_TYPES = (
         model_label="workforce.PerformanceEvaluationDocumentLink",
         target_field="performance_evaluation",
         view_permission=BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
+        project_lookup=None,
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="inspection",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="inspection",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="inspection__project_id",
+        site_lookup="inspection__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="permit",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="permit",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="permit__project_id",
+        site_lookup="permit__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="test",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="test",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="test__project_id",
+        site_lookup="test__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="test_result",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="test_result",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="test_result__test__project_id",
+        site_lookup="test_result__test__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="finding",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="finding",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="finding__project_id",
+        site_lookup="finding__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="nonconformance",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="nonconformance",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="nonconformance__project_id",
+        site_lookup="nonconformance__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="capa_action",
+        owner="compliance",
+        model_label="compliance.ComplianceEvidenceLink",
+        target_field="capa_action",
+        view_permission=BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+        project_lookup="capa_action__project_id",
+        site_lookup="capa_action__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
+        key="partner_qualification",
+        owner="partner_qualification",
+        model_label="partner_qualification.PartnerEvidence",
+        target_field="qualification",
+        view_permission=BusinessPermissionCode.PARTNER_SENSITIVE_EVIDENCE_VIEW,
         project_lookup=None,
         legacy_compatible=False,
     ),
@@ -165,8 +254,9 @@ def typed_links_for_document(document: Any) -> list[Any]:
     links: list[Any] = []
     for link_type in DOCUMENT_LINK_TYPES:
         links.extend(
-            link_type.model.objects.filter(document=document).select_related(
-                link_type.target_field
-            )
+            link_type.model.objects.filter(
+                document=document,
+                **{f"{link_type.target_field}__isnull": False},
+            ).select_related(link_type.target_field)
         )
     return links

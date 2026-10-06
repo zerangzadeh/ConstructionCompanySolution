@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}ممیزی دارایی‌های ثابت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="P8 · شواهد تغییرناپذیر" page_title="ممیزی دارایی‌های ثابت" page_description="رویدادهای مجوزدار و مستند؛ بدون اثر دفترکل یا هزینه واقعی پروژه" only %}
+<section class="erp-surface mt-5 overflow-x-auto rounded-xl p-5">
+  <table class="min-w-full text-sm">
+    <thead><tr><th class="p-2 text-right">زمان</th><th class="p-2 text-right">عملیات</th><th class="p-2 text-right">موجودیت</th><th class="p-2 text-right">عامل</th><th class="p-2 text-right">شاهد</th></tr></thead>
+    <tbody>{% for event in events %}<tr class="border-t"><td class="p-2">{{ event.created_at }}</td><td class="p-2">{{ event.get_action_display }}</td><td class="p-2">{{ event.entity_type }} / {{ event.entity_id }}</td><td class="p-2">{{ event.actor|default:"—" }}</td><td class="p-2 font-mono text-xs">{{ event.metadata }}</td></tr>{% empty %}<tr><td class="p-3 text-slate-500" colspan="5">شاهد ممیزی ثبت نشده است.</td></tr>{% endfor %}</tbody>
+  </table>
+</section>
+{% endblock %}

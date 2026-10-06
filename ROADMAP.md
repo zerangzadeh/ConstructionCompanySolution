@@ -52,12 +52,12 @@ compliance, security, migration, and integration consequences.
 | --- | --- | --- |
 | F1 Workforce | **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION BOUNDARIES** | Employees, structures, effective assignments, capability/evidence/rate history, bounded timekeeping, non-posting Core Payroll, fail-closed statutory outputs, immutable Payroll-owned downstream proposals, and final privacy/version/reconciliation assurance. No AP recognition, journal/GL, Treasury/cash, Project Cost actual, P8 functionality, production activation, or live filing is introduced. |
 | F2 Procurement | **DELIVERED expanding baseline** | Purchase request/order/goods receipt and the Product Owner-accepted P5-S01–S22 baseline are implemented. P5-S23–S25 add bounded Persian-first internal/external UI adapters over the portal and sealed-evidence services; broader portal collaboration, payable/GL/Treasury/Inventory activation remain deferred. |
-| F3 Inventory | **DELIVERED baseline** | Warehouse and posted/reversible stock-quantity ledger. Valuation, reservations, bins/lots/serials, and accounting are not delivered. |
-| F4 Equipment | **DELIVERED baseline** | Equipment, conflict-safe assignments, maintenance. Usage/fuel/cost/fixed-asset integration is not delivered. |
+| F3 Inventory | **P8-S01–S30 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION BOUNDARIES** | Warehouse, custody, moving-WAC valuation evidence, transfer lineage and read-only reconciliation are implemented within the documented non-production boundary. Final assurance accepts quantity/value conservation and transfer/reversal no-effect behavior. Equipment has reference-only linkage to posted Inventory spare transactions; Accounting/Project Cost remain proposal-only; GL, actual-cost, asset and production effects remain absent. |
+| F4 Equipment | **DELIVERED baseline / P8-S01–S30 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION BOUNDARIES** | Equipment remains the operational authority for operations and versioned internal-rate/conserved allocation proposals. The distinct Fixed Assets authority owns source-backed capitalization and book evidence. C01–C38=A is accepted; final assurance accepts carrying-value, depreciation, reversal and handoff no-double-count controls. All P8 behavior remains non-production and creates no journal, Project Cost actual, payable, cash or Inventory mutation. |
 | F5 Workflow & Work Management | **DELIVERED** | Versioned definitions, bounded registries, runtime, candidate/assignment/delegation history, work items/workbench with due/overdue and escalation routing, position routing, domain adoption, PostgreSQL acceptance gates. |
 | F6 Billing & Progress Claims | **DELIVERED receivable baseline** | Baseline/progress/claims/items/sources/adjustments, workflow, settlements and payment allocation. Policy ownership needs pre-production correction; payable claims and posting are not delivered. |
 | F7 Documents v2 | **DELIVERED baseline** | Private versioned documents and explicit links to supported records. Retention/export/object storage/scanning and broader links are not delivered. |
-| F8 Safety & Quality | **PARTIAL** | Incident and quality-issue lifecycles/workflow exist. Inspections, formal CAPA, risk, and knowledge integration remain. |
+| F8 Safety & Quality | **PARTIAL; P9-S06–S11 PRODUCT OWNER ACCEPTED** | Existing incident/issue workflows remain authoritative. The accepted bounded shared inspection mechanics provide typed HSE/QA templates, inspections, permits, QA tests/results, findings versus NCR, CAPA, verification/closure, exact DMS evidence and assurance UI. Risk registers, toolbox/PPE controls, governed knowledge and P9-S12+ remain. |
 | Foundation | **DELIVERED baseline** | Tenant/session/membership/RBAC, shared masters, projects/sites/phases/WBS/activities, contracts/amendments, estimates/revisions, expenses, payments/allocations, daily reports, audit, financial read models. |
 
 Historic validation detail belongs in `docs/PROJECT_STATUS.md`, not in this
@@ -1594,7 +1594,11 @@ Stable masters + consent/privacy + support operations -> future network/AI
   the six obsolete assertions, two serialized-test restore errors and existing
   permission-registry gaps remain outside acceptance. P6-S39–S42 is separately
   accepted; P7 is subsequently accepted and complete within documented
-  non-production boundaries. P8 remains planning-only.
+  non-production boundaries. P8-S01–S04 is subsequently accepted and P8-S05–S11
+  Product Owner accepted. P8-S12–S17 is Product Owner accepted within its
+  documented non-production boundary; P8-S18–S23 is subsequently Product Owner
+  accepted; P8-C01–C38=A and the bounded P8-S24–S27 runtime are accepted, and
+  P8-S24–S27 is subsequently Product Owner accepted.
 - **Outcome:** move retention/advance/insurance/other commercial rules to approved
   contract-term versions; apply effective regulatory versions; snapshot party,
   currency and rules; generate AR/posting proposals and taxpayer-invoice status.
@@ -1738,7 +1742,11 @@ Stable masters + consent/privacy + support operations -> future network/AI
   automatic contract/amendment, budget, schedule, Billing, financial or
   production effect. P6-S39–S42 later proceeded only under their bounded
   authorization; P7 is subsequently accepted and complete within documented
-  non-production boundaries. P8 remains planning-only.
+  non-production boundaries. P8-S01–S04 is subsequently accepted and P8-S05–S11
+  Product Owner accepted. P8-S12–S17 is Product Owner accepted within its
+  documented non-production boundary; P8-S18–S23 is subsequently Product Owner
+  accepted; P8-C01–C38=A and the bounded P8-S24–S27 runtime are accepted, and
+  P8-S24–S27 is subsequently Product Owner accepted.
 - **Outcome:** governed Site Instruction, Variation Order/Change Order,
   contractual Claim and Extension of Time lifecycles with versioned evidence,
   entitlement/approval, valuation and cost impact, schedule impact, contract-value
@@ -1901,7 +1909,20 @@ Stable masters + consent/privacy + support operations -> future network/AI
   payslip export, historical version/retroactivity assurance, golden and
   concurrency evidence, preserved downstream no-effects, unresolved production
   gates, and the bounded P8 entry questions. P7 is complete only within these
-  non-production boundaries; P8 remains planning-only and unauthorized.
+  non-production boundaries. P8-S01–S04 is subsequently accepted with
+  P8-D01–D06=A, and P8-S05–S11 is Product Owner accepted within its bounded
+  non-production authority. P8-S12–S17 and P8-S18–S23 are subsequently Product
+  Owner accepted; P8-C01–C38=A and the bounded P8-S24–S27 runtime are accepted,
+  and P8-S24–S27 is subsequently Product Owner accepted.
+- **Access-provisioning remediation (2026-10-04):** the local walkthrough database
+  applied the previously pending P7 permission migrations and adds
+  `organizations.0095_p7_role_permission_seed_reconciliation` for idempotent
+  global built-in Workforce/Timekeeping seed repair only. Sensitive Workforce,
+  Payroll, statutory, export, and handoff access remains default-denied. The
+  development-only `seed_account_data` path gives the explicit tenant-local
+  `p7_demo_payroll_assurance` role only to
+  `account.demo-construction-01.owner` in `demo-construction-01`; it is not a
+  production role policy or downstream authority.
 - **UI/security:** restricted payroll workspace, calculation explanation,
   preflight exceptions, dual approval, employee self-service only if approved.
 - **Migration/testing:** no real history exists; prefer correct opening design.
@@ -1913,7 +1934,17 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P8.1 Inventory valuation and operational depth
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P8-S01–S30 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN
+  DOCUMENTED NON-PRODUCTION BOUNDARIES**. The bounded
+  [entry/decision packet](docs/architecture/P8_S01_S04_ENTRY_AND_ARCHITECTURE_DECISION_PACKET.md)
+  reconciles current quantity-only Inventory, operational Equipment, missing Fixed
+  Assets, Procurement, Accounting, inert Project Cost and master-data authorities.
+  It fixes ownership, lineage, isolation, correction, reconciliation, migration and
+  readiness boundaries. The Product Owner selected P8-D01–D06=A and authorized
+  only S05–S11, which is now accepted. The resulting
+  [quantity/custody implementation](docs/architecture/P8_S05_S11_INVENTORY_CUSTODY_IMPLEMENTATION.md)
+  adds reservation, bins, trace/expiry, counts, two-sided transfer and
+  reconciliation without valuation, financial or production effects.
 - **Outcome:** project/activity reservations and release; reorder-point/shortage
   policy and alerts; barcode/QR capture; bins; expiry where applicable; lot/batch
   and serial traceability where justified; physical/cycle count; issue/return to
@@ -1928,9 +1959,37 @@ Stable masters + consent/privacy + support operations -> future network/AI
   transfer custody, quantity/value conservation, concurrency, reversal and close tests.
 - **Effort / risk:** **XL / High**.
 
+- **Bounded next authorization:** P8-S12–S17 is Product Owner accepted through the
+  [valuation implementation packet](docs/architecture/P8_S12_S17_INVENTORY_VALUATION_IMPLEMENTATION.md).
+  The [P8-S18–S23 Equipment operations decision packet](docs/architecture/P8_S18_S23_EQUIPMENT_OPERATIONS_DECISION_PACKET.md)
+  now defines the accepted ownership, lifecycle, Inventory reference linkage and
+  Product Owner decisions. P8-S18–S23 is Product Owner accepted. The
+  [P8-S24–S27 Equipment cost and Fixed Assets decision packet](docs/architecture/P8_S24_S27_EQUIPMENT_COST_AND_FIXED_ASSETS_DECISION_PACKET.md)
+  is authoritative; P8-C01–C38=A and its exact bounded runtime authorization are
+  accepted. P8-S24–S27 is Product Owner accepted within that non-production
+  boundary.
+  The final assurance and closeout are recorded in
+  [P8 final assurance and P9 handoff](docs/architecture/P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md).
+  Any later implementation must preserve Equipment/Fixed Asset/Accounting/Project
+  Cost separation, no P7 Payroll proposal consumption, expand-only migration and
+  non-production gates.
+
 ### P8.2 Equipment usage, fuel, maintenance cost, and fixed assets
 
-- **Status / priority:** **PLANNED / fixed assets retained target scope**
+- **Status / priority:** **P8-S01–S30 PRODUCT OWNER ACCEPTED / P8-D04–D06=A AND
+  P8-C01–C38=A ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION
+  BOUNDARIES**. The
+  [P8-S18–S23 packet](docs/architecture/P8_S18_S23_EQUIPMENT_OPERATIONS_DECISION_PACKET.md)
+  is the authoritative decision and implementation-acceptance packet. The
+  [P8-S24–S27 packet](docs/architecture/P8_S24_S27_EQUIPMENT_COST_AND_FIXED_ASSETS_DECISION_PACKET.md)
+  is the authoritative accepted architecture and decision register. Operational
+  Equipment remains distinct from the implemented financial `FixedAsset`; existing maintenance
+  `cost` is descriptive evidence, not a currency-pinned actual, capitalization
+  basis, journal or Project Cost fact. The bounded implementation creates only
+  proposal handoffs. Final assurance, documentation closeout and the bounded P9
+  handoff are recorded in
+  [P8 final assurance and P9 handoff](docs/architecture/P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md).
+  Production activation remains unauthorized.
 - **Outcome:** meter readings; operator qualification; equipment insurance,
   inspection and permit/license evidence with expiry; fuel, downtime, preventive
   maintenance plans, usage rates and cost allocation; asset acquisition,
@@ -1948,7 +2007,21 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P9.1 Field operations and paperless evidence
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P9-S01–S05 PRODUCT OWNER ACCEPTED** within the
+  Product Owner accepted/runtime-authorized boundary.
+  The
+  [field operations and paperless evidence decision packet](docs/architecture/P9_S01_S05_FIELD_OPERATIONS_AND_PAPERLESS_EVIDENCE_DECISION_PACKET.md)
+  verifies the accepted P8 prerequisite and defines the exact five-session
+  planning envelope, authority boundaries, evidence custody/lineage,
+  location/privacy, online/intermittent-connectivity behavior, immutable review,
+  and proposal-only downstream handoffs. The Product Owner accepted option A for
+  `P9-D01`–`P9-D12` exactly as recorded and authorized only `P9-S01–S05`
+  implementation. Focused PostgreSQL validation now passes (6 P9 cases), and
+  `daily_reports.0005` rollback/reapply and PostgreSQL catalog validation pass.
+  The Product Owner accepts the completed bounded implementation. P9-S06–S11 is
+  separately Product Owner accepted within its bounded envelope; subsequent P9
+  sessions through S25 are also Product Owner accepted, and S26 closeout is
+  complete. P10 runtime remains separately unauthorized.
 - **Outcome:** context-aware mobile daily capture with structured weather, work
   fronts, visits, meetings, instructions, photos/video and source evidence;
   previous-day/template reuse; optional voice-assisted reviewed transcription;
@@ -1970,7 +2043,18 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P9.2 HSE/Quality extensions to governed knowledge
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P9-S06–S11 PRODUCT OWNER ACCEPTED.** The
+  [HSE / QA / CAPA decision packet](docs/architecture/P9_S06_S11_HSE_QA_CAPA_DECISION_PACKET.md)
+  verifies the accepted `P9-S01–S05` prerequisite and defines the exact six-session
+  envelope, shared-mechanics/typed-profile recommendation, preserved HSE versus
+  QA/QC authority, inspection/permit/test/finding/NCR/CAPA state machines,
+  DMS-only evidence custody, permission and person-level separation choices,
+  expand-only migration, focused PostgreSQL acceptance, and downstream no-effect
+  gates. On 2026-10-06 the Product Owner accepted `P9-Q01`–`P9-Q18 = A` and
+  authorized the exact section 16.3 runtime. Focused clean-schema PostgreSQL
+  validation passes (10 cases), including bounded migration rollback/reapply.
+  No `P9-S12+` work, production activation or automatic downstream effect is
+  authorized; the bounded runtime is Product Owner accepted.
 - **Outcome:** HSE risk register, inspections, permit-to-work, toolbox meetings,
   PPE controls, training/qualification checks, witnesses, investigation/root cause,
   CAPA, due-date/escalation and performance metrics; plus QA/QC ITP, Inspection
@@ -1989,7 +2073,14 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P9.3 Partner performance and prequalification
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P9-S12–S15 PRODUCT OWNER ACCEPTED.** The
+  [Partner Qualification and Performance decision packet](docs/architecture/P9_S12_S15_PARTNER_QUALIFICATION_AND_PERFORMANCE_DECISION_PACKET.md)
+  is the authority for the exact four-session envelope, tenant-local
+  `BusinessParty` extension, evidence/expiry/category approval, project-scoped
+  explainable evaluation, narrow SoD, DMS-only evidence custody, expand-only
+  migration, proposal-only handoffs and focused PostgreSQL acceptance. `P9-P01`–
+  `P9-P18 = Option A` are accepted. Runtime is bounded to this scope only; no
+  `P9-S21+` work is authorized by the completed notification/support tranche.
 - **Outcome:** qualification, expiring evidence, approved vendor/category status,
   project evaluations and explainable delivery/quality/safety/commercial metrics.
 - **Prerequisites:** mature party master, Procurement/Contracts/HSE/Quality facts,
@@ -2002,7 +2093,15 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P9.4 Notifications and support platform
 
-- **Status / priority:** **PLANNED**
+- **Status / priority:** **P9-S16–S20 PRODUCT OWNER ACCEPTED.** The
+  [Notification and Support decision packet](docs/architecture/P9_S16_S20_NOTIFICATION_AND_SUPPORT_DECISION_PACKET.md)
+  is the authority for the exact five-session envelope, `N01`–`N18`, source-only
+  calendar/support boundaries, DMS/consent/privacy controls and focused PostgreSQL
+  acceptance. `P9-N01`–`P9-N18=A`; the single-runner clean-schema migration,
+  11-case focused PostgreSQL module, dependency-safe rollback/reapply and final
+  repository checks passed on 2026-10-06. The Product Owner accepted this bounded
+  scope and `P9-N01`–`P9-N18=A`; providers, queues, schedulers and `P9-S21+`
+  remain unauthorized.
 - **Outcome:** tenant-aware in-app/email notification preferences and delivery,
   provider-backed SMS only for an approved justified use case, rule-based reminders
   and escalation delivery over existing work-item due/overdue facts, calendar
@@ -2031,10 +2130,26 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P9.5 Enterprise knowledge management and reuse
 
-- **Status / priority:** **PLANNED after knowledge-producing workflows stabilize**
+- **Status / priority:** **P9-S21–S24 PRODUCT OWNER ACCEPTED.** The
+  [Knowledge Publication and Reuse decision packet](docs/architecture/P9_S21_S24_KNOWLEDGE_PUBLICATION_AND_REUSE_DECISION_PACKET.md)
+  verifies `P9-S01–S20 = Product Owner accepted` and defines the exact four-session
+  planning envelope, source-authority and DMS boundaries, Tenant/Platform ownership,
+  immutable publication/provenance, explicit recurrence and reuse evidence,
+  privacy, permissions/SoD, RTL UI, non-fabricating migration and focused
+  PostgreSQL acceptance. The Product Owner accepted `P9-K01`–`P9-K24 = A` and the
+  packet's exact bounded runtime wording. The bounded runtime now includes linked
+  reviewed publication correction/supersession and withdrawal history, restricted
+  Tenant-to-Platform promotion, permissioned provenance/history, immutable
+  recurrence and reuse correction, explicit permissions/SoD, audit and Persian RTL/
+  Jalali surfaces. Clean-schema PostgreSQL migration, 13 focused acceptance cases,
+  dependency-safe Knowledge/Organizations rollback/reapply and final repository
+  checks pass with zero fabricated Knowledge facts. `P9-S01–S25 = Product Owner
+  accepted`. P10 runtime, AI/search service and downstream effects remain
+  unauthorized pending their separate Product Owner decisions.
 - **Outcome:** governed `LessonLearned`, `BestPractice`, `TechnicalNote`,
   `Procedure`, `KnowledgeArticle` and `CaseStudy` concepts; project-closeout
-  knowledge review; repeated-issue and recurring-root-cause detection; reviewed
+  knowledge review; reviewed, reproducible repeated-issue evidence without a
+  root-cause inference; reviewed
   promotion from Lesson to Procedure, Checklist, System Control, Training or
   Partner Performance input; contextual discovery, acknowledgement and reuse/
   effectiveness tracking.
@@ -2053,11 +2168,39 @@ Stable masters + consent/privacy + support operations -> future network/AI
   retraction and reuse-metric lineage.
 - **Effort / risk:** **L / High**.
 
+### P9.6 Final privacy, evidence, workflow assurance and closeout
+
+- **P9-S25 status / priority:** **PRODUCT OWNER ACCEPTED.** The
+  [final privacy, evidence and workflow review decision packet](docs/architecture/P9_S25_FINAL_PRIVACY_EVIDENCE_AND_WORKFLOW_REVIEW_DECISION_PACKET.md)
+  records `P9-F01`–`P9-F18=A`, completed cross-domain privacy/evidence/workflow
+  assurance, the bounded cache/notification hardening and focused PostgreSQL
+  evidence. `test_construction_erp` is non-authoritative, excluded from P9
+  acceptance evidence, and must be preserved and isolated; it is not an S25
+  functional blocker. `P9-S01–S25 = Product Owner accepted`.
+- **P9-S26 status:** **CLOSEOUT COMPLETE.** The final P9 closeout and bounded P10
+  handoff are recorded in
+  [P9 final assurance closeout and P10 handoff](docs/architecture/P9_FINAL_ASSURANCE_CLOSEOUT_AND_P10_HANDOFF.md).
+  `P9 = Product Owner accepted / phase closed.` This does not authorize P10 runtime.
+- **Boundary:** no new privacy/evidence/workflow authority, provider, scheduler,
+  integration, AI/search/publication capability, downstream effect, production
+  cutover or activation is authorized.
+
 ## P10 — Reporting, reconciliation, and first production certification
 
 ### P10.1 Governed metrics and management reporting
 
 - **Status / priority:** **PLANNED**
+- **P10-S01 planning (2026-10-07):** the
+  [P10-S01–S06 governed metrics and reporting decision packet](docs/architecture/P10_S01_S06_GOVERNED_METRICS_AND_REPORTING_DECISION_PACKET.md)
+  verifies the formally closed P9 entry baseline and the exact official
+  `P10-S01–S06` envelope, then prepares the ownership, first metric set,
+  lifecycle, permission/SoD, privacy, DMS, migration, UI, validation and bounded
+  runtime-authorization decisions. `P10-M01`–`P10-M24` are recommendations only;
+  Product Owner decisions, named metric/source owners, acceptance and
+  release/rollback owners, tolerated-risk disposition and explicit authorization
+  remain required. P10-S01 changes no runtime. P10-S02–S24, scheduled/provider
+  delivery, queues, external integrations, automatic downstream effects and all
+  production cutover/activation remain unauthorized.
 - **Outcome:** semantic metric catalogue, project/portfolio dashboards, scheduled
   reports/exports, saved views, source drill-through and freshness indicators.
 - **Prerequisites:** stable authoritative transactions from P2-P8 and explicit
@@ -2175,6 +2318,75 @@ separately governed.
 advanced AI, B2B network, GPS/telematics, GIS, enterprise SSO, broad offline work and
 architectural distribution after the core. This confirms sequencing, not a reduced
 core or a frozen release scope; approval evidence is recorded in the packet.
+
+**P9-S01–S05 decision status (2026-10-05):** the
+[authoritative decision packet](docs/architecture/P9_S01_S05_FIELD_OPERATIONS_AND_PAPERLESS_EVIDENCE_DECISION_PACKET.md)
+records `P9-D01`–`P9-D12` as **ACCEPTED — A** exactly as recommended, covering
+field authority, DMS custody, initial client/offline boundary, location/mismatch
+policy, review and separation, media, proposal families/consumption, and
+retention. The Product Owner accepts the completed bounded `P9-S01–S05` runtime
+based on its recorded PostgreSQL, migration, Django, Ruff, template, and diff
+evidence. P9-S06–S11 is separately Product Owner accepted within its bounded
+envelope; `P9-S12+`, production activation and every preserved
+downstream no-effect gate remain unauthorized.
+
+**P9-S06–S11 acceptance status (2026-10-06):** the
+[authoritative decision packet](docs/architecture/P9_S06_S11_HSE_QA_CAPA_DECISION_PACKET.md)
+records the exact session decomposition and accepted `P9-Q01`–`P9-Q18=A` decisions for
+HSE/QA inspections, permits, tests, findings/NCR, CAPA, verification, closure,
+evidence, permissions, migration, UI, and focused acceptance. The bounded runtime
+is Product Owner accepted with 10 clean-schema PostgreSQL cases and rollback/
+reapply evidence. `P9-S12+`, automatic
+downstream effects and production activation remain unauthorized.
+
+**P9-S12–S15 acceptance status (2026-10-06):** the
+[authoritative decision packet](docs/architecture/P9_S12_S15_PARTNER_QUALIFICATION_AND_PERFORMANCE_DECISION_PACKET.md)
+records the accepted four-session envelope for BusinessParty qualification/
+performance evidence and explainable project evaluation. It records
+`P9-P01`–`P9-P18=A`, DMS-only evidence custody, narrow SoD,
+expand-only/non-fabricating migration, proposal-only handoffs and focused
+PostgreSQL acceptance. The Product Owner accepted the bounded implementation;
+automatic downstream effects and production activation remain unauthorized.
+
+**P9-S16–S20 acceptance status (2026-10-06):** the
+[authoritative decision packet](docs/architecture/P9_S16_S20_NOTIFICATION_AND_SUPPORT_DECISION_PACKET.md)
+records `P9-N01`–`P9-N18=A`, the accepted bounded runtime and the exact final
+validation evidence: clean-schema migration, 11 focused PostgreSQL cases,
+dependency-safe Support/Organizations rollback/reapply and clean final checks.
+The Product Owner accepted the tranche. Consolidated `P9-S01–S20 = Product Owner
+accepted`. `P9-S21+`, providers, schedulers, automatic downstream effects and
+production activation remain unauthorized.
+
+**P9-S21–S24 implementation status (2026-10-06):** the
+[authoritative decision packet](docs/architecture/P9_S21_S24_KNOWLEDGE_PUBLICATION_AND_REUSE_DECISION_PACKET.md)
+records the exact four-session decomposition and accepted `P9-K01`–`P9-K24=A` for
+reviewed publication, exact provenance, reproducible recurrence and immutable reuse
+evidence. Bounded runtime implementation is complete. Clean-schema PostgreSQL
+migration, 13 focused acceptance cases, dependency-safe rollback/reapply and final
+Django, migration-drift, Ruff, compilation, template/URL and whitespace checks pass;
+exact evidence is recorded in the packet. `test_construction_erp` was not touched.
+`P9-S21–S24 = Product Owner accepted`; its later S25 assurance and S26 closeout
+are recorded separately. AI capabilities, external publication/search, automatic
+downstream effects and production activation remain unauthorized.
+
+**P9-S25 implementation/assurance status (2026-10-06):** the
+[authoritative decision and closeout packet](docs/architecture/P9_S25_FINAL_PRIVACY_EVIDENCE_AND_WORKFLOW_REVIEW_DECISION_PACKET.md)
+records Product Owner acceptance of `P9-F01`–`P9-F18=A` and the exact bounded
+runtime authorization. Proven hardening adds registered-source/active-recipient
+notification creation, exact retry validation, open-time source revalidation,
+non-leaking unavailable-source presentation and private/non-cacheable sensitive
+Field, Support and Knowledge responses. Existing narrow sensitive permissions and
+exact DMS/provenance authorities were retained. A clean disposable PostgreSQL
+migration and 18 focused/affected tests passed; final Django, drift, Ruff,
+template/URL, compilation and whitespace checks passed. **P9-S25 introduced no
+schema migration.** `P9-S25 = Product Owner accepted`; cumulatively,
+`P9-S01–S25 = Product Owner accepted`. The disposable acceptance database was
+removed. The Product Owner classifies the pre-existing `test_construction_erp` as
+non-authoritative/excluded from P9 acceptance evidence and directs it be preserved
+and isolated without maintenance or reuse for P9/P10 acceptance. All S26 readiness
+gates were satisfied before the separately authorized S26 closeout. P10 runtime,
+AI/providers/jobs, downstream effects and production activation remain
+unauthorized.
 
 **P1-S14 Q01/Q02 status (revised 2026-09-29):** D14-04 through D14-09 record the
 Product Owner's IRR/no-FX, UTC/ISO plus Jalali UI, explicit fiscal calendar,

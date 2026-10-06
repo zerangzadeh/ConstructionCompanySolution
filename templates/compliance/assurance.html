@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}ممیزی و تطبیق HSE/QA | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="کنترل اطمینان" page_title="ممیزی و تطبیق HSE/QA" page_description=request.organization.name only %}
+<section class="erp-surface mt-6 rounded-xl p-5">
+  <dl class="grid gap-4 sm:grid-cols-2">
+    <div><dt class="text-sm text-slate-500">رکوردهای بررسی‌شده</dt><dd class="mt-1 text-2xl font-bold">{{ result.checked }}</dd></div>
+    <div><dt class="text-sm text-slate-500">استثناهای تطبیق</dt><dd class="mt-1 text-2xl font-bold">{{ result.exceptions|length }}</dd></div>
+  </dl>
+</section>
+<section class="erp-surface mt-6 overflow-hidden rounded-xl">
+  <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-lg font-bold">استثناها</h2></div>
+  <div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right"><thead><tr><th class="px-4 py-3">رکورد</th><th class="px-4 py-3">نوع مغایرت</th></tr></thead><tbody>
+  {% for item in result.exceptions %}<tr><td class="px-4 py-3"><bdi dir="ltr">{{ item.record }}</bdi></td><td class="px-4 py-3"><bdi dir="ltr">{{ item.issue }}</bdi></td></tr>{% empty %}<tr><td colspan="2" class="px-4 py-4 text-slate-500">مغایرتی یافت نشد.</td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

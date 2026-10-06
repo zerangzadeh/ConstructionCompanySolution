@@ -890,6 +890,92 @@ class BusinessPermissionCode(models.TextChoices):
     DAILY_REPORTS_SUBMIT = "daily_reports.submit", "ارسال گزارش روزانه"
     DAILY_REPORTS_APPROVE = "daily_reports.approve", "تأیید گزارش روزانه"
 
+    FIELD_OBSERVATIONS_VIEW = "field_observations.view", "مشاهده مشاهدات میدانی"
+    FIELD_OBSERVATIONS_CAPTURE = "field_observations.capture", "ثبت و ویرایش مشاهده میدانی"
+    FIELD_OBSERVATIONS_SUBMIT = "field_observations.submit", "ارسال مشاهده میدانی"
+    FIELD_OBSERVATIONS_REVIEW = "field_observations.review", "بررسی مشاهده میدانی"
+    FIELD_OBSERVATIONS_LOCATION_VIEW = "field_observations.location_view", "مشاهده مکان دقیق مشاهده"
+    FIELD_PROPOSALS_PREPARE = "field_proposals.prepare", "تهیه پیشنهاد تحویل مشاهده"
+    FIELD_PROPOSALS_REVIEW = "field_proposals.review", "بررسی پیشنهاد تحویل مشاهده"
+
+    COMPLIANCE_VIEW = "compliance.view", "مشاهده بازرسی و کنترل HSE/QA"
+    COMPLIANCE_TEMPLATES_MANAGE = "compliance.templates_manage", "مدیریت پیش‌نویس الگوی بازرسی"
+    COMPLIANCE_TEMPLATES_PUBLISH = "compliance.templates_publish", "بررسی و انتشار الگوی بازرسی"
+    COMPLIANCE_INSPECTIONS_CREATE = "compliance.inspections_create", "ایجاد و برنامه‌ریزی بازرسی"
+    COMPLIANCE_INSPECTIONS_EXECUTE = "compliance.inspections_execute", "اجرای بازرسی"
+    COMPLIANCE_INSPECTIONS_SUBMIT = "compliance.inspections_submit", "ارسال بازرسی"
+    COMPLIANCE_INSPECTIONS_REVIEW = "compliance.inspections_review", "بررسی و نتیجه‌دهی بازرسی"
+    COMPLIANCE_FINDINGS_CREATE = "compliance.findings_create", "ثبت یافته بازرسی یا آزمون"
+    COMPLIANCE_FINDINGS_CLASSIFY = "compliance.findings_classify", "طبقه‌بندی یافته"
+    COMPLIANCE_FINDINGS_MANAGE = "compliance.findings_manage", "تخصیص و مدیریت یافته"
+    COMPLIANCE_PERMITS_PREPARE = "compliance.permits_prepare", "تهیه و ارسال مجوز HSE"
+    COMPLIANCE_PERMITS_ISSUE = "compliance.permits_issue", "بررسی و صدور مجوز HSE"
+    COMPLIANCE_PERMITS_CONTROL = "compliance.permits_control", "تعلیق، اعاده و ابطال مجوز HSE"
+    COMPLIANCE_TESTS_REQUEST = "compliance.tests_request", "درخواست آزمون QA/QC"
+    COMPLIANCE_TESTS_EXECUTE = "compliance.tests_execute", "اجرا و ثبت نتیجه آزمون"
+    COMPLIANCE_TESTS_REVIEW = "compliance.tests_review", "بررسی، پذیرش یا بی‌اعتبارسازی نتیجه آزمون"
+    COMPLIANCE_NCR_MANAGE = "compliance.ncr_manage", "صدور و مدیریت عدم انطباق رسمی"
+    COMPLIANCE_CAPA_ASSIGN = "compliance.capa_assign", "تأیید و تخصیص CAPA"
+    COMPLIANCE_CAPA_EXECUTE = "compliance.capa_execute", "اجرای CAPA"
+    COMPLIANCE_VERIFY = "compliance.verify", "راستی‌آزمایی مستقل اقدام"
+    COMPLIANCE_EFFECTIVENESS_REVIEW = "compliance.effectiveness_review", "ارزیابی اثربخشی CAPA"
+    COMPLIANCE_CLOSE = "compliance.close", "بستن یافته، NCR یا CAPA"
+    COMPLIANCE_REOPEN = "compliance.reopen", "بازگشایی کنترل‌شده یافته، NCR یا CAPA"
+    COMPLIANCE_EVIDENCE_LINK = "compliance.evidence_link", "پیوند نسخه شواهد HSE/QA"
+    COMPLIANCE_SENSITIVE_EVIDENCE_VIEW = "compliance.sensitive_evidence_view", "مشاهده شواهد حساس HSE/QA"
+    COMPLIANCE_EXPORT = "compliance.export", "خروجی کنترل‌شده HSE/QA"
+    COMPLIANCE_AUDIT_RECONCILE = "compliance.audit_reconcile", "ممیزی و تطبیق HSE/QA"
+    PARTNER_VIEW = "partner.view", "مشاهده صلاحیت و عملکرد همکار"
+    PARTNER_PROFILE_MANAGE = "partner.profile_manage", "مدیریت پروفایل همکار"
+    PARTNER_REQUIREMENTS_MANAGE = "partner.requirements_manage", "انتشار الزام صلاحیت"
+    PARTNER_QUALIFICATIONS_PREPARE = "partner.qualifications_prepare", "تهیه صلاحیت همکار"
+    PARTNER_QUALIFICATIONS_SUBMIT = "partner.qualifications_submit", "ارسال صلاحیت همکار"
+    PARTNER_QUALIFICATIONS_REVIEW = "partner.qualifications_review", "بررسی صلاحیت همکار"
+    PARTNER_QUALIFICATIONS_CONTROL = "partner.qualifications_control", "کنترل صلاحیت همکار"
+    PARTNER_CATEGORY_DECIDE = "partner.category_decide", "تصمیم صلاحیت دسته همکار"
+    PARTNER_EVIDENCE_LINK = "partner.evidence_link", "پیوند شواهد صلاحیت همکار"
+    PARTNER_SENSITIVE_EVIDENCE_VIEW = "partner.sensitive_evidence_view", "مشاهده شواهد حساس همکار"
+    PARTNER_EVALUATIONS_PREPARE = "partner.evaluations_prepare", "تهیه ارزیابی عملکرد همکار"
+    PARTNER_EVALUATIONS_SUBMIT = "partner.evaluations_submit", "ارسال ارزیابی عملکرد همکار"
+    PARTNER_EVALUATIONS_PUBLISH = "partner.evaluations_publish", "انتشار ارزیابی عملکرد همکار"
+    PARTNER_EVALUATIONS_APPEAL = "partner.evaluations_appeal", "اعتراض و تصمیم ارزیابی همکار"
+    PARTNER_PROPOSALS_CREATE = "partner.proposals_create", "ایجاد پیشنهاد صلاحیت همکار"
+    PARTNER_EXPORT = "partner.export", "خروجی کنترل‌شده همکار"
+    PARTNER_AUDIT_RECONCILE = "partner.audit_reconcile", "ممیزی و تطبیق همکار"
+    SUPPORT_NOTIFICATIONS_VIEW = "support.notifications_view", "مشاهده اعلان‌ها"
+    SUPPORT_NOTIFICATIONS_ACKNOWLEDGE = "support.notifications_acknowledge", "تأیید اعلان‌ها"
+    SUPPORT_CALENDAR_VIEW = "support.calendar_view", "مشاهده تقویم نظارتی"
+    SUPPORT_CASE_CREATE = "support.case_create", "ایجاد مورد پشتیبانی"
+    SUPPORT_CASE_VIEW = "support.case_view", "مشاهده مورد پشتیبانی"
+    SUPPORT_CASE_UPDATE = "support.case_update", "به‌روزرسانی مورد پشتیبانی"
+    SUPPORT_CASE_ASSIGN = "support.case_assign", "تخصیص مورد پشتیبانی"
+    SUPPORT_CASE_RESOLVE = "support.case_resolve", "حل و بستن مورد پشتیبانی"
+    SUPPORT_CASE_REOPEN = "support.case_reopen", "بازگشایی مورد پشتیبانی"
+    SUPPORT_EVIDENCE_LINK = "support.evidence_link", "پیوند شواهد پشتیبانی"
+    SUPPORT_EVIDENCE_SENSITIVE_VIEW = "support.evidence_sensitive_view", "مشاهده شواهد حساس پشتیبانی"
+    SUPPORT_ACCESS_REQUEST = "support.access_request", "درخواست دسترسی پشتیبانی"
+    SUPPORT_ACCESS_TENANT_CONFIRM = "support.access_tenant_confirm", "تأیید Tenant دسترسی پشتیبانی"
+    SUPPORT_ACCESS_PLATFORM_APPROVE = "support.access_platform_approve", "تأیید پلتفرم دسترسی پشتیبانی"
+    SUPPORT_ACCESS_USE = "support.access_use", "استفاده از دسترسی پشتیبانی"
+    SUPPORT_ACCESS_REVOKE = "support.access_revoke", "ابطال دسترسی پشتیبانی"
+    SUPPORT_AUDIT_RECONCILE = "support.audit_reconcile", "ممیزی و تطبیق پشتیبانی"
+    KNOWLEDGE_CANDIDATES_CREATE = "knowledge.candidates_create", "ایجاد پیش‌نویس دانش"
+    KNOWLEDGE_CANDIDATES_SUBMIT = "knowledge.candidates_submit", "ارسال کاندید دانش"
+    KNOWLEDGE_CANDIDATES_REVIEW = "knowledge.candidates_review", "بررسی کاندید دانش"
+    KNOWLEDGE_PUBLICATIONS_APPROVE = "knowledge.publications_approve", "تأیید انتشار دانش"
+    KNOWLEDGE_PUBLICATIONS_PUBLISH = "knowledge.publications_publish", "انتشار دانش"
+    KNOWLEDGE_PUBLICATIONS_VIEW = "knowledge.publications_view", "مشاهده دانش منتشرشده"
+    KNOWLEDGE_UNPUBLISHED_VIEW = "knowledge.unpublished_view", "مشاهده کاندیدهای دانش"
+    KNOWLEDGE_PUBLICATIONS_SUPERSEDE = "knowledge.publications_supersede", "جایگزینی انتشار دانش"
+    KNOWLEDGE_PUBLICATIONS_WITHDRAW = "knowledge.publications_withdraw", "پس‌گرفتن انتشار دانش"
+    KNOWLEDGE_HISTORY_VIEW = "knowledge.history_view", "مشاهده تاریخچه دانش"
+    KNOWLEDGE_SENSITIVE_PROVENANCE_VIEW = "knowledge.sensitive_provenance_view", "مشاهده منبع حساس دانش"
+    KNOWLEDGE_RECURRENCE_RECORD = "knowledge.recurrence_record", "ثبت شواهد تکرار"
+    KNOWLEDGE_REUSE_RECORD = "knowledge.reuse_record", "ثبت استفاده مجدد دانش"
+    KNOWLEDGE_TAXONOMY_MANAGE = "knowledge.taxonomy_manage", "مدیریت طبقه‌بندی دانش"
+    KNOWLEDGE_EXPORT = "knowledge.export", "خروجی کنترل‌شده دانش"
+    KNOWLEDGE_AUDIT_RECONCILE = "knowledge.audit_reconcile", "ممیزی و تطبیق دانش"
+
     DEPARTMENTS_VIEW = "departments.view", "مشاهده دپارتمان‌ها"
     DEPARTMENTS_CREATE = "departments.create", "ایجاد دپارتمان"
     DEPARTMENTS_CHANGE = "departments.change", "ویرایش دپارتمان"
@@ -1024,16 +1110,46 @@ class BusinessPermissionCode(models.TextChoices):
         "payroll_statutory_audit.view",
         "مشاهده ممیزی حساس مقرراتی حقوق",
     )
-    PAYROLL_LIABILITY_HANDOFF_PREPARE = ("payroll_liability_handoff.prepare", "تهیه پیشنهاد بدهی حقوق")
-    PAYROLL_LIABILITY_HANDOFF_REVIEW = ("payroll_liability_handoff.review", "بررسی پیشنهاد بدهی حقوق")
-    PAYROLL_ACCOUNTING_HANDOFF_PREPARE = ("payroll_accounting_handoff.prepare", "تهیه پیشنهاد حسابداری حقوق")
-    PAYROLL_ACCOUNTING_HANDOFF_REVIEW = ("payroll_accounting_handoff.review", "بررسی پیشنهاد حسابداری حقوق")
-    PAYROLL_PAYMENT_HANDOFF_PREPARE = ("payroll_payment_handoff.prepare", "تهیه پیشنهاد پرداخت حقوق")
-    PAYROLL_PAYMENT_HANDOFF_REVIEW = ("payroll_payment_handoff.review", "بررسی پیشنهاد پرداخت حقوق")
-    PAYROLL_PROJECT_COST_HANDOFF_PREPARE = ("payroll_project_cost_handoff.prepare", "تهیه پیشنهاد هزینه کار حقوق")
-    PAYROLL_PROJECT_COST_HANDOFF_REVIEW = ("payroll_project_cost_handoff.review", "بررسی پیشنهاد هزینه کار حقوق")
-    PAYROLL_HANDOFF_RECONCILIATION_PREPARE = ("payroll_handoff_reconciliation.prepare", "تهیه تطبیق تحویل مالی حقوق")
-    PAYROLL_HANDOFF_RECONCILIATION_REVIEW = ("payroll_handoff_reconciliation.review", "بررسی تطبیق تحویل مالی حقوق")
+    PAYROLL_LIABILITY_HANDOFF_PREPARE = (
+        "payroll_liability_handoff.prepare",
+        "تهیه پیشنهاد بدهی حقوق",
+    )
+    PAYROLL_LIABILITY_HANDOFF_REVIEW = (
+        "payroll_liability_handoff.review",
+        "بررسی پیشنهاد بدهی حقوق",
+    )
+    PAYROLL_ACCOUNTING_HANDOFF_PREPARE = (
+        "payroll_accounting_handoff.prepare",
+        "تهیه پیشنهاد حسابداری حقوق",
+    )
+    PAYROLL_ACCOUNTING_HANDOFF_REVIEW = (
+        "payroll_accounting_handoff.review",
+        "بررسی پیشنهاد حسابداری حقوق",
+    )
+    PAYROLL_PAYMENT_HANDOFF_PREPARE = (
+        "payroll_payment_handoff.prepare",
+        "تهیه پیشنهاد پرداخت حقوق",
+    )
+    PAYROLL_PAYMENT_HANDOFF_REVIEW = (
+        "payroll_payment_handoff.review",
+        "بررسی پیشنهاد پرداخت حقوق",
+    )
+    PAYROLL_PROJECT_COST_HANDOFF_PREPARE = (
+        "payroll_project_cost_handoff.prepare",
+        "تهیه پیشنهاد هزینه کار حقوق",
+    )
+    PAYROLL_PROJECT_COST_HANDOFF_REVIEW = (
+        "payroll_project_cost_handoff.review",
+        "بررسی پیشنهاد هزینه کار حقوق",
+    )
+    PAYROLL_HANDOFF_RECONCILIATION_PREPARE = (
+        "payroll_handoff_reconciliation.prepare",
+        "تهیه تطبیق تحویل مالی حقوق",
+    )
+    PAYROLL_HANDOFF_RECONCILIATION_REVIEW = (
+        "payroll_handoff_reconciliation.review",
+        "بررسی تطبیق تحویل مالی حقوق",
+    )
 
     PURCHASE_REQUESTS_VIEW = "purchase_requests.view", "مشاهده درخواست‌های خرید"
     PURCHASE_REQUESTS_CREATE = "purchase_requests.create", "ایجاد درخواست خرید"
@@ -1171,6 +1287,81 @@ class BusinessPermissionCode(models.TextChoices):
     STOCK_TRANSACTIONS_POST = "stock_transactions.post", "ثبت نهایی تراکنش انبار"
     STOCK_TRANSACTIONS_REVERSE = "stock_transactions.reverse", "برگشت تراکنش انبار"
     STOCK_BALANCES_VIEW = "stock_balances.view", "مشاهده موجودی انبار"
+    INVENTORY_RESERVATIONS_VIEW = (
+        "inventory_reservations.view",
+        "مشاهده رزروهای موجودی",
+    )
+    INVENTORY_RESERVATIONS_MANAGE = (
+        "inventory_reservations.manage",
+        "ایجاد و تخصیص رزرو موجودی",
+    )
+    INVENTORY_RESERVATIONS_RELEASE = (
+        "inventory_reservations.release",
+        "آزادسازی یا لغو رزرو موجودی",
+    )
+    INVENTORY_TRACEABILITY_VIEW = (
+        "inventory_traceability.view",
+        "مشاهده رهگیری موجودی",
+    )
+    INVENTORY_TRACEABILITY_MANAGE = (
+        "inventory_traceability.manage",
+        "مدیریت مکان و رهگیری موجودی",
+    )
+    INVENTORY_TRACEABILITY_DISPOSE = (
+        "inventory_traceability.dispose",
+        "تعیین تکلیف قرنطینه یا انقضای موجودی",
+    )
+    INVENTORY_COUNTS_VIEW = "inventory_counts.view", "مشاهده شمارش موجودی"
+    INVENTORY_COUNTS_PREPARE = (
+        "inventory_counts.prepare",
+        "آماده‌سازی و ثبت شمارش موجودی",
+    )
+    INVENTORY_COUNTS_APPROVE = (
+        "inventory_counts.approve",
+        "تأیید مستقل شمارش موجودی",
+    )
+    INVENTORY_COUNTS_POST = (
+        "inventory_counts.post",
+        "ثبت تعدیل شمارش موجودی",
+    )
+    INVENTORY_TRANSFERS_VIEW = (
+        "inventory_transfers.view",
+        "مشاهده انتقال‌های امانی موجودی",
+    )
+    INVENTORY_TRANSFERS_PREPARE = (
+        "inventory_transfers.prepare",
+        "آماده‌سازی انتقال امانی موجودی",
+    )
+    INVENTORY_TRANSFERS_DISPATCH = (
+        "inventory_transfers.dispatch",
+        "ارسال انتقال امانی موجودی",
+    )
+    INVENTORY_TRANSFERS_ACCEPT = (
+        "inventory_transfers.accept",
+        "پذیرش مستقل انتقال امانی موجودی",
+    )
+    INVENTORY_TRANSFERS_RESOLVE = (
+        "inventory_transfers.resolve",
+        "تعیین تکلیف مغایرت انتقال موجودی",
+    )
+    INVENTORY_RECONCILIATIONS_VIEW = (
+        "inventory_reconciliations.view",
+        "مشاهده تطبیق مقدار و امانت موجودی",
+    )
+    INVENTORY_VALUATION_VIEW = "inventory_valuation.view", "مشاهده ارزش‌گذاری موجودی"
+    INVENTORY_VALUATION_PREPARE = "inventory_valuation.prepare", "تهیه ارزش‌گذاری موجودی"
+    INVENTORY_VALUATION_REVERSE = (
+        "inventory_valuation.reverse",
+        "برگشت ارزش‌گذاری موجودی",
+    )
+    INVENTORY_VALUATION_RECONCILE = (
+        "inventory_valuation.reconcile",
+        "تطبیق ارزش‌گذاری موجودی",
+    )
+    INVENTORY_VALUATION_SUPPLY = (
+        "inventory_valuation.supply",
+        "ارسال پیشنهاد هزینه موجودی",
+    )
 
     EQUIPMENT_VIEW = "equipment.view", "مشاهده تجهیزات"
     EQUIPMENT_CREATE = "equipment.create", "ایجاد تجهیز"
@@ -1200,6 +1391,140 @@ class BusinessPermissionCode(models.TextChoices):
         "maintenance_records.transition",
         "تغییر وضعیت سرویس و تعمیر",
     )
+    EQUIPMENT_OPERATIONS_VIEW = "equipment_operations.view", "مشاهده عملیات تجهیز"
+    EQUIPMENT_METERS_RECORD = "equipment_meters.record", "ثبت قرائت تجهیز"
+    EQUIPMENT_METERS_CORRECT = "equipment_meters.correct", "اصلاح قرائت تجهیز"
+    EQUIPMENT_USAGE_RECORD = "equipment_usage.record", "ثبت کارکرد تجهیز"
+    EQUIPMENT_FUEL_RECORD = "equipment_fuel.record", "ثبت سوخت تجهیز"
+    EQUIPMENT_DOWNTIME_MANAGE = "equipment_downtime.manage", "مدیریت توقف تجهیز"
+    EQUIPMENT_QUALIFICATIONS_MANAGE = (
+        "equipment_qualifications.manage",
+        "مدیریت صلاحیت اپراتور تجهیز",
+    )
+    EQUIPMENT_MAINTENANCE_PLANS_MANAGE = (
+        "equipment_maintenance_plans.manage",
+        "مدیریت برنامه نگهداری",
+    )
+    EQUIPMENT_WORK_ORDERS_MANAGE = (
+        "equipment_work_orders.manage",
+        "مدیریت دستورکار نگهداری",
+    )
+    EQUIPMENT_WORK_ORDERS_COMPLETE = (
+        "equipment_work_orders.complete",
+        "تکمیل دستورکار نگهداری",
+    )
+    EQUIPMENT_WORK_ORDERS_REOPEN = (
+        "equipment_work_orders.reopen",
+        "بازگشایی دستورکار نگهداری",
+    )
+    EQUIPMENT_SPARE_LINKS_MANAGE = (
+        "equipment_spare_links.manage",
+        "پیوند قطعات یدکی تجهیز",
+    )
+    EQUIPMENT_SPARE_LINKS_RECONCILE = (
+        "equipment_spare_links.reconcile",
+        "تطبیق قطعات یدکی تجهیز",
+    )
+    EQUIPMENT_COST_POLICY_VIEW = (
+        "equipment_cost_policy.view",
+        "مشاهده سیاست هزینه تجهیز",
+    )
+    EQUIPMENT_COST_POLICY_MANAGE = (
+        "equipment_cost_policy.manage",
+        "تهیه سیاست هزینه تجهیز",
+    )
+    EQUIPMENT_COST_POLICY_PUBLISH = (
+        "equipment_cost_policy.publish",
+        "انتشار سیاست هزینه تجهیز",
+    )
+    EQUIPMENT_COST_ALLOCATION_VIEW = (
+        "equipment_cost_allocation.view",
+        "مشاهده تخصیص هزینه تجهیز",
+    )
+    EQUIPMENT_COST_ALLOCATION_PREPARE = (
+        "equipment_cost_allocation.prepare",
+        "تهیه تخصیص هزینه تجهیز",
+    )
+    EQUIPMENT_COST_ALLOCATION_REVIEW = (
+        "equipment_cost_allocation.review",
+        "بررسی تخصیص هزینه تجهیز",
+    )
+    EQUIPMENT_COST_ALLOCATION_REVERSE = (
+        "equipment_cost_allocation.reverse",
+        "برگشت تخصیص هزینه تجهیز",
+    )
+    EQUIPMENT_COST_HANDOFF_PREPARE = (
+        "equipment_cost_handoff.prepare",
+        "تهیه پیشنهاد هزینه تجهیز",
+    )
+    EQUIPMENT_COST_HANDOFF_REVIEW = (
+        "equipment_cost_handoff.review",
+        "بررسی پیشنهاد هزینه تجهیز",
+    )
+    EQUIPMENT_COST_HANDOFF_RECONCILE = (
+        "equipment_cost_handoff.reconcile",
+        "تطبیق پیشنهاد هزینه تجهیز",
+    )
+
+    FIXED_ASSETS_VIEW = "fixed_assets.view", "مشاهده دارایی‌های ثابت"
+    FIXED_ASSET_CANDIDATE_PREPARE = (
+        "fixed_assets.candidate_prepare",
+        "تهیه نامزد دارایی ثابت",
+    )
+    FIXED_ASSET_CANDIDATE_REVIEW = (
+        "fixed_assets.candidate_review",
+        "بررسی نامزد دارایی ثابت",
+    )
+    FIXED_ASSETS_MANAGE = "fixed_assets.manage", "مدیریت دارایی ثابت"
+    FIXED_ASSET_CLASS_POLICY_MANAGE = (
+        "fixed_assets.class_policy_manage",
+        "تهیه طبقه و سیاست دارایی",
+    )
+    FIXED_ASSET_CLASS_POLICY_PUBLISH = (
+        "fixed_assets.class_policy_publish",
+        "انتشار طبقه و سیاست دارایی",
+    )
+    FIXED_ASSET_CAPITALIZE = "fixed_assets.capitalize", "سرمایه‌ای‌کردن دارایی"
+    FIXED_ASSET_TRANSACTION_PREPARE = (
+        "fixed_assets.transaction_prepare",
+        "تهیه رویداد دارایی",
+    )
+    FIXED_ASSET_TRANSACTION_REVIEW = (
+        "fixed_assets.transaction_review",
+        "بررسی رویداد دارایی",
+    )
+    FIXED_ASSET_TRANSACTION_REVERSE = (
+        "fixed_assets.transaction_reverse",
+        "برگشت رویداد دارایی",
+    )
+    FIXED_ASSET_DEPRECIATION_PREVIEW = (
+        "fixed_assets.depreciation_preview",
+        "پیش‌نمایش استهلاک",
+    )
+    FIXED_ASSET_DEPRECIATION_FINALIZE = (
+        "fixed_assets.depreciation_finalize",
+        "نهایی‌سازی استهلاک",
+    )
+    FIXED_ASSET_DEPRECIATION_REVERSE = (
+        "fixed_assets.depreciation_reverse",
+        "برگشت استهلاک",
+    )
+    FIXED_ASSET_TRANSFER = "fixed_assets.transfer", "انتقال دارایی ثابت"
+    FIXED_ASSET_IMPAIR = "fixed_assets.impair", "کاهش ارزش دارایی ثابت"
+    FIXED_ASSET_DISPOSE = "fixed_assets.dispose", "واگذاری یا خروج دارایی ثابت"
+    FIXED_ASSET_HANDOFF_PREPARE = (
+        "fixed_assets.handoff_prepare",
+        "تهیه پیشنهاد دارایی ثابت",
+    )
+    FIXED_ASSET_HANDOFF_REVIEW = (
+        "fixed_assets.handoff_review",
+        "بررسی پیشنهاد دارایی ثابت",
+    )
+    FIXED_ASSET_HANDOFF_RECONCILE = (
+        "fixed_assets.handoff_reconcile",
+        "تطبیق پیشنهاد دارایی ثابت",
+    )
+    FIXED_ASSET_AUDIT_VIEW = "fixed_assets.audit_view", "مشاهده ممیزی دارایی ثابت"
 
     SAFETY_INCIDENTS_VIEW = "safety_incidents.view", "مشاهده حوادث ایمنی"
     SAFETY_INCIDENTS_CREATE = "safety_incidents.create", "ثبت حادثه ایمنی"
@@ -1215,6 +1540,61 @@ class BusinessPermissionCode(models.TextChoices):
     QUALITY_ISSUES_CLOSE = "quality_issues.close", "بستن مسئله کیفیت"
 
     FINANCIALS_VIEW = "financials.view", "مشاهده داشبورد و گزارش‌های مالی"
+    REPORTING_METRIC_CATALOG_VIEW = (
+        "reporting.metric_catalog.view",
+        "مشاهده کاتالوگ شاخص‌های حاکم‌شده",
+    )
+    REPORTING_METRIC_DEFINITION_PREPARE = (
+        "reporting.metric_definition.prepare",
+        "تهیه تعریف شاخص",
+    )
+    REPORTING_METRIC_DEFINITION_REVIEW = (
+        "reporting.metric_definition.review",
+        "بررسی تعریف شاخص",
+    )
+    REPORTING_METRIC_DEFINITION_PUBLISH = (
+        "reporting.metric_definition.publish",
+        "انتشار تعریف شاخص",
+    )
+    REPORTING_METRIC_RESULT_VIEW = (
+        "reporting.metric_result.view",
+        "مشاهده نتیجه شاخص",
+    )
+    REPORTING_METRIC_RESULT_VIEW_SENSITIVE = (
+        "reporting.metric_result.view_sensitive",
+        "مشاهده نتیجه حساس شاخص",
+    )
+    REPORTING_PORTFOLIO_VIEW = "reporting.portfolio.view", "مشاهده شاخص‌های سبد پروژه"
+    REPORTING_METRIC_REFRESH_RUN = (
+        "reporting.metric_refresh.run",
+        "اجرای بازسازی شاخص",
+    )
+    REPORTING_METRIC_REFRESH_REVIEW = (
+        "reporting.metric_refresh.review",
+        "بررسی نتیجه بازسازی شاخص",
+    )
+    REPORTING_SOURCE_DRILLTHROUGH_VIEW = (
+        "reporting.source_drillthrough.view",
+        "مشاهده مسیر منبع شاخص",
+    )
+    REPORTING_SAVED_VIEW_MANAGE_OWN = (
+        "reporting.saved_view.manage_own",
+        "مدیریت نمای ذخیره‌شده شخصی",
+    )
+    REPORTING_SAVED_VIEW_MANAGE_SHARED = (
+        "reporting.saved_view.manage_shared",
+        "مدیریت نمای ذخیره‌شده مشترک",
+    )
+    REPORTING_EXPORT_CREATE = "reporting.export.create", "ایجاد خروجی کنترل‌شده شاخص"
+    REPORTING_EXPORT_DOWNLOAD = (
+        "reporting.export.download",
+        "دریافت خروجی کنترل‌شده شاخص",
+    )
+    REPORTING_EXPORT_SENSITIVE = (
+        "reporting.export.sensitive",
+        "خروجی حساس شاخص",
+    )
+    REPORTING_AUDIT_VIEW = "reporting.audit.view", "مشاهده ممیزی گزارش‌گیری"
     AUDIT_VIEW = "audit.view", "مشاهده گزارش رویدادها"
     WORKFLOWS_VIEW = "workflows.view", "مشاهده تعریف‌های گردش‌کار"
     WORKFLOWS_CREATE = "workflows.create", "ایجاد تعریف گردش‌کار"

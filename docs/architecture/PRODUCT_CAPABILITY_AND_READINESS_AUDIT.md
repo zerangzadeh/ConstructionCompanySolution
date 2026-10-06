@@ -59,16 +59,17 @@ This is a static and test-discovery audit, not a legal opinion, penetration test
 | Workflow/work management | **IMPLEMENTED** | Versioned/published definitions, runtime instances, steps, candidates, work items, assignment history, delegation, bounded registries, position routing, workbench, domain adoption, and PostgreSQL acceptance evidence exist. It is not general BPMN and must remain bounded. |
 | Billing/progress claims | **P6-S01–S32 PRODUCT OWNER ACCEPTED** | Baselines, receivable claims and distinct payable subcontract certificates have cumulative stable-line calculations, linked replacement/cancellation, approval workflow and RTL evidence UI. Platform-owned national regulatory rules resolve directly by effective date; taxpayer-invoice lineage, contractor-compliance assessments and immutable export/test-attempt evidence use SoD and pinned evidence. Explicit AR/AP sources and dormant posting identities are registered; automatic recognition/journals, downstream financial correction reversal, official provider transmission and statutory/legal effects remain gated. |
 | Procurement | **PARTIALLY IMPLEMENTED / P5-S01–S27 ACCEPTED** | P5-S05–S17 source-to-match controls remain authoritative and P5-S18–S25 provide the accepted bounded portal/UI. P5-S26–S27 harden exact external identity against ambiguous email ownership, email rebinding and internal-member impersonation; make browser retry identity opaque/stable; preserve bid privacy/private caching; and add permissioned Tenant/project-scoped read-only match/discrepancy review. Missing identity, permission, scope, policy or evidence fails closed. No account provisioning, external upload/delivery, force-match, material override, payable, GL, Project Cost, stock, Treasury/cash or production activation is created; P5-S28+ remains unauthorized. |
-| Inventory | **PARTIALLY IMPLEMENTED** | Warehouses and immutable/reversible stock ledger movements exist. Reservations, bins, lots/serials, cycle counts, valuation/cost layers, issue-to-activity, and procurement/accounting integration are absent. |
-| Equipment | **PARTIALLY IMPLEMENTED** | Master, conflict-safe assignment, and maintenance history exist. Usage meters, operator/certification, fuel, downtime, ownership/lease, cost recovery, fixed-asset linkage, and daily-report integration are absent. |
-| Daily site operations | **PARTIALLY IMPLEMENTED** | Reports, labor/equipment/material/activity/delay lines, lifecycle, and master references for some rows exist. Labor and equipment remain free text; mobile/offline capture, timesheet/usage generation, media/evidence capture, and cost propagation are absent. |
-| HSE and Quality | **PARTIALLY IMPLEMENTED** | Safety incidents and quality issues have controlled lifecycles, assignments, workflow adoption, and audit. Inspections, risk registers, permits, toolbox talks, test/inspection plans, formal CAPA, knowledge extraction, and generalized document links are absent. |
-| Documents | **PARTIALLY IMPLEMENTED** | Private versioned documents, immutable versions, explicit links to six domains, validation, secure download, audit, retention/hold governance foundations and P5-S08 protected quarantined sealed-supplier custody exist. Sealed evidence is classified separately and denied from generic listing/search/download/export/Admin paths. The wide generic link table will not scale across all target domains; production malware processing/object storage, general classification depth, OCR, transmittals and production recovery controls remain absent. |
+| Inventory | **PARTIALLY IMPLEMENTED; P8-S01–S17 ACCEPTED** | Warehouses and immutable/reversible quantity movements remain authoritative. Dedicated permissions govern custody and moving-WAC valuation evidence, source/version/policy pins, missing-cost exceptions, immutable reversals, transfer lineage, read-only reconciliation and RTL workbench. Proposal envelopes create no Accounting journal or Project Cost actual; production behavior remains unauthorized. |
+| Equipment / Fixed Assets | **PARTIALLY IMPLEMENTED; P8-S01–S27 ACCEPTED** | Equipment operations, versioned internal-rate/conserved allocation proposals, and a distinct source-backed Fixed Assets register, capitalization/transaction/depreciation evidence and proposal handoffs are Product Owner accepted under C01–C38=A. Existing maintenance `cost` remains descriptive. No journal, Project Cost actual, payable, cash or Inventory mutation is created. |
+| Daily site operations | **PARTIALLY IMPLEMENTED; P9-S01–S26 PRODUCT OWNER ACCEPTED / CLOSED** | Existing reports remain separate. Field Operations provides online-first, tenant/project-scoped field-observation drafts, optional minimized/untrusted location, exact DMS-version evidence pins, immutable submission/review/correction lineage and reviewed source-only handoff proposals. It does not create HSE/QA records, downstream facts, mobile native runtime, broad offline sync or background jobs. |
+| HSE and Quality | **PARTIALLY IMPLEMENTED; P9-S01–S26 PRODUCT OWNER ACCEPTED / CLOSED** | Existing SafetyIncident/QualityIssue remain authoritative. The accepted bounded typed-profile runtime adds version-pinned inspections, source-backed permits, QA tests/results, findings versus explicit NCR, CAPA verification/effectiveness/closure, exact DMS evidence, scoped export/reconciliation and RTL operations. Risk registers, toolbox/PPE, broader ITP/material approval/punch/rework, notifications/escalation delivery, metrics and automatic knowledge extraction remain absent; reviewed Knowledge derivatives are separately governed. |
+| Documents | **PARTIALLY IMPLEMENTED** | Private versioned documents, immutable versions, closed typed domain links including Field Operations, validation, secure download, audit, retention/hold governance foundations and P5-S08 protected quarantined sealed-supplier custody exist. Sealed evidence is classified separately and denied from generic listing/search/download/export/Admin paths. The wide generic link table will not scale across all target domains; production malware processing/object storage, general classification depth, OCR, transmittals and production recovery controls remain absent. |
+| Knowledge | **P9-S01–S26 PRODUCT OWNER ACCEPTED / CLOSED** | The bounded runtime provides reviewed derivative candidates and immutable publication versions, separate Tenant/Platform scope, exact typed source and DMS-version/hash provenance, linked correction/supersession/withdrawal, controlled Tenant-to-Platform promotion, deterministic recurrence and typed reuse evidence with immutable corrections, permissions/SoD, audit and Persian RTL/Jalali operations. Clean-schema PostgreSQL acceptance, dependency-safe rollback/reapply and final checks pass; formal policy, AI, cross-Tenant source disclosure and downstream effects remain excluded. |
 | Expenses and payments | **PARTIALLY IMPLEMENTED / BOUNDED** | P4-S26–S30 adds audited expense draft/submission/approval/return/void, source/idempotency controls, conserved accepted-budget coding, manual recurrence proposals and advisory budget snapshots while retaining legacy recorded history. P4-S31–S34 adds project-scoped accepted-budget/expense comparison and audited bounded export. P4-S35–S37 hardens exact retry/concurrency semantics and adds separately permissioned incomplete multi-source reconciliation that labels exclusions, uncomparable evidence and unresolved differences; it creates no control policy. Posted `Payment` and its allocations remain separate. Expense approval is not AP/AR, Treasury, settlement, Project Cost activation, or double-entry Accounting. |
-| Accounting, Treasury, AP/AR, Payroll, Fixed assets | **PARTIAL ACCOUNTING + TREASURY/AP-AR + NON-POSTING PAYROLL PROPOSALS; CONSUMER ACTIVATION MISSING** | Accounting, AP/Subledger, Treasury and Project Controls remain sole downstream authorities. Payroll now offers immutable proposals only; it creates no recognized obligation, journal/GL entry, released/executed payment, cash movement, commitment or Project Cost actual. |
+| Accounting, Treasury, AP/AR, Payroll, Fixed assets | **PARTIAL ACCOUNTING + TREASURY/AP-AR + NON-POSTING PAYROLL PROPOSALS + FIXED-ASSET EVIDENCE; CONSUMER ACTIVATION MISSING** | Accounting, AP/Subledger, Treasury and Project Controls remain sole downstream authorities. Payroll offers immutable proposals only. P8-S24–S27 implements the distinct source-backed Fixed Assets register and monthly straight-line book evidence, but no journal, payment, commitment, Project Cost actual or consumer activation is authorized. |
 | Audit and observability | **PARTIALLY IMPLEMENTED** | Append-only `AuditEvent` exists with sensitive-key filtering. Correlation/request IDs, structured change sets, security monitoring, metrics, tracing, error tracking, and operational alerting are absent. |
 | Reporting/BI | **PARTIALLY IMPLEMENTED** | Financial read models aggregate approved estimates, recorded expenses, and posted payments. There is no governed semantic metric catalogue, warehouse, scheduled reporting, drill-through contract, or reconciliation control. |
-| Support and AI | **MISSING** | No support-ticket, tenant support-access grant, knowledge base, AI support assistant, extraction review, model governance, or AI audit trail exists. |
+| Support and AI | **PARTIALLY IMPLEMENTED; P9-S16–S26 PRODUCT OWNER ACCEPTED / CLOSED** | Source-linked in-app attention, Support cases, exact DMS evidence, consented diagnostics and bounded support access are implemented. AI support, extraction review, model governance, AI audit, delivery providers, queues and external integrations remain absent. |
 
 ### 3.2 Repository consistency and domain boundaries
 
@@ -95,11 +96,11 @@ The modular-monolith shape is appropriate. Domain services own transitions and w
 | Source-to-pay | Request through immutable match evidence, invite-scoped external submission and bounded portal/custody UI are partially implemented; payable/posting/payment, broader content handling and production activation remain next | Now/Next | Procurement/AP/Treasury, each owning its transaction |
 | Hire-to-pay | Employee, attendance, timesheet, leave, payroll calculation, payslip, payroll journal, employee insurance list and tax outputs | Next | Workforce/Payroll; Accounting receives postings |
 | Contract-to-cash/pay | Contracts/subcontracts, changes, measurements, claims/certificates, retention/advance/penalties, guarantees, settlements | Next | Contracts/Billing/AP-AR/Treasury |
-| Inventory/equipment/assets | Valuation, issue/return, usage/fuel/maintenance costing, asset capitalization/depreciation/disposal | Next | Inventory/Equipment/Fixed Assets |
-| Field-to-control | Mobile daily evidence, labor/equipment/material capture, progress, HSE/quality, downstream draft transactions | Later | Operational domains; approved source documents remain authoritative |
-| HSE/Quality-to-knowledge | Inspections/CAPA, causal taxonomy, lessons learned, reusable preventive controls | Later | HSE/Quality/Knowledge with reviewed publication |
-| Partner lifecycle | Qualification, documents, project performance, risk and renewal | Later | Parties/Partner Performance |
-| Support and AI | Ticketing, safe time-limited support access, knowledge retrieval, cited assistance, reviewed extraction/actions | Later | Support/Knowledge; domain services execute approved actions |
+| Inventory/equipment/assets | P8-S01–S27 accepted; Equipment proposals and distinct asset capitalization/depreciation/disposal evidence are accepted under C01–C38=A | Now/Next | Inventory/Equipment/distinct Fixed Assets; Accounting and Project Controls own downstream facts |
+| Field-to-control | P9-S01–S05 online-first contextual field evidence, DMS-version-pinned media/documents, review/correction lineage and source-only downstream proposals; broader mobile/offline and actual-generation remain later | Now/Later | Field Operations owns observation context/lineage only; DMS owns bytes and versions; Projects/Sites and downstream domains retain authority |
+| HSE/Quality-to-knowledge | Product Owner-accepted P9-S06–S11 implements bounded inspections/permits/tests/findings/NCR/CAPA and exact evidence; P9-S21–S24 implementation and focused validation are Product Owner accepted | Now/Later | HSE/Quality own control facts; Knowledge owns only separately reviewed immutable derivatives and creates no downstream effect |
+| Partner lifecycle | P9-S12–S15 Product Owner accepted: tenant-local BusinessParty qualification/evidence/category approval and explainable project evaluation | Now / bounded | Parties/Partner Performance; no consumer effect |
+| Support and AI | P9-S16–S20 Product Owner accepted for source-linked in-app attention, cases, consented diagnostics and safe time-limited support access; AI remains deferred | Now/Later | Support owns cases/access; Knowledge owns reviewed derivatives; domain services alone execute approved actions |
 | Controlled business network | Explicit opt-in identity claims, invitation/discovery/recommendation, privacy-preserving reputation | Deferred | Separate platform boundary; tenant data private by default |
 
 ### 4.1 Gap analysis by business outcome
@@ -243,7 +244,8 @@ Project cost must be a governed read model sourced from budget, commitments, rec
 | Estimate to budget | Approved estimate revision | Approved budget baseline | On handoff/revision; Project Controls | Mapping difference and approval |
 | PO commitment | Issued/changed PO | Project commitment/subledger | Continuous; Procurement/Cost | Missing/duplicate/version mismatch |
 | Three-way match | Procurement-owned PO and receipt/service acceptance | AP/Finance-owned supplier invoice plus immutable derived match evidence | Before AP approval; each owner corrects only its source | Quantity/price/tax/tolerance reason |
-| Inventory | Stock quantity ledger | Valuation/subledger/accounting control | Periodic and close | Item/warehouse/value difference |
+| Inventory custody | Posted/reversed stock quantity ledger | Bin/lot/serial allocations, reservations, counts and transfer custody | Continuous and count close; Inventory | Unknown/unlocated, over-reserved, duplicate serial, in-transit and count-watermark differences |
+| Inventory value | Quantity/traceability ledger | Valuation layers, Accounting control and Project Cost facts | Periodic and close; Inventory/Accounting/Project Controls each signs its authority | Quantity/value, source-cost, period, mapping and reversal differences |
 | Claim to AR | Approved claim | AR open item + journal | On posting/close | Source version/posting key |
 | Settlement | AR/AP allocation | Treasury cleared movement | Continuous | Unallocated/overallocated/voided |
 | Bank | Treasury book | Imported bank statement | Daily/monthly | Unmatched line and resolution |
@@ -292,15 +294,20 @@ Every KPI definition must state grain, included statuses, time basis, currency/u
 ### Knowledge flow
 
 ```text
-Incident / NCR / delay / change / support case
+Field observation / inspection / NCR / CAPA / partner evaluation / support case
   -> evidence + taxonomy + root-cause/CAPA
   -> reviewed lesson candidate
-  -> approved reusable lesson/control/checklist
+  -> approved reusable knowledge publication
   -> suggested at project/task context
   -> acknowledgement and effectiveness feedback
 ```
 
-AI may suggest classification, summaries, or related lessons, but published knowledge needs a named reviewer, source evidence, sensitivity, scope, version, and expiry/review date.
+P9-S21–S24 permits no AI suggestion, classification, summarization or related-item
+inference. Its implemented bounded boundary requires a named author/reviewer/approver,
+exact source/version evidence, sensitivity, scope, immutable publication version and
+review metadata where applicable. Focused PostgreSQL acceptance passed in S21–S24,
+and S25 cross-domain privacy/provenance assurance is Product Owner accepted. Any
+later AI assistance remains separately gated and cannot publish.
 
 ### Partner performance and qualification
 
@@ -517,7 +524,11 @@ Current corrective themes:
 - First production financial boundary: operational ERP integrated with an external accounting package, or native Accounting/Treasury books. Avoid an ambiguous half-ledger.
 - Regulatory launch scope: taxpayer invoice submission, payroll tax, employee insurance, contractor Article 38 controls, and which outputs must be legally filed from the product.
 - Currency requirement: IRR only initially or multi-currency contracts/settlement; always keep Rial/Toman display explicit.
-- Inventory valuation method and whether perpetual financial valuation is in first release.
+- P8-D01–D06=A, P8-C01–C38=A and P8-S01–S30 are Product Owner accepted in
+  `P8_S24_S27_EQUIPMENT_COST_AND_FIXED_ASSETS_DECISION_PACKET.md` and
+  `P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md`. P8 is complete within its
+  documented non-production boundaries; production activation and downstream
+  recognition remain gated.
 - P7-S23–S28 statutory scope: official tax/insurance sources and effective versions, component mappings, cumulative/opening treatment, rounding, supported employee cases, output schemas, correction/submission evidence, professional sign-off and statutory Self-Approval policy. Attendance devices/providers remain a separate integration decision.
 - Required document signature/evidence standard and retention periods.
 - Hosting/data-residency/support model and acceptable RPO/RTO.
@@ -558,7 +569,7 @@ Sources were accessed 2026-09-23. Vendor pages are evidence of marketed capabili
 ## 23. Audit acceptance checklist
 
 - Current and target states are explicitly separated; workflow runtime and Billing are not re-planned as missing.
-- Payroll, employee insurance lists, Accounting/Treasury producer activation, project costing, fixed assets, automatic contractual change/Claim/EOT consumption, statutory guarantee/clearance effects, HSE/Quality-to-Knowledge, partner performance, controlled network, support, AI support, and reconciliation remain in target scope.
+- Payroll, employee insurance lists, Accounting/Treasury producer activation, project costing, fixed assets, automatic contractual change/Claim/EOT consumption, statutory guarantee/clearance effects, automatic HSE/Quality-to-Knowledge extraction, partner performance, controlled network, AI support, and broader reconciliation remain in target scope.
 - Duplicate authorities and pre-production correction candidates are explicit.
 - No current regulatory rate/schema is hard-coded or presented as legal advice.
 - Tenant filtering and UI visibility are never treated as authorization; project/site scope is a release prerequisite.

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}شواهد استفاده مجدد{% endblock %}
+{% block content %}
+<section class="space-y-4" dir="rtl">
+  <h1 class="text-xl font-bold">شواهد استفاده مجدد</h1>
+  <p class="text-sm text-slate-600">این رویدادها از مشاهده و جست‌وجو جدا هستند و هیچ رکورد مصرف‌کننده‌ای را تغییر نمی‌دهند.</p>
+  {% for item in items %}<article class="rounded border p-3"><div><strong>{{ item.get_reuse_type_display }}</strong> — {{ item.publication_version.title }} — {{ item.created_at|jalali_datetime }} — {% if item.reversed_by.exists %}اصلاح‌شده و خارج از برآورد جاری{% else %}{{ item.get_status_display }}{% endif %}</div><p class="text-sm text-slate-600">{{ item.consumer_type }} / {{ item.consumer_version }} · {{ item.purpose }}</p>{% if item.reverses_id %}<p class="text-xs text-slate-500">اصلاح رویداد {{ item.reverses_id }}: {{ item.reason }}</p>{% elif not item.reversed_by.exists %}<details class="mt-3"><summary class="cursor-pointer text-sm font-bold">برگشت یا جایگزینی</summary><form class="mt-2" method="post" action="{% url 'knowledge:reuse_correct' item.pk %}">{% csrf_token %}{{ correction_form.as_p }}<button class="btn btn-secondary">ثبت اصلاح با دلیل</button></form></details>{% endif %}</article>{% empty %}<p>شاهدی موجود نیست.</p>{% endfor %}
+</section>
+{% endblock %}

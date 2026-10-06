@@ -57,7 +57,7 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="precision",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock"),
+        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
         fields=(
             PolicyFieldSpec("money_scale", int, (0, 2)),
             PolicyFieldSpec("intermediate_calculation_scale", int, (6,)),
@@ -71,7 +71,7 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="rounding",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock"),
+        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
         fields=(
             PolicyFieldSpec("rounding_method", str, ("ROUND_HALF_UP",)),
             PolicyFieldSpec("output_boundary", str, ("final_monetary_line",)),

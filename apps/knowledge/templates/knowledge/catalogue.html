@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}دانش منتشرشده{% endblock %}
+{% block content %}
+<section class="space-y-4" dir="rtl">
+  <div class="flex flex-wrap items-center justify-between gap-3"><h1 class="text-xl font-bold">فهرست دانش منتشرشده</h1><div class="flex gap-2">{% if can_unpublished %}<a class="btn btn-secondary" href="{% url 'knowledge:candidates' %}">کاندیدها و صف بررسی</a>{% endif %}{% if "knowledge.recurrence_record" in business_permission_codes %}<a class="btn btn-secondary" href="{% url 'knowledge:recurrence' %}">تکرار</a>{% endif %}{% if "knowledge.reuse_record" in business_permission_codes %}<a class="btn btn-secondary" href="{% url 'knowledge:reuse' %}">استفاده مجدد</a>{% endif %}</div></div>
+  {% for item in items %}<article class="rounded-lg border p-4"><div class="flex justify-between gap-2"><a class="font-bold" href="{% url 'knowledge:publication_detail' item.pk %}">{{ item.title }}</a><span class="text-xs">{% if item.publication.scope == 'platform' %}Platform{% else %}Tenant{% endif %}</span></div><p>{{ item.get_status_display }} · {{ item.metadata.authority }} · {{ item.published_at|jalali_date }}</p><p>{{ item.body|truncatechars:240 }}</p></article>{% empty %}<p>مورد منتشرشده‌ای در دسترس نیست.</p>{% endfor %}
+</section>
+{% endblock %}

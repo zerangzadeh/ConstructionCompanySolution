@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}صلاحیت و عملکرد همکاران{% endblock %}
+{% block content %}
+<section dir="rtl" class="space-y-6"><h1 class="text-2xl font-bold">صلاحیت و عملکرد همکاران</h1><p>طرف تجاری و نسخه سند در سامانه‌های مرجع باقی می‌مانند؛ این کارتابل فقط تصمیم‌ها و پیشنهادهای منبع‌پیوند را نمایش می‌دهد.</p>
+<div class="grid gap-4 md:grid-cols-2"><article><h2>همکاران</h2><ul>{% for item in profiles %}<li>{{ item.party }}</li>{% empty %}<li>موردی ثبت نشده است.</li>{% endfor %}</ul></article><article><h2>الزامات نسخه‌دار</h2><ul>{% for item in requirements %}<li>{{ item.code }} / {{ item.version }} — {{ item.title }}</li>{% empty %}<li>موردی ثبت نشده است.</li>{% endfor %}</ul></article><article><h2>صلاحیت‌ها</h2><ul>{% for item in qualifications %}<li>{{ item.profile.party }} — {{ item.requirement.code }} — {{ item.get_status_display }}</li>{% empty %}<li>موردی ثبت نشده است.</li>{% endfor %}</ul></article><article><h2>ارزیابی‌ها</h2><ul>{% for item in evaluations %}<li>{{ item.profile.party }} — {{ item.project }} — {{ item.total_score }} — {{ item.get_status_display }}</li>{% empty %}<li>موردی ثبت نشده است.</li>{% endfor %}</ul></article></div></section>
+{% endblock %}

@@ -608,3 +608,35 @@ class StockTransaction(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return self.transaction_number
+
+
+# P8-S05–S11 expand-only custody models live in a focused module while remaining
+# part of the Inventory Django app and public model namespace.
+from apps.inventory.p8_models import (  # noqa: F401
+    DownstreamCostConsumer,
+    DownstreamCostSourceEnvelope,
+    InventoryCount,
+    InventoryCountLine,
+    InventoryCountStatus,
+    InventoryLot,
+    InventoryReservation,
+    InventoryReservationAllocation,
+    InventorySerial,
+    InventoryTransfer,
+    InventoryTransferLine,
+    InventoryTransferStatus,
+    InventoryValuationEvent,
+    InventoryValuationEventType,
+    InventoryValuationException,
+    InventoryValuationPool,
+    InventoryValuationStatus,
+    MaterialTraceabilityProfile,
+    ReservationAllocationStatus,
+    ReservationStatus,
+    StockTraceAllocation,
+    TraceabilityMode,
+    TraceAllocationDirection,
+    TraceQualityStatus,
+    TransferExceptionCode,
+    WarehouseBin,
+)

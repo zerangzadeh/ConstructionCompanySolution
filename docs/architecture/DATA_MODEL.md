@@ -118,14 +118,14 @@ Names are descriptive and may change during an approved detailed design.
 | Contract/Billing | Implemented Billing authorities remain distinct from Contracts-owned `ContractualRecord`/`ContractualRecordEvidence`. P6-S33–S38 retains versioned Site Instruction, Variation/Change Order, contractual Claim and EOT evidence, explicit approved entitlement/amount/delay-responsibility/EOT-day facts, typed source references and linked withdrawal/correction/cancellation history. Existing term, claim/certificate, guarantee/compliance and statutory records remain unchanged. Automatic contract/amendment, budget, schedule, AP/AR, subledger, GL, Treasury/cash and production effects remain gated. |
 | Time and attendance | Implemented WorkCalendar/Holiday/Shift/Break, Attendance/Import/Adjustment/Reconciliation, LeaveMissionRequest, OvertimeRequest, Timesheet/Entry/Review and minute-only LaborDistributionPreview |
 | Payroll/insurance | P7-S01–S36 is Product Owner accepted and complete within its documented non-production boundary. Immutable `FinancialHandoffProposal` envelopes and lines, review, downstream acknowledgment and reconciliation evidence pin finalized run/result, currency and monetary-policy lineage; Project Cost lines additionally pin approved timesheet entry and coding. Final assurance preserves immutable retention, rule/policy/source version history, explicit retroactivity and family-minimized sensitive access. No recognized obligation, journal, payment/cash movement, Project Cost actual, P8 behavior or production activation exists. |
-| Inventory | Reservation, StockTransaction, Lot/Batch, Serial, Bin, Count/Line, TransferCustody, ValuationLayer |
-| Equipment/assets | Meter/Usage, Fuel, OperatorQualification, MaintenancePlan/Work, EquipmentCostRate, FixedAsset, DepreciationRun/Line, Disposal |
-| Field operations | DailyReport, WeatherObservation, WorkFront, Visit, Meeting, Instruction, media/evidence link, reviewed downstream proposal |
-| HSE/Quality | Risk, Inspection, Permit, Toolbox/PPE control, Incident/Investigation, ITP, InspectionRequest, Test/SampleApproval, Punch/NCR/Rework, CAPA |
+| Inventory | P8-S05–S17 is Product Owner accepted: existing `StockTransaction` remains posted quantity authority; custody/traceability/count/transfer records plus `InventoryValuationEvent`, `InventoryValuationPool`, `InventoryValuationException` and proposal-only `DownstreamCostSourceEnvelope` add moving-WAC value evidence without journal or Project Cost actual creation. |
+| Equipment/assets | P8-S01–S30 is Product Owner accepted and complete within documented non-production boundaries. P8-S24–S27 implements Equipment-owned `EquipmentCostPolicyVersion`, component rates, conserved allocations and proposal envelopes plus distinct Fixed Assets class/book policies, register/source/link records, transaction/depreciation evidence and proposal/reconciliation envelopes. P8-S28–S30 assurance adds conserved transfer/reversal evidence, source-dimension lineage, bounded depreciation sequencing/rounding and one-source-per-consumer handoff protection. C01–C38=A governs the accepted non-production boundary; no downstream journal or Project Cost actual is created. |
+| Field operations | Existing DailyReport records plus P9-S01–S05 `FieldObservation`, append-only draft revision/status history, DMS-version-pinned `FieldObservationEvidenceLink`, and `FieldDownstreamProposal`/transition evidence. Field Operations stores no document bytes and proposal records create no downstream fact. |
+| HSE/Quality | Product Owner-accepted P9-S06–S11 implements typed `InspectionTemplate`/immutable versions, `Inspection`, `Permit`, `QualityTest`/immutable `TestResult`, `InspectionFinding`, explicit QA `Nonconformance`, `CapaAction`, exact-version `ComplianceEvidenceLink`, lifecycle events and source-only proposals. Existing Incident/QualityIssue remain separate; Risk, Toolbox/PPE, broader ITP/SampleApproval/Punch/Rework and knowledge are later. |
 | DMS/media | Document and immutable DocumentVersion are implemented, including P5-S08 protected quarantined sealed-supplier evidence and its non-disposable classification; broader classification, OCR/TextExtraction, SignatureEvidence, Transmittal/RFI/Submittal/Drawing control and MediaAlbum remain target concepts |
-| Knowledge | LessonLearned, BestPractice, TechnicalNote, Procedure, KnowledgeArticle, CaseStudy, Promotion/PublicationVersion, ReuseEvidence |
-| Partner | Qualification, Evidence/Expiry, CategoryApproval, ProjectEvaluation, PerformanceMetric/ScoreExplanation |
-| Support/AI | Notification, SupportCase, KnownIssue, FeatureRequest, ReleaseLink, DiagnosticConsent, Knowledge source, AIInteraction/Review evidence |
+| Knowledge | P9-S21–S24 Product Owner-accepted bounded runtime adds tenant- or separately Platform-owned Candidate/immutable revision and Publication/immutable version, typed source/DMS-version/hash provenance, governed RecurrenceEvidence and immutable ReuseEvidence. Source domains own facts and DMS owns bytes; focused PostgreSQL acceptance and rollback/reapply pass. |
+| Partner | Product Owner-accepted P9-S12–S15 provides tenant-local BusinessParty-linked Qualification, exact DMS Evidence/Expiry, CategoryApproval, ProjectEvaluation and explainable PerformanceMetric/ScoreExplanation. No parallel partner master, inferred history or downstream consumer is created. |
+| Support/AI | Product Owner-accepted P9-S16–S20 provides `Notification`, `SupportCase`, Support evidence/access history and source-linked calendar projections. AI interaction/review evidence, providers, queues and external integrations remain future concepts. |
 | Reporting/reconciliation | MetricDefinition, ProjectionRefresh, ReconciliationRun/Exception/TieOut/Disposition/Review, Report/ExportJob |
 | Future network | PlatformPartyClaim, VerifiedRelationship, PublicationConsent, Discovery/Recommendation, anonymized aggregate with privacy controls |
 
@@ -143,7 +143,7 @@ Names are descriptive and may change during an approved detailed design.
 | Cash/instrument state | Treasury transaction/instrument plus clearing evidence | Accounting posting and cash position |
 | Accounting balance | Posted balanced journal lines | Statements, close and reconciliation |
 | Inventory quantity | Posted/reversed stock ledger | On-hand/reservation and valuation |
-| Inventory value | Approved valuation layers reconciled to quantity | Project Cost and Accounting control |
+| Inventory value | Inventory-owned, immutable valuation evidence reconciled to quantity; P8-S12–S17 Product Owner accepted | Accounting journals and Project Cost actuals remain separate consumer authorities |
 | Asset carrying value | Fixed-asset transaction/depreciation ledger | Accounting and asset reporting |
 | Project actual cost | Classified source posting/subledger facts | Project Cost read model and KPIs |
 | Knowledge claim | Reviewed publication version with source evidence | Search, checklist/training/control suggestion |
@@ -156,6 +156,18 @@ owns only its versioned derived result. It cannot mutate source evidence or serv
 as a generic cross-domain integration mechanism. Supplier-invoice matching follows
 this derived contract across Procurement-owned order/acceptance evidence and
 AP/Finance-owned invoice evidence.
+
+P8-S05–S17 applies that rule to Inventory custody and valuation schema, and
+P8-S18–S23 applies it to operational Equipment evidence. Procurement goods
+receipt, Inventory quantity/custody/valuation, Equipment maintenance, future
+Equipment cost proposals and Fixed Asset transactions, Accounting journals and Project Cost facts retain
+separate source/version/line/occurrence identities. Operational `Equipment` and
+financial `FixedAsset` are linked identities, never one aggregate. Existing stock
+may be marked with explicit unknown/unlocated migration evidence, but no bin, lot,
+serial, expiry, cost, useful life or depreciation history may be inferred. The
+accepted earlier decisions in the existing P8 packets. Accepted P8-C01–C38=A,
+the exact S24–S27 runtime boundary and implementation evidence are in
+`P8_S24_S27_EQUIPMENT_COST_AND_FIXED_ASSETS_DECISION_PACKET.md`.
 
 P4-S35–S37 does not change this authority matrix. Its reconciliation reads the
 governing accepted budget, identically pinned approved/recorded expense

@@ -11,10 +11,14 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from apps.accounts.models import LoginPageSettings, User
+from apps.audit.models import AuditAction
+from apps.audit.services import record_audit_event
+from apps.organizations.access_services import create_organization_role
 from apps.organizations.models import (
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
+    MembershipRoleAssignment,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -23,12 +27,19 @@ from apps.organizations.models import (
 from apps.organizations.role_defaults import (
     DEFAULT_ROLE_METADATA,
     DEFAULT_ROLE_PERMISSIONS,
+    PAYROLL_SENSITIVE_PERMISSIONS,
+    WORKFORCE_SENSITIVE_PERMISSIONS,
 )
 from apps.organizations.services import create_organization_account
 
 DEMO_ADMIN_USERNAME = "admin"
 DEMO_PASSWORD = "۱۲۳۴۵۶"
 DEMO_ORGANIZATION_PREFIX = "demo-construction-"
+P7_DEMO_PAYROLL_ORGANIZATION = "demo-construction-01"
+P7_DEMO_PAYROLL_ROLE_CODE = "p7_demo_payroll_assurance"
+P7_DEMO_ASSURANCE_PERMISSIONS = (
+    PAYROLL_SENSITIVE_PERMISSIONS | WORKFORCE_SENSITIVE_PERMISSIONS
+)
 
 
 @dataclass(frozen=True)
@@ -98,6 +109,11 @@ class Command(BaseCommand):
                         account_seed=account_seed,
                         role=roles[account_seed.membership_role],
                     )
+                self._ensure_p7_demo_payroll_access(
+                    summary=summary,
+                    admin=admin,
+                    organization=organization,
+                )
 
         self.stdout.write(self.style.SUCCESS("Development account seed data is ready."))
         self.stdout.write("Password for seeded users: Persian digits 123456")
@@ -218,3 +234,103 @@ class Command(BaseCommand):
             raise CommandError(
                 f"Existing membership for '{username}' is not active and was not changed."
             )
+
+    def _ensure_p7_demo_payroll_access(
+        self,
+        *,
+        summary: SeedSummary,
+        admin: User,
+        organization: Organization,
+    ) -> None:
+        """Provision P7 access only for the designated development demo owner.
+
+        P7 sensitive Workforce, Payroll, statutory, export, and handoff
+        permissions remain outside all built-in role defaults. This idempotent
+        development seed creates a tenant-local explicit role for the single
+        walkthrough account instead.
+        """
+
+        if organization.slug != P7_DEMO_PAYROLL_ORGANIZATION:
+            return
+        owner = User.objects.get(
+            username=f"account.{organization.slug}.owner",
+            is_active=True,
+        )
+        membership = OrganizationMembership.objects.get(
+            organization=organization,
+            user=owner,
+            status=MembershipStatus.ACTIVE,
+        )
+        permission_codes = sorted(P7_DEMO_ASSURANCE_PERMISSIONS)
+        if BusinessPermission.objects.filter(
+            code__in=permission_codes,
+            is_active=True,
+        ).count() != len(permission_codes):
+            raise CommandError(
+                "P7 permission catalog is incomplete; run migrations first."
+            )
+        role = OrganizationRole.objects.filter(
+            organization=organization,
+            code=P7_DEMO_PAYROLL_ROLE_CODE,
+        ).first()
+        if role is None:
+            role = create_organization_role(
+                actor=admin,
+                organization=organization,
+                code=P7_DEMO_PAYROLL_ROLE_CODE,
+                name="دسترسی تضمین P7 دمو",
+                description="دسترسی صریح و محدود به تضمین P7 برای مالک حساب نمایشی.",
+                permissions=permission_codes,
+                reason="Provision the accepted P7 walkthrough for the designated demo owner.",
+            )
+            summary.created["p7_demo_payroll_roles"] += 1
+        else:
+            summary.existing["p7_demo_payroll_roles"] += 1
+            existing_codes = set(role.permissions.values_list("code", flat=True))
+            missing_codes = set(permission_codes) - existing_codes
+            if missing_codes:
+                role.permissions.add(
+                    *BusinessPermission.objects.filter(code__in=missing_codes)
+                )
+                record_audit_event(
+                    action=AuditAction.ROLE_UPDATED,
+                    entity_type="organizations.OrganizationRole",
+                    entity_id=role.pk,
+                    organization=organization,
+                    actor=admin,
+                    allow_platform_actor=True,
+                    metadata={
+                        "role_code": role.code,
+                        "previous_permissions": sorted(existing_codes),
+                        "new_permissions": sorted(existing_codes | missing_codes),
+                        "reason": "Reconcile the development P7 walkthrough role.",
+                    },
+                )
+        assignment, created = MembershipRoleAssignment.objects.get_or_create(
+            organization=organization,
+            membership=membership,
+            role=role,
+            revoked_at__isnull=True,
+            defaults={
+                "reason": "Accepted P7 walkthrough access for the designated demo owner.",
+                "source": "development_seed",
+            },
+        )
+        if created:
+            summary.created["p7_demo_payroll_assignments"] += 1
+            record_audit_event(
+                action=AuditAction.MEMBERSHIP_ROLE_ASSIGNED,
+                entity_type="organizations.MembershipRoleAssignment",
+                entity_id=assignment.pk,
+                organization=organization,
+                actor=admin,
+                allow_platform_actor=True,
+                metadata={
+                    "target_membership_id": str(membership.pk),
+                    "role": role.code,
+                    "source": "development_seed",
+                    "reason": assignment.reason,
+                },
+            )
+        else:
+            summary.existing["p7_demo_payroll_assignments"] += 1

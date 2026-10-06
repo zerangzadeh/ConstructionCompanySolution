@@ -454,6 +454,9 @@ def _post_stock_transaction_domain(
             raise ValueError("رسید کالای مبدأ دیگر نهایی‌شده نیست.")
     _lock_warehouses(transaction_record)
     _ensure_available_stock(transaction_record)
+    from apps.inventory.p8_services import validate_stock_trace_allocations_for_post
+
+    validate_stock_trace_allocations_for_post(transaction_record)
     transaction_record.status = StockTransactionStatus.POSTED
     transaction_record.posted_at = timezone.now()
     transaction_record.posted_by = actor
@@ -542,6 +545,9 @@ def _reverse_stock_transaction_domain(
     )
     _ensure_available_stock(reversal)
     _save_validated(reversal, "اطلاعات برگشت انبار معتبر نیست یا شماره آن تکراری است.")
+    from apps.inventory.p8_services import copy_reversal_trace_allocations
+
+    copy_reversal_trace_allocations(original=original, reversal=reversal, actor=actor)
     original.status = StockTransactionStatus.REVERSED
     original.reversed_at = timezone.now()
     original.reversed_by = actor

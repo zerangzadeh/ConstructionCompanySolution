@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+<div dir="rtl" class="max-w-4xl">
+  <p class="text-sm font-medium text-blue-600">عملیات میدانی · آنلاین</p><h1 class="mt-1 text-2xl font-bold text-slate-950">{{ title }}</h1>
+  <p class="mt-2 text-sm text-slate-500">ذخیره پیش‌نویس با زمینه انتخاب‌شده انجام می‌شود؛ مکان دستگاه اختیاری و صرفاً شاهد کمکی است.</p>
+  <form class="erp-surface mt-6 space-y-5 rounded-xl p-5" method="post">{% csrf_token %}{% include "components/form_errors.html" with form=form only %}
+    {% for field in form %}{% if not field.is_hidden %}{% include "components/form_field.html" with field=field only %}{% endif %}{% endfor %}
+    {% for field in form.hidden_fields %}{{ field }}{% endfor %}
+    <div class="flex gap-3"><button class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white" type="submit">ذخیره پیش‌نویس</button><a class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-semibold text-slate-700" href="{% url 'daily_reports:field_observation_list' %}">انصراف</a></div>
+  </form>
+</div>
+{% endblock %}

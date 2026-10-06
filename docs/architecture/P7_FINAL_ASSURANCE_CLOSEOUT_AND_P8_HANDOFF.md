@@ -13,6 +13,20 @@ authority, downstream consumer, or production behavior. The review covers the
 accepted Workforce, Timekeeping, Core Payroll, statutory tax/employee-insurance,
 payslip, financial-handoff, and audit/history boundaries.
 
+## Access-provisioning remediation (2026-10-04)
+
+The local development database that hosts the walkthrough accounts was behind the
+accepted P7 permission migrations. `organizations.0090`–`0095` are now applied.
+Migration `0095_p7_role_permission_seed_reconciliation` idempotently reconciles
+only the already-approved non-sensitive Workforce and Timekeeping grants on global
+built-in roles; it grants no sensitive Workforce, Payroll, statutory, export, or
+financial-handoff capability. The development-only `seed_account_data` command
+creates and assigns the tenant-local `p7_demo_payroll_assurance` role only to
+`account.demo-construction-01.owner` in `demo-construction-01`; that explicit role
+contains the accepted sensitive P7 permissions and is audit-recorded. It does not
+alter the default-deny policy, grant another tenant access, or authorize a
+downstream/production action.
+
 ## 2. P7-S33 privacy, retention, export, and access assurance
 
 - Payroll, payslip, statutory, handoff, and their audit permissions remain
@@ -120,3 +134,12 @@ reinterpret Payroll results, create Project Cost actuals from P7 proposals, or t
 P7 acceptance as authority for inventory valuation, asset accounting, GL posting,
 or production activation. No P8 code, schema, permission, UI, or runtime behavior is
 part of this tranche.
+
+**Subsequent disposition (2026-10-04):** P8-S01–S04 was executed as the bounded
+documentation/design tranche in
+`P8_S01_S04_ENTRY_AND_ARCHITECTURE_DECISION_PACKET.md` after this prerequisite was
+confirmed. The Product Owner subsequently accepted P8-S01–S04, selected
+P8-D01–D06=A and authorized P8-S05–S11, which is Product Owner accepted within
+its quantity/custody non-production boundary. P8-S12–S17 and P8-S18–S23 are
+subsequently Product Owner accepted within their documented non-production
+boundaries. P8-S24–S27 is subsequently Product Owner accepted under C01–C38=A and bounded runtime. At the time of this P7 handoff, P8-S28–S30 and production activation remained unauthorized; later P8-S28–S30 Product Owner acceptance is recorded in `P8_FINAL_ASSURANCE_CLOSEOUT_AND_P9_HANDOFF.md`.

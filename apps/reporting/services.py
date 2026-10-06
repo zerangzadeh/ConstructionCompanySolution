@@ -1,0 +1,468 @@
+from __future__ import annotations
+
+import csv
+import hashlib
+import io
+import json
+from dataclasses import dataclass
+from datetime import timedelta
+from decimal import Decimal
+from typing import Any, Callable
+
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.db import models, transaction
+from django.db.models import Max, Sum
+from django.utils import timezone
+
+from apps.accounts.models import User
+from apps.audit.models import AuditAction
+from apps.audit.services import record_audit_event
+from apps.inventory.models import InventoryValuationPool
+from apps.organizations.authorization import require_business_permission, scope_queryset
+from apps.organizations.models import BusinessPermissionCode, Organization
+from apps.procurement.models import GoodsReceipt, GoodsReceiptStatus
+from apps.projects.models import (
+    BudgetAllocation,
+    Project,
+    ProjectCostFact,
+    ProjectCostFactKind,
+)
+from apps.reporting.models import (
+    MetricDefinition,
+    MetricDefinitionVersion,
+    MetricExportManifest,
+    MetricFreshness,
+    MetricRefreshRun,
+    MetricResult,
+    MetricResultReview,
+    MetricRunStatus,
+    MetricVersionStatus,
+)
+from apps.treasury.models import TreasuryMovementClearing, TreasuryMovementKind
+
+
+def _json_default(value: object) -> str:
+    if isinstance(value, Decimal):
+        return format(value, "f")
+    return str(value)
+
+
+def _hash(payload: object) -> str:
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), default=_json_default
+    ).encode()
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _allowed_projects(*, user: User, organization: Organization):
+    membership = require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW,
+        message="اجازه مشاهده نتیجه شاخص را ندارید.",
+        allow_any_scope=True,
+    )
+    return scope_queryset(
+        Project.objects.filter(organization=organization, deleted_at__isnull=True),
+        membership=membership,
+        project_lookup="pk",
+        include_site_parent=True,
+    )
+
+
+def _project_ids(projects) -> list[str]:
+    return [str(value) for value in projects.order_by("pk").values_list("pk", flat=True)]
+
+
+@dataclass(frozen=True, slots=True)
+class Calculation:
+    value: dict[str, str | int]
+    currency: str
+    unit: str
+    coverage: dict[str, object]
+    sources: dict[str, object]
+
+
+def _budget(organization: Organization, projects) -> Calculation:
+    rows = BudgetAllocation.objects.filter(
+        organization=organization,
+        manifest_line__manifest__budget__governing_for__project__in=projects,
+    )
+    amount = rows.aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    ids = list(rows.order_by("pk").values_list("pk", flat=True))
+    return Calculation(
+        {"amount": format(amount, "f")},
+        "IRR",
+        "money",
+        {"complete": True, "source_count": len(ids)},
+        {"model": "projects.BudgetAllocation", "ids": [str(v) for v in ids]},
+    )
+
+
+def _cost(organization: Organization, projects, *, actual: bool) -> Calculation:
+    kinds = (
+        [ProjectCostFactKind.ACTUAL_RECOGNIZED, ProjectCostFactKind.ACTUAL_REVERSAL]
+        if actual
+        else [
+            ProjectCostFactKind.COMMITMENT_AUTHORIZED,
+            ProjectCostFactKind.COMMITMENT_ADJUSTMENT,
+            ProjectCostFactKind.COMMITMENT_RELIEF,
+        ]
+    )
+    rows = ProjectCostFact.objects.filter(
+        organization=organization, project__in=projects, kind__in=kinds
+    )
+    amount = rows.aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    ids = list(rows.order_by("pk").values_list("pk", flat=True))
+    covered_projects = rows.values("project_id").distinct().count()
+    total_projects = projects.count()
+    complete = total_projects == covered_projects and total_projects > 0
+    return Calculation(
+        {"amount": format(amount, "f")},
+        "IRR",
+        "money",
+        {
+            "complete": complete,
+            "covered_projects": covered_projects,
+            "eligible_projects": total_projects,
+            "source_count": len(ids),
+        },
+        {"model": "projects.ProjectCostFact", "ids": [str(v) for v in ids]},
+    )
+
+
+def _cash(organization: Organization, projects) -> Calculation:
+    rows = TreasuryMovementClearing.objects.filter(
+        organization=organization,
+        active=True,
+        movement__project__in=projects,
+    ).select_related("movement")
+    total = Decimal("0")
+    ids: list[str] = []
+    for clearing in rows.order_by("pk"):
+        movement = clearing.movement
+        sign = Decimal("1") if movement.kind == TreasuryMovementKind.RECEIPT else Decimal("-1")
+        if movement.kind == TreasuryMovementKind.TRANSFER:
+            sign = Decimal("0")
+        if movement.kind == TreasuryMovementKind.REVERSAL and movement.reverses_id:
+            sign = Decimal("-1") if movement.reverses.kind == TreasuryMovementKind.RECEIPT else Decimal("1")
+        total += movement.amount * sign
+        ids.append(str(clearing.pk))
+    return Calculation(
+        {"amount": format(total, "f")},
+        "IRR",
+        "money",
+        {"complete": True, "source_count": len(ids)},
+        {"model": "treasury.TreasuryMovementClearing", "ids": ids},
+    )
+
+
+def _procurement(organization: Organization, projects) -> Calculation:
+    rows = GoodsReceipt.objects.filter(
+        organization=organization,
+        project__in=projects,
+        status=GoodsReceiptStatus.POSTED,
+        purchase_order__purchase_request__submitted_at__isnull=False,
+    ).select_related("purchase_order__purchase_request")
+    durations: list[int] = []
+    ids: list[str] = []
+    for receipt in rows.order_by("pk"):
+        start = receipt.purchase_order.purchase_request.submitted_at
+        if start and receipt.posted_at and receipt.posted_at >= start:
+            durations.append(int((receipt.posted_at - start).total_seconds()))
+            ids.append(str(receipt.pk))
+    average = sum(durations) // len(durations) if durations else 0
+    return Calculation(
+        {"average_seconds": average, "completed_cycles": len(durations)},
+        "",
+        "seconds",
+        {"complete": True, "source_count": len(ids)},
+        {"model": "procurement.GoodsReceipt", "ids": ids},
+    )
+
+
+def _inventory(organization: Organization, projects) -> Calculation:
+    del projects
+    rows = InventoryValuationPool.objects.filter(organization=organization)
+    totals = rows.aggregate(quantity=Sum("quantity"), value=Sum("value_amount"))
+    ids = list(rows.order_by("pk").values_list("pk", flat=True))
+    currencies = list(rows.values_list("currency", flat=True).distinct())
+    currency = currencies[0] if len(currencies) == 1 else ""
+    complete = len(currencies) <= 1
+    return Calculation(
+        {
+            "quantity": format(totals["quantity"] or Decimal("0"), "f"),
+            "value_amount": format(totals["value"] or Decimal("0"), "f"),
+        },
+        currency,
+        "quantity_and_money",
+        {"complete": complete, "source_count": len(ids)},
+        {"model": "inventory.InventoryValuationPool", "ids": [str(v) for v in ids]},
+    )
+
+
+CALCULATORS: dict[str, Callable[[Organization, Any], Calculation]] = {
+    "approved_budget": _budget,
+    "committed_cost": lambda organization, projects: _cost(
+        organization, projects, actual=False
+    ),
+    "actual_cost_coverage": lambda organization, projects: _cost(
+        organization, projects, actual=True
+    ),
+    "cleared_cash_position": _cash,
+    "procurement_cycle_time": _procurement,
+    "inventory_quantity_value": _inventory,
+}
+
+
+@transaction.atomic
+def refresh_metric(
+    *,
+    organization: Organization,
+    actor: User,
+    metric_code: str,
+    idempotency_key: str,
+    project: Project | None = None,
+) -> MetricResult:
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.REPORTING_METRIC_REFRESH_RUN,
+        message="اجازه اجرای شاخص را ندارید.",
+        project=project,
+        allow_any_scope=project is None,
+    )
+    if project is None:
+        require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.REPORTING_PORTFOLIO_VIEW,
+            message="اجازه مشاهده سبد پروژه را ندارید.",
+            allow_any_scope=True,
+        )
+    elif project.organization_id != organization.pk:
+        raise PermissionDenied("پروژه متعلق به این شرکت نیست.")
+    projects = _allowed_projects(user=actor, organization=organization)
+    if project is not None:
+        projects = projects.filter(pk=project.pk)
+        if not projects.exists():
+            raise PermissionDenied("پروژه خارج از دامنه مجاز است.")
+    version = (
+        MetricDefinitionVersion.objects.select_for_update()
+        .select_related("definition")
+        .get(
+            definition__code=metric_code,
+            definition__is_active=True,
+            status=MetricVersionStatus.PUBLISHED,
+        )
+    )
+    fingerprint = _hash(
+        {
+            "metric_version": str(version.pk),
+            "organization": str(organization.pk),
+            "project": str(project.pk) if project else None,
+            "projects": _project_ids(projects),
+        }
+    )
+    existing = MetricRefreshRun.objects.select_for_update().filter(
+        organization=organization, idempotency_key=idempotency_key
+    ).first()
+    if existing:
+        if existing.request_fingerprint != fingerprint:
+            raise ValidationError("کلید تکرار با درخواست متفاوت استفاده شده است.")
+        if existing.status == MetricRunStatus.SUCCEEDED:
+            return existing.result
+        raise ValidationError("اجرای قبلی این کلید نهایی نشده است.")
+    now = timezone.now()
+    run = MetricRefreshRun.objects.create(
+        organization=organization,
+        metric_version=version,
+        project=project,
+        status=MetricRunStatus.BUILDING,
+        idempotency_key=idempotency_key,
+        request_fingerprint=fingerprint,
+        requested_by=actor,
+        started_at=now,
+    )
+    calculation = CALCULATORS[metric_code](organization, projects)
+    source_watermark = _hash(calculation.sources)
+    calculation_payload = {
+        "metric": metric_code,
+        "version": version.version,
+        "value": calculation.value,
+        "coverage": calculation.coverage,
+        "sources": calculation.sources,
+        "project": str(project.pk) if project else None,
+    }
+    previous = (
+        MetricResult.objects.filter(
+            organization=organization, metric_code=metric_code, project=project
+        )
+        .order_by("-created_at")
+        .first()
+    )
+    result = MetricResult.objects.create(
+        organization=organization,
+        run=run,
+        project=project,
+        metric_code=metric_code,
+        value=calculation.value,
+        currency=calculation.currency,
+        unit=calculation.unit,
+        as_of=now,
+        freshness=(
+            MetricFreshness.FRESH
+            if bool(calculation.coverage.get("complete"))
+            else MetricFreshness.INCOMPLETE
+        ),
+        coverage=calculation.coverage,
+        source_manifest=calculation.sources,
+        calculation_hash=_hash(calculation_payload),
+        replaces=previous,
+    )
+    MetricRefreshRun.objects.filter(pk=run.pk).update(
+        status=MetricRunStatus.SUCCEEDED,
+        source_watermark=source_watermark,
+        finished_at=timezone.now(),
+    )
+    record_audit_event(
+        action=AuditAction.REPORTING_METRIC_REFRESHED,
+        entity_type="reporting.MetricResult",
+        entity_id=str(result.pk),
+        organization=organization,
+        actor=actor,
+        metadata={"metric_code": metric_code, "project_id": str(project.pk) if project else ""},
+    )
+    return result
+
+
+@transaction.atomic
+def review_metric_result(
+    *, result: MetricResult, reviewer: User, reason: str
+) -> MetricResultReview:
+    require_business_permission(
+        user=reviewer,
+        organization=result.organization,
+        permission=BusinessPermissionCode.REPORTING_METRIC_REFRESH_REVIEW,
+        message="اجازه بررسی نتیجه شاخص را ندارید.",
+        project=result.project,
+        allow_any_scope=result.project_id is None,
+    )
+    if result.run.requested_by_id == reviewer.pk:
+        raise PermissionDenied("اجراکننده نمی‌تواند نتیجه مالی خود را تأیید کند.")
+    review, created = MetricResultReview.objects.get_or_create(
+        organization=result.organization,
+        result=result,
+        defaults={"reviewer": reviewer, "reason": reason.strip()},
+    )
+    if not created and (review.reviewer_id != reviewer.pk or review.reason != reason.strip()):
+        raise ValidationError("نتیجه قبلاً با شواهد متفاوت بررسی شده است.")
+    return review
+
+
+def dashboard_results(*, organization: Organization, actor: User) -> list[MetricResult]:
+    projects = _allowed_projects(user=actor, organization=organization)
+    allowed_ids = list(projects.values_list("pk", flat=True))
+    rows = MetricResult.objects.filter(organization=organization).filter(
+        models.Q(project__isnull=True) | models.Q(project_id__in=allowed_ids)
+    )
+    latest: dict[tuple[str, str | None], MetricResult] = {}
+    for result in rows.select_related("run__metric_version__definition").order_by("-created_at"):
+        key = (result.metric_code, str(result.project_id) if result.project_id else None)
+        latest.setdefault(key, result)
+    return sorted(latest.values(), key=lambda item: item.metric_code)
+
+
+def drillthrough_manifest(
+    *, organization: Organization, actor: User, result_id: str
+) -> MetricResult:
+    result = MetricResult.objects.select_related(
+        "project", "run__metric_version__definition"
+    ).filter(organization=organization, pk=result_id).first()
+    if result is None:
+        raise PermissionDenied("نتیجه شاخص در دسترس نیست.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.REPORTING_SOURCE_DRILLTHROUGH_VIEW,
+        message="اجازه مشاهده منبع شاخص را ندارید.",
+        project=result.project,
+        allow_any_scope=result.project_id is None,
+    )
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=result.run.metric_version.definition.source_permission,
+        message="مجوز دامنه منبع برای مشاهده جزئیات وجود ندارد.",
+        project=result.project,
+        allow_any_scope=result.project_id is None,
+    )
+    return result
+
+
+@transaction.atomic
+def export_dashboard_csv(
+    *,
+    organization: Organization,
+    actor: User,
+    idempotency_key: str,
+    purpose: str,
+) -> tuple[MetricExportManifest, bytes]:
+    for permission in (
+        BusinessPermissionCode.REPORTING_EXPORT_CREATE,
+        BusinessPermissionCode.REPORTING_EXPORT_DOWNLOAD,
+    ):
+        require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=permission,
+            message="اجازه ایجاد یا دریافت خروجی شاخص را ندارید.",
+            allow_any_scope=True,
+        )
+    results = dashboard_results(organization=organization, actor=actor)
+    result_ids = [str(item.pk) for item in results]
+    fingerprint = _hash({"result_ids": result_ids, "purpose": purpose.strip()})
+    output = io.StringIO(newline="")
+    writer = csv.writer(output)
+    writer.writerow(["metric_code", "persian_name", "value", "currency", "unit", "as_of", "freshness"])
+    for item in results:
+        writer.writerow(
+            [
+                item.metric_code,
+                item.run.metric_version.definition.persian_name,
+                json.dumps(item.value, ensure_ascii=False, sort_keys=True),
+                item.currency,
+                item.unit,
+                item.as_of.isoformat(),
+                item.freshness,
+            ]
+        )
+    content = output.getvalue().encode("utf-8-sig")
+    content_hash = hashlib.sha256(content).hexdigest()
+    manifest = MetricExportManifest.objects.filter(
+        organization=organization, idempotency_key=idempotency_key
+    ).first()
+    if manifest:
+        if manifest.request_fingerprint != fingerprint or manifest.content_hash != content_hash:
+            raise ValidationError("کلید تکرار خروجی با محتوای متفاوت استفاده شده است.")
+        return manifest, content
+    manifest = MetricExportManifest.objects.create(
+        organization=organization,
+        created_by=actor,
+        idempotency_key=idempotency_key,
+        request_fingerprint=fingerprint,
+        metric_codes=[item.metric_code for item in results],
+        result_ids=result_ids,
+        content_hash=content_hash,
+        purpose=purpose.strip(),
+        expires_at=timezone.now() + timedelta(hours=1),
+    )
+    record_audit_event(
+        action=AuditAction.REPORTING_EXPORTED,
+        entity_type="reporting.MetricExportManifest",
+        entity_id=str(manifest.pk),
+        organization=organization,
+        actor=actor,
+        metadata={"result_count": len(result_ids)},
+    )
+    return manifest, content

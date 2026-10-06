@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="دارایی ثابت" page_title=title page_description="ثبت شواهد کنترل‌شده و غیرمتصل به دفترکل" only %}
+<form method="post" class="erp-surface mt-6 max-w-3xl space-y-4 rounded-xl p-6">{% csrf_token %}{{ form.as_p }}<div class="flex gap-2"><button class="erp-btn erp-btn--primary" type="submit">ثبت</button><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:workbench' %}">بازگشت</a></div></form>
+{% endblock %}

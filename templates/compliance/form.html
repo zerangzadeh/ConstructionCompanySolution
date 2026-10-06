@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="کنترل HSE و QA/QC" page_title=title page_description=request.organization.name only %}
+<section class="erp-surface mx-auto mt-6 max-w-4xl rounded-xl p-5 sm:p-7">
+  <form method="post" class="space-y-5" novalidate>{% csrf_token %}
+    {% include "components/form_errors.html" with form=form only %}
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {% for field in form %}<div{% if field.field.widget.input_type == 'textarea' %} class="md:col-span-2"{% endif %}>{% include "components/form_field.html" with field=field only %}</div>{% endfor %}
+    </div>
+    <div class="flex flex-wrap gap-3"><button class="rounded-lg bg-blue-600 px-5 py-2.5 font-semibold text-white hover:bg-blue-700" type="submit">ثبت و ادامه</button><a class="rounded-lg border border-slate-300 px-5 py-2.5" href="{% url 'compliance:workbench' %}">بازگشت</a></div>
+  </form>
+</section>
+{% endblock %}

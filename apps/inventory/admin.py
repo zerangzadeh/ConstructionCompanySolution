@@ -1,7 +1,21 @@
 from django.contrib import admin
 from django.http import HttpRequest
 
-from apps.inventory.models import StockTransaction, Warehouse
+from apps.inventory.models import (
+    InventoryCount,
+    InventoryCountLine,
+    InventoryLot,
+    InventoryReservation,
+    InventoryReservationAllocation,
+    InventorySerial,
+    InventoryTransfer,
+    InventoryTransferLine,
+    MaterialTraceabilityProfile,
+    StockTraceAllocation,
+    StockTransaction,
+    Warehouse,
+    WarehouseBin,
+)
 
 
 class ReadOnlyInventoryAdmin(admin.ModelAdmin):
@@ -63,3 +77,19 @@ class StockTransactionAdmin(ReadOnlyInventoryAdmin):
         "project",
         "organization",
     )
+
+
+for model in (
+    WarehouseBin,
+    MaterialTraceabilityProfile,
+    InventoryLot,
+    InventorySerial,
+    StockTraceAllocation,
+    InventoryReservation,
+    InventoryReservationAllocation,
+    InventoryCount,
+    InventoryCountLine,
+    InventoryTransfer,
+    InventoryTransferLine,
+):
+    admin.site.register(model, ReadOnlyInventoryAdmin)

@@ -809,6 +809,165 @@ class AuditAction(models.TextChoices):
     )
     DAILY_ACTIVITY_ADDED = "daily_activity.added", "فعالیت روزانه افزوده شد"
     DELAY_EVENT_ADDED = "delay_event.added", "رویداد تأخیر افزوده شد"
+    FIELD_OBSERVATION_CREATED = "field_observation.created", "مشاهده میدانی ایجاد شد"
+    FIELD_OBSERVATION_SAVED = (
+        "field_observation.saved",
+        "پیش‌نویس مشاهده میدانی ذخیره شد",
+    )
+    FIELD_OBSERVATION_SUBMITTED = (
+        "field_observation.submitted",
+        "مشاهده میدانی ارسال شد",
+    )
+    FIELD_OBSERVATION_REVIEW_STARTED = (
+        "field_observation.review_started",
+        "بررسی مشاهده میدانی آغاز شد",
+    )
+    FIELD_OBSERVATION_ACCEPTED = (
+        "field_observation.accepted",
+        "مشاهده میدانی پذیرفته شد",
+    )
+    FIELD_OBSERVATION_REJECTED = "field_observation.rejected", "مشاهده میدانی رد شد"
+    FIELD_OBSERVATION_CORRECTED = (
+        "field_observation.corrected",
+        "اصلاح مشاهده میدانی ایجاد شد",
+    )
+    FIELD_OBSERVATION_SUPERSEDED = (
+        "field_observation.superseded",
+        "مشاهده میدانی جایگزین شد",
+    )
+    FIELD_PROPOSAL_CREATED = "field_proposal.created", "پیشنهاد تحویل مشاهده ایجاد شد"
+    FIELD_PROPOSAL_SUBMITTED = (
+        "field_proposal.submitted",
+        "پیشنهاد تحویل مشاهده ارسال شد",
+    )
+    FIELD_PROPOSAL_ACCEPTED = (
+        "field_proposal.accepted",
+        "پیشنهاد تحویل مشاهده پذیرفته شد",
+    )
+    FIELD_PROPOSAL_REJECTED = "field_proposal.rejected", "پیشنهاد تحویل مشاهده رد شد"
+    COMPLIANCE_RECORD_CREATED = (
+        "compliance.record_created",
+        "رکورد کنترل HSE/QA ایجاد شد",
+    )
+    COMPLIANCE_TEMPLATE_PUBLISHED = (
+        "compliance.template_published",
+        "نسخه الگوی بازرسی منتشر شد",
+    )
+    COMPLIANCE_TRANSITIONED = "compliance.transitioned", "وضعیت کنترل HSE/QA تغییر کرد"
+    COMPLIANCE_EVIDENCE_LINKED = (
+        "compliance.evidence_linked",
+        "نسخه شواهد HSE/QA پیوند شد",
+    )
+    COMPLIANCE_PROPOSAL_CREATED = (
+        "compliance.proposal_created",
+        "پیشنهاد پایین‌دستی HSE/QA ایجاد شد",
+    )
+    COMPLIANCE_EXPORTED = "compliance.exported", "خروجی کنترل‌شده HSE/QA ایجاد شد"
+    COMPLIANCE_RECONCILED = "compliance.reconciled", "تطبیق HSE/QA اجرا شد"
+    PARTNER_PROFILE_CREATED = "partner.profile_created", "پروفایل همکار ایجاد شد"
+    PARTNER_REQUIREMENT_PUBLISHED = (
+        "partner.requirement_published",
+        "الزام همکار منتشر شد",
+    )
+    PARTNER_QUALIFICATION_CREATED = (
+        "partner.qualification_created",
+        "صلاحیت همکار ایجاد شد",
+    )
+    PARTNER_QUALIFICATION_TRANSITIONED = (
+        "partner.qualification_transitioned",
+        "وضعیت صلاحیت همکار تغییر کرد",
+    )
+    PARTNER_EVIDENCE_LINKED = "partner.evidence_linked", "شواهد همکار پیوند شد"
+    PARTNER_CATEGORY_DECIDED = "partner.category_decided", "دسته همکار تصمیم‌گیری شد"
+    PARTNER_EVALUATION_CREATED = "partner.evaluation_created", "ارزیابی همکار ایجاد شد"
+    PARTNER_EVALUATION_TRANSITIONED = (
+        "partner.evaluation_transitioned",
+        "وضعیت ارزیابی همکار تغییر کرد",
+    )
+    PARTNER_EVALUATION_APPEALED = (
+        "partner.evaluation_appealed",
+        "اعتراض ارزیابی همکار ایجاد شد",
+    )
+    PARTNER_EVALUATION_APPEAL_DECIDED = (
+        "partner.evaluation_appeal_decided",
+        "اعتراض ارزیابی همکار تصمیم‌گیری شد",
+    )
+    PARTNER_PROPOSAL_CREATED = "partner.proposal_created", "پیشنهاد همکار ایجاد شد"
+    SUPPORT_NOTIFICATION_CREATED = (
+        "support.notification_created",
+        "اعلان پشتیبانی ایجاد شد",
+    )
+    SUPPORT_NOTIFICATION_ACKNOWLEDGED = (
+        "support.notification_acknowledged",
+        "اعلان پشتیبانی تأیید شد",
+    )
+    SUPPORT_CASE_CREATED = "support.case_created", "مورد پشتیبانی ایجاد شد"
+    SUPPORT_CASE_TRANSITIONED = (
+        "support.case_transitioned",
+        "وضعیت مورد پشتیبانی تغییر کرد",
+    )
+    SUPPORT_CASE_ASSIGNED = "support.case_assigned", "مورد پشتیبانی تخصیص یافت"
+    SUPPORT_ACCESS_REQUESTED = "support.access_requested", "دسترسی پشتیبانی درخواست شد"
+    SUPPORT_ACCESS_CONFIRMED = "support.access_confirmed", "دسترسی پشتیبانی تأیید شد"
+    SUPPORT_ACCESS_APPROVED = "support.access_approved", "دسترسی پشتیبانی فعال شد"
+    SUPPORT_ACCESS_REVOKED = "support.access_revoked", "دسترسی پشتیبانی ابطال شد"
+    SUPPORT_ACCESS_USED = "support.access_used", "دسترسی پشتیبانی استفاده شد"
+    SUPPORT_EVIDENCE_LINKED = "support.evidence_linked", "شواهد پشتیبانی پیوند شد"
+    KNOWLEDGE_CANDIDATE_CREATED = "knowledge.candidate_created", "کاندید دانش ایجاد شد"
+    KNOWLEDGE_CANDIDATE_SUBMITTED = (
+        "knowledge.candidate_submitted",
+        "کاندید دانش ارسال شد",
+    )
+    KNOWLEDGE_CANDIDATE_REVIEWED = (
+        "knowledge.candidate_reviewed",
+        "کاندید دانش بررسی شد",
+    )
+    KNOWLEDGE_CANDIDATE_APPROVED = (
+        "knowledge.candidate_approved",
+        "کاندید دانش تأیید شد",
+    )
+    KNOWLEDGE_PUBLICATION_PUBLISHED = (
+        "knowledge.publication_published",
+        "نسخه دانش منتشر شد",
+    )
+    KNOWLEDGE_PUBLICATION_SUPERSEDED = (
+        "knowledge.publication_superseded",
+        "نسخه دانش جایگزین شد",
+    )
+    KNOWLEDGE_PUBLICATION_WITHDRAWN = (
+        "knowledge.publication_withdrawn",
+        "نسخه دانش پس گرفته شد",
+    )
+    KNOWLEDGE_RECURRENCE_RECORDED = (
+        "knowledge.recurrence_recorded",
+        "شاهد تکرار دانش ثبت شد",
+    )
+    KNOWLEDGE_RECURRENCE_CORRECTED = (
+        "knowledge.recurrence_corrected",
+        "شاهد تکرار دانش اصلاح شد",
+    )
+    KNOWLEDGE_REUSE_RECORDED = (
+        "knowledge.reuse_recorded",
+        "شاهد استفاده مجدد دانش ثبت شد",
+    )
+    KNOWLEDGE_REUSE_CORRECTED = (
+        "knowledge.reuse_corrected",
+        "شاهد استفاده مجدد دانش اصلاح شد",
+    )
+    KNOWLEDGE_SENSITIVE_PROVENANCE_VIEWED = (
+        "knowledge.sensitive_provenance_viewed",
+        "منشأ حساس دانش مشاهده شد",
+    )
+    KNOWLEDGE_PROMOTION_REQUESTED = (
+        "knowledge.promotion_requested",
+        "ترویج دانش درخواست شد",
+    )
+    KNOWLEDGE_PROMOTION_REVIEWED = "knowledge.promotion_reviewed", "ترویج دانش بررسی شد"
+    KNOWLEDGE_PROMOTION_APPROVED = "knowledge.promotion_approved", "ترویج دانش تأیید شد"
+    KNOWLEDGE_PROMOTION_PUBLISHED = (
+        "knowledge.promotion_published",
+        "ترویج دانش منتشر شد",
+    )
     DEPARTMENT_CREATED = "department.created", "واحد سازمانی ایجاد شد"
     DEPARTMENT_UPDATED = "department.updated", "واحد سازمانی به‌روزرسانی شد"
     DEPARTMENT_ARCHIVED = "department.archived", "واحد سازمانی بایگانی شد"
@@ -1060,9 +1219,70 @@ class AuditAction(models.TextChoices):
         "stock_transaction.reversed",
         "تراکنش انبار برگشت داده شد",
     )
+    INVENTORY_TRACEABILITY_CONFIGURED = (
+        "inventory.traceability_configured",
+        "کنترل رهگیری موجودی پیکربندی شد",
+    )
+    INVENTORY_RESERVATION_TRANSITIONED = (
+        "inventory.reservation_transitioned",
+        "وضعیت رزرو موجودی تغییر کرد",
+    )
+    INVENTORY_COUNT_TRANSITIONED = (
+        "inventory.count_transitioned",
+        "وضعیت شمارش موجودی تغییر کرد",
+    )
+    INVENTORY_TRANSFER_TRANSITIONED = (
+        "inventory.transfer_transitioned",
+        "وضعیت انتقال امانی موجودی تغییر کرد",
+    )
     EQUIPMENT_CREATED = "equipment.created", "تجهیز ایجاد شد"
     EQUIPMENT_STATUS_CHANGED = "equipment.status_changed", "وضعیت تجهیز تغییر کرد"
     EQUIPMENT_ARCHIVED = "equipment.archived", "تجهیز بایگانی شد"
+    EQUIPMENT_OPERATION_RECORDED = "equipment.operation_recorded", "عملیات تجهیز ثبت شد"
+    EQUIPMENT_OPERATION_CORRECTED = (
+        "equipment.operation_corrected",
+        "عملیات تجهیز اصلاح شد",
+    )
+    EQUIPMENT_WORK_ORDER_TRANSITIONED = (
+        "equipment.work_order_transitioned",
+        "وضعیت دستورکار تجهیز تغییر کرد",
+    )
+    EQUIPMENT_SPARE_PART_LINKED = (
+        "equipment.spare_part_linked",
+        "قطعه یدکی تجهیز پیوند شد",
+    )
+    EQUIPMENT_COST_POLICY_TRANSITIONED = (
+        "equipment.cost_policy_transitioned",
+        "سیاست هزینه تجهیز تغییر وضعیت داد",
+    )
+    EQUIPMENT_COST_ALLOCATION_TRANSITIONED = (
+        "equipment.cost_allocation_transitioned",
+        "تخصیص هزینه تجهیز تغییر وضعیت داد",
+    )
+    EQUIPMENT_COST_HANDOFF_TRANSITIONED = (
+        "equipment.cost_handoff_transitioned",
+        "پیشنهاد هزینه تجهیز تغییر وضعیت داد",
+    )
+    FIXED_ASSET_POLICY_TRANSITIONED = (
+        "fixed_asset.policy_transitioned",
+        "سیاست دارایی ثابت تغییر وضعیت داد",
+    )
+    FIXED_ASSET_TRANSITIONED = (
+        "fixed_asset.transitioned",
+        "دارایی ثابت تغییر وضعیت داد",
+    )
+    FIXED_ASSET_TRANSACTION_RECORDED = (
+        "fixed_asset.transaction_recorded",
+        "رویداد دارایی ثابت ثبت شد",
+    )
+    FIXED_ASSET_DEPRECIATION_TRANSITIONED = (
+        "fixed_asset.depreciation_transitioned",
+        "استهلاک دارایی ثابت تغییر وضعیت داد",
+    )
+    FIXED_ASSET_HANDOFF_TRANSITIONED = (
+        "fixed_asset.handoff_transitioned",
+        "پیشنهاد دارایی ثابت تغییر وضعیت داد",
+    )
     EQUIPMENT_ASSIGNMENT_CREATED = (
         "equipment_assignment.created",
         "تجهیز به پروژه تخصیص یافت",
@@ -1186,10 +1406,16 @@ class AuditAction(models.TextChoices):
     TIME_ATTENDANCE_FINALIZED = "time.attendance_finalized", "حضور قطعی شد"
     TIME_ATTENDANCE_CORRECTED = "time.attendance_corrected", "حضور اصلاح یا برگشت شد"
     TIME_ATTENDANCE_IMPORTED = "time.attendance_imported", "ورودی حضور نگهداری شد"
-    TIME_REQUEST_TRANSITIONED = "time.request_transitioned", "درخواست زمانی تعیین تکلیف شد"
+    TIME_REQUEST_TRANSITIONED = (
+        "time.request_transitioned",
+        "درخواست زمانی تعیین تکلیف شد",
+    )
     TIME_TIMESHEET_SUBMITTED = "time.timesheet_submitted", "کارکرد ارسال شد"
     TIME_TIMESHEET_REVIEWED = "time.timesheet_reviewed", "کارکرد بررسی شد"
-    TIME_DISTRIBUTION_PREVIEWED = "time.distribution_previewed", "پیش‌نمایش توزیع کار نگهداری شد"
+    TIME_DISTRIBUTION_PREVIEWED = (
+        "time.distribution_previewed",
+        "پیش‌نمایش توزیع کار نگهداری شد",
+    )
     PAYROLL_CONFIGURATION_RECORDED = (
         "payroll.configuration_recorded",
         "نسخه پیکربندی پرداخت ثبت شد",
@@ -1245,10 +1471,22 @@ class AuditAction(models.TextChoices):
         "payroll.statutory_resolved",
         "خطای خروجی مقرراتی حقوق تعیین تکلیف شد",
     )
-    PAYROLL_FINANCIAL_HANDOFF_PREPARED = "payroll.financial_handoff_prepared", "پیشنهاد تحویل مالی حقوق تهیه شد"
-    PAYROLL_FINANCIAL_HANDOFF_REVIEWED = "payroll.financial_handoff_reviewed", "پیشنهاد تحویل مالی حقوق بررسی شد"
-    PAYROLL_FINANCIAL_HANDOFF_ACKNOWLEDGED = "payroll.financial_handoff_acknowledged", "شاهد دریافت تحویل مالی حقوق ثبت شد"
-    PAYROLL_FINANCIAL_HANDOFF_RECONCILED = "payroll.financial_handoff_reconciled", "تطبیق تحویل مالی حقوق ثبت شد"
+    PAYROLL_FINANCIAL_HANDOFF_PREPARED = (
+        "payroll.financial_handoff_prepared",
+        "پیشنهاد تحویل مالی حقوق تهیه شد",
+    )
+    PAYROLL_FINANCIAL_HANDOFF_REVIEWED = (
+        "payroll.financial_handoff_reviewed",
+        "پیشنهاد تحویل مالی حقوق بررسی شد",
+    )
+    PAYROLL_FINANCIAL_HANDOFF_ACKNOWLEDGED = (
+        "payroll.financial_handoff_acknowledged",
+        "شاهد دریافت تحویل مالی حقوق ثبت شد",
+    )
+    PAYROLL_FINANCIAL_HANDOFF_RECONCILED = (
+        "payroll.financial_handoff_reconciled",
+        "تطبیق تحویل مالی حقوق ثبت شد",
+    )
     PAYSLIP_VIEWED = "payroll.payslip_viewed", "فیش حقوق مشاهده شد"
     PAYSLIP_EXPORTED = "payroll.payslip_exported", "فیش حقوق خروجی گرفته شد"
     USER_PASSWORD_INITIALIZED = (
@@ -1271,6 +1509,11 @@ class AuditAction(models.TextChoices):
         "مجوزهای نقش شرکتی تغییر کرد",
     )
     ROLE_ARCHIVED = "role.archived", "نقش شرکتی بایگانی شد"
+    REPORTING_METRIC_REFRESHED = (
+        "reporting.metric_refreshed",
+        "شاخص حاکم‌شده بازسازی شد",
+    )
+    REPORTING_EXPORTED = "reporting.exported", "خروجی شاخص ایجاد شد"
 
 
 class AuditEventQuerySet(models.QuerySet):

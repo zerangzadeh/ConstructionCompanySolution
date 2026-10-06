@@ -10,10 +10,12 @@ from apps.accounts.management.commands.seed_account_data import (
     ACCOUNT_SEEDS,
     DEMO_ADMIN_USERNAME,
     DEMO_PASSWORD,
+    P7_DEMO_PAYROLL_ROLE_CODE,
 )
 from apps.accounts.models import LoginPageSettings, User
 from apps.organizations.models import (
     BusinessPermission,
+    MembershipRoleAssignment,
     Organization,
     OrganizationMembership,
     OrganizationRole,
@@ -45,9 +47,9 @@ def test_seed_account_data_is_incremental_and_tenant_safe(
         )
     )
     existing_image_name = login_settings.background_image.name
-    role_permissions_before = {
+    global_role_permissions_before = {
         role.code: set(role.permissions.values_list("code", flat=True))
-        for role in OrganizationRole.objects.all()
+        for role in OrganizationRole.objects.filter(organization__isnull=True)
     }
     permission_count_before = BusinessPermission.objects.count()
 
@@ -68,8 +70,21 @@ def test_seed_account_data_is_incremental_and_tenant_safe(
     assert BusinessPermission.objects.count() == permission_count_before
     assert {
         role.code: set(role.permissions.values_list("code", flat=True))
-        for role in OrganizationRole.objects.all()
-    } == role_permissions_before
+        for role in OrganizationRole.objects.filter(organization__isnull=True)
+    } == global_role_permissions_before
+    p7_organization = Organization.objects.get(slug="demo-construction-01")
+    p7_role = OrganizationRole.objects.get(
+        organization=p7_organization,
+        code=P7_DEMO_PAYROLL_ROLE_CODE,
+    )
+    assert p7_role.permissions.filter(code="payroll_results.view").exists()
+    p7_owner = User.objects.get(username="account.demo-construction-01.owner")
+    assert MembershipRoleAssignment.objects.filter(
+        organization=p7_organization,
+        membership__user=p7_owner,
+        role=p7_role,
+        revoked_at__isnull=True,
+    ).exists()
 
     seeded_usernames = set()
     for organization in demo_organizations:

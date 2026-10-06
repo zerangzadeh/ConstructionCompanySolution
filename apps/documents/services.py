@@ -13,7 +13,17 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
+from apps.compliance.models import (
+    CapaAction,
+    Inspection,
+    InspectionFinding,
+    Nonconformance,
+    Permit,
+    QualityTest,
+    TestResult,
+)
 from apps.contracts.models import Contract
+from apps.daily_reports.field_models import FieldObservation, FieldObservationStatus
 from apps.daily_reports.models import DailyReport
 from apps.documents.link_registry import (
     DOCUMENT_LINK_TYPES,
@@ -71,6 +81,7 @@ from apps.organizations.models import (
     ProtectedOperation,
     ProtectedOperationCode,
 )
+from apps.partner_qualification.models import PartnerQualification
 from apps.payments.models import Payment
 from apps.projects.models import Project
 from apps.workforce.models import (
@@ -106,9 +117,18 @@ TARGET_MODELS = {
     "expense": Expense,
     "payment": Payment,
     "daily_report": DailyReport,
+    "field_observation": FieldObservation,
     "employee_qualification": EmployeeQualification,
     "employee_training": EmployeeTrainingRecord,
     "performance_evaluation": PerformanceEvaluation,
+    "inspection": Inspection,
+    "permit": Permit,
+    "test": QualityTest,
+    "test_result": TestResult,
+    "finding": InspectionFinding,
+    "nonconformance": Nonconformance,
+    "capa_action": CapaAction,
+    "partner_qualification": PartnerQualification,
 }
 TARGET_VIEW_PERMISSIONS = {
     "material": BusinessPermissionCode.MATERIALS_VIEW,
@@ -118,9 +138,18 @@ TARGET_VIEW_PERMISSIONS = {
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
     "payment": BusinessPermissionCode.PAYMENTS_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
+    "field_observation": BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
     "employee_qualification": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
     "employee_training": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
     "performance_evaluation": BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
+    "inspection": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "permit": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "test": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "test_result": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "finding": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "nonconformance": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "capa_action": BusinessPermissionCode.COMPLIANCE_SENSITIVE_EVIDENCE_VIEW,
+    "partner_qualification": BusinessPermissionCode.PARTNER_SENSITIVE_EVIDENCE_VIEW,
 }
 LINK_PREFETCHES = tuple(
     f"links__{field_name}" for field_name in DOCUMENT_LINK_TARGET_FIELDS
@@ -177,6 +206,9 @@ def _validate_target_access(
         raise PermissionDenied("موجودیت مرتبط متعلق به این سازمان نیست.")
     project = target if field_name == "project" else getattr(target, "project", None)
     site = getattr(target, "site", None)
+    if field_name == "test_result":
+        project = target.test.project
+        site = target.test.site
     if project is not None and project.deleted_at is not None:
         raise PermissionDenied("پروژه مرتبط بایگانی شده است.")
     require_business_permission(
@@ -188,6 +220,32 @@ def _validate_target_access(
         message="اجازه مشاهده موجودیت مرتبط با سند را ندارید.",
     )
     return field_name
+
+
+def _validate_field_observation_attachment_access(
+    *, actor: User, organization: Organization, target: "Model", target_field: str
+) -> None:
+    """Apply Field Operations' write boundary without restricting DMS reads."""
+
+    if target_field != "field_observation":
+        return
+    observation = (
+        FieldObservation.objects.only(
+            "status", "project_id", "site_id", "organization_id"
+        )
+        .filter(pk=target.pk, organization=organization)
+        .first()
+    )
+    if observation is None or observation.status != FieldObservationStatus.DRAFT:
+        raise PermissionDenied("پس از ارسال مشاهده میدانی، پیوست جدید مجاز نیست.")
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
+        project=observation.project,
+        site=observation.site,
+        message="پیوند شواهد به مجوز ثبت مشاهده میدانی نیاز دارد.",
+    )
 
 
 def _validate_document_context_access(
@@ -300,6 +358,12 @@ def create_document(
         actor=actor,
         organization=organization,
         target=target,
+    )
+    _validate_field_observation_attachment_access(
+        actor=actor,
+        organization=organization,
+        target=target,
+        target_field=target_field,
     )
     if target_field == "material":
         _validate_access(
@@ -484,13 +548,20 @@ def add_document_link(*, document: Document, actor: User, target: "Model") -> "M
         organization=locked_document.organization,
         target=target,
     )
+    _validate_field_observation_attachment_access(
+        actor=actor,
+        organization=locked_document.organization,
+        target=target,
+        target_field=target_field,
+    )
     if target_field == "material":
         _validate_access(
             user=actor,
             organization=locked_document.organization,
             permission=BusinessPermissionCode.MATERIAL_DOCUMENTS_LINK,
         )
-    if target_field == "material":
+    link_type = registered_link_type(target_field)
+    if not link_type.legacy_compatible or target_field == "material":
         link = create_typed_link(
             organization=locked_document.organization,
             document=locked_document,

@@ -25,6 +25,7 @@ urlpatterns = [
     path("payments/", include("apps.payments.urls")),
     path("documents/", include("apps.documents.urls")),
     path("financials/", include("apps.financials.urls")),
+    path("reporting/", include("apps.reporting.urls")),
     path("daily-reports/", include("apps.daily_reports.urls")),
     path("workforce/", include("apps.workforce.urls")),
     path("timekeeping/", include("apps.timekeeping.urls")),
@@ -32,8 +33,13 @@ urlpatterns = [
     path("procurement/", include("apps.procurement.urls")),
     path("inventory/", include("apps.inventory.urls")),
     path("equipment/", include("apps.equipment.urls")),
+    path("fixed-assets/", include("apps.fixed_assets.urls")),
     path("safety/", include("apps.safety.urls")),
     path("quality/", include("apps.quality.urls")),
+    path("compliance/", include("apps.compliance.urls")),
+    path("partners/", include("apps.partner_qualification.urls")),
+    path("support/", include("apps.support.urls")),
+    path("knowledge/", include("apps.knowledge.urls")),
     path("workflows/", include("apps.workflows.urls")),
 ]
 

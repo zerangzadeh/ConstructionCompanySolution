@@ -6,8 +6,19 @@ from apps.equipment.models import (
     EquipmentStatus,
     MaintenanceType,
 )
+from apps.equipment.p8_models import (
+    CostPolicyStatus,
+    EquipmentCostAllocation,
+    EquipmentCostPolicyVersion,
+    EquipmentMeter,
+    EquipmentUsageLog,
+    MaintenancePlan,
+    MeterReading,
+)
+from apps.inventory.models import StockTransaction
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project, ProjectSite
+from apps.workforce.models import Employee, EmployeeQualification
 from core.forms import JalaliDateMixin
 
 
@@ -187,4 +198,293 @@ class EquipmentStatusForm(_StyledForm):
             (EquipmentStatus.RETIRED, EquipmentStatus.RETIRED.label),
             (EquipmentStatus.AVAILABLE, EquipmentStatus.AVAILABLE.label),
         ],
+    )
+
+
+class OperatorQualificationForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    employee = forms.ModelChoiceField(label="اپراتور", queryset=Employee.objects.none())
+    workforce_qualification = forms.ModelChoiceField(
+        label="صلاحیت منبع", queryset=EmployeeQualification.objects.none()
+    )
+    effective_from = forms.DateField(
+        label="شروع اعتبار", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    effective_to = forms.DateField(
+        label="پایان اعتبار",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    reason = forms.CharField(
+        label="یادداشت", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+        self.fields["employee"].queryset = Employee.objects.filter(
+            organization=organization
+        )
+        self.fields[
+            "workforce_qualification"
+        ].queryset = EmployeeQualification.objects.filter(
+            organization=organization
+        ).select_related("employee")
+
+
+class DowntimeForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    reason_code = forms.CharField(label="کد علت", max_length=50)
+    started_at = forms.DateTimeField(
+        label="شروع توقف", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+    )
+    evidence_reference = forms.CharField(
+        label="مرجع مدرک", max_length=255, required=False
+    )
+    reason = forms.CharField(
+        label="شرح", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+
+
+class WorkOrderEvidenceForm(_StyledForm):
+    reference = forms.CharField(label="مرجع DMS/مدرک", max_length=255)
+    result_notes = forms.CharField(
+        label="نتیجه عملیات", required=False, widget=forms.Textarea(attrs={"rows": 3})
+    )
+
+
+class MeterReadingForm(_StyledForm):
+    meter = forms.ModelChoiceField(
+        label="کنتور", queryset=EquipmentMeter.objects.none()
+    )
+    value = forms.DecimalField(label="عدد قرائت", min_value=0, decimal_places=3)
+    observed_at = forms.DateTimeField(
+        label="زمان مشاهده",
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+    )
+    source_key = forms.CharField(label="کلید منبع", max_length=100)
+    evidence_reference = forms.CharField(
+        label="مرجع مدرک", max_length=255, required=False
+    )
+    correction_of = forms.ModelChoiceField(
+        label="اصلاح قرائت", queryset=MeterReading.objects.none(), required=False
+    )
+    correction_reason = forms.CharField(
+        label="علت اصلاح", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["meter"].queryset = EquipmentMeter.objects.filter(
+            organization=organization, is_active=True
+        )
+        self.fields["correction_of"].queryset = MeterReading.objects.filter(
+            organization=organization
+        )
+
+
+class UsageForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    started_at = forms.DateTimeField(
+        label="شروع", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+    )
+    ended_at = forms.DateTimeField(
+        label="پایان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+    )
+    runtime_hours = forms.DecimalField(
+        label="ساعت کار", min_value=0.001, decimal_places=3
+    )
+    source_key = forms.CharField(label="کلید منبع", max_length=100)
+    evidence_reference = forms.CharField(
+        label="مرجع مدرک", required=False, max_length=255
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+
+
+class FuelForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    occurred_at = forms.DateTimeField(
+        label="زمان", widget=forms.DateTimeInput(attrs={"type": "datetime-local"})
+    )
+    quantity = forms.DecimalField(label="مقدار", min_value=0.001, decimal_places=3)
+    unit = forms.CharField(label="واحد", max_length=20)
+    source_key = forms.CharField(label="کلید منبع", max_length=100)
+    evidence_reference = forms.CharField(
+        label="مرجع مدرک", required=False, max_length=255
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+
+
+class MaintenancePlanForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    name = forms.CharField(label="نام", max_length=255)
+    maintenance_type = forms.ChoiceField(label="نوع", choices=MaintenanceType.choices)
+    interval_days = forms.IntegerField(label="تناوب روز", required=False, min_value=1)
+    meter_interval = forms.DecimalField(
+        label="تناوب کنتور", required=False, min_value=0.001, decimal_places=3
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+
+
+class WorkOrderForm(_StyledForm):
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    plan = forms.ModelChoiceField(
+        label="برنامه", queryset=MaintenancePlan.objects.none(), required=False
+    )
+    number = forms.CharField(label="شماره", max_length=50)
+    summary = forms.CharField(label="عنوان", max_length=255)
+    scheduled_for = forms.DateField(
+        label="تاریخ برنامه",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+        self.fields["plan"].queryset = MaintenancePlan.objects.filter(
+            organization=organization, active=True
+        )
+
+
+class WorkOrderTransitionForm(_StyledForm):
+    target_status = forms.ChoiceField(
+        label="وضعیت",
+        choices=[
+            ("scheduled", "برنامه‌ریزی‌شده"),
+            ("in_progress", "در حال انجام"),
+            ("completed", "تکمیل‌شده"),
+            ("cancelled", "لغوشده"),
+        ],
+    )
+    completion_notes = forms.CharField(
+        label="یادداشت تکمیل", required=False, widget=forms.Textarea(attrs={"rows": 2})
+    )
+
+
+class SpareLinkForm(_StyledForm):
+    inventory_transaction = forms.ModelChoiceField(
+        label="تراکنش قطعه انبار", queryset=StockTransaction.objects.none()
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["inventory_transaction"].queryset = StockTransaction.objects.filter(
+            organization=organization
+        )
+
+
+class CostPolicyForm(_StyledForm):
+    code = forms.CharField(label="کد سیاست", max_length=50)
+    version = forms.IntegerField(label="نسخه", min_value=1)
+    effective_from = forms.DateField(
+        label="شروع اعتبار", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    effective_to = forms.DateField(
+        label="پایان اعتبار",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+    monetary_policy_code = forms.CharField(label="کد سیاست پولی", max_length=80)
+    monetary_policy_version = forms.CharField(label="نسخه سیاست پولی", max_length=40)
+    decimal_places = forms.IntegerField(label="دقت", min_value=0, max_value=6)
+
+
+class CostRateForm(_StyledForm):
+    policy = forms.ModelChoiceField(
+        label="سیاست پیش‌نویس/بررسی‌شده",
+        queryset=EquipmentCostPolicyVersion.objects.none(),
+    )
+    equipment = forms.ModelChoiceField(label="تجهیز", queryset=Equipment.objects.none())
+    rate_amount = forms.DecimalField(
+        label="نرخ داخلی IRR", min_value=0, decimal_places=6
+    )
+    effective_from = forms.DateField(
+        label="شروع اعتبار", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    effective_to = forms.DateField(
+        label="پایان اعتبار",
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["policy"].queryset = EquipmentCostPolicyVersion.objects.filter(
+            organization=organization,
+            status__in=[CostPolicyStatus.DRAFT, CostPolicyStatus.REVIEWED],
+        )
+        self.fields["equipment"].queryset = Equipment.objects.filter(
+            organization=organization, archived_at__isnull=True
+        )
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("rate_amount") is not None:
+            cleaned["component_snapshot"] = {"base_internal": cleaned["rate_amount"]}
+        return cleaned
+
+
+class CostAllocationForm(_StyledForm):
+    usage = forms.ModelChoiceField(
+        label="کارکرد دارای استقرار", queryset=EquipmentUsageLog.objects.none()
+    )
+    source_key = forms.CharField(label="کلید رخداد", max_length=120)
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["usage"].queryset = EquipmentUsageLog.objects.filter(
+            organization=organization, deployment__isnull=False
+        ).select_related("equipment", "deployment")
+
+
+class CostHandoffForm(_StyledForm):
+    allocation = forms.ModelChoiceField(
+        label="تخصیص نهایی", queryset=EquipmentCostAllocation.objects.none()
+    )
+    occurrence_key = forms.CharField(label="کلید پیشنهاد", max_length=140)
+
+    def __init__(self, *args, organization, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["allocation"].queryset = EquipmentCostAllocation.objects.filter(
+            organization=organization, status="finalized"
+        )
+
+
+class CostAllocationReversalForm(_StyledForm):
+    reason = forms.CharField(label="علت برگشت", widget=forms.Textarea)
+    reversal_source_key = forms.CharField(
+        label="کلید برگشت", max_length=120, required=False
+    )
+
+
+class CostReconciliationForm(_StyledForm):
+    consumer_reference = forms.CharField(label="مرجع کنترل پروژه", max_length=120)
+    reconciliation_note = forms.CharField(
+        label="نتیجه تطبیق", required=False, widget=forms.Textarea
     )

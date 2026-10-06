@@ -84,6 +84,7 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "supplier_portal",
         "supplier_invoices",
         "invoice_matches",
+        "reporting",
     }
 )
 

@@ -1,8 +1,10 @@
 from typing import Any
 
 from django import forms
+from django.core.exceptions import PermissionDenied
 
 from apps.contracts.models import Contract
+from apps.daily_reports.field_models import FieldObservation, FieldObservationStatus
 from apps.daily_reports.models import DailyReport
 from apps.documents.models import (
     DocumentCategory,
@@ -11,7 +13,11 @@ from apps.documents.models import (
 )
 from apps.estimates.models import Estimate
 from apps.expenses.models import Expense
-from apps.organizations.authorization import has_business_permission
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import BusinessPermissionCode
 from apps.payments.models import Payment
 from apps.projects.models import Project
@@ -23,6 +29,7 @@ TARGET_FIELDS = (
     "expense",
     "payment",
     "daily_report",
+    "field_observation",
 )
 TARGET_PERMISSIONS = {
     "project": BusinessPermissionCode.PROJECTS_VIEW,
@@ -31,6 +38,7 @@ TARGET_PERMISSIONS = {
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
     "payment": BusinessPermissionCode.PAYMENTS_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
+    "field_observation": BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
 }
 
 
@@ -52,6 +60,9 @@ class DocumentTargetForm(forms.Form):
     )
     daily_report = forms.ModelChoiceField(
         label="گزارش روزانه", queryset=DailyReport.objects.none(), required=False
+    )
+    field_observation = forms.ModelChoiceField(
+        label="مشاهده میدانی", queryset=FieldObservation.objects.none(), required=False
     )
 
     def __init__(
@@ -82,6 +93,9 @@ class DocumentTargetForm(forms.Form):
             "daily_report": DailyReport.objects.filter(
                 organization=organization, project__deleted_at__isnull=True
             ).order_by("-reporting_date"),
+            "field_observation": FieldObservation.objects.filter(
+                organization=organization, project__deleted_at__isnull=True
+            ).order_by("-created_at"),
         }
         for field_name, queryset in querysets.items():
             if user is None or not has_business_permission(
@@ -91,8 +105,36 @@ class DocumentTargetForm(forms.Form):
             ):
                 queryset = queryset.none()
             if document is not None:
-                queryset = queryset.exclude(document_links__document=document)
+                link_lookup = (
+                    "evidence_links__document"
+                    if field_name == "field_observation"
+                    else "document_links__document"
+                )
+                queryset = queryset.exclude(**{link_lookup: document})
             self.fields[field_name].queryset = queryset
+
+        if user is not None and organization is not None:
+            try:
+                membership = get_active_membership(user=user, organization=organization)
+            except PermissionDenied:
+                self.fields["field_observation"].queryset = FieldObservation.objects.none()
+            else:
+                if not has_business_permission(
+                    user=user,
+                    organization=organization,
+                    permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
+                    allow_any_scope=True,
+                ):
+                    self.fields["field_observation"].queryset = FieldObservation.objects.none()
+                else:
+                    self.fields["field_observation"].queryset = scope_queryset(
+                        self.fields["field_observation"].queryset.filter(
+                            status=FieldObservationStatus.DRAFT
+                        ),
+                        membership=membership,
+                        project_lookup="project_id",
+                        site_lookup="site_id",
+                    )
 
     def clean(self) -> dict[str, Any]:
         cleaned_data = super().clean()

@@ -55,6 +55,20 @@ class MaintenanceStatus(models.TextChoices):
     CANCELLED = "cancelled", "لغوشده"
 
 
+class EquipmentMeterKind(models.TextChoices):
+    HOURS = "hours", "ساعت کار"
+    DISTANCE = "distance", "مسافت"
+    CYCLES = "cycles", "چرخه"
+
+
+class WorkOrderStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SCHEDULED = "scheduled", "برنامه‌ریزی‌شده"
+    IN_PROGRESS = "in_progress", "در حال انجام"
+    COMPLETED = "completed", "تکمیل‌شده"
+    CANCELLED = "cancelled", "لغوشده"
+
+
 class Equipment(UUIDModel, TimeStampedModel):
     """A tenant-owned equipment master without a denormalized current project."""
 
@@ -461,3 +475,26 @@ class MaintenanceRecord(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.record_number} - {self.equipment}"
+
+
+# Kept separate to make the P8 operational extension easy to identify while Django
+# still registers the models under the existing Equipment app.
+from apps.equipment.p8_models import (  # noqa: F401
+    CostAllocationStatus,
+    CostPolicyStatus,
+    DowntimeEvent,
+    EquipmentCostAllocation,
+    EquipmentCostPolicyVersion,
+    EquipmentCostRate,
+    EquipmentCostSourceEnvelope,
+    EquipmentMeter,
+    EquipmentUsageLog,
+    EquipmentWorkOrder,
+    FuelLog,
+    MaintenancePlan,
+    MaintenanceSparePartReference,
+    MaintenanceWorkOrderEvidence,
+    MeterReading,
+    OperatorEquipmentQualification,
+    ProposalStatus,
+)

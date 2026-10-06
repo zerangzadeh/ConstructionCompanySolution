@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}شجره منبع شاخص{% endblock %}
+{% block content %}
+<main class="mx-auto max-w-5xl space-y-5 px-4 py-6" dir="rtl">
+  <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs font-semibold text-blue-700">دسترسی منبع دوباره بررسی شده است</p>
+    <h1 class="mt-2 text-2xl font-bold">{{ result.run.metric_version.definition.persian_name }}</h1>
+    <p class="mt-2 text-sm text-slate-600">نسخه {{ result.run.metric_version.version }} — {{ result.as_of|jalali_datetime }} — {{ result.get_freshness_display }}</p>
+  </header>
+  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <h2 class="font-bold">مانیفست منبع</h2>
+    <dl class="mt-4 space-y-3 text-sm"><div><dt class="text-slate-500">مدل مرجع</dt><dd class="font-mono" dir="ltr">{{ result.source_manifest.model }}</dd></div><div><dt class="text-slate-500">شناسه‌های دقیق منبع</dt><dd class="mt-2 break-all font-mono text-xs" dir="ltr">{{ result.source_manifest.ids|join:", " }}</dd></div><div><dt class="text-slate-500">هش محاسبه</dt><dd class="break-all font-mono text-xs" dir="ltr">{{ result.calculation_hash }}</dd></div></dl>
+    <p class="mt-5 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">نمایش این تجمیع هیچ مجوزی برای تغییر یا مشاهده رکورد منبع خارج از مجوز دامنه منبع ایجاد نمی‌کند.</p>
+  </section>
+  <a class="inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:dashboard' %}">بازگشت به داشبورد</a>
+</main>
+{% endblock %}
