@@ -2,8 +2,8 @@
 
 **Candidate ID:** `P10-RC1-20261007-E0E078C9`
 
-**Status:** **CANDIDATE FROZEN — P10-S18 BLOCKED BY THE ACCEPTED MIGRATION
-WINDOW.**
+**Status:** **CANDIDATE FROZEN — P10-S18 CERTIFICATION PREREQUISITES
+SATISFIED.**
 
 **Recorded:** 2026-10-07.
 
@@ -120,9 +120,10 @@ Therefore performance must later be classified
 `environment-qualified / production capacity certification still gated` unless a
 production-equivalent isolated environment is supplied.
 
-## 7. Backup/restore preflight result
+## 7. Migration diagnosis and backup/restore preflight result
 
-The preflight used only uniquely named disposable non-production resources:
+The initial stopped preflight used only uniquely named disposable non-production
+resources:
 
 - source database:
   `p10_s18_pf_src_20261007_082054_e0e078c9`;
@@ -140,9 +141,51 @@ No RPO/RTO certification is claimed. `test_construction_erp` and production data
 were not used or mutated. Both disposable databases were dropped and the isolated
 DMS root was removed after the failed attempt.
 
-Disposition: `FC-3 Release-quality failure` / non-waivable migration-window
-**FAIL**. Unknown or unexecuted downstream preflight cells remain not passed and
-cannot be converted to pass.
+That result remained an explicit `FC-3` failure until a candidate-preserving
+diagnosis and fresh gate rerun succeeded. No missing result was treated as pass.
+
+The instrumented diagnosis then used a fresh clean database, one migration runner
+and 0.25-second PostgreSQL activity sampling. Actual Django migration execution
+completed in `1,032.661` seconds (`17m 12.661s`) across 376 migrations. Database
+creation took `0.495s`, Django/process preparation took `3.704s`, post-migration
+process overhead took `0.959s`, and migration-framework overhead within the timed
+window was `6.107s`. No blocking PID was observed in 4,127 samples. The longest
+individual migrations were `procurement.0002` (`46.861s`), `workforce.0002`
+(`44.968s`), `equipment.0002` (`29.485s`), `inventory.0002` (`28.621s`) and
+`workforce.0008` (`28.232s`).
+
+The diagnosis classifies the earlier overrun as avoidable certification
+harness/environment timing and transient contention, not a genuine migration
+graph workload, redundant migration, lock wait or migration defect. Evidence is
+two unchanged-candidate clean runs below 18 minutes, no observed blockers, and no
+individual migration approaching the prior excess. The candidate-preserving
+procedure correction uses one isolated database and runner, directly measures
+only Django migration execution, separately records setup/cleanup, samples locks/
+waits, and invokes the verified PostgreSQL 18.6 binaries directly. No migration
+was skipped, faked, pre-applied or edited.
+
+The fresh gate rerun used source database
+`p10_s18_diag_20261007_101534_e0e078c9`, separate restore database
+`p10_s18_restore_20261007_101534_e0e078c9`, and isolated source/backup/restore DMS
+paths below
+`C:\Users\azera\AppData\Local\Temp\p10_s18_diag_20261007_101534_bw86oqas`.
+Actual Django migration execution completed in `969.888` seconds (`16m 09.888s`),
+passing the 30-minute gate with no blocking PID observed in 3,869 samples.
+
+Post-migration preflight then passed:
+
+- PostgreSQL custom-format backup: 3,461,995 bytes, SHA-256
+  `7057d479d7668d15886d8eb4ae360021ea02a917877f2a63d0b7aed74728ceee`;
+- database restore into the separate disposable restore database: **PASS**;
+- DMS source-to-backup-to-separate-restore copy: **PASS**;
+- restored DB/DMS evidence identity, relative path, 49-byte size, storage
+  visibility and SHA-256
+  `7b0bdcddc9a9f89cf9de8a57195ef412840d06eaacdf5318d26f207e43f30779`:
+  **PASS**; and
+- both databases and all isolated file resources removed: **PASS**.
+
+This is S18 preflight only. It is not S19 migration/rollback/reapply or final
+RPO/RTO certification.
 
 ## 8. Named owners and preserved gates
 
@@ -163,13 +206,14 @@ production activation remain gated.
 
 ## 9. S18 conclusion
 
-`P10-S18 = BLOCKED` because the clean candidate migration exceeded the accepted
-30-minute limit and the stopped run therefore could not prove database backup,
-database restore, DMS backup/restore or restored evidence coherence. The candidate
-commit, frozen manifest, hashed dependency lock, PostgreSQL tools and isolated
-disposable topology are otherwise available.
+`P10-S18 = certification prerequisites satisfied`.
 
-`P10-S19–S21` must not start unless the Product Owner separately re-approves the
-migration limit or a candidate-preserving technical correction produces a complete
-preflight within the existing limit. No such re-approval or correction is inferred
-by this record.
+The frozen candidate, verified hashed dependency lock, PostgreSQL 18.6 tools,
+isolated recovery topology, 30-minute migration gate and coherent database/DMS
+backup/restore preflight all pass. The prior FC-3 blocker is resolved by the
+candidate-preserving certification-procedure correction; the threshold was not
+changed and the frozen candidate runtime/schema semantics were not modified.
+
+`P10-S19–S21 = may start under existing bounded certification authorization`.
+They were not executed in this pass. All production, P10-S22+ and preserved
+capability gates remain unchanged.

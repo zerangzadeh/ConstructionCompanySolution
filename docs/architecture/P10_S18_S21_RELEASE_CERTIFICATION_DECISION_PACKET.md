@@ -1,8 +1,8 @@
 # P10-S18–S21 Release Certification Decision Packet
 
 **Status:** **P10-CERT01–P10-CERT43 OPTION A PRODUCT OWNER ACCEPTED;
-P10-S18–S21 CERTIFICATION EXECUTION AUTHORIZED; CANDIDATE FROZEN BUT S18 BLOCKED
-BY THE ACCEPTED MIGRATION WINDOW. NO PRODUCTION AUTHORITY.**
+P10-S18 CERTIFICATION PREREQUISITES SATISFIED; P10-S19–S21 MAY START UNDER THE
+EXISTING BOUNDED AUTHORIZATION. NO PRODUCTION AUTHORITY.**
 
 **Date:** 2026-10-07.
 
@@ -23,12 +23,14 @@ workload, environment-classification and named-owner parameters. Candidate
 `0db3ac9a9fa70e8a857ef0867d532be5206a14c4`, its hashed dependency lock remains
 verified, and PostgreSQL 18.6 backup/restore tools plus an isolated disposable
 database/DMS topology are available, as recorded in the
-[S18 candidate manifest](P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md). S18 remains
-`BLOCKED` after an `FC-3` gate failure: its clean migration crossed the accepted
-30-minute limit, and the stopped run therefore did not prove backup, restore or
-DB/DMS coherence.
-S19–S21 evidence execution did not start. This acceptance authorizes no runtime
-feature change, migration
+[S18 candidate manifest](P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md). An
+instrumented unchanged-candidate clean migration completed in `1,032.661`
+seconds with no lock blocker. A fresh corrected-procedure rerun completed in
+`969.888` seconds and passed coherent database/DMS backup, separate restore,
+evidence-hash validation and cleanup. `P10-S18 = certification prerequisites
+satisfied`; `P10-S19–S21` may start under the existing bounded authorization but
+did not start in this pass. This acceptance authorizes no runtime feature change,
+migration
 against production, deployment, cutover, traffic, customer data, production
 credential, production restore or production activation. `P10-S22+` remains
 separately gated.
@@ -645,17 +647,27 @@ The candidate-preparation result is recorded in
 - an isolated source/restore database plus DMS source/backup/restore topology was
   created without using `test_construction_erp` or production data.
 
-The clean migration was stopped after crossing the accepted 30-minute maximum at
-approximately 30 minutes 8 seconds. No database or DMS backup had yet been
-created, so database restore, DMS restore and restored DB/DMS coherence remain
-not passed. Both disposable databases and the isolated DMS root were cleaned up.
+The earlier run was stopped after crossing the accepted 30-minute maximum at
+approximately 30 minutes 8 seconds and remains recorded as an explicit FC-3
+failure. Candidate-preserving diagnosis found an actual clean-migration duration
+of `1,032.661` seconds across 376 migrations, with zero blocking PID observations.
+The longest migration was `procurement.0002` at `46.861` seconds. Setup and
+cleanup were separated from the migration window, one runner and an isolated
+database were enforced, and verified PostgreSQL 18.6 binaries were invoked
+directly. No migration was skipped, faked, pre-applied or edited.
 
-Disposition: **`P10-S18 = BLOCKED (FC-3 Release-quality failure: non-waivable
-migration-window failure and incomplete backup/restore preflight)`**. Per the
-accepted S18 stop condition, `P10-S19–S21` did not start.
-`test_construction_erp` was not used, inspected, migrated, reset or claimed as
-evidence. No backup/restore, RPO/RTO, migration/reapply, load, Tenant penetration,
-security penetration or full PostgreSQL certification result is claimed.
+The fresh clean-schema gate rerun completed in `969.888` seconds and passed the
+30-minute limit. It then created a 3,461,995-byte custom-format database backup,
+restored it to a separate disposable database, copied DMS evidence through
+separate backup and restore locations, and verified restored DB/DMS path, size,
+storage visibility and SHA-256 identity. Both databases and all disposable files
+were cleaned up.
+
+Disposition: **`P10-S18 = certification prerequisites satisfied`** and
+**`P10-S19–S21 = may start under existing bounded certification authorization`**.
+S19–S21 did not start in this pass. `test_construction_erp` and production data
+were not used or mutated. No final RPO/RTO, rollback/reapply, load, Tenant,
+security or full PostgreSQL certification result is claimed.
 
 ### 16.4 Completed repository preflight checks
 

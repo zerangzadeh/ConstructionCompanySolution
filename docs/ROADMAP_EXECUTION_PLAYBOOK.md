@@ -1261,7 +1261,7 @@ downstream effects and production activation remain unauthorized.
 | P10-S01..S06 | 6 | `A-H` | **P10-M01–M24=A; S02–S06 Product Owner accepted.** Six governed metrics, synchronous read models, Persian RTL/Jalali dashboard, permission-preserving drill-through and bounded on-demand export; S14+ remains unauthorized. |
 | P10-S07..S13 | 7 | `A-X` | **P10-R01–P10-R36=A; P10-S07–S13 Product Owner accepted.** Exactly 13 governed financial/operational pairs with immutable comparison/exception evidence, successor-only recalculation and focused PostgreSQL assurance. |
 | P10-S14..S17 | 4 | `A-H` | **P10-C01–C36=A; Product Owner accepted.** Derived-only project-closeout coordination across nine named source-authority families; no source/downstream effect. |
-| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A and bounded certification execution authorized; candidate frozen; S18 BLOCKED by migration-window failure.** PostgreSQL backup/restore tooling and isolated disposable DB/DMS topology were available, but clean migration exceeded 30 minutes and the backup/restore preflight did not complete. S19–S21 not started. |
+| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A; candidate frozen; S18 prerequisites satisfied; S19–S21 may start under bounded authorization.** Instrumented diagnosis and a fresh rerun completed clean migration in 1,032.661s and 969.888s with no blocker; coherent PostgreSQL/DMS backup, separate restore, integrity validation and cleanup passed. S19–S21 not started. |
 | P10-S22 | 1 | `A-X` | Independent final risk and production-readiness review |
 | P10-S23 | 1 | `A-H` | Product Owner UAT finding triage and release/rollback recommendation |
 | P10-S24 | 1 | `L-M` | Final documentation closeout and approval packet preparation |
@@ -1371,12 +1371,14 @@ records the frozen candidate commit
 fingerprint, environment resources, verified hashed dependency lock and
 PostgreSQL 18.6 backup/restore executable paths. An isolated disposable
 source/restore database and DMS topology was created without using
-`test_construction_erp` or production data. S18 remains `BLOCKED` after an FC-3
-gate failure because clean migration crossed the accepted 30-minute maximum at
-approximately 30 minutes 8 seconds; the run was stopped before database/DMS
-backup, restore and coherence could be proved. Disposable resources were cleaned
-up. S19–S21 did not start; earlier repository preflight checks are not
-certification evidence.
+`test_construction_erp` or production data. The initial overrun remains recorded,
+but candidate-preserving diagnosis completed actual Django migration execution in
+`1,032.661s` across 376 migrations with zero observed blocking PIDs. A fresh
+single-runner gate rerun completed in `969.888s`, then passed database/DMS backup,
+separate restore, evidence-path/size/hash coherence and cleanup. No migration was
+skipped, faked, pre-applied or edited; setup and cleanup time were recorded
+separately. `P10-S18 = certification prerequisites satisfied`; S19–S21 may start
+under the existing bounded authorization but did not start in this pass.
 
 The six unrelated permission-registry failures remain separate known debt. No
 waiver, runtime implementation, production activation or S22–S24 authority was
