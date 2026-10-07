@@ -2196,9 +2196,10 @@ Stable masters + consent/privacy + support operations -> future network/AI
   [release-certification decision packet](docs/architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md),
   and the numeric recovery, migration and workload decisions are now recorded.
   The [candidate manifest](docs/architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md)
-  leaves S18 blocked because accepted P10 runtime is not in a clean committed
-  candidate and the isolated coherent backup/restore environment/tooling is
-  unavailable. S19–S21 have not started.
+  freezes the accepted P10 runtime and dependency lock at commit
+  `0db3ac9a9fa70e8a857ef0867d532be5206a14c4`. S18 remains blocked because clean
+  migration exceeded the accepted 30-minute window and backup/restore coherence
+  preflight did not complete. S19–S21 have not started.
 - **Status / priority:** **P10-S02–S06 PRODUCT OWNER ACCEPTED**
 - **P10-S01 planning (2026-10-07):** the
   [P10-S01–S06 governed metrics and reporting decision packet](docs/architecture/P10_S01_S06_GOVERNED_METRICS_AND_REPORTING_DECISION_PACKET.md)
@@ -2264,7 +2265,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P10.2 Reconciliation and close workbench
 
 - **Status / priority:** **P10-S07–S17 PRODUCT OWNER ACCEPTED; P10-S18–S21
-  CERTIFICATION AUTHORIZED / S18 BLOCKED**
+  CERTIFICATION AUTHORIZED / FROZEN CANDIDATE / S18 BLOCKED BY MIGRATION WINDOW**
 - **Outcome:** estimate-budget, commitment, PO-receipt-invoice, inventory value,
   subledger-GL, bank, claim-settlement and asset reconciliations; plus Employee
   Insurance List-to-payroll, payroll/insurance liabilities-to-Accounting,
@@ -2287,7 +2288,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P10.3 First production release certification
 
 - **Status / priority:** **S18–S21 OPTION A DECISIONS ACCEPTED AND CERTIFICATION
-  EXECUTION AUTHORIZED; S18 BLOCKED / MUST**
+  EXECUTION AUTHORIZED; CANDIDATE FROZEN; S18 BLOCKED BY MIGRATION WINDOW / MUST**
 - **P10-S18–S21 planning (2026-10-07):** the
   [authoritative release-certification decision packet](docs/architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md)
   defines S18 candidate/ownership freeze, S19 migration/restore rehearsal, S20
@@ -2300,13 +2301,16 @@ Stable masters + consent/privacy + support operations -> future network/AI
   at 15 minutes, RTO at 60 minutes, migration/downtime at 30 minutes and workload
   at 50 baseline/100 peak/130 surge users across 10 Tenants, 25 active users and
   10 representative projects per Tenant. Candidate
-  `P10-RC1-20261007-E0E078C9`, exact migration heads, environment inventory and a
-  verified hashed dependency lock are recorded in the
+  `P10-RC1-20261007-E0E078C9` is frozen at commit
+  `0db3ac9a9fa70e8a857ef0867d532be5206a14c4`; exact migration heads, environment
+  inventory and a verified hashed dependency lock are recorded in the
   [candidate manifest](docs/architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md).
-  S18 remains `BLOCKED`: the accepted P10 runtime is not in a clean committed
-  candidate, and PostgreSQL backup/restore tooling plus an isolated coherent
-  database/DMS recovery environment are unavailable. S19–S21 therefore did not
-  start and no certification is claimed. The six unrelated
+  PostgreSQL 18.6 `pg_dump`/`pg_restore` and an isolated disposable source/restore
+  database and DMS topology were available. S18 remains `BLOCKED` because the
+  clean migration crossed the accepted 30-minute maximum at approximately 30
+  minutes 8 seconds; the run was stopped before backup/restore and DB/DMS
+  coherence could be proved. Disposable resources were cleaned up. S19–S21 did
+  not start and no certification is claimed. The six unrelated
   permission-registry failures remain separate known debt unless the frozen-scope
   assessment proves an included permission or privilege-path certification
   impact. `P10-S22+` and every AI/provider/queue/integration/automatic-effect/

@@ -2,11 +2,13 @@
 
 **Candidate ID:** `P10-RC1-20261007-E0E078C9`
 
-**Status:** **PREPARED BUT NOT CERTIFICATION-FROZEN — BLOCKED.**
+**Status:** **CANDIDATE FROZEN — P10-S18 BLOCKED BY THE ACCEPTED MIGRATION
+WINDOW.**
 
 **Recorded:** 2026-10-07.
 
-**Base commit:** `3dd1b4ef8234f3071bf6ba186772861db99a01c0`.
+**Final candidate commit:**
+`0db3ac9a9fa70e8a857ef0867d532be5206a14c4`.
 
 **Intended scope:** the complete implemented repository runtime through
 Product Owner-accepted `P10-S02–S17`, including governed metrics, reconciliation/
@@ -18,75 +20,37 @@ activation.
 
 ## 1. Freeze result
 
-The base commit is identifiable, but it is **not** the certifiable candidate
-commit. Accepted P10-S07–S17 runtime, migrations, tests and templates exist only
-as modified/untracked worktree content relative to that commit. The runtime state
-contains 36 modified/untracked runtime/dependency files and has fingerprint:
+Commit `0db3ac9a9fa70e8a857ef0867d532be5206a14c4` contains the accepted
+P10-S02–S17 runtime, migrations, tests and templates, the certification documents
+required at freeze, and `requirements-lock.txt`. The certification-scope worktree
+was clean immediately after the commit. The unrelated local scratch directories
+`.codex_tmp_p10_lock_20261007/`, `.codex_tmp_p10_lock_verify_20261007/` and
+`.codex_tmp_p10_lock_verify_b_20261007/` are explicitly ignored and are not part
+of the candidate.
 
-`e0e078c9519db964c63e0d211ad4c1078945e08abd2c64d3e9d2397c427e04ee`
+The final runtime/dependency fingerprint is:
 
-The fingerprint is SHA-256 over the ordered `<path><TAB><Git blob hash>` entries
-in section 2. It identifies the observed state but does not replace the accepted
-requirement for a clean immutable Git commit. No commit was created because this
-tranche did not authorize committing the user's existing runtime changes.
+`76cdbbddea7a03c0463fee4a1827c70f6fadf40dfd5c340cfc9bb4d3794d6b05`
 
-Disposition: `FC-0 Evidence invalid`. Candidate freeze remains blocked until the
-accepted runtime and dependency lock are reviewed and committed, a clean checkout
-of that exact commit reproduces this intended scope, and the manifest is refreshed
-with the final commit SHA.
+It is SHA-256 over the ordered tracked candidate paths and Git blob identities for
+`apps/`, `config/`, `core/`, `templates/`, `manage.py` and
+`requirements*.txt`: 1,134 paths at the final candidate commit. A clean checkout
+of the commit therefore reproduces the frozen runtime/dependency state.
 
-## 2. Observed runtime/dependency state
+Disposition: the candidate freeze itself is **PASS**. The candidate remains
+frozen even though the later migration preflight failed its accepted time gate.
 
-| Path | Git blob hash |
-| --- | --- |
-| `apps/audit/models.py` | `68c142f74d2322fe0f557e4b356df25196b49bdc` |
-| `apps/organizations/migrations/0106_p10_s07_s13_reconciliation_permissions.py` | `668479861f01d586a68890ccfe1f28e1e54866f4` |
-| `apps/organizations/migrations/0107_p10_s14_s17_project_closeout_permissions.py` | `d37ce3d8e49318c375a4291aeb3e5602bf4d43ce` |
-| `apps/organizations/models.py` | `1808c726f477bf63e551e8e60cc0b540e3fe5a97` |
-| `apps/organizations/permission_registry.py` | `d98c34edde442a3c148f4abc3e12b32c512451c6` |
-| `apps/organizations/role_defaults.py` | `d37e3e8bfd1795cb7c1011f650d1fe34c0b0faa2` |
-| `apps/reporting/apps.py` | `4d0b746ccaa2af7d43d950bb094cb1c11ba20e90` |
-| `apps/reporting/catalog_bootstrap.py` | `7f7b2dc943ce09924866a41a83ac27e9193d93a3` |
-| `apps/reporting/catalog.py` | `fbe470987d89bf0cc3520a43ad1c1b3bc9a8495e` |
-| `apps/reporting/migrations/__init__.py` | `e69de29bb2d1d6434b8b29ae775ad8c2e48c5391` |
-| `apps/reporting/migrations/0001_initial.py` | `0cba223bdd6fbf063c1c9fd0a2950895692e29b4` |
-| `apps/reporting/migrations/0002_seed_approved_metric_catalogue.py` | `6c10f347347a672160af3d95468281d7b34c3e33` |
-| `apps/reporting/migrations/0003_p10_s07_s13_reconciliation_controls.py` | `bf5f72d9e4fc5318d331be129fe2b0575f925ed5` |
-| `apps/reporting/migrations/0004_seed_p10_s07_s13_reconciliation_pairs.py` | `79939b4ee691939948492a41495174f7261e3ccd` |
-| `apps/reporting/migrations/0005_projectcloseoutprofiledefinition_and_more.py` | `ea1ea0899ac3ff31d11ae6dd2f2294a9cd8f2d56` |
-| `apps/reporting/migrations/0006_seed_p10_s14_s17_project_closeout_profile.py` | `51004d2ce3080fc29cba6a8ac4cc254c1ba8f54f` |
-| `apps/reporting/models.py` | `a25ae0918172f2aea4dad23909242745f384e366` |
-| `apps/reporting/project_closeout_catalog.py` | `c54609d177a196245841889038205f79f8a7002a` |
-| `apps/reporting/project_closeout.py` | `f241de05192510011e5d202d295e7a0ccb14fb68` |
-| `apps/reporting/reconciliation_catalog.py` | `3393dbbb8da1a3c992a3e1b3436a69f6b1b14dd0` |
-| `apps/reporting/reconciliation.py` | `1b91d86b53dabddea42a7db3285f2fe5af95f85a` |
-| `apps/reporting/services.py` | `cba543ab1c7a34e8d885674da17ea16f62e383ad` |
-| `apps/reporting/test_p10_s02_s06.py` | `63acca3192de603dd83d50d692b53ea0e22af6e6` |
-| `apps/reporting/test_p10_s07_s13.py` | `87ea9f1386c3c90aecdb1f5c46f90e3228fc53f0` |
-| `apps/reporting/test_p10_s14_s17.py` | `34061daef0beba3b2239cc51a637c6375d116564` |
-| `apps/reporting/urls.py` | `1a0448c0947f32d9fea7dc463b5b21b6eff5bbde` |
-| `apps/reporting/views.py` | `f779b63c78d5cfcff0b2ad59eca67e9ad544b79e` |
-| `requirements-lock.txt` | `327ad889513632ff9e68e616897a6d88e1aec1c9` |
-| `templates/components/navigation_links.html` | `513bfa7d1251841e7cf32e55cccb5c3fba7b103d` |
-| `templates/financials/dashboard.html` | `f8da677a3c6cc7487efcfeccbeb792d5f815d357` |
-| `templates/financials/report.html` | `5b428e99a1551fb0881e6be55786905c9f1fd2b1` |
-| `templates/reporting/dashboard.html` | `626577021f098cffd98d9eaee17922c15b73749d` |
-| `templates/reporting/project_closeout_detail.html` | `e1a9e590935df915e39d7da32cf3ac0a822ec85b` |
-| `templates/reporting/project_closeout_workbench.html` | `4384f5e6d3262cd8a6f614c810600a07d7fc832f` |
-| `templates/reporting/reconciliation_detail.html` | `0c3eb0ca18eaf461ad789f26d3faaae06a5ab1dd` |
-| `templates/reporting/reconciliation_workbench.html` | `e8e0288007c0e63b15700cc86c7fc5bde4b42a09` |
+## 2. Documentation-only attestation boundary
 
-## 3. Documentation-only differences excluded from runtime fingerprint
+The final candidate commit includes the accepted implementation and the
+certification documentation available at freeze. The subsequent S18 evidence
+attestation updates only `ROADMAP.md`, `docs/ROADMAP_EXECUTION_PLAYBOOK.md`, this
+manifest, the release-certification decision packet and
+`PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`. Those status/evidence updates are
+explicitly excluded from the runtime fingerprint; they do not change the frozen
+candidate runtime or dependencies.
 
-The observed worktree also contains documentation-only changes in `ROADMAP.md`,
-`docs/ROADMAP_EXECUTION_PLAYBOOK.md`, `docs/architecture/DATA_MODEL.md`,
-`docs/architecture/DOMAIN_AND_DATA_MODEL.md`, `docs/architecture/DOMAIN_MODEL.md`,
-the four P10 decision/certification records, `PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`,
-`USER_CAPABILITY_MAP.md` and `WORKFLOW_AND_PERMISSION_MATRIX.md`. They are excluded
-from the runtime fingerprint only; final candidate documentation must still be
-committed or explicitly excluded with exact hashes before certification evidence.
-
-## 4. Dependency lock
+## 3. Dependency lock
 
 `requirements-lock.txt` is the candidate lock for CPython 3.11 on Windows x86-64.
 It pins 16 direct/transitive runtime and certification packages and includes one
@@ -100,7 +64,7 @@ Python installation exposes an unrelated incomplete global NLTK installation;
 that pollution is not in the project lock and must be absent from or isolated in
 the final certification environment.
 
-## 5. Configuration and migration references
+## 4. Configuration and migration references
 
 - Python: 3.11.1; Django: 5.2.17; Psycopg: 3.3.5.
 - Database: PostgreSQL 18.6 through Django's PostgreSQL backend.
@@ -120,7 +84,7 @@ the final certification environment.
   `safety.0001`, `sessions.0001`, `subledgers.0003`, `support.0002`,
   `timekeeping.0002`, `treasury.0007`, `workflows.0027`, `workforce.0008`.
 
-## 6. Accepted certification parameters
+## 5. Accepted certification parameters
 
 - Recovery: RPO 15 minutes; RTO 60 minutes. Certification targets only, not a
   production SLA.
@@ -134,7 +98,7 @@ the final certification environment.
   peak for endurance. The previously accepted latency/error/resource thresholds
   remain unchanged.
 
-## 7. Environment and recovery-tooling inventory
+## 6. Environment and recovery-tooling inventory
 
 Current available host evidence is **environment-qualified only**:
 
@@ -144,17 +108,41 @@ Current available host evidence is **environment-qualified only**:
   production-equivalence record;
 - PostgreSQL 18.6 is reachable and the configured role has `CREATEDB`;
   `max_connections=100`, `shared_buffers=128MB`, `work_mem=4MB`;
-- the development database is not current at all migration heads and is not
-  certification evidence; and
-- `pg_dump`/`pg_restore` were not available on PATH or under the standard local
-  PostgreSQL installation directories, and no coherent database/DMS backup/
-  restore target was provisioned.
+- the development database remains non-authoritative and is not certification
+  evidence;
+- PostgreSQL 18.6 tools are available and verified at
+  `D:\Program Files\PostgreSQL\18\bin\pg_dump.exe` and
+  `D:\Program Files\PostgreSQL\18\bin\pg_restore.exe`; and
+- the disposable preflight created separate source and restore databases plus
+  isolated source, backup and restore DMS paths under the local temporary root.
 
 Therefore performance must later be classified
 `environment-qualified / production capacity certification still gated` unless a
-production-equivalent isolated environment is supplied. Recovery rehearsal cannot
-start until PostgreSQL backup/restore tooling and an isolated coherent database/
-DMS restore environment are available.
+production-equivalent isolated environment is supplied.
+
+## 7. Backup/restore preflight result
+
+The preflight used only uniquely named disposable non-production resources:
+
+- source database:
+  `p10_s18_pf_src_20261007_082054_e0e078c9`;
+- separate restore database:
+  `p10_s18_pf_restore_20261007_082054_e0e078c9`; and
+- isolated DMS source, coherent-backup and restore locations below
+  `C:\Users\azera\AppData\Local\Temp\p10_s18_recovery_20261007_082054_06em_w8v`.
+
+The configured role proved database create/migrate/drop authority and the local
+temporary root provided isolated DMS write/cleanup authority. The clean migration
+crossed the accepted 30-minute maximum after approximately 30 minutes 8 seconds.
+Execution was stopped at the gate before creating a database dump or DMS backup,
+so database restore, DMS restore and restored DB/DMS coherence are **not passed**.
+No RPO/RTO certification is claimed. `test_construction_erp` and production data
+were not used or mutated. Both disposable databases were dropped and the isolated
+DMS root was removed after the failed attempt.
+
+Disposition: `FC-3 Release-quality failure` / non-waivable migration-window
+**FAIL**. Unknown or unexecuted downstream preflight cells remain not passed and
+cannot be converted to pass.
 
 ## 8. Named owners and preserved gates
 
@@ -175,12 +163,13 @@ production activation remain gated.
 
 ## 9. S18 conclusion
 
-`P10-S18 = BLOCKED` because:
+`P10-S18 = BLOCKED` because the clean candidate migration exceeded the accepted
+30-minute limit and the stopped run therefore could not prove database backup,
+database restore, DMS backup/restore or restored evidence coherence. The candidate
+commit, frozen manifest, hashed dependency lock, PostgreSQL tools and isolated
+disposable topology are otherwise available.
 
-1. no clean committed candidate contains the accepted P10-S02–S17 runtime and the
-   new dependency lock; and
-2. PostgreSQL backup/restore tooling plus an isolated coherent database/DMS
-   recovery environment are not available.
-
-`P10-S19–S21` must not start until both blockers are resolved and this manifest is
-reissued with the final clean candidate commit and environment fingerprints.
+`P10-S19–S21` must not start unless the Product Owner separately re-approves the
+migration limit or a candidate-preserving technical correction produces a complete
+preflight within the existing limit. No such re-approval or correction is inferred
+by this record.

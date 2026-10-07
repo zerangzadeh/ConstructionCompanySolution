@@ -1261,7 +1261,7 @@ downstream effects and production activation remain unauthorized.
 | P10-S01..S06 | 6 | `A-H` | **P10-M01–M24=A; S02–S06 Product Owner accepted.** Six governed metrics, synchronous read models, Persian RTL/Jalali dashboard, permission-preserving drill-through and bounded on-demand export; S14+ remains unauthorized. |
 | P10-S07..S13 | 7 | `A-X` | **P10-R01–P10-R36=A; P10-S07–S13 Product Owner accepted.** Exactly 13 governed financial/operational pairs with immutable comparison/exception evidence, successor-only recalculation and focused PostgreSQL assurance. |
 | P10-S14..S17 | 4 | `A-H` | **P10-C01–C36=A; Product Owner accepted.** Derived-only project-closeout coordination across nine named source-authority families; no source/downstream effect. |
-| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A and bounded certification execution authorized; S18 BLOCKED.** Numeric targets, Candidate ID/manifest, migration heads and hashed lock are recorded; clean committed accepted runtime and coherent backup/restore tooling/environment remain missing. S19–S21 not started. |
+| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A and bounded certification execution authorized; candidate frozen; S18 BLOCKED by migration-window failure.** PostgreSQL backup/restore tooling and isolated disposable DB/DMS topology were available, but clean migration exceeded 30 minutes and the backup/restore preflight did not complete. S19–S21 not started. |
 | P10-S22 | 1 | `A-X` | Independent final risk and production-readiness review |
 | P10-S23 | 1 | `A-H` | Product Owner UAT finding triage and release/rollback recommendation |
 | P10-S24 | 1 | `L-M` | Final documentation closeout and approval packet preparation |
@@ -1366,12 +1366,17 @@ minutes, RTO at 60 minutes, migration/downtime at 30 minutes and workload at 50
 baseline/100 peak/130 surge users across 10 Tenants, 25 active users and 10
 projects per Tenant. The
 [`P10-RC1-20261007-E0E078C9` manifest](architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md)
-records intended scope through accepted P10-S17, exact migration heads, runtime
-state fingerprint, environment resources and a verified hashed dependency lock.
-S18 remains `BLOCKED` under FC-0/FC-4 because the accepted runtime is not in a
-clean committed candidate and coherent PostgreSQL/DMS backup/restore tooling and
-an isolated recovery environment are unavailable. S19–S21 did not start;
-repository preflight checks passed but are not certification evidence.
+records the frozen candidate commit
+`0db3ac9a9fa70e8a857ef0867d532be5206a14c4`, exact migration heads, runtime
+fingerprint, environment resources, verified hashed dependency lock and
+PostgreSQL 18.6 backup/restore executable paths. An isolated disposable
+source/restore database and DMS topology was created without using
+`test_construction_erp` or production data. S18 remains `BLOCKED` after an FC-3
+gate failure because clean migration crossed the accepted 30-minute maximum at
+approximately 30 minutes 8 seconds; the run was stopped before database/DMS
+backup, restore and coherence could be proved. Disposable resources were cleaned
+up. S19–S21 did not start; earlier repository preflight checks are not
+certification evidence.
 
 The six unrelated permission-registry failures remain separate known debt. No
 waiver, runtime implementation, production activation or S22–S24 authority was

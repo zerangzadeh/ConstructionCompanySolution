@@ -1,8 +1,8 @@
 # P10-S18–S21 Release Certification Decision Packet
 
 **Status:** **P10-CERT01–P10-CERT43 OPTION A PRODUCT OWNER ACCEPTED;
-P10-S18–S21 CERTIFICATION EXECUTION AUTHORIZED; S18 PARAMETER GAPS RESOLVED BUT
-CANDIDATE/RECOVERY ENVIRONMENT FREEZE BLOCKED. NO PRODUCTION AUTHORITY.**
+P10-S18–S21 CERTIFICATION EXECUTION AUTHORIZED; CANDIDATE FROZEN BUT S18 BLOCKED
+BY THE ACCEPTED MIGRATION WINDOW. NO PRODUCTION AUTHORITY.**
 
 **Date:** 2026-10-07.
 
@@ -19,13 +19,16 @@ here. Code, migrations and tests remain authoritative for current behavior.
 `P10-CERT01`–`P10-CERT43 = Option A` and authorized P10-S18–S21 certification
 execution only. The Product Owner subsequently supplied RPO/RTO, migration-window,
 workload, environment-classification and named-owner parameters. Candidate
-`P10-RC1-20261007-E0E078C9` and a hashed dependency lock were prepared in the
+`P10-RC1-20261007-E0E078C9` is frozen at commit
+`0db3ac9a9fa70e8a857ef0867d532be5206a14c4`, its hashed dependency lock remains
+verified, and PostgreSQL 18.6 backup/restore tools plus an isolated disposable
+database/DMS topology are available, as recorded in the
 [S18 candidate manifest](P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md). S18 remains
-`BLOCKED` under `FC-0` and `FC-4` because the accepted P10-S02–S17 runtime is not
-contained in a clean committed candidate and PostgreSQL backup/restore tooling
-plus an isolated coherent database/DMS recovery environment are unavailable.
-S19–S21 evidence execution therefore did not start and no certification result
-exists. This acceptance authorizes no runtime feature change, migration
+`BLOCKED` after an `FC-3` gate failure: its clean migration crossed the accepted
+30-minute limit, and the stopped run therefore did not prove backup, restore or
+DB/DMS coherence.
+S19–S21 evidence execution did not start. This acceptance authorizes no runtime
+feature change, migration
 against production, deployment, cutover, traffic, customer data, production
 credential, production restore or production activation. `P10-S22+` remains
 separately gated.
@@ -626,27 +629,30 @@ The candidate-preparation result is recorded in
 `P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md`:
 
 - Candidate ID: `P10-RC1-20261007-E0E078C9`;
-- base commit: `3dd1b4ef8234f3071bf6ba186772861db99a01c0`;
-- observed 36-file runtime/dependency fingerprint:
-  `e0e078c9519db964c63e0d211ad4c1078945e08abd2c64d3e9d2397c427e04ee`;
-- intended scope: all implemented runtime through accepted P10-S02–S17;
-- exact migration heads and documentation-only exclusions are listed in the
-  manifest;
+- final candidate commit:
+  `0db3ac9a9fa70e8a857ef0867d532be5206a14c4`;
+- frozen 1,134-path runtime/dependency fingerprint:
+  `76cdbbddea7a03c0463fee4a1827c70f6fadf40dfd5c340cfc9bb4d3794d6b05`;
+- included scope: all implemented runtime through accepted P10-S02–S17 plus the
+  required certification documentation and dependency lock;
+- exact migration heads and the documentation-only attestation boundary are
+  listed in the manifest;
 - `requirements-lock.txt` is hashed and exact for the recorded CPython 3.11/
   Windows x86-64 environment, and `pip install --require-hashes` succeeded in a
   new temporary environment; and
-- PostgreSQL 18.6 with `CREATEDB` is reachable, but production-equivalent topology/
-  resource limits are not available, `pg_dump`/`pg_restore` are unavailable and
-  no coherent isolated database/DMS restore environment is provisioned.
+- PostgreSQL 18.6 with `CREATEDB` is reachable; PostgreSQL 18.6 `pg_dump` and
+  `pg_restore` are verified at their recorded executable paths; and
+- an isolated source/restore database plus DMS source/backup/restore topology was
+  created without using `test_construction_erp` or production data.
 
-The base commit does not contain all accepted P10-S07–S17 runtime. The modified/
-untracked runtime cannot be called a frozen candidate, and no commit was created
-without explicit commit authorization.
+The clean migration was stopped after crossing the accepted 30-minute maximum at
+approximately 30 minutes 8 seconds. No database or DMS backup had yet been
+created, so database restore, DMS restore and restored DB/DMS coherence remain
+not passed. Both disposable databases and the isolated DMS root were cleaned up.
 
-Disposition: **`P10-S18 = BLOCKED (FC-0 Evidence invalid + FC-4
-Approval/operations missing)`**. Remaining blockers are the clean immutable
-candidate commit and available recovery tooling/environment. Per the accepted S18 stop condition,
-`P10-S19–S21` did not start. No disposable certification database was created;
+Disposition: **`P10-S18 = BLOCKED (FC-3 Release-quality failure: non-waivable
+migration-window failure and incomplete backup/restore preflight)`**. Per the
+accepted S18 stop condition, `P10-S19–S21` did not start.
 `test_construction_erp` was not used, inspected, migrated, reset or claimed as
 evidence. No backup/restore, RPO/RTO, migration/reapply, load, Tenant penetration,
 security penetration or full PostgreSQL certification result is claimed.
