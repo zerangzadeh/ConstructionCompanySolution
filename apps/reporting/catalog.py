@@ -1,6 +1,5 @@
 from typing import Final
 
-
 METRIC_SPECS: Final[dict[str, dict[str, object]]] = {
     "approved_budget": {
         "persian_name": "بودجه مصوب",

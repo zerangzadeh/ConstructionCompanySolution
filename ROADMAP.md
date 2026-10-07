@@ -2189,18 +2189,69 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P10.1 Governed metrics and management reporting
 
-- **Status / priority:** **PLANNED**
+- **Cumulative status through S17:** **P10-S02–S17 PRODUCT OWNER ACCEPTED.**
+  P10-S01 remains the completed planning/session-preparation record; P10-S18–S21
+  is the exact current official envelope. Its decisions and bounded certification
+  execution are Product Owner authorized in the
+  [release-certification decision packet](docs/architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md),
+  and the numeric recovery, migration and workload decisions are now recorded.
+  The [candidate manifest](docs/architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md)
+  leaves S18 blocked because accepted P10 runtime is not in a clean committed
+  candidate and the isolated coherent backup/restore environment/tooling is
+  unavailable. S19–S21 have not started.
+- **Status / priority:** **P10-S02–S06 PRODUCT OWNER ACCEPTED**
 - **P10-S01 planning (2026-10-07):** the
   [P10-S01–S06 governed metrics and reporting decision packet](docs/architecture/P10_S01_S06_GOVERNED_METRICS_AND_REPORTING_DECISION_PACKET.md)
   verifies the formally closed P9 entry baseline and the exact official
   `P10-S01–S06` envelope, then prepares the ownership, first metric set,
   lifecycle, permission/SoD, privacy, DMS, migration, UI, validation and bounded
-  runtime-authorization decisions. `P10-M01`–`P10-M24` are recommendations only;
-  Product Owner decisions, named metric/source owners, acceptance and
-  release/rollback owners, tolerated-risk disposition and explicit authorization
-  remain required. P10-S01 changes no runtime. P10-S02–S24, scheduled/provider
-  delivery, queues, external integrations, automatic downstream effects and all
-  production cutover/activation remain unauthorized.
+  runtime-authorization decisions. On 2026-10-07 the Product Owner accepted
+  `P10-M01`–`P10-M24 = Option A` and authorized P10-S02–S06 only. The bounded
+  implementation now provides the six code-governed metric definitions,
+  immutable Tenant-scoped synchronous results and lineage, independent review for
+  material financial results, Persian RTL/Jalali dashboard, permission-preserving
+  source drill-through and private on-demand CSV export. Sixteen focused
+  PostgreSQL acceptance cases, clean-schema migration, rollback/reapply, Django,
+  drift, Ruff, template/URL and diff-hygiene checks passed. On 2026-10-07 the
+  Product Owner accepted P10-S02–S13, preserving every recorded authority,
+  privacy, no-effect and compatibility boundary. P10-S14–S17 is now Product Owner
+  accepted. Its
+  [authoritative project-closeout coordination decision packet](docs/architecture/P10_S14_S17_PROJECT_CLOSEOUT_COORDINATION_DECISION_PACKET.md)
+  now records `P10-C01`–`P10-C36 = Option A`, the exact bounded runtime
+  authorization, implementation closeout and Product Owner acceptance. The
+  then-next official envelope was P10-S18–S21, requiring new Product Owner
+  decisions and bounded authorization. Those decisions and certification-only
+  authorization are now recorded, but S18 is blocked by the mandatory candidate/
+  parameter freeze. P10-S18–S24 runtime, scheduled/provider delivery, queues, external
+  integrations, automatic downstream effects and all production
+  cutover/activation remain unauthorized.
+- **P10-S07–S13 implementation closeout (2026-10-07):** the
+  [P10-S07–S13 reconciliation and exception decision packet](docs/architecture/P10_S07_S13_RECONCILIATION_AND_EXCEPTION_DECISION_PACKET.md)
+  is the authoritative decision and implementation record. The Product Owner
+  accepted `P10-R01`–`P10-R36 = Option A` and authorized exactly its 13 governed
+  pair codes. P10-S07–S13 is Product Owner accepted.
+  It preserves source ownership, deterministic comparison/tolerance/materiality
+  semantics, append-only exception/evidence lineage and non-rewriting rebuild
+  verification. Reporting/Reconciliation cannot
+  become a parallel source authority; missing/incomplete/unknown values cannot
+  become zero; accepted history cannot be rebuilt in place. The six unrelated
+  permission-registry failures remain separate non-blocking debt. `P10-S18+` and
+  every AI/provider/queue/integration/downstream/production gate remain preserved.
+- **P10-S14–S17 implementation closeout (2026-10-07):** the
+  [authoritative decision packet](docs/architecture/P10_S14_S17_PROJECT_CLOSEOUT_COORDINATION_DECISION_PACKET.md)
+  defines the exact four-session decomposition, nine source-authority control
+  families, derived-only Reporting boundary, immutable closeout-assessment and
+  acceptance evidence, explicit non-value/stale semantics, default-deny
+  permissions/SoD, privacy/DMS/export/UI contracts, expand-only migration,
+  no-effect rules and focused PostgreSQL criteria. The Product Owner accepted
+  `P10-C01`–`P10-C36 = Option A` and authorized P10-S14–S17 only. The bounded
+  derived-control runtime, 14 default-deny permissions, immutable assessment and
+  successor evidence, private byte-free export, and Persian RTL/Jalali workbench
+  are implemented. All 16 focused PostgreSQL cases plus clean apply,
+  rollback/reapply, Django, migration-drift, Ruff, template/URL and diff-hygiene
+  checks passed. P10-S14–S17 is Product Owner accepted. P10-S18+, production and every preserved
+  provider/queue/integration/AI/downstream gate remain unauthorized. The six
+  unrelated permission-registry failures remain separate non-blocking debt.
 - **Outcome:** semantic metric catalogue, project/portfolio dashboards, scheduled
   reports/exports, saved views, source drill-through and freshness indicators.
 - **Prerequisites:** stable authoritative transactions from P2-P8 and explicit
@@ -2212,7 +2263,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P10.2 Reconciliation and close workbench
 
-- **Status / priority:** **PLANNED / release-critical for affected modules**
+- **Status / priority:** **P10-S07–S17 PRODUCT OWNER ACCEPTED; P10-S18–S21
+  CERTIFICATION AUTHORIZED / S18 BLOCKED**
 - **Outcome:** estimate-budget, commitment, PO-receipt-invoice, inventory value,
   subledger-GL, bank, claim-settlement and asset reconciliations; plus Employee
   Insurance List-to-payroll, payroll/insurance liabilities-to-Accounting,
@@ -2234,7 +2286,32 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P10.3 First production release certification
 
-- **Status / priority:** **PLANNED / MUST**
+- **Status / priority:** **S18–S21 OPTION A DECISIONS ACCEPTED AND CERTIFICATION
+  EXECUTION AUTHORIZED; S18 BLOCKED / MUST**
+- **P10-S18–S21 planning (2026-10-07):** the
+  [authoritative release-certification decision packet](docs/architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md)
+  defines S18 candidate/ownership freeze, S19 migration/restore rehearsal, S20
+  performance/Tenant certification and S21 security/privacy/permission evidence
+  consolidation. The Product Owner accepted `P10-CERT01`–`P10-CERT43 = Option A`
+  and authorized P10-S18–S21 certification execution only. The packet records
+  explicit failure/waiver rules, release/rollback authority,
+  evidence retention, focused PostgreSQL/certification validation and bounded
+  authorization wording. The Product Owner subsequently fixed certification RPO
+  at 15 minutes, RTO at 60 minutes, migration/downtime at 30 minutes and workload
+  at 50 baseline/100 peak/130 surge users across 10 Tenants, 25 active users and
+  10 representative projects per Tenant. Candidate
+  `P10-RC1-20261007-E0E078C9`, exact migration heads, environment inventory and a
+  verified hashed dependency lock are recorded in the
+  [candidate manifest](docs/architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md).
+  S18 remains `BLOCKED`: the accepted P10 runtime is not in a clean committed
+  candidate, and PostgreSQL backup/restore tooling plus an isolated coherent
+  database/DMS recovery environment are unavailable. S19–S21 therefore did not
+  start and no certification is claimed. The six unrelated
+  permission-registry failures remain separate known debt unless the frozen-scope
+  assessment proves an included permission or privilege-path certification
+  impact. `P10-S22+` and every AI/provider/queue/integration/automatic-effect/
+  production-activation gate remain preserved. No runtime, production migration,
+  deployment, cutover or activation is authorized.
 - **Outcome:** certify only the explicitly selected release scope, not the entire
   long-term roadmap.
 - **Prerequisites:** P0 gates; all MUST corrections affecting selected scope;

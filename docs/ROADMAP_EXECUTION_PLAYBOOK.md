@@ -1258,10 +1258,10 @@ downstream effects and production activation remain unauthorized.
 
 | Sessions | Count | Model | Outcome |
 | --- | ---: | --- | --- |
-| P10-S01..S06 | 6 | `A-H` | **S01 planning/decision preparation complete; runtime decisions pending.** Metric catalogue, governed read models, dashboards and source drill-through |
-| P10-S07..S13 | 7 | `A-X` | Financial/operational reconciliation pairs, exception evidence and rebuild checks |
-| P10-S14..S17 | 4 | `A-H` | Project-closeout coordination across contracts, claims, documents, assets and knowledge |
-| P10-S18..S21 | 4 | `A-X` | Release certification: migration, restore, performance, tenant and security gates |
+| P10-S01..S06 | 6 | `A-H` | **P10-M01–M24=A; S02–S06 Product Owner accepted.** Six governed metrics, synchronous read models, Persian RTL/Jalali dashboard, permission-preserving drill-through and bounded on-demand export; S14+ remains unauthorized. |
+| P10-S07..S13 | 7 | `A-X` | **P10-R01–P10-R36=A; P10-S07–S13 Product Owner accepted.** Exactly 13 governed financial/operational pairs with immutable comparison/exception evidence, successor-only recalculation and focused PostgreSQL assurance. |
+| P10-S14..S17 | 4 | `A-H` | **P10-C01–C36=A; Product Owner accepted.** Derived-only project-closeout coordination across nine named source-authority families; no source/downstream effect. |
+| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A and bounded certification execution authorized; S18 BLOCKED.** Numeric targets, Candidate ID/manifest, migration heads and hashed lock are recorded; clean committed accepted runtime and coherent backup/restore tooling/environment remain missing. S19–S21 not started. |
 | P10-S22 | 1 | `A-X` | Independent final risk and production-readiness review |
 | P10-S23 | 1 | `A-H` | Product Owner UAT finding triage and release/rollback recommendation |
 | P10-S24 | 1 | `L-M` | Final documentation closeout and approval packet preparation |
@@ -1282,12 +1282,102 @@ permission catalogue, lifecycle/concurrency contracts, `P10-M01`–`P10-M24`
 decision register, focused PostgreSQL plan and exact bounded runtime-authorization
 wording.
 
-P10-S01 is documentation only and complete as decision preparation. The proposed
-choices are not accepted decisions. P10-S02–S06 require explicit Product Owner
-disposition, named metric/source owners, acceptance owner, release/rollback
-executor, tolerated-risk disposition and bounded authorization. P10-S07–S24,
-queues/schedulers/providers, external integrations, automatic downstream effects,
-production certification, cutover and activation remain unauthorized.
+P10-S01 is complete as decision preparation. On 2026-10-07 the Product Owner
+accepted `P10-M01`–`P10-M24 = Option A`, retained source-domain fact ownership,
+named the Product Owner as P10-S06 acceptance owner, assigned non-production
+release/rollback execution to an Authorized Technical Maintainer, and authorized
+P10-S02–S06 only. That bounded implementation and its focused PostgreSQL and
+migration assurance are complete and Product Owner accepted. The exact next
+official envelope is P10-S07–S13, which requires its own Product Owner decisions
+and bounded authorization. P10-S07–S24, queues/schedulers/providers, external
+integrations, automatic downstream effects, production certification, cutover and
+activation remain unauthorized.
+
+### P10-S07–S13 accepted closeout and bounded S14–S17 handoff
+
+The authoritative
+[`P10-S07–S13` decision packet](architecture/P10_S07_S13_RECONCILIATION_AND_EXCEPTION_DECISION_PACKET.md)
+decomposes S07 pair/authority foundations, S08 finance-facing comparisons, S09
+operational/proposal comparisons, S10 exception evidence, S11 rebuild checks, S12
+permissioned RTL operations and S13 focused acceptance. It records 13 exact,
+readiness-gated pair codes; source/native-reconciliation authority; governed
+comparison, tolerance and materiality semantics; append-only exception and
+rebuild lifecycles; DMS/Audit/privacy boundaries; default-deny permissions; and
+focused PostgreSQL criteria.
+
+On 2026-10-07 the Product Owner accepted `P10-R01`–`P10-R36 = Option A` and
+`P10-S07–S13`, covering exactly the packet's 13 pair codes. Missing, incomplete, unavailable or gated
+values remain explicit rather than zero; native source-domain reconciliations
+remain authoritative; rebuild never rewrites an accepted historical result. The
+six unrelated permission-registry failures remain separate non-blocking debt.
+The next official envelope was P10-S14–S17 only and required separately bounded
+Product Owner decisions and authorization. Those decisions and the bounded
+implementation are Product Owner accepted. The then-next official envelope was
+P10-S18–S21 and required separate Product Owner decisions and bounded
+authorization. Those decisions and certification-only authorization are now
+recorded, but S18 is blocked by the mandatory candidate/parameter freeze.
+`P10-S18+` runtime, downstream effects and all production,
+AI/provider/queue/scheduler/integration gates remain unauthorized.
+
+### P10-S14–S17 implementation closeout
+
+The authoritative
+[`P10-S14–S17` decision packet](architecture/P10_S14_S17_PROJECT_CLOSEOUT_COORDINATION_DECISION_PACKET.md)
+defines the exact S14 foundation, S15 synchronous assessment, S16 governed
+acceptance/UI/export and S17 focused assurance/closeout sessions. It fixes nine
+source-authority control families, a derived-only Reporting ownership boundary,
+immutable assessment and acceptance evidence, explicit unknown/incomplete/stale/
+gated semantics, 14 default-denied permissions with maker-checker separation,
+privacy/masking/DMS/export rules, deterministic concurrency/idempotency,
+successor-only correction, Persian RTL/Jalali UI, expand-only non-fabricating
+migration and focused PostgreSQL/no-effect criteria.
+
+On 2026-10-07 the Product Owner accepted `P10-C01`–`P10-C36 = Option A` and used
+the packet's exact wording to authorize P10-S14–S17 only. The bounded runtime and
+16 focused PostgreSQL cases are complete, together with clean migration,
+dependency-safe rollback/reapply and the prescribed repository checks. The Product
+Owner accepted P10-S14–S17, including `16 passed in 946.61s` on
+`test_p10_s14_s17_accept_20261007_a91f`; `test_construction_erp` was not used.
+The then-next official envelope was P10-S18–S21 and required new Product Owner
+decisions and bounded authorization. Those decisions and certification-only
+authorization are now recorded, but S18 is blocked by the mandatory candidate/
+parameter freeze. All P10-S18+ runtime, AI/RAG/vector analytics,
+providers, queues/schedulers, integrations, automatic downstream/financial effects
+and production activation remain unauthorized. The six unrelated
+permission-registry failures remain separate non-blocking debt.
+
+### P10-S18–S21 decision preparation and bounded handoff
+
+The authoritative
+[`P10-S18–S21` release-certification decision packet](architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md)
+decomposes S18 release-candidate/ownership/evidence freeze, S19 isolated clean
+migration and coherent backup/restore rehearsal, S20 approved performance/load and
+Tenant-isolation certification, and S21 security/privacy/permission certification
+plus evidence consolidation. It records accepted
+`P10-CERT01`–`P10-CERT43 = Option A`, defines non-waivable blockers and bounded expiring Medium/Low
+exceptions, preserves the six unrelated permission-registry failures as separate
+known debt unless frozen-scope evidence makes one a blocker, and supplies the exact
+bounded certification-authorization wording.
+
+On 2026-10-07 the Product Owner accepted `P10-CERT01`–`P10-CERT43 = Option A`,
+recorded the generic role owners in the packet and authorized P10-S18–S21
+certification execution only. The Product Owner subsequently fixed RPO at 15
+minutes, RTO at 60 minutes, migration/downtime at 30 minutes and workload at 50
+baseline/100 peak/130 surge users across 10 Tenants, 25 active users and 10
+projects per Tenant. The
+[`P10-RC1-20261007-E0E078C9` manifest](architecture/P10_S18_CERTIFICATION_CANDIDATE_MANIFEST.md)
+records intended scope through accepted P10-S17, exact migration heads, runtime
+state fingerprint, environment resources and a verified hashed dependency lock.
+S18 remains `BLOCKED` under FC-0/FC-4 because the accepted runtime is not in a
+clean committed candidate and coherent PostgreSQL/DMS backup/restore tooling and
+an isolated recovery environment are unavailable. S19–S21 did not start;
+repository preflight checks passed but are not certification evidence.
+
+The six unrelated permission-registry failures remain separate known debt. No
+waiver, runtime implementation, production activation or S22–S24 authority was
+created. AI/RAG/vector, providers, queues/schedulers, integrations, automatic
+downstream/financial effects and all production migration, restore, deployment,
+cutover and activation remain unauthorized.
 
 ## 17. Future-trigger planning envelopes
 

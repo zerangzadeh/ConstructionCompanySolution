@@ -891,59 +891,122 @@ class BusinessPermissionCode(models.TextChoices):
     DAILY_REPORTS_APPROVE = "daily_reports.approve", "تأیید گزارش روزانه"
 
     FIELD_OBSERVATIONS_VIEW = "field_observations.view", "مشاهده مشاهدات میدانی"
-    FIELD_OBSERVATIONS_CAPTURE = "field_observations.capture", "ثبت و ویرایش مشاهده میدانی"
+    FIELD_OBSERVATIONS_CAPTURE = (
+        "field_observations.capture",
+        "ثبت و ویرایش مشاهده میدانی",
+    )
     FIELD_OBSERVATIONS_SUBMIT = "field_observations.submit", "ارسال مشاهده میدانی"
     FIELD_OBSERVATIONS_REVIEW = "field_observations.review", "بررسی مشاهده میدانی"
-    FIELD_OBSERVATIONS_LOCATION_VIEW = "field_observations.location_view", "مشاهده مکان دقیق مشاهده"
+    FIELD_OBSERVATIONS_LOCATION_VIEW = (
+        "field_observations.location_view",
+        "مشاهده مکان دقیق مشاهده",
+    )
     FIELD_PROPOSALS_PREPARE = "field_proposals.prepare", "تهیه پیشنهاد تحویل مشاهده"
     FIELD_PROPOSALS_REVIEW = "field_proposals.review", "بررسی پیشنهاد تحویل مشاهده"
 
     COMPLIANCE_VIEW = "compliance.view", "مشاهده بازرسی و کنترل HSE/QA"
-    COMPLIANCE_TEMPLATES_MANAGE = "compliance.templates_manage", "مدیریت پیش‌نویس الگوی بازرسی"
-    COMPLIANCE_TEMPLATES_PUBLISH = "compliance.templates_publish", "بررسی و انتشار الگوی بازرسی"
-    COMPLIANCE_INSPECTIONS_CREATE = "compliance.inspections_create", "ایجاد و برنامه‌ریزی بازرسی"
+    COMPLIANCE_TEMPLATES_MANAGE = (
+        "compliance.templates_manage",
+        "مدیریت پیش‌نویس الگوی بازرسی",
+    )
+    COMPLIANCE_TEMPLATES_PUBLISH = (
+        "compliance.templates_publish",
+        "بررسی و انتشار الگوی بازرسی",
+    )
+    COMPLIANCE_INSPECTIONS_CREATE = (
+        "compliance.inspections_create",
+        "ایجاد و برنامه‌ریزی بازرسی",
+    )
     COMPLIANCE_INSPECTIONS_EXECUTE = "compliance.inspections_execute", "اجرای بازرسی"
     COMPLIANCE_INSPECTIONS_SUBMIT = "compliance.inspections_submit", "ارسال بازرسی"
-    COMPLIANCE_INSPECTIONS_REVIEW = "compliance.inspections_review", "بررسی و نتیجه‌دهی بازرسی"
-    COMPLIANCE_FINDINGS_CREATE = "compliance.findings_create", "ثبت یافته بازرسی یا آزمون"
+    COMPLIANCE_INSPECTIONS_REVIEW = (
+        "compliance.inspections_review",
+        "بررسی و نتیجه‌دهی بازرسی",
+    )
+    COMPLIANCE_FINDINGS_CREATE = (
+        "compliance.findings_create",
+        "ثبت یافته بازرسی یا آزمون",
+    )
     COMPLIANCE_FINDINGS_CLASSIFY = "compliance.findings_classify", "طبقه‌بندی یافته"
     COMPLIANCE_FINDINGS_MANAGE = "compliance.findings_manage", "تخصیص و مدیریت یافته"
     COMPLIANCE_PERMITS_PREPARE = "compliance.permits_prepare", "تهیه و ارسال مجوز HSE"
     COMPLIANCE_PERMITS_ISSUE = "compliance.permits_issue", "بررسی و صدور مجوز HSE"
-    COMPLIANCE_PERMITS_CONTROL = "compliance.permits_control", "تعلیق، اعاده و ابطال مجوز HSE"
+    COMPLIANCE_PERMITS_CONTROL = (
+        "compliance.permits_control",
+        "تعلیق، اعاده و ابطال مجوز HSE",
+    )
     COMPLIANCE_TESTS_REQUEST = "compliance.tests_request", "درخواست آزمون QA/QC"
     COMPLIANCE_TESTS_EXECUTE = "compliance.tests_execute", "اجرا و ثبت نتیجه آزمون"
-    COMPLIANCE_TESTS_REVIEW = "compliance.tests_review", "بررسی، پذیرش یا بی‌اعتبارسازی نتیجه آزمون"
+    COMPLIANCE_TESTS_REVIEW = (
+        "compliance.tests_review",
+        "بررسی، پذیرش یا بی‌اعتبارسازی نتیجه آزمون",
+    )
     COMPLIANCE_NCR_MANAGE = "compliance.ncr_manage", "صدور و مدیریت عدم انطباق رسمی"
     COMPLIANCE_CAPA_ASSIGN = "compliance.capa_assign", "تأیید و تخصیص CAPA"
     COMPLIANCE_CAPA_EXECUTE = "compliance.capa_execute", "اجرای CAPA"
     COMPLIANCE_VERIFY = "compliance.verify", "راستی‌آزمایی مستقل اقدام"
-    COMPLIANCE_EFFECTIVENESS_REVIEW = "compliance.effectiveness_review", "ارزیابی اثربخشی CAPA"
+    COMPLIANCE_EFFECTIVENESS_REVIEW = (
+        "compliance.effectiveness_review",
+        "ارزیابی اثربخشی CAPA",
+    )
     COMPLIANCE_CLOSE = "compliance.close", "بستن یافته، NCR یا CAPA"
     COMPLIANCE_REOPEN = "compliance.reopen", "بازگشایی کنترل‌شده یافته، NCR یا CAPA"
     COMPLIANCE_EVIDENCE_LINK = "compliance.evidence_link", "پیوند نسخه شواهد HSE/QA"
-    COMPLIANCE_SENSITIVE_EVIDENCE_VIEW = "compliance.sensitive_evidence_view", "مشاهده شواهد حساس HSE/QA"
+    COMPLIANCE_SENSITIVE_EVIDENCE_VIEW = (
+        "compliance.sensitive_evidence_view",
+        "مشاهده شواهد حساس HSE/QA",
+    )
     COMPLIANCE_EXPORT = "compliance.export", "خروجی کنترل‌شده HSE/QA"
     COMPLIANCE_AUDIT_RECONCILE = "compliance.audit_reconcile", "ممیزی و تطبیق HSE/QA"
     PARTNER_VIEW = "partner.view", "مشاهده صلاحیت و عملکرد همکار"
     PARTNER_PROFILE_MANAGE = "partner.profile_manage", "مدیریت پروفایل همکار"
     PARTNER_REQUIREMENTS_MANAGE = "partner.requirements_manage", "انتشار الزام صلاحیت"
-    PARTNER_QUALIFICATIONS_PREPARE = "partner.qualifications_prepare", "تهیه صلاحیت همکار"
-    PARTNER_QUALIFICATIONS_SUBMIT = "partner.qualifications_submit", "ارسال صلاحیت همکار"
-    PARTNER_QUALIFICATIONS_REVIEW = "partner.qualifications_review", "بررسی صلاحیت همکار"
-    PARTNER_QUALIFICATIONS_CONTROL = "partner.qualifications_control", "کنترل صلاحیت همکار"
+    PARTNER_QUALIFICATIONS_PREPARE = (
+        "partner.qualifications_prepare",
+        "تهیه صلاحیت همکار",
+    )
+    PARTNER_QUALIFICATIONS_SUBMIT = (
+        "partner.qualifications_submit",
+        "ارسال صلاحیت همکار",
+    )
+    PARTNER_QUALIFICATIONS_REVIEW = (
+        "partner.qualifications_review",
+        "بررسی صلاحیت همکار",
+    )
+    PARTNER_QUALIFICATIONS_CONTROL = (
+        "partner.qualifications_control",
+        "کنترل صلاحیت همکار",
+    )
     PARTNER_CATEGORY_DECIDE = "partner.category_decide", "تصمیم صلاحیت دسته همکار"
     PARTNER_EVIDENCE_LINK = "partner.evidence_link", "پیوند شواهد صلاحیت همکار"
-    PARTNER_SENSITIVE_EVIDENCE_VIEW = "partner.sensitive_evidence_view", "مشاهده شواهد حساس همکار"
-    PARTNER_EVALUATIONS_PREPARE = "partner.evaluations_prepare", "تهیه ارزیابی عملکرد همکار"
-    PARTNER_EVALUATIONS_SUBMIT = "partner.evaluations_submit", "ارسال ارزیابی عملکرد همکار"
-    PARTNER_EVALUATIONS_PUBLISH = "partner.evaluations_publish", "انتشار ارزیابی عملکرد همکار"
-    PARTNER_EVALUATIONS_APPEAL = "partner.evaluations_appeal", "اعتراض و تصمیم ارزیابی همکار"
+    PARTNER_SENSITIVE_EVIDENCE_VIEW = (
+        "partner.sensitive_evidence_view",
+        "مشاهده شواهد حساس همکار",
+    )
+    PARTNER_EVALUATIONS_PREPARE = (
+        "partner.evaluations_prepare",
+        "تهیه ارزیابی عملکرد همکار",
+    )
+    PARTNER_EVALUATIONS_SUBMIT = (
+        "partner.evaluations_submit",
+        "ارسال ارزیابی عملکرد همکار",
+    )
+    PARTNER_EVALUATIONS_PUBLISH = (
+        "partner.evaluations_publish",
+        "انتشار ارزیابی عملکرد همکار",
+    )
+    PARTNER_EVALUATIONS_APPEAL = (
+        "partner.evaluations_appeal",
+        "اعتراض و تصمیم ارزیابی همکار",
+    )
     PARTNER_PROPOSALS_CREATE = "partner.proposals_create", "ایجاد پیشنهاد صلاحیت همکار"
     PARTNER_EXPORT = "partner.export", "خروجی کنترل‌شده همکار"
     PARTNER_AUDIT_RECONCILE = "partner.audit_reconcile", "ممیزی و تطبیق همکار"
     SUPPORT_NOTIFICATIONS_VIEW = "support.notifications_view", "مشاهده اعلان‌ها"
-    SUPPORT_NOTIFICATIONS_ACKNOWLEDGE = "support.notifications_acknowledge", "تأیید اعلان‌ها"
+    SUPPORT_NOTIFICATIONS_ACKNOWLEDGE = (
+        "support.notifications_acknowledge",
+        "تأیید اعلان‌ها",
+    )
     SUPPORT_CALENDAR_VIEW = "support.calendar_view", "مشاهده تقویم نظارتی"
     SUPPORT_CASE_CREATE = "support.case_create", "ایجاد مورد پشتیبانی"
     SUPPORT_CASE_VIEW = "support.case_view", "مشاهده مورد پشتیبانی"
@@ -952,24 +1015,45 @@ class BusinessPermissionCode(models.TextChoices):
     SUPPORT_CASE_RESOLVE = "support.case_resolve", "حل و بستن مورد پشتیبانی"
     SUPPORT_CASE_REOPEN = "support.case_reopen", "بازگشایی مورد پشتیبانی"
     SUPPORT_EVIDENCE_LINK = "support.evidence_link", "پیوند شواهد پشتیبانی"
-    SUPPORT_EVIDENCE_SENSITIVE_VIEW = "support.evidence_sensitive_view", "مشاهده شواهد حساس پشتیبانی"
+    SUPPORT_EVIDENCE_SENSITIVE_VIEW = (
+        "support.evidence_sensitive_view",
+        "مشاهده شواهد حساس پشتیبانی",
+    )
     SUPPORT_ACCESS_REQUEST = "support.access_request", "درخواست دسترسی پشتیبانی"
-    SUPPORT_ACCESS_TENANT_CONFIRM = "support.access_tenant_confirm", "تأیید Tenant دسترسی پشتیبانی"
-    SUPPORT_ACCESS_PLATFORM_APPROVE = "support.access_platform_approve", "تأیید پلتفرم دسترسی پشتیبانی"
+    SUPPORT_ACCESS_TENANT_CONFIRM = (
+        "support.access_tenant_confirm",
+        "تأیید Tenant دسترسی پشتیبانی",
+    )
+    SUPPORT_ACCESS_PLATFORM_APPROVE = (
+        "support.access_platform_approve",
+        "تأیید پلتفرم دسترسی پشتیبانی",
+    )
     SUPPORT_ACCESS_USE = "support.access_use", "استفاده از دسترسی پشتیبانی"
     SUPPORT_ACCESS_REVOKE = "support.access_revoke", "ابطال دسترسی پشتیبانی"
     SUPPORT_AUDIT_RECONCILE = "support.audit_reconcile", "ممیزی و تطبیق پشتیبانی"
     KNOWLEDGE_CANDIDATES_CREATE = "knowledge.candidates_create", "ایجاد پیش‌نویس دانش"
     KNOWLEDGE_CANDIDATES_SUBMIT = "knowledge.candidates_submit", "ارسال کاندید دانش"
     KNOWLEDGE_CANDIDATES_REVIEW = "knowledge.candidates_review", "بررسی کاندید دانش"
-    KNOWLEDGE_PUBLICATIONS_APPROVE = "knowledge.publications_approve", "تأیید انتشار دانش"
+    KNOWLEDGE_PUBLICATIONS_APPROVE = (
+        "knowledge.publications_approve",
+        "تأیید انتشار دانش",
+    )
     KNOWLEDGE_PUBLICATIONS_PUBLISH = "knowledge.publications_publish", "انتشار دانش"
     KNOWLEDGE_PUBLICATIONS_VIEW = "knowledge.publications_view", "مشاهده دانش منتشرشده"
     KNOWLEDGE_UNPUBLISHED_VIEW = "knowledge.unpublished_view", "مشاهده کاندیدهای دانش"
-    KNOWLEDGE_PUBLICATIONS_SUPERSEDE = "knowledge.publications_supersede", "جایگزینی انتشار دانش"
-    KNOWLEDGE_PUBLICATIONS_WITHDRAW = "knowledge.publications_withdraw", "پس‌گرفتن انتشار دانش"
+    KNOWLEDGE_PUBLICATIONS_SUPERSEDE = (
+        "knowledge.publications_supersede",
+        "جایگزینی انتشار دانش",
+    )
+    KNOWLEDGE_PUBLICATIONS_WITHDRAW = (
+        "knowledge.publications_withdraw",
+        "پس‌گرفتن انتشار دانش",
+    )
     KNOWLEDGE_HISTORY_VIEW = "knowledge.history_view", "مشاهده تاریخچه دانش"
-    KNOWLEDGE_SENSITIVE_PROVENANCE_VIEW = "knowledge.sensitive_provenance_view", "مشاهده منبع حساس دانش"
+    KNOWLEDGE_SENSITIVE_PROVENANCE_VIEW = (
+        "knowledge.sensitive_provenance_view",
+        "مشاهده منبع حساس دانش",
+    )
     KNOWLEDGE_RECURRENCE_RECORD = "knowledge.recurrence_record", "ثبت شواهد تکرار"
     KNOWLEDGE_REUSE_RECORD = "knowledge.reuse_record", "ثبت استفاده مجدد دانش"
     KNOWLEDGE_TAXONOMY_MANAGE = "knowledge.taxonomy_manage", "مدیریت طبقه‌بندی دانش"
@@ -1595,6 +1679,122 @@ class BusinessPermissionCode(models.TextChoices):
         "خروجی حساس شاخص",
     )
     REPORTING_AUDIT_VIEW = "reporting.audit.view", "مشاهده ممیزی گزارش‌گیری"
+    REPORTING_RECONCILIATION_CATALOG_VIEW = (
+        "reporting.reconciliation_catalog.view",
+        "مشاهده کاتالوگ تطبیق",
+    )
+    REPORTING_RECONCILIATION_DEFINITION_PREPARE = (
+        "reporting.reconciliation_definition.prepare",
+        "تهیه تعریف تطبیق",
+    )
+    REPORTING_RECONCILIATION_DEFINITION_PUBLISH = (
+        "reporting.reconciliation_definition.publish",
+        "انتشار تعریف تطبیق",
+    )
+    REPORTING_RECONCILIATION_RUN_EXECUTE = (
+        "reporting.reconciliation_run.execute",
+        "اجرای تطبیق",
+    )
+    REPORTING_RECONCILIATION_RUN_VIEW = (
+        "reporting.reconciliation_run.view",
+        "مشاهده اجرای تطبیق",
+    )
+    REPORTING_RECONCILIATION_RUN_REVIEW = (
+        "reporting.reconciliation_run.review",
+        "بررسی اجرای تطبیق",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION_VIEW = (
+        "reporting.reconciliation_exception.view",
+        "مشاهده مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION_ASSIGN = (
+        "reporting.reconciliation_exception.assign",
+        "ارجاع مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION_DISPOSITION = (
+        "reporting.reconciliation_exception.disposition",
+        "ثبت تصمیم مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION_CLOSE = (
+        "reporting.reconciliation_exception.close",
+        "بستن مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION_REOPEN = (
+        "reporting.reconciliation_exception.reopen",
+        "بازگشایی مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_EVIDENCE_LINK = (
+        "reporting.reconciliation_evidence.link",
+        "پیوند شاهد مغایرت تطبیق",
+    )
+    REPORTING_RECONCILIATION_REBUILD_EXECUTE = (
+        "reporting.reconciliation_rebuild.execute",
+        "اجرای بازسازی تطبیق",
+    )
+    REPORTING_RECONCILIATION_REBUILD_REVIEW = (
+        "reporting.reconciliation_rebuild.review",
+        "بررسی بازسازی تطبیق",
+    )
+    REPORTING_RECONCILIATION_AUDIT_VIEW = (
+        "reporting.reconciliation_audit.view",
+        "مشاهده ممیزی تطبیق",
+    )
+    REPORTING_PROJECT_CLOSEOUT_PROFILE_VIEW = (
+        "reporting.project_closeout_profile.view",
+        "مشاهده الگوی اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_PROFILE_PREPARE = (
+        "reporting.project_closeout_profile.prepare",
+        "تهیه الگوی اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_PROFILE_PUBLISH = (
+        "reporting.project_closeout_profile.publish",
+        "انتشار الگوی اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_VIEW = (
+        "reporting.project_closeout_case.view",
+        "مشاهده پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_PREPARE = (
+        "reporting.project_closeout_case.prepare",
+        "تهیه و ارزیابی پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_COORDINATE = (
+        "reporting.project_closeout_case.coordinate",
+        "هماهنگی پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_REVIEW = (
+        "reporting.project_closeout_case.review",
+        "بررسی پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_ACCEPT = (
+        "reporting.project_closeout_case.accept",
+        "پذیرش کنترل‌شده پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_CASE_REOPEN = (
+        "reporting.project_closeout_case.reopen",
+        "بازگشایی پرونده اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_EVIDENCE_LINK = (
+        "reporting.project_closeout_evidence.link",
+        "پیوند شاهد اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_SENSITIVE_VIEW = (
+        "reporting.project_closeout_sensitive.view",
+        "مشاهده داده حساس اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_EXPORT_CREATE = (
+        "reporting.project_closeout_export.create",
+        "ایجاد خروجی اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_EXPORT_DOWNLOAD = (
+        "reporting.project_closeout_export.download",
+        "دریافت خروجی اختتام پروژه",
+    )
+    REPORTING_PROJECT_CLOSEOUT_AUDIT_VIEW = (
+        "reporting.project_closeout_audit.view",
+        "مشاهده ممیزی اختتام پروژه",
+    )
     AUDIT_VIEW = "audit.view", "مشاهده گزارش رویدادها"
     WORKFLOWS_VIEW = "workflows.view", "مشاهده تعریف‌های گردش‌کار"
     WORKFLOWS_CREATE = "workflows.create", "ایجاد تعریف گردش‌کار"

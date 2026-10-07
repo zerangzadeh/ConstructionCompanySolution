@@ -1514,6 +1514,34 @@ class AuditAction(models.TextChoices):
         "شاخص حاکم‌شده بازسازی شد",
     )
     REPORTING_EXPORTED = "reporting.exported", "خروجی شاخص ایجاد شد"
+    REPORTING_RECONCILIATION_RUN = (
+        "reporting.reconciliation_run",
+        "اجرای تطبیق ثبت شد",
+    )
+    REPORTING_RECONCILIATION_REVIEW = (
+        "reporting.reconciliation_review",
+        "بررسی تطبیق ثبت شد",
+    )
+    REPORTING_RECONCILIATION_EXCEPTION = (
+        "reporting.reconciliation_exception",
+        "رویداد مغایرت تطبیق ثبت شد",
+    )
+    REPORTING_RECONCILIATION_REBUILD = (
+        "reporting.reconciliation_rebuild",
+        "بازسازی تطبیق ثبت شد",
+    )
+    REPORTING_PROJECT_CLOSEOUT_ASSESSED = (
+        "reporting.project_closeout_assessed",
+        "ارزیابی اختتام پروژه ثبت شد",
+    )
+    REPORTING_PROJECT_CLOSEOUT_EVENT = (
+        "reporting.project_closeout_event",
+        "رویداد اختتام پروژه ثبت شد",
+    )
+    REPORTING_PROJECT_CLOSEOUT_EXPORTED = (
+        "reporting.project_closeout_exported",
+        "خروجی اختتام پروژه ایجاد شد",
+    )
 
 
 class AuditEventQuerySet(models.QuerySet):

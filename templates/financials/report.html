@@ -1,6 +1,7 @@
 {% extends "base.html" %}{% load erp_format table_filters %}
 {% block title %}گزارش مالی | سامانه مدیریت ساخت{% endblock %}
 {% block content %}
+<div class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900" dir="rtl">این گزارش صرفاً سازگاری سامانه قبلی است؛ مقدار «انحراف» آن به شاخص مصوب بودجه/هزینه واقعی P10 تبدیل نشده است.</div>
 {% include "components/page_header.html" with page_eyebrow="امور مالی" page_title="گزارش مالی پروژه‌ها" page_description=request.organization.name only %}
 <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="گزارش مالی پروژه‌ها">
 {% if reports %}

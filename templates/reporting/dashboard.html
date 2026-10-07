@@ -12,11 +12,10 @@
   <section aria-labelledby="metric-results-title">
     <div class="mb-3 flex items-center justify-between gap-3">
       <h2 id="metric-results-title" class="text-lg font-bold text-slate-900">آخرین نتایج مجاز</h2>
-      <form method="post" action="{% url 'reporting:export' %}" class="flex gap-2">{% csrf_token %}
-        <input type="hidden" name="idempotency_key" value="export-{{ request.user.pk }}-{{ request.organization.pk }}">
+      {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}" class="flex gap-2">{% csrf_token %}
         <input type="hidden" name="purpose" value="داشبورد مدیریتی">
         <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
-      </form>
+      </form>{% endif %}
     </div>
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {% for result in results %}
@@ -33,7 +32,7 @@
           <div class="flex justify-between gap-3"><dt class="text-slate-500">واحد / ارز</dt><dd>{{ result.unit }}{% if result.currency %} / {{ result.currency }}{% endif %}</dd></div>
           <div class="flex justify-between gap-3"><dt class="text-slate-500">زمان مبنا</dt><dd>{{ result.as_of|jalali_datetime }}</dd></div>
         </dl>
-        <a class="mt-4 inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:drillthrough' result.pk %}">مشاهده شجره منبع ←</a>
+        {% if "reporting.source_drillthrough.view" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:drillthrough' result.pk %}">مشاهده شجره منبع ←</a>{% endif %}
       </article>
       {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">هنوز نتیجه حاکم‌شده‌ای در دامنه مجاز شما ساخته نشده است.</p>{% endfor %}
     </div>

@@ -1,17 +1,21 @@
 # P10-S01–S06 Governed Metrics and Reporting Decision Packet
 
-**Status:** **P10-S01 planning and decision preparation complete; Product Owner
-decisions and runtime authorization pending.**
+**Status:** **P10-M01–P10-M24 accepted as Option A; P10-S02–S06 Product Owner
+accepted.**
 
 **Date:** 2026-10-07.
 
-**Authority:** planning proposal derived from `ROADMAP.md`, the P10 session map in
+**Authority:** the Product Owner decision and bounded non-production runtime
+authorization dated 2026-10-07, this packet, `ROADMAP.md`, the P10 session map in
 `docs/ROADMAP_EXECUTION_PLAYBOOK.md`, and the formally closed P9 baseline in
 `P9_FINAL_ASSURANCE_CLOSEOUT_AND_P10_HANDOFF.md`.
 
-**Runtime effect:** none. This packet does not authorize models, migrations,
-permissions, services, APIs, workflows, UI, jobs, queues, integrations, exports,
-production cutover, or production activation.
+**Runtime effect:** the bounded `reporting` module, expand-only schema and
+permission catalogue, six code-governed metrics, synchronous read models,
+Persian RTL/Jalali dashboard, permission-preserving drill-through and on-demand
+CSV export are implemented for P10-S02–S06. No P10-S07+, job, queue, scheduler,
+external integration, automatic downstream effect, production cutover or
+production activation is authorized.
 
 ## 1. Entry gate and exact official envelope
 
@@ -29,10 +33,10 @@ Roadmap names P10.1 **Governed metrics and management reporting**, status
 scheduled reports/exports as target outcomes. The Roadmap does not authorize a
 separate warehouse.
 
-This tranche starts planning-first. P10-S01 is this decision packet. Runtime for
-P10-S02–S06 remains blocked until the Product Owner records the required choices
-and supplies the bounded authorization in section 16. The official map fixes the
-ending at S06; no later session number is inferred.
+This tranche started planning-first. P10-S01 is this decision packet. The Product
+Owner subsequently selected Option A for P10-M01–P10-M24 and authorized only
+P10-S02–S06. The official map fixes this implementation ending at S06; no later
+session number or production authority is inferred.
 
 ## 2. Session-by-session decomposition
 
@@ -43,11 +47,10 @@ ending at S06; no later session number is inferred.
 | P10-S03 | Governed synchronous read-model build/refresh records, source watermarks, completeness/freshness/stale evidence, deterministic rebuild and immutable result lineage | Published metric versions from S02; stable source adapters; no queue, scheduler or warehouse. |
 | P10-S04 | Tenant/project/portfolio Persian RTL dashboards, saved views, accessible chart/table parity and permission-preserving source drill-through | S03 results; source-domain read permissions/object scope enforced at drill-through; no unrestricted SQL or AI. |
 | P10-S05 | Bounded on-demand report/export, exact result/source manifest, private non-cacheable delivery, audit and DMS retention boundary | Explicit export decisions and permissions; no scheduled delivery, email/SMS/push provider, background queue or external integration. |
-| P10-S06 | Focused PostgreSQL acceptance, deterministic rebuild/tie-out, migration rollback/reapply, privacy/accessibility assurance, documentation reconciliation and bounded P10-S07 handoff preparation | All S02–S05 acceptance criteria pass. Finish as `implementation complete / Product Owner acceptance pending`; do not start S07. |
+| P10-S06 | Focused PostgreSQL acceptance, deterministic rebuild/tie-out, migration rollback/reapply, privacy/accessibility assurance, documentation reconciliation and bounded P10-S07 handoff preparation | All S02–S05 acceptance criteria pass. Product Owner accepted on 2026-10-07; do not start S07 without separate authorization. |
 
-S02–S06 form one coherent possible runtime authorization after decisions. Session
-completion never authorizes P10-S07+, production certification, cutover or
-activation.
+S02–S06 form one accepted bounded runtime tranche. Its acceptance never authorizes
+P10-S07+, production certification, cutover or activation.
 
 ## 3. Inherited non-negotiable boundaries
 
@@ -420,15 +423,11 @@ authorization-safe API for the future ERP Assistant.
 
 ## 15. Planning validation and documentation closeout
 
-This S01 pass changes documentation only. Appropriate validation is local-link and
-anchor checking, exact session/status/deferred-gate searches, Markdown whitespace
-review and scoped diff review. Application tests, Django checks and migration
-commands are not justified because no executable/configuration file changes.
-
-`ROADMAP.md` and `docs/ROADMAP_EXECUTION_PLAYBOOK.md` must record S01 planning as
-complete while leaving P10.1 `PLANNED`, all decisions pending, P10 runtime
-unauthorized and P10-S07+ prohibited. No other architecture status changes merely
-because this proposal exists.
+S01 was documentation-only. The subsequently authorized S02–S06 runtime passed
+the focused PostgreSQL, migration, Django, template/URL, Ruff and diff-hygiene
+assurance recorded in section 17. `ROADMAP.md` and
+`docs/ROADMAP_EXECUTION_PLAYBOOK.md` record the Product Owner acceptance while
+preserving P10-S07+ as prohibited pending a separate decision and authorization.
 
 ## 16. Exact bounded runtime-authorization wording
 
@@ -458,6 +457,56 @@ with explicit facts and recording decisions in this packet:
 > **`implementation complete / Product Owner acceptance pending`**. This wording
 > grants no later-session or production authority.
 
-Without that explicit decision record and authorization, the correct status is:
-**P10-S01 planning complete; Product Owner decisions required; no P10 runtime
-authorized.**
+That decision record and authorization were supplied on 2026-10-07. The Product
+Owner also accepted P10-S02–S06 on that date. The acceptance grants neither a
+later session nor production authority.
+
+## 17. P10-S02–S06 implementation and assurance closeout
+
+The bounded implementation contains exactly the six approved stable metric IDs:
+`approved_budget`, `committed_cost`, `actual_cost_coverage`,
+`cleared_cash_position`, `procurement_cycle_time`, and
+`inventory_quantity_value`. Code-owned published version 1 records the Persian
+business name, deterministic formula, source domain/owner/permission, Product
+Owner metric ownership, normal sensitivity and source drill-through contract.
+No ad-hoc executable metric-definition surface exists.
+
+The new `apps.reporting` boundary stores only governed definitions, immutable
+derived results and lineage, synchronous refresh evidence, material-result review,
+saved-view configuration and byte-free export manifests. Read models are
+Organization-scoped, project/portfolio filtered and source-permission checked;
+material financial results require an independent review before dashboard/export
+visibility. Drill-through rechecks both Reporting and authoritative source-domain
+permissions. The dashboard/export performs no independent business calculation
+and every response is private/non-cacheable. The existing `apps.financials`
+projection is preserved and visibly labelled legacy compatibility behavior; it is
+not backfilled, aliased or promoted as governed authority.
+
+All sixteen focused PostgreSQL acceptance cases passed in **12.46s** on the one
+uniquely named disposable PostgreSQL database
+`test_p10_accept_20261007_2135` with one runner; `test_construction_erp` was not
+used. Clean-schema migration and dependency-safe Reporting rollback/reapply
+through `0002` passed, as did `manage.py check`, migration drift, targeted Ruff,
+template compilation/URL resolution and `git diff --check`. The focused cases
+cover the catalogue, all six calculators,
+default-deny permissions, Platform/Tenant separation, project scope, exact retry,
+material-result separation, immutability, source-authorized drill-through,
+byte-free export, Persian RTL/private delivery, audit and no downstream mutation.
+
+Scoped defects fixed during assurance were default-role leakage of newly added
+permission codes, loss of the code-owned catalogue after test-database flush,
+portfolio/organization aggregate scope leakage, missing source-permission checks
+at refresh, mutable governed definition metadata, false-zero treatment of absent
+sources, unreviewed material-result visibility, and duplicate concurrent
+refresh/export risk. A retained broader
+`apps.organizations.test_permission_registry` suite still reports inherited,
+non-P10 registry inconsistencies for Support, Payroll handoff duplication and
+older namespace/enforcement mappings; the focused P10 check proves exactly the 16
+Reporting codes are registered and have no default grant. These six pre-existing
+failures remain unresolved repository issues, are documented, and are not P10
+acceptance blockers.
+
+The final state is **P10-S02–S06 Product Owner accepted**. P10-S07+,
+reconciliation/close, AI/RAG/vector/semantic
+analytics, providers/integrations, queues/schedulers, automatic downstream or
+financial effects, and production cutover/activation remain prohibited.

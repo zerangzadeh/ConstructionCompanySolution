@@ -6,6 +6,9 @@ from apps.organizations.permission_catalog import (
 from apps.organizations.permission_registry import registered_permission_codes
 
 ALL_PERMISSIONS = registered_permission_codes()
+REPORTING_PERMISSIONS = frozenset(
+    code for code in ALL_PERMISSIONS if code.startswith("reporting.")
+)
 WORKFORCE_GENERAL_PERMISSIONS = permission_codes(
     BusinessPermissionCode.WORKFORCE_SKILLS_VIEW,
     BusinessPermissionCode.WORKFORCE_SKILLS_MANAGE,
@@ -582,7 +585,9 @@ _field_review = permission_codes(
     BusinessPermissionCode.FIELD_OBSERVATIONS_REVIEW,
     BusinessPermissionCode.FIELD_PROPOSALS_REVIEW,
 )
-_field_location = permission_codes(BusinessPermissionCode.FIELD_OBSERVATIONS_LOCATION_VIEW)
+_field_location = permission_codes(
+    BusinessPermissionCode.FIELD_OBSERVATIONS_LOCATION_VIEW
+)
 for _role in (
     MembershipRole.TENANT_OWNER,
     MembershipRole.TENANT_ADMIN,
@@ -650,11 +655,40 @@ DEFAULT_ROLE_PERMISSIONS[MembershipRole.MEMBER].update(_compliance_view)
 DEFAULT_ROLE_PERMISSIONS[MembershipRole.VIEWER].update(_compliance_view)
 
 _partner_view = permission_codes(BusinessPermissionCode.PARTNER_VIEW)
-_partner_field = permission_codes(BusinessPermissionCode.PARTNER_PROFILE_MANAGE, BusinessPermissionCode.PARTNER_QUALIFICATIONS_PREPARE, BusinessPermissionCode.PARTNER_QUALIFICATIONS_SUBMIT, BusinessPermissionCode.PARTNER_EVIDENCE_LINK, BusinessPermissionCode.PARTNER_EVALUATIONS_PREPARE, BusinessPermissionCode.PARTNER_EVALUATIONS_SUBMIT, BusinessPermissionCode.PARTNER_EVALUATIONS_APPEAL, BusinessPermissionCode.PARTNER_PROPOSALS_CREATE)
-_partner_control = permission_codes(BusinessPermissionCode.PARTNER_REQUIREMENTS_MANAGE, BusinessPermissionCode.PARTNER_QUALIFICATIONS_REVIEW, BusinessPermissionCode.PARTNER_QUALIFICATIONS_CONTROL, BusinessPermissionCode.PARTNER_CATEGORY_DECIDE, BusinessPermissionCode.PARTNER_EVALUATIONS_PUBLISH, BusinessPermissionCode.PARTNER_EXPORT, BusinessPermissionCode.PARTNER_AUDIT_RECONCILE)
-for _role in (MembershipRole.TENANT_OWNER, MembershipRole.TENANT_ADMIN, MembershipRole.TENANT_MANAGER, MembershipRole.COMPANY_OWNER, MembershipRole.COMPANY_MANAGER, MembershipRole.OPERATIONS_MANAGER, MembershipRole.PROJECT_MANAGER):
-    DEFAULT_ROLE_PERMISSIONS[_role].update(_partner_view | _partner_field | _partner_control)
-DEFAULT_ROLE_PERMISSIONS[MembershipRole.SUPERVISOR].update(_partner_view | _partner_field)
+_partner_field = permission_codes(
+    BusinessPermissionCode.PARTNER_PROFILE_MANAGE,
+    BusinessPermissionCode.PARTNER_QUALIFICATIONS_PREPARE,
+    BusinessPermissionCode.PARTNER_QUALIFICATIONS_SUBMIT,
+    BusinessPermissionCode.PARTNER_EVIDENCE_LINK,
+    BusinessPermissionCode.PARTNER_EVALUATIONS_PREPARE,
+    BusinessPermissionCode.PARTNER_EVALUATIONS_SUBMIT,
+    BusinessPermissionCode.PARTNER_EVALUATIONS_APPEAL,
+    BusinessPermissionCode.PARTNER_PROPOSALS_CREATE,
+)
+_partner_control = permission_codes(
+    BusinessPermissionCode.PARTNER_REQUIREMENTS_MANAGE,
+    BusinessPermissionCode.PARTNER_QUALIFICATIONS_REVIEW,
+    BusinessPermissionCode.PARTNER_QUALIFICATIONS_CONTROL,
+    BusinessPermissionCode.PARTNER_CATEGORY_DECIDE,
+    BusinessPermissionCode.PARTNER_EVALUATIONS_PUBLISH,
+    BusinessPermissionCode.PARTNER_EXPORT,
+    BusinessPermissionCode.PARTNER_AUDIT_RECONCILE,
+)
+for _role in (
+    MembershipRole.TENANT_OWNER,
+    MembershipRole.TENANT_ADMIN,
+    MembershipRole.TENANT_MANAGER,
+    MembershipRole.COMPANY_OWNER,
+    MembershipRole.COMPANY_MANAGER,
+    MembershipRole.OPERATIONS_MANAGER,
+    MembershipRole.PROJECT_MANAGER,
+):
+    DEFAULT_ROLE_PERMISSIONS[_role].update(
+        _partner_view | _partner_field | _partner_control
+    )
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.SUPERVISOR].update(
+    _partner_view | _partner_field
+)
 DEFAULT_ROLE_PERMISSIONS[MembershipRole.MEMBER].update(_partner_view)
 DEFAULT_ROLE_PERMISSIONS[MembershipRole.VIEWER].update(_partner_view)
 
@@ -677,8 +711,12 @@ for _role in (
     MembershipRole.PROJECT_MANAGER,
 ):
     DEFAULT_ROLE_PERMISSIONS[_role].update(_knowledge_view | _knowledge_prepare)
-DEFAULT_ROLE_PERMISSIONS[MembershipRole.SUPERVISOR].update(_knowledge_view | _knowledge_prepare)
-DEFAULT_ROLE_PERMISSIONS[MembershipRole.MEMBER].update(_knowledge_view | _knowledge_prepare)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.SUPERVISOR].update(
+    _knowledge_view | _knowledge_prepare
+)
+DEFAULT_ROLE_PERMISSIONS[MembershipRole.MEMBER].update(
+    _knowledge_view | _knowledge_prepare
+)
 DEFAULT_ROLE_PERMISSIONS[MembershipRole.VIEWER].update(_knowledge_view)
 
 # P8-S24–S27: cost and asset finance permissions remain default-denied except
@@ -732,6 +770,9 @@ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(
         UNAUTHORIZED_PROJECT_CONTROL_APPROVAL_PERMISSIONS
     )
+    # P10-M17=A: every new reporting permission is explicitly assigned and no
+    # existing role name implies metric, drill-through, export, or audit access.
+    _default_permissions.difference_update(REPORTING_PERMISSIONS)
 
 
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {

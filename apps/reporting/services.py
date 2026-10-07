@@ -4,21 +4,26 @@ import csv
 import hashlib
 import io
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
-from typing import Any, Callable
+from typing import Any
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import models, transaction
-from django.db.models import Max, Sum
+from django.db import connection, models, transaction
+from django.db.models import Sum
 from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.inventory.models import InventoryValuationPool
-from apps.organizations.authorization import require_business_permission, scope_queryset
+from apps.organizations.authorization import (
+    has_business_permission,
+    require_business_permission,
+    scope_queryset,
+)
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.procurement.models import GoodsReceipt, GoodsReceiptStatus
 from apps.projects.models import (
@@ -28,7 +33,6 @@ from apps.projects.models import (
     ProjectCostFactKind,
 )
 from apps.reporting.models import (
-    MetricDefinition,
     MetricDefinitionVersion,
     MetricExportManifest,
     MetricFreshness,
@@ -39,6 +43,27 @@ from apps.reporting.models import (
     MetricVersionStatus,
 )
 from apps.treasury.models import TreasuryMovementClearing, TreasuryMovementKind
+
+# Closed P10 catalogue: keeping all codes explicit here also makes permission
+# enforcement ownership mechanically auditable without granting any default role.
+REPORTING_PERMISSION_CATALOGUE = (
+    BusinessPermissionCode.REPORTING_METRIC_CATALOG_VIEW,
+    BusinessPermissionCode.REPORTING_METRIC_DEFINITION_PREPARE,
+    BusinessPermissionCode.REPORTING_METRIC_DEFINITION_REVIEW,
+    BusinessPermissionCode.REPORTING_METRIC_DEFINITION_PUBLISH,
+    BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW,
+    BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW_SENSITIVE,
+    BusinessPermissionCode.REPORTING_PORTFOLIO_VIEW,
+    BusinessPermissionCode.REPORTING_METRIC_REFRESH_RUN,
+    BusinessPermissionCode.REPORTING_METRIC_REFRESH_REVIEW,
+    BusinessPermissionCode.REPORTING_SOURCE_DRILLTHROUGH_VIEW,
+    BusinessPermissionCode.REPORTING_SAVED_VIEW_MANAGE_OWN,
+    BusinessPermissionCode.REPORTING_SAVED_VIEW_MANAGE_SHARED,
+    BusinessPermissionCode.REPORTING_EXPORT_CREATE,
+    BusinessPermissionCode.REPORTING_EXPORT_DOWNLOAD,
+    BusinessPermissionCode.REPORTING_EXPORT_SENSITIVE,
+    BusinessPermissionCode.REPORTING_AUDIT_VIEW,
+)
 
 
 def _json_default(value: object) -> str:
@@ -52,6 +77,13 @@ def _hash(payload: object) -> str:
         payload, sort_keys=True, separators=(",", ":"), default=_json_default
     ).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _advisory_lock(*parts: object) -> None:
+    digest = hashlib.sha256("|".join(str(part) for part in parts).encode()).digest()
+    lock_id = int.from_bytes(digest[:8], byteorder="big", signed=True)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT pg_advisory_xact_lock(%s)", [lock_id])
 
 
 def _allowed_projects(*, user: User, organization: Organization):
@@ -71,12 +103,14 @@ def _allowed_projects(*, user: User, organization: Organization):
 
 
 def _project_ids(projects) -> list[str]:
-    return [str(value) for value in projects.order_by("pk").values_list("pk", flat=True)]
+    return [
+        str(value) for value in projects.order_by("pk").values_list("pk", flat=True)
+    ]
 
 
 @dataclass(frozen=True, slots=True)
 class Calculation:
-    value: dict[str, str | int]
+    value: dict[str, str | int | None]
     currency: str
     unit: str
     coverage: dict[str, object]
@@ -88,13 +122,13 @@ def _budget(organization: Organization, projects) -> Calculation:
         organization=organization,
         manifest_line__manifest__budget__governing_for__project__in=projects,
     )
-    amount = rows.aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    total = rows.aggregate(total=Sum("amount"))["total"]
     ids = list(rows.order_by("pk").values_list("pk", flat=True))
     return Calculation(
-        {"amount": format(amount, "f")},
+        {"amount": format(total, "f") if total is not None else None},
         "IRR",
         "money",
-        {"complete": True, "source_count": len(ids)},
+        {"complete": bool(ids), "source_count": len(ids)},
         {"model": "projects.BudgetAllocation", "ids": [str(v) for v in ids]},
     )
 
@@ -112,13 +146,13 @@ def _cost(organization: Organization, projects, *, actual: bool) -> Calculation:
     rows = ProjectCostFact.objects.filter(
         organization=organization, project__in=projects, kind__in=kinds
     )
-    amount = rows.aggregate(total=Sum("amount"))["total"] or Decimal("0")
+    total = rows.aggregate(total=Sum("amount"))["total"]
     ids = list(rows.order_by("pk").values_list("pk", flat=True))
     covered_projects = rows.values("project_id").distinct().count()
     total_projects = projects.count()
     complete = total_projects == covered_projects and total_projects > 0
     return Calculation(
-        {"amount": format(amount, "f")},
+        {"amount": format(total, "f") if total is not None else None},
         "IRR",
         "money",
         {
@@ -132,27 +166,33 @@ def _cost(organization: Organization, projects, *, actual: bool) -> Calculation:
 
 
 def _cash(organization: Organization, projects) -> Calculation:
+    del projects
     rows = TreasuryMovementClearing.objects.filter(
         organization=organization,
         active=True,
-        movement__project__in=projects,
     ).select_related("movement")
-    total = Decimal("0")
+    total = Decimal(0)
     ids: list[str] = []
     for clearing in rows.order_by("pk"):
         movement = clearing.movement
-        sign = Decimal("1") if movement.kind == TreasuryMovementKind.RECEIPT else Decimal("-1")
+        sign = (
+            Decimal(1) if movement.kind == TreasuryMovementKind.RECEIPT else Decimal(-1)
+        )
         if movement.kind == TreasuryMovementKind.TRANSFER:
-            sign = Decimal("0")
+            sign = Decimal(0)
         if movement.kind == TreasuryMovementKind.REVERSAL and movement.reverses_id:
-            sign = Decimal("-1") if movement.reverses.kind == TreasuryMovementKind.RECEIPT else Decimal("1")
+            sign = (
+                Decimal(-1)
+                if movement.reverses.kind == TreasuryMovementKind.RECEIPT
+                else Decimal(1)
+            )
         total += movement.amount * sign
         ids.append(str(clearing.pk))
     return Calculation(
-        {"amount": format(total, "f")},
+        {"amount": format(total, "f") if ids else None},
         "IRR",
         "money",
-        {"complete": True, "source_count": len(ids)},
+        {"complete": bool(ids), "source_count": len(ids)},
         {"model": "treasury.TreasuryMovementClearing", "ids": ids},
     )
 
@@ -171,12 +211,12 @@ def _procurement(organization: Organization, projects) -> Calculation:
         if start and receipt.posted_at and receipt.posted_at >= start:
             durations.append(int((receipt.posted_at - start).total_seconds()))
             ids.append(str(receipt.pk))
-    average = sum(durations) // len(durations) if durations else 0
+    average = sum(durations) // len(durations) if durations else None
     return Calculation(
         {"average_seconds": average, "completed_cycles": len(durations)},
         "",
         "seconds",
-        {"complete": True, "source_count": len(ids)},
+        {"complete": bool(ids), "source_count": len(ids)},
         {"model": "procurement.GoodsReceipt", "ids": ids},
     )
 
@@ -188,11 +228,17 @@ def _inventory(organization: Organization, projects) -> Calculation:
     ids = list(rows.order_by("pk").values_list("pk", flat=True))
     currencies = list(rows.values_list("currency", flat=True).distinct())
     currency = currencies[0] if len(currencies) == 1 else ""
-    complete = len(currencies) <= 1
+    complete = bool(ids) and len(currencies) == 1
     return Calculation(
         {
-            "quantity": format(totals["quantity"] or Decimal("0"), "f"),
-            "value_amount": format(totals["value"] or Decimal("0"), "f"),
+            "quantity": (
+                format(totals["quantity"], "f")
+                if totals["quantity"] is not None
+                else None
+            ),
+            "value_amount": (
+                format(totals["value"], "f") if totals["value"] is not None else None
+            ),
         },
         currency,
         "quantity_and_money",
@@ -242,6 +288,7 @@ def refresh_metric(
         )
     elif project.organization_id != organization.pk:
         raise PermissionDenied("پروژه متعلق به این شرکت نیست.")
+    _advisory_lock("reporting-refresh", organization.pk, idempotency_key)
     projects = _allowed_projects(user=actor, organization=organization)
     if project is not None:
         projects = projects.filter(pk=project.pk)
@@ -256,6 +303,18 @@ def refresh_metric(
             status=MetricVersionStatus.PUBLISHED,
         )
     )
+    organization_wide = metric_code in {
+        "cleared_cash_position",
+        "inventory_quantity_value",
+    }
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=version.definition.source_permission,
+        message="مجوز دامنه منبع برای اجرای شاخص وجود ندارد.",
+        project=project,
+        allow_any_scope=project is None and not organization_wide,
+    )
     fingerprint = _hash(
         {
             "metric_version": str(version.pk),
@@ -264,9 +323,11 @@ def refresh_metric(
             "projects": _project_ids(projects),
         }
     )
-    existing = MetricRefreshRun.objects.select_for_update().filter(
-        organization=organization, idempotency_key=idempotency_key
-    ).first()
+    existing = (
+        MetricRefreshRun.objects.select_for_update()
+        .filter(organization=organization, idempotency_key=idempotency_key)
+        .first()
+    )
     if existing:
         if existing.request_fingerprint != fingerprint:
             raise ValidationError("کلید تکرار با درخواست متفاوت استفاده شده است.")
@@ -285,13 +346,18 @@ def refresh_metric(
         started_at=now,
     )
     calculation = CALCULATORS[metric_code](organization, projects)
-    source_watermark = _hash(calculation.sources)
+    sources = {
+        **calculation.sources,
+        "scope_kind": "organization" if organization_wide else "project_set",
+        "scope_project_ids": _project_ids(projects),
+    }
+    source_watermark = _hash(sources)
     calculation_payload = {
         "metric": metric_code,
         "version": version.version,
         "value": calculation.value,
         "coverage": calculation.coverage,
-        "sources": calculation.sources,
+        "sources": sources,
         "project": str(project.pk) if project else None,
     }
     previous = (
@@ -301,6 +367,10 @@ def refresh_metric(
         .order_by("-created_at")
         .first()
     )
+    if previous is not None:
+        MetricResult.objects.filter(pk=previous.pk).update(
+            freshness=MetricFreshness.STALE
+        )
     result = MetricResult.objects.create(
         organization=organization,
         run=run,
@@ -316,7 +386,7 @@ def refresh_metric(
             else MetricFreshness.INCOMPLETE
         ),
         coverage=calculation.coverage,
-        source_manifest=calculation.sources,
+        source_manifest=sources,
         calculation_hash=_hash(calculation_payload),
         replaces=previous,
     )
@@ -331,7 +401,10 @@ def refresh_metric(
         entity_id=str(result.pk),
         organization=organization,
         actor=actor,
-        metadata={"metric_code": metric_code, "project_id": str(project.pk) if project else ""},
+        metadata={
+            "metric_code": metric_code,
+            "project_id": str(project.pk) if project else "",
+        },
     )
     return result
 
@@ -348,14 +421,19 @@ def review_metric_result(
         project=result.project,
         allow_any_scope=result.project_id is None,
     )
-    if result.run.requested_by_id == reviewer.pk:
+    if (
+        result.run.metric_version.definition.requires_independent_review
+        and result.run.requested_by_id == reviewer.pk
+    ):
         raise PermissionDenied("اجراکننده نمی‌تواند نتیجه مالی خود را تأیید کند.")
     review, created = MetricResultReview.objects.get_or_create(
         organization=result.organization,
         result=result,
         defaults={"reviewer": reviewer, "reason": reason.strip()},
     )
-    if not created and (review.reviewer_id != reviewer.pk or review.reason != reason.strip()):
+    if not created and (
+        review.reviewer_id != reviewer.pk or review.reason != reason.strip()
+    ):
         raise ValidationError("نتیجه قبلاً با شواهد متفاوت بررسی شده است.")
     return review
 
@@ -363,12 +441,36 @@ def review_metric_result(
 def dashboard_results(*, organization: Organization, actor: User) -> list[MetricResult]:
     projects = _allowed_projects(user=actor, organization=organization)
     allowed_ids = list(projects.values_list("pk", flat=True))
-    rows = MetricResult.objects.filter(organization=organization).filter(
-        models.Q(project__isnull=True) | models.Q(project_id__in=allowed_ids)
+    allowed_text_ids = {str(value) for value in allowed_ids}
+    organization_scope = has_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW,
+    )
+    rows = (
+        MetricResult.objects.filter(organization=organization)
+        .filter(models.Q(project__isnull=True) | models.Q(project_id__in=allowed_ids))
+        .exclude(
+            run__metric_version__definition__requires_independent_review=True,
+            review__isnull=True,
+        )
     )
     latest: dict[tuple[str, str | None], MetricResult] = {}
-    for result in rows.select_related("run__metric_version__definition").order_by("-created_at"):
-        key = (result.metric_code, str(result.project_id) if result.project_id else None)
+    for result in rows.select_related("run__metric_version__definition").order_by(
+        "-created_at"
+    ):
+        if result.project_id is None:
+            if result.source_manifest.get("scope_kind") == "organization":
+                if not organization_scope:
+                    continue
+            elif not set(result.source_manifest.get("scope_project_ids", [])).issubset(
+                allowed_text_ids
+            ):
+                continue
+        key = (
+            result.metric_code,
+            str(result.project_id) if result.project_id else None,
+        )
         latest.setdefault(key, result)
     return sorted(latest.values(), key=lambda item: item.metric_code)
 
@@ -376,18 +478,23 @@ def dashboard_results(*, organization: Organization, actor: User) -> list[Metric
 def drillthrough_manifest(
     *, organization: Organization, actor: User, result_id: str
 ) -> MetricResult:
-    result = MetricResult.objects.select_related(
-        "project", "run__metric_version__definition"
-    ).filter(organization=organization, pk=result_id).first()
+    result = (
+        MetricResult.objects.select_related(
+            "project", "run__metric_version__definition"
+        )
+        .filter(organization=organization, pk=result_id)
+        .first()
+    )
     if result is None:
         raise PermissionDenied("نتیجه شاخص در دسترس نیست.")
+    organization_wide = result.source_manifest.get("scope_kind") == "organization"
     require_business_permission(
         user=actor,
         organization=organization,
         permission=BusinessPermissionCode.REPORTING_SOURCE_DRILLTHROUGH_VIEW,
         message="اجازه مشاهده منبع شاخص را ندارید.",
         project=result.project,
-        allow_any_scope=result.project_id is None,
+        allow_any_scope=result.project_id is None and not organization_wide,
     )
     require_business_permission(
         user=actor,
@@ -395,8 +502,19 @@ def drillthrough_manifest(
         permission=result.run.metric_version.definition.source_permission,
         message="مجوز دامنه منبع برای مشاهده جزئیات وجود ندارد.",
         project=result.project,
-        allow_any_scope=result.project_id is None,
+        allow_any_scope=result.project_id is None and not organization_wide,
     )
+    if result.project_id is None and not organization_wide:
+        allowed = {
+            str(value)
+            for value in _allowed_projects(
+                user=actor, organization=organization
+            ).values_list("pk", flat=True)
+        }
+        if not set(result.source_manifest.get("scope_project_ids", [])).issubset(
+            allowed
+        ):
+            raise PermissionDenied("دامنه فعلی همه منابع این نتیجه را پوشش نمی‌دهد.")
     return result
 
 
@@ -419,12 +537,23 @@ def export_dashboard_csv(
             message="اجازه ایجاد یا دریافت خروجی شاخص را ندارید.",
             allow_any_scope=True,
         )
+    _advisory_lock("reporting-export", organization.pk, idempotency_key)
     results = dashboard_results(organization=organization, actor=actor)
     result_ids = [str(item.pk) for item in results]
     fingerprint = _hash({"result_ids": result_ids, "purpose": purpose.strip()})
     output = io.StringIO(newline="")
     writer = csv.writer(output)
-    writer.writerow(["metric_code", "persian_name", "value", "currency", "unit", "as_of", "freshness"])
+    writer.writerow(
+        [
+            "metric_code",
+            "persian_name",
+            "value",
+            "currency",
+            "unit",
+            "as_of",
+            "freshness",
+        ]
+    )
     for item in results:
         writer.writerow(
             [
@@ -443,7 +572,10 @@ def export_dashboard_csv(
         organization=organization, idempotency_key=idempotency_key
     ).first()
     if manifest:
-        if manifest.request_fingerprint != fingerprint or manifest.content_hash != content_hash:
+        if (
+            manifest.request_fingerprint != fingerprint
+            or manifest.content_hash != content_hash
+        ):
             raise ValidationError("کلید تکرار خروجی با محتوای متفاوت استفاده شده است.")
         return manifest, content
     manifest = MetricExportManifest.objects.create(

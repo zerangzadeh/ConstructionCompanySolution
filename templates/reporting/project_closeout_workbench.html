@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}کنترل هماهنگ اختتام پروژه{% endblock %}
+{% block content %}
+<main class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
+  <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs font-semibold text-blue-700">P10 — کنترل مشتق بدون تغییر دامنه‌های منبع</p>
+    <h1 class="mt-2 text-2xl font-bold text-slate-900">کنترل هماهنگ اختتام پروژه</h1>
+    <p class="mt-2 text-sm text-slate-600">پذیرش این پرونده فقط ارزیابی الگوی کنترل در برش زمانی مشخص است؛ پروژه، قرارداد، دوره مالی یا هیچ رکورد منبعی را نمی‌بندد.</p>
+  </header>
+
+  {% if "reporting.project_closeout_case.prepare" in business_permission_codes %}
+  <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="new-closeout-title">
+    <h2 id="new-closeout-title" class="text-lg font-bold">پرونده جدید</h2>
+    <form class="mt-4 flex flex-wrap items-end gap-3" method="post" action="{% url 'reporting:project_closeout_create' %}">{% csrf_token %}
+      <label class="min-w-64 text-sm"><span class="mb-1 block font-semibold">پروژه مجاز</span><select class="w-full rounded-lg border border-slate-300 px-3 py-2" name="project_id" required><option value="">انتخاب پروژه</option>{% for project in projects %}<option value="{{ project.pk }}">{{ project.code }} — {{ project.name }}</option>{% endfor %}</select></label>
+      <button class="rounded-lg bg-blue-700 px-4 py-2 font-semibold text-white" type="submit">ایجاد پرونده کنترل</button>
+    </form>
+  </section>
+  {% endif %}
+
+  <section aria-labelledby="closeout-cases-title">
+    <h2 id="closeout-cases-title" class="mb-3 text-lg font-bold">پرونده‌های مجاز</h2>
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <table class="min-w-full text-right text-sm">
+        <thead><tr class="border-b text-slate-500"><th class="p-3">پروژه</th><th class="p-3">الگو</th><th class="p-3">وضعیت</th><th class="p-3">ارزیابی جاری</th><th class="p-3">آخرین تغییر</th></tr></thead>
+        <tbody>{% for case in cases %}<tr class="border-b border-slate-100"><td class="p-3"><a class="font-semibold text-blue-700" href="{% url 'reporting:project_closeout_detail' case.pk %}">{{ case.project.code }} — {{ case.project.name }}</a></td><td class="p-3"><span dir="ltr">{{ case.profile_version.definition.code }} / v{{ case.profile_version.version }}</span></td><td class="p-3">{{ case.get_status_display }}</td><td class="p-3">{% if case.current_assessment %}شماره {{ case.current_assessment.sequence }} · {{ case.current_assessment.cutoff_at|jalali_datetime }}{% else %}<span class="text-amber-800">ثبت نشده — به‌معنای صفر یا تکمیل نیست</span>{% endif %}</td><td class="p-3">{{ case.updated_at|jalali_datetime }}</td></tr>{% empty %}<tr><td class="p-8 text-center text-slate-500" colspan="5">پرونده‌ای در دامنه مجاز ثبت نشده است.</td></tr>{% endfor %}</tbody>
+      </table>
+    </div>
+  </section>
+</main>
+{% endblock %}
