@@ -3,7 +3,7 @@ from decimal import Decimal
 from threading import Barrier
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import close_old_connections, connections
+from django.db import close_old_connections
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -192,15 +192,6 @@ class StockTransactionWorkflowTests(InventoryFixtureMixin, TestCase):
 
 class StockTransactionWorkflowConcurrencyTests(TransactionTestCase):
     serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
 
     def test_competing_assigned_posting_commits_once(self) -> None:
         owner = User.objects.create_user(username="w56-owner")

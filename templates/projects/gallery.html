@@ -1,0 +1,27 @@
+{% extends "base.html" %}{% load erp_format %}
+
+{% block title %}گالری تصاویر پروژه | {{ project.name }}{% endblock %}
+
+{% block content %}
+<nav class="flex items-center gap-2 text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-600" href="{% url 'projects:list' %}">پروژه‌ها</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a><span>/</span><span>گالری پروژه</span></nav>
+
+<div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-semibold text-blue-600">تصاویر کنترل‌شده پروژه</p><h1 class="mt-1 text-2xl font-bold text-slate-950">گالری تصاویر پروژه</h1><p class="mt-2 text-xs text-slate-500">{{ project.name }} · <span dir="ltr">{{ project.code }}</span></p></div>{% if can_upload %}<a class="erp-btn erp-btn--primary" href="{% url 'projects:photo_add' project.id %}">افزودن تصویر</a>{% endif %}</div>
+
+<form class="erp-surface mt-6 grid gap-3 rounded-xl p-4 sm:grid-cols-2 lg:grid-cols-4" method="get">
+    <div><label class="text-xs font-semibold text-slate-600" for="gallery-site">کارگاه</label><select id="gallery-site" name="site" class="mt-1 w-full"><option value="">همه کارگاه‌ها</option>{% for site in sites %}<option value="{{ site.id }}"{% if selected_site.id == site.id %} selected{% endif %}>{{ site.name }}</option>{% endfor %}</select></div>
+    <div><label class="text-xs font-semibold text-slate-600" for="date-from">از تاریخ</label><input id="date-from" name="date_from" value="{{ date_from }}" data-jalali-date="date" inputmode="numeric" placeholder="1405/01/01"></div>
+    <div><label class="text-xs font-semibold text-slate-600" for="date-to">تا تاریخ</label><input id="date-to" name="date_to" value="{{ date_to }}" data-jalali-date="date" inputmode="numeric" placeholder="1405/12/29"></div>
+    <div class="flex items-end gap-2"><button class="erp-btn erp-btn--primary" type="submit">اعمال فیلتر</button><a class="erp-btn erp-btn--secondary" href="{% url 'projects:gallery' project.id %}">پاک‌کردن</a></div>
+</form>
+
+{% if photos %}
+<section class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4" aria-label="تصاویر پروژه">
+{% for photo in photos %}
+    <article class="erp-surface overflow-hidden rounded-xl">
+        {% if can_download and photo.document.current_version.is_available %}<a class="block bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500" href="{% url 'documents:photo-preview' photo.document.id %}" target="_blank" rel="noopener" aria-label="مشاهده تصویر بزرگ‌تر: {{ photo.document.title }}"><img class="aspect-[4/3] w-full object-cover" loading="lazy" src="{% url 'documents:photo-preview' photo.document.id %}" alt="{{ photo.document.title }}{% if photo.site %} در {{ photo.site.name }}{% endif %}"></a>{% else %}<div class="grid aspect-[4/3] place-items-center bg-slate-100 px-4 text-center text-xs text-slate-500">تصویر پس از تأیید پردازش و با مجوز دریافت نمایش داده می‌شود.</div>{% endif %}
+        <div class="p-4"><h2 class="text-sm font-bold text-slate-900">{{ photo.document.title }}</h2>{% if photo.document.description %}<p class="mt-2 line-clamp-2 text-xs leading-6 text-slate-500">{{ photo.document.description }}</p>{% endif %}<dl class="mt-3 space-y-1.5 text-xs text-slate-500"><div class="flex justify-between gap-2"><dt>کارگاه</dt><dd class="font-medium text-slate-700">{{ photo.site.name|default:"—" }}</dd></div><div class="flex justify-between gap-2"><dt>زمان تصویر</dt><dd dir="ltr">{{ photo.captured_at|default:photo.document.created_at|jalali_datetime }}</dd></div><div class="flex justify-between gap-2"><dt>منبع</dt><dd>{% if photo.source == 'camera' %}دوربین{% elif photo.source == 'upload' %}بارگذاری{% else %}سند موجود{% endif %}</dd></div>{% if photo.document.created_by %}<div class="flex justify-between gap-2"><dt>ثبت‌کننده</dt><dd>{{ photo.document.created_by }}</dd></div>{% endif %}</dl></div>
+    </article>
+{% endfor %}
+</section>
+{% else %}<div class="erp-surface mt-5 rounded-xl">{% include "components/empty_state.html" with empty_title="تصویری یافت نشد" empty_description="برای این پروژه و فیلترهای انتخاب‌شده هنوز تصویری ثبت نشده است." %}</div>{% endif %}
+{% endblock %}

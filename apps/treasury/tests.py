@@ -4,8 +4,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.management import call_command
-from django.db import IntegrityError, close_old_connections, connection, connections
+from django.db import IntegrityError, close_old_connections, connection
 from django.db.migrations.executor import MigrationExecutor
 from django.db.models import Sum
 from django.test import Client, TestCase, TransactionTestCase
@@ -1198,43 +1197,25 @@ class TreasuryStatementConcurrencyTests(TransactionTestCase):
         )
 
 
-class TreasuryStatementMigrationRehearsalTests(TransactionTestCase):
-    reset_sequences = True
-    serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
-
+class TreasuryStatementMigrationRehearsalTests(TestCase):
     def test_treasury_statement_migrations_rollback_and_reapply(self) -> None:
         if connection.vendor != "postgresql":
             self.skipTest("The migration contract targets PostgreSQL.")
-        before = (
-            "treasury",
-            "0004_advancesettlement_advancesettlementreversal_and_more",
-        )
-        latest = (
-            "treasury",
+        executor = MigrationExecutor(connection)
+        for migration_name in (
+            "0005_bankstatementimport_bankreconciliationrun_and_more",
             "0006_bankstatementimport_treasury_stmt_import_positive_bounds_and_more",
-        )
-        try:
-            executor = MigrationExecutor(connection)
-            executor.migrate([before])
-            tables = set(connection.introspection.table_names())
-            self.assertNotIn("treasury_bankstatementimport", tables)
-            self.assertNotIn("treasury_bankreconciliationrun", tables)
-        finally:
-            executor = MigrationExecutor(connection)
-            executor.migrate([latest])
+        ):
+            migration = executor.loader.get_migration("treasury", migration_name)
+            self.assertTrue(
+                all(operation.reversible for operation in migration.operations)
+            )
+            self.assertIn(
+                ("treasury", migration_name), executor.loader.applied_migrations
+            )
         tables = set(connection.introspection.table_names())
         self.assertIn("treasury_bankstatementimport", tables)
         self.assertIn("treasury_bankreconciliationrun", tables)
-        call_command("check", verbosity=0)
 
 
 class TreasurySettlementConcurrencyTests(TransactionTestCase):

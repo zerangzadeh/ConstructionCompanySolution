@@ -42,6 +42,31 @@ class ProjectDocumentLink(AbstractTypedDocumentLink):
         ]
 
 
+class ProjectSiteDocumentLink(AbstractTypedDocumentLink):
+    """Project-site photo/evidence context without owning document bytes."""
+
+    target_field_name = "project_site"
+    project_site = models.ForeignKey(
+        "projects.ProjectSite",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "project_site"],
+                name="project_site_document_link_uq",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="project_site_doc_org_idx",
+            )
+        ]
+
+
 class Project(UUIDModel, TimeStampedModel):
     """A construction project belonging to exactly one organization."""
 

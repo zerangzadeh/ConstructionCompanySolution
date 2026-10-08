@@ -33,15 +33,18 @@ from apps.organizations.models import (
     Organization,
 )
 from apps.organizations.services import set_active_organization
-from apps.parties.models import BusinessParty, PartyKind
+from apps.parties.models import BusinessParty, PartyKind, PartyRole, PartyRoleType
 from apps.procurement.models import (
     GoodsReceipt,
     GoodsReceiptItem,
     PurchaseOrder,
     PurchaseOrderItem,
-    PurchaseOrderStatus,
 )
-from apps.procurement.services import post_goods_receipt, void_goods_receipt
+from apps.procurement.services import (
+    issue_purchase_order,
+    post_goods_receipt,
+    void_goods_receipt,
+)
 from apps.projects.models import Project
 from apps.projects.services import archive_project
 
@@ -172,6 +175,11 @@ class InventoryFixtureMixin:
             display_name="Inventory Supplier",
             party_kind=PartyKind.COMPANY,
         )
+        PartyRole.objects.create(
+            organization=self.organization,
+            party=supplier,
+            role=PartyRoleType.SUPPLIER,
+        )
         order = PurchaseOrder.objects.create(
             organization=self.organization,
             project=self.project,
@@ -188,11 +196,16 @@ class InventoryFixtureMixin:
             quantity=Decimal("8.0000"),
             unit_price=Decimal("100.00"),
         )
-        order.status = PurchaseOrderStatus.ISSUED
-        order.save(update_fields=["status", "updated_at"])
+        issue_purchase_order(
+            organization=self.organization,
+            actor=self.owner,
+            purchase_order=order,
+        )
+        order.refresh_from_db()
         receipt = GoodsReceipt.objects.create(
             organization=self.organization,
             purchase_order=order,
+            purchase_order_version=order.current_version,
             project=self.project,
             receipt_number="GR-INV-1",
             received_at=timezone.now(),

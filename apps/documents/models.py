@@ -22,6 +22,11 @@ class DocumentType(models.TextChoices):
     OTHER = "other", "سایر"
 
 
+class PhotoSource(models.TextChoices):
+    CAMERA = "camera", "دوربین"
+    UPLOAD = "upload", "بارگذاری"
+
+
 class DocumentConfidentiality(models.TextChoices):
     INTERNAL = "internal", "داخلی"
     CONFIDENTIAL = "confidential", "محرمانه"
@@ -407,6 +412,50 @@ class DocumentVersion(UUIDModel, CreatedAtModel):
         return bool(
             assessment and assessment.verdict == DocumentProcessingVerdict.CLEAN
         )
+
+
+class PhotoMetadata(UUIDModel, CreatedAtModel):
+    """Metadata-only photo evidence; the binary remains a DocumentVersion."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.PROTECT,
+        related_name="photo_metadata_records",
+    )
+    document = models.OneToOneField(
+        Document,
+        on_delete=models.PROTECT,
+        related_name="photo_metadata",
+    )
+    source = models.CharField(max_length=16, choices=PhotoSource.choices)
+    captured_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]  # noqa: RUF012
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "source", "-created_at"],
+                name="photo_meta_org_src_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        if self.document_id:
+            validate_related_organizations(self, document=self.document)
+            if self.document.document_type != DocumentType.PHOTO:
+                raise ValidationError(
+                    {"document": "فراداده تصویر فقط برای سند از نوع تصویر مجاز است."}
+                )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("فراداده منبع تصویر تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("فراداده تصویر جزئی از سابقه سند و حذف‌ناپذیر است.")
 
 
 class ImmutableSealedCustodyQuerySet(models.QuerySet):

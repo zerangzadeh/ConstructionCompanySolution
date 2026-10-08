@@ -1,0 +1,53 @@
+{
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A",
+  "environment_id": "P10-S20-ENV1-LOCAL-20261007-A",
+  "recorded_at": "2026-10-07T21:34:01+03:30",
+  "scope": "bounded environment-qualified preflight only; no peak, surge or endurance execution",
+  "checks": {
+    "frozen_artifact_hashes": {
+      "status": "PASS",
+      "verified_artifact_count": 7
+    },
+    "profile_consistency": {
+      "status": "PASS",
+      "journey_share_percent": 100
+    },
+    "journey_routes_and_services": {
+      "status": "PASS",
+      "resolved_route_count": 94,
+      "failures": 0
+    },
+    "single_reachability_request": {
+      "status": "PASS",
+      "method": "GET",
+      "path": "/accounts/login/",
+      "http_status": 200,
+      "latency_ms": 75.116,
+      "server_correlation_id": null
+    },
+    "database_connection_metrics": {
+      "status": "PASS",
+      "active_connections": 9,
+      "max_connections": 100,
+      "utilization": 0.09
+    },
+    "environment_fingerprint": {
+      "status": "PASS",
+      "sha256": "71bcd079a9792227064a4b049fc61d9ec24dec1016e83525a56b85940a46fd8d"
+    }
+  },
+  "bounded_preflight_status": "PASS",
+  "s20_status": "performance execution prerequisites satisfied for environment-qualified testing",
+  "capacity_classification": "environment-qualified / production capacity certification still gated",
+  "source_report_capacity_gate_status": "BLOCKED",
+  "source_report_interpretation": "The source preflight report also evaluates production-equivalent isolation, full telemetry and runner headroom. Those failed capacity gates do not negate the bounded environment-qualified preflight pass.",
+  "remaining_blockers": [
+    "direct HTTP endpoint has no TLS or proxy",
+    "application and PostgreSQL share a workstation and have no dedicated resource limits",
+    "production DMS encryption, key custody, malware scanning and latency controls are incomplete",
+    "server-side correlation, application resource, PostgreSQL wait and database CPU telemetry are incomplete"
+  ],
+  "performance_run_executed": false,
+  "overall_status": "P10-S19–S21 = BLOCKED",
+  "source_preflight_report_sha256": "117e9920784cd9ae61e2ebc041b972ee64fa8da0e5d541e9e43988f156e80957"
+}

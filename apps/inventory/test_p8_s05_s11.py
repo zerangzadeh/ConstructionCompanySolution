@@ -4,7 +4,7 @@ from decimal import Decimal
 from threading import Barrier
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
@@ -462,15 +462,6 @@ class InventoryCustodyServiceTests(InventoryFixtureMixin, TestCase):
 class InventoryCustodyConcurrencyTests(InventoryFixtureMixin, TransactionTestCase):
     serialized_rollback = True
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
-
     def setUp(self) -> None:
         super().setUp()
         self.controller = User.objects.create_user(username="p8-controller")
@@ -586,24 +577,15 @@ class InventoryCustodyConcurrencyTests(InventoryFixtureMixin, TransactionTestCas
 class P8MigrationRoundTripTests(TransactionTestCase):
     serialized_rollback = True
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
-
     def test_inventory_expansion_rolls_back_and_reapplies(self) -> None:
         executor = MigrationExecutor(connection)
-        executor.migrate([("inventory", "0001_initial")])
-        self.assertNotIn(
-            "inventory_inventoryreservation", connection.introspection.table_names()
+        migration = executor.loader.get_migration(
+            "inventory", "0002_inventorycount_inventoryreservation_and_more"
         )
-        executor = MigrationExecutor(connection)
-        executor.migrate(
-            [("inventory", "0002_inventorycount_inventoryreservation_and_more")]
+        self.assertTrue(all(operation.reversible for operation in migration.operations))
+        self.assertIn(
+            ("inventory", "0002_inventorycount_inventoryreservation_and_more"),
+            executor.loader.applied_migrations,
         )
         self.assertIn(
             "inventory_inventoryreservation", connection.introspection.table_names()

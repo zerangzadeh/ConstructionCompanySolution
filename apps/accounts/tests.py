@@ -1,7 +1,10 @@
 import tempfile
 from io import StringIO
+from urllib.parse import urlparse
 
 from django.conf import settings
+from django.core import mail
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
@@ -11,10 +14,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.accounts.models import AccountStatus, LoginPageSettings, User
+from apps.audit.models import AuditAction, AuditEvent
 
 
 class AuthenticationTests(TestCase):
     def setUp(self) -> None:
+        cache.clear()
         self.password = "test-password"
         self.user = User.objects.create_user(
             username="site-engineer",
@@ -38,7 +43,7 @@ class AuthenticationTests(TestCase):
             fetch_redirect_response=False,
         )
 
-    def test_login_page_uses_admin_managed_messages(self) -> None:
+    def test_login_page_uses_the_bonira_login_design(self) -> None:
         LoginPageSettings.objects.create(
             panel_label="برچسب سفارشی",
             panel_title="عنوان سفارشی",
@@ -48,24 +53,13 @@ class AuthenticationTests(TestCase):
 
         response = self.client.get(reverse("accounts:login"))
 
-        self.assertContains(response, "برچسب سفارشی")
-        self.assertContains(response, "عنوان سفارشی")
-        self.assertContains(response, "توضیح سفارشی")
-        self.assertContains(response, "پیام پایانی سفارشی")
-
-    def test_login_page_uses_admin_managed_background(self) -> None:
-        LoginPageSettings.objects.create(background_image="login-page/background.png")
-
-        response = self.client.get(reverse("accounts:login"))
-
-        self.assertContains(response, reverse("accounts:login-background"))
-
-    def test_login_page_uses_admin_managed_panel_image(self) -> None:
-        LoginPageSettings.objects.create(panel_image="login-page/panel.png")
-
-        response = self.client.get(reverse("accounts:login"))
-
-        self.assertContains(response, reverse("accounts:login-panel-image"))
+        self.assertContains(response, "ورود به بنیرا")
+        self.assertContains(response, "accounts/images/bonira-login-visual.png")
+        self.assertContains(response, "accounts/images/bonira-logo.svg")
+        self.assertContains(response, 'aria-describedby="id_username-errors"')
+        self.assertContains(response, 'aria-describedby="id_password-errors"')
+        self.assertContains(response, "password-toggle")
+        self.assertContains(response, "فراموشی گذرواژه")
 
     def test_background_endpoint_serves_only_the_configured_public_image(self) -> None:
         with (
@@ -138,6 +132,7 @@ class AuthenticationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.wsgi_request.user.is_authenticated)
+        self.assertContains(response, "bonira-login__non-field-errors")
 
     def test_logout_requires_post_and_redirects_to_login(self) -> None:
         self.client.force_login(self.user)
@@ -163,6 +158,108 @@ class AuthenticationTests(TestCase):
         self.assertFalse(self.user.is_active)
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.wsgi_request.user.is_authenticated)
+
+
+@override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+class PublicPasswordResetTests(TestCase):
+    def setUp(self) -> None:
+        cache.clear()
+        self.user = User.objects.create_user(
+            username="recovery-user",
+            email="recovery@example.test",
+            password="Existing-password-2026",
+        )
+
+    def test_recovery_page_is_available_and_uses_email_field(self) -> None:
+        response = self.client.get(reverse("accounts:password_reset"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "ایمیل سازمانی")
+        self.assertContains(response, "csrfmiddlewaretoken")
+        self.assertContains(response, 'autocomplete="email"')
+
+    def test_recovery_request_sends_a_signed_link_for_one_active_account(self) -> None:
+        response = self.client.post(
+            reverse("accounts:password_reset"), {"email": self.user.email}
+        )
+
+        self.assertRedirects(response, reverse("accounts:password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("/accounts/password/reset/", mail.outbox[0].body)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.USER_PASSWORD_RESET_REQUESTED,
+                entity_id=str(self.user.pk),
+            ).exists()
+        )
+
+    def test_unknown_or_ambiguous_email_returns_the_same_generic_result(self) -> None:
+        unknown_response = self.client.post(
+            reverse("accounts:password_reset"),
+            {"email": "unknown@example.test"},
+            REMOTE_ADDR="203.0.113.1",
+        )
+        User.objects.create_user(
+            username="duplicate-email-user",
+            email=self.user.email,
+            password="Duplicate-password-2026",
+        )
+        ambiguous_response = self.client.post(
+            reverse("accounts:password_reset"),
+            {"email": self.user.email},
+            REMOTE_ADDR="203.0.113.2",
+        )
+
+        self.assertRedirects(unknown_response, reverse("accounts:password_reset_done"))
+        self.assertRedirects(
+            ambiguous_response, reverse("accounts:password_reset_done")
+        )
+        self.assertEqual(len(mail.outbox), 0)
+
+    def test_recovery_request_is_throttled_by_identity(self) -> None:
+        first_response = self.client.post(
+            reverse("accounts:password_reset"), {"email": self.user.email}
+        )
+        second_response = self.client.post(
+            reverse("accounts:password_reset"), {"email": self.user.email}
+        )
+
+        self.assertRedirects(first_response, reverse("accounts:password_reset_done"))
+        self.assertRedirects(second_response, reverse("accounts:password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+
+    def test_verified_recovery_sets_a_permanent_password_and_audits(self) -> None:
+        self.user.must_change_password = True
+        self.user.save(update_fields=["must_change_password", "updated_at"])
+        self.client.post(reverse("accounts:password_reset"), {"email": self.user.email})
+        reset_path = urlparse(
+            next(
+                line
+                for line in mail.outbox[0].body.splitlines()
+                if line.startswith("http")
+            )
+        ).path
+
+        response = self.client.get(reset_path, follow=True)
+        self.assertTrue(response.context["validlink"])
+        response = self.client.post(
+            response.request["PATH_INFO"],
+            {
+                "new_password1": "Recovered-password-2026",
+                "new_password2": "Recovered-password-2026",
+            },
+        )
+
+        self.assertRedirects(response, reverse("accounts:password_reset_complete"))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("Recovered-password-2026"))
+        self.assertFalse(self.user.must_change_password)
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                action=AuditAction.USER_PASSWORD_RESET_COMPLETED,
+                entity_id=str(self.user.pk),
+            ).exists()
+        )
 
 
 class UserModelTests(TestCase):
@@ -427,3 +524,12 @@ class RequiredPasswordChangeTests(TestCase):
         self.user.refresh_from_db()
         self.assertFalse(self.user.must_change_password)
         self.assertTrue(self.user.check_password("Personal-password-2026"))
+
+    def test_recovery_routes_remain_available_during_required_password_change(
+        self,
+    ) -> None:
+        self.client.force_login(self.user)
+
+        response = self.client.get(reverse("accounts:password_reset"))
+
+        self.assertEqual(response.status_code, 200)

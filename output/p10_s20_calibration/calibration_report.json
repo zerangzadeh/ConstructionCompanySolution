@@ -1,0 +1,474 @@
+{
+  "artifact_hash_verification": {
+    "dataset_volume.json": {
+      "actual": "94ef28dc83cc57e402f96b35d0408e84bddce971ad911deb11a3c237be1668c2",
+      "expected": "94ef28dc83cc57e402f96b35d0408e84bddce971ad911deb11a3c237be1668c2",
+      "match": true
+    },
+    "environment.json": {
+      "actual": "7cb8a515054bcf72e257a75a41f9398911274bef4a9cdd17f7a6e8f38e9fb610",
+      "expected": "7cb8a515054bcf72e257a75a41f9398911274bef4a9cdd17f7a6e8f38e9fb610",
+      "match": true
+    },
+    "fixture_generator.py": {
+      "actual": "d144a06ab7f8904a1b5cd418b12cbf46fc9430abf33b7bbeae49ac9ac61e4383",
+      "expected": "d144a06ab7f8904a1b5cd418b12cbf46fc9430abf33b7bbeae49ac9ac61e4383",
+      "match": true
+    },
+    "journeys.json": {
+      "actual": "322fa73f778101e725b028242a44c6c2b2b45855bf15b01756e3f9e1a75ee359",
+      "expected": "322fa73f778101e725b028242a44c6c2b2b45855bf15b01756e3f9e1a75ee359",
+      "match": true
+    },
+    "preflight.py": {
+      "actual": "aefcf0656252b8d36865233102b1e06d21182a1ab3add24ff52a38de5bb82cc1",
+      "expected": "aefcf0656252b8d36865233102b1e06d21182a1ab3add24ff52a38de5bb82cc1",
+      "match": true
+    },
+    "ramp_think_time.json": {
+      "actual": "20c892d7b79090a20802c892480055f5d18d63a330ac848de5a539c5637f1daf",
+      "expected": "20c892d7b79090a20802c892480055f5d18d63a330ac848de5a539c5637f1daf",
+      "match": true
+    },
+    "workload.json": {
+      "actual": "0af970da66b9bc12628b8790af7927e25a409fd98391bb97a8f059560b3dbbd0",
+      "expected": "0af970da66b9bc12628b8790af7927e25a409fd98391bb97a8f059560b3dbbd0",
+      "match": true
+    }
+  },
+  "capacity_classification": "environment-qualified / production capacity certification still gated",
+  "classification": "non-certification performance calibration",
+  "concurrency": {
+    "peak_in_flight_requests": 50,
+    "virtual_users_reached": 50
+  },
+  "configuration": {
+    "base_url": "http://127.0.0.1:8000",
+    "closed_loop": true,
+    "existing_memberships_used": 25,
+    "existing_organizations_used": 4,
+    "mix_cycles": 5,
+    "virtual_users": 50
+  },
+  "counts": {
+    "http_statuses": {
+      "200": 105,
+      "302": 1240,
+      "403": 323,
+      "404": 73,
+      "405": 10,
+      "500": 31,
+      "transport_error": 13
+    },
+    "journeys": 500,
+    "requests": 1795
+  },
+  "database_connections": {
+    "minimum": 13.0,
+    "peak": 13.0,
+    "samples": 329
+  },
+  "duration_seconds": 84.701,
+  "environment_id": "P10-S20-ENV1-LOCAL-20261007-A",
+  "errors": {
+    "count": 450,
+    "exact": {
+      "GET accounting:dashboard: HTTP 403": 2,
+      "GET accounting:journal_detail: HTTP 403": 2,
+      "GET accounting:journal_detail: HTTP 404": 2,
+      "GET accounting:journal_list: HTTP 403": 2,
+      "GET billing:baseline_detail: HTTP 403": 2,
+      "GET billing:baseline_detail: HTTP 404": 1,
+      "GET billing:baseline_list: HTTP 403": 2,
+      "GET billing:claim_detail: HTTP 403": 3,
+      "GET billing:claim_detail: HTTP 404": 4,
+      "GET billing:claim_list: HTTP 403": 2,
+      "GET billing:progress_detail: HTTP 403": 1,
+      "GET billing:progress_detail: HTTP 404": 3,
+      "GET compliance:detail: HTTP 403": 8,
+      "GET compliance:workbench: HTTP 403": 8,
+      "GET daily_reports:detail: HTTP 403": 8,
+      "GET daily_reports:field_observation_detail: HTTP 403": 8,
+      "GET daily_reports:field_observation_list: HTTP 403": 8,
+      "GET daily_reports:list: HTTP 403": 1,
+      "GET documents:detail: HTTP 403": 10,
+      "GET documents:list: HTTP 500": 10,
+      "GET documents:version-download: HTTP 403": 8,
+      "GET inventory:custody_workbench: HTTP 403": 3,
+      "GET inventory:custody_workbench: HTTP 500": 2,
+      "GET inventory:transaction_detail: HTTP 403": 3,
+      "GET inventory:transaction_detail: HTTP 404": 2,
+      "GET inventory:transaction_list: HTTP 403": 3,
+      "GET inventory:warehouse_detail: HTTP 403": 3,
+      "GET inventory:warehouse_detail: HTTP 404": 2,
+      "GET inventory:warehouse_list: HTTP 403": 3,
+      "GET inventory:warehouse_list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 2,
+      "GET organizations:select: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "GET payroll:payslip_detail: HTTP 403": 1,
+      "GET payroll:payslip_detail: HTTP 404": 1,
+      "GET payroll:run_detail: HTTP 403": 2,
+      "GET payroll:workbench: HTTP 403": 1,
+      "GET payroll:workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "GET procurement:order_detail: HTTP 403": 2,
+      "GET procurement:order_detail: HTTP 404": 7,
+      "GET procurement:order_list: HTTP 403": 2,
+      "GET procurement:receipt_detail: HTTP 403": 2,
+      "GET procurement:receipt_detail: HTTP 404": 7,
+      "GET procurement:receipt_list: HTTP 403": 2,
+      "GET procurement:request_detail: HTTP 403": 4,
+      "GET procurement:request_detail: HTTP 404": 12,
+      "GET procurement:request_list: HTTP 403": 2,
+      "GET procurement:request_list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "GET projects:controls: HTTP 403": 17,
+      "GET projects:controls_comparison: HTTP 403": 17,
+      "GET projects:controls_export: HTTP 403": 4,
+      "GET projects:cost_reconciliation_export: HTTP 403": 4,
+      "GET projects:detail: HTTP 403": 30,
+      "GET projects:detail: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 3,
+      "GET projects:list: HTTP 403": 4,
+      "GET projects:list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "GET reporting:dashboard: HTTP 403": 9,
+      "GET reporting:drillthrough: HTTP 500": 9,
+      "GET reporting:export: HTTP 405": 4,
+      "GET reporting:project_closeout_detail: HTTP 500": 3,
+      "GET reporting:project_closeout_export: HTTP 405": 4,
+      "GET reporting:project_closeout_workbench: HTTP 403": 3,
+      "GET reporting:reconciliation_detail: HTTP 500": 4,
+      "GET reporting:reconciliation_workbench: HTTP 403": 3,
+      "GET reporting:reconciliation_workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 2,
+      "GET subledgers:aging: HTTP 405": 2,
+      "GET support:notifications: HTTP 403": 15,
+      "GET support:workbench: HTTP 403": 7,
+      "GET workflows:workbench: HTTP 403": 4,
+      "GET workflows:workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "POST accounting:journal_create: HTTP 403": 2,
+      "POST accounting:journal_submit: HTTP 403": 2,
+      "POST accounting:journal_submit: HTTP 404": 2,
+      "POST billing:progress_verify: HTTP 403": 1,
+      "POST billing:progress_verify: HTTP 404": 3,
+      "POST compliance:create: HTTP 403": 6,
+      "POST compliance:evidence: HTTP 403": 6,
+      "POST daily_reports:field_observation_create: HTTP 403": 6,
+      "POST daily_reports:field_observation_evidence_add: HTTP 403": 6,
+      "POST daily_reports:field_observation_save: HTTP 403": 6,
+      "POST documents:link-add: HTTP 403": 7,
+      "POST documents:upload: HTTP 403": 2,
+      "POST documents:version-add: HTTP 403": 11,
+      "POST expenses:allocate: HTTP 403": 3,
+      "POST expenses:allocate: HTTP 404": 4,
+      "POST expenses:approve: HTTP 403": 2,
+      "POST expenses:approve: HTTP 404": 4,
+      "POST expenses:draft_create: HTTP 403": 3,
+      "POST expenses:return: HTTP 403": 2,
+      "POST expenses:return: HTTP 404": 4,
+      "POST organizations:switch: HTTP 403": 4,
+      "POST procurement:receipt_create: HTTP 403": 2,
+      "POST procurement:receipt_create: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+      "POST procurement:receipt_item_add: HTTP 403": 3,
+      "POST procurement:receipt_item_add: HTTP 404": 1,
+      "POST procurement:receipt_post: HTTP 403": 3,
+      "POST procurement:receipt_post: HTTP 404": 1,
+      "POST procurement:request_approve: HTTP 403": 2,
+      "POST procurement:request_approve: HTTP 404": 5,
+      "POST procurement:request_create: HTTP 403": 1,
+      "POST procurement:request_item_add: HTTP 403": 1,
+      "POST procurement:request_item_add: HTTP 404": 4,
+      "POST procurement:request_submit: HTTP 403": 1,
+      "POST procurement:request_submit: HTTP 404": 4,
+      "POST reporting:project_closeout_assess: HTTP 500": 3,
+      "POST reporting:project_closeout_create: HTTP 403": 3,
+      "POST reporting:reconciliation_execute: HTTP 403": 4,
+      "POST reporting:refresh: HTTP 403": 9
+    },
+    "rate": 0.250696
+  },
+  "full_environment_qualified_run_may_start": false,
+  "harness_defects": [],
+  "journey_mix": [
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J01A"
+    },
+    {
+      "actual_count": 35,
+      "actual_percent": 7.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 7,
+      "journey_id": "J01B"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J01C"
+    },
+    {
+      "actual_count": 40,
+      "actual_percent": 8.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 8,
+      "journey_id": "J02A"
+    },
+    {
+      "actual_count": 25,
+      "actual_percent": 5.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 5,
+      "journey_id": "J02B"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J02C"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J02D"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J02E"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J03A"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J03B"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J03C"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J03D"
+    },
+    {
+      "actual_count": 30,
+      "actual_percent": 6.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 6,
+      "journey_id": "J04A"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J04B"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J04C"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J04D"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J05A"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J05B"
+    },
+    {
+      "actual_count": 10,
+      "actual_percent": 2.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 2,
+      "journey_id": "J05C"
+    },
+    {
+      "actual_count": 10,
+      "actual_percent": 2.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 2,
+      "journey_id": "J05D"
+    },
+    {
+      "actual_count": 20,
+      "actual_percent": 4.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 4,
+      "journey_id": "J06A"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J06B"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J06C"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J07A"
+    },
+    {
+      "actual_count": 10,
+      "actual_percent": 2.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 2,
+      "journey_id": "J07B"
+    },
+    {
+      "actual_count": 15,
+      "actual_percent": 3.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 3,
+      "journey_id": "J08A"
+    },
+    {
+      "actual_count": 10,
+      "actual_percent": 2.0,
+      "delta_percentage_points": 0.0,
+      "expected_percent": 2,
+      "journey_id": "J08B"
+    }
+  ],
+  "latency_ms_by_major_class": {
+    "bounded": {
+      "mean": 490.965,
+      "p50": 290.249,
+      "p95": 1865.726,
+      "p99": 3395.567,
+      "samples": 135
+    },
+    "mixed": {
+      "mean": 307.906,
+      "p50": 289.018,
+      "p95": 710.428,
+      "p99": 953.165,
+      "samples": 75
+    },
+    "mutation": {
+      "mean": 374.002,
+      "p50": 276.783,
+      "p95": 931.141,
+      "p99": 2074.43,
+      "samples": 495
+    },
+    "read": {
+      "mean": 406.621,
+      "p50": 285.013,
+      "p95": 1271.067,
+      "p99": 2224.532,
+      "samples": 925
+    },
+    "report": {
+      "mean": 417.7,
+      "p50": 302.622,
+      "p95": 1349.614,
+      "p99": 2499.905,
+      "samples": 165
+    }
+  },
+  "overall_status": "P10-S19–S21 = BLOCKED",
+  "performance_run_executed": false,
+  "resource_metrics": {
+    "application_cpu_percent_host": {
+      "mean": 10.493,
+      "minimum": 0.0,
+      "peak": 20.582,
+      "samples": 328
+    },
+    "application_cpu_percent_one_core": {
+      "mean": 83.947,
+      "minimum": 0.0,
+      "peak": 164.656,
+      "samples": 328
+    },
+    "application_working_set_bytes": {
+      "mean": 143242498.334,
+      "minimum": 122118144.0,
+      "peak": 147337216.0,
+      "samples": 329
+    },
+    "runner_cpu_percent_host": {
+      "mean": 0.605,
+      "minimum": 0.0,
+      "peak": 4.592,
+      "samples": 328
+    },
+    "runner_cpu_percent_one_core": {
+      "mean": 4.843,
+      "minimum": 0.0,
+      "peak": 36.732,
+      "samples": 328
+    },
+    "runner_working_set_bytes": {
+      "mean": 106699293.568,
+      "minimum": 106233856.0,
+      "peak": 106782720.0,
+      "samples": 329
+    }
+  },
+  "runtime_defects": {
+    "GET documents:list: HTTP 500": 10,
+    "GET inventory:custody_workbench: HTTP 500": 2,
+    "GET inventory:warehouse_list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 2,
+    "GET organizations:select: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "GET payroll:workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "GET procurement:request_list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "GET projects:detail: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 3,
+    "GET projects:list: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "GET reporting:drillthrough: HTTP 500": 9,
+    "GET reporting:project_closeout_detail: HTTP 500": 3,
+    "GET reporting:reconciliation_detail: HTTP 500": 4,
+    "GET reporting:reconciliation_workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 2,
+    "GET workflows:workbench: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "POST procurement:receipt_create: URLError: <urlopen error [WinError 10061] No connection could be made because the target machine actively refused it>": 1,
+    "POST reporting:project_closeout_assess: HTTP 500": 3
+  },
+  "started_at_unix": 1791396799.8970215,
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A"
+}

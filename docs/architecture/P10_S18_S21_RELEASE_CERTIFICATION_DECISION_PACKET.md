@@ -1,8 +1,8 @@
 # P10-S18–S21 Release Certification Decision Packet
 
 **Status:** **P10-CERT01–P10-CERT43 OPTION A PRODUCT OWNER ACCEPTED;
-P10-S18 CERTIFICATION PREREQUISITES SATISFIED; P10-S19–S21 MAY START UNDER THE
-EXISTING BOUNDED AUTHORIZATION. NO PRODUCTION AUTHORITY.**
+P10-S18 CERTIFICATION PREREQUISITES SATISFIED; P10-S19–S21 EXECUTED / BLOCKED;
+PRODUCT OWNER ACCEPTANCE NOT READY. NO PRODUCTION AUTHORITY.**
 
 **Date:** 2026-10-07.
 
@@ -18,7 +18,15 @@ here. Code, migrations and tests remain authoritative for current behavior.
 **Current effect:** on 2026-10-07 the Product Owner accepted
 `P10-CERT01`–`P10-CERT43 = Option A` and authorized P10-S18–S21 certification
 execution only. The Product Owner subsequently supplied RPO/RTO, migration-window,
-workload, environment-classification and named-owner parameters. Candidate
+the concurrency/duration envelope, the environment-qualification rule and
+named-owner parameters. S20 workload profile
+`P10-S20-WP1-20261007-E0E078C9-A` now freezes the exact journey/data/DMS/growth/
+bounds inputs. Qualified local environment `P10-S20-ENV1-LOCAL-20261007-A` and
+the workload artifacts are fingerprinted/hash-pinned; bounded preflight passed and
+performance execution prerequisites are satisfied for environment-qualified testing.
+A short non-certification calibration then exposed configured-database schema drift
+and connection refusals, so the full run must not start yet. Production equivalence,
+DMS controls and server-side telemetry remain open. Candidate
 `P10-RC1-20261007-E0E078C9` is frozen at commit
 `0db3ac9a9fa70e8a857ef0867d532be5206a14c4`, its hashed dependency lock remains
 verified, and PostgreSQL 18.6 backup/restore tools plus an isolated disposable
@@ -28,9 +36,17 @@ instrumented unchanged-candidate clean migration completed in `1,032.661`
 seconds with no lock blocker. A fresh corrected-procedure rerun completed in
 `969.888` seconds and passed coherent database/DMS backup, separate restore,
 evidence-hash validation and cleanup. `P10-S18 = certification prerequisites
-satisfied`; `P10-S19–S21` may start under the existing bounded authorization but
-did not start in this pass. This acceptance authorizes no runtime feature change,
-migration
+satisfied`. The subsequently authorized S19–S21 execution is recorded in
+[the certification evidence](P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md). Its
+initial full-suite 42 failures and 19 errors are fully classified, and a bounded
+test-only correction improved the single authorized rerun to 1,067 passed, 12
+failed and 18 errored without changing the frozen runtime. Follow-on focused
+verification cleared all 18 setup errors and four catalogue-baseline failures,
+then exposed two unrelated stale demo-data contract-term failures that were not
+repaired for certification. The mandatory rerun remains non-green and the
+tranche is `BLOCKED`; P10-S18–S21 is not ready for Product
+Owner acceptance. This
+acceptance authorizes no runtime feature change, migration
 against production, deployment, cutover, traffic, customer data, production
 credential, production restore or production activation. `P10-S22+` remains
 separately gated.
@@ -685,3 +701,36 @@ These are preflight repository checks, not substitutes for the blocked candidate
 PostgreSQL migration/restore, performance, Tenant or security certification. The
 six unrelated permission-registry failures remain separate known debt; they were
 not repaired or reclassified. No waiver was requested or granted.
+
+## 17. P10-S19–S21 execution result
+
+The subsequent authorized execution is recorded in
+`P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md`. Candidate integrity remained
+unchanged. S19's isolated local rehearsal passed clean migration within the
+30-minute window, coherent pre-change restore/reapply, DB/DMS reconciliation and
+the exercised `0s` RPO / `10.842s` RTO; production-provider/PITR, key/region and
+independent-witness evidence remains blocked. S20 workload profile
+`P10-S20-WP1-20261007-E0E078C9-A` now pins the required journey/data-volume/growth
+profile and transfer bounds. Qualified local environment
+`P10-S20-ENV1-LOCAL-20261007-A` and the workload artifacts are frozen. Hash,
+route/service, single-request reachability, database-connection and environment-
+fingerprint checks passed, so `P10-S20 = performance execution prerequisites
+satisfied for environment-qualified testing`. Its succeeding short calibration
+reached 50 users and the exact frozen mix, but 31
+missing-relation HTTP 500s and 13 refused connections block the full run pending
+schema alignment, executable data/payload bindings and a clean recalibration. No
+peak, surge or endurance run occurred. Its production-capacity classification remains
+`environment-qualified / production capacity certification still gated`.
+Focused Tenant/security tests passed. The initial full suite returned 1,036
+passed, 42 failed and 19 errored; every non-pass was classified without folding
+the additional outcomes into the six known registry failures. Bounded test-only
+remediation improved the single authorized mandatory rerun to 1,067 passed, 12
+failed and 18 errored. Focused follow-on verification cleared the 18 setup errors
+and four catalogue failures, then exposed two unrelated stale demo-seed failures;
+the mandatory rerun remains non-green. Missing MFA, production storage/scanning/
+key custody, observability, complete supply-chain scans and independent
+penetration evidence also remain non-waivable blockers.
+
+Overall S21 disposition: **`BLOCKED`**. No waiver was granted. P10-S18–S21 is not
+ready for Product Owner acceptance; P10-S22+ and all production authority remain
+closed.

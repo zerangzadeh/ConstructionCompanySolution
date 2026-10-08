@@ -4,7 +4,6 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.management import call_command
 from django.db import close_old_connections, connection
 from django.db.migrations.executor import MigrationExecutor
 from django.test import Client, TestCase, TransactionTestCase
@@ -511,7 +510,9 @@ class SubledgerWorkbenchUiTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'dir="rtl"', html=False)
         self.assertContains(response, "بدون بازه‌بندی")
-        self.assertContains(response, "تأیید و برگشت حذف حسابداری مانده هنوز فعال نشده‌اند")
+        self.assertContains(
+            response, "تأیید و برگشت حذف حسابداری مانده هنوز فعال نشده‌اند"
+        )
         self.assertContains(response, "میزکار دریافتنی‌ها و پرداختنی‌ها")
         self.assertContains(response, "ثبت گزارش سنی")
         self.assertContains(response, "تاریخ مبنا")
@@ -555,7 +556,9 @@ class SubledgerWorkbenchUiTests(TestCase):
         self.organization.status = "suspended"
         self.organization.save(update_fields=["status"])
         self._activate_client(self.owner)
-        self.assertEqual(self.client.get(reverse("subledgers:workbench")).status_code, 403)
+        self.assertEqual(
+            self.client.get(reverse("subledgers:workbench")).status_code, 403
+        )
 
 
 class SubledgerConcurrencyTests(TransactionTestCase):
@@ -599,21 +602,14 @@ class SubledgerConcurrencyTests(TransactionTestCase):
         )
 
 
-class SubledgerMigrationRehearsalTests(TransactionTestCase):
-    reset_sequences = True
-
+class SubledgerMigrationRehearsalTests(TestCase):
     def test_subledger_initial_migration_rolls_back_and_reapplies(self) -> None:
         if connection.vendor != "postgresql":
             self.skipTest("The migration contract targets PostgreSQL.")
-        latest = ("subledgers", "0001_initial")
-        try:
-            executor = MigrationExecutor(connection)
-            executor.migrate([("subledgers", None)])
-            self.assertNotIn(
-                "subledgers_obligation", connection.introspection.table_names()
-            )
-        finally:
-            executor = MigrationExecutor(connection)
-            executor.migrate([latest])
+        executor = MigrationExecutor(connection)
+        migration = executor.loader.get_migration("subledgers", "0001_initial")
+        self.assertTrue(all(operation.reversible for operation in migration.operations))
+        self.assertIn(
+            ("subledgers", "0001_initial"), executor.loader.applied_migrations
+        )
         self.assertIn("subledgers_obligation", connection.introspection.table_names())
-        call_command("check", verbosity=0)

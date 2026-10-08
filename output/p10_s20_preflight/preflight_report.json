@@ -1,0 +1,611 @@
+{
+  "checks": {
+    "database_connection_metrics": {
+      "active_connections": 9,
+      "max_connections": 100,
+      "status": "PASS",
+      "utilization": 0.09
+    },
+    "endpoint_reachability": {
+      "http_status": 200,
+      "latency_ms": 75.116,
+      "server_correlation_id": null,
+      "status": "PASS"
+    },
+    "environment_fingerprint": {
+      "observed": "71bcd079a9792227064a4b049fc61d9ec24dec1016e83525a56b85940a46fd8d",
+      "recorded": "71bcd079a9792227064a4b049fc61d9ec24dec1016e83525a56b85940a46fd8d",
+      "status": "PASS"
+    },
+    "isolated_environment": {
+      "status": "FAIL"
+    },
+    "journey_share_total": {
+      "status": "PASS",
+      "value": 100
+    },
+    "load_runner_headroom": {
+      "status": "FAIL"
+    },
+    "profile_ids": {
+      "status": "PASS"
+    },
+    "required_observability": {
+      "status": "FAIL"
+    },
+    "routes_and_services": {
+      "failures": [],
+      "resolved": [
+        {
+          "journey": "J01A",
+          "method": "GET",
+          "path": "/organizations/",
+          "route": "organizations:select"
+        },
+        {
+          "journey": "J01A",
+          "method": "POST",
+          "path": "/organizations/switch/",
+          "route": "organizations:switch"
+        },
+        {
+          "journey": "J01A",
+          "method": "GET",
+          "path": "/projects/",
+          "route": "projects:list"
+        },
+        {
+          "journey": "J01B",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/",
+          "route": "projects:detail"
+        },
+        {
+          "journey": "J01B",
+          "method": "GET",
+          "path": "/workflows/workbench/",
+          "route": "workflows:workbench"
+        },
+        {
+          "journey": "J01B",
+          "method": "GET",
+          "path": "/support/notifications/",
+          "route": "support:notifications"
+        },
+        {
+          "journey": "J01C",
+          "method": "GET",
+          "path": "/support/",
+          "route": "support:workbench"
+        },
+        {
+          "journey": "J02A",
+          "method": "GET",
+          "path": "/projects/",
+          "route": "projects:list"
+        },
+        {
+          "journey": "J02A",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/",
+          "route": "projects:detail"
+        },
+        {
+          "journey": "J02A",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/controls/",
+          "route": "projects:controls"
+        },
+        {
+          "journey": "J02A",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/controls/comparison/",
+          "route": "projects:controls_comparison"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/",
+          "route": "procurement:request_list"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/requests/00000000-0000-4000-8000-000000000001/",
+          "route": "procurement:request_detail"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/orders/",
+          "route": "procurement:order_list"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/orders/00000000-0000-4000-8000-000000000001/",
+          "route": "procurement:order_detail"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/receipts/",
+          "route": "procurement:receipt_list"
+        },
+        {
+          "journey": "J02B",
+          "method": "GET",
+          "path": "/procurement/receipts/00000000-0000-4000-8000-000000000001/",
+          "route": "procurement:receipt_detail"
+        },
+        {
+          "journey": "J02C",
+          "method": "GET",
+          "path": "/inventory/",
+          "route": "inventory:warehouse_list"
+        },
+        {
+          "journey": "J02C",
+          "method": "GET",
+          "path": "/inventory/00000000-0000-4000-8000-000000000001/",
+          "route": "inventory:warehouse_detail"
+        },
+        {
+          "journey": "J02C",
+          "method": "GET",
+          "path": "/inventory/transactions/",
+          "route": "inventory:transaction_list"
+        },
+        {
+          "journey": "J02C",
+          "method": "GET",
+          "path": "/inventory/transactions/00000000-0000-4000-8000-000000000001/",
+          "route": "inventory:transaction_detail"
+        },
+        {
+          "journey": "J02C",
+          "method": "GET",
+          "path": "/inventory/custody/",
+          "route": "inventory:custody_workbench"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/daily-reports/field/",
+          "route": "daily_reports:field_observation_list"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/daily-reports/field/00000000-0000-4000-8000-000000000001/",
+          "route": "daily_reports:field_observation_detail"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/daily-reports/",
+          "route": "daily_reports:list"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/daily-reports/00000000-0000-4000-8000-000000000001/",
+          "route": "daily_reports:detail"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/compliance/",
+          "route": "compliance:workbench"
+        },
+        {
+          "journey": "J02D",
+          "method": "GET",
+          "path": "/compliance/inspection/00000000-0000-4000-8000-000000000001/",
+          "route": "compliance:detail"
+        },
+        {
+          "journey": "J02E",
+          "method": "GET",
+          "path": "/workforce/",
+          "route": "workforce:employee_list"
+        },
+        {
+          "journey": "J02E",
+          "method": "GET",
+          "path": "/materials/",
+          "route": "materials:material_list"
+        },
+        {
+          "journey": "J02E",
+          "method": "GET",
+          "path": "/documents/",
+          "route": "documents:list"
+        },
+        {
+          "journey": "J02E",
+          "method": "GET",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/",
+          "route": "documents:detail"
+        },
+        {
+          "journey": "J03A",
+          "method": "POST",
+          "path": "/procurement/requests/create/",
+          "route": "procurement:request_create"
+        },
+        {
+          "journey": "J03A",
+          "method": "POST",
+          "path": "/procurement/requests/00000000-0000-4000-8000-000000000001/items/",
+          "route": "procurement:request_item_add"
+        },
+        {
+          "journey": "J03A",
+          "method": "POST",
+          "path": "/procurement/requests/00000000-0000-4000-8000-000000000001/submit/",
+          "route": "procurement:request_submit"
+        },
+        {
+          "journey": "J03B",
+          "method": "POST",
+          "path": "/daily-reports/field/create/",
+          "route": "daily_reports:field_observation_create"
+        },
+        {
+          "journey": "J03B",
+          "method": "POST",
+          "path": "/daily-reports/field/00000000-0000-4000-8000-000000000001/save/",
+          "route": "daily_reports:field_observation_save"
+        },
+        {
+          "journey": "J03B",
+          "method": "POST",
+          "path": "/daily-reports/field/00000000-0000-4000-8000-000000000001/evidence/",
+          "route": "daily_reports:field_observation_evidence_add"
+        },
+        {
+          "journey": "J03B",
+          "method": "POST",
+          "path": "/compliance/create/inspection/",
+          "route": "compliance:create"
+        },
+        {
+          "journey": "J03B",
+          "method": "POST",
+          "path": "/compliance/inspection/00000000-0000-4000-8000-000000000001/evidence/",
+          "route": "compliance:evidence"
+        },
+        {
+          "journey": "J03C",
+          "method": "POST",
+          "path": "/procurement/receipts/create/",
+          "route": "procurement:receipt_create"
+        },
+        {
+          "journey": "J03C",
+          "method": "POST",
+          "path": "/procurement/receipts/00000000-0000-4000-8000-000000000001/items/",
+          "route": "procurement:receipt_item_add"
+        },
+        {
+          "journey": "J03C",
+          "method": "POST",
+          "path": "/procurement/receipts/00000000-0000-4000-8000-000000000001/post/",
+          "route": "procurement:receipt_post"
+        },
+        {
+          "journey": "J03D",
+          "method": "POST",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/links/add/",
+          "route": "documents:link-add"
+        },
+        {
+          "journey": "J03D",
+          "method": "POST",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/versions/add/",
+          "route": "documents:version-add"
+        },
+        {
+          "journey": "J03D",
+          "method": "POST",
+          "path": "/expenses/draft/create/",
+          "route": "expenses:draft_create"
+        },
+        {
+          "journey": "J03D",
+          "method": "POST",
+          "path": "/expenses/00000000-0000-4000-8000-000000000001/allocate/",
+          "route": "expenses:allocate"
+        },
+        {
+          "journey": "J04A",
+          "method": "GET",
+          "path": "/workflows/workbench/",
+          "route": "workflows:workbench"
+        },
+        {
+          "journey": "J04A",
+          "method": "POST",
+          "path": "/workflows/workbench/00000000-0000-4000-8000-000000000001/claim/",
+          "route": "workflows:work_item_claim"
+        },
+        {
+          "journey": "J04A",
+          "method": "POST",
+          "path": "/workflows/workbench/00000000-0000-4000-8000-000000000001/action/",
+          "route": "workflows:work_item_action"
+        },
+        {
+          "journey": "J04B",
+          "method": "GET",
+          "path": "/procurement/requests/00000000-0000-4000-8000-000000000001/",
+          "route": "procurement:request_detail"
+        },
+        {
+          "journey": "J04B",
+          "method": "POST",
+          "path": "/procurement/requests/00000000-0000-4000-8000-000000000001/approve/",
+          "route": "procurement:request_approve"
+        },
+        {
+          "journey": "J04C",
+          "method": "GET",
+          "path": "/billing/progress/00000000-0000-4000-8000-000000000001/",
+          "route": "billing:progress_detail"
+        },
+        {
+          "journey": "J04C",
+          "method": "POST",
+          "path": "/billing/progress/00000000-0000-4000-8000-000000000001/verify/",
+          "route": "billing:progress_verify"
+        },
+        {
+          "journey": "J04C",
+          "method": "GET",
+          "path": "/billing/claims/00000000-0000-4000-8000-000000000001/",
+          "route": "billing:claim_detail"
+        },
+        {
+          "journey": "J04D",
+          "method": "POST",
+          "path": "/expenses/00000000-0000-4000-8000-000000000001/approve/",
+          "route": "expenses:approve"
+        },
+        {
+          "journey": "J04D",
+          "method": "POST",
+          "path": "/expenses/00000000-0000-4000-8000-000000000001/return/",
+          "route": "expenses:return"
+        },
+        {
+          "journey": "J04D",
+          "method": "POST",
+          "path": "/compliance/inspection/00000000-0000-4000-8000-000000000001/transition/",
+          "route": "compliance:transition"
+        },
+        {
+          "journey": "J05A",
+          "method": "GET",
+          "path": "/billing/baselines/",
+          "route": "billing:baseline_list"
+        },
+        {
+          "journey": "J05A",
+          "method": "GET",
+          "path": "/billing/baselines/00000000-0000-4000-8000-000000000001/",
+          "route": "billing:baseline_detail"
+        },
+        {
+          "journey": "J05A",
+          "method": "GET",
+          "path": "/billing/claims/",
+          "route": "billing:claim_list"
+        },
+        {
+          "journey": "J05A",
+          "method": "GET",
+          "path": "/billing/claims/00000000-0000-4000-8000-000000000001/",
+          "route": "billing:claim_detail"
+        },
+        {
+          "journey": "J05B",
+          "method": "GET",
+          "path": "/accounting/",
+          "route": "accounting:dashboard"
+        },
+        {
+          "journey": "J05B",
+          "method": "GET",
+          "path": "/accounting/journals/",
+          "route": "accounting:journal_list"
+        },
+        {
+          "journey": "J05B",
+          "method": "GET",
+          "path": "/accounting/journals/00000000-0000-4000-8000-000000000001/",
+          "route": "accounting:journal_detail"
+        },
+        {
+          "journey": "J05B",
+          "method": "POST",
+          "path": "/accounting/journals/create/",
+          "route": "accounting:journal_create"
+        },
+        {
+          "journey": "J05B",
+          "method": "POST",
+          "path": "/accounting/journals/00000000-0000-4000-8000-000000000001/submit/",
+          "route": "accounting:journal_submit"
+        },
+        {
+          "journey": "J05C",
+          "method": "GET",
+          "path": "/treasury/",
+          "route": "treasury:workbench"
+        },
+        {
+          "journey": "J05C",
+          "method": "GET",
+          "path": "/treasury/statements/",
+          "route": "treasury:statement_workbench"
+        },
+        {
+          "journey": "J05C",
+          "method": "GET",
+          "path": "/subledgers/",
+          "route": "subledgers:workbench"
+        },
+        {
+          "journey": "J05C",
+          "method": "GET",
+          "path": "/subledgers/aging/",
+          "route": "subledgers:aging"
+        },
+        {
+          "journey": "J05D",
+          "method": "GET",
+          "path": "/payroll/",
+          "route": "payroll:workbench"
+        },
+        {
+          "journey": "J05D",
+          "method": "GET",
+          "path": "/payroll/runs/00000000-0000-4000-8000-000000000001/",
+          "route": "payroll:run_detail"
+        },
+        {
+          "journey": "J05D",
+          "method": "GET",
+          "path": "/payroll/payslips/00000000-0000-4000-8000-000000000001/",
+          "route": "payroll:payslip_detail"
+        },
+        {
+          "journey": "J06A",
+          "method": "GET",
+          "path": "/reporting/",
+          "route": "reporting:dashboard"
+        },
+        {
+          "journey": "J06A",
+          "method": "POST",
+          "path": "/reporting/refresh/project-cost-variance/",
+          "route": "reporting:refresh"
+        },
+        {
+          "journey": "J06A",
+          "method": "GET",
+          "path": "/reporting/results/00000000-0000-4000-8000-000000000001/sources/",
+          "route": "reporting:drillthrough"
+        },
+        {
+          "journey": "J06B",
+          "method": "GET",
+          "path": "/reporting/reconciliations/",
+          "route": "reporting:reconciliation_workbench"
+        },
+        {
+          "journey": "J06B",
+          "method": "POST",
+          "path": "/reporting/reconciliations/run/estimate-budget/",
+          "route": "reporting:reconciliation_execute"
+        },
+        {
+          "journey": "J06B",
+          "method": "GET",
+          "path": "/reporting/reconciliations/00000000-0000-4000-8000-000000000001/",
+          "route": "reporting:reconciliation_detail"
+        },
+        {
+          "journey": "J06C",
+          "method": "GET",
+          "path": "/reporting/project-closeout/",
+          "route": "reporting:project_closeout_workbench"
+        },
+        {
+          "journey": "J06C",
+          "method": "POST",
+          "path": "/reporting/project-closeout/create/",
+          "route": "reporting:project_closeout_create"
+        },
+        {
+          "journey": "J06C",
+          "method": "POST",
+          "path": "/reporting/project-closeout/00000000-0000-4000-8000-000000000001/assess/",
+          "route": "reporting:project_closeout_assess"
+        },
+        {
+          "journey": "J06C",
+          "method": "GET",
+          "path": "/reporting/project-closeout/00000000-0000-4000-8000-000000000001/",
+          "route": "reporting:project_closeout_detail"
+        },
+        {
+          "journey": "J07A",
+          "method": "GET",
+          "path": "/documents/",
+          "route": "documents:list"
+        },
+        {
+          "journey": "J07A",
+          "method": "GET",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/",
+          "route": "documents:detail"
+        },
+        {
+          "journey": "J07A",
+          "method": "GET",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/versions/00000000-0000-4000-8000-000000000001/download/",
+          "route": "documents:version-download"
+        },
+        {
+          "journey": "J07B",
+          "method": "POST",
+          "path": "/documents/upload/",
+          "route": "documents:upload"
+        },
+        {
+          "journey": "J07B",
+          "method": "POST",
+          "path": "/documents/00000000-0000-4000-8000-000000000001/versions/add/",
+          "route": "documents:version-add"
+        },
+        {
+          "journey": "J08A",
+          "method": "GET",
+          "path": "/reporting/export/",
+          "route": "reporting:export"
+        },
+        {
+          "journey": "J08A",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/controls/export/",
+          "route": "projects:controls_export"
+        },
+        {
+          "journey": "J08A",
+          "method": "GET",
+          "path": "/projects/00000000-0000-4000-8000-000000000001/controls/cost-reconciliation/export/",
+          "route": "projects:cost_reconciliation_export"
+        },
+        {
+          "journey": "J08A",
+          "method": "GET",
+          "path": "/reporting/project-closeout/00000000-0000-4000-8000-000000000001/export/",
+          "route": "reporting:project_closeout_export"
+        },
+        {
+          "journey": "J08B",
+          "method": "GET",
+          "path": "/treasury/statements/",
+          "route": "treasury:statement_workbench"
+        }
+      ],
+      "status": "PASS"
+    }
+  },
+  "environment_id": "P10-S20-ENV1-LOCAL-20261007-A",
+  "performance_run_executed": false,
+  "ready_for_performance_execution": false,
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A"
+}

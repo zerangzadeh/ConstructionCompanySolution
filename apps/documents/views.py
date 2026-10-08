@@ -177,6 +177,39 @@ def _download_response(version: object) -> FileResponse:
     return response
 
 
+def _preview_response(version: object) -> FileResponse:
+    response = FileResponse(
+        version.file.open("rb"),
+        as_attachment=False,
+        filename=version.original_file_name,
+        content_type=version.content_type,
+    )
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, no-store"
+    return response
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_DOWNLOAD)
+def document_photo_preview(request: HttpRequest, document_id: str) -> FileResponse:
+    document = get_organization_document(
+        user=request.user,
+        organization=request.organization,
+        document_id=str(document_id),
+    )
+    if document.document_type != DocumentType.PHOTO:
+        raise PermissionDenied("این سند تصویر نیست.")
+    version = get_document_version_for_download(
+        document=document,
+        version_id=str(document.current_version_id),
+        actor=request.user,
+    )
+    if not version.content_type.startswith("image/"):
+        raise PermissionDenied("محتوای نسخه تصویری نیست.")
+    record_document_download(version=version, actor=request.user)
+    return _preview_response(version)
+
+
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.DOCUMENTS_DOWNLOAD)
 def document_download(request: HttpRequest, document_id: str) -> FileResponse:

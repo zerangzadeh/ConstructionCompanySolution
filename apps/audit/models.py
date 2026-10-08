@@ -1493,6 +1493,14 @@ class AuditAction(models.TextChoices):
         "user.password_initialized",
         "گذرواژه شخصی کاربر تعیین شد",
     )
+    USER_PASSWORD_RESET_REQUESTED = (
+        "user.password_reset_requested",
+        "درخواست بازیابی گذرواژه ثبت شد",
+    )
+    USER_PASSWORD_RESET_COMPLETED = (
+        "user.password_reset_completed",
+        "گذرواژه کاربر از راه بازیابی تغییر کرد",
+    )
     USER_ACCOUNT_STATUS_CHANGED = (
         "user.account_status_changed",
         "وضعیت حساب کاربر تغییر کرد",

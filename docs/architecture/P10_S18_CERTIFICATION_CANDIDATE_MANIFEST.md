@@ -3,7 +3,7 @@
 **Candidate ID:** `P10-RC1-20261007-E0E078C9`
 
 **Status:** **CANDIDATE FROZEN — P10-S18 CERTIFICATION PREREQUISITES
-SATISFIED.**
+SATISFIED; P10-S19–S21 EXECUTED / BLOCKED.**
 
 **Recorded:** 2026-10-07.
 
@@ -58,11 +58,13 @@ SHA-256 artifact hash per selected wheel. File SHA-256:
 
 `ec2f92a67b0f64ab2045364b6ed9fcef9a17aab5f74d18f8080ee74388525e12`
 
-Installation with `pip install --require-hashes` completed successfully in a new
-temporary virtual environment and imported Django 5.2.17/Psycopg 3.3.5. The base
-Python installation exposes an unrelated incomplete global NLTK installation;
-that pollution is not in the project lock and must be absent from or isolated in
-the final certification environment.
+Installation with `pip install --require-hashes` completed successfully. The base
+Python installation exposes an unrelated incomplete NLTK installation directly
+from its interpreter root, so an ordinary virtual environment inherits the
+pollution. The bounded S21 rerun therefore used an isolated CPython 3.11.1
+embedded runtime with user-site loading disabled and `--ignore-installed`: all 16
+locked packages installed by hash, NLTK was absent, and targeted `pip check`
+reported no broken requirements. No application dependency changed.
 
 ## 4. Configuration and migration references
 
@@ -217,3 +219,17 @@ changed and the frozen candidate runtime/schema semantics were not modified.
 `P10-S19–S21 = may start under existing bounded certification authorization`.
 They were not executed in this pass. All production, P10-S22+ and preserved
 capability gates remain unchanged.
+
+## 10. Subsequent S19–S21 execution disposition
+
+The authorized S19–S21 execution is recorded in
+`P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md`. The frozen runtime and dependency
+lock did not change. The local S19 clean migration, coherent pre-change restore,
+exact reapply, DB/DMS restore and measured `0s`/`10.842s` exercised RPO/RTO passed,
+but production-provider/PITR, key/region and independent-witness recovery evidence
+is absent. S20 did not run because the accepted inputs do not define a complete
+reproducible workload/topology; production capacity remains gated. Focused
+Tenant/security tests passed, while the one-time full suite returned 1,036 passed,
+42 failed and 19 errored; only six failures are the separately recorded registry
+debt. Overall S21 disposition is `BLOCKED`. P10-S18–S21 is not ready for Product
+Owner acceptance, and P10-S22+ and production activation remain unauthorized.

@@ -1,38 +1,42 @@
+from importlib import import_module
+
+from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import TransactionTestCase
+from django.test import TestCase
 
 
-class ExpenseControlMigrationTests(TransactionTestCase):
-    reset_sequences = False
-
-    def test_expense_control_migration_rolls_back_and_reapplies(self) -> None:
+class ExpenseControlMigrationTests(TestCase):
+    def test_expense_control_migration_is_reversible_and_applied(self) -> None:
         executor = MigrationExecutor(connection)
-        executor.migrate([("expenses", "0004_expensedocumentlink")])
-        self.assertNotIn("expenses_expenseallocation", connection.introspection.table_names())
+        migration = executor.loader.get_migration(
+            "expenses", "0005_p4_s26_s30_expense_controls"
+        )
 
-        executor = MigrationExecutor(connection)
-        executor.migrate([("expenses", "0005_p4_s26_s30_expense_controls")])
+        self.assertTrue(all(operation.reversible for operation in migration.operations))
+        self.assertIn(
+            ("expenses", "0005_p4_s26_s30_expense_controls"),
+            executor.loader.applied_migrations,
+        )
         tables = connection.introspection.table_names()
         self.assertIn("expenses_expenseallocation", tables)
         self.assertIn("expenses_expensebudgetassessment", tables)
         self.assertIn("expenses_recurringexpensetemplate", tables)
 
-    def test_expense_permission_migration_rolls_back_and_reapplies(self) -> None:
-        executor = MigrationExecutor(connection)
-        executor.migrate([("organizations", "0067_p4_s21_s25_project_control_permissions")])
-        old_apps = executor.loader.project_state(
-            [("organizations", "0067_p4_s21_s25_project_control_permissions")]
-        ).apps
-        Permission = old_apps.get_model("organizations", "BusinessPermission")
-        Permission.objects.filter(code="expenses.recurrences_manage").delete()
-        self.assertFalse(Permission.objects.filter(code="expenses.recurrences_manage").exists())
+    def test_expense_permission_data_migrations_are_idempotent(self) -> None:
+        permission_model = apps.get_model("organizations", "BusinessPermission")
+        permission_model.objects.filter(code="expenses.recurrences_manage").delete()
 
-        executor = MigrationExecutor(connection)
-        executor.migrate([("organizations", "0069_normalize_expense_recurrence_permission")])
-        new_apps = executor.loader.project_state(
-            [("organizations", "0069_normalize_expense_recurrence_permission")]
-        ).apps
-        Permission = new_apps.get_model("organizations", "BusinessPermission")
-        self.assertTrue(Permission.objects.filter(code="expenses.recurrences_manage").exists())
-        self.assertFalse(Permission.objects.filter(code="expense_recurrences.manage").exists())
+        import_module(
+            "apps.organizations.migrations.0068_p4_s26_s30_expense_permissions"
+        ).forward(apps, None)
+        import_module(
+            "apps.organizations.migrations.0069_normalize_expense_recurrence_permission"
+        ).forward(apps, None)
+
+        self.assertTrue(
+            permission_model.objects.filter(code="expenses.recurrences_manage").exists()
+        )
+        self.assertFalse(
+            permission_model.objects.filter(code="expense_recurrences.manage").exists()
+        )

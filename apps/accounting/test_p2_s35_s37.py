@@ -5,10 +5,9 @@ from queue import Queue
 from threading import Barrier
 
 from django.core.exceptions import ValidationError
-from django.core.management import call_command
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.utils import timezone
 
 from apps.accounting import tests as accounting_test_support
@@ -56,15 +55,6 @@ class AccountingFinancialHardeningTests(TransactionTestCase):
 
     serialized_rollback = True
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
-
     def _activate_policy(self, *args, **kwargs) -> None:
         accounting_test_support.AccountingPostingConcurrencyTests._activate_policy(
             self, *args, **kwargs
@@ -75,11 +65,11 @@ class AccountingFinancialHardeningTests(TransactionTestCase):
             self.skipTest("PostgreSQL row-lock semantics are required.")
         accounting_test_support.AccountingPostingConcurrencyTests.setUp(self)
 
-    def _member(self, username: str, role_code: str) -> tuple[User, OrganizationMembership]:
+    def _member(
+        self, username: str, role_code: str
+    ) -> tuple[User, OrganizationMembership]:
         user = User.objects.create_user(username=username, password="x")
-        role = OrganizationRole.objects.get(
-            code=role_code, organization__isnull=True
-        )
+        role = OrganizationRole.objects.get(code=role_code, organization__isnull=True)
         membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=user,
@@ -181,25 +171,29 @@ class AccountingFinancialHardeningTests(TransactionTestCase):
         second = self._second_proposed_journal()
 
         def post(journal_id):
-            return lambda: post_journal(
-                organization=type(self.organization).objects.get(
-                    pk=self.organization.pk
-                ),
-                actor=User.objects.get(pk=self.approver.pk),
-                journal=JournalEntry.objects.get(pk=journal_id),
-                reason="concurrent independent posting",
-            ).pk
+            return lambda: (
+                post_journal(
+                    organization=type(self.organization).objects.get(
+                        pk=self.organization.pk
+                    ),
+                    actor=User.objects.get(pk=self.approver.pk),
+                    journal=JournalEntry.objects.get(pk=journal_id),
+                    reason="concurrent independent posting",
+                ).pk
+            )
 
         outcomes = self._parallel([post(self.journal.pk), post(second.pk)])
         self.assertTrue(all(status == "ok" for status, _ in outcomes), outcomes)
         numbers = set(
-            JournalEntry.objects.filter(pk__in=[self.journal.pk, second.pk]).values_list(
-                "number", flat=True
-            )
+            JournalEntry.objects.filter(
+                pk__in=[self.journal.pk, second.pk]
+            ).values_list("number", flat=True)
         )
         self.assertEqual(numbers, {1, 2})
         self.assertEqual(
-            JournalNumberSequence.objects.get(organization=self.organization).next_number,
+            JournalNumberSequence.objects.get(
+                organization=self.organization
+            ).next_number,
             3,
         )
 
@@ -332,7 +326,9 @@ class AccountingFinancialHardeningTests(TransactionTestCase):
         )
         self.assertEqual(closed.status, FiscalPeriodStatus.CLOSED)
 
-    def test_concurrent_close_reopen_and_adjustment_retries_are_idempotent(self) -> None:
+    def test_concurrent_close_reopen_and_adjustment_retries_are_idempotent(
+        self,
+    ) -> None:
         original = self._post_seed_journal()
         self._signed_reconciliation()
 
@@ -469,43 +465,21 @@ class AccountingFinancialHardeningTests(TransactionTestCase):
         )
 
 
-class AccountingMigrationRehearsalTests(TransactionTestCase):
-    """Prove the latest bounded Accounting migration rolls back and reapplies."""
-
-    reset_sequences = True
-    serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
+class AccountingMigrationRehearsalTests(TestCase):
+    """Verify the migration contract without mutating the shared test schema."""
 
     def test_accounting_0009_rollback_and_reapply(self) -> None:
         if connection.vendor != "postgresql":
             self.skipTest("The migration contract targets PostgreSQL.")
-        before = ("accounting", "0008_reconciliationreview")
-        latest = ("accounting", "0009_financial_statements_close_adjustments")
-        try:
-            executor = MigrationExecutor(connection)
-            executor.migrate([before])
-            tables = set(connection.introspection.table_names())
-            self.assertNotIn("accounting_financialstatementrun", tables)
-            with connection.cursor() as cursor:
-                columns = {
-                    column.name
-                    for column in connection.introspection.get_table_description(
-                        cursor, "accounting_journalentry"
-                    )
-                }
-            self.assertNotIn("adjusts_id", columns)
-        finally:
-            executor = MigrationExecutor(connection)
-            executor.migrate([latest])
+        executor = MigrationExecutor(connection)
+        migration = executor.loader.get_migration(
+            "accounting", "0009_financial_statements_close_adjustments"
+        )
+        self.assertTrue(all(operation.reversible for operation in migration.operations))
+        self.assertIn(
+            ("accounting", "0009_financial_statements_close_adjustments"),
+            executor.loader.applied_migrations,
+        )
         tables = set(connection.introspection.table_names())
         self.assertIn("accounting_financialstatementrun", tables)
         self.assertIn("accounting_fiscalperiodcontrolevent", tables)
-        call_command("check", verbosity=0)

@@ -1,9 +1,14 @@
+from pathlib import Path
+
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_GET, require_POST
 
+from apps.documents.models import PhotoSource
+from apps.documents.photo_forms import PhotoUploadForm
+from apps.documents.photo_services import create_photo, get_project_photos
 from apps.organizations.authorization import has_business_permission
 from apps.organizations.decorators import (
     active_organization_required,
@@ -17,7 +22,7 @@ from apps.projects.forms import (
     ProjectSiteForm,
     WBSNodeForm,
 )
-from apps.projects.models import ProjectPhaseStatus, ProjectStatus
+from apps.projects.models import ProjectPhaseStatus, ProjectSite, ProjectStatus
 from apps.projects.services import (
     archive_activity,
     archive_project,
@@ -51,6 +56,7 @@ from core.list_filters import (
     build_table_filters,
     has_active_table_filters,
     paginate_table,
+    parse_user_date,
     table_pagination_query,
 )
 
@@ -174,6 +180,132 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
     )
 
 
+def _gallery_sites(request: HttpRequest, project_id: str):
+    if not has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.PROJECT_SITES_VIEW,
+        allow_any_scope=True,
+    ):
+        return None
+    return get_organization_project_sites(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_VIEW)
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_VIEW)
+@require_GET
+def project_gallery(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+    sites = _gallery_sites(request, project_id)
+    selected_site = None
+    site_id = request.GET.get("site", "").strip()
+    if site_id:
+        if sites is None:
+            raise PermissionDenied("اجازه مشاهده کارگاه را ندارید.")
+        try:
+            selected_site = sites.get(pk=site_id)
+        except (ValueError, ProjectSite.DoesNotExist) as exc:
+            raise PermissionDenied("کارگاه در این پروژه یافت نشد.") from exc
+    date_from = parse_user_date(request.GET.get("date_from", ""))
+    date_to = parse_user_date(request.GET.get("date_to", ""))
+    photos = get_project_photos(
+        organization=request.organization,
+        project=project,
+        actor=request.user,
+        site=selected_site,
+        date_from=date_from,
+        date_to=date_to,
+    )
+    can_upload = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.DOCUMENTS_UPLOAD,
+        project=project,
+    )
+    can_download = has_business_permission(
+        user=request.user,
+        organization=request.organization,
+        permission=BusinessPermissionCode.DOCUMENTS_DOWNLOAD,
+        project=project,
+    )
+    return render(
+        request,
+        "projects/gallery.html",
+        {
+            "project": project,
+            "photos": photos,
+            "sites": sites or [],
+            "selected_site": selected_site,
+            "can_upload": can_upload,
+            "can_download": can_download,
+            "date_from": request.GET.get("date_from", ""),
+            "date_to": request.GET.get("date_to", ""),
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.PROJECTS_VIEW)
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_UPLOAD)
+def project_photo_add(request: HttpRequest, project_id: str) -> HttpResponse:
+    project = get_organization_project(
+        user=request.user,
+        organization=request.organization,
+        project_id=project_id,
+    )
+    sites = _gallery_sites(request, project_id)
+    form = PhotoUploadForm(
+        request.POST or None,
+        request.FILES or None,
+        sites=sites,
+        initial={"source": PhotoSource.UPLOAD},
+    )
+    file_errors: list[str] = []
+    if request.method == "POST" and form.is_valid():
+        uploads = form.uploads()
+        title = form.cleaned_data["title"]
+        for index, upload in enumerate(uploads, start=1):
+            item_title = title
+            if title and len(uploads) > 1:
+                item_title = f"{title} ({index})"
+            try:
+                create_photo(
+                    organization=request.organization,
+                    actor=request.user,
+                    project=project,
+                    site=form.cleaned_data["site"],
+                    target=project,
+                    title=item_title,
+                    description=form.cleaned_data["description"],
+                    captured_at=form.cleaned_data["captured_at"],
+                    source=form.cleaned_data["source"],
+                    upload=upload,
+                )
+            except (PermissionDenied, ValueError) as exc:
+                file_errors.append(f"{Path(upload.name).name}: {exc}")
+        created_count = len(uploads) - len(file_errors)
+        if created_count:
+            messages.success(request, f"{created_count} تصویر با موفقیت ثبت شد.")
+            for error in file_errors:
+                messages.error(request, error)
+            return redirect("projects:gallery", project_id=project.pk)
+        for error in file_errors:
+            form.add_error(None, error)
+    return render(
+        request,
+        "projects/photo_add.html",
+        {"project": project, "form": form},
+        status=400 if request.method == "POST" else 200,
+    )
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.PROJECT_SITES_VIEW)
 @require_GET

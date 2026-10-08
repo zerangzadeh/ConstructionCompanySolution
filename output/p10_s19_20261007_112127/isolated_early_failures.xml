@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="8" skipped="0" tests="9" time="23.915" timestamp="2026-10-07T18:23:42.458698+03:30" hostname="Zerangzadeh"><testcase classname="apps.billing.tests.ProgressClaimCalculationTests" name="test_claim_creation_fails_closed_without_eligible_regulatory_rule" time="4.717"><failure message="AssertionError: ValidationError not raised">self = &lt;apps.billing.tests.ProgressClaimCalculationTests testMethod=test_claim_creation_fails_closed_without_eligible_regulatory_rule&gt;
+
+    def test_claim_creation_fails_closed_without_eligible_regulatory_rule(self) -&gt; None:
+        TenantPolicySelection.objects.all().delete()
+&gt;       with self.assertRaises(ValidationError):
+E       AssertionError: ValidationError not raised
+
+apps\billing\tests.py:832: AssertionError</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimCalculationTests" name="test_term_and_regulatory_approval_enforce_sod_and_immutability" time="2.416"><failure message="django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']">self = &lt;apps.billing.tests.ProgressClaimCalculationTests testMethod=test_term_and_regulatory_approval_enforce_sod_and_immutability&gt;
+
+    def test_term_and_regulatory_approval_enforce_sod_and_immutability(self) -&gt; None:
+        term = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2027, 1, 1),
+            reason="Future commercial version",
+        )
+        with self.assertRaises(PermissionDenied):
+            approve_contract_term_version(
+                organization=self.organization,
+                actor=self.owner,
+                term_version=term,
+                reason="Self approval is prohibited",
+            )
+        approved_term = approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent approval",
+        )
+        self.assertEqual(approved_term.status, ContractTermVersionStatus.APPROVED)
+        approved_term.retention_rate = Decimal(1)
+        with self.assertRaises(ValidationError):
+            approved_term.save()
+    
+        retire_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=self.regulatory_rules,
+            reason="Prepare isolated SoD test version",
+        )
+        policy = self.regulatory_rules.policy
+        rule = PlatformPolicyVersion.objects.create(
+            policy=policy,
+            version=2,
+            parameters={
+                "tax_rate": "0",
+                "tax_basis": "gross",
+                "insurance_rate": "0",
+                "insurance_basis": "gross",
+            },
+            effective_from=date(2027, 1, 1),
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            created_by=self.policy_author,
+            reason="Future test-only regulatory version",
+        )
+        source = record_policy_source(
+            actor=self.policy_author,
+            issuer="Test authority",
+            title="Future test rule",
+            source_identifier="TEST-CLAIM-RULE-SOD",
+            version="2",
+            applicability="Automated test fixture only",
+            reason="No legal or production meaning",
+        )
+        link_policy_version_source(
+            actor=self.policy_author,
+            policy_version=rule,
+            source=source,
+            reason="Test provenance",
+        )
+        with self.assertRaises(PermissionDenied):
+&gt;           publish_platform_policy_version(
+                actor=self.policy_author,
+                policy_version=rule,
+                reason="Self publication is prohibited",
+            )
+
+apps\billing\tests.py:798: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @transaction.atomic
+    def publish_platform_policy_version(
+        *, actor: User, policy_version: PlatformPolicyVersion, reason: str
+    ) -&gt; PlatformPolicyVersion:
+        _require_platform_admin(actor)
+        if not reason.strip():
+            raise ValidationError("دلیل انتشار نسخه سیاست الزامی است.")
+        locked = (
+            PlatformPolicyVersion.objects.select_for_update()
+            .select_related("policy")
+            .get(pk=policy_version.pk)
+        )
+        if locked.status != PolicyVersionStatus.DRAFT:
+            raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
+        spec = get_platform_policy_spec(locked.policy.code)
+        validate_policy_parameters(spec=spec, parameters=locked.parameters)
+        if locked.policy.sensitivity == "regulatory":
+            if locked.source_basis != PolicySourceBasis.EXTERNAL_AUTHORITY:
+                raise ValidationError("قاعده مقرراتی باید به مرجع بیرونی متکی باشد.")
+            if not locked.review_evidence.filter(
+                disposition=PolicyReviewDisposition.ACCEPTED
+            ).exists():
+&gt;               raise ValidationError(
+                    "قاعده مقرراتی بدون شواهد بررسی پذیرفته‌شده قابل انتشار نیست."
+                )
+E               django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']
+
+apps\organizations\policy_services.py:347: ValidationError</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowTests" name="test_claim_creation_fails_closed_without_eligible_regulatory_rule" time="2.347"><failure message="AssertionError: ValidationError not raised">self = &lt;apps.billing.tests.ProgressClaimApprovalWorkflowTests testMethod=test_claim_creation_fails_closed_without_eligible_regulatory_rule&gt;
+
+    def test_claim_creation_fails_closed_without_eligible_regulatory_rule(self) -&gt; None:
+        TenantPolicySelection.objects.all().delete()
+&gt;       with self.assertRaises(ValidationError):
+E       AssertionError: ValidationError not raised
+
+apps\billing\tests.py:832: AssertionError</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowTests" name="test_term_and_regulatory_approval_enforce_sod_and_immutability" time="2.439"><failure message="django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']">self = &lt;apps.billing.tests.ProgressClaimApprovalWorkflowTests testMethod=test_term_and_regulatory_approval_enforce_sod_and_immutability&gt;
+
+    def test_term_and_regulatory_approval_enforce_sod_and_immutability(self) -&gt; None:
+        term = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2027, 1, 1),
+            reason="Future commercial version",
+        )
+        with self.assertRaises(PermissionDenied):
+            approve_contract_term_version(
+                organization=self.organization,
+                actor=self.owner,
+                term_version=term,
+                reason="Self approval is prohibited",
+            )
+        approved_term = approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent approval",
+        )
+        self.assertEqual(approved_term.status, ContractTermVersionStatus.APPROVED)
+        approved_term.retention_rate = Decimal(1)
+        with self.assertRaises(ValidationError):
+            approved_term.save()
+    
+        retire_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=self.regulatory_rules,
+            reason="Prepare isolated SoD test version",
+        )
+        policy = self.regulatory_rules.policy
+        rule = PlatformPolicyVersion.objects.create(
+            policy=policy,
+            version=2,
+            parameters={
+                "tax_rate": "0",
+                "tax_basis": "gross",
+                "insurance_rate": "0",
+                "insurance_basis": "gross",
+            },
+            effective_from=date(2027, 1, 1),
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            created_by=self.policy_author,
+            reason="Future test-only regulatory version",
+        )
+        source = record_policy_source(
+            actor=self.policy_author,
+            issuer="Test authority",
+            title="Future test rule",
+            source_identifier="TEST-CLAIM-RULE-SOD",
+            version="2",
+            applicability="Automated test fixture only",
+            reason="No legal or production meaning",
+        )
+        link_policy_version_source(
+            actor=self.policy_author,
+            policy_version=rule,
+            source=source,
+            reason="Test provenance",
+        )
+        with self.assertRaises(PermissionDenied):
+&gt;           publish_platform_policy_version(
+                actor=self.policy_author,
+                policy_version=rule,
+                reason="Self publication is prohibited",
+            )
+
+apps\billing\tests.py:798: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @transaction.atomic
+    def publish_platform_policy_version(
+        *, actor: User, policy_version: PlatformPolicyVersion, reason: str
+    ) -&gt; PlatformPolicyVersion:
+        _require_platform_admin(actor)
+        if not reason.strip():
+            raise ValidationError("دلیل انتشار نسخه سیاست الزامی است.")
+        locked = (
+            PlatformPolicyVersion.objects.select_for_update()
+            .select_related("policy")
+            .get(pk=policy_version.pk)
+        )
+        if locked.status != PolicyVersionStatus.DRAFT:
+            raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
+        spec = get_platform_policy_spec(locked.policy.code)
+        validate_policy_parameters(spec=spec, parameters=locked.parameters)
+        if locked.policy.sensitivity == "regulatory":
+            if locked.source_basis != PolicySourceBasis.EXTERNAL_AUTHORITY:
+                raise ValidationError("قاعده مقرراتی باید به مرجع بیرونی متکی باشد.")
+            if not locked.review_evidence.filter(
+                disposition=PolicyReviewDisposition.ACCEPTED
+            ).exists():
+&gt;               raise ValidationError(
+                    "قاعده مقرراتی بدون شواهد بررسی پذیرفته‌شده قابل انتشار نیست."
+                )
+E               django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']
+
+apps\organizations\policy_services.py:347: ValidationError</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimSettlementTests" name="test_claim_creation_fails_closed_without_eligible_regulatory_rule" time="2.439"><failure message="AssertionError: ValidationError not raised">self = &lt;apps.billing.tests.ProgressClaimSettlementTests testMethod=test_claim_creation_fails_closed_without_eligible_regulatory_rule&gt;
+
+    def test_claim_creation_fails_closed_without_eligible_regulatory_rule(self) -&gt; None:
+        TenantPolicySelection.objects.all().delete()
+&gt;       with self.assertRaises(ValidationError):
+E       AssertionError: ValidationError not raised
+
+apps\billing\tests.py:832: AssertionError</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimSettlementTests" name="test_term_and_regulatory_approval_enforce_sod_and_immutability" time="2.393"><failure message="django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']">self = &lt;apps.billing.tests.ProgressClaimSettlementTests testMethod=test_term_and_regulatory_approval_enforce_sod_and_immutability&gt;
+
+    def test_term_and_regulatory_approval_enforce_sod_and_immutability(self) -&gt; None:
+        term = create_contract_term_version(
+            organization=self.organization,
+            actor=self.owner,
+            contract=self.contract,
+            effective_from=date(2027, 1, 1),
+            reason="Future commercial version",
+        )
+        with self.assertRaises(PermissionDenied):
+            approve_contract_term_version(
+                organization=self.organization,
+                actor=self.owner,
+                term_version=term,
+                reason="Self approval is prohibited",
+            )
+        approved_term = approve_contract_term_version(
+            organization=self.organization,
+            actor=self.manager,
+            term_version=term,
+            reason="Independent approval",
+        )
+        self.assertEqual(approved_term.status, ContractTermVersionStatus.APPROVED)
+        approved_term.retention_rate = Decimal(1)
+        with self.assertRaises(ValidationError):
+            approved_term.save()
+    
+        retire_platform_policy_version(
+            actor=self.policy_approver,
+            policy_version=self.regulatory_rules,
+            reason="Prepare isolated SoD test version",
+        )
+        policy = self.regulatory_rules.policy
+        rule = PlatformPolicyVersion.objects.create(
+            policy=policy,
+            version=2,
+            parameters={
+                "tax_rate": "0",
+                "tax_basis": "gross",
+                "insurance_rate": "0",
+                "insurance_basis": "gross",
+            },
+            effective_from=date(2027, 1, 1),
+            source_basis=PolicySourceBasis.EXTERNAL_AUTHORITY,
+            created_by=self.policy_author,
+            reason="Future test-only regulatory version",
+        )
+        source = record_policy_source(
+            actor=self.policy_author,
+            issuer="Test authority",
+            title="Future test rule",
+            source_identifier="TEST-CLAIM-RULE-SOD",
+            version="2",
+            applicability="Automated test fixture only",
+            reason="No legal or production meaning",
+        )
+        link_policy_version_source(
+            actor=self.policy_author,
+            policy_version=rule,
+            source=source,
+            reason="Test provenance",
+        )
+        with self.assertRaises(PermissionDenied):
+&gt;           publish_platform_policy_version(
+                actor=self.policy_author,
+                policy_version=rule,
+                reason="Self publication is prohibited",
+            )
+
+apps\billing\tests.py:798: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @transaction.atomic
+    def publish_platform_policy_version(
+        *, actor: User, policy_version: PlatformPolicyVersion, reason: str
+    ) -&gt; PlatformPolicyVersion:
+        _require_platform_admin(actor)
+        if not reason.strip():
+            raise ValidationError("دلیل انتشار نسخه سیاست الزامی است.")
+        locked = (
+            PlatformPolicyVersion.objects.select_for_update()
+            .select_related("policy")
+            .get(pk=policy_version.pk)
+        )
+        if locked.status != PolicyVersionStatus.DRAFT:
+            raise ValidationError("فقط نسخه پیش‌نویس قابل انتشار است.")
+        spec = get_platform_policy_spec(locked.policy.code)
+        validate_policy_parameters(spec=spec, parameters=locked.parameters)
+        if locked.policy.sensitivity == "regulatory":
+            if locked.source_basis != PolicySourceBasis.EXTERNAL_AUTHORITY:
+                raise ValidationError("قاعده مقرراتی باید به مرجع بیرونی متکی باشد.")
+            if not locked.review_evidence.filter(
+                disposition=PolicyReviewDisposition.ACCEPTED
+            ).exists():
+&gt;               raise ValidationError(
+                    "قاعده مقرراتی بدون شواهد بررسی پذیرفته‌شده قابل انتشار نیست."
+                )
+E               django.core.exceptions.ValidationError: ['قاعده مقرراتی بدون شواهد بررسی پذیرفته\u200cشده قابل انتشار نیست.']
+
+apps\organizations\policy_services.py:347: ValidationError</failure></testcase><testcase classname="apps.inventory.test_workflow.StockTransactionWorkflowTests" name="test_goods_receipt_stock_movement_is_outside_w56_assignment_scope" time="0.280"><failure message="ValueError: ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.">self = &lt;apps.inventory.test_workflow.StockTransactionWorkflowTests testMethod=test_goods_receipt_stock_movement_is_outside_w56_assignment_scope&gt;
+
+    def test_goods_receipt_stock_movement_is_outside_w56_assignment_scope(self) -&gt; None:
+&gt;       receipt, item = self.create_posted_goods_receipt()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\inventory\test_workflow.py:166: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\inventory\tests.py:208: in create_posted_goods_receipt
+    post_goods_receipt(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = &lt;Organization: Inventory Co&gt;, actor = &lt;User: inventory-member&gt;
+goods_receipt = &lt;GoodsReceipt: GR-INV-1&gt;
+
+    @transaction.atomic
+    def post_goods_receipt(
+        *, organization: Organization, actor: User, goods_receipt: GoodsReceipt
+    ) -&gt; GoodsReceipt:
+        receipt = _get_locked_receipt(
+            organization=organization, goods_receipt=goods_receipt
+        )
+        _require_role(
+            organization=organization,
+            actor=actor,
+            permission=BusinessPermissionCode.GOODS_RECEIPTS_POST,
+            message="اجازه نهایی‌سازی رسیدهای کالای این سازمان را ندارید.",
+            project=receipt.purchase_order.project,
+        )
+        order = _get_locked_order(
+            organization=organization, purchase_order=receipt.purchase_order
+        )
+        if receipt.status != GoodsReceiptStatus.DRAFT:
+            raise ValueError("فقط رسیدهای کالای پیش‌نویس قابل نهایی‌سازی هستند.")
+        if order.status != PurchaseOrderStatus.ISSUED:
+            raise ValueError("سفارش خرید برای دریافت کالا باز نیست.")
+        items = list(
+            receipt.items.select_related("purchase_order_item").select_for_update()
+        )
+        if not items:
+            raise ValueError("رسید کالا باید حداقل یک ردیف داشته باشد.")
+        for item in items:
+            already_received = GoodsReceiptItem.objects.filter(
+                purchase_order_item=item.purchase_order_item,
+                goods_receipt__status=GoodsReceiptStatus.POSTED,
+            ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
+            governing_line = PurchaseOrderVersionLine.objects.filter(
+                version=receipt.purchase_order_version,
+                source_item=item.purchase_order_item,
+            ).first()
+            if governing_line is None:
+&gt;               raise ValueError("ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.")
+E               ValueError: ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.
+
+apps\procurement\services.py:1209: ValueError</failure></testcase><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void" time="0.345"><failure message="ValueError: ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.">self = &lt;apps.inventory.tests.StockTransactionServiceTests testMethod=test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void&gt;
+
+    def test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void(
+        self,
+    ) -&gt; None:
+&gt;       receipt, item = self.create_posted_goods_receipt()
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\inventory\tests.py:570: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\inventory\tests.py:208: in create_posted_goods_receipt
+    post_goods_receipt(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = &lt;Organization: Inventory Co&gt;, actor = &lt;User: inventory-member&gt;
+goods_receipt = &lt;GoodsReceipt: GR-INV-1&gt;
+
+    @transaction.atomic
+    def post_goods_receipt(
+        *, organization: Organization, actor: User, goods_receipt: GoodsReceipt
+    ) -&gt; GoodsReceipt:
+        receipt = _get_locked_receipt(
+            organization=organization, goods_receipt=goods_receipt
+        )
+        _require_role(
+            organization=organization,
+            actor=actor,
+            permission=BusinessPermissionCode.GOODS_RECEIPTS_POST,
+            message="اجازه نهایی‌سازی رسیدهای کالای این سازمان را ندارید.",
+            project=receipt.purchase_order.project,
+        )
+        order = _get_locked_order(
+            organization=organization, purchase_order=receipt.purchase_order
+        )
+        if receipt.status != GoodsReceiptStatus.DRAFT:
+            raise ValueError("فقط رسیدهای کالای پیش‌نویس قابل نهایی‌سازی هستند.")
+        if order.status != PurchaseOrderStatus.ISSUED:
+            raise ValueError("سفارش خرید برای دریافت کالا باز نیست.")
+        items = list(
+            receipt.items.select_related("purchase_order_item").select_for_update()
+        )
+        if not items:
+            raise ValueError("رسید کالا باید حداقل یک ردیف داشته باشد.")
+        for item in items:
+            already_received = GoodsReceiptItem.objects.filter(
+                purchase_order_item=item.purchase_order_item,
+                goods_receipt__status=GoodsReceiptStatus.POSTED,
+            ).aggregate(total=Sum("quantity"))["total"] or Decimal(0)
+            governing_line = PurchaseOrderVersionLine.objects.filter(
+                version=receipt.purchase_order_version,
+                source_item=item.purchase_order_item,
+            ).first()
+            if governing_line is None:
+&gt;               raise ValueError("ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.")
+E               ValueError: ردیف رسید در نسخه پین‌شده سفارش وجود ندارد.
+
+apps\procurement\services.py:1209: ValueError</failure></testcase><testcase classname="apps.support.test_p9_s16_s20.SupportP9ConcurrencyTests" name="test_concurrent_transition_has_one_winner_and_one_stale_rejection" time="5.599" /></testsuite></testsuites>

@@ -56,3 +56,21 @@ csrf_trusted_origins = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "")
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in csrf_trusted_origins.split(",") if origin.strip()
 ]
+
+if EMAIL_BACKEND != "django.core.mail.backends.smtp.EmailBackend":
+    raise ImproperlyConfigured("Production password recovery requires Django SMTP.")
+for email_setting in (
+    "DJANGO_EMAIL_HOST",
+    "DJANGO_EMAIL_HOST_USER",
+    "DJANGO_EMAIL_HOST_PASSWORD",
+    "DJANGO_DEFAULT_FROM_EMAIL",
+    "DJANGO_CACHE_BACKEND",
+    "DJANGO_CACHE_LOCATION",
+):
+    _required_env(email_setting)
+if not EMAIL_USE_TLS:
+    raise ImproperlyConfigured("Production password-recovery email must use TLS.")
+if CACHES["default"]["BACKEND"] == "django.core.cache.backends.locmem.LocMemCache":
+    raise ImproperlyConfigured(
+        "Production password recovery requires a shared cache backend."
+    )

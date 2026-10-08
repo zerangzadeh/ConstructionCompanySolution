@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% load erp_format %}
+
+{% block title %}افزودن تصویر | {{ project.name }}{% endblock %}
+
+{% block content %}
+<nav class="flex items-center gap-2 text-xs text-slate-400" aria-label="مسیر صفحه"><a class="hover:text-blue-600" href="{% url 'projects:list' %}">پروژه‌ها</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:detail' project.id %}">{{ project.name }}</a><span>/</span><a class="hover:text-blue-600" href="{% url 'projects:gallery' project.id %}">گالری پروژه</a><span>/</span><span>افزودن تصویر</span></nav>
+
+<div class="mt-4 flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs font-semibold text-blue-600">ثبت ایمن در سامانه اسناد</p><h1 class="mt-1 text-2xl font-bold text-slate-950">افزودن تصویر</h1></div><a class="erp-btn erp-btn--secondary" href="{% url 'projects:gallery' project.id %}">بازگشت به گالری</a></div>
+
+<form class="erp-surface mt-6 space-y-5 rounded-xl p-5" method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="grid gap-4 md:grid-cols-2">
+        <div><label class="text-xs font-semibold text-slate-700" for="{{ form.title.id_for_label }}">{{ form.title.label }}</label><div class="mt-2">{{ form.title }}</div>{{ form.title.errors }}</div>
+        <div><label class="text-xs font-semibold text-slate-700" for="{{ form.site.id_for_label }}">{{ form.site.label }}</label><div class="mt-2">{{ form.site }}</div>{{ form.site.errors }}</div>
+        <div><label class="text-xs font-semibold text-slate-700" for="{{ form.captured_at.id_for_label }}">{{ form.captured_at.label }}</label><div class="mt-2">{{ form.captured_at }}</div>{{ form.captured_at.errors }}</div>
+        <div><label class="text-xs font-semibold text-slate-700" for="{{ form.description.id_for_label }}">{{ form.description.label }}</label><div class="mt-2">{{ form.description }}</div>{{ form.description.errors }}</div>
+    </div>
+    {% include "components/photo_input.html" with form=form only %}
+</form>
+{% endblock %}

@@ -7,7 +7,7 @@ from threading import Barrier
 from types import SimpleNamespace
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.test import SimpleTestCase, TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -130,7 +130,9 @@ class AccountingPolicyCalculationTests(SimpleTestCase):
                 Decimal("1.5"), precision=precision, rounding=rounding
             )
 
-    def test_intermediate_value_is_preserved_and_invalid_values_are_rejected(self) -> None:
+    def test_intermediate_value_is_preserved_and_invalid_values_are_rejected(
+        self,
+    ) -> None:
         precision = money_precision_policy_from_version(
             self._version(SPEC_PRECISION_POLICY_CODE)
         )
@@ -312,7 +314,9 @@ class AccountingFoundationTests(TestCase):
             reason="independent review",
         )
 
-    def test_submit_rejects_fractional_final_manual_line_at_money_scale_zero(self) -> None:
+    def test_submit_rejects_fractional_final_manual_line_at_money_scale_zero(
+        self,
+    ) -> None:
         self._activate_posting_policies()
         journal = self._journal()
         debit_line, credit_line = list(journal.lines.order_by("line_number"))
@@ -1432,9 +1436,11 @@ class AccountingTenantUiTests(TestCase):
         self.assertContains(response, f'data-account-id="{group.pk}"', html=False)
         self.assertContains(response, f'data-account-id="{leaf.pk}"', html=False)
         self.assertContains(response, 'class="account-tree-node" open', html=False)
-        self.assertContains(response, 'data-account-tree', html=False)
-        self.assertContains(response, 'data-tree-toggle', html=False)
-        self.assertContains(response, 'details.addEventListener("toggle", sync)', html=False)
+        self.assertContains(response, "data-account-tree", html=False)
+        self.assertContains(response, "data-tree-toggle", html=False)
+        self.assertContains(
+            response, 'details.addEventListener("toggle", sync)', html=False
+        )
         self.assertNotContains(response, "حساب سایر مستأجران")
         tree = response.context["account_tree"]
         asset_root = next(node for node in tree if node.account.pk == root.pk)
@@ -1475,15 +1481,6 @@ class AccountingTenantUiTests(TestCase):
 
 class AccountingPostingConcurrencyTests(TransactionTestCase):
     serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
 
     def setUp(self) -> None:
         if connection.vendor != "postgresql":

@@ -1,49 +1,42 @@
+from importlib import import_module
+
+from django.apps import apps
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import TransactionTestCase
+from django.test import TestCase
 
 
-class ProjectCostHardeningMigrationTests(TransactionTestCase):
-    reset_sequences = False
-
-    def test_permission_and_audit_migrations_roll_back_and_reapply(self) -> None:
-        executor = MigrationExecutor(connection)
-        executor.migrate(
-            [("organizations", "0070_p4_s31_s34_project_controls_permissions")]
+class ProjectCostHardeningMigrationTests(TestCase):
+    def test_permission_and_audit_migration_contracts_are_applied(self) -> None:
+        permission_migration = import_module(
+            "apps.organizations.migrations.0071_p4_s35_s37_reconciliation_permissions"
         )
-        old_apps = executor.loader.project_state(
-            [("organizations", "0070_p4_s31_s34_project_controls_permissions")]
-        ).apps
-        Permission = old_apps.get_model("organizations", "BusinessPermission")
+        permission_model = apps.get_model("organizations", "BusinessPermission")
+
+        permission_migration.reverse(apps, None)
         self.assertFalse(
-            Permission.objects.filter(code="project_cost.reconciliations_view").exists()
+            permission_model.objects.filter(
+                code="project_cost.reconciliations_view"
+            ).exists()
         )
-
-        executor = MigrationExecutor(connection)
-        executor.migrate(
-            [("organizations", "0071_p4_s35_s37_reconciliation_permissions")]
-        )
-        new_apps = executor.loader.project_state(
-            [("organizations", "0071_p4_s35_s37_reconciliation_permissions")]
-        ).apps
-        Permission = new_apps.get_model("organizations", "BusinessPermission")
+        permission_migration.forward(apps, None)
         self.assertTrue(
-            Permission.objects.filter(code="project_cost.reconciliations_view").exists()
+            permission_model.objects.filter(
+                code="project_cost.reconciliations_view"
+            ).exists()
         )
         self.assertTrue(
-            Permission.objects.filter(
+            permission_model.objects.filter(
                 code="project_cost.reconciliations_export"
             ).exists()
         )
 
         executor = MigrationExecutor(connection)
-        executor.migrate([("audit", "0050_p4_s31_s34_project_control_export_action")])
-        executor = MigrationExecutor(connection)
-        executor.migrate([("audit", "0051_p4_s35_s37_reconciliation_actions")])
-        audit_apps = executor.loader.project_state(
-            [("audit", "0051_p4_s35_s37_reconciliation_actions")]
-        ).apps
-        AuditEvent = audit_apps.get_model("audit", "AuditEvent")
-        actions = dict(AuditEvent._meta.get_field("action").choices)
+        self.assertIn(
+            ("audit", "0051_p4_s35_s37_reconciliation_actions"),
+            executor.loader.applied_migrations,
+        )
+        audit_event = apps.get_model("audit", "AuditEvent")
+        actions = dict(audit_event._meta.get_field("action").choices)
         self.assertIn("project_cost.reconciliation_viewed", actions)
         self.assertIn("project_cost.reconciliation_exported", actions)

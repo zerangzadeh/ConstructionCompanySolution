@@ -6,7 +6,14 @@ class ForcePasswordChangeMiddleware:
     """Confine temporary-password sessions to password initialization or logout."""
 
     allowed_url_names = frozenset(
-        {"accounts:required_password_change", "accounts:logout"}
+        {
+            "accounts:required_password_change",
+            "accounts:password_reset",
+            "accounts:password_reset_done",
+            "accounts:password_reset_confirm",
+            "accounts:password_reset_complete",
+            "accounts:logout",
+        }
     )
 
     def __init__(self, get_response):

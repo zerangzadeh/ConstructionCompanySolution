@@ -1261,7 +1261,7 @@ downstream effects and production activation remain unauthorized.
 | P10-S01..S06 | 6 | `A-H` | **P10-M01–M24=A; S02–S06 Product Owner accepted.** Six governed metrics, synchronous read models, Persian RTL/Jalali dashboard, permission-preserving drill-through and bounded on-demand export; S14+ remains unauthorized. |
 | P10-S07..S13 | 7 | `A-X` | **P10-R01–P10-R36=A; P10-S07–S13 Product Owner accepted.** Exactly 13 governed financial/operational pairs with immutable comparison/exception evidence, successor-only recalculation and focused PostgreSQL assurance. |
 | P10-S14..S17 | 4 | `A-H` | **P10-C01–C36=A; Product Owner accepted.** Derived-only project-closeout coordination across nine named source-authority families; no source/downstream effect. |
-| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A; candidate frozen; S18 prerequisites satisfied; S19–S21 may start under bounded authorization.** Instrumented diagnosis and a fresh rerun completed clean migration in 1,032.661s and 969.888s with no blocker; coherent PostgreSQL/DMS backup, separate restore, integrity validation and cleanup passed. S19–S21 not started. |
+| P10-S18..S21 | 4 | `A-X` | **P10-CERT01–CERT43=A; candidate frozen; S18 prerequisites satisfied; S19–S21 executed / BLOCKED.** Local S19 exercised migration/restore and `0s`/`10.842s` RPO/RTO passed, but production recovery evidence remains incomplete. S20 workload profile `P10-S20-WP1-20261007-E0E078C9-A` freezes the exact journey, volume/skew, history/growth and transfer bounds. Qualified local environment `P10-S20-ENV1-LOCAL-20261007-A` and workload artifacts passed bounded preflight; performance execution prerequisites are satisfied for environment-qualified testing. The subsequent short 50-user calibration reproduced the exact mix but exposed unapplied configured-database migrations, 31 HTTP 500s and 13 refused connections, so the full run is stopped pending correction and clean recalibration. No peak/surge/endurance run occurred, and production capacity remains gated by non-equivalent shared topology, incomplete DMS controls and incomplete server telemetry. All initial full-suite non-passes were classified; bounded test-only remediation improved the single mandatory rerun to 1,067 passed, 12 failed and 18 errored. Follow-on focused verification cleared its 18 setup errors and four catalogue failures, then exposed two unrelated stale demo-seed failures; the mandatory evidence remains non-green. Required production controls remain absent. No waiver; not ready for Product Owner acceptance or S22. |
 | P10-S22 | 1 | `A-X` | Independent final risk and production-readiness review |
 | P10-S23 | 1 | `A-H` | Product Owner UAT finding triage and release/rollback recommendation |
 | P10-S24 | 1 | `L-M` | Final documentation closeout and approval packet preparation |
@@ -1377,10 +1377,29 @@ but candidate-preserving diagnosis completed actual Django migration execution i
 single-runner gate rerun completed in `969.888s`, then passed database/DMS backup,
 separate restore, evidence-path/size/hash coherence and cleanup. No migration was
 skipped, faked, pre-applied or edited; setup and cleanup time were recorded
-separately. `P10-S18 = certification prerequisites satisfied`; S19–S21 may start
-under the existing bounded authorization but did not start in this pass.
+separately. `P10-S18 = certification prerequisites satisfied`. S19–S21
+subsequently executed and are `BLOCKED` as recorded in
+[`P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md`](architecture/P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md):
+local recovery evidence passed its exercised set; S20 workload profile
+`P10-S20-WP1-20261007-E0E078C9-A` now freezes the requested journey/volume/history/
+bound inputs. Qualified environment `P10-S20-ENV1-LOCAL-20261007-A` passed the
+bounded preflight, so performance execution prerequisites are satisfied for
+environment-qualified testing. The short calibration then exposed configured-DB
+schema drift and connection refusals, so the full run must not start pending
+correction and clean recalibration. Production capacity remains gated by topology,
+DMS-control and telemetry gaps. S21 retains missing production
+controls plus non-green mandatory full-suite evidence. The original 42 failures
+and 19 errors were fully classified as 6 known-debt failures, 8 obsolete
+assertions and 28 failures plus 19 errors caused by the test/environment, with no
+established candidate defect. Bounded test-only correction improved the single
+authorized rerun to 1,067 passed, 12 failed and 18 errored. Focused follow-on
+verification cleared the 18 setup errors and four catalogue failures, while two
+seed tests exposed an unrelated stale demo-data contract-term fixture that was
+not repaired merely to obtain certification.
 
-The six unrelated permission-registry failures remain separate known debt. No
+The six unrelated permission-registry failures remain separate known debt; the
+other rerun non-passes remain classified as test/environment defects rather than
+being folded into that debt. No
 waiver, runtime implementation, production activation or S22–S24 authority was
 created. AI/RAG/vector, providers, queues/schedulers, integrations, automatic
 downstream/financial effects and all production migration, restore, deployment,

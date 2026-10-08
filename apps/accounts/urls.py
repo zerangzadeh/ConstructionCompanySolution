@@ -7,6 +7,26 @@ app_name = "accounts"
 urlpatterns = [
     path("login/", views.UserLoginView.as_view(), name="login"),
     path(
+        "password/reset/",
+        views.PublicPasswordResetRequestView.as_view(),
+        name="password_reset",
+    ),
+    path(
+        "password/reset/done/",
+        views.PublicPasswordResetDoneView.as_view(),
+        name="password_reset_done",
+    ),
+    path(
+        "password/reset/<uidb64>/<token>/",
+        views.PublicPasswordResetConfirmView.as_view(),
+        name="password_reset_confirm",
+    ),
+    path(
+        "password/reset/complete/",
+        views.PublicPasswordResetCompleteView.as_view(),
+        name="password_reset_complete",
+    ),
+    path(
         "password/required/",
         views.required_password_change,
         name="required_password_change",

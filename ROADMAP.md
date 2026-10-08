@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-10-04
+**Status date:** 2026-10-08
 
 **Product stage:** pre-production
 
@@ -56,7 +56,7 @@ compliance, security, migration, and integration consequences.
 | F4 Equipment | **DELIVERED baseline / P8-S01–S30 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN DOCUMENTED NON-PRODUCTION BOUNDARIES** | Equipment remains the operational authority for operations and versioned internal-rate/conserved allocation proposals. The distinct Fixed Assets authority owns source-backed capitalization and book evidence. C01–C38=A is accepted; final assurance accepts carrying-value, depreciation, reversal and handoff no-double-count controls. All P8 behavior remains non-production and creates no journal, Project Cost actual, payable, cash or Inventory mutation. |
 | F5 Workflow & Work Management | **DELIVERED** | Versioned definitions, bounded registries, runtime, candidate/assignment/delegation history, work items/workbench with due/overdue and escalation routing, position routing, domain adoption, PostgreSQL acceptance gates. |
 | F6 Billing & Progress Claims | **DELIVERED receivable baseline** | Baseline/progress/claims/items/sources/adjustments, workflow, settlements and payment allocation. Policy ownership needs pre-production correction; payable claims and posting are not delivered. |
-| F7 Documents v2 | **DELIVERED baseline** | Private versioned documents and explicit links to supported records. Retention/export/object storage/scanning and broader links are not delivered. |
+| F7 Documents v2 | **DELIVERED expanding baseline** | Private versioned documents and explicit registered links remain authoritative. The bounded Project/Site Gallery adds reusable photo ingestion, metadata-only camera/upload provenance, project/site typed links, protected previews and Daily Report compatibility without a second binary store. Production scanner/object-storage activation, transmittals and broader module integrations remain gated. |
 | F8 Safety & Quality | **PARTIAL; P9-S06–S11 PRODUCT OWNER ACCEPTED** | Existing incident/issue workflows remain authoritative. The accepted bounded shared inspection mechanics provide typed HSE/QA templates, inspections, permits, QA tests/results, findings versus NCR, CAPA, verification/closure, exact DMS evidence and assurance UI. Risk registers, toolbox/PPE controls, governed knowledge and P9-S12+ remain. |
 | Foundation | **DELIVERED baseline** | Tenant/session/membership/RBAC, shared masters, projects/sites/phases/WBS/activities, contracts/amendments, estimates/revisions, expenses, payments/allocations, daily reports, audit, financial read models. |
 
@@ -2190,6 +2190,13 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P10.1 Governed metrics and management reporting
 
 - **Cumulative status through S17:** **P10-S02–S17 PRODUCT OWNER ACCEPTED.**
+  **Administrative closeout (2026-10-08):** P10 execution is closed without
+  market-readiness or Product Owner release acceptance. The retained status is
+  `P10-S20 = calibration blocked` and `P10-S19–S21 = BLOCKED`. Existing
+  migrations restored configured calibration-database schema parity, but no
+  binding-complete recalibration or certification-duration test followed.
+  P10-S22–S24, any audit/refactor, production activation and market release
+  require separate authorization after a later audit/refactor decision.
   P10-S01 remains the completed planning/session-preparation record; P10-S18–S21
   is the exact current official envelope. Its decisions and bounded certification
   execution are Product Owner authorized in the
@@ -2201,8 +2208,21 @@ Stable masters + consent/privacy + support operations -> future network/AI
   rerun completed clean migration in `17m 12.661s` and `16m 09.888s` respectively,
   with no lock blocker; the rerun also passed coherent isolated PostgreSQL/DMS
   backup, separate restore, integrity validation and cleanup. S18 prerequisites
-  are satisfied. S19–S21 may start under the existing bounded authorization but
-  have not started.
+  are satisfied. The authorized S19–S21 execution is now recorded in the
+  [certification evidence](docs/architecture/P10_S19_S21_RELEASE_CERTIFICATION_EVIDENCE.md):
+  the local S19 rehearsal passed its exercised migration/restore/RPO/RTO gates,
+  but production recovery evidence remains incomplete; S20 workload profile
+  `P10-S20-WP1-20261007-E0E078C9-A` is frozen. Qualified local environment
+  `P10-S20-ENV1-LOCAL-20261007-A` passed bounded preflight, so performance
+  execution prerequisites are satisfied for environment-qualified testing. A
+  subsequent 84.701-second non-certification calibration reached 50 users and
+  reproduced the frozen mix, but exposed configured-database schema drift, 31
+  HTTP 500s and 13 refused connections; the full run must not start until these
+  blockers are corrected and calibration passes. Production capacity remains
+  gated. S21 is
+  blocked by missing production controls
+  plus non-green mandatory full-suite evidence. P10-S18–S21 is not ready for
+  Product Owner acceptance.
 - **Status / priority:** **P10-S02–S06 PRODUCT OWNER ACCEPTED**
 - **P10-S01 planning (2026-10-07):** the
   [P10-S01–S06 governed metrics and reporting decision packet](docs/architecture/P10_S01_S06_GOVERNED_METRICS_AND_REPORTING_DECISION_PACKET.md)
@@ -2268,7 +2288,7 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P10.2 Reconciliation and close workbench
 
 - **Status / priority:** **P10-S07–S17 PRODUCT OWNER ACCEPTED; P10-S18
-  PREREQUISITES SATISFIED; P10-S19–S21 AUTHORIZED TO START**
+  PREREQUISITES SATISFIED; P10-S19–S21 EXECUTED / BLOCKED**
 - **Outcome:** estimate-budget, commitment, PO-receipt-invoice, inventory value,
   subledger-GL, bank, claim-settlement and asset reconciliations; plus Employee
   Insurance List-to-payroll, payroll/insurance liabilities-to-Accounting,
@@ -2291,7 +2311,8 @@ Stable masters + consent/privacy + support operations -> future network/AI
 ### P10.3 First production release certification
 
 - **Status / priority:** **S18–S21 OPTION A DECISIONS ACCEPTED; S18 PREREQUISITES
-  SATISFIED; S19–S21 MAY START UNDER BOUNDED AUTHORIZATION / MUST**
+  SATISFIED; S19–S21 EXECUTED / BLOCKED; ADMINISTRATIVELY CLOSED; PRODUCT OWNER
+  ACCEPTANCE NOT READY / MUST**
 - **P10-S18–S21 planning (2026-10-07):** the
   [authoritative release-certification decision packet](docs/architecture/P10_S18_S21_RELEASE_CERTIFICATION_DECISION_PACKET.md)
   defines S18 candidate/ownership freeze, S19 migration/restore rehearsal, S20
@@ -2313,11 +2334,37 @@ Stable masters + consent/privacy + support operations -> future network/AI
   migration in `1,032.661s` with no lock blocker; a fresh gate rerun completed in
   `969.888s`, then passed database/DMS backup, separate restore, coherence
   validation and cleanup. The prior FC-3 blocker is resolved without changing the
-  candidate or 30-minute threshold. S18 prerequisites are satisfied; S19–S21 may
-  start under the existing bounded authorization but did not start. The six unrelated
-  permission-registry failures remain separate known debt unless the frozen-scope
-  assessment proves an included permission or privilege-path certification
-  impact. `P10-S22+` and every AI/provider/queue/integration/automatic-effect/
+  candidate or 30-minute threshold. S18 prerequisites are satisfied. S19 later
+  passed the exercised local clean migration, coherent pre-change restore/reapply
+  and DB/DMS checks with measured `0s` RPO and `10.842s` RTO, but production
+  recovery scenarios remain blocked. S20 load testing did not run; workload profile
+  `P10-S20-WP1-20261007-E0E078C9-A` now freezes the journey scripts, database/DMS
+  volumes and skew, 24-month history/growth shape, transfer/import/export bounds
+  and zero external-participant share. Qualified local environment
+  `P10-S20-ENV1-LOCAL-20261007-A` and all workload/configuration artifacts are
+  fingerprinted/hash-pinned. Static fixture-plan and route/service preflight plus
+  one local reachability request and the DB-connection/fingerprint checks passed.
+  `P10-S20 = performance execution prerequisites satisfied for environment-qualified
+  testing`. The short 50-user calibration generated 500 journeys/1,795 requests
+  with exact mix but failed its start-safety decision: the configured database has
+  unapplied reporting/inventory/daily-report migrations, all 31 HTTP 500s were
+  missing-relation errors, and 13 connections were refused. No runtime-code defect
+  was established; no peak, surge or endurance run occurred. Production capacity
+  remains gated by direct HTTP without TLS/proxy,
+  shared app/DB resources without dedicated limits, incomplete production DMS
+  controls and incomplete server-side telemetry. Focused S21 Tenant/security tests passed. All original
+  42 failures and 19 errors were classified: 6 failures are the separate known
+  permission-registry debt, 8 were obsolete assertions, and 28 failures plus 19
+  errors were test/environment defects; no candidate defect was established.
+  Bounded test-only remediation improved the single authorized mandatory rerun to
+  1,067 passed, 12 failed and 18 errored. Six failures remain the known debt and
+  the other 24 non-passes share the transactional-test baseline defect; the
+  mandatory rerun remains non-green. Follow-on focused verification cleared all
+  18 setup errors and four catalogue-baseline failures; the two remaining seed
+  tests now expose separate stale demo-data contract-term setup, classified as
+  unrelated repository debt and not repaired for certification. Required
+  production controls remain absent. Overall disposition is `BLOCKED`, with no
+  waiver. `P10-S22+` and every AI/provider/queue/integration/automatic-effect/
   production-activation gate remain preserved. No runtime, production migration,
   deployment, cutover or activation is authorized.
 - **Outcome:** certify only the explicitly selected release scope, not the entire

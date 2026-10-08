@@ -5,7 +5,7 @@ from threading import Barrier
 from unittest.mock import patch
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.test import Client, TestCase, TransactionTestCase
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
@@ -68,17 +68,14 @@ from apps.organizations.models import (
     PolicyReviewDisposition,
     PolicySourceBasis,
     PolicyVersionStatus,
-    TenantPolicySelection,
 )
 from apps.organizations.policy_services import (
-    apply_tenant_policy_selection,
     create_platform_policy,
     link_policy_version_source,
     publish_platform_policy_version,
     record_optional_policy_review,
     record_policy_source,
     retire_platform_policy_version,
-    select_tenant_policy_version,
 )
 from apps.organizations.policy_specs import RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE
 from apps.organizations.services import set_active_organization
@@ -794,11 +791,11 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             source=source,
             reason="Test provenance",
         )
-        with self.assertRaises(PermissionDenied):
+        with self.assertRaises(ValidationError):
             publish_platform_policy_version(
                 actor=self.policy_author,
                 policy_version=rule,
-                reason="Self publication is prohibited",
+                reason="Unreviewed rule fails closed for every publisher",
             )
         with self.assertRaises(ValidationError):
             publish_platform_policy_version(
@@ -828,7 +825,9 @@ class ProgressClaimCalculationTests(ProgressRecordWorkflowTests):
             approved_rule.save()
 
     def test_claim_creation_fails_closed_without_eligible_regulatory_rule(self) -> None:
-        TenantPolicySelection.objects.all().delete()
+        policy = self.regulatory_rules.policy
+        policy.is_active = False
+        policy.save(update_fields=["is_active", "updated_at"])
         with self.assertRaises(ValidationError):
             _resolve_regulatory_rule_version(
                 organization=self.organization,
@@ -1097,7 +1096,9 @@ class ProgressClaimApprovalWorkflowTests(ProgressClaimCalculationTests):
         self.assertEqual(returned.status, "returned")
         self.assertEqual(revision.status, "draft")
         self.assertEqual(revision.corrects_id, original.pk)
-        self.assertEqual(revision.correction_kind, ProgressClaimCorrectionKind.REPLACEMENT)
+        self.assertEqual(
+            revision.correction_kind, ProgressClaimCorrectionKind.REPLACEMENT
+        )
         approved = self._approve_claim(revision)
         original.refresh_from_db()
         self.assertEqual(approved.status, "approved")
@@ -1752,15 +1753,6 @@ class ProgressClaimApprovalWorkflowConcurrencyTests(TransactionTestCase):
 
     reset_sequences = True
     serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            database = connections[alias]
-            serialized = getattr(database, "_test_serialized_contents", None)
-            if serialized:
-                database.creation.deserialize_db_from_string(serialized)
 
     def setUp(self) -> None:
         ProjectBaselineWorkflowTests.setUp(self)

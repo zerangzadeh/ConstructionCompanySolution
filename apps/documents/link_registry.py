@@ -46,6 +46,16 @@ DOCUMENT_LINK_TYPES = (
         project_lookup="project_id",
     ),
     DocumentLinkType(
+        key="project_site",
+        owner="projects",
+        model_label="projects.ProjectSiteDocumentLink",
+        target_field="project_site",
+        view_permission=BusinessPermissionCode.PROJECT_SITES_VIEW,
+        project_lookup="project_site__project_id",
+        site_lookup="project_site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
         key="contract",
         owner="contracts",
         model_label="contracts.ContractDocumentLink",

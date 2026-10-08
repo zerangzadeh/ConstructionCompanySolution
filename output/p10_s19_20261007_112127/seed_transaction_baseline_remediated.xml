@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="1032.670" timestamp="2026-10-07T20:48:01.242284+03:30" hostname="Zerangzadeh"><testcase classname="tests.test_seed_account_data" name="test_seed_account_data_is_incremental_and_tenant_safe" time="1016.121"><failure message="django.core.exceptions.ValidationError: ['نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.']">settings = &lt;pytest_django.fixtures.Settings object at 0x000001CDE1C6AF50&gt;
+tmp_path = WindowsPath('C:/Users/azera/AppData/Local/Temp/pytest-of-Zerangzadeh/pytest-3/test_seed_account_data_is_incr0')
+
+    @pytest.mark.django_db(transaction=True)
+    def test_seed_account_data_is_incremental_and_tenant_safe(
+        settings: Any, tmp_path: Path
+    ) -&gt; None:
+        settings.MEDIA_ROOT = tmp_path
+        settings.DEBUG = True
+&gt;       call_command("seed_demo_data", stdout=StringIO())
+
+tests\test_seed_account_data.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:449: in handle
+    self._seed_organization(organization_index, organization_name, admin)
+apps\accounts\management\commands\seed_demo_data.py:915: in _seed_organization
+    project, site = self._seed_project(
+apps\accounts\management\commands\seed_demo_data.py:1356: in _seed_project
+    self._seed_billing(
+apps\accounts\management\commands\seed_demo_data.py:1581: in _seed_billing
+    claim = create_progress_claim(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\services.py:1223: in create_progress_claim
+    term_version = _resolve_contract_term_version(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = &lt;Organization: شرکت سازه‌پردازان پارس&gt;
+contract = &lt;Contract: CTR-01-01-01 - قرارداد مدیریت پیمان و اجرای عملیات اصلی&gt;
+on_date = datetime.date(2025, 5, 25)
+
+    def _resolve_contract_term_version(
+        *, organization: Organization, contract: Contract, on_date: date
+    ) -&gt; ContractTermVersion:
+        version = (
+            ContractTermVersion.objects.select_for_update()
+            .filter(
+                organization=organization,
+                contract=contract,
+                status__in=(
+                    ContractTermVersionStatus.APPROVED,
+                    ContractTermVersionStatus.SUPERSEDED,
+                ),
+                effective_from__lte=on_date,
+            )
+            .order_by("-effective_from", "-version")
+            .first()
+        )
+        if version is None:
+&gt;           raise ValidationError("نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.")
+E           django.core.exceptions.ValidationError: ['نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.']
+
+apps\billing\services.py:1144: ValidationError</failure></testcase><testcase classname="tests.test_seed_demo_data" name="test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent" time="15.605"><failure message="django.core.exceptions.ValidationError: ['نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.']">settings = &lt;pytest_django.fixtures.Settings object at 0x000001CDDF5E88D0&gt;
+tmp_path = WindowsPath('C:/Users/azera/AppData/Local/Temp/pytest-of-Zerangzadeh/pytest-3/test_seed_demo_data_creates_fo0')
+
+    @pytest.mark.django_db(transaction=True)
+    def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
+        settings: Any, tmp_path: Path
+    ) -&gt; None:
+        settings.MEDIA_ROOT = tmp_path
+        settings.DEBUG = True
+    
+&gt;       call_command("seed_demo_data", stdout=StringIO())
+
+tests\test_seed_demo_data.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:449: in handle
+    self._seed_organization(organization_index, organization_name, admin)
+apps\accounts\management\commands\seed_demo_data.py:915: in _seed_organization
+    project, site = self._seed_project(
+apps\accounts\management\commands\seed_demo_data.py:1356: in _seed_project
+    self._seed_billing(
+apps\accounts\management\commands\seed_demo_data.py:1581: in _seed_billing
+    claim = create_progress_claim(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\services.py:1223: in create_progress_claim
+    term_version = _resolve_contract_term_version(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = &lt;Organization: شرکت سازه‌پردازان پارس&gt;
+contract = &lt;Contract: CTR-01-01-01 - قرارداد مدیریت پیمان و اجرای عملیات اصلی&gt;
+on_date = datetime.date(2025, 5, 25)
+
+    def _resolve_contract_term_version(
+        *, organization: Organization, contract: Contract, on_date: date
+    ) -&gt; ContractTermVersion:
+        version = (
+            ContractTermVersion.objects.select_for_update()
+            .filter(
+                organization=organization,
+                contract=contract,
+                status__in=(
+                    ContractTermVersionStatus.APPROVED,
+                    ContractTermVersionStatus.SUPERSEDED,
+                ),
+                effective_from__lte=on_date,
+            )
+            .order_by("-effective_from", "-version")
+            .first()
+        )
+        if version is None:
+&gt;           raise ValidationError("نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.")
+E           django.core.exceptions.ValidationError: ['نسخه تأییدشده شرایط قرارداد برای تاریخ قطع وجود ندارد.']
+
+apps\billing\services.py:1144: ValidationError</failure></testcase></testsuite></testsuites>

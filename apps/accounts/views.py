@@ -1,16 +1,31 @@
+import logging
+from smtplib import SMTPException
+
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetConfirmView
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.http import FileResponse, Http404, HttpRequest, HttpResponse
+from django.http import (
+    FileResponse,
+    Http404,
+    HttpRequest,
+    HttpResponse,
+    HttpResponseRedirect,
+)
 from django.shortcuts import redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.utils.crypto import salted_hmac
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
+from django.views.generic import TemplateView
 
 from apps.accounts.forms import (
     PersonalPasswordChangeForm,
     PersonalSettingsForm,
+    PublicPasswordResetRequestForm,
+    PublicPasswordResetSetForm,
     RequiredPasswordChangeForm,
     UserLoginForm,
 )
@@ -20,11 +35,40 @@ from apps.accounts.services import (
     initialize_personal_password,
     update_personal_settings,
 )
+from apps.audit.models import AuditAction
+from apps.audit.services import record_audit_event
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
     OrganizationAccountConnectionRequest,
 )
 from apps.organizations.services import respond_to_account_connection_request
+
+logger = logging.getLogger(__name__)
+
+
+def _password_reset_throttle_key(*, category: str, value: str) -> str:
+    """Return a cache key that never contains a raw email address or IP."""
+
+    digest = salted_hmac(f"accounts.password_reset.{category}", value).hexdigest()
+    return f"accounts:password-reset:{category}:{digest}"
+
+
+def _password_reset_is_allowed(*, request: HttpRequest, email: str) -> bool:
+    """Bound public recovery requests by both source and requested identity."""
+
+    source = request.META.get("REMOTE_ADDR", "")
+    duration = settings.PASSWORD_RESET_THROTTLE_SECONDS
+    source_allowed = cache.add(
+        _password_reset_throttle_key(category="source", value=source),
+        True,
+        duration,
+    )
+    identity_allowed = cache.add(
+        _password_reset_throttle_key(category="identity", value=email.lower()),
+        True,
+        duration,
+    )
+    return source_allowed and identity_allowed
 
 
 class UserLoginView(LoginView):
@@ -45,6 +89,77 @@ class UserLoginView(LoginView):
             LoginPageSettings.objects.first() or LoginPageSettings()
         )
         return context
+
+
+class PublicPasswordResetRequestView(TemplateView):
+    """Start recovery without revealing whether an account can receive email."""
+
+    template_name = "accounts/password_reset_form.html"
+    form_class = PublicPasswordResetRequestForm
+    success_url = reverse_lazy("accounts:password_reset_done")
+
+    def get_context_data(self, **kwargs: object) -> dict[str, object]:
+        context = super().get_context_data(**kwargs)
+        context.setdefault("form", self.form_class())
+        return context
+
+    def post(
+        self, request: HttpRequest, *args: object, **kwargs: object
+    ) -> HttpResponse:
+        form = self.form_class(request.POST)
+        if form.is_valid() and _password_reset_is_allowed(
+            request=request,
+            email=form.cleaned_data["email"],
+        ):
+            try:
+                eligible_users = list(form.get_users(form.cleaned_data["email"]))
+                if eligible_users:
+                    record_audit_event(
+                        action=AuditAction.USER_PASSWORD_RESET_REQUESTED,
+                        entity_type="user",
+                        entity_id=eligible_users[0].pk,
+                        metadata={"channel": "email"},
+                    )
+                    form.save(
+                        request=request,
+                        use_https=request.is_secure(),
+                        email_template_name="accounts/emails/password_reset_email.txt",
+                        subject_template_name="accounts/emails/password_reset_subject.txt",
+                    )
+            except (OSError, SMTPException):
+                logger.error("Password-reset email delivery failed.")
+        return HttpResponseRedirect(self.success_url)
+
+
+class PublicPasswordResetDoneView(TemplateView):
+    """Show the same completion state for every recovery request."""
+
+    template_name = "accounts/password_reset_done.html"
+
+
+class PublicPasswordResetConfirmView(PasswordResetConfirmView):
+    """Accept Django's signed recovery link and audit a successful reset."""
+
+    form_class = PublicPasswordResetSetForm
+    template_name = "accounts/password_reset_confirm.html"
+    success_url = reverse_lazy("accounts:password_reset_complete")
+
+    def form_valid(self, form: PublicPasswordResetSetForm) -> HttpResponse:
+        user = form.save()
+        record_audit_event(
+            action=AuditAction.USER_PASSWORD_RESET_COMPLETED,
+            entity_type="user",
+            entity_id=user.pk,
+            actor=user,
+            metadata={"channel": "email"},
+        )
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class PublicPasswordResetCompleteView(TemplateView):
+    """Confirm that a verified recovery flow has completed."""
+
+    template_name = "accounts/password_reset_complete.html"
 
 
 @login_required

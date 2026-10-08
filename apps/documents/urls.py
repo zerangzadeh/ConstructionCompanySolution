@@ -10,6 +10,11 @@ urlpatterns = [
     path("<uuid:document_id>/", views.document_detail, name="detail"),
     path("<uuid:document_id>/download/", views.document_download, name="download"),
     path(
+        "<uuid:document_id>/photo-preview/",
+        views.document_photo_preview,
+        name="photo-preview",
+    ),
+    path(
         "<uuid:document_id>/versions/<uuid:version_id>/download/",
         views.document_version_download,
         name="version-download",

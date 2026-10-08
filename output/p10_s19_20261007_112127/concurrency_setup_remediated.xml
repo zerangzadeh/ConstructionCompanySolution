@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="17" time="141.211" timestamp="2026-10-07T19:00:45.299533+03:30" hostname="Zerangzadeh"><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests" name="test_concurrent_partial_settlements_cannot_exceed_claim_outstanding" time="13.121"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests testMethod=test_concurrent_partial_settlements_cannot_exceed_claim_outstanding&gt;
+
+    def test_concurrent_partial_settlements_cannot_exceed_claim_outstanding(self):
+&gt;       claim = self._claim()
+                ^^^^^^^^^^^^^
+
+apps\billing\tests.py:1819: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:1775: in _claim
+    return ProgressClaimCalculationTests._claim(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:661: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:1772: in _verified_record
+    return ProgressClaimCalculationTests._verified_record(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:649: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:1769: in _record
+    return ProgressRecordWorkflowTests._record(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:505: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:1763: in _approved_baseline
+    return ProgressRecordWorkflowTests._approved_baseline(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:636: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: billing.project_baseline_approval&gt;, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests" name="test_concurrent_submission_is_deduplicated_to_one_instance_and_audit" time="9.591"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests testMethod=test_concurrent_submission_is_deduplicated_to_one_instance_and_audit&gt;
+
+    def test_concurrent_submission_is_deduplicated_to_one_instance_and_audit(self):
+&gt;       claim = self._claim()
+                ^^^^^^^^^^^^^
+
+apps\billing\tests.py:1785: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:1775: in _claim
+    return ProgressClaimCalculationTests._claim(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:661: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:1772: in _verified_record
+    return ProgressClaimCalculationTests._verified_record(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:649: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:1769: in _record
+    return ProgressRecordWorkflowTests._record(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:505: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:1763: in _approved_baseline
+    return ProgressRecordWorkflowTests._approved_baseline(self)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:636: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: billing.project_baseline_approval&gt;, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.daily_reports.test_workflow.DailyReportConcurrencyTests" name="test_competing_approvals_commit_only_once" time="8.049" /><testcase classname="apps.equipment.test_workflow.MaintenanceWorkflowConcurrencyTests" name="test_competing_start_actions_commit_once" time="7.983" /><testcase classname="apps.estimates.test_workflow.EstimateWorkflowConcurrencyTests" name="test_competing_approvals_commit_once" time="7.001"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.estimates.test_workflow.EstimateWorkflowConcurrencyTests testMethod=test_competing_approvals_commit_once&gt;
+
+    def test_competing_approvals_commit_once(self) -&gt; None:
+        owner = User.objects.create_user(username="w54-estimate-race-owner")
+        manager = User.objects.create_user(username="w54-estimate-race-manager")
+        organization = Organization.objects.create(
+            name="W54 Estimate Race", slug="w54-estimate-race"
+        )
+        for user, role in (
+            (owner, MembershipRole.COMPANY_OWNER),
+            (manager, MembershipRole.COMPANY_MANAGER),
+        ):
+            organization.memberships.create(
+                user=user, role=role, status=MembershipStatus.ACTIVE
+            )
+        project = create_project(
+            organization=organization, actor=owner, code="W54-RACE", name="Race"
+        )
+        estimate = create_estimate(
+            organization=organization,
+            project=project,
+            actor=owner,
+            estimate_number="W54-RACE-1",
+            title="Race estimate",
+        )
+        add_estimate_item(
+            estimate=estimate,
+            actor=owner,
+            description="Line",
+            quantity=Decimal(1),
+            unit_price=Decimal(1),
+        )
+&gt;       request_estimate_approval(estimate=estimate, actor=owner)
+
+apps\estimates\test_workflow.py:196: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\estimates\workflow.py:369: in request_estimate_approval
+    version = ensure_estimate_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\estimates\workflow.py:246: in ensure_estimate_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: estimates.estimate_approval&gt;, 'code': 'estimate_legacy_compatibility', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.inventory.test_p8_s05_s11.InventoryCustodyConcurrencyTests" name="test_competing_count_post_creates_one_adjustment" time="7.376" /><testcase classname="apps.inventory.test_p8_s05_s11.InventoryCustodyConcurrencyTests" name="test_competing_transfer_dispatch_posts_once" time="8.236" /><testcase classname="apps.inventory.test_workflow.StockTransactionWorkflowConcurrencyTests" name="test_competing_assigned_posting_commits_once" time="6.893"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.inventory.test_workflow.StockTransactionWorkflowConcurrencyTests testMethod=test_competing_assigned_posting_commits_once&gt;
+
+    def test_competing_assigned_posting_commits_once(self) -&gt; None:
+        owner = User.objects.create_user(username="w56-owner")
+        manager = User.objects.create_user(username="w56-manager")
+        organization = Organization.objects.create(name="W56", slug="w56")
+        for user, role in (
+            (owner, MembershipRole.COMPANY_OWNER),
+            (manager, MembershipRole.COMPANY_MANAGER),
+        ):
+            organization.memberships.create(
+                user=user, role=role, status=MembershipStatus.ACTIVE
+            )
+        from apps.inventory.services import create_warehouse
+        from apps.materials.models import Material, UnitCategory, UnitOfMeasure
+    
+        unit = UnitOfMeasure.objects.create(
+            organization=organization,
+            code="W56-KG",
+            name="W56 kilogram",
+            symbol="kg",
+            category=UnitCategory.WEIGHT,
+            decimal_places=4,
+        )
+        material = Material.objects.create(
+            organization=organization,
+            code="W56-MAT",
+            name="W56 material",
+            unit_of_measure=unit,
+        )
+        warehouse = create_warehouse(
+            organization=organization, actor=owner, code="W56", name="W56 warehouse"
+        )
+        draft = create_stock_transaction(
+            organization=organization,
+            actor=owner,
+            transaction_number="W56-RACE",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            destination_warehouse=warehouse,
+            material=material,
+            unit_of_measure=unit,
+            quantity=Decimal("1.0000"),
+            occurred_at=timezone.now(),
+        )
+&gt;       request_stock_transaction_posting(
+            organization=organization, actor=owner, stock_transaction=draft
+        )
+
+apps\inventory\test_workflow.py:236: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:482: in request_stock_transaction_posting
+    return _request(
+apps\inventory\workflow.py:455: in _request
+    ensure_stock_transaction_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:326: in ensure_stock_transaction_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: inventory.stock_transaction_posting&gt;, 'code': 'stock_transaction_posting_legacy_compatibility', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.quality.test_workflow.QualityWorkflowConcurrencyTests" name="test_competing_reviews_commit_once" time="7.446"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.quality.test_workflow.QualityWorkflowConcurrencyTests testMethod=test_competing_reviews_commit_once&gt;
+
+    def test_competing_reviews_commit_once(self) -&gt; None:
+        owner = User.objects.create_user(username="quality-race-owner")
+        manager = User.objects.create_user(username="quality-race-manager")
+        organization = Organization.objects.create(
+            name="Quality Race", slug="quality-race"
+        )
+        OrganizationSettings.objects.create(organization=organization)
+        for user, role in (
+            (owner, MembershipRole.COMPANY_OWNER),
+            (manager, MembershipRole.COMPANY_MANAGER),
+        ):
+            organization.memberships.create(
+                user=user, role=role, status=MembershipStatus.ACTIVE
+            )
+        project = Project.objects.create(
+            organization=organization, code="RACE", name="Race"
+        )
+        issue = _create_quality_issue_domain(
+            organization=organization,
+            actor=owner,
+            project=project,
+            issue_number="RACE-1",
+            identified_at=timezone.now() - timedelta(minutes=1),
+            issue_type=QualityIssueType.DEFECT,
+            severity=QualityIssueSeverity.MAJOR,
+            description="Race",
+        )
+        from apps.quality.workflow import start_quality_workflow
+    
+&gt;       start_quality_workflow(organization=organization, issue=issue, actor=owner)
+
+apps\quality\test_workflow.py:349: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:509: in start_quality_workflow
+    ensure_quality_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\quality\workflow.py:382: in ensure_quality_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: quality.quality_issue_lifecycle&gt;, 'code': 'quality_issue_legacy_compatibility', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.safety.test_workflow.SafetyWorkflowConcurrencyTests" name="test_competing_reviews_commit_once" time="7.835"><failure message="apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.">self = &lt;apps.safety.test_workflow.SafetyWorkflowConcurrencyTests testMethod=test_competing_reviews_commit_once&gt;
+
+    def test_competing_reviews_commit_once(self) -&gt; None:
+        owner = User.objects.create_user(username="safety-race-owner")
+        manager = User.objects.create_user(username="safety-race-manager")
+        organization = Organization.objects.create(
+            name="Safety Race", slug="safety-race"
+        )
+        OrganizationSettings.objects.create(organization=organization)
+        organization.memberships.create(
+            user=owner,
+            role=MembershipRole.COMPANY_OWNER,
+            status=MembershipStatus.ACTIVE,
+        )
+        organization.memberships.create(
+            user=manager,
+            role=MembershipRole.COMPANY_MANAGER,
+            status=MembershipStatus.ACTIVE,
+        )
+        project = Project.objects.create(
+            organization=organization, code="RACE", name="Race"
+        )
+&gt;       incident = create_safety_incident(
+            organization=organization,
+            actor=owner,
+            project=project,
+            incident_number="RACE-1",
+            occurred_at=timezone.now() - timedelta(minutes=1),
+            incident_type=SafetyIncidentType.NEAR_MISS,
+            severity=SafetyIncidentSeverity.HIGH,
+            description="Race",
+        )
+
+apps\safety\test_workflow.py:508: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\services.py:534: in create_safety_incident
+    start_safety_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:487: in start_safety_workflow
+    ensure_safety_compatibility_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\safety\workflow.py:360: in ensure_safety_compatibility_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = ()
+kwargs = {'workflow_type': &lt;WorkflowType: safety.safety_incident_lifecycle&gt;, 'code': 'safety_incident_legacy_compatibility', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="apps.workflows.test_runtime.WorkflowRuntimeConcurrencyTests" name="test_concurrent_claim_and_decision_have_one_winner" time="8.883" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_daily_report_submit_and_approve_each_have_one_winner" time="7.648" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_estimate_approval_has_one_winner" time="7.842" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_expense_void_has_one_winner" time="7.701" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_payment_void_has_one_winner" time="6.443" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_phase_transition_has_one_winner" time="8.424" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_stock_issues_cannot_overdraw_warehouse" time="8.622" /></testsuite></testsuites>

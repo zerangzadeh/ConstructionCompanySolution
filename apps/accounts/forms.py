@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import (
     AuthenticationForm,
     PasswordChangeForm,
+    PasswordResetForm,
     SetPasswordForm,
 )
 
@@ -32,6 +33,7 @@ class UserLoginForm(AuthenticationForm):
                 "class": INPUT_CLASSES,
                 "autocomplete": "username",
                 "placeholder": "نام کاربری خود را وارد کنید",
+                "aria-describedby": "id_username-errors",
             }
         ),
     )
@@ -42,12 +44,49 @@ class UserLoginForm(AuthenticationForm):
                 "class": INPUT_CLASSES,
                 "autocomplete": "current-password",
                 "placeholder": "گذرواژه خود را وارد کنید",
+                "aria-describedby": "id_password-errors",
             }
         ),
     )
 
     def clean_username(self) -> str:
         return canonicalize_lower_identifier(self.cleaned_data["username"])
+
+
+class PublicPasswordResetRequestForm(PasswordResetForm):
+    """Issue recovery email only for one unambiguous active account."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["email"].label = "ایمیل سازمانی"
+        self.fields["email"].widget.attrs.update(
+            {
+                "class": INPUT_CLASSES,
+                "autocomplete": "email",
+                "dir": "ltr",
+                "inputmode": "email",
+                "placeholder": "email@example.com",
+            }
+        )
+
+    def get_users(self, email: str):  # type: ignore[override]
+        users = [
+            user
+            for user in User.objects.filter(email__iexact=email, is_active=True)
+            if user.has_usable_password()
+        ]
+        return iter(users if len(users) == 1 else [])
+
+
+class PublicPasswordResetSetForm(SetPasswordForm):
+    """Set a permanent password after a verified public recovery link."""
+
+    def save(self, commit: bool = True) -> User:
+        user = super().save(commit=False)
+        user.must_change_password = False
+        if commit:
+            user.save(update_fields=["password", "must_change_password", "updated_at"])
+        return user
 
 
 class PersonalSettingsForm(forms.ModelForm):

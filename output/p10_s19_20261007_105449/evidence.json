@@ -1,0 +1,64 @@
+{
+  "candidate_commit": "0db3ac9a9fa70e8a857ef0867d532be5206a14c4",
+  "candidate_id": "P10-RC1-20261007-E0E078C9",
+  "candidate_runtime_diff_clean": true,
+  "clean_migration_within_window": true,
+  "clean_schema_state_hash": "00a2d01680be572d8f502f1c189948de9f9cc5328818c01b7026e9d206a6fe49",
+  "clean_schema_table_count": 450,
+  "cleanup": {
+    "completed_at": "2026-10-07T11:19:49.467822+00:00",
+    "started_at": "2026-10-07T11:19:49.080989+00:00",
+    "success": true
+  },
+  "completed_at": "2026-10-07T11:19:49.080989+00:00",
+  "configured_database_touched": false,
+  "deliberate_atomic_failure_left_no_state": true,
+  "error": "No module named 'config'",
+  "error_type": "ModuleNotFoundError",
+  "lock_sha256": "ec2f92a67b0f64ab2045364b6ed9fcef9a17aab5f74d18f8080ee74388525e12",
+  "migration_window_target_minutes": 30,
+  "production_resource_used": false,
+  "reapply_schema_state_hash": "00a2d01680be572d8f502f1c189948de9f9cc5328818c01b7026e9d206a6fe49",
+  "restore_database": "p10_s19_restore_20261007_105449_e0e078c9",
+  "result": "FAIL",
+  "rollback_reapply_schema_match": true,
+  "rollback_reporting_permission_count": 45,
+  "rollback_reporting_table_count": 0,
+  "rpo_target_minutes": 15,
+  "rto_target_minutes": 60,
+  "runner_count": 1,
+  "source_database": "p10_s19_src_20261007_105449_e0e078c9",
+  "started_at": "2026-10-07T10:54:49.199939+00:00",
+  "steps": [
+    {
+      "duration_seconds": 4.073,
+      "label": "01_migration_plan",
+      "log_sha256": "997912e166f311171b551d44ef0f3707a59ca1b2200cd6813260ae210fd56d89",
+      "returncode": 0
+    },
+    {
+      "duration_seconds": 1287.307,
+      "label": "02_clean_apply",
+      "log_sha256": "3ebaaaf9e7055f7ca56d94529870a5ffed89492e9db11525cd7ceafaf3a1c5da",
+      "returncode": 0
+    },
+    {
+      "duration_seconds": 131.453,
+      "label": "03_rollback_reporting",
+      "log_sha256": "0538220c63db2fa81550b31aa6172c1009e9e9e716dcacf161ba2df3f8e006a9",
+      "returncode": 0
+    },
+    {
+      "duration_seconds": 9.083,
+      "label": "04_rollback_organizations",
+      "log_sha256": "cc6a7ed2a7591df53ad1fbdd4963ad89e28cc91fb448eaccbd65d11ce54f23f1",
+      "returncode": 0
+    },
+    {
+      "duration_seconds": 63.8,
+      "label": "05_exact_reapply",
+      "log_sha256": "a575d58aa1a47aebcfbd902f9d0bd47bb48397aa4f66f3f23ab9305df3f391d1",
+      "returncode": 0
+    }
+  ]
+}

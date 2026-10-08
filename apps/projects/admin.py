@@ -1,7 +1,42 @@
 from django.contrib import admin
 from django.http import HttpRequest
 
-from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite, WBSNode
+from apps.projects.models import (
+    Activity,
+    Project,
+    ProjectPhase,
+    ProjectSite,
+    ProjectSiteDocumentLink,
+    WBSNode,
+)
+
+
+@admin.register(ProjectSiteDocumentLink)
+class ProjectSiteDocumentLinkAdmin(admin.ModelAdmin):
+    list_display = ("document", "project_site", "organization", "created_at")
+    list_filter = ("organization",)
+    readonly_fields = (
+        "id",
+        "organization",
+        "document",
+        "project_site",
+        "created_by",
+        "legacy_link_id",
+        "created_at",
+    )
+
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: ProjectSiteDocumentLink | None = None
+    ) -> bool:
+        return False
+
+    def has_delete_permission(
+        self, request: HttpRequest, obj: ProjectSiteDocumentLink | None = None
+    ) -> bool:
+        return False
 
 
 @admin.register(Project)

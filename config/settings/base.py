@@ -110,6 +110,13 @@ def _positive_int_env(name: str, default: int) -> int:
     return value
 
 
+def _env_bool(name: str, default: bool) -> bool:
+    raw_value = os.getenv(name)
+    if raw_value is None:
+        return default
+    return raw_value.lower() in {"1", "true", "yes", "on"}
+
+
 def _database_configuration() -> dict:
     options = {
         "sslmode": os.getenv("DB_SSLMODE", "prefer").strip() or "prefer",
@@ -133,6 +140,30 @@ def _database_configuration() -> dict:
 DATABASES: dict = {
     "default": _database_configuration(),
 }
+
+CACHES = {
+    "default": {
+        "BACKEND": os.getenv(
+            "DJANGO_CACHE_BACKEND", "django.core.cache.backends.locmem.LocMemCache"
+        ),
+        "LOCATION": os.getenv("DJANGO_CACHE_LOCATION", "bonira-default-cache"),
+    }
+}
+
+EMAIL_BACKEND = os.getenv(
+    "DJANGO_EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend"
+)
+EMAIL_HOST = os.getenv("DJANGO_EMAIL_HOST", "")
+EMAIL_PORT = _positive_int_env("DJANGO_EMAIL_PORT", 587)
+EMAIL_HOST_USER = os.getenv("DJANGO_EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("DJANGO_EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = _env_bool("DJANGO_EMAIL_USE_TLS", False)
+EMAIL_TIMEOUT = _positive_int_env("DJANGO_EMAIL_TIMEOUT", 10)
+DEFAULT_FROM_EMAIL = os.getenv("DJANGO_DEFAULT_FROM_EMAIL", "noreply@localhost")
+PASSWORD_RESET_TIMEOUT = _positive_int_env("DJANGO_PASSWORD_RESET_TIMEOUT", 3600)
+PASSWORD_RESET_THROTTLE_SECONDS = _positive_int_env(
+    "DJANGO_PASSWORD_RESET_THROTTLE_SECONDS", 900
+)
 
 LANGUAGE_CODE = "fa"
 LANGUAGES = [("fa", "فارسی")]

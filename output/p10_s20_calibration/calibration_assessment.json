@@ -1,0 +1,98 @@
+{
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A",
+  "environment_id": "P10-S20-ENV1-LOCAL-20261007-A",
+  "recorded_at": "2026-10-07T21:47:16+03:30",
+  "classification": "short non-certification performance calibration",
+  "duration_seconds": 84.701,
+  "concurrency": {
+    "closed_loop_virtual_users_reached": 50,
+    "peak_in_flight_requests": 50
+  },
+  "counts": {
+    "journeys": 500,
+    "requests": 1795,
+    "http_statuses": {
+      "200": 105,
+      "302": 1240,
+      "403": 323,
+      "404": 73,
+      "405": 10,
+      "500": 31,
+      "transport_error": 13
+    }
+  },
+  "journey_mix_reconciliation": {
+    "status": "PASS",
+    "method": "five deterministic copies of the frozen 100-point journey distribution",
+    "journeys_reconciled": 27,
+    "maximum_delta_percentage_points": 0.0
+  },
+  "latency_ms_by_major_class": {
+    "read": {"p50": 285.013, "p95": 1271.067, "p99": 2224.532},
+    "mutation": {"p50": 276.783, "p95": 931.141, "p99": 2074.43},
+    "mixed": {"p50": 289.018, "p95": 710.428, "p99": 953.165},
+    "report": {"p50": 302.622, "p95": 1349.614, "p99": 2499.905},
+    "bounded": {"p50": 290.249, "p95": 1865.726, "p99": 3395.567}
+  },
+  "errors": {
+    "all_http_4xx_5xx_and_transport_count": 450,
+    "all_http_4xx_5xx_and_transport_rate": 0.250696,
+    "unexpected_5xx_and_transport_count": 44,
+    "unexpected_5xx_and_transport_rate": 0.024513,
+    "http_500_count": 31,
+    "connection_refused_count": 13,
+    "exact_http_500s": {
+      "GET documents:list": 10,
+      "GET inventory:custody_workbench": 2,
+      "GET reporting:drillthrough": 9,
+      "GET reporting:reconciliation_detail": 4,
+      "GET reporting:project_closeout_detail": 3,
+      "POST reporting:project_closeout_assess": 3
+    },
+    "exact_http_4xx_and_transport_map": "calibration_report.json -> errors.exact"
+  },
+  "postgresql_connections": {
+    "samples": 329,
+    "minimum": 13,
+    "peak": 13,
+    "peak_utilization_of_max_connections": 0.13
+  },
+  "available_resource_metrics": {
+    "application_cpu_percent_host": {"mean": 10.493, "peak": 20.582},
+    "application_cpu_percent_one_core": {"mean": 83.947, "peak": 164.656},
+    "application_working_set_bytes": {"mean": 143242498.334, "peak": 147337216},
+    "runner_cpu_percent_host": {"mean": 0.605, "peak": 4.592},
+    "runner_working_set_bytes": {"mean": 106699293.568, "peak": 106782720},
+    "unavailable": [
+      "database CPU",
+      "PostgreSQL wait events",
+      "server correlation IDs",
+      "independent host or production-tier telemetry"
+    ]
+  },
+  "harness_execution_defects": [],
+  "harness_and_fixture_limitations": [
+    "The environment had 4 active organizations and 25 active memberships, so 50 virtual users reused identities instead of representing the frozen 10-Tenant/250-user population.",
+    "Frozen placeholder UUIDs and absent request payload/data bindings produced redirects, permission denials, not-found responses and method denials; the latency sample is therefore a script/runtime calibration, not representative business-throughput evidence.",
+    "Redirect destinations were not retained in the raw report, so the 1,240 HTTP 302 responses cannot be treated as completed journey steps.",
+    "The runner, application, PostgreSQL and DMS shared the same workstation."
+  ],
+  "environment_defects": [
+    "The configured database is behind the frozen candidate: reporting migrations 0001-0006, inventory 0002-0006 and daily_reports 0005-0006 are unapplied.",
+    "All 31 HTTP 500 responses diagnosed as PostgreSQL ProgrammingError for relations absent because those migrations are unapplied.",
+    "Thirteen requests were refused while the Django development server remained running, exposing an immediate direct-runserver/shared-host connectivity or accept-capacity bottleneck."
+  ],
+  "runtime_code_defects_established": [],
+  "full_s20_environment_qualified_performance_run_may_safely_start": false,
+  "start_blockers": [
+    "Bring the configured calibration database to the frozen candidate migration heads and verify schema parity.",
+    "Provide executable record-ID and request-payload bindings plus identities/permissions sufficient to exercise each frozen journey rather than redirects and expected denials.",
+    "Diagnose or eliminate the connection-refusal behavior and repeat the short calibration before any certification-duration run."
+  ],
+  "capacity_classification": "environment-qualified / production capacity certification still gated",
+  "overall_status": "P10-S19–S21 = BLOCKED",
+  "certification_evidence_for_production_capacity": false,
+  "full_peak_surge_or_endurance_run_executed": false,
+  "raw_report_sha256": "35d00ec1eeb602d7eceb171990e5c53442c6cada2b7cb569029ce7c300f0067d",
+  "harness_sha256": "393b5c470f9156024c03a687180ae087598e95a70ffac77de67c371623771e2e"
+}

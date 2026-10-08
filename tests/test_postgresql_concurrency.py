@@ -5,7 +5,7 @@ from decimal import Decimal
 from queue import Queue
 from threading import Barrier
 
-from django.db import close_old_connections, connection, connections
+from django.db import close_old_connections, connection
 from django.test import TransactionTestCase
 from django.utils import timezone
 
@@ -44,15 +44,6 @@ from apps.projects.services import transition_project_phase_status
 
 class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
     serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
 
     def setUp(self) -> None:
         if connection.vendor != "postgresql":

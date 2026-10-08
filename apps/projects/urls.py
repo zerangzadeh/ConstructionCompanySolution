@@ -9,6 +9,12 @@ urlpatterns = [
     path("sites/", views.site_list, name="all_site_list"),
     path("create/", views.project_create, name="create"),
     path("<uuid:project_id>/sites/", views.project_site_list, name="site_list"),
+    path("<uuid:project_id>/gallery/", views.project_gallery, name="gallery"),
+    path(
+        "<uuid:project_id>/gallery/add/",
+        views.project_photo_add,
+        name="photo_add",
+    ),
     path("<uuid:project_id>/controls/", views.project_controls, name="controls"),
     path(
         "<uuid:project_id>/controls/comparison/",

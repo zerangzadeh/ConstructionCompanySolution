@@ -83,7 +83,7 @@ from apps.organizations.models import (
 )
 from apps.partner_qualification.models import PartnerQualification
 from apps.payments.models import Payment
-from apps.projects.models import Project
+from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import (
     EmployeeQualification,
     EmployeeTrainingRecord,
@@ -112,6 +112,7 @@ FILE_SIGNATURES = {
 TARGET_MODELS = {
     "material": Material,
     "project": Project,
+    "project_site": ProjectSite,
     "contract": Contract,
     "estimate": Estimate,
     "expense": Expense,
@@ -133,6 +134,7 @@ TARGET_MODELS = {
 TARGET_VIEW_PERMISSIONS = {
     "material": BusinessPermissionCode.MATERIALS_VIEW,
     "project": BusinessPermissionCode.PROJECTS_VIEW,
+    "project_site": BusinessPermissionCode.PROJECT_SITES_VIEW,
     "contract": BusinessPermissionCode.CONTRACTS_VIEW,
     "estimate": BusinessPermissionCode.ESTIMATES_VIEW,
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
@@ -205,7 +207,7 @@ def _validate_target_access(
     if getattr(target, "organization_id", None) != organization.pk:
         raise PermissionDenied("موجودیت مرتبط متعلق به این سازمان نیست.")
     project = target if field_name == "project" else getattr(target, "project", None)
-    site = getattr(target, "site", None)
+    site = target if field_name == "project_site" else getattr(target, "site", None)
     if field_name == "test_result":
         project = target.test.project
         site = target.test.site
@@ -346,6 +348,7 @@ def create_document(
     category: DocumentCategory | None = None,
     confidentiality: str = DocumentConfidentiality.INTERNAL,
     access_expires_at: datetime | None = None,
+    audit_metadata: dict[str, object] | None = None,
 ) -> Document:
     """Create a document, its first immutable version, and its initial link."""
 
@@ -432,6 +435,7 @@ def create_document(
         organization=organization,
         actor=actor,
         metadata={
+            **(audit_metadata or {}),
             "version_id": str(version.pk),
             "version_number": version.version_number,
             "target_type": target_field,

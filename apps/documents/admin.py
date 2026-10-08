@@ -18,6 +18,7 @@ from apps.documents.models import (
     DocumentRetentionPolicyVersion,
     DocumentSignatureEvidence,
     DocumentVersion,
+    PhotoMetadata,
 )
 
 
@@ -177,6 +178,7 @@ for model in (
     DocumentExportManifest,
     DocumentKeyCustodyAttestation,
     DocumentRecoveryManifest,
+    PhotoMetadata,
 ):
     admin.site.register(
         model,

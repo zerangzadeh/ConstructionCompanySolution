@@ -1,0 +1,33 @@
+{
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A",
+  "placeholder_uuid": "00000000-0000-4000-8000-000000000001",
+  "journeys": [
+    {"id":"J01A","share":4,"class":"read","routes":[["GET","organizations:select",{}],["POST","organizations:switch",{}],["GET","projects:list",{}]]},
+    {"id":"J01B","share":7,"class":"read","routes":[["GET","projects:detail",{"project_id":"$UUID"}],["GET","workflows:workbench",{}],["GET","support:notifications",{}]]},
+    {"id":"J01C","share":4,"class":"read","routes":[["GET","support:workbench",{}]]},
+    {"id":"J02A","share":8,"class":"read","routes":[["GET","projects:list",{}],["GET","projects:detail",{"project_id":"$UUID"}],["GET","projects:controls",{"project_id":"$UUID"}],["GET","projects:controls_comparison",{"project_id":"$UUID"}]]},
+    {"id":"J02B","share":5,"class":"read","routes":[["GET","procurement:request_list",{}],["GET","procurement:request_detail",{"request_id":"$UUID"}],["GET","procurement:order_list",{}],["GET","procurement:order_detail",{"order_id":"$UUID"}],["GET","procurement:receipt_list",{}],["GET","procurement:receipt_detail",{"receipt_id":"$UUID"}]]},
+    {"id":"J02C","share":4,"class":"read","routes":[["GET","inventory:warehouse_list",{}],["GET","inventory:warehouse_detail",{"warehouse_id":"$UUID"}],["GET","inventory:transaction_list",{}],["GET","inventory:transaction_detail",{"transaction_id":"$UUID"}],["GET","inventory:custody_workbench",{}]]},
+    {"id":"J02D","share":4,"class":"read","routes":[["GET","daily_reports:field_observation_list",{}],["GET","daily_reports:field_observation_detail",{"observation_id":"$UUID"}],["GET","daily_reports:list",{}],["GET","daily_reports:detail",{"report_id":"$UUID"}],["GET","compliance:workbench",{}],["GET","compliance:detail",{"kind":"inspection","record_id":"$UUID"}]]},
+    {"id":"J02E","share":4,"class":"read","routes":[["GET","workforce:employee_list",{}],["GET","materials:material_list",{}],["GET","documents:list",{}],["GET","documents:detail",{"document_id":"$UUID"}]]},
+    {"id":"J03A","share":4,"class":"mutation","routes":[["POST","procurement:request_create",{}],["POST","procurement:request_item_add",{"request_id":"$UUID"}],["POST","procurement:request_submit",{"request_id":"$UUID"}]]},
+    {"id":"J03B","share":4,"class":"mutation","routes":[["POST","daily_reports:field_observation_create",{}],["POST","daily_reports:field_observation_save",{"observation_id":"$UUID"}],["POST","daily_reports:field_observation_evidence_add",{"observation_id":"$UUID"}],["POST","compliance:create",{"kind":"inspection"}],["POST","compliance:evidence",{"kind":"inspection","record_id":"$UUID"}]]},
+    {"id":"J03C","share":3,"class":"mutation","routes":[["POST","procurement:receipt_create",{}],["POST","procurement:receipt_item_add",{"receipt_id":"$UUID"}],["POST","procurement:receipt_post",{"receipt_id":"$UUID"}]]},
+    {"id":"J03D","share":4,"class":"mutation","routes":[["POST","documents:link-add",{"document_id":"$UUID"}],["POST","documents:version-add",{"document_id":"$UUID"}],["POST","expenses:draft_create",{}],["POST","expenses:allocate",{"expense_id":"$UUID"}]]},
+    {"id":"J04A","share":6,"class":"mutation","routes":[["GET","workflows:workbench",{}],["POST","workflows:work_item_claim",{"work_item_id":"$UUID"}],["POST","workflows:work_item_action",{"work_item_id":"$UUID"}]]},
+    {"id":"J04B","share":3,"class":"mutation","routes":[["GET","procurement:request_detail",{"request_id":"$UUID"}],["POST","procurement:request_approve",{"request_id":"$UUID"}]]},
+    {"id":"J04C","share":3,"class":"mutation","routes":[["GET","billing:progress_detail",{"record_id":"$UUID"}],["POST","billing:progress_verify",{"record_id":"$UUID"}],["GET","billing:claim_detail",{"claim_id":"$UUID"}]]},
+    {"id":"J04D","share":3,"class":"mutation","routes":[["POST","expenses:approve",{"expense_id":"$UUID"}],["POST","expenses:return",{"expense_id":"$UUID"}],["POST","compliance:transition",{"kind":"inspection","record_id":"$UUID"}]]},
+    {"id":"J05A","share":3,"class":"read","routes":[["GET","billing:baseline_list",{}],["GET","billing:baseline_detail",{"baseline_id":"$UUID"}],["GET","billing:claim_list",{}],["GET","billing:claim_detail",{"claim_id":"$UUID"}]]},
+    {"id":"J05B","share":3,"class":"mixed","routes":[["GET","accounting:dashboard",{}],["GET","accounting:journal_list",{}],["GET","accounting:journal_detail",{"journal_id":"$UUID"}],["POST","accounting:journal_create",{}],["POST","accounting:journal_submit",{"journal_id":"$UUID"}]]},
+    {"id":"J05C","share":2,"class":"read","routes":[["GET","treasury:workbench",{}],["GET","treasury:statement_workbench",{}],["GET","subledgers:workbench",{}],["GET","subledgers:aging",{}]]},
+    {"id":"J05D","share":2,"class":"read","routes":[["GET","payroll:workbench",{}],["GET","payroll:run_detail",{"run_id":"$UUID"}],["GET","payroll:payslip_detail",{"payslip_id":"$UUID"}]]},
+    {"id":"J06A","share":4,"class":"report","routes":[["GET","reporting:dashboard",{}],["POST","reporting:refresh",{"metric_code":"project-cost-variance"}],["GET","reporting:drillthrough",{"result_id":"$UUID"}]]},
+    {"id":"J06B","share":3,"class":"report","routes":[["GET","reporting:reconciliation_workbench",{}],["POST","reporting:reconciliation_execute",{"pair_code":"estimate-budget"}],["GET","reporting:reconciliation_detail",{"run_id":"$UUID"}]]},
+    {"id":"J06C","share":3,"class":"report","routes":[["GET","reporting:project_closeout_workbench",{}],["POST","reporting:project_closeout_create",{}],["POST","reporting:project_closeout_assess",{"case_id":"$UUID"}],["GET","reporting:project_closeout_detail",{"case_id":"$UUID"}]]},
+    {"id":"J07A","share":3,"class":"bounded","routes":[["GET","documents:list",{}],["GET","documents:detail",{"document_id":"$UUID"}],["GET","documents:version-download",{"document_id":"$UUID","version_id":"$UUID"}]]},
+    {"id":"J07B","share":2,"class":"bounded","routes":[["POST","documents:upload",{}],["POST","documents:version-add",{"document_id":"$UUID"}]]},
+    {"id":"J08A","share":3,"class":"bounded","routes":[["GET","reporting:export",{}],["GET","projects:controls_export",{"project_id":"$UUID"}],["GET","projects:cost_reconciliation_export",{"project_id":"$UUID"}],["GET","reporting:project_closeout_export",{"case_id":"$UUID"}]]},
+    {"id":"J08B","share":2,"class":"bounded","service":"apps.treasury.statement_services.preview_statement_import","routes":[["GET","treasury:statement_workbench",{}]]}
+  ]
+}

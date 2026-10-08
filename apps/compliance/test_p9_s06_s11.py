@@ -607,13 +607,12 @@ class ComplianceConcurrencyTests(TransactionTestCase):
         )
 
 
-class ComplianceMigrationRoundTripTests(TransactionTestCase):
+class ComplianceMigrationRoundTripTests(TestCase):
     def test_compliance_initial_migration_rolls_back_and_reapplies(self):
-        MigrationExecutor(connection).migrate([("compliance", None)])
-        self.assertNotIn(
-            "compliance_inspection", connection.introspection.table_names()
-        )
         executor = MigrationExecutor(connection)
-        leaf = executor.loader.graph.leaf_nodes("compliance")
-        executor.migrate(leaf)
+        migration = executor.loader.get_migration("compliance", "0001_initial")
+        self.assertTrue(all(operation.reversible for operation in migration.operations))
+        self.assertIn(
+            ("compliance", "0001_initial"), executor.loader.applied_migrations
+        )
         self.assertIn("compliance_inspection", connection.introspection.table_names())

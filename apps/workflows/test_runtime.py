@@ -11,7 +11,6 @@ from django.db import (
     DatabaseError,
     close_old_connections,
     connection,
-    connections,
     models,
     transaction,
 )
@@ -1183,17 +1182,6 @@ class WorkflowRuntimeTests(RuntimeTestBase, TestCase):
 class WorkflowRuntimeConcurrencyTests(RuntimeTestBase, TransactionTestCase):
     reset_sequences = True
     serialized_rollback = True
-
-    @classmethod
-    def tearDownClass(cls) -> None:
-        super().tearDownClass()
-        # TransactionTestCase flushes migration-seeded role/permission rows. Restore
-        # the serialized post-migration baseline for subsequently collected tests.
-        for alias in cls._databases_names(include_mirrors=False):
-            db_connection = connections[alias]
-            serialized = getattr(db_connection, "_test_serialized_contents", None)
-            if serialized:
-                db_connection.creation.deserialize_db_from_string(serialized)
 
     def _run_in_thread(self, callback):
         close_old_connections()

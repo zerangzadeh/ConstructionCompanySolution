@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="24" time="1181.005" timestamp="2026-10-07T20:13:03.907975+03:30" hostname="Zerangzadeh"><testcase classname="apps.billing.test_commercial_controls.RetentionReleaseConcurrencyTests" name="test_concurrent_approval_cannot_over_release" time="931.679" /><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests" name="test_concurrent_partial_settlements_cannot_exceed_claim_outstanding" time="13.649" /><testcase classname="apps.billing.tests.ProgressClaimApprovalWorkflowConcurrencyTests" name="test_concurrent_submission_is_deduplicated_to_one_instance_and_audit" time="14.425" /><testcase classname="apps.daily_reports.test_workflow.DailyReportConcurrencyTests" name="test_competing_approvals_commit_only_once" time="8.775" /><testcase classname="apps.equipment.test_workflow.MaintenanceWorkflowConcurrencyTests" name="test_competing_start_actions_commit_once" time="8.401" /><testcase classname="apps.estimates.test_workflow.EstimateWorkflowConcurrencyTests" name="test_competing_approvals_commit_once" time="10.179" /><testcase classname="apps.inventory.test_p8_s05_s11.InventoryCustodyConcurrencyTests" name="test_competing_count_post_creates_one_adjustment" time="9.161" /><testcase classname="apps.inventory.test_p8_s05_s11.InventoryCustodyConcurrencyTests" name="test_competing_transfer_dispatch_posts_once" time="8.571" /><testcase classname="apps.inventory.test_p8_s05_s11.P8MigrationRoundTripTests" name="test_inventory_expansion_rolls_back_and_reapplies" time="12.325" /><testcase classname="apps.inventory.test_workflow.StockTransactionWorkflowConcurrencyTests" name="test_competing_assigned_posting_commits_once" time="12.362" /><testcase classname="apps.payroll.test_p7_s23_s28_statutory_payroll.StatutoryExportConcurrencyTests" name="test_concurrent_same_idempotency_key_records_one_export" time="10.746" /><testcase classname="apps.projects.test_p4_s35_s37.ProjectCostConcurrencyTests" name="test_s36_concurrent_idempotency_and_commitment_cap_are_serialized" time="13.019" /><testcase classname="apps.quality.test_workflow.QualityWorkflowConcurrencyTests" name="test_competing_reviews_commit_once" time="9.508" /><testcase classname="apps.safety.test_workflow.SafetyWorkflowConcurrencyTests" name="test_competing_reviews_commit_once" time="16.766" /><testcase classname="apps.support.test_p9_s16_s20.SupportP9ConcurrencyTests" name="test_concurrent_transition_has_one_winner_and_one_stale_rejection" time="8.931" /><testcase classname="apps.workflows.test_runtime.WorkflowRuntimeConcurrencyTests" name="test_concurrent_claim_and_decision_have_one_winner" time="11.563" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_daily_report_submit_and_approve_each_have_one_winner" time="9.355" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_estimate_approval_has_one_winner" time="8.894" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_expense_void_has_one_winner" time="9.135" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_payment_void_has_one_winner" time="8.575" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_phase_transition_has_one_winner" time="8.111" /><testcase classname="tests.test_postgresql_concurrency.PostgreSQLSelectForUpdateConcurrencyTests" name="test_concurrent_stock_issues_cannot_overdraw_warehouse" time="8.115" /><testcase classname="tests.test_seed_account_data" name="test_seed_account_data_is_incremental_and_tenant_safe" time="9.543"><failure message="apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.">settings = &lt;pytest_django.fixtures.Settings object at 0x000001BBA7133CD0&gt;
+tmp_path = WindowsPath('C:/Users/azera/AppData/Local/Temp/pytest-of-Zerangzadeh/pytest-2/test_seed_account_data_is_incr0')
+
+    @pytest.mark.django_db(transaction=True)
+    def test_seed_account_data_is_incremental_and_tenant_safe(
+        settings: Any, tmp_path: Path
+    ) -&gt; None:
+        settings.MEDIA_ROOT = tmp_path
+        settings.DEBUG = True
+&gt;       call_command("seed_demo_data", stdout=StringIO())
+
+tests\test_seed_account_data.py:31: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:449: in handle
+    self._seed_organization(organization_index, organization_name, admin)
+apps\accounts\management\commands\seed_demo_data.py:910: in _seed_organization
+    expense_categories = self._seed_expense_categories(organization, owner)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:1257: in _seed_expense_categories
+    category = self._existing_or_create(
+apps\accounts\management\commands\seed_demo_data.py:465: in _existing_or_create
+    return existing if existing is not None else creator()
+                                                 ^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:1260: in &lt;lambda&gt;
+    lambda code=code, name=name: create_expense_category(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\expenses\services.py:882: in create_expense_category
+    primary_group = primary_group or PlatformExpenseGroup.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = (), kwargs = {'code': LegacyExpenseCategory.OTHER}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase><testcase classname="tests.test_seed_demo_data" name="test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent" time="17.691"><failure message="apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.">settings = &lt;pytest_django.fixtures.Settings object at 0x000001BBA9C42590&gt;
+tmp_path = WindowsPath('C:/Users/azera/AppData/Local/Temp/pytest-of-Zerangzadeh/pytest-2/test_seed_demo_data_creates_fo0')
+
+    @pytest.mark.django_db(transaction=True)
+    def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
+        settings: Any, tmp_path: Path
+    ) -&gt; None:
+        settings.MEDIA_ROOT = tmp_path
+        settings.DEBUG = True
+    
+&gt;       call_command("seed_demo_data", stdout=StringIO())
+
+tests\test_seed_demo_data.py:61: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+.venv\Lib\site-packages\django\core\management\__init__.py:194: in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\core\management\base.py:464: in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:449: in handle
+    self._seed_organization(organization_index, organization_name, admin)
+apps\accounts\management\commands\seed_demo_data.py:910: in _seed_organization
+    expense_categories = self._seed_expense_categories(organization, owner)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:1257: in _seed_expense_categories
+    category = self._existing_or_create(
+apps\accounts\management\commands\seed_demo_data.py:465: in _existing_or_create
+    return existing if existing is not None else creator()
+                                                 ^^^^^^^^^
+apps\accounts\management\commands\seed_demo_data.py:1260: in &lt;lambda&gt;
+    lambda code=code, name=name: create_expense_category(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\expenses\services.py:882: in create_expense_category
+    primary_group = primary_group or PlatformExpenseGroup.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;QuerySet []&gt;, args = (), kwargs = {'code': LegacyExpenseCategory.OTHER}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+&gt;           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.expenses.models.PlatformExpenseGroup.DoesNotExist: PlatformExpenseGroup matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist</failure></testcase></testsuite></testsuites>

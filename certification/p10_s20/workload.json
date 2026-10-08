@@ -1,0 +1,41 @@
+{
+  "workload_profile_id": "P10-S20-WP1-20261007-E0E078C9-A",
+  "candidate_id": "P10-RC1-20261007-E0E078C9",
+  "runtime_commit": "0db3ac9a9fa70e8a857ef0867d532be5206a14c4",
+  "users": {"baseline": 50, "peak": 100, "surge": 130},
+  "tenants": 10,
+  "active_users_per_tenant": 25,
+  "projects_per_tenant": 10,
+  "durations_seconds": {"peak": 1800, "surge": 900, "endurance": 7200},
+  "journey_family_percent": {
+    "tenant_project_workbench": 15,
+    "operational_reads": 25,
+    "construction_mutations": 15,
+    "workflow_approvals": 15,
+    "commercial_financial": 10,
+    "governed_reporting": 10,
+    "private_dms": 5,
+    "bounded_import_export": 5
+  },
+  "external_supplier_percent": 0,
+  "purpose_bound_support_percent": 1,
+  "thresholds_seconds": {
+    "reads_p95": 2,
+    "reads_p99": 4,
+    "mutations_p95": 3,
+    "mutations_p99": 6,
+    "governed_reports_p95": 10,
+    "governed_reports_p99": 20,
+    "bounded_operations_p95": 30,
+    "bounded_operations_max": 60
+  },
+  "unexpected_error_rate_max": 0.001,
+  "database_connection_utilization_max": 0.8,
+  "steady_cpu_utilization_max": 0.75,
+  "artifacts": {
+    "journeys": "journeys.json",
+    "ramp_think_time": "ramp_think_time.json",
+    "dataset_volume": "dataset_volume.json",
+    "environment": "environment.json"
+  }
+}
