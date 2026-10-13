@@ -60,3 +60,11 @@ Focused pre-change baseline: two existing authorization/project selector tests w
 - Separate final focused CEP security command covered the ten case A–F tests: 10 passed in 21.90 seconds. The combined run also covers 22 P1.1 authorization tests, 9 organization Admin tests, 63 organization service/tenant tests, 21 project service tests and 15 account Admin tests. Ruff and Django checks passed.
 - The Human-supplied final closure prompt authoritatively defines `GATE-01` as Foundation Stability, a foundation stability gate requiring IMB-0001, IMB-0002, IMB-0003, IMB-0030, IMB-0052, IMB-0055 and IMB-0069. CEP-001 contributes IMB-0001 and IMB-0002 only; both have 6/6 Acceptance Criteria PASS and canonical DoD PASS. Global GATE-01 is pending the other required IMBs and is not claimed passed.
 - Final status claim: CEP-001 **EXECUTION COMPLETE** for its bounded Development implementation and evidence. Global GATE-01 remains pending, Human Sign-off NOT EXECUTED, Production actions NOT EXECUTED, and CEP-002 NOT STARTED.
+
+## Local main application verification (2026-10-14)
+
+- Current branch: `main`; HEAD `65f349e` (`CEP-001 completed`), parent `d75a9334d8e27683159c5f756725c0540651ec43`.
+- Verified CEP-001 code, tests, required documentation, and evidence are present in HEAD. The unrelated audit-document move to `docs/architecture/history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md` is preserved.
+- Combined regression: 140 passed; includes focused CEP security tests. Ruff and Django system check passed. See EV-021 through EV-023 and their output files in `output/cep-001/`.
+- Migration impact: none. No add, commit, push, or merge command was run during this verification; added verification records are unstaged.
+- CEP-002: not started.

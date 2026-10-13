@@ -120,3 +120,9 @@ Out-of-scope changes: none by this CEP. The pre-existing audit-document move is 
 Remaining CEP-001-specific blockers: **none**. Global gate completion and Human Sign-off remain separate governance work.
 
 **Human Sign-off: NOT EXECUTED. NEXT CEP: NOT STARTED.**
+
+## Local main application and verification
+
+The accepted CEP-001 change set is present in local `main` at `65f349e` (`CEP-001 completed`), whose parent is `d75a9334d8e27683159c5f756725c0540651ec43`. The current unstaged changes are limited to this application verification record, its manifests, and refreshed regression output. The accepted change set includes the unrelated 100% audit-document rename to `docs/architecture/history/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`; it is preserved. No migration files or schema changes are present.
+
+Final validation on local main: the six-file combined regression subset passed 140/140 in 216.48 seconds, including all 10 focused security tests and 22 P1.1 authorization tests. Ruff passed and confirmed all 10 changed Python files are formatted; Django system checks reported zero issues. Logs are EV-021 through EV-023. No `git add`, `git commit`, `git push`, or `git merge` command was run during this verification. The verification evidence remains unstaged for human review.
