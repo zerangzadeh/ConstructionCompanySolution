@@ -16,7 +16,7 @@ allowed_hosts = os.getenv("DJANGO_ALLOWED_HOSTS", "")
 ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(",") if host.strip()]
 
 INSTALLED_APPS: list[str] = [
-    "django.contrib.admin",
+    "config.admin_config.TenantSafeAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",

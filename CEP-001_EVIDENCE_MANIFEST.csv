@@ -1,0 +1,21 @@
+evidence_id,evidence_type,source_or_command,result,limit
+CEP-001-EV-001,CODE DIFF,"git diff -- apps/audit/admin.py apps/organizations/admin.py apps/organizations/authorization.py apps/accounts/test_admin.py apps/organizations/tests.py apps/projects/tests.py config/settings/base.py; inspect new core/admin.py config/admin_config.py apps/organizations/test_cep001_security.py",Inspect source in CEP-001 branch,Untracked new files are not in git diff until staged by the owner
+CEP-001-EV-002,TEST CODE,apps/organizations/test_cep001_security.py,Ten focused CEP-001 security tests,Tests use disposable development PostgreSQL test database
+CEP-001-EV-003,TEST OUTPUT,output/cep-001/cep-focused-output.txt,10 passed,Focused CEP-001 scope
+CEP-001-EV-004,LINT OUTPUT,output/cep-001/lint-output.txt,Ruff check and format passed for 10 touched Python files,Changed Python files only
+CEP-001-EV-005,DJANGO CHECK,output/cep-001/django-check-output.txt,System check identified no issues,Development settings
+CEP-001-EV-006,SECURITY REMEDIATION,apps/organizations/authorization.py:membership_has_scope;scope_queryset,No implicit organization scope remains without an effective explicit same-Tenant grant,No application data or migration changed
+CEP-001-EV-007,UI TEMPLATE TEST,apps/organizations/test_cep001_security.py:test_admin_list_search_and_direct_details_enforce_scope,Rendered Admin list search and direct detail responses enforce scope,No visual layout change or screenshot claim
+CEP-001-EV-008,PERMISSION AND TENANT-ISOLATION TEST,apps/organizations/test_cep001_security.py,Allowed denied cross-tenant cross-project and sensitive-field assertions pass,Migrated-grant path plus explicit legacy Admin denial
+CEP-001-EV-009,REGRESSION TEST OUTPUT,output/cep-001/organization-regression-output.txt,63 passed after explicit-scope fixture correction,Organization service and route subset
+CEP-001-EV-010,INTERMEDIATE REGRESSION OUTPUT,output/cep-001/test-output.txt,121 passed and 18 failed before organization fixture correction,All 18 failures were no-grant expectations in old fixtures; corrected in apps/organizations/tests.py and EV-009 passed
+CEP-001-EV-011,DEVELOPMENT DATA REVIEW,"read-only Django shell count of active memberships grouped by migrated and grant state",25 active; 0 unmigrated no-grant; 17 migrated no-grant and all 17 quarantined,Development database only; no Production data inspected
+CEP-001-EV-012,INITIAL GATE SEARCH,"rg -n GATE-01 over repository and first two supplied CEP prompts",No definition in those sources at the time,Superseded by the Human-supplied final closure prompt in EV-019
+CEP-001-EV-013,FINAL COMBINED REGRESSION,output/cep-001/final-combined-regression-output.txt,140 passed in 244.82 seconds; failed skipped xfailed 0,Six-file focused authorization service and Admin subset; no full application suite
+CEP-001-EV-014,FINAL FOCUSED SECURITY,output/cep-001/final-focused-security-output.txt,10 passed in 21.90 seconds,Focused CEP-001 tests on final working tree
+CEP-001-EV-015,FINAL RUFF,output/cep-001/final-lint-output.txt,Check passed and 10 Python files formatted,Touched Python files only
+CEP-001-EV-016,FINAL DJANGO CHECK,output/cep-001/final-django-check-output.txt,System check identified no issues,Development settings
+CEP-001-EV-017,FINAL TEST COLLECTION,output/cep-001/final-collection-output.txt,140 tests collected; increase from previous 139 is one wrong-Tenant-grant test,Collection only; execution evidence is EV-013
+CEP-001-EV-018,PREVALIDATION CODE DIFF,output/cep-001/final-prevalidation-git-diff.patch,Full tracked git diff recorded at unchanged HEAD before final validation,Does not include untracked CEP source; includes unrelated pre-existing audit-document move
+CEP-001-EV-019,AUTHORITATIVE GATE DEFINITION,"Human-supplied BONIRA CEP-001 Final Closure Verification prompt of 2026-10-14",GATE-01 Foundation Stability requires seven listed IMBs; CEP-001 owns IMB-0001 and IMB-0002 only,Global gate remains pending other IMBs and is not claimed passed
+CEP-001-EV-020,FINAL TRACKED DIFF,output/cep-001/final-working-tree-git-diff.patch,Final tracked code and active-document changes recorded at unchanged HEAD,Untracked CEP files remain individually inspectable; unrelated pre-existing audit-document move also appears

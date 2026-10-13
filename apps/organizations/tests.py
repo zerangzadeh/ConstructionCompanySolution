@@ -18,9 +18,11 @@ from apps.organizations.forms import (
 )
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
+    AuthorizationScopeType,
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -70,11 +72,17 @@ class OrganizationTenantIsolationTests(TestCase):
             created_by=self.other_user,
             updated_by=self.other_user,
         )
-        OrganizationMembership.objects.create(
+        owner_membership = OrganizationMembership.objects.create(
             user=self.user,
             organization=self.organization,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=owner_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Tenant isolation fixture requires explicit owner scope",
         )
         OrganizationMembership.objects.create(
             user=self.user,
@@ -431,6 +439,12 @@ class OrganizationMembershipAccessServiceTests(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=self.owner_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Membership access fixture requires explicit owner scope",
+        )
 
     def test_legacy_membership_service_rejects_role_changes(self) -> None:
         with self.assertRaisesMessage(
@@ -501,6 +515,12 @@ class GlobalRoleAuthorizationTests(TestCase):
             user=self.user,
             role_definition=self.role,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=self.membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Custom role fixture requires explicit scope",
         )
 
     def test_permission_catalog_and_protected_roles_are_seeded(self) -> None:
@@ -865,11 +885,17 @@ class OrganizationSettingsServiceTests(TestCase):
             created_by=self.other_owner,
             updated_by=self.other_owner,
         )
-        OrganizationMembership.objects.create(
+        owner_membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=owner_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Settings fixture requires explicit owner scope",
         )
         OrganizationMembership.objects.create(
             organization=self.organization,
@@ -1232,11 +1258,17 @@ class OwnerAccountManagementTests(TestCase):
             code=MembershipRole.COMPANY_OWNER
         )
         self.member_role = OrganizationRole.objects.get(code=MembershipRole.MEMBER)
-        OrganizationMembership.objects.create(
+        owner_membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.owner,
             role_definition=self.owner_role,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=owner_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Account management fixture requires explicit owner scope",
         )
         self.member = User.objects.create_user(
             username="password-reset-member", password="original-password"

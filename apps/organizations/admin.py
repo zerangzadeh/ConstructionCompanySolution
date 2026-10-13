@@ -318,10 +318,16 @@ class OrganizationRoleAdmin(admin.ModelAdmin):
     def has_module_permission(self, request: HttpRequest) -> bool:
         return request.user.is_superuser
 
+    def get_queryset(self, request: HttpRequest):
+        # Tenant custom roles are governed through the tenant role workspace.
+        return super().get_queryset(request).filter(organization__isnull=True)
+
     def has_view_permission(
         self, request: HttpRequest, obj: OrganizationRole | None = None
     ) -> bool:
-        return request.user.is_superuser
+        return request.user.is_superuser and (
+            obj is None or obj.organization_id is None
+        )
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False

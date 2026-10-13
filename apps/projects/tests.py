@@ -10,7 +10,9 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.materials.services import create_unit_of_measure
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationStatus,
@@ -60,10 +62,16 @@ class ProjectServiceTests(TestCase):
             created_by=self.other_user,
             updated_by=self.other_user,
         )
-        self.organization.memberships.create(
+        owner_membership = self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=owner_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Project service fixture requires explicit owner scope",
         )
 
     def test_create_project_scopes_project_and_records_audit(self) -> None:
@@ -108,6 +116,12 @@ class ProjectServiceTests(TestCase):
             user=self.owner,
             role=MembershipRole.OPERATIONS_MANAGER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.other_organization,
+            membership=other_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Cross-tenant project fixture requires explicit scope",
         )
         self.assertIsNotNone(other_membership)
         project = create_project(
@@ -637,16 +651,26 @@ class ProjectControlsServiceTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="Other Controls Co", slug="other-controls-co"
         )
-        self.organization.memberships.create(
+        owner_membership = self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
-        self.other_organization.memberships.create(
+        other_owner_membership = self.other_organization.memberships.create(
             user=self.other_owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        for organization, membership in (
+            (self.organization, owner_membership),
+            (self.other_organization, other_owner_membership),
+        ):
+            MembershipScopeGrant.objects.create(
+                organization=organization,
+                membership=membership,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Project controls fixture requires explicit owner scope",
+            )
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,

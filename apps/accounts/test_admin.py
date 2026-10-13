@@ -12,7 +12,9 @@ from apps.accounts.models import (
 from apps.audit.models import AuditAction, AuditEvent
 from apps.audit.services import record_audit_event
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -345,11 +347,17 @@ class UserDetailAdminTenantIsolationTests(TestCase):
             slug="hidden-org",
             created_by=self.hidden_user,
         )
-        OrganizationMembership.objects.create(
+        tenant_admin_membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=self.tenant_admin,
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=tenant_admin_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Tenant Admin inspection fixture requires explicit scope",
         )
         OrganizationMembership.objects.create(
             organization=self.organization,

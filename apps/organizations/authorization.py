@@ -287,6 +287,7 @@ def effective_scope_grants(
 ) -> QuerySet[MembershipScopeGrant]:
     now = timezone.now()
     return membership.scope_grants.filter(
+        organization_id=membership.organization_id,
         starts_at__lte=now,
         revoked_at__isnull=True,
     ).filter(Q(ends_at__isnull=True) | Q(ends_at__gt=now))
@@ -302,26 +303,11 @@ def _prefetched_effective_scopes(
     return [
         grant
         for grant in cache["scope_grants"]
-        if grant.revoked_at is None
+        if grant.organization_id == membership.organization_id
+        and grant.revoked_at is None
         and grant.starts_at <= now
         and (grant.ends_at is None or grant.ends_at > now)
     ]
-
-
-def _legacy_scope_compatibility(membership: OrganizationMembership) -> bool:
-    """Allow unswitched rows only; migrated or restricted rows deny missing scope."""
-
-    cache = getattr(membership, "_prefetched_objects_cache", {})
-    has_grants = (
-        bool(cache["scope_grants"])
-        if "scope_grants" in cache
-        else membership.scope_grants.exists()
-    )
-    return (
-        membership.authorization_migrated_at is None
-        and membership.authorization_quarantined_at is None
-        and not has_grants
-    )
 
 
 def membership_has_scope(
@@ -348,12 +334,12 @@ def membership_has_scope(
     prefetched = _prefetched_effective_scopes(membership)
     if prefetched is not None:
         if allow_any_scope:
-            return bool(prefetched) or _legacy_scope_compatibility(membership)
+            return bool(prefetched)
         if project is None and site is None:
             return any(
                 grant.scope_type == AuthorizationScopeType.ORGANIZATION
                 for grant in prefetched
-            ) or _legacy_scope_compatibility(membership)
+            )
         return any(
             grant.scope_type == AuthorizationScopeType.ORGANIZATION
             or (
@@ -373,14 +359,12 @@ def membership_has_scope(
                 and grant.project_id == project.pk
             )
             for grant in prefetched
-        ) or _legacy_scope_compatibility(membership)
+        )
     grants = effective_scope_grants(membership)
     if allow_any_scope:
-        return grants.exists() or _legacy_scope_compatibility(membership)
+        return grants.exists()
     if project is None and site is None:
-        return grants.filter(
-            scope_type=AuthorizationScopeType.ORGANIZATION
-        ).exists() or _legacy_scope_compatibility(membership)
+        return grants.filter(scope_type=AuthorizationScopeType.ORGANIZATION).exists()
     query = Q(scope_type=AuthorizationScopeType.ORGANIZATION) | Q(
         scope_type=AuthorizationScopeType.PROJECT,
         project_id=project.pk,
@@ -396,7 +380,7 @@ def membership_has_scope(
             scope_type=AuthorizationScopeType.SITE,
             project_id=project.pk,
         )
-    return grants.filter(query).exists() or _legacy_scope_compatibility(membership)
+    return grants.filter(query).exists()
 
 
 def has_business_permission(
@@ -459,10 +443,15 @@ def scope_queryset(
     site_lookup: str | None = None,
     include_site_parent: bool = False,
 ) -> QuerySet[Any]:
-    """Filter a tenant queryset to currently effective explicit grants."""
+    """Intersect a queryset with the tenant and currently effective grants."""
 
-    if _legacy_scope_compatibility(membership):
-        return queryset
+    if (
+        membership.status != MembershipStatus.ACTIVE
+        or not membership.organization.is_active
+        or not membership.user.is_active
+    ):
+        return queryset.none()
+    queryset = queryset.filter(organization_id=membership.organization_id)
     grants = effective_scope_grants(membership)
     if grants.filter(scope_type=AuthorizationScopeType.ORGANIZATION).exists():
         return queryset

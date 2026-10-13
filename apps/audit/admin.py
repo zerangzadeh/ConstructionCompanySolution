@@ -31,6 +31,15 @@ class AuditEventAdmin(admin.ModelAdmin):
         "created_at",
     )
 
+    def get_queryset(self, request):
+        # Platform audit records are separate from tenant audit workspaces.
+        return super().get_queryset(request).filter(organization__isnull=True)
+
+    def has_view_permission(self, request, obj=None):
+        return super().has_view_permission(request, obj) and (
+            obj is None or obj.organization_id is None
+        )
+
     def has_add_permission(self, request, obj=None):
         return False
 

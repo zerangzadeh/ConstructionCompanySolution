@@ -69,11 +69,21 @@ candidate membership or Superuser convenience is not ordinary business authority
   administration within delegated boundaries; Tenant Manager owns business/
   operational management. These roles are independent, may be explicitly
   co-assigned, and do not inherit one another implicitly.
-- Current protected role codes remain code-authoritative until an approved role
-  migration. The implemented membership currently references one role definition;
-  multi-role Membership assignments are target documentation, not implementation.
+- Protected role codes remain code-authoritative. Current authorization supports
+  multiple independent Membership role assignments and explicit Organization,
+  Project and Site grants; the legacy single-role reference remains for reversible
+  permission read compatibility. A Membership with no effective same-Tenant scope
+  grant is denied by shared service, queryset and Admin checks. An explicit
+  Organization grant is required for broad Tenant scope; a legacy role alone does
+  not supply it. This is the CEP-001 implementation boundary.
 - Project/site grants can only restrict/intersect tenant permission. They do not
   create a second permission catalogue.
+- Django Admin Tenant inspection requires active Tenant membership, a mapped
+  business view permission and object scope; unmapped Tenant Admin models fail
+  closed. The Company/Project/Site Admin views use the shared scope queryset,
+  and related-field list filters are suppressed where they could enumerate
+  out-of-scope choices. Platform-only role and audit Admin lists exclude Tenant
+  rows; Superuser or Platform Admin status does not supply Tenant data authority.
 - Workflow position routing records who was responsible. It never grants the
   underlying business permission.
 - Every sensitive export, archive, void, reversal, close/reopen, support access,

@@ -432,6 +432,23 @@ Stable masters + consent/privacy + support operations -> future network/AI
   before/after audit evidence. Persian-first RTL role-catalog and Protected
   Operations screens are available from the platform journey. No P1.2 scope is
   implemented by this closeout.
+- **CEP-001 bounded hardening (2026-10-14):** `AUTH-BATCH-001` authorized only
+  the tenant/object-scope security package. Its shared queryset now intersects
+  the membership Tenant, and Django Admin inspection of Tenant models is
+  default-denied unless the Company/Project/Site permission and recorded object
+  scope are mapped; platform-only audit and role catalogues exclude Tenant rows.
+  The service-level no-grant compatibility fallback has been removed: absent an
+  effective explicit same-Tenant scope grant, Admin and services deny access. Existing
+  organization grants remain the explicit broad-scope mechanism. The final
+  combined authorization/service/Admin regression subset collected and passed
+  140 tests; all 10 focused CEP security tests, Ruff and Django checks also pass.
+  All 12 CEP acceptance criteria and both canonical IMB Definitions of Done have
+  final-state evidence, so CEP-001 claims **EXECUTION COMPLETE** for its bounded
+  Development scope. The Human-provided `GATE-01` Foundation Stability definition
+  includes IMB-0001 and IMB-0002 from CEP-001 plus five other required IMBs;
+  the global gate remains **PENDING OTHER REQUIRED IMBs**, not passed by this CEP.
+  Human Sign-off and Production actions remain unexecuted; the historical P1.1
+  closeout does not grant them.
 - **Effort / risk:** **L / Critical**.
 
 ### P1.2 Configuration and master-governance corrections
