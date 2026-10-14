@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}اندازه‌گیری پیمان جزء | سازه‌یار{% endblock %}
+{% block title %}اندازه‌گیری پیمان جزء | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_breadcrumb_label="اندازه‌گیری‌های پیمان جزء" page_breadcrumb_url="/billing/payable-measurements/" page_eyebrow=measurement.project.name page_title=measurement.contract.contract_number page_description=measurement.contract_item.description only %}
 <section class="erp-surface mt-6 rounded-xl p-5"><dl class="grid gap-5 text-sm sm:grid-cols-2"><div><dt class="text-slate-500">شناسه پایدار ردیف</dt><dd class="mt-1" dir="ltr">{{ measurement.contract_item_id }}</dd></div><div><dt class="text-slate-500">مرجع شواهد</dt><dd class="mt-1">{{ measurement.evidence_reference }}</dd></div><div><dt class="text-slate-500">تاریخ</dt><dd class="mt-1" dir="ltr">{{ measurement.measured_on }}</dd></div><div><dt class="text-slate-500">مقدار دوره</dt><dd class="mt-1" dir="ltr">{{ measurement.period_quantity }}</dd></div><div><dt class="text-slate-500">مقدار تجمعی</dt><dd class="mt-1" dir="ltr">{{ measurement.cumulative_quantity }}</dd></div><div><dt class="text-slate-500">وضعیت</dt><dd class="mt-1">{% include "components/status_badge.html" with status=measurement.status label=measurement.get_status_display only %}</dd></div></dl></section>

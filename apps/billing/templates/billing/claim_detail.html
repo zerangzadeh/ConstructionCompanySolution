@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}صورت‌وضعیت {{ claim.claim_number }} | سازه‌یار{% endblock %}
+{% block title %}صورت‌وضعیت {{ claim.claim_number }} | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_breadcrumb_label="صورت‌وضعیت‌ها" page_breadcrumb_url="/billing/claims/" page_eyebrow=claim.project.name page_title=claim.contract.contract_number page_description="صورت‌وضعیت "|add:claim.claim_number only %}
 

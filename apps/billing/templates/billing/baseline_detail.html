@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}مبنای تجاری | سازه‌یار{% endblock %}
+{% block title %}مبنای تجاری | بنیرا{% endblock %}
 {% block content %}
 {% include "components/page_header.html" with page_breadcrumb_label="مبناهای تجاری" page_breadcrumb_url="/billing/baselines/" page_eyebrow=baseline.project.name page_title=baseline.contract.contract_number page_description="نسخه و ردیف‌های تجاری مبنا" only %}
 <div class="mt-6 grid gap-4 sm:grid-cols-3"><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">نسخه</p><p class="mt-2 text-xl font-bold" dir="ltr">{{ baseline.version }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">سقف مؤثر</p><p class="mt-2 text-xl font-bold" dir="ltr">{{ baseline.effective_ceiling }}</p></section><section class="erp-surface rounded-xl p-4"><p class="text-xs text-slate-500">وضعیت</p><p class="mt-2">{% include "components/status_badge.html" with status=baseline.status label=baseline.get_status_display only %}</p></section></div>

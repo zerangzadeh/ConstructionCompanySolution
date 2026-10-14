@@ -91,6 +91,9 @@ TEMPLATES = [
                 "apps.organizations.context_processors.business_permissions",
             ],
             "builtins": ["apps.accounts.templatetags.erp_format"],
+            "libraries": {
+                "form_accessibility": "core.templatetags.form_accessibility",
+            },
         },
     },
 ]

@@ -24,6 +24,7 @@ from apps.organizations.models import (
 )
 from apps.organizations.permission_registry import PERMISSION_RESOURCES
 from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
+from apps.procurement.models import GoodsReceipt
 from apps.projects.models import Project
 from apps.reporting.catalog import METRIC_SPECS
 from apps.reporting.models import (
@@ -303,6 +304,80 @@ class P10S02S06AcceptanceTests(TestCase):
         first.refresh_from_db()
         self.assertEqual(first.freshness, MetricFreshness.STALE)
         self.assertEqual(replacement.replaces_id, first.pk)
+
+    def test_17_dashboard_suppresses_incomplete_latest_snapshot(self) -> None:
+        first = self._material_result()
+        review_metric_result(
+            result=first, reviewer=self.reviewer, reason="first tie-out"
+        )
+        self.assertIn(
+            first, dashboard_results(organization=self.organization, actor=self.user)
+        )
+        latest = self._material_result()
+        MetricResult.objects.filter(pk=latest.pk).update(
+            freshness=MetricFreshness.INCOMPLETE, coverage={"complete": False}
+        )
+        review_metric_result(
+            result=latest, reviewer=self.reviewer, reason="latest tie-out"
+        )
+        self.assertNotIn(
+            first, dashboard_results(organization=self.organization, actor=self.user)
+        )
+
+    def test_18_dashboard_requires_source_permission(self) -> None:
+        viewer = User.objects.create_user(username="p10-no-source", password="x")
+        self._grant(viewer, organization_scope=True, permissions=REPORTING_PERMISSIONS)
+        result = self._material_result()
+        review_metric_result(
+            result=result, reviewer=self.reviewer, reason="source tie-out"
+        )
+        self.assertEqual(
+            dashboard_results(organization=self.organization, actor=viewer), []
+        )
+
+    def test_19_drillthrough_requires_result_view_permission(self) -> None:
+        viewer = User.objects.create_user(username="p10-no-result", password="x")
+        self._grant(
+            viewer,
+            organization_scope=True,
+            permissions={
+                BusinessPermissionCode.REPORTING_SOURCE_DRILLTHROUGH_VIEW,
+                BusinessPermissionCode.BUDGETS_VIEW,
+            },
+        )
+        result = self._material_result()
+        with self.assertRaises(PermissionDenied):
+            drillthrough_manifest(
+                organization=self.organization, actor=viewer, result_id=str(result.pk)
+            )
+
+    def test_20_dashboard_suppresses_stale_snapshot(self) -> None:
+        result = self._material_result()
+        review_metric_result(
+            result=result, reviewer=self.reviewer, reason="stale tie-out"
+        )
+        MetricResult.objects.filter(pk=result.pk).update(
+            freshness=MetricFreshness.STALE
+        )
+        self.assertEqual(
+            dashboard_results(organization=self.organization, actor=self.user), []
+        )
+
+    def test_21_empty_source_reconciles_to_traceable_incomplete_result(self) -> None:
+        before = GoodsReceipt.objects.filter(organization=self.organization).count()
+        result = self._refresh(key="source-reconciliation")
+        run = MetricRefreshRun.objects.get(pk=result.run_id)
+        self.assertEqual(result.as_of, run.started_at)
+        self.assertEqual(run.metric_version.status, "published")
+        self.assertEqual(len(run.source_watermark), 64)
+        self.assertEqual(result.source_manifest["model"], "procurement.GoodsReceipt")
+        self.assertEqual(result.source_manifest["ids"], [])
+        self.assertEqual(result.coverage["source_count"], 0)
+        self.assertIsNone(result.value["average_seconds"])
+        self.assertEqual(result.freshness, MetricFreshness.INCOMPLETE)
+        self.assertEqual(
+            GoodsReceipt.objects.filter(organization=self.organization).count(), before
+        )
 
     def test_08_idempotency_collision_fails_closed(self) -> None:
         self._refresh(key="collision")

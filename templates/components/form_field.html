@@ -1,3 +1,4 @@
+{% load form_accessibility %}
 <div class="erp-form-field{% if field.errors %} erp-form-field--invalid{% endif %}">
     <label class="mb-1.5 block text-sm font-medium text-slate-700" for="{{ field.id_for_label }}">
         {% if field.name == "project" %}پروژه
@@ -68,11 +69,11 @@
         {% elif field.name == "duration_hours" %}مدت (ساعت)
         {% else %}{{ field.label }}{% endif %}{% if field.field.required %}<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>{% endif %}
     </label>
-    {{ field }}
+    {% accessible_field field %}
     {% if field.help_text %}
-        <p class="erp-field-help mt-1 text-sm text-slate-500">{{ field.help_text }}</p>
+        <p class="erp-field-help mt-1 text-sm text-slate-500" id="{{ field.auto_id }}-help">{{ field.help_text }}</p>
     {% endif %}
     {% if field.errors %}
-        <p class="erp-field-error mt-1 text-sm text-red-600" role="alert">{{ field.errors|striptags }}</p>
+        <p class="erp-field-error mt-1 text-sm text-red-600" id="{{ field.auto_id }}-errors" role="alert">{{ field.errors|striptags }}</p>
     {% endif %}
 </div>

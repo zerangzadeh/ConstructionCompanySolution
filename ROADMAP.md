@@ -63,26 +63,38 @@ compliance, security, migration, and integration consequences.
 Historic validation detail belongs in `docs/PROJECT_STATUS.md`, not in this
 forward roadmap.
 
-**AUTH-BATCH-001 current reconciliation (2026-10-15):** all five authorized
-Development CEPs (`001`, `002`, `005`, `007`, `010`) have independently verified
-bounded execution closeouts, **5/5 EXECUTION COMPLETE**. CEP-010 is in its
-separate unstaged worktree; CEP-005/007 remain unstaged here, so this is not a
-claim of Git integration. Historical authorized/not-executed and blocked
-snapshots are preserved. `GATE-01` remains **PARTIAL / NOT READY** because
-`IMB-0055 / CEP-008` has a bounded, non-activating recognition-owner foundation
-under its preserved Human authorization. Its historical failed-before-mutation
-attempt remains preserved; `CEP-008-FINDING-002 /
-BLOCKER-REGRESSION-EXECUTION` is now resolved. Accounting collection is fast;
-the selected database-backed journal tests are blocked before their bodies by an
-existing test-database UUID GiST operator-class configuration defect, classified
-as `BASELINE / OUT-OF-SCOPE TEST DEBT`. The representative Accounting regression
-and existing posting-contract checks pass, with no CEP-008 regression found.
-CEP-008 is therefore **EXECUTION COMPLETE**. This verification does not
-re-evaluate `GATE-01`; it remains **PARTIAL / NOT READY** pending the required
-separate re-evaluation. Human Sign-off and Production
-acceptance/deployment/cutover/certification remain unexecuted. See [the final
-batch review](AUTH-BATCH-001_FINAL_REVIEW.md) and its current CEP-status and
-blocker reconciliations.
+**Foundation reconciliation (2026-10-15):** CEPs `001`, `002`, `005`, `007`,
+`008`, and `010` are **EXECUTION COMPLETE** and integrated on local `main`.
+`AUTH-BATCH-002` is a separate Product Owner authorization. The Product Owner
+explicitly records `GATE-01 = PASS` as its authorization basis; this status is
+recorded here, not inferred by this execution.
+
+**CEP-003 / IMB-0013 and IMB-0014 (2026-10-15):** **EXECUTION COMPLETE** in
+Development under the first serial `AUTH-BATCH-002` session and included in the
+completed-CEP local `main` integration. The shared Jalali
+input/display contract and Persian numeric/currency presentation remain
+presentation-only; a shared form accessibility renderer now associates controls
+with help/error text, and user-visible product naming is reconciled to `بنیرا`.
+No model, migration, date-storage, authorization, route, workflow, production,
+runtime-conformance, Human Sign-off, or downstream CEP action occurred. The
+conditional Person/WorkRelationship access requirement was not applicable because
+CEP-003 created no backend access surface. See [the CEP-003 closeout](CEP-003_COMPLETION_REPORT.md).
+
+**CEP-004 / IMB-0016 bounded Development closure (2026-10-15):**
+`AUTH-BATCH-002` authorized the metric-governance slice on its separate
+worktree. Current reporting dashboard selection suppresses incomplete, stale,
+or unpublished metric cards and rechecks source-domain permission; direct
+drillthrough also requires result-view permission. Governed CSV export retains
+explicitly freshness-labeled incomplete evidence, preserving its existing
+nonempty manifest contract. No new KPI formula, source write authority, model,
+or migration was introduced. The earlier silent test setup was attributed to
+progressing one-time test-database migrations, not a product failure. The
+corrected focused Reporting module passed 21/21 tests, including five new
+CEP-004 cases, and seven selected existing dashboard/export/drillthrough
+regressions passed. All six bounded AC and scoped DoD have PASS evidence;
+CEP-004 claims **EXECUTION COMPLETE** for Development only and is included in
+the completed-CEP local `main` integration. This is not a Human Sign-off,
+Production action, or GATE-01 re-evaluation. See [the CEP-004 closeout](CEP-004_COMPLETION_REPORT.md).
 
 ## Mandatory delivery contract for every future work package
 

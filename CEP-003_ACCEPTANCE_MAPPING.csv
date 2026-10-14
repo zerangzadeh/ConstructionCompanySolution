@@ -1,0 +1,13 @@
+acceptance_criterion,status,evidence
+"AC-1 Shared Persian-first RTL Jalali primitives","PASS","Existing core Jalali primitives plus focused shared-form regression"
+"AC-2 Persian labels/validation/errors","PASS","Shared component retains Persian labels and exposes field errors programmatically"
+"AC-3 RTL and mixed-direction readability","PASS","RTL shell and explicit LTR/isolation contract verified by focused static regression"
+"AC-4 Jalali user-facing dates without storage change","PASS","Persian Jalali input normalizes to Gregorian date before Django validation"
+"AC-5 Numeral/currency display preserves values","PASS","Existing erp_number and rial regression tests pass"
+"AC-6 Shared primitives replace component-level duplication","PASS","Shared form component and core template tag are reused without domain changes"
+"AC-7 Static shared accessibility defects","PASS","Help/error association, invalid state, login landmark and naming cleanup verified"
+"AC-8 Approved-surface access behavior","PASS","No route or access behavior changed; existing login surface and public/private boundary preserved"
+"AC-9 Out-of-scope runtime conformance remains unavailable","PASS","No runtime conformance claim, browser certification, or activation added"
+"AC-10 Backend object authorization","PASS (conditional N/A)","CEP-003 creates no Person/WorkRelationship endpoint or backend access surface; existing authorization is unchanged"
+"AC-11 Empty/error/unauthorized state safety","PASS","Shared field-error association and existing login error state covered; no object-existence surface added"
+"AC-12 Persian/RTL/Jalali where relevant","PASS","Focused source regression verifies Persian-first shell and Jalali input contract"

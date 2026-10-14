@@ -438,7 +438,9 @@ def review_metric_result(
     return review
 
 
-def dashboard_results(*, organization: Organization, actor: User) -> list[MetricResult]:
+def dashboard_results(
+    *, organization: Organization, actor: User, include_incomplete: bool = False
+) -> list[MetricResult]:
     projects = _allowed_projects(user=actor, organization=organization)
     allowed_ids = list(projects.values_list("pk", flat=True))
     allowed_text_ids = {str(value) for value in allowed_ids}
@@ -456,8 +458,9 @@ def dashboard_results(*, organization: Organization, actor: User) -> list[Metric
         )
     )
     latest: dict[tuple[str, str | None], MetricResult] = {}
+    seen: set[tuple[str, str | None]] = set()
     for result in rows.select_related("run__metric_version__definition").order_by(
-        "-created_at"
+        "-created_at", "-pk"
     ):
         if result.project_id is None:
             if result.source_manifest.get("scope_kind") == "organization":
@@ -471,7 +474,32 @@ def dashboard_results(*, organization: Organization, actor: User) -> list[Metric
             result.metric_code,
             str(result.project_id) if result.project_id else None,
         )
-        latest.setdefault(key, result)
+        if key in seen:
+            continue
+        seen.add(key)
+        definition = result.run.metric_version.definition
+        if (
+            (
+                not include_incomplete
+                and (
+                    result.freshness != MetricFreshness.FRESH
+                    or not result.coverage.get("complete")
+                )
+            )
+            or not definition.is_active
+            or result.run.metric_version.status != MetricVersionStatus.PUBLISHED
+        ):
+            continue
+        if not has_business_permission(
+            user=actor,
+            organization=organization,
+            permission=definition.source_permission,
+            project=result.project,
+            allow_any_scope=result.project_id is None
+            and result.source_manifest.get("scope_kind") != "organization",
+        ):
+            continue
+        latest[key] = result
     return sorted(latest.values(), key=lambda item: item.metric_code)
 
 
@@ -488,6 +516,14 @@ def drillthrough_manifest(
     if result is None:
         raise PermissionDenied("نتیجه شاخص در دسترس نیست.")
     organization_wide = result.source_manifest.get("scope_kind") == "organization"
+    require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.REPORTING_METRIC_RESULT_VIEW,
+        message="اجازه مشاهده نتیجه شاخص را ندارید.",
+        project=result.project,
+        allow_any_scope=result.project_id is None and not organization_wide,
+    )
     require_business_permission(
         user=actor,
         organization=organization,
@@ -538,7 +574,11 @@ def export_dashboard_csv(
             allow_any_scope=True,
         )
     _advisory_lock("reporting-export", organization.pk, idempotency_key)
-    results = dashboard_results(organization=organization, actor=actor)
+    # Exports retain explicit freshness/coverage evidence; incomplete values are
+    # suppressed only from KPI cards, not from the governed audit export.
+    results = dashboard_results(
+        organization=organization, actor=actor, include_incomplete=True
+    )
     result_ids = [str(item.pk) for item in results]
     fingerprint = _hash({"result_ids": result_ids, "purpose": purpose.strip()})
     output = io.StringIO(newline="")

@@ -1,0 +1,7 @@
+evidence_id,category,command_or_source,result
+CEP-003-EV-001,"canonical prompt identity","Get-FileHash CEP-003_EXECUTION_PROMPT.md SHA256","PASS: 17589d700d9ae3b4d17f2adca362439dda3ea3eda32e8ab1b5771937954b7048"
+CEP-003-EV-002,"focused regression","python -m pytest -q core/test_cep003_localization_accessibility.py apps/accounts/test_jalali.py apps/accounts/test_money_format.py","PASS: 11 tests"
+CEP-003-EV-003,"Django system checks","python manage.py check","PASS: no issues"
+CEP-003-EV-004,"lint","ruff check core/templatetags/form_accessibility.py core/test_cep003_localization_accessibility.py config/settings/base.py","PASS"
+CEP-003-EV-005,"format and whitespace","ruff format --check core/templatetags/form_accessibility.py core/test_cep003_localization_accessibility.py config/settings/base.py; git diff --check","PASS"
+CEP-003-EV-006,"legacy product-name scan","rg 'سازه[‌ ]یار' templates apps config","PASS: no user-visible legacy product-name result"
