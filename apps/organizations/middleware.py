@@ -34,6 +34,7 @@ class OrganizationMiddleware:
 
             if (
                 organization is None
+                and not had_selected_organization
                 and ACTIVE_ORGANIZATION_SESSION_KEY not in request.session
             ):
                 organization = resolve_active_organization(request.user)

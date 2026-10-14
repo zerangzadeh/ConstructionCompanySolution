@@ -449,6 +449,37 @@ Stable masters + consent/privacy + support operations -> future network/AI
   the global gate remains **PENDING OTHER REQUIRED IMBs**, not passed by this CEP.
   Human Sign-off and Production actions remain unexecuted; the historical P1.1
   closeout does not grant them.
+- **CEP-002 canonical application shell (2026-10-14):** `AUTH-BATCH-001`
+  authorized the bounded Development package. Repository grounding found an
+  existing Persian RTL shell and a financial compatibility dashboard as the
+  current login/organization-selection landing. The reconstructed latest frozen
+  Product Decision register confirms `PD-016` governs role/person separation,
+  not Home. The Human/Product Owner approved the bounded canonical Home semantics
+  in [PD-032](docs/architecture/BONIRA_PD_032_CANONICAL_HOME.md): `/` named
+  `home` is the neutral permission-aware landing; the current financial dashboard
+  remains a separately permissioned legacy workspace. The separate explicit
+  Product Owner command froze **PD-032 only** under the
+  [addendum freeze record](docs/architecture/BONIRA_PD_032_FREEZE_RECORD.md),
+  leaving `BONIRA-PD-FREEZE-v1.0` and `PD-001..PD-031` sealed and unchanged.
+  `CEP-002-FINDING-001 / BLOCKER-PD` is **RESOLVED**; source-package reference
+  regeneration remains a documentation follow-up under PD-032's correction
+  layer. `CEP-002` implementation subsequently resumed under `AUTH-BATCH-001`:
+  authenticated `/` now has route name `home`, login/switch/shell identity land
+  there, and Home composes only permission/scope-filtered links and active context.
+  The financial dashboard remains a separate permissioned legacy workspace.
+  Final focused Home/browser/account/organization/CEP-001 security verification
+  passed 54/54; six AC have PASS evidence. Headless Chrome verified Home and
+  safe states at desktop/mobile widths with no material overflow and usable
+  mobile navigation. Verification-only attribution on the fresh isolated migrated
+  run found all 15 workflow/financial failures stop in legacy fixture authorization
+  setup before any CEP-002 behavior is reached: eight during purchase-request
+  creation and seven during common project creation. They are recorded separately
+  as cross-domain fixture debt, not CEP-002 regressions. CEP-002 therefore claims
+  **EXECUTION COMPLETE** with canonical DoD **PASS**; no Product Decision, scope,
+  AC, DoD definition, DAG or authorization changes are implied.
+  See [the CEP-002 closeout](CEP-002_COMPLETION_REPORT.md). Scope, AC, DoD,
+  DAG and `AUTH-BATCH-001` remain unchanged. No migration, Human Sign-off,
+  Production action, next CEP or global GATE-01 passage is claimed.
 - **Effort / risk:** **L / Critical**.
 
 ### P1.2 Configuration and master-governance corrections

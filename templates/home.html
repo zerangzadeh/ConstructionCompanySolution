@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}خانه | سازه‌یار{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl space-y-6 px-4 py-6 sm:px-6 lg:px-8" data-home-state="{{ home_state }}">
+    <header class="space-y-2">
+        <h1 class="text-2xl font-semibold text-slate-900">خانه</h1>
+        <p class="text-sm text-slate-600">دسترسی به فضاهای کاری مجاز شما</p>
+    </header>
+
+    {% if home_state == "unauthorized" %}
+    <section class="rounded-xl border border-amber-200 bg-amber-50 p-5" role="alert">
+        <h2 class="font-semibold text-amber-900">دسترسی مجاز نیست</h2>
+        <p class="mt-2 text-sm text-amber-800">زمینه سازمانی انتخاب‌شده معتبر نیست. سازمان مجاز خود را دوباره انتخاب کنید.</p>
+        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
+    </section>
+    {% elif home_state == "no_context" %}
+    <section class="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 class="font-semibold">سازمان فعالی انتخاب نشده است</h2>
+        <p class="mt-2 text-sm text-slate-600">برای ورود به فضای کاری، یکی از سازمان‌های مجاز خود را انتخاب کنید.</p>
+        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
+    </section>
+    {% elif home_state == "empty" %}
+    <section class="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 class="font-semibold">فضای کاری در دسترس نیست</h2>
+        <p class="mt-2 text-sm text-slate-600">در حال حاضر عضویت فعال در سازمانی ندارید.</p>
+        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
+    </section>
+    {% elif home_state == "error" %}
+    <section class="rounded-xl border border-red-200 bg-red-50 p-5" role="alert">
+        <h2 class="font-semibold text-red-900">بارگذاری خانه ممکن نیست</h2>
+        <p class="mt-2 text-sm text-red-800">لطفاً دوباره تلاش کنید یا سازمان مجاز خود را انتخاب کنید.</p>
+        <a class="mt-3 inline-block text-sm font-medium text-blue-700 underline" href="{% url 'organizations:select' %}">انتخاب سازمان</a>
+    </section>
+    {% else %}
+    <section class="rounded-xl border border-slate-200 bg-white p-5" aria-label="سازمان فعال">
+        <p class="text-xs text-slate-500">سازمان فعال</p>
+        <p class="mt-1 font-semibold">{{ home_organization.name }}</p>
+        <a class="mt-2 inline-block text-sm text-blue-700 underline" href="{% url 'organizations:select' %}">تغییر سازمان</a>
+    </section>
+
+    {% if home_state == "no_workspace" %}
+    <section class="rounded-xl border border-slate-200 bg-white p-5">
+        <h2 class="font-semibold">فضای کاری مجازی در دسترس نیست</h2>
+        <p class="mt-2 text-sm text-slate-600">برای دسترسی، از مسیرهای حساب کاربری یا درخواست اتصال استفاده کنید.</p>
+        <a class="mt-3 inline-block text-sm text-blue-700 underline" href="{% url 'accounts:connection_requests' %}">درخواست‌های اتصال</a>
+    </section>
+    {% else %}
+    {% if home_workspaces %}
+    <section aria-labelledby="home-workspaces">
+        <h2 id="home-workspaces" class="mb-3 text-lg font-semibold">فضاهای کاری</h2>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {% for link in home_workspaces %}
+            <a class="rounded-xl border border-slate-200 bg-white p-5 text-sm font-medium text-blue-800 shadow-sm hover:border-blue-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600" href="{% url link.route %}">{{ link.label }}</a>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+    {% if home_assigned_work %}<a class="block rounded-xl border border-slate-200 bg-white p-5 text-sm font-medium text-blue-800" href="{% url home_assigned_work.route %}">{{ home_assigned_work.label }}</a>{% endif %}
+    {% if home_alerts %}<a class="block rounded-xl border border-slate-200 bg-white p-5 text-sm font-medium text-blue-800" href="{% url home_alerts.route %}">{{ home_alerts.label }}</a>{% endif %}
+    {% endif %}
+    {% endif %}
+
+    <a class="inline-block text-sm text-blue-700 underline" href="{% url 'accounts:settings' %}">تنظیمات حساب کاربری</a>
+</div>
+{% endblock %}

@@ -156,7 +156,7 @@ class OrganizationTenantIsolationTests(TestCase):
             {"organization_id": str(self.organization.id)},
         )
 
-        self.assertRedirects(response, reverse("financials:dashboard"))
+        self.assertRedirects(response, reverse("home"))
         self.assertEqual(
             self.client.session[ACTIVE_ORGANIZATION_SESSION_KEY],
             str(self.organization.id),

@@ -132,7 +132,7 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
         return HttpResponseForbidden("به این سازمان دسترسی ندارید.")
 
     set_active_organization(request.session, organization)
-    return redirect("financials:dashboard")
+    return redirect("home")
 
 
 @login_required
