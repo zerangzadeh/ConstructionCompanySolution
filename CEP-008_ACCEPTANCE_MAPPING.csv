@@ -1,0 +1,7 @@
+acceptance_criterion,status,evidence
+"AC-1 Matrix drives eligible source-family policy resolution and fail-closed behavior",PASS,"test_cep008_recognition_registry.py::RecognitionOwnerRegistryTests"
+"AC-2 Source authority remains separate from Accounting output authority",PASS,"recognition_registry.py has no model or journal mutation; focused tests resolve policy only"
+"AC-3 Invalid or policy-absent input fails closed",PASS,"focused negative-path tests"
+"AC-4 Correction/replacement retains governed source identity/version lineage",PASS,"RecognitionIdentity and audit metadata preserve source identity/version and policy correction/reversal owners"
+"AC-5 Scope is limited to registry resolution identity/version and duplicate guard",PASS,"change manifest and focused tests"
+"AC-6 No generic model-save-to-journal or parallel journal writer",PASS,"code review of isolated registry-only change"

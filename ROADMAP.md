@@ -63,19 +63,23 @@ compliance, security, migration, and integration consequences.
 Historic validation detail belongs in `docs/PROJECT_STATUS.md`, not in this
 forward roadmap.
 
-**AUTH-BATCH-001 current reconciliation (2026-10-14):** all five authorized
+**AUTH-BATCH-001 current reconciliation (2026-10-15):** all five authorized
 Development CEPs (`001`, `002`, `005`, `007`, `010`) have independently verified
 bounded execution closeouts, **5/5 EXECUTION COMPLETE**. CEP-010 is in its
 separate unstaged worktree; CEP-005/007 remain unstaged here, so this is not a
 claim of Git integration. Historical authorized/not-executed and blocked
 snapshots are preserved. `GATE-01` remains **PARTIAL / NOT READY** because
-`IMB-0055 / CEP-008` has no implementation evidence. Its bounded Human
-authorization is preserved, while the 2026-10-14 canonical-source recovery
-resolved the repository-local source-availability finding: the CEP prompt,
-PD-030, IMB-0055 and complete authoritative SPEC-002 Recognition Owner Matrix
-were directly verified from the consolidated project packages. This recovery
-does not execute CEP-008; a separate bounded resume is required. `GATE-01`
-therefore remains **PARTIAL / NOT READY**. Human Sign-off and Production
+`IMB-0055 / CEP-008` has a bounded, non-activating recognition-owner foundation
+under its preserved Human authorization. Its historical failed-before-mutation
+attempt remains preserved; `CEP-008-FINDING-002 /
+BLOCKER-REGRESSION-EXECUTION` is now resolved. Accounting collection is fast;
+the selected database-backed journal tests are blocked before their bodies by an
+existing test-database UUID GiST operator-class configuration defect, classified
+as `BASELINE / OUT-OF-SCOPE TEST DEBT`. The representative Accounting regression
+and existing posting-contract checks pass, with no CEP-008 regression found.
+CEP-008 is therefore **EXECUTION COMPLETE**. This verification does not
+re-evaluate `GATE-01`; it remains **PARTIAL / NOT READY** pending the required
+separate re-evaluation. Human Sign-off and Production
 acceptance/deployment/cutover/certification remain unexecuted. See [the final
 batch review](AUTH-BATCH-001_FINAL_REVIEW.md) and its current CEP-status and
 blocker reconciliations.

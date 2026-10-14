@@ -1,0 +1,12 @@
+evidence_id,category,command_or_source,result
+CEP-008-EV-001,"canonical prompt hash","Get-FileHash CEP-008_EXECUTION_PROMPT.md SHA256",PASS
+CEP-008-EV-002,"SPEC-002 matrix","authoritative consolidated matrix archive; 18 rows",PASS
+CEP-008-EV-003,"focused domain integration reconciliation negative tests","python -m pytest apps/accounting/test_cep008_recognition_registry.py -q","PASS: 8 tests; 28 subtests"
+CEP-008-EV-004,lint,"ruff check recognition_registry.py test_cep008_recognition_registry.py",PASS
+CEP-008-EV-005,format,"ruff format --check recognition_registry.py test_cep008_recognition_registry.py",PASS
+CEP-008-EV-006,"migration drift","python manage.py makemigrations --check --dry-run","PASS: No changes detected"
+CEP-008-EV-007,"Django system checks","python manage.py check","PASS: no issues"
+CEP-008-EV-008,"full Accounting regression diagnostic","python -m pytest apps/accounting --collect-only -q; selected database-backed journal tests","INCOMPLETE AFTER ATTRIBUTION: collection 60 tests in 0.17s; test database schema setup fails on existing UUID GiST exclusion constraint before test bodies"
+CEP-008-EV-009,"representative Accounting regression","python -m pytest -q apps/accounting/tests.py::AccountingPolicyCalculationTests apps/accounting/test_cep008_recognition_registry.py","PASS: 10 tests; 28 subtests"
+CEP-008-EV-010,"existing posting registry contracts","python -c posting_registry contract assertions","PASS: 4 existing posting contracts resolved"
+CEP-008-EV-011,"baseline test-environment attribution","pytest --nomigrations selected journal-service tests","BASELINE / OUT-OF-SCOPE TEST DEBT: PostgreSQL UUID GiST operator class absent during accounting_fiscalyear schema creation; 4 setup errors; no test body entered"
