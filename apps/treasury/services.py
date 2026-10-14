@@ -8,7 +8,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
 from django.utils import timezone
 
@@ -442,7 +442,11 @@ def create_movement(
     site=None,
     party=None,
 ) -> TreasuryMovement:
-    organization = _lock_organization(organization)
+    # The account rows serialize cash effects. Locking the Organization here
+    # would serialize unrelated movements across every account in the tenant.
+    organization = Organization.objects.get(pk=organization.pk)
+    if not organization.is_active:
+        raise PermissionDenied("Tenant غیرفعال است.")
     maker = require_business_permission(
         user=actor,
         organization=organization,
@@ -523,7 +527,23 @@ def create_movement(
         party=party,
         created_by=maker,
     )
-    movement.save()
+    try:
+        # The tenant/key unique constraint is the final arbiter when two callers
+        # use the same key against different accounts concurrently. A savepoint
+        # leaves the outer transaction usable after the losing insert.
+        with transaction.atomic():
+            movement.save()
+    except IntegrityError:
+        existing = TreasuryMovement.objects.filter(
+            organization=organization, idempotency_key=normalized_key
+        ).first()
+        if existing is None:
+            raise
+        if existing.payload_hash == digest:
+            return existing
+        raise ValidationError(
+            "کلید idempotency با محتوای متفاوت قبلاً استفاده شده است."
+        ) from None
     if kind == TreasuryMovementKind.RECEIPT:
         legs = [(account, TreasuryLegDirection.IN)]
     elif kind == TreasuryMovementKind.DISBURSEMENT:

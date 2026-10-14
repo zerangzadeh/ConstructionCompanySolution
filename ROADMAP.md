@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-10-08
+**Status date:** 2026-10-14
 
 **Product stage:** pre-production
 
@@ -62,6 +62,18 @@ compliance, security, migration, and integration consequences.
 
 Historic validation detail belongs in `docs/PROJECT_STATUS.md`, not in this
 forward roadmap.
+
+**AUTH-BATCH-001 current reconciliation (2026-10-14):** all five authorized
+Development CEPs (`001`, `002`, `005`, `007`, `010`) have independently verified
+bounded execution closeouts, **5/5 EXECUTION COMPLETE**. CEP-010 is in its
+separate unstaged worktree; CEP-005/007 remain unstaged here, so this is not a
+claim of Git integration. Historical authorized/not-executed and blocked
+snapshots are preserved. `GATE-01` remains **PARTIAL / NOT READY** because
+`IMB-0055 / CEP-008` has no implementation evidence. CEP-008 is ready for Human
+authorization review only; no new CEP is authorized by this status. Human
+Sign-off and Production acceptance/deployment/cutover/certification remain
+unexecuted. See [the final batch review](AUTH-BATCH-001_FINAL_REVIEW.md) and its
+current CEP-status and blocker reconciliations.
 
 ## Mandatory delivery contract for every future work package
 
@@ -1061,6 +1073,17 @@ Stable masters + consent/privacy + support operations -> future network/AI
   `MATERIAL_DOCUMENTS_LINK` registry failure remains separate and unchanged.
   At that closeout, P3-S12+, legacy cutover/backfill, pilot activation, UI,
   statements, AP/AR, integrations and background work remained unauthorized.
+- **CEP-007 cash occurrence idempotency (2026-10-14):** `AUTH-BATCH-001`
+  authorized only the bounded `IMB-0052` development enabler. Treasury movement
+  creation now uses existing Tenant/source-key uniqueness and account row locks
+  without a Tenant-wide organization lock; concurrent exact retries preserve one
+  movement/occurrence and changed payloads fail with no duplicate cash effect.
+  Focused PostgreSQL concurrency and retained posting/reconciliation tests pass
+  (2/2), as do targeted Ruff and whitespace checks. No model/migration, new
+  producer, permission, UI, production deployment or other CEP is included.
+  [CEP-007 closeout](CEP-007_COMPLETION_REPORT.md) records five PASS criteria,
+  bounded DoD, evidence and remaining operational-load UTV. Global `GATE-01`
+  remains pending other required IMBs; Human Sign-off is not executed.
 - **P3-S12–S17 implementation closeout (2026-10-01):** explicit Product Owner
   authorization first produced the bounded
   [implementation contract](docs/architecture/P3_S12_S17_IMPLEMENTATION_CONTRACT.md),
@@ -1292,6 +1315,22 @@ Stable masters + consent/privacy + support operations -> future network/AI
   Forecast approval, real-producer recognition mappings, activation/cutoff and
   warning-versus-hard-stop remain fail-closed; see
   `docs/architecture/P4_S14_S20_IMPLEMENTATION_CONTRACT.md`.
+- **CEP-005 root integration (2026-10-14):** **EXECUTION COMPLETE** for
+  bounded non-production `IMB-0030` under `AUTH-BATCH-001`, separate resume and
+  explicit audit migration authorization. Frozen PD-010, canonical SPEC-008 /
+  INT-B11 and approved P01–P07 remain unchanged. Findings 001/002 are **RESOLVED**.
+  The root retains the exact five-part key, validates registered child contracts,
+  versions and mapping, preserves source authority and immutable correction /
+  reversal lineage, records durable attempts and atomic target/success evidence,
+  and provides bounded read-only reconciliation. Cancellation is RELEASE of
+  remaining commitment. Audit0054 adds one action/model-state entry with no SQL
+  schema/business-row change; forward/reverse/reapply preserves audit history.
+  All six AC and scoped DoD have executable evidence: 15 focused tests pass,
+  plus two final reconciliation follow-up tests; Ruff/system/drift checks pass.
+  The source-producer registry ships empty; IMB-0031/0032/0033, producer activation,
+  production effects and CEP-007 are not implemented here. GATE-05 is an **EXIT
+  GATE / NOT EVALUATED**; no global gate passage or Human Sign-off is claimed.
+  See [CEP-005 closeout](CEP-005_COMPLETION_REPORT.md).
 - **Outcome:** accepted estimate-to-budget handoff, explicit mapping among
   contractual BOQ/internal estimate/approved budget baseline, CBS/cost-center
   mappings, budget versions, commitments, accruals, actuals, forecast/ETC/EAC,

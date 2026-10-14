@@ -1,0 +1,7 @@
+evidence_id,evidence_type,status,source,summary
+CEP-007-EV-001,Repository grounding,RECORDED,CEP-007_EXECUTION_MANIFEST.md,Branch SHA dirty worktree existing schema source linkage and actual execution touch set recorded before product mutation
+CEP-007-EV-002,Code diff,VERIFIED,apps/treasury/services.py;apps/treasury/tests.py,Creation uses fresh active-tenant read and account locks; database tenant/key constraint plus savepoint resolves exact retry and conflict without duplicate movement
+CEP-007-EV-003,Test output,PASS,output/cep-007/test-output.txt,Two focused PostgreSQL tests passed; concurrent conflict and replay plus retained posting/reconciliation path
+CEP-007-EV-004,Lint and formatting,PASS,output/cep-007/lint-output.txt;output/cep-007/format-output.txt,Ruff check on touched code passed; focused test file format check passed; git diff whitespace check passed
+CEP-007-EV-005,Integration transaction and data-reconciliation trace,PASS,apps/treasury/tests.py;output/cep-007/test-output.txt,One tenant/key yields one movement UUID occurrence UUID leg and success audit; exact replay retains identity; posted journal and Treasury-to-GL reconciliation remain exact
+CEP-007-EV-006,Roadmap disposition,RECORDED,ROADMAP.md,CEP-007 bounded verification recorded without global GATE-01 Human Sign-off or production claim

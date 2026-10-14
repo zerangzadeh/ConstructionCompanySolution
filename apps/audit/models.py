@@ -650,6 +650,10 @@ class AuditAction(models.TextChoices):
         "project_cost.fact_recorded",
         "برون‌داد هزینه پروژه ثبت شد",
     )
+    PROJECT_COST_INTEGRATION_ATTEMPT = (
+        "project_cost.integration_attempt",
+        "شواهد اجرای یکپارچگی تعهد پروژه",
+    )
     PROJECT_COST_COVERAGE_CHANGED = (
         "project_cost.coverage_changed",
         "پوشش منبع هزینه پروژه تغییر کرد",

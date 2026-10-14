@@ -63,6 +63,47 @@ foundation delivered here.
 
 ## Verification
 
+### CEP-005 additive root integration — 2026-10-14
+
+Separate `AUTH-BATCH-001` / IMB-0030 authorization delivers the INT-B11 root in
+`apps/projects/commitment_integration.py`, under the approved
+`CEP-005_SPEC_008_INT_B11_SUPPLEMENT_v1.0.md`. Project Controls/ProjectCostFact
+remains cost authority. Source-specific PO/Subcontract eligibility, mapping,
+valuation and cutoff validation remain delegated to code-owned child adapters;
+the shipped producer registry is empty and fails closed. No operational producer,
+accrual/actual producer, backfill, legacy replacement or production effect is
+activated. IMB-0031/0032/0033 are not implemented by this root package.
+
+The common key is exactly ProducerContractID + SourceType + SourceID +
+SourceVersion + RecognitionType. Event/line/project/correlation/time evidence does
+not extend deduplication identity. Source-approved successor links govern version
+ordering; exact historical replays do not reactivate superseded effects. Corrections
+and reversals are additive linked evidence; cancellation releases the explicitly
+mapped remaining commitment. Existing fact classification and valuation rules are
+reused, with no source-state mutation or new recognition authority.
+
+The root requires an autocommit caller boundary. It persists an attempt before
+target work, commits facts/linkage/success evidence atomically, and persists failure
+evidence outside target rollback. Attempts/results use one new append-only audit
+action, `project_cost.integration_attempt`. Bounded authorized audit migration
+`0054_cep005_integration_attempt_action` changes action-choice/model state only;
+generated SQL is a no-op. The pending existing audit 0053 prerequisite was also
+applied locally. Development reverse/reapply preserved all 4,537 audit records
+and existing Project Cost facts/source contracts by value/hash comparison.
+
+Read-only reconciliation reports source and accepted target versions, contributing
+facts, correction/reversal lineage, missing/duplicate/stale effects and source
+payload/version or lineage mismatch. Unapproved/pending evidence is not treated
+as an eligible missing target. It does not repair or write source/target records.
+
+The focused suite passed 15 tests; the final reconciliation changes passed two
+targeted follow-up tests. All six IMB-0030 AC and scoped DoD have executable
+evidence; Ruff, system and migration drift checks pass. See
+`CEP-005_COMPLETION_REPORT.md` and `output/cep-005/` for exact commands/counts,
+migration evidence and traces. Performance/concurrency certification remains UTV;
+GATE-05 and Human Sign-off are not claimed. Original P4 delivery evidence below
+is historical and unchanged.
+
 - 7 retained P4-S07–S13 PostgreSQL service tests plus 5 P4-S14–S20 tests cover
   producer ordering/approval SoD, idempotency conflict, commitment relief,
   accrual reversal/actual replacement, source evidence, coverage, forecast math,

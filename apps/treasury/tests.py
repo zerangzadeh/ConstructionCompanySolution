@@ -18,6 +18,7 @@ from apps.accounting.services import (
     create_fiscal_year,
 )
 from apps.accounts.models import User
+from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.models import (
     AuthorizationScopeType,
     MembershipRole,
@@ -1119,6 +1120,74 @@ class TreasuryConcurrencyTests(TransactionTestCase):
         self.assertEqual(
             TreasuryAccount.objects.filter(organization=organization).count(), 1
         )
+
+
+class TreasuryOccurrenceIdempotencyTests(TransactionTestCase):
+    setUp = TreasuryFoundationTests.setUp
+    _member = TreasuryFoundationTests._member
+    _activate_policy = TreasuryFoundationTests._activate_policy
+    _bank = TreasuryFoundationTests._bank
+
+    def test_parallel_same_source_key_has_one_cash_occurrence_and_audit(self) -> None:
+        other_bank = self._bank("RACE-BANK-2", "RACE0002", self.cash_gl_2)
+
+        def create_once(account_id) -> tuple[str, str]:
+            close_old_connections()
+            try:
+                movement = create_movement(
+                    organization=self.organization.__class__.objects.get(
+                        pk=self.organization.pk
+                    ),
+                    actor=User.objects.get(pk=self.owner.pk),
+                    kind="receipt",
+                    movement_date=date(2026, 6, 1),
+                    amount=Decimal(100),
+                    description="same source, different cash account",
+                    idempotency_key="race-source-1",
+                    account=TreasuryAccount.objects.get(pk=account_id),
+                )
+                return "created", str(movement.pk)
+            except ValidationError:
+                return "conflict", ""
+            finally:
+                close_old_connections()
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            outcomes = list(executor.map(create_once, [self.bank.pk, other_bank.pk]))
+        self.assertCountEqual(
+            [outcome[0] for outcome in outcomes], ["created", "conflict"]
+        )
+        movement = self.organization.treasury_movements.get(
+            idempotency_key="race-source-1"
+        )
+        self.assertEqual(movement.legs.count(), 1)
+        self.assertEqual(
+            AuditEvent.objects.filter(
+                organization=self.organization,
+                action=AuditAction.TREASURY_MOVEMENT_CREATED,
+                entity_id=str(movement.pk),
+            ).count(),
+            1,
+        )
+        matching_account = movement.legs.get().account
+        replay = create_movement(
+            organization=self.organization,
+            actor=self.owner,
+            kind="receipt",
+            movement_date=date(2026, 6, 1),
+            amount=Decimal(100),
+            description="same source, different cash account",
+            idempotency_key=" race-source-1 ",
+            account=matching_account,
+        )
+        self.assertEqual(replay.pk, movement.pk)
+        self.assertEqual(replay.occurrence_id, movement.occurrence_id)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            retries = list(
+                executor.map(create_once, [matching_account.pk, matching_account.pk])
+            )
+        self.assertEqual(retries, [("created", str(movement.pk))] * 2)
+        self.assertEqual(self.organization.treasury_movements.count(), 1)
 
 
 class TreasuryStatementConcurrencyTests(TransactionTestCase):

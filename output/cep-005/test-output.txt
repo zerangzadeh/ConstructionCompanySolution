@@ -1,0 +1,6 @@
+.....CEP005 TRACE: canonical identity -> one fact -> revalidated replay -> conflict rejected
+.CEP005 MIGRATION: reverse 0054 -> 0053 -> reapply 0054; all audit rows byte/value-preserved
+.....CEP005 TRANSACTION: attempt COMMIT -> fact+success ROLLBACK -> failure COMMIT -> retry revalidates -> one fact
+.CEP005 TRACE: v1 CREATE -> v2 SUPERSEDE(+20) -> stale REJECT -> v3 RELEASE(120); net=0
+...
+15 passed in 125.16s (0:02:05)
