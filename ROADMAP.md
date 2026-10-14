@@ -1835,6 +1835,17 @@ Stable masters + consent/privacy + support operations -> future network/AI
 
 ### P7.0 Workforce skills, qualifications, development, and labor rates
 
+- **CEP-010 / IMB-0069 foundation (2026-10-14):** `AUTH-BATCH-001` and the
+  Product Owner's bounded schema-migration resolution authorize the separate
+  Person / WorkRelationship target foundation. The schema and versioned episode
+  services are implemented and verified in Development; existing `Employee`
+  remains the legacy source and all ten Employee, twelve position-assignment and
+  eight project-assignment rows in the configured Development database were
+  preserved through forward/reverse/reapply verification. No legacy backfill,
+  cutover, production migration, or Human Sign-off occurred. `CEP-029 / IMB-0070`
+  retains Employee migration and rehire reconstruction. CEP-010 contributes
+  IMB-0069 only; global `GATE-01` is not claimed passed. See
+  [CEP-010 closeout](CEP-010_COMPLETION_REPORT.md).
 - **Status / priority:** **P7-S01–S36 PRODUCT OWNER ACCEPTED / COMPLETED WITHIN
   DOCUMENTED NON-PRODUCTION BOUNDARIES; P8 PLANNING ONLY / UNAUTHORIZED.** Delivered workforce structure is
   retained and P7-S01–S05 adds the bounded Workforce foundation recorded in

@@ -1,0 +1,7 @@
+Acceptance Criterion,Result,Evidence IDs,Verification
+AC-1,PASS,CEP-010-EV-001; CEP-010-EV-003,Person and episode models exist; historical episodes tested
+AC-2,PASS,CEP-010-EV-001; CEP-010-EV-002; CEP-010-EV-003,UUID identity; optional User; employee number; dates; constraints
+AC-3,PASS,CEP-010-EV-003,End appends version 2 and preserves version 1; prior episode retained
+AC-4,PASS,CEP-010-EV-003,Cross-tenant Person; User; Employee references rejected
+AC-5,PASS,CEP-010-EV-002; CEP-010-EV-003,Legacy Employee resolves without synthesized target rows; ambiguous mapping fails closed
+AC-6,PASS,CEP-010-EV-001; CEP-010-EV-003,No Job Family or Grade model/field added

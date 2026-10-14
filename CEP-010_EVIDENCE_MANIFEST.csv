@@ -1,0 +1,7 @@
+Evidence ID,Type,Source,Result
+CEP-010-EV-001,CODE DIFF,Workforce models/person_services/schema migration and git diff --check,Inspected; no unrelated product surface
+CEP-010-EV-002,MIGRATION OUTPUT,manage.py migrate workforce 0009; migrate workforce 0008; migrate workforce 0009; before/after counts,Forward/reverse/reapply PASS; Employee 10; position assignments 12; project assignments 8; target tables 0
+CEP-010-EV-003,TEST OUTPUT,python -m pytest apps/workforce/test_cep010_person_workrelationship.py --nomigrations --reuse-db -q,12 passed
+CEP-010-EV-004,REGRESSION OUTPUT,python -m pytest apps/workforce/tests.py::WorkforceModelTests --nomigrations --reuse-db -q -k employee,4 passed; 6 deselected
+CEP-010-EV-005,LINT OUTPUT,ruff check models.py person_services.py test_cep010_person_workrelationship.py; ruff format --check new service/test,All checks passed; 2 files formatted
+CEP-010-EV-006,SYSTEM OUTPUT,manage.py makemigrations --check --dry-run; manage.py check; migrate workforce 0009 --plan,No changes detected; 0 system issues; schema-only plan
