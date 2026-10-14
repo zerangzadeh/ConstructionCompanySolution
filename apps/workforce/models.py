@@ -513,6 +513,213 @@ class Employee(UUIDModel, TimeStampedModel):
         return f"{self.employee_number} - {self.first_name} {self.last_name}"
 
 
+class Person(UUIDModel, TimeStampedModel):
+    """Stable tenant-owned worker identity, independent of employment episodes."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE, related_name="people"
+    )
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="workforce_people",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "user"],
+                condition=Q(user__isnull=False),
+                name="unique_person_user_per_org",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        self.first_name = self.first_name.strip()
+        self.last_name = self.last_name.strip()
+        if not self.first_name or not self.last_name:
+            raise ValidationError("Person name is required.")
+        if (
+            self.user_id
+            and not self.organization.memberships.filter(
+                user_id=self.user_id, status="active"
+            ).exists()
+        ):
+            raise ValidationError(
+                {"user": "User must be an active organization member."}
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+
+class WorkRelationship(UUIDModel, TimeStampedModel):
+    """One effective-dated episode; identity fields cannot be rewritten."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="work_relationships",
+    )
+    person = models.ForeignKey(
+        Person, on_delete=models.PROTECT, related_name="work_relationships"
+    )
+    employee_number = models.CharField(max_length=50)
+    effective_start = models.DateField()
+    effective_end = models.DateField(null=True, blank=True)
+    legacy_employee = models.ForeignKey(
+        Employee,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="work_relationships",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.CheckConstraint(
+                condition=Q(effective_end__isnull=True)
+                | Q(effective_end__gte=models.F("effective_start")),
+                name="work_rel_end_not_before_start",
+            ),
+            models.UniqueConstraint(
+                fields=["person", "organization", "effective_start"],
+                name="unique_work_rel_person_start",
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "employee_number", "effective_start"],
+                name="unique_work_rel_number_start",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "person", "effective_start"],
+                name="work_rel_org_person_start_idx",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        self.employee_number = canonicalize_upper_identifier(self.employee_number)
+        if not self.employee_number:
+            raise ValidationError({"employee_number": "Employee number is required."})
+        if self.effective_end and self.effective_end < self.effective_start:
+            raise ValidationError({"effective_end": "End cannot precede start."})
+        relations = {"person": self.person}
+        if self.legacy_employee_id:
+            relations["legacy_employee"] = self.legacy_employee
+            if self.legacy_employee.employee_number != self.employee_number:
+                raise ValidationError(
+                    {
+                        "legacy_employee": "Employee number does not match legacy identity."
+                    }
+                )
+            if WorkRelationship.objects.filter(
+                legacy_employee_id=self.legacy_employee_id
+            ).exclude(person_id=self.person_id).exists():
+                raise ValidationError(
+                    {"legacy_employee": "Legacy Employee is linked to another Person."}
+                )
+            if (
+                self.person.user_id
+                and self.legacy_employee.user_id
+                and self.person.user_id != self.legacy_employee.user_id
+            ):
+                raise ValidationError(
+                    {"legacy_employee": "Legacy User link conflicts with Person."}
+                )
+        validate_related_organizations(self, **relations)
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        self.full_clean()
+        if self._state.adding is False:
+            raise ValidationError(
+                "WorkRelationship changes require a versioned service."
+            )
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("WorkRelationship history cannot be deleted.")
+
+
+class WorkRelationshipRevision(UUIDModel):
+    """Append-only effective-date snapshot for an episode."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization",
+        on_delete=models.CASCADE,
+        related_name="work_relationship_revisions",
+    )
+    relationship = models.ForeignKey(
+        WorkRelationship, on_delete=models.PROTECT, related_name="revisions"
+    )
+    version = models.PositiveIntegerField()
+    effective_start = models.DateField()
+    effective_end = models.DateField(null=True, blank=True)
+    recorded_at = models.DateTimeField(default=timezone.now)
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="work_relationship_revisions",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["relationship", "version"], name="unique_work_rel_revision"
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_end__isnull=True)
+                | Q(effective_end__gte=models.F("effective_start")),
+                name="work_rel_revision_dates_valid",
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(self, relationship=self.relationship)
+        if self.effective_start != self.relationship.effective_start:
+            raise ValidationError(
+                {"effective_start": "Revision start must match episode."}
+            )
+        if self.effective_end != self.relationship.effective_end:
+            raise ValidationError(
+                {"effective_end": "Revision end must match episode state."}
+            )
+        if self.effective_end and self.effective_end < self.effective_start:
+            raise ValidationError({"effective_end": "End cannot precede start."})
+        next_version = (
+            WorkRelationshipRevision.objects.filter(relationship=self.relationship)
+            .order_by("-version")
+            .values_list("version", flat=True)
+            .first()
+            or 0
+        ) + 1
+        if self.version != next_version:
+            raise ValidationError({"version": "Revision version must be consecutive."})
+        if not self.organization.memberships.filter(
+            user_id=self.recorded_by_id, status="active"
+        ).exists():
+            raise ValidationError(
+                {"recorded_by": "Actor must be an active organization member."}
+            )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("WorkRelationship revisions are immutable.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("WorkRelationship revisions cannot be deleted.")
+
+
 class WorkforceCatalogueBase(UUIDModel, TimeStampedModel):
     """Shared tenant-safe catalogue fields for Workforce reference facts."""
 
