@@ -69,11 +69,16 @@ bounded execution closeouts, **5/5 EXECUTION COMPLETE**. CEP-010 is in its
 separate unstaged worktree; CEP-005/007 remain unstaged here, so this is not a
 claim of Git integration. Historical authorized/not-executed and blocked
 snapshots are preserved. `GATE-01` remains **PARTIAL / NOT READY** because
-`IMB-0055 / CEP-008` has no implementation evidence. CEP-008 is ready for Human
-authorization review only; no new CEP is authorized by this status. Human
-Sign-off and Production acceptance/deployment/cutover/certification remain
-unexecuted. See [the final batch review](AUTH-BATCH-001_FINAL_REVIEW.md) and its
-current CEP-status and blocker reconciliations.
+`IMB-0055 / CEP-008` has no implementation evidence. Its bounded Human
+authorization is preserved, while the 2026-10-14 canonical-source recovery
+resolved the repository-local source-availability finding: the CEP prompt,
+PD-030, IMB-0055 and complete authoritative SPEC-002 Recognition Owner Matrix
+were directly verified from the consolidated project packages. This recovery
+does not execute CEP-008; a separate bounded resume is required. `GATE-01`
+therefore remains **PARTIAL / NOT READY**. Human Sign-off and Production
+acceptance/deployment/cutover/certification remain unexecuted. See [the final
+batch review](AUTH-BATCH-001_FINAL_REVIEW.md) and its current CEP-status and
+blocker reconciliations.
 
 ## Mandatory delivery contract for every future work package
 
