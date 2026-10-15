@@ -87,6 +87,9 @@ def runtime_check(wheelhouse: Path, output: Path) -> None:
         checks["pure_import_and_absence"] = "PASS"
 
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.development")
+        repo_root = Path(__file__).resolve().parents[1]
+        if str(repo_root) not in sys.path:
+            sys.path.insert(0, str(repo_root))
         import django
 
         django.setup()
