@@ -25,6 +25,16 @@ def prepare_lock(source: Path, destination: Path) -> None:
     binary_indexes = [
         i for i, line in enumerate(lines) if line.startswith("psycopg-binary==")
     ]
+    if not binary_indexes:
+        if "psycopg-binary" in raw.lower():
+            raise ValueError("Rejected artifact remains in lock")
+        if len(re.findall(r"^psycopg==3\.3\.5\s*\\$", raw, re.MULTILINE)) != 1:
+            raise ValueError("Exact psycopg version missing or duplicated")
+        if raw.count(f"--hash=sha256:{PURE_SHA256}") != 1:
+            raise ValueError("Exact psycopg wheel hash missing or duplicated")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(raw, encoding="utf-8")
+        return
     if len(binary_indexes) != 1:
         raise ValueError("Expected exactly one psycopg-binary lock entry")
     index = binary_indexes[0]

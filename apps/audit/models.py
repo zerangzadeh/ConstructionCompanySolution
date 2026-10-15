@@ -177,6 +177,10 @@ class AuditAction(models.TextChoices):
         "accounting.controlled_adjustment_created",
         "تعدیل کنترل‌شده ایجاد شد",
     )
+    ACCOUNTING_CONTROL_ACCOUNT_MAPPING_VERSIONED = (
+        "accounting.control_account_mapping_versioned",
+        "نسخه نگاشت حساب کنترل ثبت شد",
+    )
     WORKFLOW_DEFINITION_CREATED = (
         "workflow_definition.created",
         "تعریف گردش‌کار ایجاد شد",
@@ -746,6 +750,10 @@ class AuditAction(models.TextChoices):
     DOCUMENT_CATEGORY_CREATED = (
         "document.category_created",
         "دسته‌بندی سند ایجاد شد",
+    )
+    DOCUMENT_CATEGORY_POLICY_UPDATED = (
+        "document.category_policy_updated",
+        "سیاست دسترسی دسته‌بندی سند به‌روزرسانی شد",
     )
     DOCUMENT_PROCESSING_ASSESSED = (
         "document.processing_assessed",

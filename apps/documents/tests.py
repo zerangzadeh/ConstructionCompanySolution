@@ -25,9 +25,11 @@ from apps.documents.services import (
 )
 from apps.organizations.access_services import assign_platform_role
 from apps.organizations.models import (
+    AuthorizationScopeType,
     BusinessPermission,
     BusinessPermissionCode,
     MembershipRole,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
     OrganizationMembership,
@@ -71,16 +73,26 @@ class DocumentServiceTests(TestCase):
         )
         OrganizationSettings.objects.create(organization=self.organization)
         OrganizationSettings.objects.create(organization=self.other_organization)
-        self.organization.memberships.create(
+        owner_membership = self.organization.memberships.create(
             user=self.owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
-        self.other_organization.memberships.create(
+        other_membership = self.other_organization.memberships.create(
             user=self.other_user,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        for organization, membership in (
+            (self.organization, owner_membership),
+            (self.other_organization, other_membership),
+        ):
+            MembershipScopeGrant.objects.create(
+                organization=organization,
+                membership=membership,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Document regression fixture scope",
+            )
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,
@@ -264,11 +276,17 @@ class DocumentServiceTests(TestCase):
                 ]
             )
         )
-        OrganizationMembership.objects.create(
+        restricted_membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=restricted_user,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=restricted_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Document-only regression fixture scope",
         )
 
         self.assertFalse(

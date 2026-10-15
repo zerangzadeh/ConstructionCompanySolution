@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="1597.912" timestamp="2026-10-15T15:47:47.500576+03:30" hostname="Zerangzadeh"><testcase classname="apps.inventory.test_cep009.InventoryBalanceQueryTests" name="test_single_scoped_aggregate_preserves_transfer_and_reversal_history" time="1492.117" /><testcase classname="apps.inventory.test_cep009.InventoryBalanceQueryTests" name="test_warehouse_locks_follow_uuid_order_for_either_direction" time="0.352"><failure message="AssertionError: '2c791836-b0f1-4ff4-be14-bead4ab91ebd' not found in 'SELECT &quot;inventory_warehouse&quot;.&quot;id&quot;, &quot;inventory_warehouse&quot;.&quot;created_at&quot;, &quot;inventory_warehouse&quot;.&quot;updated_at&quot;, &quot;inventory_warehouse&quot;.&quot;organization_id&quot;, &quot;inventory_warehouse&quot;.&quot;project_id&quot;, &quot;inventory_warehouse&quot;.&quot;code&quot;, &quot;inventory_warehouse&quot;.&quot;name&quot;, &quot;inventory_warehouse&quot;.&quot;location&quot;, &quot;inventory_warehouse&quot;.&quot;is_active&quot;, &quot;inventory_warehouse&quot;.&quot;archived_at&quot;, &quot;inventory_warehouse&quot;.&quot;created_by_id&quot;, &quot;inventory_warehouse&quot;.&quot;updated_by_id&quot; FROM &quot;inventory_warehouse&quot; WHERE (&quot;inventory_warehouse&quot;.&quot;organization_id&quot; = \'1cf4f06eec9f4b48942532df0bc67cfc\'::uuid AND &quot;inventory_warehouse&quot;.&quot;id&quot; = \'2c791836b0f14ff4be14bead4ab91ebd\'::uuid) LIMIT 21 FOR UPDATE'">self = &lt;apps.inventory.test_cep009.InventoryBalanceQueryTests testMethod=test_warehouse_locks_follow_uuid_order_for_either_direction&gt;
+
+    def test_warehouse_locks_follow_uuid_order_for_either_direction(self) -&gt; None:
+        with CaptureQueriesContext(connection) as captured:
+            locked = _lock_warehouse_ids(
+                organization=self.organization,
+                warehouse_ids={self.site.pk, self.central.pk},
+            )
+        self.assertEqual(list(locked), sorted([self.site.pk, self.central.pk]))
+        self.assertEqual(len(captured), 2)
+        for query, warehouse_id in zip(captured, sorted(locked), strict=True):
+            self.assertIn("FOR UPDATE", query["sql"].upper())
+&gt;           self.assertIn(str(warehouse_id), query["sql"])
+E           AssertionError: '2c791836-b0f1-4ff4-be14-bead4ab91ebd' not found in 'SELECT "inventory_warehouse"."id", "inventory_warehouse"."created_at", "inventory_warehouse"."updated_at", "inventory_warehouse"."organization_id", "inventory_warehouse"."project_id", "inventory_warehouse"."code", "inventory_warehouse"."name", "inventory_warehouse"."location", "inventory_warehouse"."is_active", "inventory_warehouse"."archived_at", "inventory_warehouse"."created_by_id", "inventory_warehouse"."updated_by_id" FROM "inventory_warehouse" WHERE ("inventory_warehouse"."organization_id" = \'1cf4f06eec9f4b48942532df0bc67cfc\'::uuid AND "inventory_warehouse"."id" = \'2c791836b0f14ff4be14bead4ab91ebd\'::uuid) LIMIT 21 FOR UPDATE'
+
+apps\inventory\test_cep009.py:38: AssertionError</failure></testcase><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_transfer_debits_source_and_credits_destination" time="1.410" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_reversal_adds_opposite_entry_and_preserves_original" time="0.790" /><testcase classname="apps.inventory.tests.StockTransactionServiceTests" name="test_rbac_and_read_queries_are_tenant_scoped" time="0.447" /><testcase classname="apps.inventory.test_p8_s05_s11.InventoryCustodyServiceTests" name="test_two_sided_transfer_conserves_quantity_and_is_retry_safe" time="1.659"><failure message="django.core.exceptions.PermissionDenied: اجازه انجام این عملیات کنترل موجودی را ندارید.">self = &lt;apps.inventory.test_p8_s05_s11.InventoryCustodyServiceTests testMethod=test_two_sided_transfer_conserves_quantity_and_is_retry_safe&gt;
+
+    def test_two_sided_transfer_conserves_quantity_and_is_retry_safe(self) -&gt; None:
+        self.create_and_post(
+            number="OPENING-TRANSFER",
+            transaction_type=StockTransactionType.ADJUSTMENT_IN,
+            quantity=Decimal(5),
+            destination=self.central,
+            actor=self.owner,
+        )
+        transfer = create_inventory_transfer(
+            organization=self.organization,
+            actor=self.owner,
+            transfer_number="MOVE-1",
+            source_warehouse=self.central,
+            destination_warehouse=self.site,
+            lines=[TransferLineSpec(self.material, Decimal(3))],
+        )
+        transfer = dispatch_inventory_transfer(
+            organization=self.organization,
+            actor=self.owner,
+            inventory_transfer=transfer,
+        )
+        with self.assertRaises(ValueError):
+            dispatch_inventory_transfer(
+                organization=self.organization,
+                actor=self.owner,
+                inventory_transfer=transfer,
+            )
+        transfer = mark_transfer_in_transit(
+            organization=self.organization,
+            actor=self.owner,
+            inventory_transfer=transfer,
+        )
+        with self.assertRaises(PermissionDenied):
+            accept_inventory_transfer(
+                organization=self.organization,
+                actor=self.owner,
+                inventory_transfer=transfer,
+                outcomes={
+                    transfer.lines.get().pk: (
+                        Decimal(3),
+                        TransferExceptionCode.NONE,
+                        "",
+                    )
+                },
+            )
+&gt;       transfer = accept_inventory_transfer(
+            organization=self.organization,
+            actor=self.controller,
+            inventory_transfer=transfer,
+            outcomes={
+                transfer.lines.get().pk: (
+                    Decimal(3),
+                    TransferExceptionCode.NONE,
+                    "",
+                )
+            },
+        )
+
+apps\inventory\test_p8_s05_s11.py:371: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\p8_services.py:1966: in accept_inventory_transfer
+    _require(
+apps\inventory\p8_services.py:614: in _require
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = &lt;User: inventory-controller&gt;, organization = &lt;Organization: Inventory Co&gt;
+permission = BusinessPermissionCode.INVENTORY_TRANSFERS_ACCEPT
+message = 'اجازه انجام این عملیات کنترل موجودی را ندارید.'
+project = &lt;Project: INV-PROJ - Inventory Project&gt;, site = None
+allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -&gt; OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+&gt;           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: اجازه انجام این عملیات کنترل موجودی را ندارید.
+
+apps\organizations\authorization.py:434: PermissionDenied</failure></testcase><testcase classname="apps.inventory.test_cep009.InventoryTransferLockOrderTests" name="test_opposing_transfers_post_once_without_lost_update" time="99.146" /></testsuite></testsuites>

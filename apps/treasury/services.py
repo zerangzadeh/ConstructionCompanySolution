@@ -59,8 +59,12 @@ from apps.treasury.models import (
     TreasuryAdvance,
     TreasuryAdvanceReconciliationRun,
     TreasuryAdvanceStatus,
+    TreasuryGLReconciliationJournalLineEvidence,
+    TreasuryGLReconciliationLegEvidence,
     TreasuryGLReconciliationReview,
     TreasuryGLReconciliationRun,
+    TreasuryGLReconciliationRunProvenance,
+    TreasuryGLReconciliationSlice,
     TreasuryLegDirection,
     TreasuryMovement,
     TreasuryMovementKind,
@@ -1263,6 +1267,64 @@ def bounce_cleared_cheque(
     return cheque
 
 
+def _treasury_gl_slice_data(*, organization, movements, cutoff_date):
+    """Capture the approved currency/Treasury-account grain without replaying history."""
+
+    groups: dict[tuple[str, object], dict[str, object]] = {}
+    for movement in movements:
+        journal = movement.journal
+        evidence = getattr(movement, "posting_evidence", None)
+        mappings = {}
+        if evidence:
+            mappings = {
+                str(item.pk): item
+                for item in TreasuryAccountMappingVersion.objects.filter(
+                    organization=organization, pk__in=evidence.mapping_version_ids
+                )
+            }
+        for index, leg in enumerate(movement.legs.all()):
+            key = (movement.currency, leg.account)
+            group = groups.setdefault(
+                key,
+                {
+                    "currency": movement.currency,
+                    "account": leg.account,
+                    "legs": [],
+                    "lines": [],
+                    "in": Decimal(0),
+                    "out": Decimal(0),
+                    "debit": Decimal(0),
+                    "credit": Decimal(0),
+                },
+            )
+            group["legs"].append((movement, leg))
+            if leg.direction == TreasuryLegDirection.IN:
+                group["in"] += leg.amount
+            else:
+                group["out"] += leg.amount
+            if not journal or journal.status != JournalStatus.POSTED:
+                continue
+            if index >= len(getattr(evidence, "mapping_version_ids", [])):
+                continue
+            mapping = mappings.get(str(evidence.mapping_version_ids[index]))
+            if not mapping or mapping.treasury_account_id != leg.account_id:
+                continue
+            expected = {
+                "account_id": mapping.cash_ledger_account_id,
+                "debit": leg.amount
+                if leg.direction == TreasuryLegDirection.IN
+                else Decimal(0),
+                "credit": leg.amount
+                if leg.direction == TreasuryLegDirection.OUT
+                else Decimal(0),
+            }
+            for line in journal.lines.filter(**expected):
+                group["lines"].append((movement, line))
+                group["debit"] += line.debit
+                group["credit"] += line.credit
+    return list(groups.values())
+
+
 @transaction.atomic
 def run_treasury_gl_reconciliation(
     *, organization: Organization, actor, cutoff_date: date
@@ -1361,6 +1423,16 @@ def run_treasury_gl_reconciliation(
         totals = journal.lines.aggregate(debit=Sum("debit"), credit=Sum("credit"))
         journal_debit += totals["debit"] or Decimal(0)
         journal_credit += totals["credit"] or Decimal(0)
+    slice_data = _treasury_gl_slice_data(
+        organization=organization, movements=movements, cutoff_date=cutoff_date
+    )
+    treasury_in = sum((item["in"] for item in slice_data), Decimal(0))
+    treasury_out = sum((item["out"] for item in slice_data), Decimal(0))
+    journal_debit = sum((item["debit"] for item in slice_data), Decimal(0))
+    journal_credit = sum((item["credit"] for item in slice_data), Decimal(0))
+    journal_ids = {
+        str(line.journal_id) for item in slice_data for _movement, line in item["lines"]
+    }
     payload = {
         "cutoff": cutoff_date.isoformat(),
         "movements": [str(item.pk) for item in movements],
@@ -1383,6 +1455,71 @@ def run_treasury_gl_reconciliation(
         exceptions=exceptions,
         evidence_hash=_payload_hash(payload),
         run_by=runner,
+    )
+    for item in slice_data:
+        prior = (
+            TreasuryGLReconciliationSlice.objects.select_for_update(of=("self",))
+            .filter(
+                organization=organization,
+                cutoff_date=cutoff_date,
+                currency=item["currency"],
+                treasury_account=item["account"],
+                invalidation__isnull=True,
+            )
+            .order_by("-grain_revision")
+            .first()
+        )
+        revision = (prior.grain_revision if prior else 0) + 1
+        slice_hash = _payload_hash(
+            {
+                "cutoff": cutoff_date.isoformat(),
+                "currency": item["currency"],
+                "account": str(item["account"].pk),
+                "revision": revision,
+                "legs": [str(leg.pk) for _movement, leg in item["legs"]],
+                "lines": [str(line.pk) for _movement, line in item["lines"]],
+            }
+        )
+        slice = TreasuryGLReconciliationSlice.objects.create(
+            run=run,
+            organization=organization,
+            cutoff_date=cutoff_date,
+            currency=item["currency"],
+            treasury_account=item["account"],
+            treasury_in=item["in"],
+            treasury_out=item["out"],
+            journal_debit=item["debit"],
+            journal_credit=item["credit"],
+            evidence_hash=slice_hash,
+            grain_revision=revision,
+            supersedes=prior,
+        )
+        for movement, leg in item["legs"]:
+            TreasuryGLReconciliationLegEvidence.objects.create(
+                slice=slice,
+                organization=organization,
+                movement=movement,
+                leg=leg,
+                movement_version=movement.version,
+                occurrence_id=movement.occurrence_id,
+                currency=movement.currency,
+                direction=leg.direction,
+                amount=leg.amount,
+            )
+        for movement, line in item["lines"]:
+            TreasuryGLReconciliationJournalLineEvidence.objects.create(
+                slice=slice,
+                organization=organization,
+                movement=movement,
+                journal=line.journal,
+                journal_line=line,
+                journal_source_uuid=line.journal.source_uuid,
+                journal_source_version=line.journal.source_version,
+                debit=line.debit,
+                credit=line.credit,
+            )
+    TreasuryGLReconciliationRunProvenance.objects.create(
+        run=run, classification="prospective", evidence_hash=run.evidence_hash
     )
     record_audit_event(
         action=AuditAction.TREASURY_RECONCILIATION_RETAINED,
@@ -1484,9 +1621,7 @@ def review_treasury_gl_reconciliation(
 def verify_treasury_gl_reconciliation_review(
     *, organization: Organization, run: TreasuryGLReconciliationRun
 ) -> TreasuryGLReconciliationReview:
-    run = TreasuryGLReconciliationRun.objects.get(
-        pk=run.pk, organization=organization
-    )
+    run = TreasuryGLReconciliationRun.objects.get(pk=run.pk, organization=organization)
     try:
         review = run.review
     except TreasuryGLReconciliationReview.DoesNotExist as exc:

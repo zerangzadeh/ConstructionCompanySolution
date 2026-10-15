@@ -52,12 +52,13 @@ from apps.inventory.models import (
 )
 from apps.inventory.services import (
     _get_warehouse,
+    _lock_warehouse_ids,
     _stock_balance_value,
     _validate_material,
     create_stock_transaction,
     post_stock_transaction,
 )
-from apps.materials.models import Material
+from apps.materials.models import Material, UnitOfMeasure
 from apps.organizations.authorization import (
     get_active_membership,
     require_business_permission,
@@ -1784,11 +1785,12 @@ def create_inventory_transfer(
     destination_warehouse: Warehouse,
     lines: Iterable[TransferLineSpec],
 ) -> InventoryTransfer:
-    source = _get_warehouse(organization=organization, warehouse=source_warehouse)
-    destination = _get_warehouse(
-        organization=organization, warehouse=destination_warehouse
+    locked_warehouses = _lock_warehouse_ids(
+        organization=organization,
+        warehouse_ids={source_warehouse.pk, destination_warehouse.pk},
     )
-    assert source is not None and destination is not None
+    source = locked_warehouses[source_warehouse.pk]
+    destination = locked_warehouses[destination_warehouse.pk]
     _require(
         organization=organization,
         actor=actor,
@@ -1808,12 +1810,18 @@ def create_inventory_transfer(
     line_specs = tuple(lines)
     if not line_specs:
         raise ValueError("انتقال باید حداقل یک ردیف داشته باشد.")
-    for spec in line_specs:
-        stored_material, unit = _validate_material(
+    validated_materials: dict[int, tuple[Material, UnitOfMeasure]] = {}
+    for index in sorted(
+        range(len(line_specs)), key=lambda position: line_specs[position].material.pk
+    ):
+        spec = line_specs[index]
+        validated_materials[index] = _validate_material(
             organization=organization,
             material=spec.material,
             unit_of_measure=spec.material.unit_of_measure,
         )
+    for index, spec in enumerate(line_specs):
+        stored_material, unit = validated_materials[index]
         line = InventoryTransferLine(
             organization=organization,
             transfer=record,

@@ -30,6 +30,11 @@ class AccountType(models.TextChoices):
     EXPENSE = "expense", "هزینه"
 
 
+class ControlAccountDirection(models.TextChoices):
+    RECEIVABLE = "receivable", "دریافتنی"
+    PAYABLE = "payable", "پرداختنی"
+
+
 class FiscalYearStatus(models.TextChoices):
     DRAFT = "draft", "پیش‌نویس"
     ACTIVE = "active", "فعال"
@@ -161,6 +166,77 @@ class Account(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.code} - {self.name}"
+
+
+class ControlAccountMappingVersion(UUIDModel, CreatedAtModel):
+    """Accounting-owned AP/AR control-account policy for one effective scope."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    source_kind = models.CharField(max_length=80)
+    direction = models.CharField(max_length=16, choices=ControlAccountDirection.choices)
+    version = models.PositiveIntegerField()
+    control_account = models.ForeignKey(
+        Account, on_delete=models.PROTECT, related_name="control_account_mappings"
+    )
+    effective_from = models.DateField()
+    effective_to = models.DateField(null=True, blank=True)
+    reason = models.TextField()
+    created_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    class Meta:
+        ordering = ["source_kind", "direction", "version"]  # noqa: RUF012
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "source_kind", "direction", "version"],
+                name="control_mapping_unique_version",
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_to__isnull=True)
+                | Q(effective_to__gte=models.F("effective_from")),
+                name="control_mapping_valid_interval",
+            ),
+            ExclusionConstraint(
+                name="control_mapping_no_scope_overlap",
+                expressions=[
+                    ("organization", RangeOperators.EQUAL),
+                    ("source_kind", RangeOperators.EQUAL),
+                    ("direction", RangeOperators.EQUAL),
+                    (
+                        DateRangeExpression(
+                            "effective_from",
+                            "effective_to",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=True),
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                ],
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            control_account=self.control_account,
+            created_by=self.created_by,
+        )
+        self.source_kind = self.source_kind.strip()
+        self.reason = self.reason.strip()
+        if not self.source_kind or not self.reason:
+            raise ValidationError("نوع منبع و دلیل نگاشت الزامی است.")
+        if not self.control_account.is_posting or self.control_account.archived_at:
+            raise ValidationError("نگاشت فقط به حساب برگ فعال مجاز است.")
+        if self.effective_to and self.effective_to < self.effective_from:
+            raise ValidationError("بازه اعتبار نگاشت نامعتبر است.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("نسخه نگاشت حساب کنترل تغییرناپذیر است.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
 
 
 class FiscalYear(UUIDModel, TimeStampedModel):

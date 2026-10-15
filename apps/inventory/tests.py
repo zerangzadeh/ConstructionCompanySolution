@@ -28,7 +28,9 @@ from apps.inventory.services import (
 from apps.materials.models import Material, UnitCategory, UnitOfMeasure
 from apps.materials.services import archive_material
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
+    MembershipScopeGrant,
     MembershipStatus,
     Organization,
 )
@@ -68,15 +70,27 @@ class InventoryFixtureMixin:
             (self.member, MembershipRole.MEMBER),
             (self.viewer, MembershipRole.VIEWER),
         ):
-            self.organization.memberships.create(
+            membership = self.organization.memberships.create(
                 user=user,
                 role=role,
                 status=MembershipStatus.ACTIVE,
             )
-        self.other_organization.memberships.create(
+            MembershipScopeGrant.objects.create(
+                organization=self.organization,
+                membership=membership,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Inventory test organization scope",
+            )
+        other_membership = self.other_organization.memberships.create(
             user=self.outsider,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.other_organization,
+            membership=other_membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Inventory test organization scope",
         )
         self.project = Project.objects.create(
             organization=self.organization,

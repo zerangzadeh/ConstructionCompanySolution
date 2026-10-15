@@ -729,6 +729,216 @@ class TreasuryGLReconciliationRun(UUIDModel, CreatedAtModel):
         raise ValidationError("اجرای تطبیق نگهداری‌شده قابل حذف نیست.")
 
 
+class TreasuryGLReconciliationSlice(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    run = models.ForeignKey(
+        TreasuryGLReconciliationRun, on_delete=models.PROTECT, related_name="slices"
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    cutoff_date = models.DateField()
+    currency = models.CharField(max_length=3)
+    treasury_account = models.ForeignKey(TreasuryAccount, on_delete=models.PROTECT)
+    treasury_in = models.DecimalField(
+        max_digits=24, decimal_places=6, default=Decimal(0)
+    )
+    treasury_out = models.DecimalField(
+        max_digits=24, decimal_places=6, default=Decimal(0)
+    )
+    journal_debit = models.DecimalField(
+        max_digits=24, decimal_places=6, default=Decimal(0)
+    )
+    journal_credit = models.DecimalField(
+        max_digits=24, decimal_places=6, default=Decimal(0)
+    )
+    evidence_hash = models.CharField(max_length=64)
+    grain_revision = models.PositiveIntegerField()
+    supersedes = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["run", "currency", "treasury_account"],
+                name="treasury_gl_slice_one_grain_per_run",
+            ),
+            models.UniqueConstraint(
+                fields=[
+                    "organization",
+                    "cutoff_date",
+                    "currency",
+                    "treasury_account",
+                    "grain_revision",
+                ],
+                name="treasury_gl_slice_unique_grain_revision",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=[
+                    "organization",
+                    "cutoff_date",
+                    "currency",
+                    "treasury_account",
+                    "grain_revision",
+                ],
+                name="treasury_gl_slice_current_idx",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            run=self.run,
+            treasury_account=self.treasury_account,
+            supersedes=self.supersedes,
+        )
+        if (
+            self.run.organization_id != self.organization_id
+            or self.run.cutoff_date != self.cutoff_date
+            or self.grain_revision < 1
+        ):
+            raise ValidationError("برش تطبیق خزانه با اجرای والد سازگار نیست.")
+        if self.supersedes_id and (
+            self.supersedes.organization_id != self.organization_id
+            or self.supersedes.cutoff_date != self.cutoff_date
+            or self.supersedes.currency != self.currency
+            or self.supersedes.treasury_account_id != self.treasury_account_id
+            or self.supersedes.grain_revision + 1 != self.grain_revision
+        ):
+            raise ValidationError("جانشین برش تطبیق خزانه معتبر نیست.")
+
+
+class TreasuryGLReconciliationLegEvidence(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.ForeignKey(
+        TreasuryGLReconciliationSlice,
+        on_delete=models.PROTECT,
+        related_name="leg_evidence",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    movement = models.ForeignKey(TreasuryMovement, on_delete=models.PROTECT)
+    leg = models.ForeignKey(TreasuryMovementLeg, on_delete=models.PROTECT)
+    movement_version = models.PositiveIntegerField()
+    occurrence_id = models.UUIDField()
+    currency = models.CharField(max_length=3)
+    direction = models.CharField(max_length=3, choices=TreasuryLegDirection.choices)
+    amount = models.DecimalField(max_digits=24, decimal_places=6)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["slice", "leg"], name="treasury_gl_slice_unique_leg"
+            )
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, slice=self.slice, movement=self.movement, leg=self.leg
+        )
+        if (
+            self.movement.organization_id != self.organization_id
+            or self.leg.movement_id != self.movement_id
+            or self.leg.account_id != self.slice.treasury_account_id
+            or self.movement.currency != self.currency
+        ):
+            raise ValidationError("شاهد حرکت خزانه با برش سازگار نیست.")
+
+
+class TreasuryGLReconciliationJournalLineEvidence(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.ForeignKey(
+        TreasuryGLReconciliationSlice,
+        on_delete=models.PROTECT,
+        related_name="journal_line_evidence",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    movement = models.ForeignKey(TreasuryMovement, on_delete=models.PROTECT)
+    journal = models.ForeignKey("accounting.JournalEntry", on_delete=models.PROTECT)
+    journal_line = models.ForeignKey("accounting.JournalLine", on_delete=models.PROTECT)
+    journal_source_uuid = models.UUIDField()
+    journal_source_version = models.PositiveIntegerField()
+    debit = models.DecimalField(max_digits=24, decimal_places=6)
+    credit = models.DecimalField(max_digits=24, decimal_places=6)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["slice", "journal_line"],
+                name="treasury_gl_slice_unique_journal_line",
+            )
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            slice=self.slice,
+            movement=self.movement,
+            journal=self.journal,
+            journal_line=self.journal_line,
+        )
+        if (
+            self.journal_line.journal_id != self.journal_id
+            or self.movement.organization_id != self.organization_id
+        ):
+            raise ValidationError("شاهد خط دفترکل خزانه معتبر نیست.")
+
+
+class TreasuryGLReconciliationSliceInvalidation(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.OneToOneField(
+        TreasuryGLReconciliationSlice,
+        on_delete=models.PROTECT,
+        related_name="invalidation",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    reason = models.TextField()
+    evidence_hash = models.CharField(max_length=64)
+    invalidated_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, slice=self.slice, invalidated_by=self.invalidated_by
+        )
+        if (
+            self.slice.organization_id != self.organization_id
+            or not self.reason.strip()
+        ):
+            raise ValidationError("ابطال برش تطبیق خزانه نامعتبر است.")
+
+
+class TreasuryGLReconciliationRunProvenance(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    run = models.OneToOneField(
+        TreasuryGLReconciliationRun, on_delete=models.PROTECT, related_name="provenance"
+    )
+    classification = models.CharField(max_length=32)
+    evidence_hash = models.CharField(max_length=64)
+
+    def clean(self) -> None:
+        if self.classification not in {"legacy_unverified", "prospective"}:
+            raise ValidationError("طبقه‌بندی منشأ تطبیق معتبر نیست.")
+
+
 class TreasuryGLReconciliationReview(
     ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
 ):
@@ -746,9 +956,7 @@ class TreasuryGLReconciliationReview(
     )
 
     def clean(self) -> None:
-        validate_related_organizations(
-            self, run=self.run, reviewed_by=self.reviewed_by
-        )
+        validate_related_organizations(self, run=self.run, reviewed_by=self.reviewed_by)
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل بررسی تطبیق الزامی است."})
         if self.reviewed_by_id == self.run.run_by_id:
@@ -1495,11 +1703,79 @@ class BankReconciliationRun(ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
     run_by = models.ForeignKey(
         "organizations.OrganizationMembership", on_delete=models.PROTECT
     )
+    grain_revision = models.PositiveIntegerField(null=True, blank=True)
+    supersedes = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
 
     class Meta:
         constraints = [  # noqa: RUF012
             models.UniqueConstraint(
                 fields=["organization", "idempotency_key"],
                 name="treasury_bank_recon_unique_key",
-            )
+            ),
+            models.UniqueConstraint(
+                fields=[
+                    "organization",
+                    "account",
+                    "statement_import",
+                    "as_of_date",
+                    "grain_revision",
+                ],
+                condition=Q(grain_revision__isnull=False),
+                name="treasury_bank_unique_grain_revision",
+            ),
         ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=[
+                    "organization",
+                    "account",
+                    "statement_import",
+                    "as_of_date",
+                    "grain_revision",
+                ],
+                name="treasury_bank_current_idx",
+            ),
+        ]
+
+
+class BankReconciliationRunInvalidation(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    run = models.OneToOneField(
+        BankReconciliationRun, on_delete=models.PROTECT, related_name="invalidation"
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    reason = models.TextField()
+    evidence_hash = models.CharField(max_length=64)
+    invalidated_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, run=self.run, invalidated_by=self.invalidated_by
+        )
+        if self.run.organization_id != self.organization_id or not self.reason.strip():
+            raise ValidationError("ابطال اجرای تطبیق بانکی نامعتبر است.")
+
+
+class BankReconciliationRunProvenance(
+    ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel
+):
+    run = models.OneToOneField(
+        BankReconciliationRun, on_delete=models.PROTECT, related_name="provenance"
+    )
+    classification = models.CharField(max_length=32)
+    evidence_hash = models.CharField(max_length=64)
+
+    def clean(self) -> None:
+        if self.classification not in {"legacy_unverified", "prospective"}:
+            raise ValidationError("طبقه‌بندی منشأ تطبیق بانکی معتبر نیست.")

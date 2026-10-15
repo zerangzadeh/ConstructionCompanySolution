@@ -55,7 +55,12 @@ from apps.inventory.services import (
     reverse_stock_transaction,
 )
 from apps.inventory.tests import InventoryFixtureMixin
-from apps.organizations.models import MembershipRole, MembershipStatus
+from apps.organizations.models import (
+    AuthorizationScopeType,
+    MembershipRole,
+    MembershipScopeGrant,
+    MembershipStatus,
+)
 from apps.organizations.services import set_active_organization
 from apps.payroll.models import PayrollRun
 from apps.projects.models import ProjectCostFact
@@ -65,10 +70,16 @@ class InventoryCustodyServiceTests(InventoryFixtureMixin, TestCase):
     def setUp(self) -> None:
         super().setUp()
         self.controller = User.objects.create_user(username="inventory-controller")
-        self.organization.memberships.create(
+        membership = self.organization.memberships.create(
             user=self.controller,
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization,
+            membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Inventory custody test organization scope",
         )
 
     def _draft(

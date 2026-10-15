@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}اسناد من | سامانه مدیریت ساخت{% endblock %}
+{% block content %}
+<section class="erp-surface rounded-xl p-5">
+  <h1 class="text-xl font-bold text-slate-950">اسناد من</h1>
+  <p class="mt-2 text-sm text-slate-600">اسناد مجاز مرتبط با سوابق کاری شما</p>
+  <ul class="mt-4 divide-y divide-slate-100">
+    {% for access in documents %}
+      <li class="py-3"><a class="text-sm font-semibold text-blue-700" href="{% url 'documents:employee-detail' access.document.id %}">{{ access.document.title }}</a><span class="mr-2 text-xs text-slate-500">{{ access.document.category.name }}</span></li>
+    {% empty %}
+      <li class="py-3 text-sm text-slate-500">سند قابل مشاهده‌ای وجود ندارد.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+# CEP-009 completion report — 2026-10-15
+
+**Status: EXECUTION COMPLETE.** `IMB-0067` and `IMB-0068` are implemented within the no-migration scope. All ten mapped acceptance criteria (ACC-0398–ACC-0407) pass on the combined selected evidence; scoped DoD passes. Inventory remains the stock and value source of truth. No new transfer or valuation policy was introduced.
+
+The balance service now uses one tenant/material/warehouse scoped SQL aggregate instead of two ledger aggregates. Warehouse row locks are acquired in UUID order for stock and transfer operations; transfer line material locks are ordered. Opposite-direction concurrent transfers posted once each with conserved balances in the selected development test. Operational-load performance and concurrency remain **UTV**, with no production certification claim.
+
+**Validation:** `output/cep-009/validation-results.xml` records five passes and two test-only failures in the seven-test selection. `output/cep-009/validation-recheck-results.xml` records both corrected cases passing. The earlier 13 fixture setup failures were **TEST INFRASTRUCTURE DEBT** from missing explicit scope grants, corrected in the scoped Inventory fixtures. The two later failures were a PostgreSQL UUID rendering test assertion and the custody-controller fixture scope, both corrected. No CEP-009 product regression remains. Ruff, formatting, Django system check, migration drift, and diff whitespace pass. No schema or data migration was created. The isolated test database was retained for review; shared `test_construction_erp` was untouched.
+
+**Git and queue:** Branch `main`; start/end HEAD `533fbd52e38dd448973ba4cc618e5faa44b01fec`. Git branch/worktree created: **NO**. `git add`: **NOT EXECUTED**. `git commit`: **NOT EXECUTED**. `git push`: **NOT EXECUTED**. `git merge`: **NOT EXECUTED**. CEP-011: **READY FOR CONTINUATION / NOT STARTED**. CEP-013: **NOT STARTED**. Human Sign-off and production actions: **NOT EXECUTED**.

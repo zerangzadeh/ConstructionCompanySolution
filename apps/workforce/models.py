@@ -1020,6 +1020,29 @@ class LaborRateVersion(UUIDModel, TimeStampedModel):
         super().save(*args, **kwargs)
 
 
+class WorkRelationshipDocumentLink(AbstractTypedDocumentLink):
+    """Immutable DMS link to one employment episode."""
+
+    target_field_name = "work_relationship"
+    work_relationship = models.ForeignKey(
+        WorkRelationship, on_delete=models.PROTECT, related_name="typed_document_links"
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "work_relationship"],
+                name="work_relationship_document_uq",
+            )
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=["organization", "document"],
+                name="work_relationship_doc_idx",
+            )
+        ]
+
+
 class EmployeeQualificationDocumentLink(AbstractTypedDocumentLink):
     """Workforce-owned, immutable DMS evidence link for a qualification."""
 

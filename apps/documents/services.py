@@ -88,6 +88,7 @@ from apps.workforce.models import (
     EmployeeQualification,
     EmployeeTrainingRecord,
     PerformanceEvaluation,
+    WorkRelationship,
 )
 
 if TYPE_CHECKING:
@@ -119,6 +120,7 @@ TARGET_MODELS = {
     "payment": Payment,
     "daily_report": DailyReport,
     "field_observation": FieldObservation,
+    "work_relationship": WorkRelationship,
     "employee_qualification": EmployeeQualification,
     "employee_training": EmployeeTrainingRecord,
     "performance_evaluation": PerformanceEvaluation,
@@ -141,6 +143,7 @@ TARGET_VIEW_PERMISSIONS = {
     "payment": BusinessPermissionCode.PAYMENTS_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
     "field_observation": BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
+    "work_relationship": BusinessPermissionCode.EMPLOYEES_VIEW,
     "employee_qualification": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
     "employee_training": BusinessPermissionCode.WORKFORCE_QUALIFICATIONS_VIEW,
     "performance_evaluation": BusinessPermissionCode.WORKFORCE_PERFORMANCE_VIEW,
@@ -273,7 +276,9 @@ def _validate_document_context_access(
         link.pk
         for link in links
         if next(
-            item for item in DOCUMENT_LINK_TYPES if item.key == link.target_type
+            item
+            for item in DOCUMENT_LINK_TYPES
+            if item.target_field == link.target_type
         ).legacy_compatible
     }
     if legacy_link_ids != typed_link_ids:
@@ -458,6 +463,9 @@ def create_document_category(
     code: str,
     name: str,
     description: str = "",
+    employee_current_visible: bool = False,
+    employee_history_visible: bool = False,
+    employee_download_allowed: bool = False,
 ) -> DocumentCategory:
     _validate_access(
         user=actor,
@@ -469,6 +477,9 @@ def create_document_category(
         code=code,
         name=name,
         description=description.strip(),
+        employee_current_visible=employee_current_visible,
+        employee_history_visible=employee_history_visible,
+        employee_download_allowed=employee_download_allowed,
         created_by=actor,
     )
     category.save()
@@ -478,9 +489,57 @@ def create_document_category(
         entity_id=category.pk,
         organization=organization,
         actor=actor,
-        metadata={"code": category.code},
+        metadata={
+            "code": category.code,
+            "employee_current_visible": category.employee_current_visible,
+            "employee_history_visible": category.employee_history_visible,
+            "employee_download_allowed": category.employee_download_allowed,
+        },
     )
     return category
+
+
+@transaction.atomic
+def set_document_category_employee_policy(
+    *,
+    category: DocumentCategory,
+    actor: User,
+    employee_current_visible: bool,
+    employee_history_visible: bool,
+    employee_download_allowed: bool,
+) -> DocumentCategory:
+    """Change employee access under the existing category-management authority."""
+    _validate_access(
+        user=actor,
+        organization=category.organization,
+        permission=BusinessPermissionCode.DOCUMENT_CATEGORIES_MANAGE,
+    )
+    locked = DocumentCategory.objects.select_for_update().get(
+        pk=category.pk, organization=category.organization, archived_at__isnull=True
+    )
+    changes = {
+        field: {"old": getattr(locked, field), "new": value}
+        for field, value in {
+            "employee_current_visible": employee_current_visible,
+            "employee_history_visible": employee_history_visible,
+            "employee_download_allowed": employee_download_allowed,
+        }.items()
+        if getattr(locked, field) != value
+    }
+    if not changes:
+        return locked
+    for field, change in changes.items():
+        setattr(locked, field, change["new"])
+    locked.save(update_fields=[*changes, "updated_at"])
+    record_audit_event(
+        action=AuditAction.DOCUMENT_CATEGORY_POLICY_UPDATED,
+        entity_type="document_category",
+        entity_id=locked.pk,
+        organization=locked.organization,
+        actor=actor,
+        changes=changes,
+    )
+    return locked
 
 
 @transaction.atomic

@@ -232,22 +232,541 @@ Before implementing a feature:
 7. Report changed files, test results, documentation updates (or explicitly state
    that none were required), assumptions, and follow-up work.
 
-Preserve unrelated user changes in a dirty worktree. Do not rewrite unrelated
-files or create branches, commits, pushes, pull requests, or remote changes unless
-explicitly requested.
+Preserve unrelated user changes in a dirty working tree. Do not rewrite unrelated
+files or create branches, worktrees, commits, pushes, pull requests, or remote changes
+unless explicitly requested. For normal CEP implementation, the default execution
+branch is the current local `main`; do not create or switch to a CEP branch/worktree
+unless the Human Decision Maker explicitly authorizes that exception.
 
-## Git workflow
+## Git workflow and persistent Codex execution policy
 
-- Use read-only Git commands only when they are necessary to inspect repository
-  state or verify a change. Keep inspection targeted; do not repeatedly run or
-  display large diffs without a verification need.
-- Do not create commits, commit messages, branches, branch switches, pushes, or
-  pull requests unless the user explicitly requests the specific action.
-- Do not include full Git diffs in progress updates or final reports unless asked.
-  Final reports summarize changed files and significant modifications only.
-- The user reviews completed work, creates commits, and pushes remote changes.
+This section is a repository-level persistent instruction and applies in every Codex
+session unless an explicit, bounded Human Authorization overrides a specific rule.
 
-## 11. Token, time, and execution efficiency
+### Default execution branch
+
+- The default implementation branch is the current local `main`.
+- For normal CEP implementation, work directly in the local `main` working tree.
+- Do **not** create a new branch, CEP branch, Git worktree, temporary integration
+  branch, or detached implementation branch by default.
+- A separate branch/worktree is allowed only when the Human Decision Maker explicitly
+  authorizes it for a specific operation.
+- Do not switch away from `main` merely because a new Codex session has started.
+
+### Default Git permissions
+
+Use read-only Git commands only when needed to inspect repository state or verify a
+change. Appropriate examples include:
+
+```text
+git status
+git diff
+git log
+git show
+git branch
+git rev-parse
+git ls-files
+```
+
+Unless the Human Decision Maker explicitly authorizes the specific action, Codex must
+not execute:
+
+```text
+git add
+git commit
+git push
+git merge
+git rebase
+git cherry-pick
+git reset
+git clean
+git stash
+git tag
+```
+
+Destructive operations such as `git reset --hard`, `git clean -fd`, force push,
+history rewrite, destructive checkout, or discarding unrelated changes are prohibited
+unless separately and explicitly authorized for a narrowly defined purpose.
+
+The normal repository workflow is:
+
+```text
+local main
+→ execute the authorized CEP
+→ run required tests and evidence
+→ leave approved changes uncommitted
+→ STOP
+→ Human later performs or separately authorizes git add / commit / push
+```
+
+The user reviews completed work and controls Git history and remote publication.
+
+### CEP execution queue policy
+
+A Codex session may execute one or more CEPs when they are explicitly listed for
+execution and are already covered by applicable Human Authorization.
+
+For multiple CEPs, the default execution mode is:
+
+```text
+SERIAL EXECUTION
+```
+
+Do not execute CEPs concurrently unless the Human Decision Maker explicitly
+authorizes parallel execution after dependency and repository-collision review.
+
+An authorized CEP queue follows:
+
+```text
+CEP-A
+→ complete bounded execution
+→ validation
+→ CEP completion report
+→ if COMPLETE, continue to CEP-B
+→ if COMPLETE, continue to CEP-C
+→ FINAL QUEUE REPORT
+→ STOP
+```
+
+Codex may continue automatically to the next CEP in the same explicitly listed queue
+only when the current CEP ends as:
+
+```text
+EXECUTION COMPLETE
+```
+
+If any CEP ends as:
+
+```text
+EXECUTION PARTIAL
+EXECUTION FAILED
+BLOCKED BEFORE MUTATION
+```
+
+or exposes a material unresolved blocker:
+
+```text
+STOP THE ENTIRE QUEUE
+```
+
+Do not start any remaining CEPs in that queue. Report every remaining CEP as:
+
+```text
+NOT STARTED
+```
+
+Queue membership does not waive any control for the next CEP. Each CEP must
+independently satisfy the repository and canonical controls applicable to it.
+
+For each CEP in the queue, perform:
+
+```text
+Repository Grounding
+→ Canonical Source Verification / Recovery
+→ Actual Execution Touch Set
+→ Implementation
+→ Focused Tests
+→ Required Regression
+→ Evidence
+→ CEP Completion Report
+```
+
+Prior results from the same session may be reused only when they remain directly
+valid and reuse does not weaken an Acceptance Criterion, security control, scope
+boundary, migration control, or evidence requirement.
+
+All queued CEP execution remains serial on the current local `main` unless an
+explicit Human Authorization states otherwise.
+
+A CEP must not consume, infer, or expand into another CEP's scope merely because both
+appear in the same queue.
+
+Git policy remains unchanged during queued execution. Unless separately authorized:
+
+```text
+git add = NOT AUTHORIZED
+git commit = NOT AUTHORIZED
+git push = NOT AUTHORIZED
+git merge = NOT AUTHORIZED
+```
+
+Multiple completed CEP changes may accumulate in the local `main` working tree for a
+later Human Git checkpoint.
+
+At the end of a successful queue, report:
+
+```text
+CEP QUEUE STATUS
+
+CEP-A = EXECUTION COMPLETE
+CEP-B = EXECUTION COMPLETE
+CEP-C = EXECUTION COMPLETE
+
+Queue stopped on blocker:
+NO
+
+git add:
+NOT EXECUTED
+
+git commit:
+NOT EXECUTED
+
+git push:
+NOT EXECUTED
+
+git merge:
+NOT EXECUTED
+```
+
+Explicitly listing CEPs in a queue is execution sequencing only. It must never be used
+to bypass prerequisite, gate, migration, production, Product Decision, authorization,
+or no-inference controls.
+
+
+### Required CEP execution sequence
+
+Every CEP implementation session must follow:
+
+```text
+Repository Grounding
+→ Canonical Source Verification / Recovery
+→ Actual Execution Touch Set
+→ Implementation
+→ Focused Tests
+→ Required Regression
+→ Evidence
+→ Completion Report
+→ STOP
+```
+
+Before product mutation, record at minimum:
+
+```text
+current branch
+current HEAD
+git status --short
+git diff --name-status
+git diff --stat
+```
+
+Expected package code surfaces are hints only; inspect the actual repository before
+selecting files, models, services, migrations, or implementation seams.
+
+### Dirty working tree protection
+
+If unrelated user changes already exist:
+
+```text
+DO NOT DISCARD THEM
+DO NOT OVERWRITE THEM
+```
+
+If the authorized CEP cannot proceed safely without risking unrelated work, stop
+before mutation and report the exact blocker. Do not use `git stash`, `git reset`,
+`git clean`, destructive checkout, or a new worktree as an automatic workaround.
+
+### Canonical-source and no-inference rule
+
+Repository-local absence of a canonical source does not prove the source does not
+exist. Before declaring a source blocker, check the approved consolidated canonical
+execution materials available to the project.
+
+Do not infer missing Product Decisions, financial authority, posting rules, domain
+ownership, migration semantics, Acceptance Criteria, or Definition of Done.
+
+Preserve fail-closed behavior:
+
+```text
+NO APPROVED POLICY
+→ NO INFERRED BUSINESS BEHAVIOR
+```
+
+If authoritative sources materially conflict, stop before product mutation.
+
+### Actual Execution Touch Set
+
+Before implementation, record the exact intended mutation surface, including as
+applicable:
+
+```text
+files
+models
+schema
+migrations
+services
+selectors
+forms
+views
+templates
+queries
+shared contracts/utilities
+tests
+settings/configuration
+```
+
+Discovery of an adjacent defect or improvement does not authorize fixing it.
+
+### Scope and downstream control
+
+A CEP execution does not authorize:
+
+- scope expansion;
+- unrelated refactoring;
+- Product Decision changes;
+- Acceptance Criteria or Definition of Done changes;
+- CEP DAG changes;
+- automatic downstream CEP activation;
+- production deployment/cutover;
+- Human Sign-off;
+- UAT or Production Certification.
+
+A completed CEP does not automatically authorize the next CEP.
+
+### Migration boundary
+
+If canonical package metadata says:
+
+```text
+Migration Impact = NONE
+```
+
+do not create a schema or data migration. If a migration becomes genuinely necessary,
+stop before model/migration mutation and request bounded Human resolution.
+
+Authorization for migration tooling, migration code, or rehearsal preparation never
+implies authorization for production migration or irreversible production cutover.
+
+### Testing, regression, and baseline debt
+
+Run the smallest sufficient validation required by the canonical CEP/IMB. Begin with
+focused tests and expand only when affected boundaries, failures, or release risk
+require it.
+
+When a failure occurs, classify it with evidence as one of:
+
+```text
+CEP REGRESSION
+BASELINE TEST DEBT
+TEST INFRASTRUCTURE DEBT
+UNRELATED FAILURE
+UTV
+```
+
+Do not claim full regression PASS when only representative regression was executed.
+Do not classify a failure as baseline merely because it is inconvenient.
+
+### CEP completion states
+
+Every CEP must end with exactly one of:
+
+```text
+EXECUTION COMPLETE
+EXECUTION PARTIAL
+EXECUTION FAILED
+```
+
+`EXECUTION COMPLETE` requires the canonical implementation-required Acceptance
+Criteria and scoped Definition of Done to be satisfied, required tests/regression to
+pass or be validly attributed, required lint/system checks to pass, and no unresolved
+in-scope blocker or unauthorized product semantics.
+
+### Completion report Git fields
+
+Unless specifically authorized otherwise, every CEP completion report must state:
+
+```text
+Branch: main
+Git branch/worktree created: NO
+git add: NOT EXECUTED
+git commit: NOT EXECUTED
+git push: NOT EXECUTED
+git merge: NOT EXECUTED
+Next CEP: NOT STARTED
+```
+
+### Human Git checkpoints
+
+Multiple completed CEP changes may intentionally accumulate in the local `main`
+working tree. The Human Decision Maker may periodically create a checkpoint:
+
+```text
+main
+├── completed CEP changes
+├── completed CEP changes
+├── completed CEP changes
+└── Human Git checkpoint
+    → git status
+    → git add
+    → git commit
+    → git push
+```
+
+Codex must not create that checkpoint unless separately authorized.
+
+### Explicit override rule
+
+An explicit Human Authorization or approved CEP-specific execution prompt may
+override a rule in this section only when the override is specific, bounded, and
+unambiguous. Silence is not an override, and historical authorization is not
+automatically reusable for a materially different action.
+
+
+## 11. Engineering constraint framework
+
+All repository work must optimize for the following project constraints together.
+Do not optimize one dimension by silently degrading another.
+
+### Non-negotiable constraints
+
+The following take precedence over speed, token reduction, convenience, or short-term
+delivery cost:
+
+```text
+1. Correctness and Quality
+2. Data and Financial Integrity
+3. Security and Tenant Isolation
+4. Financial / Domain Authority Integrity
+5. Auditability, Traceability, and Regulatory Safety
+```
+
+A faster or cheaper implementation is unacceptable if it materially weakens any of
+these controls.
+
+### Constraints to optimize
+
+Subject to the non-negotiable constraints above, actively minimize:
+
+```text
+6. Time and Execution Latency
+7. Cost and Compute/Token Consumption
+8. Governance and Decision Overhead
+9. Operational Complexity
+10. Change Blast Radius
+```
+
+Also preserve adequate:
+
+```text
+Performance and Scalability
+Concurrency Safety
+Maintainability
+Testability
+Backward Compatibility
+Reversibility and Recoverability
+```
+
+### Decision rule
+
+Before adding a control, analysis step, test, document, tool call, or approval cycle,
+ask:
+
+```text
+Does this materially reduce a correctness, integrity, security, authority,
+migration, regulatory, or production risk?
+
+YES
+→ perform it at the smallest sufficient scope.
+
+NO
+→ do not add it merely for procedural completeness.
+```
+
+If two approaches provide materially equivalent assurance, prefer the one with lower:
+
+```text
+elapsed time
+execution cost
+token/compute use
+repository churn
+test duration
+human decision latency
+operational complexity
+```
+
+### Minimum-sufficient evidence
+
+Evidence must be sufficient to support the claim being made, but duplicate assurance
+is not a goal.
+
+Prefer:
+
+```text
+focused test
+→ affected-boundary regression
+→ broader validation only when triggered by risk or failure
+```
+
+Do not run a broad or full suite when focused and representative evidence provides the
+required confidence. Do not skip a required high-risk validation merely to save time
+or cost.
+
+Reuse valid existing evidence when the underlying implementation, configuration,
+schema, and relevant assumptions have not materially changed.
+
+### Governance efficiency
+
+Governance cost must remain proportional to risk reduced:
+
+```text
+CONTROL COST
+must be proportional to
+MATERIAL RISK REDUCED
+```
+
+Avoid repeated decision packets, repeated source recovery, repeated authorization
+restatement, or repeated analysis when the prior result remains valid.
+
+A new Human/Product Decision is required only when implementation would otherwise
+need to invent or materially alter:
+
+```text
+business semantics
+financial authority
+domain ownership
+Acceptance Criteria / Definition of Done
+schema or migration scope outside authorization
+security or tenant-isolation policy
+regulatory behavior
+production / irreversible action
+```
+
+Do not turn ordinary engineering ambiguity into a Product Decision when repository
+evidence and existing architecture already determine a safe implementation.
+
+### Blocked-work efficiency
+
+A blocked CEP must not unnecessarily stop other explicitly authorized and independent
+CEPs.
+
+When a CEP is blocked:
+
+```text
+record exact blocker
+preserve current evidence
+stop mutation for that CEP
+evaluate dependency/collision impact
+continue only authorized independent work when safe
+```
+
+Never bypass a real dependency merely for throughput.
+
+### Quality/time/cost priority
+
+Use this default priority rule:
+
+```text
+QUALITY / CORRECTNESS = NON-NEGOTIABLE
+INTEGRITY / SECURITY = NON-NEGOTIABLE
+
+TIME = OPTIMIZE
+COST = OPTIMIZE
+GOVERNANCE OVERHEAD = MINIMIZE
+```
+
+Optimization must never convert a required PASS into an unsupported assumption,
+inference, or false confidence.
+
+## 12. Token, time, and execution efficiency
 
 Treat the user's token allowance and elapsed time as finite project resources.
 Accuracy and safety remain mandatory, but unnecessary work is not evidence of
@@ -316,7 +835,7 @@ response. It does not authorize unrelated documentation rewrites: inspect and
 update only affected authoritative documents, preserve current-vs-target labels,
 and keep models/migrations/tests authoritative for implemented behavior.
 
-## 12. Build-vs-Reuse and engineering Skills
+## 13. Build-vs-Reuse and engineering Skills
 
 - Reuse commodity technical capability; own strategic construction-ERP business
   logic. Before custom implementation, consider in order: Python standard library,

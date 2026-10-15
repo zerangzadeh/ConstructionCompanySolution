@@ -13,8 +13,10 @@ from django.utils import timezone
 from apps.accounting.models import AccountType, JournalEntry
 from apps.accounting.services import (
     create_account,
+    create_control_account_mapping_version,
     create_fiscal_period,
     create_fiscal_year,
+    resolve_control_account_mapping,
 )
 from apps.accounts.models import User
 from apps.organizations.authorization import membership_has_permission
@@ -47,6 +49,7 @@ from apps.subledgers.services import (
     allocate_settlement,
     approve_write_off,
     recognize_obligation,
+    resolve_pinned_control_account_for_posting,
     reverse_settlement,
     review_subledger_reconciliation,
     run_aging,
@@ -420,7 +423,7 @@ class SubledgerFoundationTests(TestCase):
     def test_reconciliation_retains_missing_mapping_without_accounting_mutation(
         self,
     ) -> None:
-        obligation = self._obligation()
+        self._obligation()
         journal_count = JournalEntry.objects.count()
         run = run_subledger_reconciliation(
             organization=self.organization,
@@ -429,12 +432,169 @@ class SubledgerFoundationTests(TestCase):
             as_of_date=date(2026, 6, 30),
             idempotency_key="RECON-1",
         )
-        self.assertEqual(run.subledger_outstanding_total, obligation.original_amount)
+        self.assertEqual(run.subledger_outstanding_total, Decimal(0))
         self.assertEqual(run.linked_gl_total, Decimal(0))
         self.assertEqual(
-            run.exception_snapshots[0]["code"], "MISSING_RECOGNITION_JOURNAL"
+            run.exception_snapshots[0]["code"], "CONTROL_MAPPING_NOT_APPROVED"
         )
         self.assertEqual(JournalEntry.objects.count(), journal_count)
+
+    def test_control_account_mapping_is_effective_dated_pinned_and_tenant_scoped(
+        self,
+    ) -> None:
+        ar_control = create_account(
+            organization=self.organization,
+            actor=self.owner,
+            code="1210",
+            name="حساب کنترل دریافتنی",
+            account_type=AccountType.ASSET,
+            is_posting=True,
+        )
+        future_control = create_account(
+            organization=self.organization,
+            actor=self.owner,
+            code="1211",
+            name="حساب کنترل دریافتنی بعدی",
+            account_type=AccountType.ASSET,
+            is_posting=True,
+        )
+        first = create_control_account_mapping_version(
+            organization=self.organization,
+            actor=self.owner,
+            source_kind="test.exact-source.v1",
+            direction=ObligationDirection.RECEIVABLE,
+            control_account=ar_control,
+            effective_from=date(2026, 1, 1),
+            effective_to=date(2026, 6, 30),
+            reason="نگاشت دریافتنی نخست",
+        )
+        second = create_control_account_mapping_version(
+            organization=self.organization,
+            actor=self.owner,
+            source_kind="test.exact-source.v1",
+            direction=ObligationDirection.RECEIVABLE,
+            control_account=future_control,
+            effective_from=date(2026, 7, 1),
+            effective_to=None,
+            reason="نگاشت دریافتنی بعدی",
+        )
+        ap_control = create_account(
+            organization=self.organization,
+            actor=self.owner,
+            code="2110",
+            name="حساب کنترل پرداختنی",
+            account_type=AccountType.LIABILITY,
+            is_posting=True,
+        )
+        payable = create_control_account_mapping_version(
+            organization=self.organization,
+            actor=self.owner,
+            source_kind="test.payable-source.v1",
+            direction=ObligationDirection.PAYABLE,
+            control_account=ap_control,
+            effective_from=date(2026, 1, 1),
+            effective_to=None,
+            reason="نگاشت پرداختنی",
+        )
+        self.assertEqual(
+            resolve_control_account_mapping(
+                organization=self.organization,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                effective_on=date(2026, 6, 30),
+            ).pk,
+            first.pk,
+        )
+        self.assertEqual(
+            resolve_control_account_mapping(
+                organization=self.organization,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                effective_on=date(2026, 7, 1),
+            ).pk,
+            second.pk,
+        )
+        self.assertEqual(
+            resolve_control_account_mapping(
+                organization=self.organization,
+                source_kind="test.payable-source.v1",
+                direction=ObligationDirection.PAYABLE,
+                effective_on=date(2026, 1, 1),
+            ).pk,
+            payable.pk,
+        )
+        with self.assertRaises(ValidationError):
+            resolve_control_account_mapping(
+                organization=self.organization,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                effective_on=date(2025, 12, 31),
+            )
+        with self.assertRaises(ValidationError):
+            create_control_account_mapping_version(
+                organization=self.organization,
+                actor=self.owner,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                control_account=ar_control,
+                effective_from=date(2026, 6, 1),
+                effective_to=date(2026, 8, 1),
+                reason="هم‌پوشانی ممنوع",
+            )
+        source_id = uuid4()
+        obligation = Obligation.objects.create(
+            organization=self.organization,
+            direction=ObligationDirection.RECEIVABLE,
+            source_kind="test.exact-source.v1",
+            source_uuid=source_id,
+            source_version=1,
+            source_status="final",
+            source_hash="e" * 64,
+            source_snapshot={"source": str(source_id)},
+            party_name_snapshot="Pinned customer",
+            original_amount=Decimal(10),
+            recognized_on=date(2026, 6, 1),
+            idempotency_key=f"PIN:{source_id}",
+            payload_hash="f" * 64,
+            recognized_by=self.owner_membership,
+            control_account=ar_control,
+            control_account_mapping=first,
+        )
+        self.assertEqual(
+            resolve_pinned_control_account_for_posting(
+                organization=self.organization, obligation=obligation
+            ).pk,
+            ar_control.pk,
+        )
+        obligation.control_account = future_control
+        with self.assertRaises(ValidationError):
+            obligation.save()
+        other_owner = User.objects.create_user(username="p3-map-other", password="x")
+        other = create_organization_with_owner(
+            owner=other_owner, name="Other Mapping", slug="other-mapping"
+        )
+        with self.assertRaises(ValidationError):
+            create_control_account_mapping_version(
+                organization=other,
+                actor=other_owner,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                control_account=ar_control,
+                effective_from=date(2026, 1, 1),
+                effective_to=None,
+                reason="حساب Tenant دیگر",
+            )
+        with self.assertRaises(ValidationError):
+            resolve_control_account_mapping(
+                organization=other,
+                source_kind="test.exact-source.v1",
+                direction=ObligationDirection.RECEIVABLE,
+                effective_on=date(2026, 6, 1),
+            )
+        with self.assertRaises(PermissionDenied):
+            resolve_pinned_control_account_for_posting(
+                organization=other, obligation=obligation
+            )
 
     def test_subledger_reconciliation_review_enforces_maker_checker(self) -> None:
         self._obligation()

@@ -1,0 +1,18 @@
+Evidence ID,Type,Result,Location
+CEP-013-EV-001,Repository grounding,PASS,CEP-013_EXECUTION_MANIFEST.md
+CEP-013-EV-002,Canonical source and Human decision,PASS,CEP-013_SUPPLY_CHAIN_DECISION.md
+CEP-013-EV-003,Historical Windows lock identity,PRESERVED,requirements-lock.txt
+CEP-013-EV-004,Exact Linux lock and image configuration,PASS,requirements-prod-linux.lock; requirements-dev-linux.lock; security/supply_chain/build_image.json
+CEP-013-EV-005,Hash-checked online and offline wheelhouse,PASS,output/cep-013/gate/gate-result.json
+CEP-013-EV-006,OSV exact-version advisory query,ZERO IDS AT QUERY TIME,output/cep-013/gate/osv-prod-response.json; output/cep-013/gate/osv-dev-response.json
+CEP-013-EV-007,SBOM and wheel provenance identity,GENERATED,output/cep-013/gate/sbom-prod.cdx.json; output/cep-013/gate/sbom-dev.cdx.json
+CEP-013-EV-008,License and fail-closed gate,BLOCKED 16 UNREVIEWED,output/cep-013/gate/gate-result.json; CEP-013_LICENSE_DISPOSITION_PACKET.md
+CEP-013-EV-009,Focused unit and policy tests,PASS 9,output/cep-013/focused-results.xml
+CEP-013-EV-010,Ruff Django and drift checks,PASS,CEP-013_EXECUTION_MANIFEST.md
+CEP-013-EV-011,Committed CI and operating procedure,STATIC ONLY,.github/workflows/supply-chain.yml; .github/dependabot.yml; security/supply_chain/README.md
+CEP-013-EV-012,Pure Linux runtime,VERIFIED,GitHub Actions run 38803595706
+CEP-013-EV-013,Remediated exact Linux sets and local gate,BUILD_CONTROL_PASS,requirements-prod-linux.lock; requirements-dev-linux.lock; output/cep-013/final-gate/gate-result.json
+CEP-013-EV-014,CI offline install focused validation and SBOM,PASS,GitHub Actions run 38806288348 artifact 12006247931
+CEP-013-EV-015,Signed attestation,FAIL USER-OWNED PRIVATE REPOSITORY INELIGIBLE,GitHub Actions run 38806288348
+CEP-013-EV-016,Targeted Tenant isolation regression,PASS 1,output/cep-013/final-blocker-closure.md
+CEP-013-EV-017,Canonical provenance identity assessment,PASS A,output/cep-013/final-blocker-closure.md; GitHub Actions run 38806288348 artifact 12006247931

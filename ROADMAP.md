@@ -69,6 +69,81 @@ forward roadmap.
 explicitly records `GATE-01 = PASS` as its authorization basis; this status is
 recorded here, not inferred by this execution.
 
+**CEP-006 queue resume (2026-10-15):** The Human Decision Maker approved the
+bounded V1 current-run selection rule in [PD-033](docs/architecture/BONIRA_PD_033_RECONCILIATION_CURRENT_STATE.md).
+CEP-006 remains **EXECUTION PARTIAL**, before product mutation: the existing
+`subledger_gl` and `treasury_gl` run records do not unambiguously represent all
+dimensions declared by their pair-catalogue comparison grains. The decision's
+no-guess rule stops AUTH-BATCH-002 at CEP-006 pending exact grain resolution within
+the no-migration boundary. CEP-009, CEP-011, and CEP-013 were not started; no
+production or Human Sign-off state changed. See [the CEP-006 resume evidence](CEP-006_EXECUTION_MANIFEST.md).
+
+**CEP-006 remediation preparation (2026-10-15):** The Human Decision Maker
+approved D01 (native-run rule only for adapters consuming native runs) and D08
+(`contractor_compliance` stays gated), recorded in PD-033. D02–D07 and any
+source-owned schema/migration scope remain undecided. The
+[reauthorization packet](CEP-006_SCHEMA_REMEDIATION_REAUTHORIZATION_PACKET.md)
+recommends prospective exact evidence and an explicit package/migration decision;
+it is not implementation authorization. CEP-006 and the serial queue remain stopped.
+
+**CEP-006 control-account decision and implementation (2026-10-15):** The Human
+Decision Maker approved [PD-006-CAM-02](docs/architecture/BONIRA_PD_034_CONTROL_ACCOUNT_MAPPING.md),
+resolving `CEP-006-FINDING-003 / BLOCKER-PD`. CEP-006 implements only the bounded
+Accounting-owned mapping/pin, prospective source-owned reconciliation evidence and
+provenance remediation authorized by the decision. CEP-006 validation closure is
+**EXECUTION COMPLETE**: a dedicated isolated PostgreSQL test database applied the
+full migration graph and passed 54 focused tests; the representative CEP-005/008
+regression passed 23 tests and 28 subtests. The source-owned row lock correction
+required by that run is included in the completion evidence. CEP-009 is ready for
+the already-authorized serial queue resume; CEP-011 and CEP-013 remain not started.
+No production or Human Sign-off state changed. See the
+[CEP-006 execution manifest](CEP-006_EXECUTION_MANIFEST.md).
+
+**CEP-009 inventory query and concurrency foundation (2026-10-15):**
+`IMB-0067` and `IMB-0068` are **EXECUTION COMPLETE** in development under the
+explicit CEP-009 authorization. Inventory on-hand uses one tenant/material/warehouse
+scoped database aggregate; stock movements and transfer preparation acquire warehouse
+locks in UUID order, with transfer material locks ordered as well. The seven selected
+Inventory tests have passing combined evidence (five on the first scoped run and two
+on focused recheck). Ruff, formatting, Django checks and migration drift pass. No
+Inventory authority, valuation rule, schema or migration changed. Operational-load
+PostgreSQL verification remains UTV. CEP-011 is ready for separately scoped queue
+continuation and was not started; CEP-013 remains not started. See the
+[CEP-009 completion report](CEP-009_COMPLETION_REPORT.md).
+
+**CEP-011 Core DMS access foundation (2026-10-15):** `IMB-0095` is
+**EXECUTION COMPLETE** in Development under the explicit Human DMS decision and
+bounded `Migration Impact = SCHEMA` reauthorization. Deny-by-default employee
+category policy now separates current/history visibility and download;
+Workforce owns immutable WorkRelationship source links, and employee list,
+detail, version and download paths enforce Person/episode, every linked source,
+tenant, permission and scanner checks in the backend. No acknowledgement
+lifecycle or inferred legacy backfill was introduced. Focused CEP-011 tests
+pass 6/6 and representative DMS regression passes 10/10 on isolated PostgreSQL;
+the two schema migrations apply and reapply. Ruff, Django checks, migration drift
+and whitespace checks pass; the pre-existing Workforce model-wide formatting
+debt is unchanged outside the new class. Browser/accessibility and production
+runtime remain UTV. CEP-013 is **NOT STARTED** and ready for separately
+authorized queue continuation. See the
+[CEP-011 completion report](CEP-011_COMPLETION_REPORT.md).
+
+**CEP-013 dependency and supply-chain security foundation (2026-10-16):**
+`IMB-0102` is **EXECUTION COMPLETE** for its scoped Development outcome; all
+six AC and scoped DoD are PASS. Human-approved remediation removed only
+`psycopg-binary==3.3.5` from the two Linux sets; pure `psycopg==3.3.5`
+remains hash pinned. GitHub run `38803595706` verified its Debian 12 runtime.
+The local final gate and GitHub run `38806288348` passed hash acquisition,
+offline installation, advisory/license gates, SBOM, focused tests, Ruff and
+Django checks. A targeted Tenant isolation test passed 1/1 on disposable
+PostgreSQL 18.6 with full migrations. Canonical AC/DoD require immutable
+provenance evidence and verifiable artifact identity; the retained run
+artifact, commit, image, lock, SBOM and archive hashes satisfy that scoped
+requirement. GitHub-hosted signed attestation could not persist for a
+user-owned private repository, so the later attested-wheelhouse production
+release gate remains UTV. `AUTH-BATCH-002` is **EXECUTION COMPLETE**. No
+production deployment, Human Sign-off or downstream CEP activation occurred.
+See the [CEP-013 completion report](CEP-013_COMPLETION_REPORT.md).
+
 **CEP-003 / IMB-0013 and IMB-0014 (2026-10-15):** **EXECUTION COMPLETE** in
 Development under the first serial `AUTH-BATCH-002` session and included in the
 completed-CEP local `main` integration. The shared Jalali

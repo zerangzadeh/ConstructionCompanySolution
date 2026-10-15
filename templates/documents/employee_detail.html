@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ access.document.title }} | اسناد من{% endblock %}
+{% block content %}
+<nav class="text-xs text-slate-500"><a href="{% url 'documents:employee-list' %}">اسناد من</a> / {{ access.document.title }}</nav>
+<section class="erp-surface mt-4 rounded-xl p-5">
+  <h1 class="text-xl font-bold text-slate-950">{{ access.document.title }}</h1>
+  <p class="mt-2 text-sm text-slate-600">{{ access.document.category.name }}</p>
+  <h2 class="mt-5 text-sm font-bold text-slate-900">منابع سند</h2>
+  <ul class="mt-2 space-y-1 text-xs text-slate-600">
+    {% for source_type, source_id in access.source_links %}
+      <li><span>{{ source_type }}</span> · <span dir="ltr">{{ source_id }}</span></li>
+    {% endfor %}
+  </ul>
+  <h2 class="mt-5 text-sm font-bold text-slate-900">نسخه‌های مجاز</h2>
+  <ul class="mt-3 divide-y divide-slate-100">
+    {% for version in access.versions %}
+      <li class="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+        <span>نسخه {{ version.version_number }}{% if version.id == access.document.current_version_id %} · جاری{% else %} · پیشین{% endif %}</span>
+        {% if access.can_download and version.is_available and "documents.download" in business_permission_codes %}
+          <a class="font-semibold text-blue-700" href="{% url 'documents:employee-version-download' access.document.id version.id %}">دریافت</a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

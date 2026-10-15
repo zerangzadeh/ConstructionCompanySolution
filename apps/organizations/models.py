@@ -320,6 +320,10 @@ class BusinessPermissionCode(models.TextChoices):
     )
     ACCOUNTING_PERIODS_CLOSE = "accounting.periods_close", "بستن دوره مالی"
     ACCOUNTING_PERIODS_REOPEN = "accounting.periods_reopen", "بازگشایی دوره مالی"
+    ACCOUNTING_CONTROL_ACCOUNT_MAPPINGS_MANAGE = (
+        "accounting.control_account_mappings_manage",
+        "مدیریت نگاشت حساب کنترل AP/AR",
+    )
 
     TREASURY_VIEW = "treasury.view", "مشاهده خزانه‌داری"
     TREASURY_ACCOUNTS_MANAGE = (

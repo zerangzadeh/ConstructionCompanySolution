@@ -6,6 +6,17 @@ app_name = "documents"
 
 urlpatterns = [
     path("", views.document_list, name="list"),
+    path("mine/", views.employee_document_list, name="employee-list"),
+    path(
+        "mine/<uuid:document_id>/",
+        views.employee_document_detail,
+        name="employee-detail",
+    ),
+    path(
+        "mine/<uuid:document_id>/versions/<uuid:version_id>/download/",
+        views.employee_document_download,
+        name="employee-version-download",
+    ),
     path("upload/", views.document_upload, name="upload"),
     path("<uuid:document_id>/", views.document_detail, name="detail"),
     path("<uuid:document_id>/download/", views.document_download, name="download"),

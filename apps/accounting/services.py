@@ -6,12 +6,13 @@ from decimal import Decimal
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
-from django.db.models import QuerySet, Sum
+from django.db.models import Q, QuerySet, Sum
 from django.utils import timezone
 
 from apps.accounting.models import (
     Account,
     AccountType,
+    ControlAccountMappingVersion,
     FiscalPeriod,
     FiscalPeriodControlEvent,
     FiscalPeriodStatus,
@@ -231,6 +232,101 @@ def create_account(
         metadata={"code": account.code, "account_type": account.account_type},
     )
     return account
+
+
+@transaction.atomic
+def create_control_account_mapping_version(
+    *,
+    organization: Organization,
+    actor: User,
+    source_kind: str,
+    direction: str,
+    control_account: Account,
+    effective_from: date,
+    effective_to: date | None,
+    reason: str,
+) -> ControlAccountMappingVersion:
+    """Create the immutable Accounting policy used to pin AP/AR obligations."""
+
+    organization = _lock_accounting_organization(organization)
+    membership = require_business_permission(
+        user=actor,
+        organization=organization,
+        permission=BusinessPermissionCode.ACCOUNTING_CONTROL_ACCOUNT_MAPPINGS_MANAGE,
+        message="اختیار مدیریت نگاشت حساب کنترل را ندارید.",
+    )
+    source_kind = source_kind.strip()
+    if not source_kind:
+        raise ValidationError("نوع منبع نگاشت الزامی است.")
+    if direction not in {"payable", "receivable"}:
+        raise ValidationError("جهت نگاشت حساب کنترل معتبر نیست.")
+    if effective_to and effective_to < effective_from:
+        raise ValidationError("بازه اعتبار نگاشت نامعتبر است.")
+    control_account = Account.objects.select_for_update().get(pk=control_account.pk)
+    if (
+        control_account.organization_id != organization.pk
+        or not control_account.is_posting
+        or control_account.archived_at is not None
+    ):
+        raise ValidationError("نگاشت فقط به حساب برگ فعال همین Tenant مجاز است.")
+    scope = ControlAccountMappingVersion.objects.select_for_update().filter(
+        organization=organization, source_kind=source_kind, direction=direction
+    )
+    if (
+        scope.filter(effective_from__lte=effective_to if effective_to else date.max)
+        .filter(Q(effective_to__isnull=True) | Q(effective_to__gte=effective_from))
+        .exists()
+    ):
+        raise ValidationError("بازه نگاشت حساب کنترل با نسخه موجود هم‌پوشانی دارد.")
+    version = (
+        scope.order_by("-version").values_list("version", flat=True).first() or 0
+    ) + 1
+    mapping = ControlAccountMappingVersion(
+        organization=organization,
+        source_kind=source_kind,
+        direction=direction,
+        version=version,
+        control_account=control_account,
+        effective_from=effective_from,
+        effective_to=effective_to,
+        reason=_require_reason(reason),
+        created_by=membership,
+    )
+    mapping.save()
+    record_audit_event(
+        action=AuditAction.ACCOUNTING_CONTROL_ACCOUNT_MAPPING_VERSIONED,
+        entity_type="accounting.ControlAccountMappingVersion",
+        entity_id=mapping.pk,
+        organization=organization,
+        actor=actor,
+        metadata={
+            "source_kind": source_kind,
+            "direction": direction,
+            "version": version,
+        },
+    )
+    return mapping
+
+
+def resolve_control_account_mapping(
+    *, organization: Organization, source_kind: str, direction: str, effective_on: date
+) -> ControlAccountMappingVersion:
+    """Return the one approved mapping or fail closed without any fallback."""
+
+    mappings = ControlAccountMappingVersion.objects.filter(
+        organization=organization,
+        source_kind=source_kind,
+        direction=direction,
+        effective_from__lte=effective_on,
+    ).filter(Q(effective_to__isnull=True) | Q(effective_to__gte=effective_on))
+    try:
+        return mappings.select_related("control_account").get()
+    except ControlAccountMappingVersion.DoesNotExist as exc:
+        raise ValidationError(
+            "نگاشت مؤثر حساب کنترل برای این تعهد تأیید نشده است."
+        ) from exc
+    except ControlAccountMappingVersion.MultipleObjectsReturned as exc:
+        raise ValidationError("نگاشت مؤثر حساب کنترل مبهم است.") from exc
 
 
 @transaction.atomic
@@ -597,9 +693,7 @@ def submit_journal(
         raise ValidationError(
             "سند باید دارای ردیف و از نظر بدهکار/بستانکار متوازن باشد."
         )
-    precision, rounding = resolve_accounting_posting_policies(
-        organization=organization
-    )
+    precision, rounding = resolve_accounting_posting_policies(organization=organization)
     for line in locked.lines.all():
         require_final_monetary_amount(
             line.debit, precision=precision, rounding=rounding

@@ -556,6 +556,20 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
         blank=True,
         related_name="subledger_recognition",
     )
+    control_account = models.ForeignKey(
+        "accounting.Account",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="subledger_control_obligations",
+    )
+    control_account_mapping = models.ForeignKey(
+        "accounting.ControlAccountMappingVersion",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="pinned_obligations",
+    )
 
     class Meta:
         ordering = ["recognized_on", "created_at"]  # noqa: RUF012
@@ -592,6 +606,8 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
             contract=self.contract,
             recognized_by=self.recognized_by,
             recognition_journal=self.recognition_journal,
+            control_account=self.control_account,
+            control_account_mapping=self.control_account_mapping,
         )
         if (
             self.contract_id
@@ -603,6 +619,14 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
             raise ValidationError({"party_name_snapshot": "تصویر نام طرف الزامی است."})
         if self.original_amount <= 0:
             raise ValidationError({"original_amount": "مبلغ تعهد باید مثبت باشد."})
+        if bool(self.control_account_id) != bool(self.control_account_mapping_id):
+            raise ValidationError("حساب کنترل و نسخه نگاشت باید هم‌زمان ثبت شوند.")
+        if self.control_account_mapping_id and (
+            self.control_account_mapping.control_account_id != self.control_account_id
+            or self.control_account_mapping.source_kind != self.source_kind
+            or self.control_account_mapping.direction != self.direction
+        ):
+            raise ValidationError("شواهد نگاشت حساب کنترل با تعهد سازگار نیست.")
 
     @property
     def outstanding_amount(self):
@@ -885,6 +909,210 @@ class SubledgerReconciliationRun(ImmutableSubledgerEvidence, UUIDModel, CreatedA
 
     def clean(self) -> None:
         validate_related_organizations(self, created_by=self.created_by)
+
+
+class SubledgerReconciliationAccountSlice(
+    ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel
+):
+    run = models.ForeignKey(
+        SubledgerReconciliationRun,
+        on_delete=models.PROTECT,
+        related_name="account_slices",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    direction = models.CharField(max_length=16, choices=ObligationDirection.choices)
+    as_of_date = models.DateField()
+    control_account = models.ForeignKey("accounting.Account", on_delete=models.PROTECT)
+    subledger_outstanding_total = models.DecimalField(max_digits=30, decimal_places=6)
+    linked_gl_total = models.DecimalField(max_digits=30, decimal_places=6)
+    difference = models.DecimalField(max_digits=30, decimal_places=6)
+    evidence_hash = models.CharField(max_length=64)
+    grain_revision = models.PositiveIntegerField()
+    supersedes = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="superseded_by",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["run", "control_account"],
+                name="subledger_slice_one_account_per_run",
+            ),
+            models.UniqueConstraint(
+                fields=[
+                    "organization",
+                    "direction",
+                    "as_of_date",
+                    "control_account",
+                    "grain_revision",
+                ],
+                name="subledger_slice_unique_grain_revision",
+            ),
+        ]
+        indexes = [  # noqa: RUF012
+            models.Index(
+                fields=[
+                    "organization",
+                    "direction",
+                    "as_of_date",
+                    "control_account",
+                    "grain_revision",
+                ],
+                name="subledger_slice_current_idx",
+            )
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            run=self.run,
+            control_account=self.control_account,
+            supersedes=self.supersedes,
+        )
+        if (
+            self.run.organization_id != self.organization_id
+            or self.run.direction != self.direction
+            or self.run.as_of_date != self.as_of_date
+            or self.grain_revision < 1
+        ):
+            raise ValidationError("شواهد برش تطبیق با اجرای والد سازگار نیست.")
+        if self.difference != self.subledger_outstanding_total - self.linked_gl_total:
+            raise ValidationError("اختلاف برش تطبیق باید از جمع‌های ثبت‌شده محاسبه شود.")
+        if self.supersedes_id and (
+            self.supersedes.organization_id != self.organization_id
+            or self.supersedes.direction != self.direction
+            or self.supersedes.as_of_date != self.as_of_date
+            or self.supersedes.control_account_id != self.control_account_id
+            or self.supersedes.grain_revision + 1 != self.grain_revision
+        ):
+            raise ValidationError("جانشین برش تطبیق معتبر نیست.")
+
+
+class SubledgerReconciliationObligationEvidence(
+    ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.ForeignKey(
+        SubledgerReconciliationAccountSlice,
+        on_delete=models.PROTECT,
+        related_name="obligation_evidence",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    obligation = models.ForeignKey(Obligation, on_delete=models.PROTECT)
+    source_kind = models.CharField(max_length=80)
+    source_uuid = models.UUIDField()
+    source_version = models.PositiveIntegerField()
+    source_line_key = models.CharField(max_length=120, blank=True)
+    source_hash = models.CharField(max_length=64)
+    outstanding_amount = models.DecimalField(max_digits=24, decimal_places=6)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["slice", "obligation"], name="subledger_slice_unique_obligation"
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, slice=self.slice, obligation=self.obligation
+        )
+        if self.obligation.organization_id != self.organization_id:
+            raise ValidationError("شاهد تعهد متعلق به Tenant برش نیست.")
+
+
+class SubledgerReconciliationJournalLineEvidence(
+    ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.ForeignKey(
+        SubledgerReconciliationAccountSlice,
+        on_delete=models.PROTECT,
+        related_name="journal_line_evidence",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    obligation = models.ForeignKey(Obligation, on_delete=models.PROTECT)
+    journal = models.ForeignKey("accounting.JournalEntry", on_delete=models.PROTECT)
+    journal_line = models.ForeignKey("accounting.JournalLine", on_delete=models.PROTECT)
+    journal_source_uuid = models.UUIDField()
+    journal_source_version = models.PositiveIntegerField()
+    debit = models.DecimalField(max_digits=24, decimal_places=6)
+    credit = models.DecimalField(max_digits=24, decimal_places=6)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["slice", "journal_line"],
+                name="subledger_slice_unique_journal_line",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            slice=self.slice,
+            obligation=self.obligation,
+            journal=self.journal,
+            journal_line=self.journal_line,
+        )
+        if (
+            self.obligation.organization_id != self.organization_id
+            or self.journal_line.journal_id != self.journal_id
+            or self.journal_line.account_id != self.slice.control_account_id
+        ):
+            raise ValidationError("شاهد خط دفترکل با برش تطبیق سازگار نیست.")
+
+
+class SubledgerReconciliationSliceInvalidation(
+    ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel
+):
+    slice = models.OneToOneField(
+        SubledgerReconciliationAccountSlice,
+        on_delete=models.PROTECT,
+        related_name="invalidation",
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    reason = models.TextField()
+    evidence_hash = models.CharField(max_length=64)
+    invalidated_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, slice=self.slice, invalidated_by=self.invalidated_by
+        )
+        if (
+            self.slice.organization_id != self.organization_id
+            or not self.reason.strip()
+        ):
+            raise ValidationError("ابطال برش تطبیق نامعتبر است.")
+
+
+class SubledgerReconciliationRunProvenance(
+    ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel
+):
+    LEGACY_UNVERIFIED = "legacy_unverified"
+    PROSPECTIVE = "prospective"
+    run = models.OneToOneField(
+        SubledgerReconciliationRun, on_delete=models.PROTECT, related_name="provenance"
+    )
+    classification = models.CharField(max_length=32)
+    evidence_hash = models.CharField(max_length=64)
+
+    def clean(self) -> None:
+        if self.classification not in {self.LEGACY_UNVERIFIED, self.PROSPECTIVE}:
+            raise ValidationError("طبقه‌بندی منشأ تطبیق معتبر نیست.")
 
 
 class SubledgerReconciliationReview(

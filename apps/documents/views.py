@@ -2,6 +2,11 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 
+from apps.documents.employee_access import (
+    get_employee_document,
+    get_employee_documents,
+    record_employee_download,
+)
 from apps.documents.forms import (
     DocumentArchiveForm,
     DocumentCreateForm,
@@ -243,6 +248,40 @@ def document_version_download(
         actor=request.user,
     )
     record_document_download(version=version, actor=request.user)
+    return _download_response(version)
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_VIEW)
+def employee_document_list(request: HttpRequest) -> HttpResponse:
+    documents = get_employee_documents(
+        user=request.user, organization=request.organization
+    )
+    return render(request, "documents/employee_list.html", {"documents": documents})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_VIEW)
+def employee_document_detail(request: HttpRequest, document_id: str) -> HttpResponse:
+    access = get_employee_document(
+        user=request.user,
+        organization=request.organization,
+        document_id=str(document_id),
+    )
+    return render(request, "documents/employee_detail.html", {"access": access})
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.DOCUMENTS_DOWNLOAD)
+def employee_document_download(
+    request: HttpRequest, document_id: str, version_id: str
+) -> FileResponse:
+    version = record_employee_download(
+        user=request.user,
+        organization=request.organization,
+        document_id=str(document_id),
+        version_id=str(version_id),
+    )
     return _download_response(version)
 
 

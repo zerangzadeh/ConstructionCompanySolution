@@ -32,8 +32,12 @@ from apps.subledgers.models import (
     ObligationDirection,
     SettlementAllocation,
     SettlementReversal,
+    SubledgerReconciliationAccountSlice,
+    SubledgerReconciliationJournalLineEvidence,
+    SubledgerReconciliationObligationEvidence,
     SubledgerReconciliationReview,
     SubledgerReconciliationRun,
+    SubledgerReconciliationRunProvenance,
     SupplierInvoice,
     SupplierInvoiceLine,
     SupplierInvoiceLineKind,
@@ -243,6 +247,15 @@ def recognize_obligation(
             raise ValidationError("هویت منبع تعهد با تصویر متفاوت قبلاً ثبت شده است.")
         return source_existing
 
+    from apps.accounting.services import resolve_control_account_mapping
+
+    control_mapping = resolve_control_account_mapping(
+        organization=organization,
+        source_kind=source_kind,
+        direction=snapshot.direction,
+        effective_on=snapshot.recognized_on,
+    )
+
     from apps.contracts.models import Contract
     from apps.parties.models import BusinessParty
     from apps.projects.models import Project
@@ -290,6 +303,8 @@ def recognize_obligation(
         idempotency_key=idempotency_key,
         payload_hash=payload_hash,
         recognized_by=membership,
+        control_account=control_mapping.control_account,
+        control_account_mapping=control_mapping,
     )
     record_audit_event(
         action=AuditAction.SUBLEDGER_OBLIGATION_RECOGNIZED,
@@ -300,6 +315,29 @@ def recognize_obligation(
         metadata={"source_kind": source_kind, "source_uuid": str(source_uuid)},
     )
     return obligation
+
+
+def resolve_pinned_control_account_for_posting(
+    *, organization: Organization, obligation: Obligation
+):
+    """Return the one historical control-account pin that an AP/AR post may use."""
+
+    obligation = Obligation.objects.select_related(
+        "control_account", "control_account_mapping"
+    ).get(pk=obligation.pk)
+    if obligation.organization_id != organization.pk:
+        raise PermissionDenied("تعهد متعلق به Tenant دیگری است.")
+    if not obligation.control_account_id or not obligation.control_account_mapping_id:
+        raise ValidationError("تعهد فاقد شواهد نگاشت حساب کنترل تأییدشده است.")
+    mapping = obligation.control_account_mapping
+    if (
+        mapping.organization_id != organization.pk
+        or mapping.control_account_id != obligation.control_account_id
+        or mapping.source_kind != obligation.source_kind
+        or mapping.direction != obligation.direction
+    ):
+        raise ValidationError("شواهد پین حساب کنترل تعهد معتبر نیست.")
+    return obligation.control_account
 
 
 @transaction.atomic
@@ -736,32 +774,108 @@ def run_subledger_reconciliation(
             project_lookup="project_id",
         ).order_by("pk")
     )
-    outstanding_total = ZERO
+    from apps.accounting.models import JournalLine
+
+    grouped: dict[object, list[tuple[Obligation, Decimal]]] = {}
     journal_ids: list[str] = []
     exceptions: list[dict[str, str]] = []
     for obligation in obligations:
         settled, written_off = _amounts_as_of(obligation, as_of_date)
-        outstanding_total += obligation.original_amount - settled - written_off
-        if obligation.recognition_journal_id:
-            journal_ids.append(str(obligation.recognition_journal_id))
+        outstanding = obligation.original_amount - settled - written_off
+        if (
+            not obligation.control_account_id
+            or not obligation.control_account_mapping_id
+        ):
             exceptions.append(
                 {
                     "obligation_id": str(obligation.pk),
                     "code": "CONTROL_MAPPING_NOT_APPROVED",
                 }
             )
-        else:
-            exceptions.append(
-                {
-                    "obligation_id": str(obligation.pk),
-                    "code": "MISSING_RECOGNITION_JOURNAL",
-                }
+            continue
+        grouped.setdefault(obligation.control_account, []).append(
+            (obligation, outstanding)
+        )
+
+    slice_payloads: list[dict[str, object]] = []
+    outstanding_total = linked_gl_total = ZERO
+    for control_account, members in grouped.items():
+        slice_outstanding = sum((item[1] for item in members), ZERO)
+        slice_gl = ZERO
+        line_evidence: list[tuple[Obligation, object]] = []
+        for obligation, _outstanding in members:
+            if not obligation.recognition_journal_id:
+                exceptions.append(
+                    {
+                        "obligation_id": str(obligation.pk),
+                        "code": "MISSING_RECOGNITION_JOURNAL",
+                    }
+                )
+                continue
+            journal_ids.append(str(obligation.recognition_journal_id))
+            lines = list(
+                JournalLine.objects.filter(
+                    journal_id=obligation.recognition_journal_id,
+                    account_id=control_account.pk,
+                ).select_related("journal")
             )
-    linked_gl_total = ZERO
+            if not lines:
+                exceptions.append(
+                    {
+                        "obligation_id": str(obligation.pk),
+                        "code": "MISSING_CONTROL_ACCOUNT_LINE",
+                    }
+                )
+                continue
+            for line in lines:
+                # PD-006-CAM-02 pins a receivable debit balance and a payable credit balance.
+                slice_gl += (
+                    line.debit - line.credit
+                    if obligation.direction == ObligationDirection.RECEIVABLE
+                    else line.credit - line.debit
+                )
+                line_evidence.append((obligation, line))
+        prior = (
+            SubledgerReconciliationAccountSlice.objects.select_for_update(of=("self",))
+            .filter(
+                organization=organization,
+                direction=direction,
+                as_of_date=as_of_date,
+                control_account=control_account,
+                invalidation__isnull=True,
+            )
+            .order_by("-grain_revision")
+            .first()
+        )
+        revision = (prior.grain_revision if prior else 0) + 1
+        payload = {
+            "control_account": str(control_account.pk),
+            "revision": revision,
+            "obligations": [str(obligation.pk) for obligation, _ in members],
+            "journal_lines": [str(line.pk) for _, line in line_evidence],
+            "subledger_total": str(slice_outstanding),
+            "gl_total": str(slice_gl),
+        }
+        slice_payloads.append(
+            {
+                "account": control_account,
+                "members": members,
+                "lines": line_evidence,
+                "outstanding": slice_outstanding,
+                "gl": slice_gl,
+                "prior": prior,
+                "revision": revision,
+                "hash": _canonical_hash(payload),
+            }
+        )
+        outstanding_total += slice_outstanding
+        linked_gl_total += slice_gl
     payload = {
         "direction": direction,
         "as_of_date": as_of_date,
-        "obligations": [str(item.pk) for item in obligations],
+        "obligations": [
+            str(item.pk) for item in obligations if item.control_account_id
+        ],
         "journals": journal_ids,
         "subledger_total": outstanding_total,
         "linked_gl_total": linked_gl_total,
@@ -787,6 +901,50 @@ def run_subledger_reconciliation(
         evidence_hash=evidence_hash,
         idempotency_key=idempotency_key,
         created_by=membership,
+    )
+    for data in slice_payloads:
+        control_account = data["account"]
+        slice = SubledgerReconciliationAccountSlice.objects.create(
+            run=run,
+            organization=organization,
+            direction=direction,
+            as_of_date=as_of_date,
+            control_account=control_account,
+            subledger_outstanding_total=data["outstanding"],
+            linked_gl_total=data["gl"],
+            difference=data["outstanding"] - data["gl"],
+            evidence_hash=data["hash"],
+            grain_revision=data["revision"],
+            supersedes=data["prior"],
+        )
+        for obligation, outstanding in data["members"]:
+            SubledgerReconciliationObligationEvidence.objects.create(
+                slice=slice,
+                organization=organization,
+                obligation=obligation,
+                source_kind=obligation.source_kind,
+                source_uuid=obligation.source_uuid,
+                source_version=obligation.source_version,
+                source_line_key=obligation.source_line_key,
+                source_hash=obligation.source_hash,
+                outstanding_amount=outstanding,
+            )
+        for obligation, line in data["lines"]:
+            SubledgerReconciliationJournalLineEvidence.objects.create(
+                slice=slice,
+                organization=organization,
+                obligation=obligation,
+                journal=line.journal,
+                journal_line=line,
+                journal_source_uuid=line.journal.source_uuid,
+                journal_source_version=line.journal.source_version,
+                debit=line.debit,
+                credit=line.credit,
+            )
+    SubledgerReconciliationRunProvenance.objects.create(
+        run=run,
+        classification=SubledgerReconciliationRunProvenance.PROSPECTIVE,
+        evidence_hash=evidence_hash,
     )
     record_audit_event(
         action=AuditAction.SUBLEDGER_RECONCILIATION_RETAINED,

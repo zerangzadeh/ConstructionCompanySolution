@@ -90,7 +90,7 @@ class RecoveryEvidenceState(models.TextChoices):
 
 
 class DocumentCategory(UUIDModel, TimeStampedModel):
-    """Tenant-owned descriptive category without authorization semantics."""
+    """Tenant category with explicit, default-denied employee access policy."""
 
     organization = models.ForeignKey(
         "organizations.Organization",
@@ -100,6 +100,9 @@ class DocumentCategory(UUIDModel, TimeStampedModel):
     code = models.SlugField(max_length=50)
     name = models.CharField(max_length=120)
     description = models.TextField(blank=True)
+    employee_current_visible = models.BooleanField(default=False)
+    employee_history_visible = models.BooleanField(default=False)
+    employee_download_allowed = models.BooleanField(default=False)
     archived_at = models.DateTimeField(null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -1050,10 +1053,7 @@ class AbstractTypedDocumentLink(UUIDModel, CreatedAtModel):
             if hasattr(self, "document_version_id"):
                 immutable_fields.append("document_version_id")
             original = (
-                type(self)
-                .objects.filter(pk=self.pk)
-                .values(*immutable_fields)
-                .first()
+                type(self).objects.filter(pk=self.pk).values(*immutable_fields).first()
             )
             current = {field: getattr(self, field) for field in immutable_fields}
             if original is not None and original != current:

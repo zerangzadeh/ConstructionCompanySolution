@@ -145,6 +145,7 @@ ACTIVE_DEFAULT_PERMISSIONS = (
     - FIELD_OPERATION_PERMISSIONS
 )
 ACCOUNTING_RESTRICTED_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.ACCOUNTING_CONTROL_ACCOUNT_MAPPINGS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE,
@@ -406,6 +407,7 @@ DEFAULT_ROLE_PERMISSIONS: dict[str, set[str]] = {
     ),
     MembershipRole.ACCOUNTANT: READ_ONLY_PERMISSIONS
     | permission_codes(
+        BusinessPermissionCode.ACCOUNTING_CONTROL_ACCOUNT_MAPPINGS_MANAGE,
         BusinessPermissionCode.ACCOUNTING_ACCOUNTS_MANAGE,
         BusinessPermissionCode.ACCOUNTING_PERIODS_MANAGE,
         BusinessPermissionCode.ACCOUNTING_JOURNALS_PREPARE,

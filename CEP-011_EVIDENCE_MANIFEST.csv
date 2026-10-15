@@ -1,0 +1,8 @@
+Evidence ID,Type,Result,Reference
+CEP-011-EV-001,Repository grounding,PASS,"main @ 533fbd52e38dd448973ba4cc618e5faa44b01fec; pre-mutation git status/diff; CEP-011_EXECUTION_MANIFEST.md"
+CEP-011-EV-002,Human decision and schema reauthorization,PASS,CEP-011_DMS_ACCESS_DECISION.md
+CEP-011-EV-003,Schema forward and isolated reapply,PASS,"apps/documents/migrations/0011_documentcategory_employee_current_visible_and_more.py; apps/workforce/migrations/0010_workrelationshipdocumentlink.py; output/cep-011/reapply_schema.py"
+CEP-011-EV-004,Focused security/service/UI tests,PASS,"6 passed; apps/documents/test_cep011.py; output/cep-011/focused-results.xml"
+CEP-011-EV-005,Representative DMS regression,PASS,"10 passed; apps/documents/tests.py; output/cep-011/regression-results.xml"
+CEP-011-EV-006,Static and migration drift checks,PASS,"Ruff check; formatting on scoped DMS files; manage.py check; makemigrations --check --dry-run; git diff --check"
+CEP-011-EV-007,Code and scope inspection,PASS,"apps/documents/employee_access.py; apps/documents/services.py; apps/documents/views.py; templates/documents/employee_*.html; no acknowledgement or advanced EDMS"

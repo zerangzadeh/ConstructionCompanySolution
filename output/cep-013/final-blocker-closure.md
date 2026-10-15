@@ -1,0 +1,15 @@
+# CEP-013 final blocker closure — 2026-10-16
+
+## Targeted Tenant regression
+
+- Isolated local PostgreSQL 18.6 cluster under the user temporary directory, bound to `127.0.0.1:55433`; `DB_NAME=cep013_source`, pytest-created `test_cep013_source`; no production data. The temporary server was stopped after the test.
+- `python -m pytest apps/organizations/test_cep001_security.py::CEP001SecurityTests::test_wrong_tenant_grant_cannot_authorize_membership -q --create-db --tb=short`: **1 passed in 1956.43s**. Full repository migrations were applied. A prior `--no-migrations` setup attempt failed on an existing GiST operator-class dependency before the test assertion; it was superseded by the migration-backed pass.
+- `TARGETED_TENANT_REGRESSION = PASS`; no CEP-013 regression attributable.
+
+## Canonical provenance assessment
+
+The approved consolidated `packages/CEP-013.md` requires dependency targets, hash/pin acquisition, update policy, SCA gate and SBOM/license/provenance evidence. Its scoped IMB-0102 DoD requires the target outcome, required production control/configuration, responsibility/evidence hooks, a failure/exception evidence path and no readiness PASS without later runtime evidence. The `BONIRA_CEP_ACCEPTANCE_COVERAGE_REGISTER.csv` ACC-0610 wording is acquisition/update/SCA/advisory/SBOM/license controls satisfying Audit 18. These sources do not specifically require a GitHub-hosted signed attestation. Classification: **A**, immutable provenance evidence and verifiable artifact identity.
+
+The retained GitHub Actions run `38806288348` is linked to workflow `.github/workflows/supply-chain.yml` and commit `3ab7663a7289ffb9fc4257f075061ce54e980530`. Retained artifact `12006247931` is unexpired and has GitHub API digest `sha256:6a214934d62143fa27bf9b47dac4f1a8b07fc509aa4e3fa97a1d964b7fc68365`. Inside it, `ci-wheelhouse.tar.gz` matches the retained archive digest `42beb24461d5957efeb80090b2d9f50548ef272c8ecbfc8669d14681706cfdbc`. The gate result records `BUILD_CONTROL_PASS`, approved platform image digest `sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590`, runtime lock SHA-256 `9fb97a40e2d580220a2326895c6f4ca451e3e9f2d9c9b1f88f921475c332c43d`, development lock SHA-256 `abdcc1e1944deeb4f149b563fe4fc3f6eb6b112b884b9f0f17f7d5f37567f591`, separate CycloneDX SBOMs, exact wheel inventory, PyPI source and advisory/license gate outcomes. The archive digest was recomputed from the downloaded artifact and matched.
+
+The GitHub signed-attestation action generated its predicate and reached persistence, which failed with `Feature not available for user-owned private repositories`. The separate `gh attestation verify` job was skipped. No signature or signed-attestation verification is claimed. The development-stage canonical provenance evidence is **PASS** by the wording above; the approved release contract still requires an attested wheelhouse for offline production deployment, and production readiness remains UTV. No repository visibility change or control bypass was made.

@@ -1,5 +1,6 @@
 from datetime import datetime
 from decimal import Decimal
+from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
@@ -142,44 +143,56 @@ def _save_validated(instance: object, message: str) -> None:
 def _stock_balance_value(
     *, organization: Organization, warehouse: Warehouse, material: Material
 ) -> Decimal:
-    incoming = StockTransaction.objects.filter(
-        organization=organization,
-        destination_warehouse=warehouse,
-        material=material,
-        status__in=_LEDGER_STATUSES,
-    ).aggregate(total=Sum("quantity"))["total"] or Decimal("0.0000")
-    outgoing = StockTransaction.objects.filter(
-        organization=organization,
-        source_warehouse=warehouse,
-        material=material,
-        status__in=_LEDGER_STATUSES,
-    ).aggregate(total=Sum("quantity"))["total"] or Decimal("0.0000")
-    return incoming - outgoing
+    totals = (
+        StockTransaction.objects.filter(
+            organization=organization,
+            material=material,
+            status__in=_LEDGER_STATUSES,
+        )
+        .filter(Q(source_warehouse=warehouse) | Q(destination_warehouse=warehouse))
+        .aggregate(
+            incoming=Sum("quantity", filter=Q(destination_warehouse=warehouse)),
+            outgoing=Sum("quantity", filter=Q(source_warehouse=warehouse)),
+        )
+    )
+    return (totals["incoming"] or Decimal("0.0000")) - (
+        totals["outgoing"] or Decimal("0.0000")
+    )
+
+
+def _lock_warehouse_ids(
+    *, organization: Organization, warehouse_ids: set[UUID]
+) -> dict[UUID, Warehouse]:
+    """Acquire warehouse row locks in UUID order, independent of query planning."""
+
+    if None in warehouse_ids:
+        raise PermissionDenied("انبار متعلق به این سازمان نیست.")
+    locked = {}
+    for warehouse_id in sorted(warehouse_ids):
+        try:
+            warehouse = Warehouse.objects.select_for_update().get(
+                pk=warehouse_id, organization=organization
+            )
+        except Warehouse.DoesNotExist as exc:
+            raise PermissionDenied("انبار متعلق به این سازمان نیست.") from exc
+        if not warehouse.is_active or warehouse.archived_at is not None:
+            raise ValueError("تراکنش به انبارهای فعال همین سازمان نیاز دارد.")
+        locked[warehouse_id] = warehouse
+    return locked
 
 
 def _lock_warehouses(transaction_record: StockTransaction) -> None:
-    warehouse_ids = sorted(
-        {
-            warehouse_id
-            for warehouse_id in (
-                transaction_record.source_warehouse_id,
-                transaction_record.destination_warehouse_id,
-            )
-            if warehouse_id is not None
-        },
-        key=str,
-    )
-    locked_warehouses = list(
-        Warehouse.objects.select_for_update().filter(
-            pk__in=warehouse_ids,
-            organization=transaction_record.organization,
+    warehouse_ids = {
+        warehouse_id
+        for warehouse_id in (
+            transaction_record.source_warehouse_id,
+            transaction_record.destination_warehouse_id,
         )
+        if warehouse_id is not None
+    }
+    _lock_warehouse_ids(
+        organization=transaction_record.organization, warehouse_ids=warehouse_ids
     )
-    if len(locked_warehouses) != len(warehouse_ids) or any(
-        not warehouse.is_active or warehouse.archived_at is not None
-        for warehouse in locked_warehouses
-    ):
-        raise ValueError("تراکنش به انبارهای فعال همین سازمان نیاز دارد.")
 
 
 def _ensure_available_stock(transaction_record: StockTransaction) -> None:
@@ -324,15 +337,24 @@ def create_stock_transaction(
     if timezone.is_naive(occurred_at):
         raise ValueError("زمان تراکنش باید دارای منطقه زمانی باشد.")
     project = _validate_project(organization=organization, project=project)
+    warehouse_ids = {
+        warehouse.pk
+        for warehouse in (source_warehouse, destination_warehouse)
+        if warehouse is not None
+    }
+    locked_warehouses = _lock_warehouse_ids(
+        organization=organization, warehouse_ids=warehouse_ids
+    )
+    source = locked_warehouses.get(source_warehouse.pk) if source_warehouse else None
+    destination = (
+        locked_warehouses.get(destination_warehouse.pk)
+        if destination_warehouse
+        else None
+    )
     material, unit_of_measure = _validate_material(
         organization=organization,
         material=material,
         unit_of_measure=unit_of_measure,
-    )
-    source = _get_warehouse(organization=organization, warehouse=source_warehouse)
-    destination = _get_warehouse(
-        organization=organization,
-        warehouse=destination_warehouse,
     )
     effective_project = project or source.project if source else project
     if effective_project is None and destination is not None:
@@ -438,6 +460,7 @@ def _post_stock_transaction_domain(
         organization=organization,
         project=transaction_record.project,
     )
+    _lock_warehouses(transaction_record)
     transaction_record.material, transaction_record.unit_of_measure = (
         _validate_material(
             organization=organization,
@@ -452,7 +475,6 @@ def _post_stock_transaction_domain(
         )
         if source_receipt.status != GoodsReceiptStatus.POSTED:
             raise ValueError("رسید کالای مبدأ دیگر نهایی‌شده نیست.")
-    _lock_warehouses(transaction_record)
     _ensure_available_stock(transaction_record)
     from apps.inventory.p8_services import validate_stock_trace_allocations_for_post
 
@@ -517,12 +539,12 @@ def _reverse_stock_transaction_domain(
         raise ValueError("تراکنش برگشتی قابل برگشت مجدد نیست.")
     if not reason.strip():
         raise ValueError("وارد کردن دلیل برگشت الزامی است.")
+    _lock_warehouses(original)
     original.material, original.unit_of_measure = _validate_material(
         organization=organization,
         material=original.material,
         unit_of_measure=original.unit_of_measure,
     )
-    _lock_warehouses(original)
     reversal = StockTransaction(
         organization=organization,
         transaction_number=canonicalize_upper_identifier(reversal_number),

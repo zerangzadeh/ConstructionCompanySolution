@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-15T17:12:05.090199+00:00",
+  "status": "BLOCKED",
+  "production_readiness": "UTV",
+  "source": "https://pypi.org/simple/",
+  "target": "CPython 3.11.17 Debian 12 linux/amd64",
+  "checks": {
+    "locks": "PASS",
+    "secret_config": "PASS",
+    "image_identity": "PASS",
+    "prod_wheelhouse_hash_offline": "PASS",
+    "prod_sbom": "PASS",
+    "prod_vulnerabilities": "PASS",
+    "dev_wheelhouse_hash_offline": "PASS",
+    "dev_sbom": "PASS",
+    "dev_vulnerabilities": "PASS"
+  },
+  "image_digest": "sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590",
+  "sets": {
+    "prod": {
+      "lock_sha256": "eca6bbf1d2e8ee1affe1e14bfcd5a64166015e947cd7dc790ea0e350f31b524b",
+      "wheel_count": 8,
+      "vulnerabilities": [],
+      "license_unreviewed": [
+        "asgiref==3.12.1:fe386d1c2bff7259ea95929266d12a8cf9a8b5a1c2598402967d8792e7a7c094",
+        "django==5.2.17:f04fb3b36ee119e1af4fa1d397d5fd6cf12700f49321e84d4f4c642c5b1973db",
+        "psycopg==3.3.5:ce5aa5cdb4f9379f00f487590e5890bfa7df9a164648c969ffa628505e21af4e",
+        "psycopg-binary==3.3.5:d8b66353b20e79bf7ac0a80f03ae97f522ccbbf909d687eec62f112e56c0276d",
+        "python-dotenv==1.2.3:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9",
+        "sqlparse==0.6.0:b861c0288ce2fa56209a9a6412d2e066ac664b3873b89c26c9d8415e8e32996f",
+        "typing-extensions==4.16.0:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "tzdata==2026.5:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"
+      ]
+    },
+    "dev": {
+      "lock_sha256": "2295eaa55e51f22953d86afee5e8b29e756bd2786e721f88c0318e77237d24db",
+      "wheel_count": 16,
+      "vulnerabilities": [],
+      "license_unreviewed": [
+        "asgiref==3.12.1:fe386d1c2bff7259ea95929266d12a8cf9a8b5a1c2598402967d8792e7a7c094",
+        "colorama==0.4.6:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6",
+        "django==5.2.17:f04fb3b36ee119e1af4fa1d397d5fd6cf12700f49321e84d4f4c642c5b1973db",
+        "iniconfig==2.3.1:9121e2c1fdb355232495be3194c8dfe87ccc2d5dee45947b78e68f499790d7a7",
+        "packaging==26.3:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c",
+        "pluggy==1.6.0:e920276dd6813095e9377c0bc5566d94c932c33b27a3e3945d8389c374dd4746",
+        "psycopg==3.3.5:ce5aa5cdb4f9379f00f487590e5890bfa7df9a164648c969ffa628505e21af4e",
+        "psycopg-binary==3.3.5:d8b66353b20e79bf7ac0a80f03ae97f522ccbbf909d687eec62f112e56c0276d",
+        "pygments==2.21.0:2363c69b61c4a97c838da3b130dcd6468f4848992b21a82f2a63ec34377137d9",
+        "pytest==9.1.1:37a86b45efb9a47a61a36449063e8e18d0cab3161329fc099eb21783169c4f0c",
+        "pytest-django==4.14.0:c533b08d89cc675efcd5398eea270b34547e35f9a3608e2c9748dd88428ea187",
+        "python-dotenv==1.2.3:904552145e8bfed22162c09dab1c2b9b54fefa7b23ba780f4f26ca0316b0f0d9",
+        "ruff==0.16.5:ef0f69e191a13a3c9816f63163c88790cb12cd157bbbb384e9c44745702ab105",
+        "sqlparse==0.6.0:b861c0288ce2fa56209a9a6412d2e066ac664b3873b89c26c9d8415e8e32996f",
+        "typing-extensions==4.16.0:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8",
+        "tzdata==2026.5:b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"
+      ]
+    }
+  },
+  "failure": "Unreviewed license artifacts: 16",
+  "completed_at": "2026-10-15T17:12:38.303437+00:00"
+}

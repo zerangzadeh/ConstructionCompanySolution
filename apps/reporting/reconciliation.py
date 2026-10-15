@@ -8,7 +8,7 @@ from decimal import Decimal
 from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connection, transaction
-from django.db.models import Sum
+from django.db.models import OuterRef, Subquery, Sum
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -181,6 +181,7 @@ def _estimate_budget(
 def _commitment_projection(
     organization: Organization, project: Project | None, cutoff_at
 ) -> PairData:
+    """Retain source visibility without asserting an unapproved direct comparison."""
     contracts = _model("projects.ProjectCostSourceContract").objects.filter(
         organization=organization, status="approved"
     )
@@ -190,7 +191,6 @@ def _commitment_projection(
     contracts = _at_cutoff(contracts, cutoff_at)
     po_lines = _at_cutoff(po_lines, cutoff_at)
     po_lines = _scoped(po_lines, project, "version__purchase_order__project")
-    po_total = sum((line.quantity * line.unit_price for line in po_lines), Decimal(0))
     facts = _model("projects.ProjectCostFact").objects.filter(
         organization=organization,
         kind__in=[
@@ -201,39 +201,20 @@ def _commitment_projection(
     )
     facts = _at_cutoff(facts, cutoff_at)
     facts = _scoped(facts, project)
-    if not contracts.exists():
-        readiness = "gated_not_activated"
-        return PairData(
-            _side(
-                "Procurement or Contracts",
-                "procurement.PurchaseOrderVersionLine",
-                po_lines,
-                amount=po_total if po_lines.exists() else None,
-            ),
-            _side(
-                "Project Controls",
-                "projects.ProjectCostFact",
-                facts,
-                readiness=readiness,
-            ),
-            None,
-            currency="IRR",
-            unit="money",
-        )
     return PairData(
         _side(
             "Procurement or Contracts",
             "procurement.PurchaseOrderVersionLine",
             po_lines,
-            amount=po_total if po_lines.exists() else None,
+            readiness="uncomparable",
         ),
         _side(
             "Project Controls",
             "projects.ProjectCostFact",
             facts,
-            amount=_sum(facts, "amount"),
+            readiness="uncomparable",
         ),
-        "amount",
+        None,
         currency="IRR",
         unit="money",
     )
@@ -306,12 +287,12 @@ def _inventory_quantity_value(
     )
     pools = _at_cutoff(pools, cutoff_at)
     currencies = list(pools.values_list("currency", flat=True).distinct())
-    readiness = "uncomparable" if len(currencies) > 1 else None
     return PairData(
         _side(
             "Inventory Custody",
             "inventory.StockTransaction",
             transactions,
+            readiness="uncomparable",
             extra={
                 "quantity": format(quantity, "f") if transactions.exists() else None
             },
@@ -320,15 +301,14 @@ def _inventory_quantity_value(
             "Inventory Valuation",
             "inventory.InventoryValuationPool",
             pools,
-            amount=_sum(pools, "value_amount"),
-            readiness=readiness,
+            readiness="uncomparable",
             extra={
                 "quantity": format(_sum(pools, "quantity"), "f")
                 if _sum(pools, "quantity") is not None
                 else None
             },
         ),
-        "quantity",
+        None,
         currency=currencies[0] if len(currencies) == 1 else "",
         unit="quantity_and_money",
     )
@@ -368,18 +348,31 @@ def _subledger_gl(
     organization: Organization, project: Project | None, cutoff_at
 ) -> PairData:
     del project
-    runs = _model("subledgers.SubledgerReconciliationRun").objects.filter(
+    slices = _model("subledgers.SubledgerReconciliationAccountSlice").objects.filter(
         organization=organization
     )
-    runs = _at_cutoff(runs, cutoff_at)
-    left = _sum(runs, "subledger_outstanding_total")
-    right = _sum(runs, "linked_gl_total")
+    slices = _at_cutoff(slices, cutoff_at).filter(invalidation__isnull=True)
+    latest = slices.filter(
+        organization_id=OuterRef("organization_id"),
+        direction=OuterRef("direction"),
+        as_of_date=OuterRef("as_of_date"),
+        control_account_id=OuterRef("control_account_id"),
+        invalidation__isnull=True,
+    ).order_by("-grain_revision")
+    slices = slices.filter(grain_revision=Subquery(latest.values("grain_revision")[:1]))
+    left = _sum(slices, "subledger_outstanding_total")
+    right = _sum(slices, "linked_gl_total")
     return PairData(
-        _side("AP/AR", "subledgers.SubledgerReconciliationRun", runs, amount=left),
+        _side(
+            "AP/AR",
+            "subledgers.SubledgerReconciliationAccountSlice",
+            slices,
+            amount=left,
+        ),
         _side(
             "Accounting / GL",
-            "subledgers.SubledgerReconciliationRun",
-            runs,
+            "subledgers.SubledgerReconciliationAccountSlice",
+            slices,
             amount=right,
         ),
         "amount",
@@ -394,7 +387,17 @@ def _treasury_bank(
     runs = _model("treasury.BankReconciliationRun").objects.filter(
         organization=organization
     )
-    runs = _at_cutoff(runs, cutoff_at)
+    runs = _at_cutoff(runs, cutoff_at).filter(
+        grain_revision__isnull=False, invalidation__isnull=True
+    )
+    latest = runs.filter(
+        organization_id=OuterRef("organization_id"),
+        account_id=OuterRef("account_id"),
+        statement_import_id=OuterRef("statement_import_id"),
+        as_of_date=OuterRef("as_of_date"),
+        invalidation__isnull=True,
+    ).order_by("-grain_revision")
+    runs = runs.filter(grain_revision=Subquery(latest.values("grain_revision")[:1]))
     book = (
         (_sum(runs, "cleared_book_in") or Decimal(0))
         - (_sum(runs, "cleared_book_out") or Decimal(0))
@@ -424,30 +427,41 @@ def _treasury_gl(
     organization: Organization, project: Project | None, cutoff_at
 ) -> PairData:
     del project
-    runs = _model("treasury.TreasuryGLReconciliationRun").objects.filter(
+    slices = _model("treasury.TreasuryGLReconciliationSlice").objects.filter(
         organization=organization
     )
-    runs = _at_cutoff(runs, cutoff_at)
+    slices = _at_cutoff(slices, cutoff_at).filter(invalidation__isnull=True)
+    latest = slices.filter(
+        organization_id=OuterRef("organization_id"),
+        cutoff_date=OuterRef("cutoff_date"),
+        currency=OuterRef("currency"),
+        treasury_account_id=OuterRef("treasury_account_id"),
+        invalidation__isnull=True,
+    ).order_by("-grain_revision")
+    slices = slices.filter(grain_revision=Subquery(latest.values("grain_revision")[:1]))
     treasury = (
-        (_sum(runs, "treasury_in") or Decimal(0))
-        - (_sum(runs, "treasury_out") or Decimal(0))
-        if runs.exists()
+        (_sum(slices, "treasury_in") or Decimal(0))
+        - (_sum(slices, "treasury_out") or Decimal(0))
+        if slices.exists()
         else None
     )
     ledger = (
-        (_sum(runs, "journal_debit") or Decimal(0))
-        - (_sum(runs, "journal_credit") or Decimal(0))
-        if runs.exists()
+        (_sum(slices, "journal_debit") or Decimal(0))
+        - (_sum(slices, "journal_credit") or Decimal(0))
+        if slices.exists()
         else None
     )
     return PairData(
         _side(
-            "Treasury", "treasury.TreasuryGLReconciliationRun", runs, amount=treasury
+            "Treasury",
+            "treasury.TreasuryGLReconciliationSlice",
+            slices,
+            amount=treasury,
         ),
         _side(
             "Accounting / GL",
-            "treasury.TreasuryGLReconciliationRun",
-            runs,
+            "treasury.TreasuryGLReconciliationSlice",
+            slices,
             amount=ledger,
         ),
         "amount",
@@ -465,40 +479,20 @@ def _project_cost_sources(
     contracts = _at_cutoff(contracts, cutoff_at)
     facts = _at_cutoff(facts, cutoff_at)
     facts = _scoped(facts, project)
-    if not contracts.exists():
-        return PairData(
-            _side(
-                "Registered Source Domains",
-                "projects.ProjectCostSourceContract",
-                contracts,
-                readiness="gated_not_activated",
-            ),
-            _side(
-                "Project Controls",
-                "projects.ProjectCostFact",
-                facts,
-                readiness="gated_not_activated",
-            ),
-            None,
-            unit="count_and_money",
-        )
-    producer_count = contracts.count()
-    fact_contract_count = facts.values("contract_id").distinct().count()
     return PairData(
         _side(
             "Registered Source Domains",
             "projects.ProjectCostSourceContract",
             contracts,
-            extra={"producer_count": producer_count},
+            readiness="uncomparable",
         ),
         _side(
             "Project Controls",
             "projects.ProjectCostFact",
             facts,
-            amount=_sum(facts, "amount"),
-            extra={"producer_count": fact_contract_count},
+            readiness="uncomparable",
         ),
-        "producer_count",
+        None,
         unit="count_and_money",
     )
 

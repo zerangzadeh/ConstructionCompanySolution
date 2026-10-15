@@ -107,6 +107,15 @@ DOCUMENT_LINK_TYPES = (
         legacy_compatible=False,
     ),
     DocumentLinkType(
+        key="work_relationship",
+        owner="workforce",
+        model_label="workforce.WorkRelationshipDocumentLink",
+        target_field="work_relationship",
+        view_permission=BusinessPermissionCode.EMPLOYEES_VIEW,
+        project_lookup=None,
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
         key="employee_qualification",
         owner="workforce",
         model_label="workforce.EmployeeQualificationDocumentLink",
@@ -251,9 +260,7 @@ def create_typed_link(
         link_fields.update(id=legacy_link.pk, legacy_link_id=legacy_link.pk)
     # Version-aware typed evidence must not silently begin to point at a later
     # revision of the underlying DMS document.
-    if any(
-        field.name == "document_version" for field in link_type.model._meta.fields
-    ):
+    if any(field.name == "document_version" for field in link_type.model._meta.fields):
         link_fields["document_version"] = document_version or document.current_version
     return link_type.model.objects.create(
         **link_fields,

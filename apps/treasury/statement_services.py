@@ -19,6 +19,7 @@ from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import BusinessPermissionCode, OrganizationMembership
 from apps.treasury.models import (
     BankReconciliationRun,
+    BankReconciliationRunProvenance,
     BankStatementImport,
     BankStatementLine,
     StatementImportStatus,
@@ -166,7 +167,10 @@ def preview_statement_import(
     account = TreasuryAccount.objects.select_for_update().get(pk=account.pk)
     if account.organization_id != organization.pk:
         raise PermissionDenied("حساب بانکی متعلق به این Tenant نیست.")
-    if account.kind != TreasuryAccountKind.BANK or account.status != TreasuryAccountStatus.ACTIVE:
+    if (
+        account.kind != TreasuryAccountKind.BANK
+        or account.status != TreasuryAccountStatus.ACTIVE
+    ):
         raise ValidationError("ورود صورتحساب فقط برای حساب بانکی فعال مجاز است.")
     if not isinstance(max_file_bytes, int) or max_file_bytes <= 0:
         raise ValidationError("حد مثبت حجم فایل برای اجرای همگام الزامی است.")
@@ -201,7 +205,9 @@ def preview_statement_import(
             raise ValidationError("تاریخ ردیف خارج از بازه صورتحساب است.")
     file_hash = hashlib.sha256(source_bytes).hexdigest()
     evidence_hashes = [
-        _payload_hash({key: value for key, value in payload.items() if key != "row_number"})
+        _payload_hash(
+            {key: value for key, value in payload.items() if key != "row_number"}
+        )
         for payload in row_payloads
     ]
     if len(set(evidence_hashes)) != len(evidence_hashes):
@@ -244,12 +250,15 @@ def preview_statement_import(
     ]
     if len(set(provider_ids)) != len(provider_ids):
         raise ValidationError("شناسه ردیف ارائه‌دهنده در فایل تکراری است.")
-    if provider_ids and BankStatementLine.objects.filter(
-        organization=organization,
-        account=account,
-        provider_code=provider_code,
-        provider_row_id__in=provider_ids,
-    ).exists():
+    if (
+        provider_ids
+        and BankStatementLine.objects.filter(
+            organization=organization,
+            account=account,
+            provider_code=provider_code,
+            provider_row_id__in=provider_ids,
+        ).exists()
+    ):
         raise ValidationError("شناسه ردیف ارائه‌دهنده قبلاً وارد شده است.")
     try:
         statement_import = BankStatementImport.objects.create(
@@ -517,7 +526,9 @@ def generate_statement_match_suggestions(
             },
         )
         if not created and proposal.evidence_hash != evidence_hash:
-            raise ValidationError("کلید تکرارپذیری پیشنهاد با شواهد دیگری استفاده شده است.")
+            raise ValidationError(
+                "کلید تکرارپذیری پیشنهاد با شواهد دیگری استفاده شده است."
+            )
         proposals.append(proposal)
     if proposals:
         record_audit_event(
@@ -569,7 +580,9 @@ def confirm_statement_match(
         organization=organization, memberships=(proposal.proposed_by, checker)
     )
     checker = locked_members[checker.pk]
-    TreasuryAccount.objects.select_for_update().get(pk=proposal.statement_line.account_id)
+    TreasuryAccount.objects.select_for_update().get(
+        pk=proposal.statement_line.account_id
+    )
     BankStatementImport.objects.select_for_update().get(
         pk=proposal.statement_line.statement_import_id
     )
@@ -587,7 +600,10 @@ def confirm_statement_match(
         return proposal.clearing
     if proposal.status != StatementMatchStatus.SUGGESTED:
         raise ValidationError("فقط پیشنهاد فعال قابل تأیید است.")
-    if proposal.statement_line.statement_import.status != StatementImportStatus.ACCEPTED:
+    if (
+        proposal.statement_line.statement_import.status
+        != StatementImportStatus.ACCEPTED
+    ):
         raise ValidationError("صورتحساب پذیرفته‌شده الزامی است.")
     _assert_exact_match(proposal)
     if TreasuryMovementClearing.objects.filter(
@@ -694,7 +710,9 @@ def reverse_statement_clearing(
         site=clearing.movement.site,
         message="اختیار اصلاح تطبیق بانکی را ندارید.",
     )
-    TreasuryAccount.objects.select_for_update().get(pk=clearing.statement_line.account_id)
+    TreasuryAccount.objects.select_for_update().get(
+        pk=clearing.statement_line.account_id
+    )
     clearing = (
         TreasuryMovementClearing.objects.select_for_update()
         .select_related("proposal", "statement_line", "movement")
@@ -780,7 +798,9 @@ def run_bank_reconciliation(
         ).select_related("statement_line", "movement", "proposal__movement_leg")
     )
     cleared_line_ids = {item.statement_line_id for item in active_clearings}
-    unmatched_line_ids = [str(line.pk) for line in lines if line.pk not in cleared_line_ids]
+    unmatched_line_ids = [
+        str(line.pk) for line in lines if line.pk not in cleared_line_ids
+    ]
     statement_in = sum(
         (line.amount for line in lines if line.direction == TreasuryLegDirection.IN),
         Decimal(0),
@@ -817,12 +837,18 @@ def run_bank_reconciliation(
         .order_by("pk")
         .distinct()
     )
-    uncleared_movement_ids = [str(pk) for pk in book_movements.values_list("pk", flat=True)]
+    uncleared_movement_ids = [
+        str(pk) for pk in book_movements.values_list("pk", flat=True)
+    ]
     exceptions: list[dict[str, object]] = []
     if unmatched_line_ids:
-        exceptions.append({"code": "unmatched_statement_lines", "count": len(unmatched_line_ids)})
+        exceptions.append(
+            {"code": "unmatched_statement_lines", "count": len(unmatched_line_ids)}
+        )
     if uncleared_movement_ids:
-        exceptions.append({"code": "uncleared_book_movements", "count": len(uncleared_movement_ids)})
+        exceptions.append(
+            {"code": "uncleared_book_movements", "count": len(uncleared_movement_ids)}
+        )
     if statement_in != cleared_book_in or statement_out != cleared_book_out:
         exceptions.append({"code": "exact_totals_difference"})
     payload = {
@@ -844,8 +870,24 @@ def run_bank_reconciliation(
     ).first()
     if existing:
         if existing.evidence_hash != evidence_hash:
-            raise ValidationError("کلید تکرارپذیری تطبیق با شواهد دیگری استفاده شده است.")
+            raise ValidationError(
+                "کلید تکرارپذیری تطبیق با شواهد دیگری استفاده شده است."
+            )
         return existing
+    prior = (
+        BankReconciliationRun.objects.select_for_update(of=("self",))
+        .filter(
+            organization=organization,
+            statement_import=statement_import,
+            account=statement_import.account,
+            as_of_date=as_of_date,
+            grain_revision__isnull=False,
+            invalidation__isnull=True,
+        )
+        .order_by("-grain_revision")
+        .first()
+    )
+    grain_revision = (prior.grain_revision if prior else 0) + 1
     run = BankReconciliationRun.objects.create(
         organization=organization,
         statement_import=statement_import,
@@ -861,6 +903,11 @@ def run_bank_reconciliation(
         uncleared_movement_ids=uncleared_movement_ids,
         exceptions=exceptions,
         run_by=runner,
+        grain_revision=grain_revision,
+        supersedes=prior,
+    )
+    BankReconciliationRunProvenance.objects.create(
+        run=run, classification="prospective", evidence_hash=evidence_hash
     )
     record_audit_event(
         action=AuditAction.TREASURY_BANK_RECONCILIATION_RETAINED,

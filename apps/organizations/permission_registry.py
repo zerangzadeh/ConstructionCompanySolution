@@ -1589,6 +1589,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         "دفترکل و کنترل‌های حسابداری",
         (
             "accounting.Account",
+            "accounting.ControlAccountMappingVersion",
             "accounting.FiscalYear",
             "accounting.FiscalPeriod",
             "accounting.JournalEntry",
@@ -1608,6 +1609,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             P.ACCOUNTING_VIEW,
             P.ACCOUNTING_ACCOUNTS_MANAGE,
+            P.ACCOUNTING_CONTROL_ACCOUNT_MAPPINGS_MANAGE,
             P.ACCOUNTING_PERIODS_MANAGE,
             P.ACCOUNTING_JOURNALS_PREPARE,
             P.ACCOUNTING_JOURNALS_SUBMIT,
@@ -1643,6 +1645,11 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "treasury.ChequeTransition",
             "treasury.TreasuryGLReconciliationRun",
             "treasury.TreasuryGLReconciliationReview",
+            "treasury.TreasuryGLReconciliationSlice",
+            "treasury.TreasuryGLReconciliationLegEvidence",
+            "treasury.TreasuryGLReconciliationJournalLineEvidence",
+            "treasury.TreasuryGLReconciliationSliceInvalidation",
+            "treasury.TreasuryGLReconciliationRunProvenance",
             "treasury.PaymentRequest",
             "treasury.PaymentRequestTransition",
             "treasury.TreasuryAdvance",
@@ -1656,6 +1663,8 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "treasury.TreasuryMovementClearing",
             "treasury.TreasuryMovementClearingReversal",
             "treasury.BankReconciliationRun",
+            "treasury.BankReconciliationRunInvalidation",
+            "treasury.BankReconciliationRunProvenance",
         ),
         (
             P.TREASURY_VIEW,
@@ -1790,6 +1799,11 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "subledgers.AgingRun",
             "subledgers.SubledgerReconciliationRun",
             "subledgers.SubledgerReconciliationReview",
+            "subledgers.SubledgerReconciliationAccountSlice",
+            "subledgers.SubledgerReconciliationObligationEvidence",
+            "subledgers.SubledgerReconciliationJournalLineEvidence",
+            "subledgers.SubledgerReconciliationSliceInvalidation",
+            "subledgers.SubledgerReconciliationRunProvenance",
         ),
         (
             P.SUBLEDGERS_VIEW,
