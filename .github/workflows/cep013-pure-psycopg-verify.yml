@@ -1,0 +1,85 @@
+name: CEP-013 pure Psycopg runtime verification
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-only:
+    runs-on: ubuntu-24.04
+    container:
+      image: python@sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590
+    env:
+      PIP_CONFIG_FILE: /dev/null
+      PYTHONDONTWRITEBYTECODE: "1"
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      DB_NAME: cep013_verify
+      DB_USER: root
+      DB_HOST: /var/run/postgresql
+      DB_PORT: "5432"
+      DB_SSLMODE: disable
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Verify platform and install disposable Debian runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p output/cep-013/ci-pure-psycopg
+          . /etc/os-release
+          test "$ID" = debian && test "$VERSION_CODENAME" = bookworm
+          test "$(uname -m)" = x86_64
+          python -c 'import sys; assert sys.version_info[:3] == (3, 11, 17)'
+          {
+            echo 'configured_image=python@sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590'
+            python --version
+            cat /etc/os-release
+            uname -m
+          } > output/cep-013/ci-pure-psycopg/platform.txt
+          dpkg-query -W -f='${Package}\t${Version}\n' | sort > /tmp/cep013-packages-before.tsv
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends libpq5 postgresql-15
+          dpkg-query -W -f='${Package}\t${Version}\n' | sort > output/cep-013/ci-pure-psycopg/packages-after.tsv
+          comm -13 /tmp/cep013-packages-before.tsv output/cep-013/ci-pure-psycopg/packages-after.tsv > output/cep-013/ci-pure-psycopg/packages-installed-or-updated.tsv
+          {
+            apt-cache policy libpq5 libc6 libgssapi-krb5-2 libldap-2.5-0 libssl3 postgresql-15
+            cut -f1 output/cep-013/ci-pure-psycopg/packages-installed-or-updated.tsv | while read -r package; do apt-cache policy "$package"; done
+          } > output/cep-013/ci-pure-psycopg/apt-policy.txt
+          apt-cache policy > output/cep-013/ci-pure-psycopg/apt-sources.txt
+          dpkg-query -W -f='${Package}\t${Version}\n' libpq5 libc6 libgssapi-krb5-2 libldap-2.5-0 libssl3 postgresql-15 > output/cep-013/ci-pure-psycopg/required-packages.tsv
+          pg_ctlcluster 15 main start
+          runuser -u postgres -- createuser --superuser root
+          runuser -u postgres -- createdb --owner=root cep013_verify
+      - name: Install exact pure-Psycopg verification set
+        shell: bash
+        run: |
+          set -euo pipefail
+          python scripts/verify_pure_psycopg.py prepare-lock requirements-prod-linux.lock /tmp/cep013-pure.lock
+          python -m pip download --require-hashes --only-binary=:all: --index-url https://pypi.org/simple \
+            --dest /tmp/cep013-pure-wheels -r /tmp/cep013-pure.lock
+          python -m venv /tmp/cep013-pure-venv
+          /tmp/cep013-pure-venv/bin/python -m pip install --require-hashes --only-binary=:all: \
+            --no-index --find-links /tmp/cep013-pure-wheels -r /tmp/cep013-pure.lock
+          /tmp/cep013-pure-venv/bin/python -m pip check
+          /tmp/cep013-pure-venv/bin/python -m pip freeze > output/cep-013/ci-pure-psycopg/python-packages.txt
+          if /tmp/cep013-pure-venv/bin/python -m pip show psycopg-binary >/dev/null 2>&1; then
+            echo 'Rejected psycopg-binary was installed' >&2
+            exit 1
+          fi
+      - name: Exercise disposable BONIRA Django database backend
+        shell: bash
+        run: |
+          set -euo pipefail
+          /tmp/cep013-pure-venv/bin/python manage.py migrate --noinput
+          /tmp/cep013-pure-venv/bin/python scripts/verify_pure_psycopg.py runtime-check \
+            /tmp/cep013-pure-wheels output/cep-013/ci-pure-psycopg/runtime-result.json
+      - name: Retain verification-only evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: cep013-pure-psycopg-verification
+          path: output/cep-013/ci-pure-psycopg/
+          if-no-files-found: warn
