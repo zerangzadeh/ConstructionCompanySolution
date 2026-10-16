@@ -7,7 +7,7 @@
 - **Freeze version:** `BONIRA-PD-FREEZE-v1.1-PD032-ADDENDUM`
 - **Freeze timestamp:** `2026-10-14T09:54:43+03:30`
 - **Scope:** [PD-032 — Canonical Home ownership, route and bounded composition](BONIRA_PD_032_CANONICAL_HOME.md) only.
-- **Approval provenance:** Human/Product Owner “BONIRA — CEP-002 Home Decision Canonicalization,” 2026-10-14, approving the semantics in [the Home governance resolution](../../CEP-002_HOME_GOVERNANCE_RESOLUTION.md).
+- **Approval provenance:** Human/Product Owner “BONIRA — CEP-002 Home Decision Canonicalization,” 2026-10-14, approving the semantics in [the Home governance resolution](../governance/cep/supporting/CEP-002_HOME_GOVERNANCE_RESOLUTION.md).
 
 ## 2. Frozen decision and integrity
 

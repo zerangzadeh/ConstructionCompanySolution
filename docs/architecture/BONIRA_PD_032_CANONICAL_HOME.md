@@ -4,7 +4,7 @@ This is the approved successor addendum to the canonical Product Decision regist
 
 **Decision status:** FROZEN — PD-032 addendum only
 
-**Decision authority:** Human/Product Owner instruction, “BONIRA — CEP-002 Home Decision Canonicalization,” 2026-10-14. It explicitly approves the semantics in [CEP-002_HOME_GOVERNANCE_RESOLUTION.md](../../CEP-002_HOME_GOVERNANCE_RESOLUTION.md).
+**Decision authority:** Human/Product Owner instruction, “BONIRA — CEP-002 Home Decision Canonicalization,” 2026-10-14. It explicitly approves the semantics in [CEP-002_HOME_GOVERNANCE_RESOLUTION.md](../governance/cep/supporting/CEP-002_HOME_GOVERNANCE_RESOLUTION.md).
 
 **Freeze authority:** Human/Product Owner command `APPROVE PRODUCT DECISION FREEZE — PD-032 ADDENDUM`, 2026-10-14. See [the addendum freeze record](BONIRA_PD_032_FREEZE_RECORD.md).
 

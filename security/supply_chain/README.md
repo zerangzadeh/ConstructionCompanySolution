@@ -1,6 +1,6 @@
 # CEP-013 supply-chain operating contract
 
-The Human-approved target and policy are in [`CEP-013_SUPPLY_CHAIN_DECISION.md`](../../CEP-013_SUPPLY_CHAIN_DECISION.md). This directory records **Development build controls**, not production certification or permission to change application package versions.
+The Human-approved target and policy are in [`CEP-013_SUPPLY_CHAIN_DECISION.md`](../../docs/governance/cep/supporting/CEP-013_SUPPLY_CHAIN_DECISION.md). This directory records **Development build controls**, not production certification or permission to change application package versions.
 
 ## Acquisition and evidence
 

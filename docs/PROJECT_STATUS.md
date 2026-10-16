@@ -2,6 +2,7 @@
 
 This file holds dated, volatile project snapshots and historical validation evidence
 that should not be loaded for ordinary implementation tasks.
+`docs/governance/CEP_PROGRAM_AUTHORITY.md` defines the current source hierarchy.
 `CEP_EXECUTION_REGISTRY.yaml` is authoritative for current CEP execution/lifecycle
 state; `ROADMAP.md` is authoritative for current delivery direction, sequencing,
 and phase disposition; Django models and migrations are authoritative for the
@@ -84,7 +85,8 @@ records, and generated audit history. Django internal/system tables were exclude
 
 The delivery note at that time identified Tenant Workflow & Work Management as the
 next cross-domain foundation and Billing & Progress Claims as dependent on it. This
-is historical context only; consult `ROADMAP.md` for the current state.
+is historical context only; consult `CEP_EXECUTION_REGISTRY.yaml` for current CEP
+state and `ROADMAP.md` for current delivery direction.
 
 ## Historical validation baseline — 2026-09-15
 
@@ -94,6 +96,7 @@ is historical context only; consult `ROADMAP.md` for the current state.
 - Ruff check and format: passed.
 
 PostgreSQL 18.6 with Psycopg 3 was the authoritative database baseline. These
-counts are not a current release claim; rerun relevant checks for the current
-checkout and consult newer dated validation records in the roadmap and architecture
-documents.
+counts are not a current release claim. For current CEP state, consult
+`CEP_EXECUTION_REGISTRY.yaml`; for validation, consult the relevant CEP Completion
+Report, its execution/test evidence, and applicable architecture evidence, then
+run the relevant checks against the current checkout.
