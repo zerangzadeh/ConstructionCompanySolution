@@ -9,7 +9,10 @@ approved scope. A planned roadmap item is not implementation authorization.
 
 Use references progressively; read only those relevant to the task:
 
-- `ROADMAP.md`: delivery order, implementation status, and approved next scope.
+- `CEP_EXECUTION_REGISTRY.yaml`: authoritative current CEP execution/lifecycle,
+  recorded authorization, blocker, completion, UTV, and Git-integration state.
+- `ROADMAP.md`: delivery direction, dependency-ordered sequencing, phase
+  disposition, and future target scope; it does not authorize implementation.
 - `docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`: repository-wide
   current/target capability assessment, ownership gaps, pre-production correction
   register, and production-readiness gates.
@@ -38,7 +41,8 @@ Use references progressively; read only those relevant to the task:
 - `docs/architecture/web_stack_specification.md`: detailed stack and layer
   responsibilities.
 - `docs/PROJECT_STATUS.md`: dated snapshots and historical validation records;
-  never use it instead of current code, migrations, tests, or `ROADMAP.md`.
+  never use it instead of current code, migrations, tests, the Registry, or
+  `ROADMAP.md`.
 
 ## 2. Stack and repository conventions
 
@@ -242,6 +246,46 @@ unless the Human Decision Maker explicitly authorizes that exception.
 
 This section is a repository-level persistent instruction and applies in every Codex
 session unless an explicit, bounded Human Authorization overrides a specific rule.
+
+### CEP Registry reconciliation
+
+For every CEP session, before product mutation, Codex MUST:
+
+1. Read `CEP_EXECUTION_REGISTRY.yaml`.
+2. Ground the current branch, `HEAD`, `origin/main`, and working tree.
+3. Read the relevant `ROADMAP.md` section.
+4. Read the current CEP execution contract or canonical prompt/sources.
+5. Read explicit Human Authorization.
+6. Compare explicit Human Authorization with Registry state.
+7. Detect material Registry/repository contradictions and whether `HEAD` changed
+   since Registry reconciliation.
+
+If `HEAD` differs from `repository_state.last_reconciled_head`, reconcile the
+relevant Git-integration metadata and repository-state metadata before product
+mutation. A HEAD change never by itself changes execution completion or
+authorization.
+
+Update `CEP_EXECUTION_REGISTRY.yaml` for applicable material lifecycle events:
+`STARTED`, `BLOCKED`, `PARTIAL`, `FAILED`, `RESUMED`, `BLOCKER_RESOLVED`,
+`MIGRATION_STATE_CHANGED`, `MATERIAL_UTV_CHANGED`, `COMPLETE`,
+`CLOSED_VERIFIED`, and `GIT_INTEGRATED`. Preserve historical events; never
+silently replace them.
+
+Before issuing a CEP Completion Report, update and reconcile the Registry and the
+relevant `CEP-xxx_COMPLETION_REPORT.md`, then recalculate Registry summary fields
+from CEP records. Update `ROADMAP.md` only when the CEP materially changes delivery
+direction, dependency-ordered sequencing, phase disposition, or future target
+scope. Do not use the Roadmap as the detailed acceptance, DoD, Git, or UTV ledger.
+
+Codex MUST NOT independently issue or infer Human Authorization, Gate PASS, Human
+Sign-off, Production Certification, Production Cutover, or a global authorization
+frontier. If a material conflict remains unresolved, stop with
+`BLOCKER-REGISTRY-CONFLICT`.
+
+After a Human Git checkpoint, if `HEAD` or `origin/main` changed, inspect the new
+commit boundary; update `repository_state`; and reconcile affected CEP
+Git-integration fields while preserving execution history. Git integration never
+by itself grants CEP execution authorization or completion.
 
 ### Default execution branch
 

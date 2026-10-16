@@ -1,9 +1,11 @@
 # Project Status Reference
 
-This file holds dated, volatile project snapshots that should not be loaded for
-ordinary implementation tasks. `ROADMAP.md` is authoritative for current delivery
-status; Django models and migrations are authoritative for the schema; current test
-runs are authoritative for validation.
+This file holds dated, volatile project snapshots and historical validation evidence
+that should not be loaded for ordinary implementation tasks.
+`CEP_EXECUTION_REGISTRY.yaml` is authoritative for current CEP execution/lifecycle
+state; `ROADMAP.md` is authoritative for current delivery direction, sequencing,
+and phase disposition; Django models and migrations are authoritative for the
+schema; current test runs are authoritative for validation.
 
 ## Documentation audit snapshot — 2026-09-24
 

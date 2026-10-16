@@ -6,6 +6,13 @@
 
 **Purpose:** dependency-ordered delivery plan; a listed item is not implementation authorization
 
+**Current CEP state:** `CEP_EXECUTION_REGISTRY.yaml` is authoritative for current
+CEP execution/lifecycle, recorded authorization, blocker, completion, UTV, and
+Git-integration state. This Roadmap is authoritative for delivery direction,
+dependency-ordered sequencing, phase disposition, and future target scope. A
+dependency-ready, `NEXT-CANDIDATE`, or `ELIGIBLE` roadmap item is not
+implementation authorization.
+
 **Current/target audit:** `docs/architecture/PRODUCT_CAPABILITY_AND_READINESS_AUDIT.md`
 
 Construction ERP is a Persian-first, multi-tenant construction SaaS. Models,

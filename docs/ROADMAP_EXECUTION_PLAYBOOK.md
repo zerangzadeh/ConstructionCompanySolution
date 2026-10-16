@@ -4,8 +4,12 @@
 
 This document converts `ROADMAP.md` into resource-aware Codex execution sessions.
 It does not add product scope, authorize implementation, replace architecture
-documents, or change roadmap status. `ROADMAP.md` remains the delivery-order and
-status authority; code, migrations, and tests remain the implementation authority.
+documents, or change roadmap status. `CEP_EXECUTION_REGISTRY.yaml` is the
+current CEP execution/lifecycle and recorded authorization authority; `ROADMAP.md`
+is the delivery-direction, sequencing, phase-disposition, and future-scope
+authority; code, migrations, and tests remain the implementation authority. This
+Playbook does not override the Registry, Roadmap, canonical CEP scope, or explicit
+Human Authorization.
 
 The Product Owner owns product decisions, prioritization, acceptance, and manual
 Django Admin/user UI testing. Codex owns the approved implementation slice, automated
@@ -73,7 +77,7 @@ Context is loaded progressively in three layers:
 
 | Layer | Loaded when | Required content |
 | --- | --- | --- |
-| C0 — session contract | Every session | Applicable `AGENTS.md`; session card; exact roadmap subsection; previous compact handoff; current `git status`/target diff; acceptance and stop conditions |
+| C0 — session contract | Every session | Applicable `Agents.md`; `CEP_EXECUTION_REGISTRY.yaml`; session card/current CEP execution contract or canonical prompt; explicit Human Authorization; exact `ROADMAP.md` subsection; current Git branch/HEAD/status; previous compact handoff when relevant; acceptance and stop conditions |
 | C1 — direct implementation | Every implementation/review session | Relevant architecture sections; directly affected models, migrations, services, permissions, views/forms/templates and tests; current behavior evidence |
 | C2 — risk expansion | Only when a trigger is observed | Adjacent domain contracts, older migrations/history, operations/UI guidance, external official sources, wider tests or performance/security evidence |
 
@@ -2744,7 +2748,6 @@ organization states, membership/session access and lifecycle services/direct tes
 Preserve existing behavior; do not invent limit values, cancellation/retention
 durations, support grants or background authority. Network privacy remains a later
 separate topic, and every implementation package still needs explicit authorization.
-
 ## 36. P0-S11 Tenant lifecycle ADR proposal and S12 handoff
 
 **Recorded:** 2026-09-25. **Authorization:** Product Owner explicitly requested

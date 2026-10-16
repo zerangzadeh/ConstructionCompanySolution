@@ -1,13 +1,12 @@
 schema_version: 1
 project: BONIRA
-artifact_role: "Single authoritative current-state registry for controlled CEP execution"
-
+artifact_role: Authoritative current-state registry for controlled CEP execution/lifecycle tracking
 governance:
   principles:
-    - "ELIGIBLE != AUTHORIZED"
-    - "EXECUTION_COMPLETION != GIT_INTEGRATION"
-    - "UI_VISIBILITY != AUTHORIZATION"
-    - "HISTORICAL_STATES_MUST_NOT_BE_SILENTLY_REWRITTEN"
+  - ELIGIBLE != AUTHORIZED
+  - EXECUTION_COMPLETION != GIT_INTEGRATION
+  - UI_VISIBILITY != AUTHORIZATION
+  - HISTORICAL_STATES_MUST_NOT_BE_SILENTLY_REWRITTEN
   codex_update_policy:
     mandatory_at_session_start: true
     mandatory_on_material_lifecycle_event: true
@@ -18,62 +17,72 @@ governance:
     may_independently_issue_human_signoff: false
     may_independently_issue_production_certification: false
     conflict_action: STOP_AND_REPORT_BLOCKER_REGISTRY_CONFLICT
-
+    mandatory_reconcile_if_head_changed: true
+    mandatory_recalculate_summary_from_records: true
+    roadmap_update_only_for_direction_or_disposition_change: true
+    completion_report_is_execution_evidence_not_current_state_registry: true
 inventory:
   total: 86
   current_governed: 79
   post_v1: 7
-  v1_implementation: "CEP-001..CEP-068"
-  production_certification: "CEP-069..CEP-072"
-  verification_uat: "CEP-073..CEP-079"
-  post_v1_range: "CEP-080..CEP-086"
-
+  v1_implementation: CEP-001..CEP-068
+  production_certification: CEP-069..CEP-072
+  verification_uat: CEP-073..CEP-079
+  post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 20
-  authorized_not_started: 1
+  execution_state_complete: 21
+  authorized_not_started: 0
   eligible_not_authorized: 11
   in_progress: 0
   blocked_current: 0
   not_started_other_current_governed: 47
   deferred_post_v1: 7
-  remote_main_verified_complete_from_last_audit: 11
-  last_updated: "2026-10-16"
-
+  remote_main_verified_complete_from_last_audit: null
+  last_updated: '2026-10-16'
+  remote_main_complete_count_status: REQUIRES_FULL_REPORT_RECONCILIATION
 gates:
   GATE-01:
     status: PASS
     source: ADVISOR_EVALUATION
     human_signoff_required: false
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
   GATE-02:
     status: NOT_READY
     source: CURRENT_EXECUTION_PROJECTION
-    note: "CEP-003, CEP-016 and CEP-017 are complete; CEP-014 and CEP-026 remain required contributors."
-    updated_at: "2026-10-16"
-
+    note: CEP-003, CEP-016, CEP-017 and CEP-026 contributions are complete; CEP-014 remains an outstanding required contributor.
+      Eligibility does not grant authorization.
+    updated_at: '2026-10-16'
 authorization_batches:
   AUTH-BATCH-003:
     execution_mode: SERIAL
-    ceps: [CEP-017, CEP-016, CEP-026]
-    complete: [CEP-017, CEP-016]
-    pending: [CEP-026]
-    status: ACTIVE
-
+    ceps:
+    - CEP-017
+    - CEP-016
+    - CEP-026
+    complete:
+    - CEP-017
+    - CEP-016
+    - CEP-026
+    pending: []
+    status: COMPLETE
 registry_update_rules:
   on_start:
-    - "Read registry"
-    - "Reconcile current CEP record with explicit authorization and accepted prior results"
-    - "Preserve history"
+  - Read registry before product mutation
+  - Ground branch/HEAD/working tree and compare HEAD with repository_state.last_reconciled_head
+  - Reconcile current CEP record with explicit Human Authorization, repository evidence and accepted prior results
+  - If HEAD changed, reconcile relevant Git integration metadata before product mutation
+  - Preserve history; never silently rewrite contradictions
   on_material_event:
-    - "Update current CEP lifecycle state"
-    - "Record blocker/resolution/migration/UTV changes"
-    - "Do not infer Human Authorization or Gate PASS"
+  - Update current CEP lifecycle state for STARTED/BLOCKED/PARTIAL/FAILED/RESUMED/COMPLETE/CLOSED_VERIFIED
+  - Record blocker resolution, migration-state changes and material UTV changes
+  - Record Git integration only from actual Git evidence
+  - Do not infer Human Authorization, Gate PASS, Human Sign-off or Production Certification
   on_closeout:
-    - "Update CEP record before final Completion Report"
-    - "Update AC, DoD, blockers, UTV, evidence/report path, SHA, Git state"
-    - "Append history event"
-    - "Recalculate summary counts from CEP records"
-
+  - Update CEP record before issuing the final Completion Report
+  - Update AC, DoD, blockers, UTV, evidence/report path, execution baseline SHA and Git state
+  - Append history event
+  - Recalculate summary counts from CEP records
+  - Update ROADMAP.md only when delivery direction, sequencing or phase disposition materially changed
 ceps:
   CEP-001:
     title: null
@@ -107,7 +116,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-002:
     title: null
@@ -141,7 +150,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-003:
     title: null
@@ -175,7 +184,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-004:
     title: null
@@ -209,7 +218,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-005:
     title: null
@@ -243,7 +252,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-006:
     title: null
@@ -277,11 +286,12 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
     reconciliation:
       status: DIVERGENT_REMOTE_MAIN
-      note: "Current execution state treats CEP-006 as COMPLETE, while the last audited remote main report still showed PARTIAL/BLOCKED. Preserve both facts until repository reconciliation."
+      note: Current execution state treats CEP-006 as COMPLETE, while the last audited remote main report still showed PARTIAL/BLOCKED.
+        Preserve both facts until repository reconciliation.
   CEP-007:
     title: null
     phase: V1_IMPLEMENTATION
@@ -314,7 +324,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-008:
     title: null
@@ -348,7 +358,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-009:
     title: null
@@ -382,7 +392,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-010:
     title: null
@@ -416,7 +426,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-011:
     title: null
@@ -450,7 +460,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-012:
     title: null
@@ -484,7 +494,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-013:
     title: null
@@ -518,10 +528,10 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-014:
-    title: "Administration surface separation"
+    title: Administration surface separation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: ELIGIBLE
@@ -552,7 +562,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-015:
     title: null
@@ -586,17 +596,17 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-016:
-    title: "Context UX and scoped form filtering"
+    title: Context UX and scoped form filtering
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
-      authorization_id: "AUTH-BATCH-003"
-      source: "HUMAN_DECISION"
+      authorization_id: AUTH-BATCH-003
+      source: HUMAN_DECISION
     execution:
       status: COMPLETE
       lifecycle: CLOSED_VERIFIED
@@ -608,35 +618,41 @@ ceps:
     dod: PASS
     blockers: []
     remaining_utv:
-      - manual_browser_accessibility_runtime
-      - performance
-      - concurrency
+    - manual_browser_accessibility_runtime
+    - performance
+    - concurrency
     completion_report:
-      path: "CEP-016_COMPLETION_REPORT.md"
-      evidence_presence: CONFIRMED_IN_CURRENT_SESSION
+      path: CEP-016_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: 2f16cc05fabe404da32aa51bc5328b069567f350
+      pushed: true
+      remote_branch: main
       merged_to_main: false
-      remote_main_evidence: REPORT_NOT_FOUND
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: COMPLETE
     last_execution:
       branch: main
-      sha: "89ca8f28da8828a6ac4226baceb18d27c5d98f09"
-    updated_at: "2026-10-16"
+      sha: 89ca8f28da8828a6ac4226baceb18d27c5d98f09
+    updated_at: '2026-10-16'
     history:
-      - date: "2026-10-16"
-        status: CLOSED_VERIFIED
-        reason: "12/12 AC PASS; scoped DoD PASS"
+    - date: '2026-10-16'
+      status: CLOSED_VERIFIED
+      reason: 12/12 AC PASS; scoped DoD PASS
+    - date: '2026-10-16'
+      status: GIT_INTEGRATED
+      reason: Human direct commit/push to main at 2f16cc05fabe404da32aa51bc5328b069567f350; no merge command claimed.
   CEP-017:
-    title: "Navigation and workspace architecture"
+    title: Navigation and workspace architecture
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
-      authorization_id: "AUTH-BATCH-003"
-      source: "HUMAN_DECISION"
+      authorization_id: AUTH-BATCH-003
+      source: HUMAN_DECISION
     execution:
       status: COMPLETE
       lifecycle: CLOSED_VERIFIED
@@ -648,30 +664,36 @@ ceps:
     dod: PASS
     blockers: []
     remaining_utv:
-      - browser_accessibility_runtime
+    - browser_accessibility_runtime
     completion_report:
-      path: "CEP-017_COMPLETION_REPORT.md"
-      evidence_presence: CONFIRMED_IN_CURRENT_SESSION
+      path: CEP-017_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: 2f16cc05fabe404da32aa51bc5328b069567f350
+      pushed: true
+      remote_branch: main
       merged_to_main: false
-      remote_main_evidence: REPORT_NOT_FOUND
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: COMPLETE
     last_execution:
       branch: main
-      sha: "89ca8f28da8828a6ac4226baceb18d27c5d98f09"
-    updated_at: "2026-10-16"
+      sha: 89ca8f28da8828a6ac4226baceb18d27c5d98f09
+    updated_at: '2026-10-16'
     history:
-      - date: "2026-10-16"
-        status: BLOCKED
-        reason: "BLOCKER-SPEC / missing canonical UI architecture sources"
-      - date: "2026-10-16"
-        status: BLOCKED
-        reason: "BLOCKER-ENVIRONMENT / PostgreSQL verification setup"
-      - date: "2026-10-16"
-        status: CLOSED_VERIFIED
-        reason: "12/12 AC PASS; scoped DoD PASS; required regression PASS"
+    - date: '2026-10-16'
+      status: BLOCKED
+      reason: BLOCKER-SPEC / missing canonical UI architecture sources
+    - date: '2026-10-16'
+      status: BLOCKED
+      reason: BLOCKER-ENVIRONMENT / PostgreSQL verification setup
+    - date: '2026-10-16'
+      status: CLOSED_VERIFIED
+      reason: 12/12 AC PASS; scoped DoD PASS; required regression PASS
+    - date: '2026-10-16'
+      status: GIT_INTEGRATED
+      reason: Human direct commit/push to main at 2f16cc05fabe404da32aa51bc5328b069567f350; no merge command claimed.
   CEP-018:
     title: null
     phase: V1_IMPLEMENTATION
@@ -704,7 +726,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-019:
     title: null
@@ -738,7 +760,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-020:
     title: null
@@ -772,7 +794,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-021:
     title: null
@@ -806,7 +828,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-022:
     title: null
@@ -840,7 +862,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-023:
     title: null
@@ -874,7 +896,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-024:
     title: null
@@ -908,7 +930,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-025:
     title: null
@@ -942,42 +964,57 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-026:
-    title: "ESS own-data privacy boundary"
+    title: ESS own-data privacy boundary
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED
-      authorization_id: "AUTH-BATCH-003"
-      source: "HUMAN_DECISION"
+      authorization_id: AUTH-BATCH-003
+      source: HUMAN_DECISION
     execution:
-      status: NOT_STARTED
-      lifecycle: AUTHORIZED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - browser_manual_accessibility
+    - performance
+    - concurrency
+    - UAT
+    - production_certification
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: CEP-026_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 2f16cc05fabe404da32aa51bc5328b069567f350
+      pushed: true
+      remote_branch: main
+      merged_to_main: false
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: COMPLETE
     last_execution:
-      branch: null
-      sha: null
-    updated_at: "2026-10-16"
-    history: []
+      branch: main
+      sha: 89ca8f28da8828a6ac4226baceb18d27c5d98f09
+    updated_at: '2026-10-16'
+    history:
+    - date: '2026-10-16'
+      status: CLOSED_VERIFIED
+      reason: 'CEP-026 accepted: IMB-0093 only; 6/6 AC PASS; scoped DoD PASS; required security/regression evidence PASS;
+        no migration; no unresolved blocker.'
+    - date: '2026-10-16'
+      status: GIT_INTEGRATED
+      reason: Human direct commit/push to main at 2f16cc05fabe404da32aa51bc5328b069567f350; no merge command claimed.
   CEP-027:
     title: null
     phase: V1_IMPLEMENTATION
@@ -1010,7 +1047,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-028:
     title: null
@@ -1044,7 +1081,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-029:
     title: null
@@ -1078,7 +1115,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-030:
     title: null
@@ -1384,7 +1421,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-039:
     title: null
@@ -1418,7 +1455,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-040:
     title: null
@@ -1452,7 +1489,7 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: "2026-10-16"
+    updated_at: '2026-10-16'
     history: []
   CEP-041:
     title: null
@@ -3018,3 +3055,37 @@ ceps:
       sha: null
     updated_at: null
     history: []
+authority_scope:
+  owns:
+  - current CEP execution status
+  - current CEP lifecycle status
+  - recorded authorization state
+  - blocker state
+  - acceptance/DoD closeout state
+  - UTV state
+  - Git integration state
+  - execution frontier
+  does_not_own:
+  - product requirements
+  - canonical CEP scope
+  - canonical Acceptance Criteria or Definition of Done
+  - dependency graph design
+  - roadmap delivery direction
+  - Human Authorization issuance
+  - Gate PASS issuance
+  - Human Sign-off
+  - Production Certification
+repository_state:
+  branch: main
+  last_reconciled_head: 2f16cc05fabe404da32aa51bc5328b069567f350
+  origin_main: 2f16cc05fabe404da32aa51bc5328b069567f350
+  integration_checkpoint: 2f16cc05fabe404da32aa51bc5328b069567f350
+  integration_method: DIRECT_COMMIT_TO_MAIN
+  last_reconciled_at: '2026-10-16'
+execution_frontier:
+  active_authorization_batch: null
+  authorized_execution_queue: []
+  next_authorized_cep: null
+  next_known_eligible_not_authorized_candidate: CEP-014
+  production_authorized: false
+  human_signoff_executed: false
