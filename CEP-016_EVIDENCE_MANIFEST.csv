@@ -1,0 +1,10 @@
+Evidence ID,Type,Source,Result
+CEP-016-EV-001,Repository grounding,CEP-016_EXECUTION_MANIFEST.md,"main @ 89ca8f28da8828a6ac4226baceb18d27c5d98f09; dirty CEP-017 work preserved; prerequisites and gate verified"
+CEP-016-EV-002,Code diff,"git diff / CEP-016_CHANGE_MANIFEST.csv","Session context contract, scoped form primitives, fixed cascade registry, shell and mutation UX implemented; no models/migrations/permissions"
+CEP-016-EV-003,Focused PostgreSQL tests,"python -m pytest apps/organizations/test_cep016_context.py -q --reuse-db","9 passed in 15.83s on final run after initial reusable database setup; initial run also passed 9/9 in 907.51s"
+CEP-016-EV-004,System/schema checks,"python manage.py check; python manage.py makemigrations --check --dry-run","System check: 0 issues; no model changes detected"
+CEP-016-EV-005,Lint/whitespace,"python -m ruff check [CEP-016 Python touch set]; git diff --check","PASS; only existing Windows LF/CRLF notices"
+CEP-016-EV-006,Representative domain regression,"pytest apps/expenses/tests.py apps/estimates/tests.py apps/organizations/test_cep001_security.py core/test_home.py -q --reuse-db","22 passed; 31 legacy Expense/Estimate tests failed in pre-behavior fixture setup because explicit CEP-001 scope grants are absent"
+CEP-016-EV-007,Authorization/Home regression,"pytest apps/organizations/tests.py apps/organizations/test_permission_decorators.py apps/organizations/test_cep001_security.py core/test_home.py -q --reuse-db","86 passed; 1 pre-existing invalid-session expectation mismatch; changed middleware control flow is additive only"
+CEP-016-EV-008,Template/static evidence,"Focused response assertions; python manage.py findstatic js/erp_context.js --verbosity 2","Persian RTL context/mutation states rendered; shared script resolves from apps/accounts/static/js/erp_context.js"
+CEP-016-EV-009,Compatibility regression,"pytest tests/test_identifier_canonicalization.py::IdentifierCanonicalizationTests::test_identifier_forms_return_canonical_codes_and_numbers -q --reuse-db","1 test passed with 6 subtests"

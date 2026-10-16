@@ -11,6 +11,7 @@ from apps.estimates.services import (
     create_estimate,
     get_organization_estimates,
 )
+from apps.organizations.authorization import get_active_membership
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -87,7 +88,15 @@ def estimate_list(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.ESTIMATES_CREATE)
 def estimate_create(request: HttpRequest) -> HttpResponse:
-    form = EstimateForm(request.POST or None, organization=request.organization)
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    form = EstimateForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=membership,
+        active_project=request.active_project,
+    )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:

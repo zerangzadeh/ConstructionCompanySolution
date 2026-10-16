@@ -1,0 +1,19 @@
+File,Change_Type,CEP_026_Change,Migration_Impact
+apps/workforce/ess_services.py,ADD,"Shared authoritative ESS subject resolver; own-profile object scope; national-ID masking",NONE
+apps/workforce/views.py,MODIFY,"Read-only ESS profile endpoint",NONE
+apps/workforce/urls.py,MODIFY,"Own profile and relationship-history routes",NONE
+templates/workforce/ess_profile.html,ADD,"Persian-first responsive read-only own profile and source-protected document entry",NONE
+apps/documents/employee_access.py,MODIFY,"Reuse shared ESS subject resolver while preserving DMS permission/source/download controls",NONE
+apps/organizations/context_processors.py,MODIFY,"Expose resolver-backed ESS navigation availability",NONE
+templates/base.html,MODIFY,"Pass ESS availability into isolated desktop/mobile navigation includes",NONE
+templates/components/navigation_links.html,MODIFY,"Conditionally activate NAV-006 with unavailable fallback",NONE
+apps/workforce/test_cep026_ess_privacy.py,ADD,"Six focused security/service/tenant/UI tests",NONE
+core/test_cep017_navigation.py,MODIFY,"Remove newly implemented NAV-006 from permanently-unavailable static list",NONE
+ROADMAP.md,MODIFY,"Record verified bounded CEP-026 disposition",NONE
+docs/architecture/DATA_MODEL.md,MODIFY,"Record explicit ESS identity and shared employee-DMS boundary",NONE
+docs/architecture/DOMAIN_AND_DATA_MODEL.md,MODIFY,"Record implemented resolver/profile boundary",NONE
+CEP-026_EXECUTION_MANIFEST.md,ADD,"Grounding and actual touch set",NONE
+CEP-026_ACCEPTANCE_MAPPING.csv,ADD,"6/6 acceptance mapping",NONE
+CEP-026_EVIDENCE_MANIFEST.csv,ADD,"Executable evidence index",NONE
+CEP-026_CHANGE_MANIFEST.csv,ADD,"Bounded change inventory",NONE
+CEP-026_COMPLETION_REPORT.md,ADD,"Final controlled execution report",NONE

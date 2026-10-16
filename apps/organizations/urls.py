@@ -52,4 +52,10 @@ urlpatterns = [
     ),
     path("settings/", views.organization_settings, name="settings"),
     path("switch/", views.switch_organization, name="switch"),
+    path("context/", views.update_context, name="update_context"),
+    path(
+        "context/form-options/",
+        views.form_context_options,
+        name="form_context_options",
+    ),
 ]

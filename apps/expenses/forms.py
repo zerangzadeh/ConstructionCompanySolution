@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from django import forms
+from django.urls import reverse
 
 from apps.expenses.models import (
     Expense,
@@ -9,6 +10,11 @@ from apps.expenses.models import (
     ExpenseClassification,
     PlatformExpenseGroup,
     RecurringExpenseTemplate,
+)
+from apps.organizations.form_scoping import (
+    scope_project_related_choices,
+    scoped_projects_for_form,
+    selected_form_project,
 )
 from apps.parties.models import BusinessParty
 from apps.projects.models import (
@@ -49,7 +55,14 @@ class ExpenseForm(JalaliDateMixin, forms.ModelForm):
             "notes",
         ]
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        organization=None,
+        membership=None,
+        active_project=None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.fields["category"].label = "گروه اصلی هزینه"
         self.fields["expense_category"].label = "دسته هزینه"
@@ -60,17 +73,52 @@ class ExpenseForm(JalaliDateMixin, forms.ModelForm):
             .order_by("name")
             .values_list("code", "name")
         )
-        self.fields["project"].queryset = Project.objects.filter(
-            organization=organization,
-            deleted_at__isnull=True,
-        ).order_by("name")
-        self.fields["phase"].queryset = (
-            ProjectPhase.objects.filter(
+        projects = (
+            scoped_projects_for_form(
                 organization=organization,
-                site__project__deleted_at__isnull=True,
+                membership=membership,
             )
-            .select_related("site", "site__project")
-            .order_by("site__project__name", "site__name", "name")
+            if membership is not None
+            else Project.objects.filter(
+                organization=organization, deleted_at__isnull=True
+            ).order_by("name")
+        )
+        self.fields["project"].queryset = projects
+        self.fields["project"].widget.attrs["data-cascade-project"] = ""
+        selected_project = selected_form_project(
+            data=self.data if self.is_bound else None,
+            field_name=self.add_prefix("project"),
+            projects=projects,
+            active_project=active_project,
+        )
+        if not self.is_bound and selected_project is not None:
+            self.initial.setdefault("project", selected_project.pk)
+        phases = ProjectPhase.objects.filter(
+            organization=organization,
+            site__project__deleted_at__isnull=True,
+        )
+        if membership is not None:
+            phases = scope_project_related_choices(
+                phases,
+                membership=membership,
+                project_lookup="site__project_id",
+                site_lookup="site_id",
+                project=selected_project,
+            )
+        elif selected_project is not None:
+            phases = phases.filter(site__project=selected_project)
+        else:
+            phases = phases.none()
+        self.fields["phase"].queryset = phases.select_related(
+            "site", "site__project"
+        ).order_by("site__name", "name")
+        self.fields["phase"].widget.attrs.update(
+            {
+                "data-cascade-field": "phase",
+                "data-cascade-source": "expenses",
+                "data-options-url": reverse("organizations:form_context_options"),
+                "data-empty-label": "بدون فاز",
+            }
         )
         self.fields["party"].queryset = BusinessParty.objects.filter(
             organization=organization, archived_at__isnull=True
@@ -93,6 +141,8 @@ class ExpenseForm(JalaliDateMixin, forms.ModelForm):
         phase = cleaned_data.get("phase")
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
+        if phase and project is None:
+            self.add_error("phase", "ابتدا پروژه مجاز را انتخاب کنید.")
         return cleaned_data
 
 

@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from zoneinfo import ZoneInfo
 
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -18,6 +17,7 @@ from apps.documents.models import (
 )
 from apps.documents.services import _validate_access, _validate_target_access
 from apps.organizations.models import BusinessPermissionCode, Organization
+from apps.workforce.ess_services import resolve_ess_subject
 from apps.workforce.models import Person, WorkRelationship
 
 _DENIED = "سند در این سازمان یافت نشد."
@@ -38,23 +38,11 @@ def _subject(*, user: User, organization: Organization) -> tuple[Person, set]:
         organization=organization,
         permission=BusinessPermissionCode.DOCUMENTS_VIEW,
     )
-    people = list(Person.objects.filter(organization=organization, user=user)[:2])
-    if len(people) != 1:
-        raise PermissionDenied(_DENIED)
-    person = people[0]
-    today = timezone.localdate(timezone=ZoneInfo(organization.settings.timezone))
-    current_ids = set(
-        WorkRelationship.objects.filter(
-            organization=organization,
-            person=person,
-            effective_start__lte=today,
-        )
-        .filter(Q(effective_end__isnull=True) | Q(effective_end__gte=today))
-        .values_list("pk", flat=True)[:2]
-    )
-    if len(current_ids) != 1:
-        raise PermissionDenied(_DENIED)
-    return person, current_ids
+    try:
+        subject = resolve_ess_subject(user=user, organization=organization)
+    except PermissionDenied as exc:
+        raise PermissionDenied(_DENIED) from exc
+    return subject.person, {subject.current_relationship.pk}
 
 
 def _linked_episode(*, link: object, organization: Organization) -> WorkRelationship:

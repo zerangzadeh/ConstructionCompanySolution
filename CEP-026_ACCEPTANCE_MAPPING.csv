@@ -1,0 +1,7 @@
+Acceptance_Criterion,Requirement,Implementation,Evidence_ID,Status,Notes
+AC-01,"Authoritative User↔Person/WorkRelationship resolution and backend field/object masking","Shared fail-closed ESS resolver; masked read-only profile; employee DMS consumes shared resolver","CEP-026-EV-002; CEP-026-EV-003",PASS,"No username/email/employee-number inference"
+AC-02,"Actor inside approved own scope can use the capability","Own profile service and route return the linked Person/current WorkRelationship","CEP-026-EV-002",PASS,"Own access verified"
+AC-03,"Out-of-scope and cross-tenant objects denied at service/queryset/backend","Relationship lookup is Organization+Person scoped; other-person and cross-tenant tests deny","CEP-026-EV-002; CEP-026-EV-003",PASS,"DMS source/queryset controls retained"
+AC-04,"Direct URL/API applies the same authorization as normal UI","Direct relationship URL uses the same service boundary; employee download reauthorizes","CEP-026-EV-002; CEP-026-EV-003",PASS,"Unauthorized direct requests return 403"
+AC-05,"UI/navigation visibility never expands authority","NAV-006 is conditional on resolver state; direct service/route remains authoritative","CEP-026-EV-002; CEP-026-EV-003",PASS,"Unlinked actor sees unavailable entry and direct access is denied"
+AC-06,"Denied access does not disclose object existence or sensitive fields","Missing and unauthorized relationship responses are identical; national ID is masked; full value absent","CEP-026-EV-002",PASS,"Other-person name/number absent"

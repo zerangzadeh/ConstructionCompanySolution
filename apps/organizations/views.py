@@ -10,12 +10,15 @@ from django.http import (
     HttpRequest,
     HttpResponse,
     HttpResponseForbidden,
+    JsonResponse,
 )
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from apps.accounts.models import User
+from apps.contracts.models import Contract
 from apps.organizations.access_services import (
     archive_organization_role,
     assign_membership_role,
@@ -31,13 +34,20 @@ from apps.organizations.authorization import (
     get_active_membership,
     has_business_permission,
     is_platform_admin,
+    membership_has_permission,
     membership_has_role,
     membership_is_tenant_owner,
 )
+from apps.organizations.context import set_effective_context
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
     require_organization_permission,
+)
+from apps.organizations.form_scoping import (
+    normalized_uuid,
+    scope_project_related_choices,
+    scoped_projects_for_form,
 )
 from apps.organizations.forms import (
     ExistingAccountConnectionForm,
@@ -97,6 +107,7 @@ from apps.organizations.services import (
     update_organization_membership,
     update_organization_settings,
 )
+from apps.projects.models import ProjectPhase
 from core.list_filters import apply_table_sorting
 
 
@@ -133,6 +144,92 @@ def switch_organization(request: HttpRequest) -> HttpResponse:
 
     set_active_organization(request.session, organization)
     return redirect("home")
+
+
+@active_organization_required
+@require_POST
+def update_context(request: HttpRequest) -> HttpResponse:
+    """Persist a validated Project/Site context without granting authority."""
+
+    try:
+        set_effective_context(
+            user=request.user,
+            organization=request.organization,
+            session=request.session,
+            project_id=request.POST.get("project_id"),
+            site_id=request.POST.get("site_id"),
+        )
+    except PermissionDenied:
+        return HttpResponseForbidden("دامنه انتخاب‌شده مجاز نیست.")
+
+    next_url = request.POST.get("next", "")
+    if not url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        next_url = "/"
+    return redirect(next_url)
+
+
+@active_organization_required
+@require_GET
+def form_context_options(request: HttpRequest) -> JsonResponse:
+    """Return fixed-registry dependent choices after backend scope checks."""
+
+    source = request.GET.get("source")
+    field = request.GET.get("field")
+    policy = {
+        ("expenses", "phase"): BusinessPermissionCode.EXPENSES_CREATE,
+        ("estimates", "phase"): BusinessPermissionCode.ESTIMATES_CREATE,
+        ("estimates", "contract"): BusinessPermissionCode.ESTIMATES_CREATE,
+    }
+    permission = policy.get((source, field))
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    if permission is None or not membership_has_permission(membership, permission):
+        return JsonResponse({"detail": "گزینه‌های وابسته مجاز نیستند."}, status=403)
+
+    project_id = normalized_uuid(request.GET.get("project"))
+    project = (
+        scoped_projects_for_form(
+            organization=request.organization,
+            membership=membership,
+        )
+        .filter(pk=project_id)
+        .first()
+    )
+    if project is None:
+        return JsonResponse({"options": []})
+
+    if field == "phase":
+        choices = scope_project_related_choices(
+            ProjectPhase.objects.filter(organization=request.organization),
+            membership=membership,
+            project_lookup="site__project_id",
+            site_lookup="site_id",
+            project=project,
+        ).select_related("site")
+        options = [
+            {"value": str(item.pk), "label": f"{item.site.name} — {item.name}"}
+            for item in choices.order_by("site__name", "name")
+        ]
+    else:
+        choices = scope_project_related_choices(
+            Contract.objects.filter(
+                organization=request.organization,
+                deleted_at__isnull=True,
+            ),
+            membership=membership,
+            project_lookup="project_id",
+            project=project,
+        )
+        options = [
+            {"value": str(item.pk), "label": str(item)}
+            for item in choices.order_by("contract_number")
+        ]
+    return JsonResponse({"options": options})
 
 
 @login_required

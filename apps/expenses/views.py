@@ -40,7 +40,11 @@ from apps.expenses.services import (
     update_platform_expense_group,
     void_expense,
 )
-from apps.organizations.authorization import has_business_permission, is_platform_admin
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    is_platform_admin,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -286,7 +290,15 @@ def platform_expense_group_archive(request: HttpRequest, group_id: str) -> HttpR
 @active_organization_required
 @organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)
 def expense_create(request: HttpRequest) -> HttpResponse:
-    form = ExpenseForm(request.POST or None, organization=request.organization)
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
+    form = ExpenseForm(
+        request.POST or None,
+        organization=request.organization,
+        membership=membership,
+        active_project=request.active_project,
+    )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data
         try:
@@ -316,8 +328,15 @@ def expense_create(request: HttpRequest) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.EXPENSES_CREATE)
 def expense_draft_create(request: HttpRequest) -> HttpResponse:
     initial = {"idempotency_key": str(uuid.uuid4())}
+    membership = get_active_membership(
+        user=request.user, organization=request.organization
+    )
     form = ExpenseDraftForm(
-        request.POST or None, organization=request.organization, initial=initial
+        request.POST or None,
+        organization=request.organization,
+        membership=membership,
+        active_project=request.active_project,
+        initial=initial,
     )
     if request.method == "POST" and form.is_valid():
         data = form.cleaned_data

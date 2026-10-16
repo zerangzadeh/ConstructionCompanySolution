@@ -7,6 +7,10 @@
 <p class="text-xs font-semibold text-blue-600">مدیریت هزینه‌ها</p>
 <h1 class="mt-1 text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">ثبت هزینه</h1>
 <p class="mt-1 text-sm text-slate-500">ثبت هزینه پروژه برای {{ request.organization.name }}</p>
+<section class="mt-4 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-xs text-blue-900" aria-label="دامنه ثبت">
+    <p class="font-semibold" data-mutation-context>{% if active_project %}پروژه مؤثر این ثبت: {{ active_project.code }} — {{ active_project.name }}{% else %}پروژه مؤثر این ثبت هنوز انتخاب نشده است.{% endif %}</p>
+    <p class="mt-1 text-blue-700">انتخاب دامنه فقط گزینه‌ها را محدود می‌کند و مجوز تازه‌ای ایجاد نمی‌کند.</p>
+</section>
 <form class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6" method="post">
 {% csrf_token %}
 {% include "components/form_errors.html" with form=form only %}

@@ -2,6 +2,7 @@ from collections.abc import Callable
 
 from django.http import HttpRequest, HttpResponse
 
+from apps.organizations.context import resolve_session_context
 from apps.organizations.services import (
     ACTIVE_ORGANIZATION_SESSION_KEY,
     resolve_active_organization,
@@ -18,6 +19,8 @@ class OrganizationMiddleware:
 
     def __call__(self, request: HttpRequest) -> HttpResponse:
         request.organization = None
+        request.active_project = None
+        request.active_site = None
         request.organization_access_denied = False
 
         if request.user.is_authenticated:
@@ -42,5 +45,13 @@ class OrganizationMiddleware:
                     set_active_organization(request.session, organization)
 
             request.organization = organization
+            if organization is not None:
+                context = resolve_session_context(
+                    user=request.user,
+                    organization=organization,
+                    session=request.session,
+                )
+                request.active_project = context.project
+                request.active_site = context.site
 
         return self.get_response(request)

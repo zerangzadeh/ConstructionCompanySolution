@@ -1,0 +1,3020 @@
+schema_version: 1
+project: BONIRA
+artifact_role: "Single authoritative current-state registry for controlled CEP execution"
+
+governance:
+  principles:
+    - "ELIGIBLE != AUTHORIZED"
+    - "EXECUTION_COMPLETION != GIT_INTEGRATION"
+    - "UI_VISIBILITY != AUTHORIZATION"
+    - "HISTORICAL_STATES_MUST_NOT_BE_SILENTLY_REWRITTEN"
+  codex_update_policy:
+    mandatory_at_session_start: true
+    mandatory_on_material_lifecycle_event: true
+    mandatory_at_closeout: true
+    may_record_explicit_human_or_advisor_decisions: true
+    may_independently_issue_human_authorization: false
+    may_independently_mark_gate_pass: false
+    may_independently_issue_human_signoff: false
+    may_independently_issue_production_certification: false
+    conflict_action: STOP_AND_REPORT_BLOCKER_REGISTRY_CONFLICT
+
+inventory:
+  total: 86
+  current_governed: 79
+  post_v1: 7
+  v1_implementation: "CEP-001..CEP-068"
+  production_certification: "CEP-069..CEP-072"
+  verification_uat: "CEP-073..CEP-079"
+  post_v1_range: "CEP-080..CEP-086"
+
+summary:
+  execution_state_complete: 20
+  authorized_not_started: 1
+  eligible_not_authorized: 11
+  in_progress: 0
+  blocked_current: 0
+  not_started_other_current_governed: 47
+  deferred_post_v1: 7
+  remote_main_verified_complete_from_last_audit: 11
+  last_updated: "2026-10-16"
+
+gates:
+  GATE-01:
+    status: PASS
+    source: ADVISOR_EVALUATION
+    human_signoff_required: false
+    updated_at: "2026-10-16"
+  GATE-02:
+    status: NOT_READY
+    source: CURRENT_EXECUTION_PROJECTION
+    note: "CEP-003, CEP-016 and CEP-017 are complete; CEP-014 and CEP-026 remain required contributors."
+    updated_at: "2026-10-16"
+
+authorization_batches:
+  AUTH-BATCH-003:
+    execution_mode: SERIAL
+    ceps: [CEP-017, CEP-016, CEP-026]
+    complete: [CEP-017, CEP-016]
+    pending: [CEP-026]
+    status: ACTIVE
+
+registry_update_rules:
+  on_start:
+    - "Read registry"
+    - "Reconcile current CEP record with explicit authorization and accepted prior results"
+    - "Preserve history"
+  on_material_event:
+    - "Update current CEP lifecycle state"
+    - "Record blocker/resolution/migration/UTV changes"
+    - "Do not infer Human Authorization or Gate PASS"
+  on_closeout:
+    - "Update CEP record before final Completion Report"
+    - "Update AC, DoD, blockers, UTV, evidence/report path, SHA, Git state"
+    - "Append history event"
+    - "Recalculate summary counts from CEP records"
+
+ceps:
+  CEP-001:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-002:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-003:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-004:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-005:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-006:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: PARTIAL_BLOCKED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+    reconciliation:
+      status: DIVERGENT_REMOTE_MAIN
+      note: "Current execution state treats CEP-006 as COMPLETE, while the last audited remote main report still showed PARTIAL/BLOCKED. Preserve both facts until repository reconciliation."
+  CEP-007:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-008:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-009:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-010:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-011:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-012:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-013:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: COMPLETE
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-014:
+    title: "Administration surface separation"
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-015:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-016:
+    title: "Context UX and scoped form filtering"
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: "AUTH-BATCH-003"
+      source: "HUMAN_DECISION"
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: 12
+      total: 12
+      status: PASS
+    dod: PASS
+    blockers: []
+    remaining_utv:
+      - manual_browser_accessibility_runtime
+      - performance
+      - concurrency
+    completion_report:
+      path: "CEP-016_COMPLETION_REPORT.md"
+      evidence_presence: CONFIRMED_IN_CURRENT_SESSION
+    git:
+      committed: false
+      commit_sha: null
+      pushed: false
+      merged_to_main: false
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: main
+      sha: "89ca8f28da8828a6ac4226baceb18d27c5d98f09"
+    updated_at: "2026-10-16"
+    history:
+      - date: "2026-10-16"
+        status: CLOSED_VERIFIED
+        reason: "12/12 AC PASS; scoped DoD PASS"
+  CEP-017:
+    title: "Navigation and workspace architecture"
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: "AUTH-BATCH-003"
+      source: "HUMAN_DECISION"
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: 12
+      total: 12
+      status: PASS
+    dod: PASS
+    blockers: []
+    remaining_utv:
+      - browser_accessibility_runtime
+    completion_report:
+      path: "CEP-017_COMPLETION_REPORT.md"
+      evidence_presence: CONFIRMED_IN_CURRENT_SESSION
+    git:
+      committed: false
+      commit_sha: null
+      pushed: false
+      merged_to_main: false
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: main
+      sha: "89ca8f28da8828a6ac4226baceb18d27c5d98f09"
+    updated_at: "2026-10-16"
+    history:
+      - date: "2026-10-16"
+        status: BLOCKED
+        reason: "BLOCKER-SPEC / missing canonical UI architecture sources"
+      - date: "2026-10-16"
+        status: BLOCKED
+        reason: "BLOCKER-ENVIRONMENT / PostgreSQL verification setup"
+      - date: "2026-10-16"
+        status: CLOSED_VERIFIED
+        reason: "12/12 AC PASS; scoped DoD PASS; required regression PASS"
+  CEP-018:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-019:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-020:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-021:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-022:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-023:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-024:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-025:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-026:
+    title: "ESS own-data privacy boundary"
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: AUTHORIZED
+      authorization_id: "AUTH-BATCH-003"
+      source: "HUMAN_DECISION"
+    execution:
+      status: NOT_STARTED
+      lifecycle: AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-027:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-028:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: ELIGIBLE_NOT_AUTHORIZED
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-029:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-030:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-031:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-032:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-033:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-034:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-035:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-036:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-037:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-038:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-039:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-040:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
+    authorization:
+      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      authorization_id: null
+      source: null
+    execution:
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: ACCEPTED
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: REPORT_NOT_FOUND
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: "2026-10-16"
+    history: []
+  CEP-041:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-042:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-043:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-044:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-045:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-046:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-047:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-048:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-049:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-050:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-051:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-052:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-053:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-054:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-055:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-056:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-057:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-058:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-059:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-060:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-061:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-062:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-063:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-064:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-065:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-066:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-067:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-068:
+    title: null
+    phase: V1_IMPLEMENTATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-069:
+    title: null
+    phase: PRODUCTION_CERTIFICATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-070:
+    title: null
+    phase: PRODUCTION_CERTIFICATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-071:
+    title: null
+    phase: PRODUCTION_CERTIFICATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-072:
+    title: null
+    phase: PRODUCTION_CERTIFICATION
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-073:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-074:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-075:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-076:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-077:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-078:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-079:
+    title: null
+    phase: VERIFICATION_UAT
+    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    eligibility_status: NOT_ELIGIBLE
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: NOT_ELIGIBLE
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-080:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-081:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-082:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-083:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-084:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-085:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []
+  CEP-086:
+    title: null
+    phase: POST_V1
+    dependency_status: DEFERRED
+    eligibility_status: DEFERRED
+    authorization:
+      status: NOT_AUTHORIZED
+      authorization_id: null
+      source: null
+    execution:
+      status: NOT_STARTED
+      lifecycle: DEFERRED_POST_V1
+      advisor_review: PENDING
+    acceptance:
+      passed: null
+      total: null
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
+    remaining_utv: []
+    completion_report:
+      path: null
+      evidence_presence: UNVERIFIED
+    git:
+      committed: null
+      commit_sha: null
+      pushed: null
+      merged_to_main: null
+      remote_main_evidence: UNVERIFIED
+    last_execution:
+      branch: null
+      sha: null
+    updated_at: null
+    history: []

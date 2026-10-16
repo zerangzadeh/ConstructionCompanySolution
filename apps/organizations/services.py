@@ -16,6 +16,7 @@ from apps.organizations.authorization import (
     membership_permission_codes,
     require_business_permission,
 )
+from apps.organizations.context import clear_effective_context
 from apps.organizations.models import (
     AccountConnectionRequestStatus,
     BusinessPermissionCode,
@@ -908,9 +909,12 @@ def set_active_organization(
     organization: Organization,
 ) -> None:
     """Store a validated organization identifier in the current session."""
+    if session.get(ACTIVE_ORGANIZATION_SESSION_KEY) != str(organization.pk):
+        clear_effective_context(session)
     session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(organization.pk)
 
 
 def clear_active_organization(session: MutableMapping[str, Any]) -> None:
     """Remove the active organization from the current session."""
     session.pop(ACTIVE_ORGANIZATION_SESSION_KEY, None)
+    clear_effective_context(session)

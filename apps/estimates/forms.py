@@ -1,8 +1,14 @@
 from django import forms
+from django.urls import reverse
 
 from apps.contracts.models import Contract
 from apps.estimates.models import Estimate, EstimateItem
 from apps.materials.models import UnitOfMeasure
+from apps.organizations.form_scoping import (
+    scope_project_related_choices,
+    scoped_projects_for_form,
+    selected_form_project,
+)
 from apps.projects.models import Project, ProjectPhase
 from core.forms import JalaliDateMixin
 from core.identifiers import canonicalize_upper_identifier
@@ -36,29 +42,85 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
             "notes",
         ]
 
-    def __init__(self, *args, organization=None, **kwargs):
+    def __init__(
+        self,
+        *args,
+        organization=None,
+        membership=None,
+        active_project=None,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
-        self.fields["project"].queryset = Project.objects.filter(
+        projects = (
+            scoped_projects_for_form(
+                organization=organization,
+                membership=membership,
+            )
+            if membership is not None
+            else Project.objects.filter(
+                organization=organization, deleted_at__isnull=True
+            ).order_by("name")
+        )
+        self.fields["project"].queryset = projects
+        self.fields["project"].widget.attrs["data-cascade-project"] = ""
+        selected_project = selected_form_project(
+            data=self.data if self.is_bound else None,
+            field_name=self.add_prefix("project"),
+            projects=projects,
+            active_project=active_project,
+        )
+        if not self.is_bound and selected_project is not None:
+            self.initial.setdefault("project", selected_project.pk)
+
+        contracts = Contract.objects.filter(
             organization=organization,
             deleted_at__isnull=True,
-        ).order_by("name")
-        self.fields["contract"].queryset = (
-            Contract.objects.filter(
-                organization=organization,
-                deleted_at__isnull=True,
-                project__deleted_at__isnull=True,
-            )
-            .select_related("project")
-            .order_by("contract_number")
+            project__deleted_at__isnull=True,
         )
-        self.fields["phase"].queryset = (
-            ProjectPhase.objects.filter(
-                organization=organization,
-                site__project__deleted_at__isnull=True,
-            )
-            .select_related("site", "site__project")
-            .order_by("site__project__name", "site__name", "name")
+        phases = ProjectPhase.objects.filter(
+            organization=organization,
+            site__project__deleted_at__isnull=True,
         )
+        if membership is not None:
+            contracts = scope_project_related_choices(
+                contracts,
+                membership=membership,
+                project_lookup="project_id",
+                project=selected_project,
+            )
+            phases = scope_project_related_choices(
+                phases,
+                membership=membership,
+                project_lookup="site__project_id",
+                site_lookup="site_id",
+                project=selected_project,
+            )
+        elif selected_project is not None:
+            contracts = contracts.filter(project=selected_project)
+            phases = phases.filter(site__project=selected_project)
+        else:
+            contracts = contracts.none()
+            phases = phases.none()
+        self.fields["contract"].queryset = contracts.select_related("project").order_by(
+            "contract_number"
+        )
+        self.fields["phase"].queryset = phases.select_related(
+            "site", "site__project"
+        ).order_by("site__name", "name")
+        for field_name, empty_label in (
+            ("contract", "بدون قرارداد"),
+            ("phase", "بدون فاز"),
+        ):
+            self.fields[field_name].widget.attrs.update(
+                {
+                    "data-cascade-field": field_name,
+                    "data-cascade-source": "estimates",
+                    "data-options-url": reverse(
+                        "organizations:form_context_options"
+                    ),
+                    "data-empty-label": empty_label,
+                }
+            )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -69,6 +131,8 @@ class EstimateForm(JalaliDateMixin, forms.ModelForm):
             raise forms.ValidationError("قرارداد انتخاب‌شده متعلق به این پروژه نیست.")
         if phase and project and phase.site.project_id != project.pk:
             self.add_error("phase", "فاز انتخاب‌شده متعلق به این پروژه نیست.")
+        if (contract or phase) and project is None:
+            raise forms.ValidationError("ابتدا پروژه مجاز را انتخاب کنید.")
         return cleaned_data
 
     def clean_estimate_number(self) -> str:

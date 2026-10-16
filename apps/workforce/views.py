@@ -19,6 +19,7 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import ProjectSite
+from apps.workforce.ess_services import get_own_profile
 from apps.workforce.forms import (
     AssignmentStatusTransitionForm,
     DepartmentForm,
@@ -110,6 +111,19 @@ _IMAGE_CONTENT_TYPES = {
     ".png": "image/png",
     ".webp": "image/webp",
 }
+
+
+@active_organization_required
+@require_GET
+def ess_profile(
+    request: HttpRequest, relationship_id: str | None = None
+) -> HttpResponse:
+    profile = get_own_profile(
+        user=request.user,
+        organization=request.organization,
+        relationship_id=relationship_id,
+    )
+    return render(request, "workforce/ess_profile.html", {"profile": profile})
 
 
 def _employee(request: HttpRequest, employee_id: str):

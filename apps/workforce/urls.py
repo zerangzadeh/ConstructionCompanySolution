@@ -6,6 +6,12 @@ app_name = "workforce"
 
 urlpatterns = [
     path("", views.employee_list, name="employee_list"),
+    path("ess/profile/", views.ess_profile, name="ess_profile"),
+    path(
+        "ess/profile/<uuid:relationship_id>/",
+        views.ess_profile,
+        name="ess_profile_relationship",
+    ),
     path("foundation/", views.workforce_foundation, name="foundation"),
     path("foundation/skills/create/", views.workforce_skill_create, name="skill_create"),
     path("foundation/competencies/create/", views.workforce_competency_create, name="competency_create"),

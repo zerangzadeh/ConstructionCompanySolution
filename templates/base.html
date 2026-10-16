@@ -12,6 +12,7 @@
     <script src="{% static 'js/erp_jalali.js' %}" defer></script>
     <script src="{% static 'js/erp_money.js' %}" defer></script>
     <script src="{% static 'js/erp_table.js' %}" defer></script>
+    <script src="{% static 'js/erp_context.js' %}" defer></script>
     <style>
          :root {
             --erp-canvas: #f8fafc;
@@ -339,6 +340,11 @@
             border-radius: 99px 0 0 99px;
             background: rgb(147 197 253);
             content: "";
+        }
+
+        .erp-nav-link.is-unavailable {
+            cursor: default;
+            color: rgb(100 116 139);
         }
         
         .erp-nav-link>svg {
@@ -668,7 +674,7 @@
                 <span><strong class="block text-sm font-semibold text-white">بنیرا</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت ساخت</small></span>
             </a>
             <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
-                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}
+                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available only %}
             </div>
             <div class="border-t border-slate-800 p-3">
                 <div class="mb-2 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-[10px] text-slate-400"><span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>فضای کاری فعال</span><span dir="ltr">ERP</span></div>
@@ -677,10 +683,10 @@
         </aside>
         <header class="sticky top-0 z-30 h-[60px] border-b border-slate-200 bg-white">
             <div class="mx-auto flex h-full max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:px-8">
-                <details class="erp-mobile-nav lg:hidden">
-                    <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
-                    <summary class="erp-mobile-nav__backdrop" aria-label="بستن فهرست"></summary>
-                    <div class="erp-mobile-nav__panel">{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes only %}</div>
+                <details class="erp-mobile-nav lg:hidden" data-mobile-nav>
+                    <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست" aria-expanded="false"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
+                    <button class="erp-mobile-nav__backdrop" type="button" data-mobile-nav-close aria-label="بستن فهرست"></button>
+                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available only %}</div>
                 </details>
                 <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="{% url 'organizations:select' %}"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">{{ request.organization.name|default:"انتخاب شرکت" }}</span></a>
                 <div class="hidden h-5 w-px bg-slate-200 md:block"></div>
@@ -691,6 +697,7 @@
                 </a>
             </div>
         </header>
+        {% if request.organization %}{% include "components/context_selector.html" %}{% endif %}
         {% endif %}
         <main id="main-content" tabindex="-1" class="mx-auto min-w-0 {% if request.user.is_authenticated %}max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6{% else %}min-h-screen max-w-7xl px-4 py-10 sm:px-6 lg:px-8{% endif %}">
             {% include "components/messages.html" %}{% if filters and request.resolver_match.url_name != "site_list" and request.resolver_match.url_name != "phase_list" %}{% table_filters filters "table-filters" %}{% endif %} {% block content %}{% endblock %}{% if page_obj and not pagination_rendered %}{% include "components/table_pagination.html" with page_obj=page_obj pagination_query=pagination_query only %}{% endif %}
@@ -699,6 +706,15 @@
     </div>
     {% endif %}
     <script>
+        (() => {
+            document.querySelectorAll("[data-mobile-nav]").forEach((drawer) => {
+                const summary = drawer.querySelector("summary");
+                const close = () => { drawer.open = false; summary.setAttribute("aria-expanded", "false"); };
+                drawer.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(drawer.open)));
+                drawer.querySelectorAll("[data-mobile-nav-close], a").forEach((item) => item.addEventListener("click", close));
+                document.addEventListener("keydown", (event) => { if (event.key === "Escape" && drawer.open) close(); });
+            });
+        })();
         (() => {
             const persianLabels = new Map([
                 ["Draft", "پیش‌نویس"],

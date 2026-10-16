@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}خدمات من | بنیرا{% endblock %}
+{% block content %}
+<header class="erp-surface rounded-2xl p-5 sm:p-6">
+  <p class="text-xs font-bold text-blue-700">خدمات کارکنان</p>
+  <h1 class="mt-2 text-2xl font-black text-slate-950">پروفایل شخصی من</h1>
+  <p class="mt-2 text-sm text-slate-600">اطلاعات فقط‌خواندنی از هویت و رابطه کاری تأییدشده شما نمایش داده می‌شود.</p>
+</header>
+
+<section class="erp-surface mt-5 rounded-2xl p-5 sm:p-6" aria-labelledby="identity-heading">
+  <h2 id="identity-heading" class="text-lg font-black text-slate-950">هویت و رابطه کاری</h2>
+  <dl class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div><dt class="text-xs text-slate-500">نام و نام خانوادگی</dt><dd class="mt-1 font-bold">{{ profile.person.first_name }} {{ profile.person.last_name }}</dd></div>
+    <div><dt class="text-xs text-slate-500">شماره پرسنلی</dt><dd class="mt-1 font-bold" dir="ltr">{{ profile.relationship.employee_number }}</dd></div>
+    <div><dt class="text-xs text-slate-500">کد ملی</dt><dd class="mt-1 font-bold" dir="ltr">{{ profile.masked_national_id|default:"ثبت نشده" }}</dd></div>
+    <div><dt class="text-xs text-slate-500">شروع رابطه کاری</dt><dd class="mt-1 font-bold">{{ profile.relationship.effective_start|jalali_date }}</dd></div>
+    <div><dt class="text-xs text-slate-500">پایان رابطه کاری</dt><dd class="mt-1 font-bold">{% if profile.relationship.effective_end %}{{ profile.relationship.effective_end|jalali_date }}{% else %}فعال{% endif %}</dd></div>
+  </dl>
+</section>
+
+{% if profile.relationships|length > 1 %}
+<section class="erp-surface mt-5 rounded-2xl p-5 sm:p-6" aria-labelledby="history-heading">
+  <h2 id="history-heading" class="text-lg font-black text-slate-950">سوابق رابطه کاری</h2>
+  <ul class="mt-3 divide-y divide-slate-100">
+    {% for relationship in profile.relationships %}
+      <li class="flex flex-wrap items-center justify-between gap-3 py-3 text-sm">
+        <span><b dir="ltr">{{ relationship.employee_number }}</b> · {{ relationship.effective_start|jalali_date }} تا {% if relationship.effective_end %}{{ relationship.effective_end|jalali_date }}{% else %}اکنون{% endif %}</span>
+        <a class="font-bold text-blue-700" href="{% url 'workforce:ess_profile_relationship' relationship.id %}">مشاهده</a>
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+
+<section class="erp-surface mt-5 rounded-2xl p-5 sm:p-6" aria-labelledby="documents-heading">
+  <h2 id="documents-heading" class="text-lg font-black text-slate-950">اسناد من</h2>
+  <p class="mt-2 text-sm text-slate-600">نمایش و دریافت اسناد تابع سیاست دسته سند و مجوزهای منبع است.</p>
+  {% if "documents.view" in business_permission_codes %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'documents:employee-list' %}">مشاهده اسناد مجاز</a>{% else %}<p class="mt-4 text-sm text-slate-500">دسترسی به اسناد برای این حساب فعال نیست.</p>{% endif %}
+</section>
+{% endblock %}

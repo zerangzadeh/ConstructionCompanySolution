@@ -1,6 +1,6 @@
 # Product Development Roadmap
 
-**Status date:** 2026-10-14
+**Status date:** 2026-10-16
 
 **Product stage:** pre-production
 
@@ -68,6 +68,44 @@ forward roadmap.
 `AUTH-BATCH-002` is a separate Product Owner authorization. The Product Owner
 explicitly records `GATE-01 = PASS` as its authorization basis; this status is
 recorded here, not inferred by this execution.
+
+**CEP-017 verification closeout (2026-10-16):** The canonical Persian-first
+navigation/workspace presentation and responsive shared shell are **CLOSED —
+VERIFIED** within the approved non-production boundary. All 12 scoped acceptance
+criteria and the scoped DoD pass on the isolated PostgreSQL regression path; no
+schema, route, permission, tenant-scope, or business-semantic change was introduced.
+Browser/accessibility runtime evidence remains UTV as permitted by the CEP.
+
+**CEP-026 execution closeout (2026-10-16):** `AUTH-BATCH-003` authorized only
+the Development implementation of the `IMB-0093` ESS own-data privacy boundary.
+ESS identity now resolves exclusively through the tenant-scoped `User` → `Person`
+→ current `WorkRelationship` links; username, email and employee number are never
+identity evidence. The bounded read-only personal profile masks national identity,
+direct relationship routes enforce same-Person and tenant scope with uniform
+non-disclosure, and the existing employee DMS access/download path consumes the
+same resolver while retaining source permission, category policy, scanner and
+audit controls. `NAV-006` is active only for a resolvable subject and remains
+presentation, not authority. No migration, new permission, editable profile field,
+Payroll/Timekeeping ESS activation, Production action or downstream CEP is implied.
+See [the CEP-026 closeout](CEP-026_COMPLETION_REPORT.md).
+
+**CEP-016 execution closeout (2026-10-16):** `AUTH-BATCH-003` authorized the
+bounded Development implementation of persistent Company/Project/bounded-Site
+context and shared scope-aware form cascading. The shell now persists only
+membership-, permission- and object-scope-valid context, invalidates stale
+Project/Site selections, and makes effective mutation context explicit without
+granting authority. Expense and Estimate creation use reusable server-scoped
+Project/dependent-choice primitives plus a fixed-registry cascade endpoint; their
+existing service/direct-route authorization remains authoritative. Focused
+CEP-016 verification passed 9/9, Ruff/Django/schema checks pass, and affected
+authorization/Home regression reached 86 passes with one pre-existing invalid-
+session expectation mismatch. Legacy Expense/Estimate regression fixtures remain
+blocked before CEP-016 behavior because they omit the explicit grants required by
+CEP-001; no fixture repair was authorized. All 12 CEP acceptance criteria and the
+scoped DoD have evidence, so CEP-016 is **CLOSED — VERIFIED** with browser/manual
+accessibility, performance and concurrency remaining UTV. No migration, new
+permission, authority expansion, Production action or downstream CEP is implied.
+See [the CEP-016 closeout](CEP-016_COMPLETION_REPORT.md).
 
 **CEP-006 queue resume (2026-10-15):** The Human Decision Maker approved the
 bounded V1 current-run selection rule in [PD-033](docs/architecture/BONIRA_PD_033_RECONCILIATION_CURRENT_STATE.md).

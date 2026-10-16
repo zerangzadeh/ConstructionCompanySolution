@@ -759,7 +759,7 @@ class P11RoleCatalogCloseoutTests(TestCase):
     def test_platform_navigation_exposes_all_approved_platform_controls(self) -> None:
         self.client.force_login(self.platform_admin)
         response = self.client.get(reverse("organizations:select"))
-        self.assertContains(response, "کنترل‌های پلتفرم")
+        self.assertContains(response, "مدیریت پلتفرم")
         self.assertContains(response, "کاتالوگ نقش‌ها")
         self.assertContains(response, "عملیات حفاظت‌شده")
         self.assertEqual(
