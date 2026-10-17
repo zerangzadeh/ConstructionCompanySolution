@@ -12,11 +12,13 @@ authority boundaries, and repository rules that must always be true. Detailed
 repository execution, Git, queue, validation, evidence, efficiency, and
 communication controls are defined in
 `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`. The procedure for one
-authorized CEP is defined in `docs/ROADMAP_EXECUTION_PLAYBOOK.md`.
+or more serial CEPs is defined in `docs/ROADMAP_EXECUTION_PLAYBOOK.md`.
 
-Development is incremental. Implement only explicitly requested and authorized
-scope. A roadmap item, dependency-ready state, historical phase, passing test,
-or completed CEP is not implementation authorization.
+Development is incremental. Implement only authorized scope. Current-governed
+non-production CEPs have standing bounded execution authority when their
+canonical dependencies and gates are satisfied. A roadmap item, historical
+phase, passing test, or completed CEP does not expand package scope or authorize
+production action.
 
 ## 2. Authority map
 
@@ -25,8 +27,8 @@ or completed CEP is not implementation authorization.
 - `Agents.md` defines persistent architecture, invariants, and entry rules.
 - `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md` defines detailed
   generic repository execution policy.
-- `docs/ROADMAP_EXECUTION_PLAYBOOK.md` defines the procedural workflow for one
-  authorized CEP.
+- `docs/ROADMAP_EXECUTION_PLAYBOOK.md` defines the procedural workflow for serial
+  CEP execution and closeout.
 - `docs/governance/cep/PROMPTS/CEP-xxx_EXECUTION_PROMPT.md`, verified through
   `docs/governance/cep/CEP_PROMPT_MANIFEST.yaml`, defines package-specific Scope,
   Acceptance Criteria, Definition of Done, migration impact, evidence, and stop
@@ -266,14 +268,22 @@ where required.
 
 ## 12. No-inference and scope controls
 
-- Only the Human Decision Authority may issue implementation/production
-  authorization, Human Sign-off, or Production Certification. Codex may record an
-  explicit decision but may not issue or infer it.
-- Do not infer Gate PASS, Product Decisions, business behavior, financial/posting
-  rules, domain ownership, migration semantics, CEP Scope/AC/DoD, dependency
-  changes, or a next authorized CEP.
-- `ELIGIBLE`, `READY`, `NEXT-CANDIDATE`, dependency-satisfied, historical P0–P10
-  completion, or CEP completion does not grant execution authority.
+- Autonomy is the default. For current-governed non-production CEPs, the standing
+  Human authorization applies when canonical identity, dependencies, gates,
+  blockers, repository safety, and package Scope/AC/DoD permit execution.
+- Escalate only for the material Human-decision triggers defined in the Execution
+  Policy. Do not request a Human choice between technically equivalent safe
+  options or create a separate decision audit for ordinary engineering choices.
+- Codex may evaluate and record objectively defined technical, dependency,
+  evidence, and readiness Gate PASS when all canonical requirements are proved
+  and no material Human-decision trigger applies. Gate PASS never expands scope,
+  activates Post-V1 work, or authorizes production.
+- Only the Human Decision Authority may change Product Decisions, CEP Scope/AC/DoD
+  or the dependency graph; accept material legal/business/financial/security or
+  residual risk; authorize irreversible production action; issue Human Sign-off;
+  or issue final Production Certification.
+- Do not infer Product Decisions, business behavior, financial/posting rules,
+  domain ownership, migration semantics, CEP Scope/AC/DoD, or dependency changes.
 - Repository-local absence of a canonical source does not prove nonexistence;
   follow approved canonical recovery rules in the Execution Policy.
 - Preserve fail-closed behavior: no approved policy means no invented business
@@ -295,10 +305,17 @@ Before product mutation:
    Roadmap section.
 2. Ground the current branch, HEAD, upstream state, and dirty working tree.
 3. Load and verify the applicable canonical contract and referenced sources.
-4. Verify explicit Human Authorization where required.
+4. Verify the standing or other applicable Human Authorization.
 5. Verify applicable dependencies and gates without inference.
 6. Follow `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`.
 7. For CEP execution, follow `docs/ROADMAP_EXECUTION_PLAYBOOK.md`.
+
+A single session may execute multiple eligible CEPs serially, with no fixed CEP
+count. Do not stop merely because one CEP completes: close it out, synchronize the
+Registry, evaluate objective gates, recalculate the frontier, and continue when
+safe. Stop automatic continuation on a partial, failed, or blocked CEP, a material
+Human-decision trigger, or a clean operational boundary. Detailed continuation
+rules belong to the Execution Policy and CEP Playbook.
 
 Preserve unrelated Human changes. Stop before mutation when authorization,
 canonical identity, repository safety, tenant/security/financial integrity, or

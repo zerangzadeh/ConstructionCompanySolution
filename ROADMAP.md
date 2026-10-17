@@ -72,11 +72,11 @@ graph.
 
 The approved CEP dependency model and canonical package sources govern exact
 prerequisites. For each CEP, verify its dependencies and applicable gates against
-those sources, the Registry, explicit Human decisions, and repository evidence.
-`DEPENDENCY READY`, `ELIGIBLE`, `READY`, and a Roadmap entry do not equal
-`AUTHORIZED`. Gate passage is never inferred from the completion of a related
-package. A blocked dependency stays blocked until supported resolution is
-recorded; a completed CEP does not activate its successor.
+those sources, the Registry, standing or specific Human authority, and repository
+evidence. `DEPENDENCY READY`, `ELIGIBLE`, `READY`, and a Roadmap entry do not
+expand scope or authorize production. Objectively defined technical/evidence
+gates may pass under the Execution Policy; a blocked dependency stays blocked
+until supported resolution is recorded.
 
 ## 8. Delivered and closed baseline
 
@@ -92,16 +92,16 @@ retain dated validation claims.
 
 ## 9. Current execution frontier
 
-The Registry's `execution_frontier`, authorization batches, CEP records, and
-gate records determine the current frontier. Read them at the start of every
-session and after a Human Git checkpoint. A candidate can be dependency-ready
-while lacking Human Authorization. This Roadmap deliberately maintains no
-second live CEP queue or per-CEP completion ledger.
+The Registry's `execution_frontier`, CEP records, and gate records determine the
+current frontier. Read them at the start of every session and reconcile them after
+a Human Git checkpoint. Eligible current-governed non-production CEPs may proceed
+under standing authority as defined by the Execution Policy. This Roadmap
+deliberately maintains no second live CEP queue or per-CEP completion ledger.
 
 ## 10. Remaining dependency-ordered delivery model
 
-Residual work proceeds only through the applicable canonical CEPs and separately
-authorized decisions. The remaining direction includes administration surface
+Residual work proceeds only through the applicable canonical CEPs under standing
+or specific authority. The remaining direction includes administration surface
 separation; bounded tenant, object-scope, privacy, and DMS corrections; source-
 owned financial and project-cost integration; operational provider and
 statutory-value activation; production storage, recovery, observability, and
@@ -159,4 +159,4 @@ current CEP lifecycle and Git state in the Registry and detailed execution
 evidence in the relevant Completion Report. Use
 `docs/ROADMAP_EXECUTION_PLAYBOOK.md` for execution procedure and `Agents.md`
 for persistent Codex rules. Do not infer a Product Decision, dependency edge,
-Gate PASS, or Human Authorization from this Roadmap.
+Gate PASS, or scope expansion from this Roadmap.

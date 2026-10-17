@@ -19,9 +19,11 @@ This policy does **not** define:
 - Human Authorization, Human Sign-off, or Production Certification;
 - Roadmap direction, dependency design, or Product Decisions.
 
-Those belong to the authorities identified below. An explicit, bounded Human
-Authorization may override a generic rule only for the specific operation it
-names. Silence and historical authorization are not overrides.
+Those belong to the authorities identified below. The standing bounded Human
+authorization covers eligible current-governed non-production CEP execution. An
+additional explicit Human Authorization may override a generic rule only for the
+specific operation it names. Silence and historical authorization are not
+overrides.
 
 ## 2. Governance precedence and responsibilities
 
@@ -31,8 +33,8 @@ Use the following responsibility model:
 2. `Agents.md` defines persistent architecture, invariants, and repository entry
    rules.
 3. This policy defines detailed generic repository execution rules.
-4. `docs/ROADMAP_EXECUTION_PLAYBOOK.md` defines the procedure for executing one
-   authorized CEP.
+4. `docs/ROADMAP_EXECUTION_PLAYBOOK.md` defines the procedure for serial CEP
+   execution, closeout, and continuation.
 5. The canonical CEP prompt defines package-specific Scope, AC, DoD, migration,
    evidence, and package stop conditions.
 6. `CEP_EXECUTION_REGISTRY.yaml` is the sole live CEP-state authority.
@@ -133,49 +135,113 @@ For CEP work, compare repository state with applicable Registry metadata. A HEAD
 change does not itself change execution, authorization, completion, or Gate state.
 Reconcile path/repository metadata only when authorized and supported by evidence.
 
-## 7. Scope and authorization control
+## 7. Autonomy, scope, and Human escalation
 
-Implement only explicitly requested and authorized scope. Do not use ambiguity to:
+**Autonomy by default; Human escalation by material exception.** Within approved
+scope, resolve ordinary implementation and engineering choices without requesting
+Human approval when a safe answer is available, in this order:
+
+1. applicable authoritative Iranian law or regulation in approved project sources;
+2. frozen Product Decisions and approved BONIRA policies;
+3. the canonical CEP contract;
+4. current BONIRA architecture and repository invariants;
+5. official framework, platform, and database guidance;
+6. established industry and engineering best practice;
+7. the safest reversible repository-consistent default.
+
+Do not create decision classes, decision registries, per-decision provenance logs,
+approval matrices, mandatory review layers, or new decision gates. Normal code,
+tests, repository history, CEP evidence, and Completion Reports provide ordinary
+engineering evidence.
+
+Implement only authorized scope. Do not use ambiguity to:
 
 - expand a CEP or ordinary task;
 - alter Product Decisions, AC, DoD, or the dependency graph;
 - activate downstream work;
 - perform unrelated refactoring;
 - invent business, financial, security, regulatory, or migration semantics;
-- infer Human Sign-off, Gate PASS, Production Certification, or production action.
+- infer Human Sign-off, Production Certification, or production action.
 
 Discovery of an adjacent defect creates a finding with evidence, not authority to
-fix it. If safe implementation requires a material decision outside current
-authority, stop and request bounded Human resolution.
+fix it. Request a Human decision only when continuing requires one or more of:
 
-## 8. Default session and CEP queue model
+- a change to CEP Scope, AC, DoD, a frozen Product Decision, or the dependency
+  graph;
+- resolution of a material authority conflict or a material Iranian legal or
+  regulatory ambiguity unsupported by approved authoritative evidence;
+- a material change to business or financial semantics, domain/source-of-truth
+  authority, accounting recognition, payroll/statutory semantics, or project-cost
+  authority;
+- a material weakening or redesign of authentication, authorization, tenant
+  isolation, privacy, protected operations, separation policy, or security
+  controls;
+- production cutover, irreversible production migration or data mutation, or a
+  destructive production rollback outside explicit production authorization;
+- acceptance of material unresolved compliance, evidence, data-integrity,
+  security, or other residual risk;
+- Human Sign-off, final Production Certification, explicit legal/business risk
+  acceptance, or another expressly Human-only decision.
 
-**Default: one CEP per session.** After that CEP completes or stops, stop unless
-the Human Authorization explicitly lists a multi-CEP queue.
+If none applies, make the safest supported decision, implement, test, and
+continue. Do not invent Iranian legal requirements from model memory or substitute
+generic international practice for a mandatory Iranian rule.
 
-Multiple CEPs may run in one session only when:
+## 8. Standing authority and serial multi-CEP execution
 
-- every CEP is explicitly listed in Human Authorization;
-- every CEP is individually authorized;
-- its dependencies and gates are satisfied;
-- repository collision and sequencing safety are verified;
-- execution is serial by default.
+The Human Decision Authority grants standing bounded authority to execute a
+current-governed CEP in non-production when:
 
-Parallel CEP execution requires separate explicit Human Authorization after
-dependency and repository-collision review.
+- canonical prompt identity is established;
+- the CEP is not deferred or Post-V1;
+- canonical prerequisites and applicable gates are satisfied;
+- no unresolved blocking Finding exists;
+- repository state is safe;
+- execution remains within canonical Scope/AC/DoD; and
+- no material Human-escalation trigger in section 7 is reached.
 
-For an authorized serial queue, each CEP remains separately scoped and validated.
+Routine per-CEP Human Authorization is not required. The standing authority does
+not authorize Post-V1 activation, scope or Product Decision expansion, dependency
+graph changes, production deployment/cutover/migration, Human Sign-off, final
+Production Certification, material risk acceptance, or Git writes.
+
+Multiple CEPs may execute serially in one session. There is no fixed CEP-count
+limit; continue according to actual complexity, risk, context and working-tree
+size, test cost, collision risk, elapsed time, and reviewability. Parallel CEP
+execution still requires separate explicit Human Authorization after dependency
+and collision review.
+
+Each serial CEP remains separately scoped and validated.
 Advance only when the prior CEP ends `EXECUTION COMPLETE`. Stop the entire queue
 when a CEP is `EXECUTION PARTIAL`, `EXECUTION FAILED`, blocked before mutation, or
-has a materially unresolved blocker. Report all remaining CEPs as `NOT STARTED`.
+has a materially unresolved blocker. An independent eligible CEP may proceed only
+when it cannot collide with or bypass the unresolved work.
 
 Queue membership does not waive canonical identity, authorization, dependency,
 Gate, migration, security, tenant, evidence, or production controls. A completed
-CEP never automatically authorizes the next CEP.
+CEP does not expand the next package's scope; standing authority permits the next
+eligible current-governed non-production CEP when all entry conditions remain met.
+
+After `EXECUTION COMPLETE`, perform implementation closeout, focused and required
+regression evidence, AC/scoped-DoD evaluation, Completion Report, Registry
+synchronization, applicable objective-gate evaluation, dependency-frontier
+recalculation, and next-CEP selection in the same session. Exclude completed,
+blocked, deferred/Post-V1, and prerequisite/gate-unsatisfied CEPs. Follow canonical
+dependency ordering; if candidates remain equally eligible, prefer the smallest
+repository collision/blast radius, then the lowest CEP ID. Do not request a Human
+choice between equivalent safe candidates.
+
+Stop at a clean completed-CEP boundary when further continuation becomes
+materially inefficient or unsafe because of context or working-tree size,
+reviewability, collision risk, validation cost, environment limits, or the need
+for a practical Human Git checkpoint. This is an operational handoff, not a Human
+decision requirement. Finish closeout, calculate the frontier, and leave a compact
+handoff; a later session resumes under the same standing authority.
 
 ## 9. CEP procedure boundary
 
-For every authorized CEP, follow `docs/ROADMAP_EXECUTION_PLAYBOOK.md`. It owns the
+For every CEP under standing or specific authorization, follow
+`docs/ROADMAP_EXECUTION_PLAYBOOK.md`. It owns the
 step-by-step procedure for grounding, contract loading, authorization/dependency
 verification, touch-set discovery, implementation, focused validation, regression,
 evidence, Registry reconciliation, Completion Report, and STOP behavior.
@@ -263,6 +329,19 @@ Human Sign-off = NOT EXECUTED
 Production Certification = NOT EXECUTED
 Production Cutover = NOT EXECUTED
 ```
+
+## 14A. Objective gates
+
+Codex may evaluate and record PASS for an objectively defined technical,
+dependency, evidence, or implementation-readiness gate when all canonical
+requirements are satisfied, required evidence exists, no required unresolved item
+remains, and no section 7 escalation trigger applies. A separate Human Gate-PASS
+instruction is not required.
+
+Human authority remains required when passage itself entails production approval
+or cutover, final Production Certification, Human Sign-off, material risk
+acceptance, material legal/business judgment, or irreversible production action.
+Gate PASS never expands CEP scope or activates Post-V1 work.
 
 ## 15. Validation strategy
 
@@ -374,7 +453,7 @@ git add: NOT EXECUTED
 git commit: NOT EXECUTED
 git push: NOT EXECUTED
 git merge: NOT EXECUTED
-Next CEP: NOT STARTED
+Next CEP: CONTINUED / NOT STARTED AT CLEAN OPERATIONAL BOUNDARY
 ```
 
 ## 20. Registry reconciliation
@@ -383,9 +462,11 @@ Read the Registry at every CEP session start. Update it only for evidence-suppor
 material lifecycle events and only within current authority. Preserve history;
 never silently replace events or recalculate a desired narrative.
 
-Do not infer or issue authorization, Gate PASS, Human Sign-off, Production
-Certification, Production Cutover, global frontier, AC/DoD satisfaction, or Git
-integration. A file move or policy refactor is not a CEP lifecycle event.
+Do not issue new Human authority, Human Sign-off, Production Certification,
+Production Cutover, unsupported AC/DoD satisfaction, or Git integration. Codex may
+apply the standing authority, record evidence-supported objective Gate PASS, and
+recalculate the dependency-ready frontier. A file move or policy refactor is not
+a CEP lifecycle event.
 
 If Registry, repository reality, and explicit Human evidence materially conflict,
 stop before product mutation with `BLOCKER-REGISTRY-CONFLICT` and identify the
@@ -397,10 +478,9 @@ Record the finding, affected criterion, reproducible evidence, classification,
 scope impact, and safe next action. Do not bypass a real dependency or blocker for
 throughput.
 
-A blocked CEP does not unnecessarily stop another explicitly authorized,
-independent, non-colliding CEP outside the same stop-on-blocker queue. Evaluate
-dependency and collision impact and proceed only when separate authority remains
-valid. Within an authorized serial queue, apply the queue stop rule in section 8.
+A blocked CEP does not unnecessarily stop another eligible, independent,
+non-colliding CEP covered by standing authority. Evaluate dependency and collision
+impact and apply the stop rule in section 8; never bypass a real dependency.
 
 ## 22. Human Git checkpoints
 
@@ -414,8 +494,13 @@ git commit
 git push
 ```
 
-Codex does not create the checkpoint without explicit authority. Git integration
-is distinct from CEP execution completion and never grants downstream execution.
+Codex does not create the checkpoint without explicit authority. After a Human
+commit or push, normal repository grounding reconciles HEAD, `origin/main`, the
+working tree, `repository_state.last_reconciled_head`, and applicable integration
+metadata. No separate reconciliation session is required when that reconciliation
+is straightforward. Stop only for a material `BLOCKER-REGISTRY-CONFLICT`. Git
+integration remains distinct from CEP execution completion and never expands
+scope.
 
 ## 23. Engineering constraints
 
@@ -485,9 +570,10 @@ grant scope, or replace verification against repository reality.
 
 ## 26. Documentation closeout
 
-Documentation closeout is the final work step before reporting. Inspect and update
-only affected authoritative documents. Preserve current-versus-target labels and
-do not create duplicate live status or snapshot authorities.
+Documentation closeout is part of each CEP's normal same-session closeout before
+frontier recalculation and possible continuation. Inspect and update only affected
+authoritative documents. Preserve current-versus-target labels and do not create
+duplicate live status or snapshot authorities.
 
 Update `ROADMAP.md` only for a material change to delivery direction, dependency
 planning, program disposition, or future scope. Update the Registry only for actual
@@ -509,8 +595,9 @@ instead of copying their contents when a concise reference is sufficient.
 
 ## 28. Explicit override and stop rule
 
-An override must be explicit, bounded, unambiguous, and specific to the operation.
-Historical authorization is not automatically reusable for different work.
+An override beyond standing authority must be explicit, bounded, unambiguous, and
+specific to the operation. Historical package authorization is not automatically
+reusable for different work.
 
 Stop before product mutation for material canonical-source conflict, unresolved
 required Product Decision, unsafe repository collision, missing business authority,

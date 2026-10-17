@@ -3,7 +3,10 @@ project: BONIRA
 artifact_role: Authoritative current-state registry for controlled CEP execution/lifecycle tracking
 governance:
   principles:
-  - ELIGIBLE != AUTHORIZED
+  - AUTONOMY_BY_DEFAULT
+  - HUMAN_ESCALATION_BY_MATERIAL_EXCEPTION
+  - SERIAL_MULTI_CEP_EXECUTION
+  - ELIGIBILITY_REQUIRES_STANDING_AUTHORITY_ENTRY_CHECKS_BEFORE_EXECUTION
   - EXECUTION_COMPLETION != GIT_INTEGRATION
   - UI_VISIBILITY != AUTHORIZATION
   - HISTORICAL_STATES_MUST_NOT_BE_SILENTLY_REWRITTEN
@@ -13,7 +16,7 @@ governance:
     mandatory_at_closeout: true
     may_record_explicit_human_or_advisor_decisions: true
     may_independently_issue_human_authorization: false
-    may_independently_mark_gate_pass: false
+    may_record_objective_gate_pass_when_canonical_requirements_are_proved: true
     may_independently_issue_human_signoff: false
     may_independently_issue_production_certification: false
     conflict_action: STOP_AND_REPORT_BLOCKER_REGISTRY_CONFLICT
@@ -21,6 +24,35 @@ governance:
     mandatory_recalculate_summary_from_records: true
     roadmap_update_only_for_direction_or_disposition_change: true
     completion_report_is_execution_evidence_not_current_state_registry: true
+  standing_non_production_execution_authority:
+    status: ACTIVE
+    source: HUMAN_DECISION_AUTHORITY / Product Owner
+    effective_at: '2026-10-17'
+    applies_to: CURRENT_GOVERNED_CEPS_WITH_SATISFIED_CANONICAL_ENTRY_CONDITIONS
+    execution_mode: SERIAL_BY_DEFAULT
+    fixed_cep_count_per_session: NONE
+    routine_per_cep_human_authorization_required: false
+    historical_per_cep_authorization_records_preserved: true
+    excludes:
+    - POST_V1_ACTIVATION
+    - SCOPE_OR_PRODUCT_DECISION_OR_DEPENDENCY_GRAPH_CHANGE
+    - PRODUCTION_DEPLOYMENT_CUTOVER_OR_IRREVERSIBLE_MIGRATION
+    - HUMAN_SIGNOFF_OR_FINAL_PRODUCTION_CERTIFICATION
+    - MATERIAL_RISK_ACCEPTANCE
+    - GIT_WRITES_WITHOUT_SEPARATE_AUTHORITY
+  objective_gate_policy:
+    status: AUTOMATIC_WHEN_CANONICAL_REQUIREMENTS_ARE_PROVED
+    human_decision_required_for:
+    - PRODUCTION_APPROVAL_OR_CUTOVER
+    - FINAL_PRODUCTION_CERTIFICATION
+    - HUMAN_SIGNOFF
+    - MATERIAL_RISK_ACCEPTANCE
+    - MATERIAL_LEGAL_OR_BUSINESS_JUDGMENT
+    - IRREVERSIBLE_PRODUCTION_ACTION
+  per_cep_authorization_field_semantics:
+    meaning: HISTORICAL_OR_PACKAGE_SPECIFIC_AUTHORITY_ONLY
+    standing_authority_applies_independently: true
+    not_authorized_value_does_not_negate_standing_authority: true
 inventory:
   total: 86
   current_governed: 79
@@ -32,7 +64,7 @@ inventory:
 summary:
   execution_state_complete: 22
   authorized_not_started: 0
-  eligible_not_authorized: 10
+  eligible_under_standing_authority: 10
   in_progress: 0
   blocked_current: 0
   not_started_other_current_governed: 47
@@ -49,7 +81,7 @@ gates:
   GATE-02:
     status: PASS
     source: HUMAN_DECISION_AUTHORITY / Product Owner explicit decision
-    decision_reference: HUMAN DECISION: GATE-02 PASS
+    decision_reference: 'HUMAN DECISION: GATE-02 PASS'
     decided_at: '2026-10-17T05:53:29+03:30'
     note: Human Decision Authority / Product Owner explicitly approved GATE-02 PASS based on 7/7 satisfied canonical requirements, no unresolved requirements, CEP-014 contribution satisfied, and CEP-014 browser/accessibility UTV having no gate impact. No Human Sign-off, Production Certification, CEP authorization, or CEP execution was granted by this decision.
     evaluated_at: '2026-10-17'
@@ -68,6 +100,7 @@ gates:
       IMB-0015: PASS
       IMB-0093: PASS
     browser_accessibility_runtime: UTV_NON_BLOCKING_BY_CANONICAL_GATE_CONTRACT
+    objective_policy_validation: PASS_NO_ADDITIONAL_HUMAN_GATE_DECISION_REQUIRED
     updated_at: '2026-10-17'
 authorization_batches:
   AUTH-BATCH-003:
@@ -86,14 +119,14 @@ registry_update_rules:
   on_start:
   - Read registry before product mutation
   - Ground branch/HEAD/working tree and compare HEAD with repository_state.last_reconciled_head
-  - Reconcile current CEP record with explicit Human Authorization, repository evidence and accepted prior results
+  - Reconcile current CEP record with standing or explicit Human authority, repository evidence and accepted prior results
   - If HEAD changed, reconcile relevant Git integration metadata before product mutation
   - Preserve history; never silently rewrite contradictions
   on_material_event:
   - Update current CEP lifecycle state for STARTED/BLOCKED/PARTIAL/FAILED/RESUMED/COMPLETE/CLOSED_VERIFIED
   - Record blocker resolution, migration-state changes and material UTV changes
   - Record Git integration only from actual Git evidence
-  - Do not infer Human Authorization, Gate PASS, Human Sign-off or Production Certification
+  - Apply standing authority and record objective Gate PASS only under governing policy; do not infer Human Sign-off or Production Certification
   on_closeout:
   - Update CEP record before issuing the final Completion Report
   - Update AC, DoD, blockers, UTV, evidence/report path, execution baseline SHA and Git state
@@ -3102,20 +3135,31 @@ authority_scope:
   - dependency graph design
   - roadmap delivery direction
   - Human Authorization issuance
-  - Gate PASS issuance
+  - Human-only or production Gate PASS issuance
   - Human Sign-off
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: ae3be0335a76b0d08fa5ed330770b9b2fe089060
-  origin_main: ae3be0335a76b0d08fa5ed330770b9b2fe089060
-  integration_checkpoint: 2f16cc05fabe404da32aa51bc5328b069567f350
+  last_reconciled_head: af9b6200584b2bb0dd6a4f794677538334041d37
+  origin_main: af9b6200584b2bb0dd6a4f794677538334041d37
+  integration_checkpoint: af9b6200584b2bb0dd6a4f794677538334041d37
   integration_method: DIRECT_COMMIT_TO_MAIN
-  last_reconciled_at: '2026-10-16'
+  last_reconciled_at: '2026-10-17'
 execution_frontier:
-  active_authorization_batch: null
-  authorized_execution_queue: []
-  next_authorized_cep: null
-  next_known_eligible_not_authorized_candidate: CEP-015
+  standing_authority_active: true
+  execution_mode: SERIAL_BY_DEFAULT
+  fixed_cep_count_per_session: NONE
+  dependency_ready_current_governed:
+  - CEP-015
+  - CEP-018
+  - CEP-019
+  - CEP-020
+  - CEP-021
+  - CEP-022
+  - CEP-024
+  - CEP-025
+  - CEP-027
+  - CEP-028
+  next_autonomous_cep: CEP-015
   production_authorized: false
   human_signoff_executed: false
