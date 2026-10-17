@@ -218,6 +218,35 @@ registry.register_domain_command(
 )
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="projects.project_cost_forecast",
+        subject_type="projects.project_cost_forecast",
+        exposed_attributes=frozenset({"project_id", "status", "created_by_id"}),
+        start_permission="project_cost.forecasts_prepare",
+        view_permission="project_cost.view",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="projects.forecast_approval",
+        subject_type="projects.project_cost_forecast",
+        subject_adapter="projects.project_cost_forecast",
+        allowed_scope_fields=frozenset({"project_id"}),
+        domain_commands=frozenset(
+            {"projects.forecast.approve", "projects.forecast.reject"}
+        ),
+    )
+)
+for _command, _target in (("approve", "approved"), ("reject", "rejected")):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key=f"projects.forecast.{_command}",
+            workflow_type="projects.forecast_approval",
+            from_states=frozenset({"under_review"}),
+            to_state=_target,
+        )
+    )
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="contracts.contract_amendment",
         subject_type="contracts.contract_amendment",
         exposed_attributes=frozenset(

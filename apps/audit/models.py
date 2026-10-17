@@ -666,6 +666,18 @@ class AuditAction(models.TextChoices):
         "project_cost.forecast_drafted",
         "پیش‌نویس پیش‌بینی هزینه پروژه ایجاد شد",
     )
+    PROJECT_COST_FORECAST_TRANSITION = (
+        "project_cost.forecast_transition",
+        "وضعیت پیش‌بینی هزینه پروژه تغییر کرد",
+    )
+    PROJECT_BUDGET_CONTROL_EVALUATED = (
+        "project_cost.budget_control_evaluated",
+        "کنترل عبور از بودجه ارزیابی شد",
+    )
+    PROJECT_BUDGET_CONTROL_OVERRIDE = (
+        "project_cost.budget_control_override",
+        "عبور از کنترل بودجه با مجوز ثبت شد",
+    )
     PROJECT_COST_RECONCILIATION_VIEWED = (
         "project_cost.reconciliation_viewed",
         "تطبیق محدود شواهد هزینه پروژه مشاهده شد",
@@ -1457,6 +1469,11 @@ class AuditAction(models.TextChoices):
     PAYROLL_RUN_SUBMITTED = "payroll.run_submitted", "اجرای حقوق برای بررسی ارسال شد"
     PAYROLL_RUN_APPROVED = "payroll.run_approved", "اجرای حقوق تأیید شد"
     PAYROLL_RUN_FINALIZED = "payroll.run_finalized", "اجرای حقوق قطعی شد"
+    PAYROLL_YEAR_APPROVED = "payroll.year_approved", "سال عملیاتی حقوق تأیید شد"
+    PAYROLL_CUMULATIVE_RECORDED = (
+        "payroll.cumulative_recorded",
+        "مانده تجمعی عملیاتی حقوق ثبت شد",
+    )
     PAYROLL_EXCEPTION_RESOLVED = "payroll.exception_resolved", "استثنای حقوق رفع شد"
     PAYROLL_RUN_REVERSED = "payroll.run_reversed", "اجرای حقوق برگشت و مرتبط شد"
     PAYROLL_STATUTORY_CALCULATED = (

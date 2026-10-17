@@ -1,13 +1,13 @@
 acceptance_criterion,status,evidence,notes
-IMB-0040-AC-1,BLOCKED,CEP-020-EV-003,PD-020 forecast approval and reforecast lifecycle definition is unavailable.
-IMB-0040-AC-2,BLOCKED,CEP-020-EV-003,Source preconditions cannot be selected without authoritative lifecycle policy.
-IMB-0040-AC-3,BLOCKED,CEP-020-EV-003,Reviewer or approver workflow and object-assignment requirements are not supplied by authoritative sources.
-IMB-0040-AC-4,BLOCKED,CEP-020-EV-003,Action and source-audit linkage cannot be modeled without defined actions and lifecycle states.
-IMB-0040-AC-5,BLOCKED,CEP-020-EV-003,Permitted rejection cancellation and correction behavior is absent.
-IMB-0040-AC-6,BLOCKED,CEP-020-EV-003,Requester-visible status fields cannot be classified without authoritative lifecycle and reviewer-metadata policy.
-IMB-0042-AC-1,BLOCKED,CEP-020-EV-003,Approved configuration keys and override reason/audit semantics are unavailable.
-IMB-0042-AC-2,BLOCKED,CEP-020-EV-003,Owning authoritative source cannot be selected from references alone.
-IMB-0042-AC-3,BLOCKED,CEP-020-EV-003,Policy-absent input must fail closed but valid policy inputs are not defined.
-IMB-0042-AC-4,BLOCKED,CEP-020-EV-003,Correction or replacement source identity and version rules are unavailable.
-IMB-0042-AC-5,BLOCKED,CEP-020-EV-003,Approved business-event control points are unavailable.
-IMB-0042-AC-6,BLOCKED,CEP-020-EV-003,No profile-label behavior was introduced because product mutation stopped.
+IMB-0040-AC-1,PASS,CEP-020-EV-005; CEP-020-EV-006,Published workflow drives draft to under-review to approved or rejected; reforecast approval supersedes prior approved version.
+IMB-0040-AC-2,PASS,CEP-020-EV-005; CEP-020-EV-006,Initiator permission and project scope and current governing Budget/source assumptions are required.
+IMB-0040-AC-3,PASS,CEP-020-EV-005; CEP-020-EV-006,Reviewer needs separate permission and active claimed workflow assignment; preparer self-review is denied.
+IMB-0040-AC-4,PASS,CEP-020-EV-005; CEP-020-EV-006,Append-only transitions and audit retain actor time source version cutoff watermark prior and new state and reason.
+IMB-0040-AC-5,PASS,CEP-020-EV-005; CEP-020-EV-006,Rejection is governed; revised forecast is a new immutable snapshot and predecessor is superseded only on approval; cancellation was not approved and remains absent.
+IMB-0040-AC-6,PASS,CEP-020-EV-005; CEP-020-EV-006,Requester projection exposes forecast ID version as-of and status only.
+IMB-0042-AC-1,PASS,CEP-020-EV-005; CEP-020-EV-006,Explicit tenant policy versions drive WARNING or HARD_STOP and override eligibility; test-isolated synthetic event proves override reason and audit linkage while production enrollment remains empty.
+IMB-0042-AC-2,PASS,CEP-020-EV-005; CEP-020-EV-006,Budget and cost source domains remain authoritative; evaluator returns disposition and audit evidence without mutating source records.
+IMB-0042-AC-3,PASS,CEP-020-EV-005; CEP-020-EV-006,Unenrolled event and missing tenant policy fail closed; invalid profile-derived response is rejected.
+IMB-0042-AC-4,PASS,CEP-020-EV-005; CEP-020-EV-006,Evaluation records source ID and source version and pinned policy versions; correction or replacement is retained by authoritative source domain and cannot be enrolled without its approved contract.
+IMB-0042-AC-5,PASS,CEP-020-EV-005; CEP-020-EV-006,Evaluator accepts only explicitly enrolled approved business-event keys; initial enrolled set is empty under Human Decision-02.
+IMB-0042-AC-6,PASS,CEP-020-EV-005; CEP-020-EV-006,No profile-label lookup or automatic Budget mutation exists in evaluator or forecast workflow.

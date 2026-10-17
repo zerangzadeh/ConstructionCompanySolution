@@ -984,6 +984,222 @@ class PayrollResultLine(ImmutablePayrollRecord):
         )
 
 
+class PayrollYearStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    APPROVED = "approved", "تأییدشده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+
+
+class PayrollYearInterval(UUIDModel, TimeStampedModel):
+    """Explicit tenant operational YTD reset boundary, versioned by approval."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    code = models.CharField(max_length=50)
+    version = models.PositiveIntegerField()
+    starts_on = models.DateField()
+    ends_on = models.DateField()
+    status = models.CharField(
+        max_length=20,
+        choices=PayrollYearStatus.choices,
+        default=PayrollYearStatus.DRAFT,
+    )
+    predecessor = models.ForeignKey(
+        "self", null=True, blank=True, on_delete=models.PROTECT
+    )
+    reason = models.TextField()
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="payroll_years_created",
+    )
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="payroll_years_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+    superseded_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["organization", "code", "version"],
+                name="payroll_year_org_code_version_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(ends_on__gte=models.F("starts_on")),
+                name="payroll_year_dates_ck",
+            ),
+            ExclusionConstraint(
+                name="payroll_year_approved_no_overlap",
+                expressions=[
+                    ("organization", RangeOperators.EQUAL),
+                    (
+                        DateRangeExpression(
+                            "starts_on",
+                            "ends_on",
+                            RangeBoundary(inclusive_lower=True, inclusive_upper=True),
+                        ),
+                        RangeOperators.OVERLAPS,
+                    ),
+                ],
+                condition=Q(status=PayrollYearStatus.APPROVED),
+            ),
+        ]
+
+    def clean(self) -> None:
+        self.code = canonicalize_upper_identifier(self.code)
+        if not self.code or not self.reason.strip():
+            raise ValidationError("Payroll year code and reason are required.")
+        if self.ends_on < self.starts_on:
+            raise ValidationError("Payroll year end cannot precede start.")
+        if self.status != PayrollYearStatus.DRAFT and (
+            self.approved_by_id is None or self.approved_at is None
+        ):
+            raise ValidationError(
+                "Approved Payroll-year history requires actor and time."
+            )
+        if self.predecessor_id:
+            validate_related_organizations(self, predecessor=self.predecessor)
+            if (
+                self.predecessor.code != self.code
+                or self.predecessor.version >= self.version
+            ):
+                raise ValidationError(
+                    "Payroll year predecessor must be an older version."
+                )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            immutable = (
+                "organization_id",
+                "code",
+                "version",
+                "starts_on",
+                "ends_on",
+                "predecessor_id",
+                "reason",
+                "created_by_id",
+            )
+            if any(
+                getattr(previous, field) != getattr(self, field) for field in immutable
+            ):
+                raise ValidationError("Payroll year source and interval are immutable.")
+            if previous.status != self.status and not getattr(
+                self, "_transition_authorized", False
+            ):
+                raise ValidationError(
+                    "Payroll year approval requires its domain service."
+                )
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        if self.status != PayrollYearStatus.DRAFT:
+            raise ValidationError("Approved Payroll-year history cannot be deleted.")
+        super().delete(*args, **kwargs)
+
+
+class PayrollCumulativeState(ImmutablePayrollRecord):
+    """Append-only signed bucket balance after one finalized result line."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    year = models.ForeignKey(
+        PayrollYearInterval, on_delete=models.PROTECT, related_name="states"
+    )
+    employee = models.ForeignKey("workforce.Employee", on_delete=models.PROTECT)
+    work_relationship = models.ForeignKey(
+        "workforce.WorkRelationship", null=True, blank=True, on_delete=models.PROTECT
+    )
+    component = models.ForeignKey(PayrollComponent, on_delete=models.PROTECT)
+    component_kind = models.CharField(max_length=30, choices=ComponentKind.choices)
+    state_version = models.PositiveIntegerField()
+    source_run = models.ForeignKey(PayrollRun, on_delete=models.PROTECT)
+    source_line = models.ForeignKey(
+        PayrollResultLine, on_delete=models.PROTECT, related_name="cumulative_states"
+    )
+    source_version = models.CharField(max_length=64)
+    effective_on = models.DateField()
+    delta = models.DecimalField(max_digits=24, decimal_places=2)
+    balance = models.DecimalField(max_digits=24, decimal_places=2)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["year", "source_line"], name="payroll_ytd_year_line_uq"
+            ),
+            models.UniqueConstraint(
+                fields=["year", "employee", "component", "state_version"],
+                name="payroll_ytd_bucket_version_uq",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            year=self.year,
+            employee=self.employee,
+            work_relationship=self.work_relationship
+            if self.work_relationship_id
+            else None,
+            component=self.component,
+            source_run=self.source_run,
+            source_line=self.source_line,
+        )
+        if (
+            self.component_kind == ComponentKind.INFORMATIONAL
+            or self.source_line.component_kind != self.component_kind
+            or self.source_line.component_id != self.component_id
+            or self.source_line.run_id != self.source_run_id
+            or self.source_line.run_employee.employee_id != self.employee_id
+            or self.delta != self.source_line.amount
+            or self.source_version != self.source_run.calculation_digest
+            or not self.source_version
+            or self.source_run.status
+            not in {
+                PayrollRunStatus.FINALIZED,
+                PayrollRunStatus.REVERSED,
+            }
+            or self.year.status
+            not in {
+                PayrollYearStatus.APPROVED,
+                PayrollYearStatus.SUPERSEDED,
+            }
+            or (
+                self.work_relationship_id
+                and self.work_relationship.legacy_employee_id != self.employee_id
+            )
+            or not self.year.starts_on <= self.effective_on <= self.year.ends_on
+        ):
+            raise ValidationError(
+                "Cumulative state must pin a qualifying finalized source line."
+            )
+        previous = (
+            type(self).objects.filter(
+                year_id=self.year_id,
+                employee_id=self.employee_id,
+                component_id=self.component_id,
+            )
+            .order_by("-state_version")
+            .first()
+        )
+        expected_version = previous.state_version + 1 if previous else 1
+        expected_balance = (previous.balance if previous else Decimal(0)) + self.delta
+        if (
+            self.state_version != expected_version
+            or self.balance != expected_balance
+            or (previous and previous.component_kind != self.component_kind)
+        ):
+            raise ValidationError("Cumulative version and signed balance must follow history.")
+
+
 class PayrollExceptionSeverity(models.TextChoices):
     ERROR = "error", "خطا"
     WARNING = "warning", "هشدار"

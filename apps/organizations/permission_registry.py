@@ -505,6 +505,8 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "projects.ProjectCostFact",
             "projects.ProjectCostCoverage",
             "projects.ProjectCostForecast",
+            "projects.ProjectForecastReview",
+            "projects.ProjectForecastTransition",
         ),
         (
             P.PROJECT_COST_SOURCES_MANAGE,
@@ -514,8 +516,14 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.PROJECT_COST_RECONCILIATIONS_VIEW,
             P.PROJECT_COST_RECONCILIATIONS_EXPORT,
             P.PROJECT_FORECASTS_PREPARE,
+            P.PROJECT_FORECASTS_REVIEW,
+            P.PROJECT_BUDGET_OVERRIDES_APPROVE,
         ),
-        ("apps.projects.services",),
+        (
+            "apps.projects.services",
+            "apps.projects.forecast_governance",
+            "apps.projects.budget_control",
+        ),
     ),
     PermissionResource(
         "project_schedules",
@@ -985,9 +993,14 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "payroll.PayrollComponent",
             "payroll.PayrollRule",
             "payroll.PayrollPeriod",
+            "payroll.PayrollYearInterval",
         ),
         (P.PAYROLL_CONFIGURATION_VIEW, P.PAYROLL_CONFIGURATION_MANAGE),
-        ("apps.payroll.services", "apps.payroll.views"),
+        (
+            "apps.payroll.services",
+            "apps.payroll.cumulative_services",
+            "apps.payroll.views",
+        ),
     ),
     PermissionResource(
         "payroll",
@@ -1006,7 +1019,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.PAYROLL_FINALIZE,
             P.PAYROLL_ADJUST,
         ),
-        ("apps.payroll.services",),
+        ("apps.payroll.services", "apps.payroll.cumulative_services"),
     ),
     PermissionResource(
         "payroll_results",
@@ -1014,9 +1027,14 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             "payroll.PayrollRunEmployee",
             "payroll.PayrollResultLine",
+            "payroll.PayrollCumulativeState",
         ),
         (P.PAYROLL_RESULTS_VIEW,),
-        ("apps.payroll.services", "apps.payroll.views"),
+        (
+            "apps.payroll.services",
+            "apps.payroll.cumulative_services",
+            "apps.payroll.views",
+        ),
     ),
     PermissionResource(
         "payslips",

@@ -38,6 +38,7 @@ from apps.projects.models import (
     CostCenter,
     CostStructureStatus,
     CostStructureVersion,
+    ForecastReviewStatus,
     Project,
     ProjectBudgetControl,
     ProjectChangeProposal,
@@ -53,6 +54,7 @@ from apps.projects.models import (
     ProjectCostMeasure,
     ProjectCostSourceContract,
     ProjectCostSourceContractStatus,
+    ProjectForecastReview,
     ProjectPhase,
     ProjectPhaseStatus,
     ProjectScheduleDependency,
@@ -2743,6 +2745,17 @@ def create_project_cost_forecast_draft(
         source_watermark=watermark,
         coverage_complete=projection.coverage_complete,
         created_by=actor,
+    )
+    predecessor = ProjectForecastReview.objects.filter(
+        organization=organization,
+        project=project,
+        status=ForecastReviewStatus.APPROVED,
+    ).first()
+    ProjectForecastReview.objects.create(
+        organization=organization,
+        project=project,
+        forecast=forecast,
+        predecessor=predecessor,
     )
     record_audit_event(
         action=AuditAction.PROJECT_COST_FORECAST_DRAFTED,

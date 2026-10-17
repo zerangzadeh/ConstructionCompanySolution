@@ -1,7 +1,7 @@
 acceptance_criterion,status,evidence,notes
-IMB-0079-AC-1,BLOCKED,CEP-025-EV-003,PDM-012 cumulative period/component/source-version semantics unavailable.
-IMB-0079-AC-2,BLOCKED,CEP-025-EV-003,No cumulative-state persistence model or constraints exist.
-IMB-0079-AC-3,BLOCKED,CEP-025-EV-003,Effective-date/version history and reset policy are undefined.
-IMB-0079-AC-4,BLOCKED,CEP-025-EV-003,Tenant/object model cannot be selected before authoritative state contract exists.
-IMB-0079-AC-5,BLOCKED,CEP-025-EV-003,No approved compatibility or migration path exists.
-IMB-0079-AC-6,BLOCKED,CEP-025-EV-003,No statutory rate or formula was introduced.
+IMB-0079-AC-1,PASS,CEP-025-EV-005; CEP-025-EV-006,Finalized result lines contribute once per explicit Payroll-year version and component; reversal lines add signed inverse with source digest pinned.
+IMB-0079-AC-2,PASS,CEP-025-EV-005; CEP-025-EV-006,Year and cumulative state use tenant/source FKs date and identity constraints and unique year-source-line and bucket-state-version keys.
+IMB-0079-AC-3,PASS,CEP-025-EV-005; CEP-025-EV-006,Year version approval supersedes predecessor without deleting prior state; append-only balance versions retain effective date and source version.
+IMB-0079-AC-4,PASS,CEP-025-EV-005; CEP-025-EV-006,Tenant object relationships are validated and cross-tenant reads denied; explicitly linked WorkRelationship is optional for legacy Employee compatibility.
+IMB-0079-AC-5,PASS,CEP-025-EV-006; CEP-025-EV-007,Existing finalized runs retain their identity through reversible expansion and can be accumulated explicitly into an approved year without modifying source rows.
+IMB-0079-AC-6,PASS,CEP-025-EV-005; CEP-025-EV-006,Operational buckets exclude INFORMATIONAL monetary treatment and contain no taxable insurable cap exemption rate or statutory formula.

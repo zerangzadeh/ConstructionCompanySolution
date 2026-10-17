@@ -62,15 +62,16 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 27
+  execution_state_complete: 29
   authorized_not_started: 0
-  eligible_under_standing_authority: 4
-  in_progress: 1
+  eligible_under_standing_authority: 6
+  in_progress: 0
   blocked_current: 0
-  not_started_other_current_governed: 47
+  partial_current: 1
+  not_started_other_current_governed: 43
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
-  last_updated: '2026-10-17'
+  last_updated: '2026-10-18'
   remote_main_complete_count_status: REQUIRES_FULL_REPORT_RECONCILIATION
 gates:
   GATE-01:
@@ -598,7 +599,7 @@ ceps:
     title: Administration surface separation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED
       authorization_id: CEP-014-AUTH-2026-10-16
@@ -641,6 +642,9 @@ ceps:
     - date: '2026-10-17'
       status: CLOSED_VERIFIED
       reason: Corrected focused database-backed suite passed 8/8 on isolated test_cep014_verify_20261017. All 6/6 AC and scoped DoD pass; browser/accessibility runtime remains explicit UTV. GATE-02 was not evaluated or issued.
+    - date: '2026-10-17'
+      status: METADATA_RECONCILED
+      reason: Eligibility corrected from ELIGIBLE to SATISFIED because CEP-014 was already CLOSED_VERIFIED; no execution or Gate state changed.
   CEP-015:
     title: Guided configuration-profile governance
     phase: V1_IMPLEMENTATION
@@ -668,11 +672,14 @@ ceps:
       path: docs/governance/cep/reports/CEP-015_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
+      pushed: true
+      remote_branch: main
+      merged_to_main: false
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: COMPLETE
     last_execution:
       branch: main
       sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
@@ -693,6 +700,9 @@ ceps:
     - date: '2026-10-17'
       status: COMPLETE
       reason: Inert versioned profile preview and explicit per-key Project Controls policy application with tenant audit implemented; Leave application fails closed pending approved Leave Policy version. 6/6 AC and scoped build DoD PASS; 4 focused and 15 affected regression tests PASS; check, drift and lint PASS. One unrelated unchanged middleware/session baseline test failure recorded. No migration, production or Git write. See CEP-015 Completion Report.
+    - date: '2026-10-17'
+      status: GIT_INTEGRATED
+      reason: Existing Human direct commit/push to main at dd8cf032b85873dcdfb730a20c747b0431d6f4d2 verified from Git; no merge claimed.
   CEP-016:
     title: Context UX and scoped form filtering
     phase: V1_IMPLEMENTATION
@@ -889,23 +899,24 @@ ceps:
     title: Forecast and budget-control governance
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: BLOCKER_RESOLVED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
+      passed: 12
       total: 12
-      status: UNRECORDED
-    dod: UNRECORDED
+      status: PASS
+    dod: PASS
     blockers: []
     remaining_utv:
-    - unit_model_service_workflow_and_regression_validation
+    - development_deployment_and_migration
+    - approved_source_event_activation_and_GATE-03
     - performance_concurrency_runtime
     completion_report:
       path: docs/governance/cep/reports/CEP-020_COMPLETION_REPORT.md
@@ -918,7 +929,7 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
+      sha: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
     updated_at: '2026-10-17'
     history:
     - date: '2026-10-17'
@@ -930,6 +941,18 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKER_RESOLVED
       reason: Human Decision Authority approved zero-tolerance positive-overrun rule, WARNING default, empty initial event set, guarded override and bounded non-production persistence migration in BONIRA-CONSOLIDATED-20261017.
+    - date: '2026-10-17'
+      status: STARTED
+      reason: Prompt identity, recovered PD-020/024 and SPEC-001/004, consolidated Human Decision-02/07, GATE-01, empty enrolled-event boundary, and clean main at dd8cf032b85873dcdfb730a20c747b0431d6f4d2 verified before product mutation.
+    - date: '2026-10-17'
+      status: MIGRATION_STATE_CHANGED
+      reason: Bounded non-production projects 0010 expand/backfill and organizations 0109 catalog migrations added; PostgreSQL test rollback/reapply passed; no non-test database migration executed.
+    - date: '2026-10-17'
+      status: COMPLETE
+      reason: Forecast workflow/version/audit lifecycle and fail-closed explicit budget-control evaluator implemented; 12/12 AC and scoped DoD PASS; 6 focused and 2 migration PostgreSQL tests plus 6 affected workflow regression tests PASS; baseline legacy fixture/catalog failures attributed; activation remains gated with empty event set.
+    - date: '2026-10-17'
+      status: CLOSED_VERIFIED
+      reason: Completion Report and manifests reconciled; Ruff, Django check, migration drift and diff checks PASS; no Git write, production action or Human Sign-off.
   CEP-021:
     title: Direct expense and reimbursement settlement boundary
     phase: V1_IMPLEMENTATION
@@ -956,11 +979,14 @@ ceps:
       path: docs/governance/cep/reports/CEP-021_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
+      pushed: true
+      remote_branch: main
+      merged_to_main: false
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: COMPLETE
     last_execution:
       branch: main
       sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
@@ -981,6 +1007,9 @@ ceps:
     - date: '2026-10-17'
       status: COMPLETE
       reason: Bounded Expense/Treasury lineage migration and services implemented; 6/6 AC and DoD PASS; 25 focused PostgreSQL tests including migration rollback/reapply and row conservation plus check drift and lint PASS. Development and production migration not executed; no Git write. See CEP-021 Completion Report.
+    - date: '2026-10-17'
+      status: GIT_INTEGRATED
+      reason: Existing Human direct commit/push to main at dd8cf032b85873dcdfb730a20c747b0431d6f4d2 verified from Git; no merge claimed.
   CEP-022:
     title: Employment lifecycle and roster foundation
     phase: V1_IMPLEMENTATION
@@ -1114,23 +1143,24 @@ ceps:
     title: Payroll cumulative/YTD authority
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: BLOCKER_RESOLVED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
+      passed: 6
       total: 6
-      status: UNRECORDED
-    dod: UNRECORDED
+      status: PASS
+    dod: PASS
     blockers: []
     remaining_utv:
-    - unit_model_service_transaction_and_regression_validation
+    - development_deployment_and_migration
+    - statutory_currentness_and_certification
     - performance_concurrency_runtime
     completion_report:
       path: docs/governance/cep/reports/CEP-025_COMPLETION_REPORT.md
@@ -1143,8 +1173,8 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
-    updated_at: '2026-10-17'
+      sha: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
+    updated_at: '2026-10-18'
     history:
     - date: '2026-10-17'
       status: BLOCKED
@@ -1155,6 +1185,18 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKER_RESOLVED
       reason: Human Decision Authority approved operational signed component-kind buckets, explicit versioned tenant Payroll-year intervals and bounded non-production persistence migration in BONIRA-CONSOLIDATED-20261017; statutory currentness remains UTV.
+    - date: '2026-10-17'
+      status: STARTED
+      reason: Canonical hash and recovered PD-028/031 SPEC-013 Decision-05/07 verified; CEP-010 and GATE-01/02 satisfied; payroll touch set has no collision with completed CEP-020 changes at main dd8cf032.
+    - date: '2026-10-18'
+      status: MIGRATION_STATE_CHANGED
+      reason: Bounded non-production Payroll 0006 expand-only YTD schema added; PostgreSQL test rollback/reapply preserved a finalized source run; no non-test database migration executed.
+    - date: '2026-10-18'
+      status: COMPLETE
+      reason: Operational signed buckets and explicit tenant Payroll-year versioning implemented with atomic finalization/reversal hooks; 6/6 AC and scoped DoD PASS; 4 focused PostgreSQL tests and one migration test PASS; legacy permission-fixture regression debt attributed.
+    - date: '2026-10-18'
+      status: CLOSED_VERIFIED
+      reason: Completion Report/manifests reconciled; Ruff, Django check, migration drift and diff checks PASS; statutory activation, production action and Git writes absent.
   CEP-026:
     title: ESS own-data privacy boundary
     phase: V1_IMPLEMENTATION
@@ -1984,15 +2026,15 @@ ceps:
   CEP-049:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2013,8 +2055,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP-020 and CEP-040 COMPLETE; prior-wave contract/schema prerequisites satisfied for non-production build.
   CEP-050:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2052,15 +2097,15 @@ ceps:
   CEP-051:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2081,20 +2126,23 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP-025 COMPLETE; prior-wave Payroll cumulative/YTD foundation satisfied for non-production build.
   CEP-052:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2115,8 +2163,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP-025 COMPLETE; EXT-0018 and GATE-03 remain activation-only, so non-production fail-closed build is eligible.
   CEP-053:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2154,15 +2205,15 @@ ceps:
   CEP-054:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2183,8 +2234,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP-025 and CEP-026 COMPLETE; GATE-02 PASS for non-production build.
   CEP-055:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3295,9 +3349,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: fb6a1feaa78168748741c3c3253e2dea0871cda8
-  origin_main: fb6a1feaa78168748741c3c3253e2dea0871cda8
-  integration_checkpoint: fb6a1feaa78168748741c3c3253e2dea0871cda8
+  last_reconciled_head: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
+  origin_main: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
+  integration_checkpoint: dd8cf032b85873dcdfb730a20c747b0431d6f4d2
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-17'
 execution_frontier:
@@ -3305,10 +3359,12 @@ execution_frontier:
   execution_mode: SERIAL_BY_DEFAULT
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
-  - CEP-020
   - CEP-022
-  - CEP-025
   - CEP-027
-  next_autonomous_cep: CEP-020
+  - CEP-049
+  - CEP-051
+  - CEP-052
+  - CEP-054
+  next_autonomous_cep: CEP-027
   production_authorized: false
   human_signoff_executed: false

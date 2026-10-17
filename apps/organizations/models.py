@@ -772,6 +772,14 @@ class BusinessPermissionCode(models.TextChoices):
         "project_cost.forecasts_prepare",
         "آماده‌سازی پیش‌نویس پیش‌بینی هزینه پروژه",
     )
+    PROJECT_FORECASTS_REVIEW = (
+        "project_cost.forecasts_review",
+        "بررسی مستقل پیش‌بینی هزینه پروژه",
+    )
+    PROJECT_BUDGET_OVERRIDES_APPROVE = (
+        "project_cost.budget_overrides_approve",
+        "تأیید عبور ثبت‌شده از کنترل بودجه",
+    )
     PROJECT_SCHEDULES_VIEW = (
         "project_schedules.view",
         "مشاهده برنامه زمان‌بندی و کنترل تغییر پروژه",

@@ -1,5 +1,23 @@
 # CEP-020 Execution Manifest
 
+## Resumption at the Human checkpoint — 2026-10-17
+
+- Branch and baseline: clean `main` at `dd8cf032b85873dcdfb730a20c747b0431d6f4d2`, matching `origin/main`. The intervening Human direct commit was inspected and Registry Git metadata for completed CEP-015/021 reconciled before product mutation.
+- Canonical prompt byte SHA-256 remains `d79ae3dc72ea9c06be2c4106bfe8bbbd47ce5f5a3dbcc648c619234d3001f5a2`. No prerequisite CEP; GATE-01 PASS; EXT-0011 and GATE-03 activation only.
+- Recovered frozen PD-020/024, accepted DTR-PD-009/010, SPEC-001/004 and the explicit consolidated Human Decision-02 define the forecast sequence and budget control values. Decision-07 separately authorizes bounded non-production expand-first migration despite the prompt's historical `NONE` migration classification.
+- The approved enrolled-event set is empty. No source-domain event can be silently enrolled or blocked. Forecast approval cannot change the governing Budget.
+- Intended product touch set: `apps/projects` forecast lifecycle model/service and migration, budget-control evaluator, `apps/workflows` registered subject/commands, `apps/organizations` permission catalog and migration where needed, `apps/audit` action catalog, and focused project/workflow/policy tests. No UI, source-domain enrollment, production data movement, or CEP-028 backfill.
+- Intended evidence touch set: CEP-020 execution/change/evidence/acceptance manifests, Completion Report, and Registry. Tests and migration verification will determine the final result.
+
+## Current execution closeout — 2026-10-17
+
+- `CEP-020-FINDING-001 / BLOCKER-SPEC` is resolved by recovered frozen PD-020/024, SPEC-001/004 and consolidated Human Decision-02. Decision-07 permits the bounded non-production expand-first migrations recorded in the Change Manifest. The earlier blocked section below remains historical evidence.
+- Implemented an immutable forecast snapshot review lifecycle with a one-current-approved constraint, append-only actor/reason transition evidence, workflow-owned independent approval/rejection, versioned reforecast supersession, and a requester-safe status projection. A forecast approval cannot mutate Budget.
+- Implemented an explicit tenant-policy budget-control evaluator with exact Decimal zero-tolerance exposure and source/policy-version audit linkage. `APPROVED_CONTROL_EVENTS` is empty by authority; no source event or production activation was enrolled. A synthetic key was patched only inside isolated tests to verify policy/override paths.
+- Added projects `0010` schema and legacy-draft backfill and organizations `0109` catalog migration. Both migrations were rolled back and reapplied in PostgreSQL tests; no development or production database migration was run outside the test database.
+- Focused evidence: six lifecycle/control tests and two migration tests PASS; six CEP-018 workflow workspace regression tests PASS; Ruff, Django system check, migration drift and diff checks PASS. Broader legacy budget/workflow/permission-registry suites have independently attributed existing fixture/catalog failures recorded in the Evidence Manifest and Completion Report.
+- Execution baseline remains `main @ dd8cf032b85873dcdfb730a20c747b0431d6f4d2`; no Git write, production action, CEP-028 dataset work, Human Sign-off or certification occurred.
+
 ## Grounding and authority — 2026-10-17
 
 - Branch and baseline: `main` at `76362e23fbbd18c5f280343ece064e95eeae4881`; `origin/main` matched the Registry reconciliation baseline.

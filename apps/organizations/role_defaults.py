@@ -221,6 +221,8 @@ BUDGET_RESTRICTED_PERMISSIONS = permission_codes(
     BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_VIEW,
     BusinessPermissionCode.PROJECT_COST_RECONCILIATIONS_EXPORT,
     BusinessPermissionCode.PROJECT_FORECASTS_PREPARE,
+    BusinessPermissionCode.PROJECT_FORECASTS_REVIEW,
+    BusinessPermissionCode.PROJECT_BUDGET_OVERRIDES_APPROVE,
     BusinessPermissionCode.PROJECT_SCHEDULES_VIEW,
     BusinessPermissionCode.PROJECT_SCHEDULES_PREPARE,
     BusinessPermissionCode.PROJECT_CONTROL_REGISTERS_VIEW,

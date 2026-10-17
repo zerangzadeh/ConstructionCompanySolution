@@ -4,3 +4,10 @@ CEP-020-CH-002,docs/governance/cep/manifests/CEP-020_EXECUTION_MANIFEST.md,Recor
 CEP-020-CH-003,docs/governance/cep/evidence/CEP-020_ACCEPTANCE_MAPPING.csv,Record twelve blocked acceptance criteria,IN SCOPE GOVERNANCE,NONE
 CEP-020-CH-004,docs/governance/cep/evidence/CEP-020_EVIDENCE_MANIFEST.csv,Record prompt identity grounding recovery and UTV evidence,IN SCOPE GOVERNANCE,NONE
 CEP-020-CH-005,docs/governance/cep/reports/CEP-020_COMPLETION_REPORT.md,Record blocked execution closeout,IN SCOPE GOVERNANCE,NONE
+CEP-020-CH-006,apps/projects/models.py; apps/projects/services.py; apps/projects/forecast_governance.py,Add immutable forecast snapshot review pointer transition history and workflow-owned approval reforecast lifecycle,IN SCOPE PRODUCT,PROJECTS 0010 EXPAND AND LEGACY DRAFT BACKFILL
+CEP-020-CH-007,apps/projects/budget_control.py,Add explicit policy-versioned budget-control evaluator with empty approved event enrollment and source audit linkage,IN SCOPE PRODUCT,NONE
+CEP-020-CH-008,apps/workflows/registry.py; apps/projects/apps.py,Register forecast subject adapter workflow type and approve/reject commands,IN SCOPE PRODUCT,NONE
+CEP-020-CH-009,apps/organizations/models.py; apps/organizations/permission_registry.py; apps/organizations/role_defaults.py; apps/organizations/migrations/0109_cep020_forecast_budget_control_permissions.py,Add separate review and override permissions to existing authorization catalog and bounded catalog migration,IN SCOPE PRODUCT,ORGANIZATIONS 0109 CATALOG
+CEP-020-CH-010,apps/audit/models.py,Register forecast transition and budget-control audit actions,IN SCOPE PRODUCT,NONE
+CEP-020-CH-011,apps/projects/test_cep020_forecast_budget_control.py; apps/projects/test_cep020_migration.py,Verify lifecycle control policy fail-closed and migration conservation/reversibility,IN SCOPE TEST,TEST DATABASE ONLY
+CEP-020-CH-012,CEP_EXECUTION_REGISTRY.yaml; CEP-020 evidence manifests and report,Record resumption evidence AC DoD status baseline debt and frontier,IN SCOPE GOVERNANCE,NONE

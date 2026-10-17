@@ -1474,6 +1474,14 @@ def finalize_run(
         entity=run,
         metadata={"employee_count": len(results), "calculation_digest": run.calculation_digest},
     )
+    from .cumulative_services import record_cumulative_for_run
+
+    record_cumulative_for_run(
+        organization=organization,
+        actor=actor,
+        run=run,
+        require_approved_year=False,
+    )
     return run
 
 
@@ -1689,6 +1697,20 @@ def reverse_run(
             "reversal_run_id": str(reversal_run.pk),
             "replacement_run_id": str(replacement_run.pk) if replacement_run else None,
         },
+    )
+    from .cumulative_services import record_cumulative_for_run
+
+    record_cumulative_for_run(
+        organization=organization,
+        actor=actor,
+        run=original_run,
+        require_approved_year=False,
+    )
+    record_cumulative_for_run(
+        organization=organization,
+        actor=actor,
+        run=reversal_run,
+        require_approved_year=False,
     )
     return reversal
 

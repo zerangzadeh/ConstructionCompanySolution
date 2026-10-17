@@ -4,3 +4,8 @@ CEP-025-CH-002,docs/governance/cep/manifests/CEP-025_EXECUTION_MANIFEST.md,Recor
 CEP-025-CH-003,docs/governance/cep/evidence/CEP-025_ACCEPTANCE_MAPPING.csv,Record six blocked criteria,IN SCOPE GOVERNANCE,NONE
 CEP-025-CH-004,docs/governance/cep/evidence/CEP-025_EVIDENCE_MANIFEST.csv,Record recovery and UTV evidence,IN SCOPE GOVERNANCE,NONE
 CEP-025-CH-005,docs/governance/cep/reports/CEP-025_COMPLETION_REPORT.md,Record blocked closeout,IN SCOPE GOVERNANCE,NONE
+CEP-025-CH-006,apps/payroll/models.py; apps/payroll/migrations/0006_cep025_operational_cumulative_ytd.py,Add versioned explicit tenant Payroll-year interval and immutable cumulative source-line bucket balance history,IN SCOPE PRODUCT,PAYROLL 0006 EXPAND ONLY
+CEP-025-CH-007,apps/payroll/cumulative_services.py; apps/payroll/services.py,Add approved-year and cumulative recording/read services plus atomic finalization and reversal hooks,IN SCOPE PRODUCT,NONE
+CEP-025-CH-008,apps/audit/models.py; apps/organizations/permission_registry.py,Register payroll-year and cumulative audit actions and models under existing payroll permission resources,IN SCOPE PRODUCT,NONE
+CEP-025-CH-009,apps/payroll/test_cep025_cumulative.py; apps/payroll/test_cep025_migration.py,Verify signed buckets idempotency version history tenant fail-closed hooks and migration conservation,IN SCOPE TEST,TEST DATABASE ONLY
+CEP-025-CH-010,CEP_EXECUTION_REGISTRY.yaml; CEP-025 evidence manifests and report,Record resumption tests AC DoD baseline debt and frontier,IN SCOPE GOVERNANCE,NONE

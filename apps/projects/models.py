@@ -1249,7 +1249,7 @@ class ProjectCostCoverage(UUIDModel, TimeStampedModel):
 
 
 class ProjectCostForecast(UUIDModel, TimeStampedModel):
-    """Immutable draft snapshot; acceptance is fail-closed pending forecast policy."""
+    """Immutable source snapshot for the governed forecast review lifecycle."""
 
     organization = models.ForeignKey(
         "organizations.Organization", on_delete=models.PROTECT
@@ -1296,6 +1296,120 @@ class ProjectCostForecast(UUIDModel, TimeStampedModel):
             raise ValidationError("Forecast totals are invalid.")
         self.full_clean()
         super().save(*args, **kwargs)
+
+
+class ForecastReviewStatus(models.TextChoices):
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    UNDER_REVIEW = "under_review", "در حال بررسی"
+    APPROVED = "approved", "تأییدشده"
+    REJECTED = "rejected", "ردشده"
+    SUPERSEDED = "superseded", "جایگزین‌شده"
+
+
+class ProjectForecastReview(UUIDModel, TimeStampedModel):
+    """Mutable lifecycle pointer; the forecast snapshot remains immutable."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    project = models.ForeignKey(Project, on_delete=models.PROTECT)
+    forecast = models.OneToOneField(
+        ProjectCostForecast, on_delete=models.PROTECT, related_name="review"
+    )
+    predecessor = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="successors",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=ForecastReviewStatus.choices,
+        default=ForecastReviewStatus.DRAFT,
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["project"],
+                condition=models.Q(status="approved"),
+                name="one_current_approved_forecast_per_project",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self, project=self.project, forecast=self.forecast
+        )
+        if self.forecast.project_id != self.project_id:
+            raise ValidationError("Forecast and review project must match.")
+        if self.predecessor_id and (
+            self.predecessor.organization_id != self.organization_id
+            or self.predecessor.project_id != self.project_id
+            or self.predecessor.forecast.version_number >= self.forecast.version_number
+        ):
+            raise ValidationError("Predecessor must be an older same-project forecast.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            previous = type(self).objects.get(pk=self.pk)
+            if (
+                previous.forecast_id != self.forecast_id
+                or previous.predecessor_id != self.predecessor_id
+                or previous.organization_id != self.organization_id
+                or previous.project_id != self.project_id
+            ):
+                raise ValidationError("Forecast review source identity is immutable.")
+            if previous.status != self.status and not getattr(
+                self, "_transition_authorized", False
+            ):
+                raise ValidationError(
+                    "Forecast review transitions require the domain service."
+                )
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("Forecast review history cannot be deleted.")
+
+
+class ProjectForecastTransition(UUIDModel, TimeStampedModel):
+    """Append-only decision evidence for one immutable forecast version."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    review = models.ForeignKey(
+        ProjectForecastReview, on_delete=models.PROTECT, related_name="transitions"
+    )
+    sequence = models.PositiveIntegerField()
+    previous_status = models.CharField(
+        max_length=20, choices=ForecastReviewStatus.choices
+    )
+    new_status = models.CharField(max_length=20, choices=ForecastReviewStatus.choices)
+    reason = models.TextField()
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["review", "sequence"], name="forecast_transition_sequence_uq"
+            ),
+        ]
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if self.pk and not self._state.adding:
+            raise ValidationError("Forecast transition history is immutable.")
+        validate_related_organizations(self, review=self.review)
+        if not self.reason.strip():
+            raise ValidationError("A transition reason is required.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("Forecast transition history cannot be deleted.")
 
 
 class ProjectScheduleStatus(models.TextChoices):
