@@ -8,21 +8,27 @@
 - Roadmap Stage: `STG-02 CORE BUILD`
 - Roadmap Wave: `RW-03`
 - Primary Track: `TRACK-07`
-- Lifecycle Status: `DRAFT`
-- CEP Authorization Status: `NOT AUTHORIZED`
-- Prompt Status: `READY FOR AUTHORIZATION`
+- Lifecycle Status: `LIVE STATE OWNED BY CEP_EXECUTION_REGISTRY.yaml`
+- CEP Authorization Status: `SEE CURRENT GOVERNANCE + CEP_EXECUTION_REGISTRY.yaml`
+- Prompt Status: `CANONICAL — VERIFY SHA-256 IN CEP_PROMPT_MANIFEST.yaml`
 
 ## 2. Authorization Boundary
-`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`
+This canonical prompt defines package-specific Scope / AC / DoD; it does not itself grant authority.
 
-`DO NOT EXECUTE UNTIL EXPLICITLY AUTHORIZED`
+Current governance applies:
+- Eligible current-governed non-production execution is covered by the standing bounded Human authority recorded in the repository.
+- Routine per-CEP explicit Human Authorization is **not required** when canonical identity, dependencies, gates, blockers, repository safety and this package's Scope / AC / DoD permit execution.
+- Any separate explicit Human Authorization applies only to the bounded operation it names.
+- Standing authority does not authorize Post-V1 activation, Scope / AC / DoD / Product-Decision / dependency-graph changes, production deployment/cutover/irreversible production migration, Human Sign-off, final Production Certification, or material risk acceptance.
 
-`EXECUTION PROMPT EXISTS ≠ IMPLEMENTATION AUTHORIZED`
-
-Upon explicit authorization, execute only the governed steps in this prompt. Prompt readiness, prerequisite satisfaction or gate readiness does not self-authorize this CEP.
+`PROMPT EXISTENCE ≠ SCOPE EXPANSION OR PRODUCTION AUTHORITY`
 
 ## 3. Authoritative Sources
-- BONIRA Codex Implementation Playbook v1.0
+- `docs/governance/CEP_PROGRAM_AUTHORITY.md`
+- `Agents.md`
+- `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`
+- `docs/ROADMAP_EXECUTION_PLAYBOOK.md`
+- `CEP_EXECUTION_REGISTRY.yaml` for live state only
 - CEP-045 Package Card
 - Canonical IMB records
 - Canonical CEP Dependency Model
@@ -36,8 +42,14 @@ Package-card source traceability:
 - Integration IDs: `NONE`
 - UI Architecture IDs: `UIA-035; UIA-048; UIA-049; UIA-050`
 - ESS Capability IDs: `NONE`
-- Canonical sources: Final Implementation Master Backlog, Dependency Graph, Implementation Roadmap, Codex Implementation Playbook v1.0.
-- Repository design baseline: `main @ d75a9334d8e27683159c5f756725c0540651ec43` (read-only inspection).
+- Canonical sources: Final Implementation Master Backlog, Dependency Graph, Implementation Roadmap, the current repository governance hierarchy and the package-specific canonical sources listed above.
+- Historical prompt-design baseline: `main @ d75a9334d8e27683159c5f756725c0540651ec43` (context only; execution MUST ground the current repository state).
+
+Repository source-resolution rule:
+- Use repository-local canonical sources first and verify this prompt byte-for-byte against `docs/governance/cep/CEP_PROMPT_MANIFEST.yaml`.
+- Approved consolidated execution materials are **recovery-only** when a required repository-local canonical source is unavailable.
+- Never substitute an external or historical consolidated copy for an available repository-local canonical prompt/source.
+- Current generic execution mechanics come from `Agents.md`, the Execution Policy and the Playbook; package-specific Scope / AC / DoD / migration / evidence semantics remain owned by this canonical prompt.
 
 ## 4. Objective
 Deliver the canonical outcomes owned by the listed IMBs as one bounded package without expanding authority, scope, roadmap placement or business semantics.
@@ -56,7 +68,7 @@ Only these Primary IMBs define implementation ownership. Secondary/reference IMB
 - Equipment object ≠ Fixed Asset automatically.
 - No new financial source or metric.
 - Any untraced cleanup/refactor/enhancement outside approved IMB outcomes.
-- Any actual deployment, migration execution, runtime verification or Human Sign-off unless a later authorized execution package explicitly permits it.
+- Production deployment/cutover, irreversible production migration or production data mutation, runtime verification outside this CEP’s required checks, and Human Sign-off remain outside scope unless separately authorized.
 
 `OUTSIDE APPROVED CEP / IMB SCOPE → RECORD FINDING → DO NOT IMPLEMENT`
 
@@ -81,22 +93,22 @@ Respect phase semantics. A dependency that blocks Activation/Verification/Produc
 Gate state must be checked at execution time. Prompt existence does not satisfy a gate.
 
 ## 11. Repository Grounding
-At future authorized execution start, before any code change:
+At execution start, before product mutation:
 1. Confirm current branch/base and record commit SHA.
 2. Inspect existing implementation and relevant apps/models/services/templates/endpoints/tests.
 3. Inspect migration state only when applicable.
 4. Run/record focused baseline checks where practical; separate pre-existing failures.
 5. Compare repository reality with this package design.
-6. Complete `CEP-###_EXECUTION_MANIFEST.md` with actual execution-time findings.
+6. Complete `CEP-045_EXECUTION_MANIFEST.md` with actual execution-time findings.
 
 `REPOSITORY REALITY > DOCUMENT ASSUMPTION`
 
-If repository reality contradicts the package design, record `CEP-###-FINDING-###`; do not silently redesign. If safe execution is impossible, use `BLOCKER-REPOSITORY` or the appropriate blocker and STOP.
+If repository reality contradicts the package design, record `CEP-045-FINDING-###`; do not silently redesign. If safe execution is impossible, use `BLOCKER-REPOSITORY` or the appropriate blocker and STOP.
 
-Future Git workflow after authorization:
-`one CEP → one branch cep/CEP-045-short-slug → focused commits → verification → review`
+Current Git mechanics are governed by `Agents.md` and the Execution Policy:
+`default = current local main; no new branch/worktree; no git add/commit/push/merge unless separately and explicitly authorized`.
 
-Prompt generation itself creates no branch and no commit.
+Prompt existence or CEP completion does not grant Git-write authority.
 
 ## 12. Expected Code Surfaces
 core/ (CONFIRMED repository directory; exact files UNKNOWN); apps/equipment (CONFIRMED directory; exact files UNKNOWN); apps/financials (CONFIRMED directory; exact files UNKNOWN); apps/fixed_assets (CONFIRMED directory; exact files UNKNOWN); apps/reporting (CONFIRMED directory; exact files UNKNOWN)
@@ -104,7 +116,7 @@ core/ (CONFIRMED repository directory; exact files UNKNOWN); apps/equipment (CON
 Treat exact files as repository-grounding results, not assumptions. Do not fabricate paths.
 
 ## 13. Implementation Requirements
-Upon explicit authorization, implement only the canonical scope below. Use minimum necessary refactoring only when required to safely deliver the approved IMB outcome, and record it in the Change Manifest.
+Under the current applicable execution authority, implement only the canonical scope below. Use minimum necessary refactoring only when required to safely deliver the approved IMB outcome, and record it in the Change Manifest.
 
 Canonical package scope:
 - Navigation/workspace mapping, cross-links only where approved relationship exists.
@@ -114,11 +126,11 @@ Required internal IMB sequence:
 NONE
 
 ## 14. Security Requirements
-Canonical Security Impact: `AUTHORIZATION`.
-- Security Impact: `AUTHORIZATION`
-- Applicability detail: AUTHORIZATION
-- Permission Test: `CONDITIONAL`
-- Tenant-Isolation Test: `CONDITIONAL`
+Canonical Security Impact: `AUTHORIZATION, TENANT-ISOLATION`.
+- Security Impact: `AUTHORIZATION, TENANT-ISOLATION`
+- Applicability detail: Verify the authorization/object-scope and tenant-boundary behavior required by this CEP; do not invent new roles, permissions or scope semantics.
+- Permission Test: `REQUIRED`
+- Tenant-Isolation Test: `REQUIRED`
 - Apply only the package-specific security tests marked REQUIRED/CONDITIONAL in the corrected Test Plan.
 - Do not turn N/A tenant/permission testing into boilerplate requirements.
 
@@ -167,16 +179,16 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=CONDITIONAL; TENANT-ISOLATION=CONDITIONAL; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=REQUIRED; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0020:UNIT; DOMAIN; REGRESSION | IMB-0021:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=REQUIRED; TENANT-ISOLATION=REQUIRED; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=REQUIRED; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0020:UNIT; DOMAIN; REGRESSION | IMB-0021:UNIT; DOMAIN; REGRESSION
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=CONDITIONAL; TENANT-ISOLATION TEST=CONDITIONAL; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=CONDITIONAL; SCREENSHOT=CONDITIONAL; UI RUNTIME EVIDENCE=CONDITIONAL; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0020:Operational Equipment vs Financial Fixed Assets workspace split: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof. | IMB-0021:Financial authority drill-down and legacy dashboard de-emphasis: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=REQUIRED; TENANT-ISOLATION TEST=REQUIRED; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=CONDITIONAL; SCREENSHOT=REQUIRED; UI RUNTIME EVIDENCE=CONDITIONAL; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0020:Operational Equipment vs Financial Fixed Assets workspace split: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof. | IMB-0021:Financial authority drill-down and legacy dashboard de-emphasis: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof.
 
-Future authorized execution must produce:
+Execution must produce:
 - `CEP-045_EXECUTION_MANIFEST.md`
 - `CEP-045_ACCEPTANCE_MAPPING.csv`
 - `CEP-045_EVIDENCE_MANIFEST.csv`
@@ -234,7 +246,7 @@ Acceptance criteria coverage for this CEP: `12 / 12`.
 Canonical DoD is not replaced by “tests pass”.
 
 ## 25. Entry Criteria
-- Explicit implementation authorization exists.
+- Standing or specific current execution authority applies under repository governance.
 - All prerequisite CEP/IMB outcomes required by canonical dependencies are available.
 - Required gates and external conditions are satisfied for the relevant execution phase.
 - No unresolved Frozen-PD/specification conflict.
@@ -242,7 +254,7 @@ Canonical DoD is not replaced by “tests pass”.
 - Build vs activation distinction is honored for conditional-readiness IMBs.
 
 Additionally:
-- Explicit implementation authorization must exist.
+- Registry eligibility, standing/specific authority and material Human-escalation triggers must be checked.
 - Actual prerequisite CEP status must be checked.
 - Required gate/build-blocking external state must permit execution.
 - Execution Manifest must be completed before code/product changes.
@@ -274,7 +286,7 @@ If blocked:
 Never `FAILED TEST → NOTE AND CLOSE`.
 
 ## 28. Forbidden Actions
-- Do not execute before explicit implementation authorization.
+- Do not execute when current standing/specific authority, canonical identity, dependencies, gates, blockers or repository safety do not permit it.
 - Do not change scope, CEP boundaries, IMB ownership, dependency topology, roadmap placement or Frozen PDs.
 - Do not perform unrelated refactoring.
 - Do not invent roles, permissions, workflow states, posting rules, regulatory values, scoring models, profile semantics, RPO/RTO/PITR, production topology, external APIs or SLA/SLO.
@@ -285,7 +297,7 @@ Never `FAILED TEST → NOTE AND CLOSE`.
 - `OUTSIDE APPROVED CEP / IMB SCOPE → RECORD FINDING → DO NOT IMPLEMENT`.
 
 ## 29. Required Completion Report
-Future authorized execution must produce:
+Execution must produce:
 - `CEP-045_EXECUTION_MANIFEST.md`
 - `CEP-045_ACCEPTANCE_MAPPING.csv`
 - `CEP-045_EVIDENCE_MANIFEST.csv`
@@ -297,16 +309,16 @@ Evidence IDs must use `CEP-045-EV-001`, `CEP-045-EV-002`, ... and must not be fa
 The Completion Report must distinguish pre-existing failures, package-introduced failures, remaining UTV, blockers and downstream readiness.
 
 ## 30. Final Execution Verdict Format
-At the end of future authorized execution, return exactly one allowed execution outcome:
-- `CLOSED — VERIFIED`
-- `BLOCKED`
-- `FAILED`
-- `CANCELLED`
-- `SUPERSEDED`
+At the end of this CEP execution/verification, report exactly one execution state:
+- `EXECUTION COMPLETE`
+- `EXECUTION PARTIAL`
+- `EXECUTION FAILED`
+
+Registry lifecycle/disposition fields such as `CLOSED_VERIFIED`, `BLOCKED`, `CANCELLED` or `SUPERSEDED` are recorded separately when applicable; they do not replace the execution state.
 
 Required checkpoint fields:
 - CEP ID: `CEP-045`
-- execution verdict
+- execution state
 - Primary IMBs
 - repository baseline (branch + commit SHA)
 - files/components changed
@@ -318,15 +330,15 @@ Required checkpoint fields:
 - blockers/findings
 - remaining UTV
 - downstream readiness
-- final lifecycle status
+- Registry synchronization
+- Git-write status
+- Human Sign-off / Production Certification / Cutover status where applicable
 
 Never report ambiguous states such as “mostly complete”, “almost passed” or “good enough”.
 
 ---
-`PROMPT STATUS: READY FOR AUTHORIZATION`
+`PROMPT STATUS: CANONICAL — VERIFY SHA-256 IN CEP_PROMPT_MANIFEST.yaml`
 
-`CEP AUTHORIZATION STATUS: NOT AUTHORIZED`
+`LIVE CEP STATE / AUTHORIZATION: SEE CEP_EXECUTION_REGISTRY.yaml AND CURRENT GOVERNANCE`
 
-`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`
-
-`HUMAN SIGN-OFF: NOT EXECUTED`
+`HUMAN SIGN-OFF / PRODUCTION CERTIFICATION / PRODUCTION CUTOVER: NEVER INFER`
