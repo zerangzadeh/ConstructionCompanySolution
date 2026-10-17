@@ -47,6 +47,5 @@
         <span data-nav-id="NAV-043" class="erp-nav-link is-unavailable" aria-disabled="true">حاکمیت طرف‌های تجاری</span>
     </div></details>
     <a data-nav-id="NAV-041" class="erp-nav-link{% if current_namespace == 'accounts' and current_url_name == 'settings' %} is-active{% endif %}" href="{% url 'accounts:settings' %}">پروفایل کاربر</a>
-    {% if navigation_is_platform_admin %}<details data-nav-id="NAV-042" class="erp-nav-group"><summary><span>مدیریت پلتفرم</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items"><a class="erp-nav-link" href="{% url 'organizations:platform_role_catalog' %}">کاتالوگ نقش‌ها</a><a class="erp-nav-link" href="{% url 'organizations:protected_operation_catalog' %}">عملیات حفاظت‌شده</a></div></details>{% endif %}
 </nav>
 {% else %}<a class="rounded-lg bg-blue-600 px-4 py-2.5 font-semibold text-white hover:bg-blue-700" href="{% url 'accounts:login' %}">ورود</a>{% endif %}

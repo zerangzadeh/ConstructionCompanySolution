@@ -1,0 +1,8 @@
+evidence_id,kind,source_or_command,result,status
+CEP-014-EV-001,Canonical identity,"Get-FileHash CEP-014 prompt; CEP_PROMPT_MANIFEST.yaml",SHA-256 a9c142eee2cf324b495080ff919eb2d5941b79f0feca78a1dad5260278c0a9e4 matches immutable manifest,PASS
+CEP-014-EV-002,Grounding,"git branch --show-current; rev-parse HEAD/origin/main; status/diff",main and origin/main at ae3be0335a76b0d08fa5ed330770b9b2fe089060; pre-existing Registry reconciliation preserved,RECORDED
+CEP-014-EV-003,Prerequisite and gates,"CEP_EXECUTION_REGISTRY.yaml; consolidated UI/PD/IMB archives",CEP-001 and CEP-017 closed; GATE-01 PASS; GATE-02 exit gate not issued,PASS_WITH_UTV
+CEP-014-EV-004,Focused template tests,"python -m pytest core/test_cep014_administration.py::Cep014AdministrationTemplateTests core/test_cep017_navigation.py -q",5 passed in 0.09s,PASS
+CEP-014-EV-005,Focused route tests,"DB_NAME=cep014_verify_20261017 python -m pytest core/test_cep014_administration.py core/test_cep017_navigation.py apps/organizations/test_p1_1_authorization.py::P11RoleCatalogCloseoutTests::test_platform_navigation_exposes_all_approved_platform_controls -q --reuse-db",8 passed in 11.41s; corrected assertion confirms safe 302 tenant denial for a Platform-only user without active membership,PASS
+CEP-014-EV-006,Checks,"ruff check; ruff format --check; manage.py check; git diff --check",All passed,PASS
+CEP-014-EV-007,Browser/accessibility runtime,"Canonical CEP-014 UTV rule; no browser runtime executed",Platform entry remains desktop-only and responsive separation is template-verified; browser/accessibility runtime remains UTV rather than PASS,UTV

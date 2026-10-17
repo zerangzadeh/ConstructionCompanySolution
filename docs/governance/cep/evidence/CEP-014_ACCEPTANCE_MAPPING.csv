@@ -1,0 +1,7 @@
+acceptance_criterion,status,evidence,notes
+IMB-0010-AC-1,PASS,CEP-014-EV-004;CEP-014-EV-005,Tenant, Platform, and technical administration are explicitly separated in the shell and existing backend guards.
+IMB-0010-AC-2,PASS,CEP-014-EV-004;CEP-014-EV-005,The desktop-only Platform entry links only existing approved Platform controls; Tenant navigation remains company/permission-scoped.
+IMB-0010-AC-3,PASS,CEP-014-EV-004;CEP-014-EV-005,Django Admin is separately labelled technical access and Platform authorization does not expose ordinary Tenant administration.
+IMB-0010-AC-4,PASS,CEP-014-EV-005,Tenant owner received platform-route 403; Platform Admin received platform 200s and tenant-settings 302 denial without an active membership.
+IMB-0010-AC-5,PASS,CEP-014-EV-005,The direct tenant-settings denial redirects without protected tenant content; existing platform routes retain explicit forbidden states.
+IMB-0010-AC-6,PASS,CEP-014-EV-004;CEP-014-EV-006,Persian labels and the existing RTL desktop/mobile shell remain template-verified; this surface has no user-facing date.

@@ -14,7 +14,7 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
             / "components"
             / "navigation_links.html"
         ).read_text(encoding="utf-8")
-        expected_ids = {f"NAV-{number:03d}" for number in range(1, 44)}
+        expected_ids = {f"NAV-{number:03d}" for number in range(1, 44) if number != 42}
         rendered_ids = {
             token.split('"')[1]
             for token in navigation.split()
@@ -24,6 +24,11 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
         self.assertIn('data-canonical-navigation="43"', navigation)
         self.assertIn("صورت‌وضعیت و صورتحساب", navigation)
         self.assertIn("حاکمیت طرف‌های تجاری", navigation)
+        base = (Path(settings.BASE_DIR) / "templates" / "base.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('data-nav-id="NAV-042"', base)
+        self.assertIn("مدیریت پلتفرم", base)
 
     def test_unimplemented_targets_are_not_links_or_new_actions(self) -> None:
         navigation = (
