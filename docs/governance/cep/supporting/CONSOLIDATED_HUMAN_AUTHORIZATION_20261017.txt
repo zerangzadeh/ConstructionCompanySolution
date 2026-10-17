@@ -1,0 +1,385 @@
+BONIRA — CONSOLIDATED HUMAN AUTHORIZATION AND PIPELINE RESUME
+
+I am the Human Decision Authority / Product Owner for BONIRA.
+
+I reviewed and approve the recommendations in the current
+BONIRA CONSOLIDATED HUMAN DECISION PACKET as follows.
+
+==================================================
+1. DECISION-01 — CEP-015 CONFIGURATION PROFILES
+==================================================
+
+APPROVED: Option A.
+
+Approve the following as versioned PRODUCT SUGGESTIONS only:
+
+project_controls.budget_overrun.response
+Small      = WARNING
+Standard   = WARNING
+Enterprise = WARNING
+
+project_controls.budget_overrun.override_enabled
+Small      = false
+Standard   = false
+Enterprise = false
+
+leave.accrual_preset
+Small      = POLICY_DEFINED
+Standard   = POLICY_DEFINED
+Enterprise = POLICY_DEFINED
+
+Rules:
+
+- profile values are suggestions, not automatic policy;
+- every key requires explicit authorized application;
+- record matrix version, old/new value, actor, effective time and governed reason;
+- POLICY_DEFINED may be applied only when an approved Leave Policy version exists;
+- otherwise fail closed;
+- a profile must not grant permissions, workflow authority, entitlement,
+  or budget authority.
+
+This approval does not claim these values were previously frozen Product Decisions.
+
+==================================================
+2. DECISION-02 — CEP-020 BUDGET CONTROL
+==================================================
+
+APPROVED: Option A.
+
+Approve:
+
+- budget overrun means a positive amount above the governing approved Budget
+  at the same project/CBS scope and currency;
+- source-matched actual and open-commitment effects must be counted exactly once;
+- initial tolerance = ZERO;
+- no percentage tolerance, warning band or monetary allowance is inferred;
+- default response = WARNING;
+- override_enabled = false by default;
+- enabled override requires explicit permission, reason and immutable audit evidence;
+- HARD_STOP remains an available tenant-configured response where explicitly approved.
+
+The enrolled-event set initially remains EMPTY.
+
+A source event may be enrolled only when an approved active producer/control
+contract exists for that event.
+
+Forecast approval must never modify Budget authority.
+
+==================================================
+3. DECISION-03 — CEP-021 DURABLE TREASURY LINEAGE
+==================================================
+
+ACKNOWLEDGED AS ALREADY DETERMINED.
+
+No new business-policy decision is introduced.
+
+Implement only the already approved:
+
+Direct Expense / reimbursement
+→ controlled Treasury settlement
+
+boundary with durable tenant/source/version lineage and no-double-count controls.
+
+==================================================
+4. DECISION-04 — CEP-022 WORKFORCE PERSISTENCE
+==================================================
+
+ACKNOWLEDGED AS ALREADY DETERMINED.
+
+No new HR domain semantics are introduced.
+
+Persist only the already approved WorkRelationship,
+employment/offboarding/document/roster semantics and effective history.
+
+Employment end and clearance completion remain separate.
+
+==================================================
+5. DECISION-05 — CEP-025 PAYROLL CUMULATIVE / YTD
+==================================================
+
+APPROVED.
+
+For operational BONIRA YTD:
+
+Accumulate finalized PayrollResultLine values in separate signed buckets for:
+
+- EARNING
+- ALLOWANCE
+- DEDUCTION
+- REIMBURSEMENT
+- EMPLOYER
+
+INFORMATIONAL remains non-monetary evidence.
+
+This operational classification MUST NOT be interpreted as statutory:
+
+- taxable classification;
+- insurable classification;
+- exemption;
+- statutory cap;
+- cross-employment treatment.
+
+Statutory behavior remains controlled only by an approved effective-dated
+official statutory source package and must fail closed when unavailable.
+
+Operational reset boundary:
+
+Use an explicitly approved, versioned tenant Payroll-year interval with
+explicit start and end dates.
+
+Do NOT assume:
+
+- 1 January;
+- 1 Farvardin;
+- accounting fiscal-year boundary.
+
+This approval establishes an operational product policy only and does NOT
+constitute Iranian statutory certification.
+
+==================================================
+6. DECISION-06 — CEP-027 SAFETY / QUALITY LIFECYCLE
+==================================================
+
+APPROVED.
+
+Map the approved journeys to the existing:
+
+SafetyIncident
+QualityIssue
+
+authorities.
+
+Add a separate RECORD REVIEW lifecycle:
+
+DRAFT
+→ SUBMITTED
+→ APPROVED / REJECTED / RETURNED
+
+A RETURNED record must be corrected through linked versioning and resubmission.
+
+Existing Safety/Quality remediation lifecycle remains separate.
+
+Domain closure may occur only after:
+
+- record approval; and
+- existing domain closure conditions are satisfied.
+
+Every review transition must preserve:
+
+- authorized actor/object scope;
+- state lock;
+- timestamp;
+- previous/new decision;
+- required reason;
+- append-only history.
+
+Evidence must reference the exact tenant-scoped DMS document version.
+
+Existing records must receive an explicit LEGACY / UNASSESSED review state.
+
+Do NOT infer historical approval.
+
+This does NOT authorize:
+
+- new HSE risk scales;
+- new QA taxonomy;
+- new checklists;
+- new KPIs;
+- new regulatory rules.
+
+==================================================
+7. CONSOLIDATED MIGRATION AUTHORITY
+==================================================
+
+APPROVED.
+
+I authorize bounded NON-PRODUCTION Django schema migrations and necessary
+reversible data-migration preparation, tests and development rehearsal for:
+
+CEP-020
+CEP-021
+CEP-022
+CEP-025
+CEP-027
+CEP-028
+
+ONLY.
+
+For CEP-020/021/022/025/027 this is an explicit bounded exception to each
+canonical prompt's Migration Impact = NONE solely to persist the business
+semantics approved here or already established by frozen BONIRA authority.
+
+CEP-028 retains its canonical MULTIPLE migration impact.
+
+Requirements:
+
+- expand-first migrations;
+- preserve legacy/finalized history;
+- enforce tenant and source identity;
+- use appropriate constraints and uniqueness;
+- review migration plans;
+- focused migration tests;
+- rollback/reapply evidence where applicable;
+- reconciliation evidence;
+- retry/idempotency evidence;
+- regression testing.
+
+This authority DOES NOT:
+
+- modify CEP Scope;
+- modify Acceptance Criteria;
+- modify Definition of Done;
+- modify Product Decisions;
+- modify dependency graph;
+- authorize unrelated schema redesign;
+- authorize destructive production migration;
+- authorize production data mutation;
+- authorize Production Cutover;
+- authorize Deployment;
+- authorize dual authority;
+- authorize Human Sign-off;
+- authorize Production Certification.
+
+==================================================
+8. CEP-028 — DECISION REMAINS PARTIALLY PENDING
+==================================================
+
+DO NOT perform CEP-028 authoritative data backfill yet.
+
+The following tenant-specific facts remain Human-required:
+
+- pilot tenant identity;
+- exclusive cutoff;
+- authoritative source/opening dataset;
+- opening-balance versus replay coverage;
+- accountable reviewers.
+
+Until those facts are separately supplied:
+
+- retain CEP-028 as PARTIAL where appropriate;
+- read-only inventory and preparation may remain;
+- unsupported source rows remain unresolved exceptions;
+- create NO Treasury fact;
+- create NO GL fact;
+- perform NO speculative source-reference backfill.
+
+The current development inventory must not be treated as an approved production
+or migration dataset.
+
+==================================================
+9. EXECUTION EFFECT
+==================================================
+
+Use these approvals to resolve the applicable Human-decision blockers for:
+
+CEP-015
+CEP-020
+CEP-021
+CEP-022
+CEP-025
+CEP-027
+
+and the migration-authority portion of CEP-028.
+
+Do NOT overwrite historical blocker evidence.
+Record resolution as a new authoritative Human decision.
+
+Update the Registry accordingly.
+
+Recalculate:
+
+- blockers;
+- applicable objective gates;
+- dependency-ready frontier.
+
+Then resume the current-governed autonomous CEP pipeline under the standing
+non-production execution authority.
+
+Resume previously blocked CEPs when they become eligible.
+
+For each CEP:
+
+canonical prompt verification
+→ implementation
+→ migrations where authorized
+→ focused tests
+→ required regression
+→ evidence
+→ AC / scoped DoD
+→ Completion Report
+→ Registry synchronization
+→ objective Gate evaluation
+→ frontier recalculation
+→ next eligible CEP
+
+Continue SERIALly across CEP boundaries.
+
+Do NOT stop merely because one CEP completes.
+
+CEP-028 must NOT execute its dataset-dependent backfill until its separate
+tenant/cutoff/dataset/reviewer authorization exists.
+
+Stop only for:
+
+- a new material Human decision;
+- unresolved blocker;
+- failed/partial CEP with no safe independent work;
+- canonical/governance conflict;
+- unsafe repository state;
+- or a concrete operational boundary.
+
+Do NOT run:
+
+git add
+git commit
+git push
+git merge
+
+==================================================
+FINAL RESPONSE
+==================================================
+
+CONSOLIDATED HUMAN AUTHORIZATION EXECUTION
+
+Repository baseline:
+<branch + SHA>
+
+Human decisions recorded:
+<list>
+
+Blockers resolved:
+<CEP IDs>
+
+Blockers remaining:
+<list>
+
+Migration authority:
+RECORDED / BLOCKED
+
+CEPs executed/resumed:
+<CEP ID + status>
+
+Objective Gates changed:
+<list / NONE>
+
+Current dependency-ready frontier:
+<list / NONE>
+
+Next eligible CEP:
+<CEP-ID / NONE>
+
+CEP-028:
+PARTIAL / COMPLETE / BLOCKED
+Dataset-dependent backfill executed:
+NO
+
+Remaining Human decisions:
+<exact list / NONE>
+
+Registry:
+UPDATED / BLOCKED
+
+git add/commit/push/merge:
+NOT EXECUTED
+
+STOP

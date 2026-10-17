@@ -45,6 +45,7 @@ from apps.projects.models import (
     ProjectPhase,
     WBSNode,
 )
+from apps.workforce.models import Employee
 
 
 def _has_expense_permission(
@@ -214,6 +215,8 @@ def _same_expense_draft_request(
     notes: str,
     recurrence_template: RecurringExpenseTemplate | None,
     recurrence_occurrence_on: date | None,
+    reimbursement_employee: Employee | None,
+    replaces: Expense | None,
 ) -> bool:
     """Require an idempotency retry to reproduce the complete immutable payload."""
 
@@ -234,6 +237,8 @@ def _same_expense_draft_request(
         and expense.notes == notes.strip()
         and expense.recurrence_template_id == getattr(recurrence_template, "pk", None)
         and expense.recurrence_occurrence_on == recurrence_occurrence_on
+        and expense.reimbursement_employee_id == getattr(reimbursement_employee, "pk", None)
+        and expense.replaces_id == getattr(replaces, "pk", None)
     )
 
 
@@ -258,6 +263,8 @@ def create_expense_draft(
     notes: str = "",
     recurrence_template: RecurringExpenseTemplate | None = None,
     recurrence_occurrence_on: date | None = None,
+    reimbursement_employee: Employee | None = None,
+    replaces: Expense | None = None,
 ) -> Expense:
     """Create a reviewable draft; no payable, posting, cash, or cost fact is made."""
 
@@ -283,6 +290,24 @@ def create_expense_draft(
     primary_group = PlatformExpenseGroup.objects.get(code=category)
     if classification not in ExpenseClassification.values:
         raise ValueError("Invalid direct/indirect classification.")
+    if reimbursement_employee and (
+        reimbursement_employee.organization_id != organization.pk
+        or classification != ExpenseClassification.DIRECT
+    ):
+        raise PermissionDenied("Reimbursement beneficiary must belong to this tenant and a direct expense.")
+    if replaces is not None:
+        replaces = Expense.objects.select_for_update().filter(
+            pk=replaces.pk, organization=organization,
+        ).first()
+        if replaces is None:
+            raise ValueError("Replacement source does not belong to this tenant.")
+    if replaces and (
+        replaces.organization_id != organization.pk
+        or replaces.project_id != project.pk
+        or replaces.status != ExpenseStatus.VOID
+        or replaces.reimbursement_employee_id != getattr(reimbursement_employee, "pk", None)
+    ):
+        raise ValueError("Replacement requires a voided expense in the same context.")
     if party and (party.organization_id != organization.pk or party.archived_at):
         raise PermissionDenied("Business party does not belong to this organization.")
     if expense_category and (
@@ -320,6 +345,8 @@ def create_expense_draft(
         "notes": notes,
         "recurrence_template": recurrence_template,
         "recurrence_occurrence_on": recurrence_occurrence_on,
+        "reimbursement_employee": reimbursement_employee,
+        "replaces": replaces,
     }
     existing = Expense.objects.filter(
         organization=organization, idempotency_key=normalized_key
@@ -360,6 +387,9 @@ def create_expense_draft(
                 notes=notes.strip(),
                 recurrence_template=recurrence_template,
                 recurrence_occurrence_on=recurrence_occurrence_on,
+                reimbursement_employee=reimbursement_employee,
+                replaces=replaces,
+                source_version=replaces.source_version + 1 if replaces else 1,
                 created_by=actor,
                 updated_by=actor,
             )
@@ -838,6 +868,19 @@ def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
         raise ValueError("این هزینه قابل ابطال نیست.")
     if not reason.strip():
         raise ValueError("وارد کردن دلیل ابطال هزینه الزامی است.")
+    if locked_expense.reimbursement_employee_id:
+        from apps.treasury.models import PaymentRequest, PaymentRequestStatus
+
+        if PaymentRequest.objects.filter(
+            source_expense=locked_expense,
+            status__in=(
+                PaymentRequestStatus.DRAFT,
+                PaymentRequestStatus.SUBMITTED,
+                PaymentRequestStatus.APPROVED,
+                PaymentRequestStatus.RELEASED,
+            ),
+        ).exists():
+            raise ValueError("An active or settled reimbursement request prevents voiding.")
 
     locked_expense.status = ExpenseStatus.VOID
     locked_expense.void_reason = reason.strip()

@@ -67,6 +67,7 @@ class PaymentRequestKind(models.TextChoices):
     PAYMENT = "payment", "درخواست پرداخت"
     EMPLOYEE_ADVANCE = "employee_advance", "تنخواه کارمند"
     VENDOR_ADVANCE = "vendor_advance", "پیش‌پرداخت تأمین‌کننده"
+    EMPLOYEE_REIMBURSEMENT = "employee_reimbursement", "بازپرداخت هزینه کارمند"
 
 
 class PaymentRequestStatus(models.TextChoices):
@@ -318,6 +319,10 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
     party = models.ForeignKey(
         "parties.BusinessParty", on_delete=models.PROTECT, null=True, blank=True
     )
+    origin_request = models.OneToOneField(
+        "treasury.PaymentRequest", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="originated_movement",
+    )
     created_by = models.ForeignKey(
         "organizations.OrganizationMembership",
         on_delete=models.PROTECT,
@@ -428,6 +433,7 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
                 "project_id",
                 "site_id",
                 "party_id",
+                "origin_request_id",
                 "created_by_id",
                 "reverses_id",
             )
@@ -444,12 +450,24 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
             project=self.project,
             site=self.site,
             party=self.party,
+            origin_request=self.origin_request,
             created_by=self.created_by,
         )
         if self.site_id and (
             not self.project_id or self.site.project_id != self.project_id
         ):
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
+        if self.origin_request_id and (
+            self.kind != TreasuryMovementKind.DISBURSEMENT
+            or self.origin_request.kind != PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            or self.origin_request.status != PaymentRequestStatus.APPROVED
+            or self.amount != self.origin_request.amount
+            or self.currency != self.origin_request.currency
+            or self.project_id != self.origin_request.project_id
+            or self.site_id != self.origin_request.site_id
+            or self.party_id is not None
+        ):
+            raise ValidationError("The reimbursement movement must match its approved request.")
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
@@ -983,6 +1001,11 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
     employee = models.ForeignKey(
         "workforce.Employee", on_delete=models.PROTECT, null=True, blank=True
     )
+    source_expense = models.OneToOneField(
+        "expenses.Expense", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="treasury_payment_request",
+    )
+    source_expense_version = models.PositiveIntegerField(null=True, blank=True)
     party = models.ForeignKey(
         "parties.BusinessParty", on_delete=models.PROTECT, null=True, blank=True
     )
@@ -1046,6 +1069,8 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                         kind=PaymentRequestKind.EMPLOYEE_ADVANCE,
                         employee__isnull=False,
                         party__isnull=True,
+                        source_expense__isnull=True,
+                        source_expense_version__isnull=True,
                     )
                     | Q(
                         kind__in=[
@@ -1054,6 +1079,15 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                         ],
                         employee__isnull=True,
                         party__isnull=False,
+                        source_expense__isnull=True,
+                        source_expense_version__isnull=True,
+                    )
+                    | Q(
+                        kind=PaymentRequestKind.EMPLOYEE_REIMBURSEMENT,
+                        employee__isnull=False,
+                        party__isnull=True,
+                        source_expense__isnull=False,
+                        source_expense_version__isnull=False,
                     )
                 ),
                 name="treasury_request_beneficiary_consistent",
@@ -1072,6 +1106,8 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                 "idempotency_key",
                 "payload_hash",
                 "employee_id",
+                "source_expense_id",
+                "source_expense_version",
                 "party_id",
                 "project_id",
                 "site_id",
@@ -1091,6 +1127,7 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
         validate_related_organizations(
             self,
             employee=self.employee,
+            source_expense=self.source_expense,
             party=self.party,
             project=self.project,
             site=self.site,
@@ -1100,6 +1137,23 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
             not self.project_id or self.site.project_id != self.project_id
         ):
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
+        if self.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT:
+            source = self.source_expense
+            if (
+                source is None
+                or source.status != "approved"
+                or source.classification != "direct"
+                or source.settlement_status != "unsettled"
+                or source.reimbursement_employee_id != self.employee_id
+                or source.source_version != self.source_expense_version
+                or source.amount != self.amount
+                or source.project_id != self.project_id
+                or self.currency != "IRR"
+                or self.party_id is not None
+            ):
+                raise ValidationError("Reimbursement request must match an approved direct Expense version.")
+        elif self.source_expense_id or self.source_expense_version is not None:
+            raise ValidationError("Only reimbursement requests may link an Expense.")
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 

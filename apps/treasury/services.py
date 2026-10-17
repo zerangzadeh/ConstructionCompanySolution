@@ -415,6 +415,7 @@ def _movement_payload(
     project,
     site,
     party,
+    origin_request: PaymentRequest | None = None,
 ) -> dict[str, object]:
     return {
         "kind": kind,
@@ -426,6 +427,7 @@ def _movement_payload(
         "project": str(project.pk) if project else None,
         "site": str(site.pk) if site else None,
         "party": str(party.pk) if party else None,
+        "origin_request": str(origin_request.pk) if origin_request else None,
     }
 
 
@@ -445,6 +447,7 @@ def create_movement(
     project=None,
     site=None,
     party=None,
+    origin_request: PaymentRequest | None = None,
 ) -> TreasuryMovement:
     # The account rows serialize cash effects. Locking the Organization here
     # would serialize unrelated movements across every account in the tenant.
@@ -467,6 +470,21 @@ def create_movement(
         raise ValidationError("نوع حرکت مستقیم معتبر نیست.")
     if not isinstance(amount, Decimal) or not amount.is_finite() or amount <= 0:
         raise ValidationError("مبلغ حرکت باید Decimal مثبت و متناهی باشد.")
+    if origin_request is not None:
+        origin_request = PaymentRequest.objects.select_for_update().get(pk=origin_request.pk)
+        if (
+            origin_request.organization_id != organization.pk
+            or origin_request.kind != PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            or origin_request.status != PaymentRequestStatus.APPROVED
+            or origin_request.source_expense.status != "approved"
+            or origin_request.source_expense.source_version != origin_request.source_expense_version
+            or kind != TreasuryMovementKind.DISBURSEMENT
+            or amount != origin_request.amount
+            or project != origin_request.project
+            or site != origin_request.site
+            or party is not None
+        ):
+            raise ValidationError("Movement does not match an approved reimbursement request.")
     if kind == TreasuryMovementKind.TRANSFER:
         if (
             not source_account
@@ -508,6 +526,7 @@ def create_movement(
         project=project,
         site=site,
         party=party,
+        origin_request=origin_request,
     )
     digest = _payload_hash(payload)
     normalized_key = idempotency_key.strip()
@@ -529,6 +548,7 @@ def create_movement(
         project=project,
         site=site,
         party=party,
+        origin_request=origin_request,
         created_by=maker,
     )
     try:
@@ -692,6 +712,14 @@ def approve_and_post_movement(
         return movement
     if movement.status != TreasuryMovementStatus.SUBMITTED:
         raise ValidationError("فقط حرکت ارسال‌شده قابل تأیید و ثبت است.")
+    if movement.origin_request_id:
+        source_request = PaymentRequest.objects.select_for_update().get(pk=movement.origin_request_id)
+        if (
+            source_request.status != PaymentRequestStatus.APPROVED
+            or source_request.source_expense.status != "approved"
+            or source_request.source_expense.source_version != source_request.source_expense_version
+        ):
+            raise ValidationError("Reimbursement source changed before cash posting.")
     policy = _approval_policy(
         organization=organization, maker=movement.created_by, approver=approver
     )
@@ -1635,7 +1663,8 @@ def verify_treasury_gl_reconciliation_review(
 
 
 def _request_payload(
-    *, kind: str, amount: Decimal, purpose: str, employee, party, project, site
+    *, kind: str, amount: Decimal, purpose: str, employee, party, project, site,
+    source_expense=None,
 ) -> dict[str, object]:
     return {
         "kind": kind,
@@ -1645,6 +1674,8 @@ def _request_payload(
         "party": str(party.pk) if party else None,
         "project": str(project.pk) if project else None,
         "site": str(site.pk) if site else None,
+        "source_expense": str(source_expense.pk) if source_expense else None,
+        "source_expense_version": source_expense.source_version if source_expense else None,
     }
 
 
@@ -1661,6 +1692,7 @@ def create_payment_request(
     party=None,
     project=None,
     site=None,
+    source_expense=None,
 ) -> PaymentRequest:
     organization = _lock_organization(organization)
     maker = require_business_permission(
@@ -1675,10 +1707,27 @@ def create_payment_request(
         raise ValidationError("نوع درخواست پرداخت معتبر نیست.")
     if not isinstance(amount, Decimal) or not amount.is_finite() or amount <= 0:
         raise ValidationError("مبلغ درخواست باید Decimal مثبت و متناهی باشد.")
-    if kind == PaymentRequestKind.EMPLOYEE_ADVANCE:
-        if employee is None or party is not None:
+    if kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT:
+        if source_expense is not None:
+            from apps.expenses.models import Expense
+
+            source_expense = Expense.objects.select_for_update().get(pk=source_expense.pk)
+        if (
+            source_expense is None
+            or source_expense.organization_id != organization.pk
+            or source_expense.status != "approved"
+            or source_expense.classification != "direct"
+            or source_expense.settlement_status != "unsettled"
+            or source_expense.reimbursement_employee_id != getattr(employee, "pk", None)
+            or source_expense.amount != amount
+            or source_expense.project_id != getattr(project, "pk", None)
+            or party is not None
+        ):
+            raise ValidationError("A reimbursement needs one approved direct Expense and employee.")
+    elif kind == PaymentRequestKind.EMPLOYEE_ADVANCE:
+        if employee is None or party is not None or source_expense is not None:
             raise ValidationError("تنخواه کارمند به دقیقاً یک کارمند نیاز دارد.")
-    elif employee is not None or party is None:
+    elif employee is not None or party is None or source_expense is not None:
         raise ValidationError(
             "درخواست پرداخت/پیش‌پرداخت به دقیقاً یک طرف تجاری نیاز دارد."
         )
@@ -1690,6 +1739,7 @@ def create_payment_request(
         party=party,
         project=project,
         site=site,
+        source_expense=source_expense,
     )
     digest = _payload_hash(payload)
     normalized_key = idempotency_key.strip()
@@ -1708,6 +1758,8 @@ def create_payment_request(
         idempotency_key=normalized_key,
         payload_hash=digest,
         employee=employee,
+        source_expense=source_expense,
+        source_expense_version=source_expense.source_version if source_expense else None,
         party=party,
         project=project,
         site=site,
@@ -1882,6 +1934,11 @@ def cancel_payment_request(
         raise ValidationError("درخواست در این وضعیت قابل لغو نیست.")
     if request.created_by_id != actor_membership.pk:
         raise PermissionDenied("فقط سازنده می‌تواند درخواست را لغو کند.")
+    if (
+        request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+        and TreasuryMovement.objects.filter(origin_request=request).exists()
+    ):
+        raise ValidationError("A reimbursement with a cash movement cannot be cancelled.")
     previous = request.status
     PaymentRequest.objects.filter(pk=request.pk).update(
         status=PaymentRequestStatus.CANCELLED, updated_at=timezone.now()
@@ -1943,6 +2000,16 @@ def release_payment_request(
         or movement.amount != request.amount
         or movement.currency != request.currency
         or movement.party_id != request.party_id
+        or (
+            request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            and (
+                movement.origin_request_id != request.pk
+                or request.source_expense.status != "approved"
+                or request.source_expense.source_version != request.source_expense_version
+                or movement.project_id != request.project_id
+                or movement.site_id != request.site_id
+            )
+        )
     ):
         raise ValidationError("حرکت پرداخت قطعی با درخواست هم‌خوان نیست.")
     PaymentRequest.objects.filter(pk=request.pk).update(

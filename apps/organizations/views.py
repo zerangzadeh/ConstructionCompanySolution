@@ -38,6 +38,12 @@ from apps.organizations.authorization import (
     membership_has_role,
     membership_is_tenant_owner,
 )
+from apps.organizations.configuration_profiles import (
+    MATRIX_VERSION,
+    PROFILE_NAMES,
+    apply_profile_suggestion,
+    preview_configuration_profile,
+)
 from apps.organizations.context import set_effective_context
 from apps.organizations.decorators import (
     active_organization_required,
@@ -520,6 +526,11 @@ def organization_settings(request: HttpRequest) -> HttpResponse:
             "profile_form": profile_form,
             "settings_form": settings_form,
             "can_change_settings": can_change_settings,
+            "can_view_configuration_profiles": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.TENANT_POLICIES_VIEW,
+            ),
         },
     )
 
@@ -1170,6 +1181,49 @@ def tenant_policy_configuration(request: HttpRequest) -> HttpResponse:
             "selections": selections,
             "ready_versions": ready_versions,
             "upcoming_versions": upcoming_versions,
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.TENANT_POLICIES_VIEW)
+@require_http_methods(["GET", "POST"])
+def configuration_profiles(request: HttpRequest) -> HttpResponse:
+    """Preview product suggestions and explicitly apply one governed key."""
+
+    if request.method == "POST":
+        try:
+            apply_profile_suggestion(
+                organization=request.organization,
+                actor=request.user,
+                profile=request.POST.get("profile", ""),
+                key=request.POST.get("key", ""),
+                reason=request.POST.get("reason", ""),
+            )
+            messages.success(request, "کلید پیکربندی به صورت صریح اعمال شد.")
+        except (PermissionDenied, ValidationError) as exc:
+            messages.error(request, str(exc))
+        return redirect("organizations:configuration_profiles")
+
+    profile = request.GET.get("profile", "")
+    try:
+        suggestions = preview_configuration_profile(profile) if profile else ()
+    except ValidationError:
+        suggestions = ()
+        messages.error(request, "پروفایل پیکربندی معتبر نیست.")
+    return render(
+        request,
+        "organizations/configuration_profiles.html",
+        {
+            "profile_names": PROFILE_NAMES,
+            "selected_profile": profile if profile in PROFILE_NAMES else "",
+            "suggestions": suggestions,
+            "matrix_version": MATRIX_VERSION,
+            "can_apply": has_business_permission(
+                user=request.user,
+                organization=request.organization,
+                permission=BusinessPermissionCode.TENANT_POLICIES_APPLY,
+            ),
         },
     )
 

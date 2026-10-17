@@ -26,6 +26,11 @@ urlpatterns = [
         name="tenant_policy_configuration",
     ),
     path(
+        "configuration-profiles/",
+        views.configuration_profiles,
+        name="configuration_profiles",
+    ),
+    path(
         "members/<uuid:membership_id>/profile-image/",
         views.member_profile_image,
         name="member_profile_image",

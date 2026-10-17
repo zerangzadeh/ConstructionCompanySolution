@@ -254,6 +254,15 @@ class Expense(UUIDModel, TimeStampedModel):
         choices=ExpenseClassification.choices,
         default=ExpenseClassification.DIRECT,
     )
+    source_version = models.PositiveIntegerField(default=1)
+    replaces = models.OneToOneField(
+        "self", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="replacement",
+    )
+    reimbursement_employee = models.ForeignKey(
+        "workforce.Employee", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="reimbursable_expenses",
+    )
     source_reference = models.CharField(max_length=160, blank=True)
     source_fingerprint = models.CharField(max_length=64, blank=True)
     idempotency_key = models.CharField(max_length=120, blank=True)
@@ -381,7 +390,6 @@ class Expense(UUIDModel, TimeStampedModel):
             relations["expense_category"] = self.expense_category
         if self.recurrence_template_id:
             relations["recurrence_template"] = self.recurrence_template
-        validate_related_organizations(self, **relations)
         if self.phase_id and self.phase.site.project_id != self.project_id:
             raise ValidationError({"phase": "فاز باید متعلق به پروژه انتخاب‌شده باشد."})
         if self.primary_group_id and self.primary_group.code != self.category:
@@ -390,6 +398,22 @@ class Expense(UUIDModel, TimeStampedModel):
             )
         if self.party_id and self.party.archived_at is not None:
             raise ValidationError({"party": "طرف تجاری باید فعال باشد."})
+        if self.reimbursement_employee_id:
+            relations["reimbursement_employee"] = self.reimbursement_employee
+            if self.classification != ExpenseClassification.DIRECT:
+                raise ValidationError("A reimbursement must be a direct expense.")
+        if self.replaces_id:
+            relations["replaces"] = self.replaces
+            if (
+                self.replaces.project_id != self.project_id
+                or self.replaces.status != ExpenseStatus.VOID
+                or self.replaces.reimbursement_employee_id != self.reimbursement_employee_id
+                or self.source_version != self.replaces.source_version + 1
+            ):
+                raise ValidationError("Replacement must follow a voided source version in the same context.")
+        elif self.source_version != 1:
+            raise ValidationError("An initial expense has source version 1.")
+        validate_related_organizations(self, **relations)
         if self.expense_category_id and (
             self.expense_category.archived_at is not None
             or not self.expense_category.is_active
@@ -429,6 +453,9 @@ class Expense(UUIDModel, TimeStampedModel):
                 "receipt_reference",
                 "notes",
                 "classification",
+                "source_version",
+                "replaces_id",
+                "reimbursement_employee_id",
                 "source_reference",
                 "source_fingerprint",
                 "idempotency_key",

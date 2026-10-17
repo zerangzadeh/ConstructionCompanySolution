@@ -689,7 +689,11 @@ def list_tenant_policy_selections(*, organization: Organization, actor: User):
 
 @transaction.atomic
 def apply_tenant_policy_selection(
-    *, organization: Organization, actor: User, selection: TenantPolicySelection
+    *,
+    organization: Organization,
+    actor: User,
+    selection: TenantPolicySelection,
+    profile_audit: dict[str, Any] | None = None,
 ) -> TenantPolicySelection:
     locked_organization = Organization.objects.select_for_update().get(
         pk=organization.pk
@@ -762,6 +766,16 @@ def apply_tenant_policy_selection(
                 "policy_version": locked.policy_version.version,
             },
             "reason": locked.reason,
+            **(
+                {
+                    "configuration_profile": {
+                        **profile_audit,
+                        "effective_time": now.isoformat(),
+                    }
+                }
+                if profile_audit
+                else {}
+            ),
         },
     )
     return locked

@@ -1,7 +1,7 @@
 acceptance_criterion,status,evidence,notes
-IMB-0017-AC-1,BLOCKED,CEP-015-EV-003,Approved Small/Standard/Enterprise key-value suggestions are unavailable because the canonical matrix is absent.
-IMB-0017-AC-2,BLOCKED,CEP-015-EV-003,No profile apply path was implemented; authoritative persistence was not exercised.
-IMB-0017-AC-3,BLOCKED,CEP-015-EV-003,No policy-absent or invalid-input implementation was created.
-IMB-0017-AC-4,BLOCKED,CEP-015-EV-003,Matrix source/version identity requirements cannot be implemented without the canonical matrix.
-IMB-0017-AC-5,BLOCKED,CEP-015-EV-003,Product implementation stopped before mutation within the bounded scope.
-IMB-0017-AC-6,BLOCKED,CEP-015-EV-003,No label-driven role permission workflow or capability behavior was introduced.
+IMB-0017-AC-1,PASS,CEP-015-EV-005; CEP-015-EV-006; CEP-015-EV-007,Small Standard and Enterprise preview exact approved suggestions and selection is inert.
+IMB-0017-AC-2,PASS,CEP-015-EV-006; CEP-015-EV-007,Each valid Project Controls key applies through the authoritative versioned TenantPolicySelection boundary; Leave remains activation-closed without approved policy version.
+IMB-0017-AC-3,PASS,CEP-015-EV-006; CEP-015-EV-007,Invalid profile key missing version and absent Leave Policy fail closed.
+IMB-0017-AC-4,PASS,CEP-015-EV-006; CEP-015-EV-007,Repeated key application supersedes the prior tenant selection and retains exact prior selection/version identity.
+IMB-0017-AC-5,PASS,CEP-015-EV-006; CEP-015-EV-008; CEP-015-EV-010,Only profile selection preview per-key apply and audit surfaces changed; no schema or migration.
+IMB-0017-AC-6,PASS,CEP-015-EV-006; CEP-015-EV-007,Preview creates no policy selection and profile label grants no role permission workflow or capability.

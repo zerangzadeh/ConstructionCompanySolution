@@ -27,3 +27,9 @@ CEP-015 AC-1 and the package regulatory/configuration requirement say Small/Stan
 Resolution requires an authoritative, versioned `BONIRA_CONFIGURATION_PROFILE_MATRIX` that identifies the allowed keys and exact suggested values for each profile, including any source/version identity required by AC-4. CEP-015 must then be re-grounded and resumed under the standing authority.
 
 Final lifecycle: **BLOCKED BEFORE PRODUCT MUTATION**. No schema, migration, product code, test, production, Human Sign-off, or Git-write action was executed.
+
+## Resumed execution grounding — 2026-10-17
+
+The prior blocked finding is historical. Consolidated Human Decision-01 now approves the three exact key suggestions for each profile, with explicit key application and versioned audit; Decision-02 approves the Project Controls value contract. The recovered `SPEC-001` matrix was read from the approved consolidated archive. The canonical prompt hash remains `f8b50d828578735f4ec4ea60a87252e06d84a20fe6e4a6db388d95a2e78fa031` and matches the manifest. Branch `main`, HEAD and local `origin/main` are `fb6a1feaa78168748741c3c3253e2dea0871cda8`; existing CEP-021/028 work is dirty and preserved. Registry shows no prerequisite and CEP-015 ELIGIBLE; `GATE-03` is activation-only.
+
+Actual touch set: `apps/organizations/policy_specs.py`, a focused configuration-profile service, `apps/organizations/policy_services.py`, `apps/organizations/views.py`, `apps/organizations/urls.py`, a focused profile template, and focused tests; then this manifest, CEP-015 evidence/change/acceptance/report artifacts and Registry. No schema or migration. Existing tenant policy selection is the authoritative per-key versioned application boundary. The Leave key remains fail-closed until an approved Leave Policy version can be verified; no Leave Policy version is present in repository reality.

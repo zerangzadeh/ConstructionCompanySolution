@@ -1,7 +1,7 @@
 from datetime import date
 from decimal import Decimal
 
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import DatabaseError, transaction
 from django.test import TestCase
 from django.urls import reverse
@@ -9,7 +9,11 @@ from django.urls import reverse
 from apps.accounting.models import JournalEntry
 from apps.accounts.models import User
 from apps.estimates.services import add_estimate_item, approve_estimate, create_estimate
-from apps.expenses.models import ExpenseBudgetAssessment, ExpenseStatus
+from apps.expenses.models import (
+    ExpenseBudgetAssessment,
+    ExpenseStatus,
+    PlatformExpenseGroup,
+)
 from apps.expenses.services import (
     add_expense_allocation,
     approve_expense,
@@ -18,7 +22,9 @@ from apps.expenses.services import (
     propose_recurring_expense,
     return_expense,
     submit_expense,
+    void_expense,
 )
+from apps.organizations.access_services import bootstrap_membership_authorization
 from apps.organizations.models import (
     BusinessPermission,
     MembershipRole,
@@ -41,7 +47,9 @@ from apps.projects.services import (
     submit_budget_version,
 )
 from apps.subledgers.models import Obligation
-from apps.treasury.models import TreasuryMovement
+from apps.treasury.models import PaymentRequest, TreasuryMovement
+from apps.treasury.services import create_payment_request
+from apps.workforce.models import Employee
 
 
 class ExpenseControlTests(TestCase):
@@ -51,9 +59,15 @@ class ExpenseControlTests(TestCase):
         self.outsider = User.objects.create_user(username="expense-control-outsider")
         self.organization = Organization.objects.create(name="Expense Control", slug="expense-control")
         OrganizationSettings.objects.create(organization=self.organization, currency="IRR")
+        PlatformExpenseGroup.objects.get_or_create(
+            code="other", defaults={"name": "Other"},
+        )
         for user in (self.maker, self.approver):
-            self.organization.memberships.create(
+            membership = self.organization.memberships.create(
                 user=user, role=MembershipRole.COMPANY_OWNER, status=MembershipStatus.ACTIVE
+            )
+            bootstrap_membership_authorization(
+                membership=membership, actor=user, source="test-fixture",
             )
         self.project = create_project(
             organization=self.organization,
@@ -173,6 +187,82 @@ class ExpenseControlTests(TestCase):
             before,
             (JournalEntry.objects.count(), TreasuryMovement.objects.count(), Obligation.objects.count()),
         )
+
+    def test_reimbursement_source_request_and_replacement_preserve_authority(self) -> None:
+        employee = Employee.objects.create(
+            organization=self.organization,
+            employee_number="EXP-R1",
+            first_name="Test",
+            last_name="Worker",
+        )
+        other = Organization.objects.create(name="Other reimbursement", slug="other-reimbursement")
+        other_employee = Employee.objects.create(
+            organization=other,
+            employee_number="EXP-R1",
+            first_name="Other",
+            last_name="Worker",
+        )
+        with self.assertRaises(PermissionDenied):
+            create_expense_draft(
+                organization=self.organization, project=self.project, actor=self.maker,
+                description="Reimbursement", amount=Decimal("60.00"),
+                incurred_on=date(2026, 10, 1), source_reference="REIMB-INVALID",
+                idempotency_key="reimb-invalid", reimbursement_employee=other_employee,
+            )
+        expense = create_expense_draft(
+            organization=self.organization, project=self.project, actor=self.maker,
+            description="Reimbursement", amount=Decimal("60.00"),
+            incurred_on=date(2026, 10, 1), source_reference="REIMB-1",
+            idempotency_key="reimb-1", reimbursement_employee=employee,
+        )
+        self._allocate(expense)
+        submit_expense(expense=expense, actor=self.maker)
+        approve_expense(expense=expense, actor=self.approver)
+        expense.refresh_from_db()
+        before = (JournalEntry.objects.count(), TreasuryMovement.objects.count(), Obligation.objects.count())
+        request = create_payment_request(
+            organization=self.organization, actor=self.maker,
+            kind="employee_reimbursement", amount=expense.amount,
+            purpose="Reviewed employee reimbursement", idempotency_key="reimb-request-1",
+            employee=employee, project=self.project, source_expense=expense,
+        )
+        self.assertEqual(request.source_expense_version, 1)
+        self.assertEqual(request.source_expense_id, expense.pk)
+        self.assertEqual(PaymentRequest.objects.filter(source_expense=expense).count(), 1)
+        self.assertEqual(before, (JournalEntry.objects.count(), TreasuryMovement.objects.count(), Obligation.objects.count()))
+        with self.assertRaises(ValidationError):
+            create_payment_request(
+                organization=self.organization, actor=self.maker,
+                kind="employee_reimbursement", amount=expense.amount,
+                purpose="Duplicate", idempotency_key="reimb-request-2",
+                employee=employee, project=self.project, source_expense=expense,
+            )
+        with self.assertRaises(ValueError):
+            void_expense(expense=expense, actor=self.approver, reason="Correction")
+
+    def test_voided_reimbursement_replacement_keeps_source_version(self) -> None:
+        employee = Employee.objects.create(
+            organization=self.organization, employee_number="EXP-R2",
+            first_name="Test", last_name="Worker",
+        )
+        original = create_expense_draft(
+            organization=self.organization, project=self.project, actor=self.maker,
+            description="Employee expense", amount=Decimal("60.00"),
+            incurred_on=date(2026, 10, 1), source_reference="REIMB-2",
+            idempotency_key="reimb-2", reimbursement_employee=employee,
+        )
+        void_expense(expense=original, actor=self.approver, reason="Source correction")
+        replacement = create_expense_draft(
+            organization=self.organization, project=self.project, actor=self.maker,
+            description="Employee expense corrected", amount=Decimal("60.00"),
+            incurred_on=date(2026, 10, 1), source_reference="REIMB-2",
+            idempotency_key="reimb-2-v2", reimbursement_employee=employee,
+            replaces=original,
+        )
+        self.assertEqual(replacement.replaces_id, original.pk)
+        self.assertEqual(replacement.source_version, 2)
+        original.refresh_from_db()
+        self.assertEqual(original.status, ExpenseStatus.VOID)
 
     def test_return_and_resubmit_preserve_evidence_and_append_assessment(self) -> None:
         expense = self._draft()

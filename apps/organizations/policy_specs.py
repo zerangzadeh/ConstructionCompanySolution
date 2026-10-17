@@ -24,6 +24,8 @@ PAYROLL_TAX_REGULATORY_POLICY_CODE = "payroll-tax-regulatory"
 EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE = "employee-insurance-regulatory"
 PAYROLL_TAX_OUTPUT_SCHEMA_POLICY_CODE = "payroll-tax-output-schema"
 EMPLOYEE_INSURANCE_OUTPUT_SCHEMA_POLICY_CODE = "employee-insurance-output-schema"
+PROJECT_BUDGET_RESPONSE_POLICY_CODE = "project-controls-budget-overrun-response"
+PROJECT_BUDGET_OVERRIDE_POLICY_CODE = "project-controls-budget-overrun-override-enabled"
 
 
 @dataclass(frozen=True)
@@ -51,6 +53,26 @@ class PlatformPolicySpec:
 # technical/business values, not a claim of statutory or regulatory authority.
 # A future change remains a new, effective-dated, historically pinned version.
 PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
+    PROJECT_BUDGET_RESPONSE_POLICY_CODE: PlatformPolicySpec(
+        code=PROJECT_BUDGET_RESPONSE_POLICY_CODE,
+        name="پاسخ به عبور از بودجه پروژه",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("project_controls.budget_overrun.evaluate",),
+        fields=(PolicyFieldSpec("response", str, ("WARNING", "HARD_STOP")),),
+        value_schema_approved=True,
+    ),
+    PROJECT_BUDGET_OVERRIDE_POLICY_CODE: PlatformPolicySpec(
+        code=PROJECT_BUDGET_OVERRIDE_POLICY_CODE,
+        name="امکان مجوز عبور از کنترل بودجه",
+        category="other",
+        sensitivity="operational",
+        tenant_selectable=True,
+        permitted_consumers=("project_controls.budget_overrun.evaluate",),
+        fields=(PolicyFieldSpec("override_enabled", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
     ACCOUNTING_MONEY_PRECISION_POLICY_CODE: PlatformPolicySpec(
         code=ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
         name="دقت پول حسابداری",

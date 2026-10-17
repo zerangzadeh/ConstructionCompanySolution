@@ -62,11 +62,11 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 25
+  execution_state_complete: 27
   authorized_not_started: 0
-  eligible_under_standing_authority: 2
-  in_progress: 0
-  blocked_current: 5
+  eligible_under_standing_authority: 4
+  in_progress: 1
+  blocked_current: 0
   not_started_other_current_governed: 47
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
@@ -115,6 +115,20 @@ authorization_batches:
     - CEP-026
     pending: []
     status: COMPLETE
+human_decisions:
+  BONIRA-CONSOLIDATED-20261017:
+    source: docs/governance/cep/supporting/CONSOLIDATED_HUMAN_AUTHORIZATION_20261017.txt
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED
+    profile_suggestions: CEP-015_DECISION-01_OPTION-A
+    budget_control: CEP-020_DECISION-02_OPTION-A
+    expense_treasury_lineage: CEP-021_ALREADY_DETERMINED
+    workforce_persistence: CEP-022_ALREADY_DETERMINED
+    operational_payroll_ytd: CEP-025_DECISION-05
+    safety_quality_review: CEP-027_DECISION-06
+    migration_authority: NON_PRODUCTION_ONLY_CEP-020_021_022_025_027_028
+    cep_028_dataset_backfill: PENDING_TENANT_CUTOFF_DATASET_REVIEWERS
+    production_authorized: false
 registry_update_rules:
   on_start:
   - Read registry before product mutation
@@ -631,25 +645,25 @@ ceps:
     title: Guided configuration-profile governance
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: BLOCKED
-      lifecycle: BLOCKED_BEFORE_PRODUCT_MUTATION
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 0
+      passed: 6
       total: 6
-      status: BLOCKED
-    dod: BLOCKED
-    blockers:
-    - CEP-015-FINDING-001 / BLOCKER-SPEC / SPEC-001 key definitions recovered; Small/Standard/Enterprise suggested values and governed application/version semantics remain unapproved
+      status: PASS
+    dod: PASS
+    blockers: []
     remaining_utv:
-    - unit_model_service_workflow_ui_template_and_regression_validation
     - browser_accessibility_runtime
+    - profile_specific_activation_gate03
+    - approved_leave_policy_version_for_policy_defined_application
     completion_report:
       path: docs/governance/cep/reports/CEP-015_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
@@ -661,7 +675,7 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
+      sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
     updated_at: '2026-10-17'
     history:
     - date: '2026-10-17'
@@ -670,6 +684,15 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKED
       reason: SPEC-001 matrix recovered from approved consolidated specification archive; all profile suggestion values remain explicitly UNSPECIFIED. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority approved versioned WARNING/false/POLICY_DEFINED suggestions and explicit per-key application in BONIRA-CONSOLIDATED-20261017; prior blocker evidence retained.
+    - date: '2026-10-17'
+      status: RESUMED
+      reason: Standing non-production authority, canonical prompt hash, recovered SPEC-001 matrix, no prerequisites, activation-only GATE-03 and repository safety verified at main fb6a1fe; no migration authority needed.
+    - date: '2026-10-17'
+      status: COMPLETE
+      reason: Inert versioned profile preview and explicit per-key Project Controls policy application with tenant audit implemented; Leave application fails closed pending approved Leave Policy version. 6/6 AC and scoped build DoD PASS; 4 focused and 15 affected regression tests PASS; check, drift and lint PASS. One unrelated unchanged middleware/session baseline test failure recorded. No migration, production or Git write. See CEP-015 Completion Report.
   CEP-016:
     title: Context UX and scoped form filtering
     phase: V1_IMPLEMENTATION
@@ -866,22 +889,21 @@ ceps:
     title: Forecast and budget-control governance
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: BLOCKED
-      lifecycle: BLOCKED_BEFORE_PRODUCT_MUTATION
+      status: NOT_STARTED
+      lifecycle: BLOCKER_RESOLVED
       advisor_review: PENDING
     acceptance:
-      passed: 0
+      passed: null
       total: 12
-      status: BLOCKED
-    dod: BLOCKED
-    blockers:
-    - CEP-020-FINDING-001 / BLOCKER-SPEC-MIGRATION / PD-020 and SPEC-001/004 recovered; approved threshold/event enrollment and forecast approval persistence migration remain unavailable under Migration Impact NONE
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
     remaining_utv:
     - unit_model_service_workflow_and_regression_validation
     - performance_concurrency_runtime
@@ -905,28 +927,30 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKED
       reason: Frozen PD-020/024, accepted DTR-PD-009/010 and SPEC-001/004 recovered. Matrix has no approved threshold/event enrollment; existing ProjectCostForecast has no approval state and prompt migration impact is NONE. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority approved zero-tolerance positive-overrun rule, WARNING default, empty initial event set, guarded override and bounded non-production persistence migration in BONIRA-CONSOLIDATED-20261017.
   CEP-021:
     title: Direct expense and reimbursement settlement boundary
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: BLOCKED
-      lifecycle: BLOCKED_BEFORE_PRODUCT_MUTATION
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 0
+      passed: 6
       total: 6
-      status: BLOCKED
-    dod: BLOCKED
-    blockers:
-    - CEP-021-FINDING-001 / BLOCKER-REPOSITORY-MIGRATION / required reimbursement beneficiary and expense-to-Treasury source identity-version linkage absent while Migration Impact is NONE
+      status: PASS
+    dod: PASS
+    blockers: []
     remaining_utv:
-    - unit_model_service_transaction_and_regression_validation
+    - development_deployment_and_migration
     - performance_concurrency_runtime
     completion_report:
       path: docs/governance/cep/reports/CEP-021_COMPLETION_REPORT.md
@@ -939,7 +963,7 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
+      sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
     updated_at: '2026-10-17'
     history:
     - date: '2026-10-17'
@@ -948,26 +972,34 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKED
       reason: Frozen PD-014/030 and SPEC-002 confirm the boundary; no existing persistence provides reimbursement beneficiary and correction-safe Expense-to-PaymentRequest lineage. Bounded migration authority outside canonical NONE is required. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority acknowledged approved Expense-to-Treasury semantics and granted bounded non-production lineage migration authority in BONIRA-CONSOLIDATED-20261017.
+    - date: '2026-10-17'
+      status: RESUMED
+      reason: Standing non-production authority, canonical prompt hash, GATE-01/GATE-02, repository safety and consolidated bounded migration authority verified at main fb6a1fe; implementation limited to approved Expense/reimbursement-to-Treasury source/version lineage.
+    - date: '2026-10-17'
+      status: COMPLETE
+      reason: Bounded Expense/Treasury lineage migration and services implemented; 6/6 AC and DoD PASS; 25 focused PostgreSQL tests including migration rollback/reapply and row conservation plus check drift and lint PASS. Development and production migration not executed; no Git write. See CEP-021 Completion Report.
   CEP-022:
     title: Employment lifecycle and roster foundation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: BLOCKED
-      lifecycle: BLOCKED_BEFORE_PRODUCT_MUTATION
+      status: NOT_STARTED
+      lifecycle: BLOCKER_RESOLVED
       advisor_review: PENDING
     acceptance:
-      passed: 0
+      passed: null
       total: 18
-      status: BLOCKED
-    dod: BLOCKED
-    blockers:
-    - CEP-022-FINDING-001 / BLOCKER-REPOSITORY-MIGRATION / PD-025/029 and SPEC-009/010/017/033 recovered; offboarding and roster persistence require migration outside canonical NONE
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
     remaining_utv:
     - unit_model_service_workflow_ui_template_and_regression_validation
     - browser_accessibility_runtime
@@ -992,6 +1024,9 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKED
       reason: Frozen workforce decisions and SPEC-009/010/017/033 recovered from consolidated sources; required offboarding and roster persistence is absent while prompt migration impact is NONE. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority reaffirmed existing workforce contract and granted bounded non-production persistence migration authority in BONIRA-CONSOLIDATED-20261017.
   CEP-023:
     title: null
     phase: V1_IMPLEMENTATION
@@ -1079,22 +1114,21 @@ ceps:
     title: Payroll cumulative/YTD authority
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: BLOCKED
-      lifecycle: BLOCKED_BEFORE_PRODUCT_MUTATION
+      status: NOT_STARTED
+      lifecycle: BLOCKER_RESOLVED
       advisor_review: PENDING
     acceptance:
-      passed: 0
+      passed: null
       total: 6
-      status: BLOCKED
-    dod: BLOCKED
-    blockers:
-    - CEP-025-FINDING-001 / BLOCKER-SPEC-MIGRATION / PDM-012 and SPEC-013 recovered; classification/reset values remain unspecified and cumulative persistence requires migration outside canonical NONE
+      status: UNRECORDED
+    dod: UNRECORDED
+    blockers: []
     remaining_utv:
     - unit_model_service_transaction_and_regression_validation
     - performance_concurrency_runtime
@@ -1118,6 +1152,9 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKED
       reason: Frozen PD-028/031, PDM-012 and SPEC-013 recovered; approved component classifications/reset policy and authorized cumulative-state migration are still absent. Statutory currentness remains UTV. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority approved operational signed component-kind buckets, explicit versioned tenant Payroll-year intervals and bounded non-production persistence migration in BONIRA-CONSOLIDATED-20261017; statutory currentness remains UTV.
   CEP-026:
     title: ESS own-data privacy boundary
     phase: V1_IMPLEMENTATION
@@ -1200,7 +1237,7 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
+      sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
     updated_at: '2026-10-17'
     history:
     - date: '2026-10-17'
@@ -1209,25 +1246,32 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKER_RESOLVED
       reason: Frozen PD-022 and SPEC-026 recovered; accepted P9-S06-S11 evidence maps typed HSE/QA journeys to apps/compliance. Prompt paths are nonexclusive surface hints. No product execution occurred; see BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: BLOCKED
+      reason: CEP-027-FINDING-002; deeper SPEC-026-to-repository mapping found separate Safety/Quality record submit/approve/reject/return/evidence journeys absent. PD-022 forbids invented lifecycles and canonical Migration Impact is NONE. No product mutation; see updated Execution Manifest and Completion Report.
+    - date: '2026-10-17'
+      status: BLOCKER_RESOLVED
+      reason: Human Decision Authority approved existing SafetyIncident/QualityIssue mapping, separate review lifecycle, exact DMS-version evidence and bounded non-production migration in BONIRA-CONSOLIDATED-20261017; prior blocker history retained.
   CEP-028:
     title: Legacy Payment migration preparation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: BLOCKED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: BLOCKER_RESOLVED
+      status: PARTIAL
+      lifecycle: EXECUTION_PARTIAL
       advisor_review: PENDING
     acceptance:
-      passed: null
+      passed: 0
       total: 7
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
+      status: PARTIAL
+    dod: PARTIAL
+    blockers:
+    - CEP-028-FINDING-002 / BLOCKER-DATA / No approved Tenant cutoff, opening-versus-replay dataset or exact source-to-target evidence; development inventory has 80 legacy Payments and zero Treasury movements; migration/backfill and GATE-06 remain incomplete
     remaining_utv:
     - migration_reconciliation_retry_and_regression_validation
     - performance_concurrency_runtime
@@ -1242,7 +1286,7 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
+      sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
     updated_at: '2026-10-17'
     history:
     - date: '2026-10-17'
@@ -1251,6 +1295,12 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKER_RESOLVED
       reason: PD-001 and accepted D3-06/07/12 recover INT-R01 source/target and per-row mapping/exception contract; repository has legacy and Treasury schemas. Canonical prompt names GATE-06 as EXIT, which remains unpassed; preparation only is eligible. See BLOCKED_CEP_AUTHORITY_RECOVERY_20261017.md.
+    - date: '2026-10-17'
+      status: PARTIAL
+      reason: At main fb6a1fe, implemented read-only deterministic inventory and fail-closed proposed-disposition reconciliation; 3 unit tests and 2 subtests plus lint passed. Development inventory found 80 legacy Payments and no Treasury movements. No approved cutoff/dataset, migration/backfill execution or GATE-06 proof; 0/7 AC fully verified. See updated manifests and Completion Report.
+    - date: '2026-10-17'
+      status: PARTIAL
+      reason: Human Decision Authority granted bounded non-production migration preparation and rehearsal authority in BONIRA-CONSOLIDATED-20261017 but expressly withheld dataset-dependent backfill pending named tenant, exclusive cutoff, authoritative source/opening dataset and accountable reviewers. BLOCKER-DATA remains.
   CEP-029:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3245,9 +3295,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: dd843a2d77aca43955c0089e28220b3ab05e5bdb
-  origin_main: dd843a2d77aca43955c0089e28220b3ab05e5bdb
-  integration_checkpoint: dd843a2d77aca43955c0089e28220b3ab05e5bdb
+  last_reconciled_head: fb6a1feaa78168748741c3c3253e2dea0871cda8
+  origin_main: fb6a1feaa78168748741c3c3253e2dea0871cda8
+  integration_checkpoint: fb6a1feaa78168748741c3c3253e2dea0871cda8
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-17'
 execution_frontier:
@@ -3255,8 +3305,10 @@ execution_frontier:
   execution_mode: SERIAL_BY_DEFAULT
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
+  - CEP-020
+  - CEP-022
+  - CEP-025
   - CEP-027
-  - CEP-028
-  next_autonomous_cep: CEP-027
+  next_autonomous_cep: CEP-020
   production_authorized: false
   human_signoff_executed: false

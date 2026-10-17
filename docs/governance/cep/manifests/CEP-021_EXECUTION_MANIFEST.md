@@ -27,3 +27,45 @@ The approved recognition policy is present, but repository reality lacks the dur
 Resolution requires a separately governed decision that either supplies an approved no-migration durable contract already owned by the relevant domains, or explicitly authorizes a bounded schema/migration contract defining reimbursement beneficiary, expense source/version identity, Expense↔Treasury request lineage, correction/reversal behavior, and associated transaction guarantees. Re-ground CEP-021 after that authority is present.
 
 Final lifecycle: **BLOCKED BEFORE PRODUCT MUTATION**. No schema, migration, product code, test, production, Human Sign-off, or Git-write action was executed.
+
+## 2026-10-17 Human decision and resumed execution
+
+The Human Decision Authority approved `BONIRA-CONSOLIDATED-20261017`, which
+acknowledges the frozen Expense/Treasury boundary and grants a bounded
+non-production migration exception to the prompt's `Migration Impact = NONE`.
+The prior blocked finding remains historical. At `main`
+`fb6a1feaa78168748741c3c3253e2dea0871cda8`, `origin/main` matches; the
+working tree contains unrelated CEP-027/028 records and CEP-028 preparation that
+must be preserved. The canonical prompt SHA-256 remains
+`d724e1fdd5e691087f7d04de27b60a69e14e9ef0936bbf78fbeb6e921b1dda45`.
+There are no CEP prerequisites, and GATE-01/GATE-02 are PASS.
+
+Intended bounded touch set: `apps/expenses` source identity, reimbursement
+beneficiary, correction lineage and settlement request service; `apps/treasury`
+request-kind/source-link validation and existing release lifecycle; expand-only
+`expenses`/`treasury` migrations; focused domain and negative-path tests; this
+CEP's evidence, mapping, change manifest and Completion Report. The existing
+Accounting recognition registry, AP route, Treasury posting producer and
+CEP-028 legacy migration preparation remain outside the touch set.
+
+## Resumed implementation and migration finding
+
+`CEP-021-FINDING-001` is resolved by the cited Human authorization for a
+bounded non-production expand-only schema. The implementation adds nullable
+reimbursement/source links, Expense source version and replacement lineage,
+and a Treasury request-to-movement link. Existing rows retain their values;
+no legacy reimbursement backfill, destructive contract, production migration,
+or accounting/AP posting is part of this package. Generated migrations are
+`expenses.0009` and `treasury.0009`. The latter depends on the former and
+replaces only the payment-request beneficiary check to include the governed
+reimbursement kind. Source and request links have one-to-one database
+uniqueness, with service/model tenant, state, amount, version, beneficiary,
+and project checks. The PostgreSQL test database applied, reversed, and
+reapplied both migrations; a legacy Expense and PaymentRequest retained UUIDs,
+amounts, party and row counts. Twenty-five focused Expense/Treasury/migration
+tests, Django system check, migration drift
+check, and touched source/test lint passed. The development database migration
+plan contains existing `documents.0011` and `workforce.0010` prerequisites;
+no development or production migration was executed. AC 6/6 and DoD PASS;
+remaining runtime verification and deployment are UTV. Execution closed at a
+clean non-production boundary with no Git write.

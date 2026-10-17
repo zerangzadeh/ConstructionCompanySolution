@@ -19,6 +19,7 @@ from apps.accounting.services import (
 )
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
+from apps.expenses.models import Expense, ExpenseStatus
 from apps.organizations.models import (
     AuthorizationScopeType,
     MembershipRole,
@@ -43,6 +44,7 @@ from apps.organizations.policy_specs import (
 )
 from apps.organizations.services import create_organization_with_owner
 from apps.parties.models import BusinessParty, PartyKind
+from apps.projects.services import create_project
 from apps.treasury.models import (
     AdvanceSettlement,
     AdvanceSettlementStatus,
@@ -62,6 +64,7 @@ from apps.treasury.models import (
 from apps.treasury.services import (
     approve_and_post_movement,
     bounce_cleared_cheque,
+    cancel_payment_request,
     clear_cheque,
     create_account_mapping_version,
     create_advance_settlement,
@@ -592,6 +595,68 @@ class TreasuryFoundationTests(TestCase):
         self.assertEqual(request.status, "approved")
         self.assertEqual(request.approved_by, self.accountant_membership)
         self.assertFalse(hasattr(request, "scheduled_for"))
+
+    def test_employee_reimbursement_cash_links_one_approved_expense(self) -> None:
+        project = create_project(
+            organization=self.organization, actor=self.owner,
+            code="REIMB-PROJECT", name="Reimbursement project",
+        )
+        employee = Employee.objects.create(
+            organization=self.organization, employee_number="EMP-REIMB-1",
+            first_name="Test", last_name="Worker",
+        )
+        expense = Expense.objects.create(
+            organization=self.organization, project=project,
+            description="Approved reimbursement fixture", amount=Decimal("75.00"),
+            incurred_on=date(2026, 9, 1), status=ExpenseStatus.APPROVED,
+            reimbursement_employee=employee,
+        )
+        request = create_payment_request(
+            organization=self.organization, actor=self.owner,
+            kind="employee_reimbursement", amount=expense.amount,
+            purpose="Employee expense settlement", idempotency_key="reimb-cash-1",
+            employee=employee, project=project, source_expense=expense,
+        )
+        request = submit_payment_request(
+            organization=self.organization, actor=self.owner,
+            request=request, reason="Source reviewed",
+        )
+        request = decide_payment_request(
+            organization=self.organization, actor=self.owner,
+            request=request, approve=True, reason="Approved settlement",
+        )
+        unrelated = self._post(create_movement(
+            organization=self.organization, actor=self.owner,
+            kind="disbursement", movement_date=date(2026, 9, 1),
+            amount=expense.amount, description="Unrelated cash",
+            idempotency_key="reimb-unrelated", account=self.bank,
+            project=project,
+        ))
+        with self.assertRaises(ValidationError):
+            release_payment_request(
+                organization=self.organization, actor=self.owner,
+                request=request, movement=unrelated, reason="Wrong source",
+            )
+        movement = create_movement(
+            organization=self.organization, actor=self.owner,
+            kind="disbursement", movement_date=date(2026, 9, 1),
+            amount=expense.amount, description="Employee reimbursement",
+            idempotency_key="reimb-movement-1", account=self.bank,
+            project=project, origin_request=request,
+        )
+        with self.assertRaises(ValidationError):
+            cancel_payment_request(
+                organization=self.organization, actor=self.owner,
+                request=request, reason="Cannot detach cash",
+            )
+        movement = self._post(movement)
+        request = release_payment_request(
+            organization=self.organization, actor=self.owner,
+            request=request, movement=movement, reason="Cash settled",
+        )
+        self.assertEqual(request.released_movement_id, movement.pk)
+        self.assertEqual(movement.origin_request_id, request.pk)
+        self.assertEqual(expense.status, ExpenseStatus.APPROVED)
 
     def test_employee_advance_cash_settlement_reversal_and_reconciliation(
         self,

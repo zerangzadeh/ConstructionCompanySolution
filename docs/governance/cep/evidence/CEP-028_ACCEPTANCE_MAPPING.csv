@@ -1,8 +1,8 @@
 acceptance_criterion,status,evidence,notes
-IMB-0050-AC-1,BLOCKED,CEP-028-EV-003,Approved conversion/link mapping and historical compatibility contract unavailable.
-IMB-0050-AC-2,BLOCKED,CEP-028-EV-003,Eligible source record definition and exception contract unavailable.
-IMB-0050-AC-3,BLOCKED,CEP-028-EV-003,No stable source-target mapping exists to reconcile counts and identifiers.
-IMB-0050-AC-4,BLOCKED,CEP-028-EV-003,No approved retry/idempotency migration contract exists.
-IMB-0050-AC-5,BLOCKED,CEP-028-EV-003,Historical traceability mapping unavailable.
-IMB-0050-AC-6,BLOCKED,CEP-028-EV-003,Authority-preserving cutover boundary cannot be defined before required gate/contract evidence.
-IMB-0050-AC-7,BLOCKED,CEP-028-EV-003,Failed/unmigrated exception and rollback boundary unavailable.
+IMB-0050-AC-1,PARTIAL,CEP-028-EV-005,Read-only inventory and disposition validation exist; no source-reference conversion or backfill is implemented.
+IMB-0050-AC-2,PARTIAL,CEP-028-EV-006,Read-only development inventory used date.max rather than an approved cutoff; 80 legacy records and zero target movements remain explicit preparation exceptions.
+IMB-0050-AC-3,PARTIAL,CEP-028-EV-005,Deterministic source fingerprints and source-target reporting exist; no approved target links or before-after conversion evidence exists.
+IMB-0050-AC-4,BLOCKED,CEP-028-EV-005,No executed migration/retry pathway exists; unit checks cover duplicate targets only.
+IMB-0050-AC-5,PARTIAL,CEP-028-EV-005,Inventory retains dependent allocation settlement document-link and audit identities; no conversion history exists.
+IMB-0050-AC-6,PARTIAL,CEP-028-EV-005,Preparation makes no Treasury or GL mutation; actual cutover boundary remains unexecuted.
+IMB-0050-AC-7,PARTIAL,CEP-028-EV-006,All currently unmapped records remain identifiable; rollback/cutover record awaits approved dataset and execution.
