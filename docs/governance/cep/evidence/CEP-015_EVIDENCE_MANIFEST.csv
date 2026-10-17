@@ -1,0 +1,5 @@
+evidence_id,kind,source_or_command,result,status
+CEP-015-EV-001,Canonical identity,"Get-FileHash CEP-015 prompt; CEP_PROMPT_MANIFEST.yaml",SHA-256 f8b50d828578735f4ec4ea60a87252e06d84a20fe6e4a6db388d95a2e78fa031 matches immutable manifest,PASS
+CEP-015-EV-002,Repository grounding,"git branch --show-current; rev-parse HEAD/origin/main; status/diff; Registry reconciliation",main and origin/main matched at 76362e23fbbd18c5f280343ece064e95eeae4881; initial working tree clean; repository metadata reconciled,RECORDED
+CEP-015-EV-003,Canonical source recovery,"rg current tree; git grep retained checkpoint a4a18a1 and reachable history",Matrix name and constraints found but no approved profile key-value definitions; implementation stopped before product mutation,BLOCKED
+CEP-015-EV-004,Product validation,"Not executed because BLOCKER-SPEC precedes product mutation",Required unit model service workflow UI template and regression evidence remains UTV,UTV

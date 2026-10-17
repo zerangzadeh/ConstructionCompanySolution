@@ -9,8 +9,10 @@ from django.shortcuts import render
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 
+from apps.organizations.decorators import active_organization_required
 from apps.organizations.services import get_valid_memberships
 from core.home import authorized_home_links
+from core.search import search_active_organization
 
 logger = logging.getLogger(__name__)
 
@@ -53,3 +55,17 @@ def home(request: HttpRequest) -> HttpResponse:
             "home_alerts": alerts,
         },
     )
+
+
+@active_organization_required
+@require_GET
+@never_cache
+def global_search(request: HttpRequest) -> HttpResponse:
+    """Render only source-authorized results for the governed safe-family allowlist."""
+
+    search = search_active_organization(
+        actor=request.user,
+        organization=request.organization,
+        query=request.GET.get("q", ""),
+    )
+    return render(request, "core/global_search.html", {"search": search})

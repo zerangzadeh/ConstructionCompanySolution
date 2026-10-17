@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from core.views import home
+from core.views import global_search, home
 
 admin.site.site_header = "مدیریت سامانه بنیرا"
 admin.site.site_title = "مدیریت بنیرا"
@@ -11,6 +11,7 @@ admin.site.index_title = "داشبورد مدیریت"
 
 urlpatterns = [
     path("", home, name="home"),
+    path("search/", global_search, name="global_search"),
     path("admin/", admin.site.urls),
     path("accounts/", include("apps.accounts.urls")),
     path("organizations/", include("apps.organizations.urls")),

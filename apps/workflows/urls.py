@@ -6,6 +6,8 @@ app_name = "workflows"
 
 urlpatterns = [
     path("workbench/", views.workbench, name="workbench"),
+    path("my-requests/", views.my_requests, name="my_requests"),
+    path("manager/", views.manager_workspace, name="manager_workspace"),
     path(
         "workbench/<uuid:work_item_id>/claim/",
         views.work_item_claim,

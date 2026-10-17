@@ -958,6 +958,12 @@ def add_timesheet_entry(
         site=site,
     )
     _ensure_tenant(organization, project=project, site=site, activity=activity)
+    if activity is not None and activity.site_id != getattr(site, "pk", None):
+        raise ValidationError(
+            {
+                "activity": "فعالیت باید با کارگاه انتخاب‌شده سازگار باشد؛ کارگاه فعالیت قابل استنباط نیست."
+            }
+        )
     if timesheet.prepared_by_id != actor.pk or timesheet.state != TimesheetState.DRAFT:
         raise PermissionDenied("فقط تهیه‌کننده می‌تواند پیش‌نویس کارکرد را تکمیل کند.")
     return TimesheetEntry.objects.create(

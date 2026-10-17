@@ -6,6 +6,7 @@ import uuid
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.urls import reverse
 from django.utils import timezone
 
 from apps.audit.models import AuditAction
@@ -160,6 +161,11 @@ def list_notifications(*, organization, actor):
         )
         item.display_summary = (
             item.summary if item.source_available else "منبع اعلان دیگر در دسترس نیست."
+        )
+        item.source_url = (
+            reverse("support:case_detail", args=[item.source_id])
+            if item.source_available and item.source_type == "support_case"
+            else ""
         )
     return items
 

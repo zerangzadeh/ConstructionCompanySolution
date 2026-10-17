@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}جستجو | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="جستجوی سازمان" page_title="جستجوی مجاز" page_description="فقط پروژه‌ها و مصالحی که هم‌اکنون به آن‌ها دسترسی دارید جستجو می‌شوند." only %}
+<section class="erp-surface mt-5 rounded-xl p-4" aria-labelledby="global-search-title">
+  <h2 id="global-search-title" class="sr-only">جستجوی مجاز</h2>
+  <form class="flex flex-col gap-3 sm:flex-row" method="get" action="{% url 'global_search' %}">
+    <label class="sr-only" for="global-search-query">عبارت جستجو</label>
+    <input id="global-search-query" name="q" value="{{ search.query }}" maxlength="100" minlength="2" autocomplete="off" placeholder="نام یا کد پروژه یا مصالح" required>
+    <button class="erp-btn erp-btn--primary shrink-0" type="submit">جستجو</button>
+  </form>
+  {% if search.validation_message %}<p class="mt-3 text-sm text-amber-700" role="status">{{ search.validation_message }}</p>{% endif %}
+</section>
+{% if search.query and not search.validation_message %}
+<section class="erp-surface mt-5 overflow-hidden rounded-xl" aria-labelledby="search-results-title">
+  <div class="border-b border-slate-100 px-4 py-3"><h2 id="search-results-title" class="font-bold">نتایج مجاز</h2></div>
+  {% if search.results %}<div class="erp-table-wrap"><table class="w-full min-w-[560px] text-right"><thead><tr><th class="px-4 py-3">نوع</th><th class="px-4 py-3">عنوان</th><th class="px-4 py-3">کد</th><th class="px-4 py-3">منبع</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in search.results %}<tr><td class="px-4 py-3">{{ item.family_label }}</td><td class="px-4 py-3">{{ item.title }}</td><td class="px-4 py-3" dir="ltr">{{ item.reference }}</td><td class="px-4 py-3"><a class="text-blue-700 underline" href="{{ item.url }}">مشاهده</a></td></tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="نتیجه مجازی یافت نشد" empty_description="نتایج فاقد دسترسی نمایش داده نمی‌شوند." only %}{% endif %}
+</section>
+{% endif %}
+{% endblock %}

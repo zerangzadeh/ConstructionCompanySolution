@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}درخواست‌های من | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="کار من" page_title="درخواست‌های من" page_description="وضعیت درخواست‌های ثبت‌شده در منبع اصلی؛ این نما وضعیت کسب‌وکار را تغییر نمی‌دهد." only %}
+<section class="erp-surface mt-5 overflow-hidden rounded-xl" aria-labelledby="my-requests-title">
+  <h2 id="my-requests-title" class="sr-only">فهرست درخواست‌های من</h2>
+  {% if request_rows %}<div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right"><thead><tr><th class="px-4 py-3">نوع درخواست</th><th class="px-4 py-3">وضعیت منبع</th><th class="px-4 py-3">آخرین تغییر</th><th class="px-4 py-3">منبع</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in request_rows %}<tr><td class="px-4 py-3">{{ item.source_label }}</td><td class="px-4 py-3">{% include "components/status_badge.html" with status=item.status label=item.status_label only %}</td><td class="px-4 py-3"><span dir="ltr">{{ item.occurred_at|jalali_datetime }}</span></td><td class="px-4 py-3">{% if item.source_url %}<a class="text-blue-700 underline" href="{{ item.source_url }}">مشاهده در منبع</a>{% else %}<span class="text-slate-500">دسترسی منبع موجود نیست</span>{% endif %}</td></tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="درخواستی ثبت نشده است" empty_description="درخواست‌های ثبت‌شده شما بدون تغییر وضعیت منبع در اینجا نمایش داده می‌شوند." only %}{% endif %}
+</section>
+{% endblock %}

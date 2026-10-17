@@ -1,0 +1,12 @@
+evidence_id,kind,source_or_command,result,status
+CEP-019-EV-001,Repository grounding,"git branch --show-current; git rev-parse HEAD; git rev-parse origin/main; git status --short; git diff --check","main and origin/main at 76362e23fbbd18c5f280343ece064e95eeae4881; preserved CEP-015 and CEP-018 artifacts identified before CEP-019 mutation",PASS
+CEP-019-EV-002,Canonical prompt verification,"SHA-256 docs/governance/cep/PROMPTS/CEP-019_EXECUTION_PROMPT.md against CEP_PROMPT_MANIFEST.yaml","985904a4ffe2892eb844d34d4c19373cbc3ef2c323569dd6ae85cbc24e02dd66 exact match",PASS
+CEP-019-EV-003,Prerequisite gate and collision review,"CEP_EXECUTION_REGISTRY.yaml; CEP-019 prompt; ROADMAP.md; CEP-015 blocker scope","CEP-001 and CEP-002 complete; GATE-01 and GATE-02 PASS; no CEP-015 dependency or configuration-profile semantics used",PASS
+CEP-019-EV-004,Focused security integration UI tests,"python -m pytest core/test_cep019_search.py -q --reuse-db","4 passed in 7.10s; authenticated/active-org protection tenant isolation project scope safe allowlist deep-link reenforcement no leakage RTL and GET-only checked",PASS
+CEP-019-EV-005,Authorization-safe adapter review,"core/search.py; apps/projects/services.py; apps/materials/services.py; focused tests","Only existing Project and Material read services are enrolled; source services and source routes retain authorization; no sensitive family adapter exists",PASS
+CEP-019-EV-006,Affected shell regression,"python -m pytest core/test_home.py core/test_cep017_navigation.py core/test_cep019_search.py -q --reuse-db","19 passed in 12.38s",PASS
+CEP-019-EV-007,Static checks,"ruff check/format; manage.py check; compileall","Touched Python passed Ruff; Django reported no issues; compilation passed",PASS
+CEP-019-EV-008,Schema check,"manage.py makemigrations --check --dry-run","No changes detected; Migration Impact NONE",PASS
+CEP-019-EV-009,Template review,"templates/core/global_search.html; templates/base.html; focused tests","Persian-first RTL responsive input/table explicit empty and validation states plus accessible labels verified",PASS
+CEP-019-EV-010,Diff hygiene,"git diff --check","Passed; repository checkout line-ending warnings only",PASS
+CEP-019-EV-011,Runtime UTV,"Canonical Test Plan and local evidence review","Browser/accessibility and performance/concurrency runtime evidence not executed and remain UTV",UTV

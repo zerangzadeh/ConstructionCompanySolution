@@ -1,0 +1,6 @@
+evidence_id,kind,source_or_command,result,status
+CEP-024-EV-001,Canonical identity,"Get-FileHash CEP-024 prompt; CEP_PROMPT_MANIFEST.yaml",SHA-256 88c0183c5fb8415c9d614f8999ddeed66cea1d424692431b047233a246000c97 matches immutable manifest,PASS
+CEP-024-EV-002,Focused security test,".venv\\Scripts\\python.exe -m pytest apps/timekeeping/test_cep024_scope.py -q --reuse-db",5 passed and 2 subtests passed; allowed denied cross-tenant form and direct-route cases covered,PASS
+CEP-024-EV-003,Affected regression,".venv\\Scripts\\python.exe -m pytest apps/timekeeping/test_p7_s06_s12_timekeeping.py apps/timekeeping/test_cep024_scope.py -q --reuse-db",9 tests passed plus 2 subtests; 3 legacy failures are authorization-scope fixture debt validly attributed to committed test setup with no scope grants,PASS_WITH_BASELINE_DEBT
+CEP-024-EV-004,Quality checks,"ruff check; manage.py makemigrations --check --dry-run; manage.py check; compileall; git diff --check",Ruff Django migration drift system check compilation and diff whitespace all passed,PASS
+CEP-024-EV-005,Baseline attribution,"git show HEAD for timekeeping P7 fixture and authorization membership_has_scope; CEP-024 diff",Committed P7 reviewer fixture creates no scope grants while committed authorization requires explicit scope; CEP-024 changed only Activity Site invariant paths,RECORDED

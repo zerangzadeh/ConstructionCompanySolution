@@ -1,0 +1,5 @@
+evidence_id,kind,source_or_command,result,status
+CEP-020-EV-001,Canonical identity,"Get-FileHash CEP-020 prompt; CEP_PROMPT_MANIFEST.yaml",SHA-256 d79ae3dc72ea9c06be2c4106bfe8bbbd47ce5f5a3dbcc648c619234d3001f5a2 matches immutable manifest,PASS
+CEP-020-EV-002,Repository grounding,"git branch/rev-parse/status; Registry reconciliation; apps/projects models/services inspection",main and origin/main matched at 76362e23fbbd18c5f280343ece064e95eeae4881; existing immutable draft and budget pointer do not define the required governed lifecycle,RECORDED
+CEP-020-EV-003,Canonical source recovery,"rg non-prompt repository documentation/code and approved governance materials for PD-020 PD-024 SPEC-001 SPEC-004 and BONIRA_CONFIGURATION_PROFILE_MATRIX",Only references were found; no authoritative lifecycle control-key override or source-version definitions exist to implement without invention,BLOCKED
+CEP-020-EV-004,Product validation,"Not executed because BLOCKER-SPEC precedes product mutation",Required unit model service workflow and regression evidence remains UTV,UTV

@@ -10,6 +10,10 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.context import scoped_context_projects, scoped_context_sites
 from apps.organizations.models import BusinessPermissionCode
+from apps.workflows.personal_workspaces import (
+    manager_workspace_available,
+    my_requests_available,
+)
 from apps.workforce.ess_services import has_ess_subject
 
 SITE_CONTEXT_NAMESPACES = frozenset(
@@ -47,6 +51,8 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
     active_project = getattr(request, "active_project", None)
     active_site = getattr(request, "active_site", None)
     ess_subject_available = False
+    my_requests_workspace_available = False
+    manager_workspace_entry_available = False
     if organization is not None and request.user.is_authenticated:
         try:
             membership = get_active_membership(
@@ -76,6 +82,12 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
             ess_subject_available = has_ess_subject(
                 user=request.user, organization=organization
             )
+            my_requests_workspace_available = my_requests_available(
+                actor=request.user, organization=organization
+            )
+            manager_workspace_entry_available = manager_workspace_available(
+                actor=request.user, organization=organization
+            )
 
     resolver_match = getattr(request, "resolver_match", None)
     namespace = resolver_match.namespace if resolver_match else None
@@ -96,4 +108,6 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
         "site_context_relevant": namespace in SITE_CONTEXT_NAMESPACES,
         "context_requires_project": view_name in PROJECT_REQUIRED_MUTATIONS,
         "ess_subject_available": ess_subject_available,
+        "my_requests_workspace_available": my_requests_workspace_available,
+        "manager_workspace_available": manager_workspace_entry_available,
     }

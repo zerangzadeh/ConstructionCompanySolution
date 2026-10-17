@@ -38,7 +38,6 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
             / "navigation_links.html"
         ).read_text(encoding="utf-8")
         for node_id in (
-            "NAV-004",
             "NAV-009",
             "NAV-013",
             "NAV-015",

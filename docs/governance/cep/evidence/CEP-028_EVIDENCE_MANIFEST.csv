@@ -1,0 +1,5 @@
+evidence_id,kind,source_or_command,result,status
+CEP-028-EV-001,Canonical identity,"Get-FileHash CEP-028 prompt; CEP_PROMPT_MANIFEST.yaml",Prompt SHA-256 matches immutable manifest,PASS
+CEP-028-EV-002,Repository grounding,"apps/payments Payment; apps/treasury TreasuryMovement; migration inspection",Legacy Payment and Treasury schemas exist but no approved conversion mapping or reconciliation contract exists,RECORDED
+CEP-028-EV-003,Gate and contract recovery,"CEP_EXECUTION_REGISTRY.yaml; AUTH-BATCH-001 current status and blocker reconciliation; rg INT-R01",No GATE-06 state/evidence and retained approved reconciliation marks CEP-028 blocked; no INT-R01 mapping recovered,BLOCKED
+CEP-028-EV-004,Product validation,"Not run because BLOCKER-GATE-SPEC precedes mutation",Required migration reconciliation retry and regression evidence remains UTV,UTV

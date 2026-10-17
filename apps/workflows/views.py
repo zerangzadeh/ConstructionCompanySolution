@@ -8,7 +8,7 @@ from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_GET, require_POST
 
 from apps.organizations.decorators import (
     active_organization_required,
@@ -18,6 +18,7 @@ from apps.organizations.models import BusinessPermissionCode
 from apps.workflows.models import WorkItem
 from core.list_filters import table_pagination_query
 
+from .personal_workspaces import build_manager_workspace, build_my_requests
 from .runtime import (
     WorkflowConflict,
     claim_work_item,
@@ -25,6 +26,22 @@ from .runtime import (
     release_work_item,
 )
 from .workbench import build_workbench, decorate_work_items, get_workbench_item
+
+
+@active_organization_required
+@require_GET
+def my_requests(request: HttpRequest) -> HttpResponse:
+    rows = build_my_requests(actor=request.user, organization=request.organization)
+    return render(request, "workflows/my_requests.html", {"request_rows": rows})
+
+
+@active_organization_required
+@require_GET
+def manager_workspace(request: HttpRequest) -> HttpResponse:
+    data = build_manager_workspace(
+        actor=request.user, organization=request.organization
+    )
+    return render(request, "workflows/manager_workspace.html", {"manager": data})
 
 
 @active_organization_required

@@ -1,0 +1,5 @@
+evidence_id,kind,source_or_command,result,status
+CEP-021-EV-001,Canonical identity,"Get-FileHash CEP-021 prompt; CEP_PROMPT_MANIFEST.yaml",SHA-256 d724e1fdd5e691087f7d04de27b60a69e14e9ef0936bbf78fbeb6e921b1dda45 matches immutable manifest,PASS
+CEP-021-EV-002,Canonical financial source,"apps/accounting/recognition_registry.py; apps/accounting/test_cep008_recognition_registry.py",Frozen SPEC-002 includes Direct Expense and Employee Reimbursement rows with Expenses recognition ownership Treasury settlement and NO generic AP,PASS
+CEP-021-EV-003,Repository grounding,"apps/expenses/models.py services.py; apps/treasury/models.py services.py",Expense has no reimbursement beneficiary/source version and PaymentRequest has no expense source identity/version relationship; a durable boundary requires schema contract not allowed by Migration Impact NONE,BLOCKED
+CEP-021-EV-004,Product validation,"Not executed because BLOCKER-REPOSITORY-MIGRATION precedes product mutation",Required unit model service transaction and regression evidence remains UTV,UTV

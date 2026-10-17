@@ -275,6 +275,20 @@ class TimesheetEntryForm(StyledForm):
                 site_lookup="site_id",
             )
 
+    def clean(self):
+        cleaned = super().clean()
+        project = cleaned.get("project")
+        site = cleaned.get("site")
+        activity = cleaned.get("activity")
+        if activity and activity.project_id != getattr(project, "pk", None):
+            self.add_error("activity", "فعالیت باید متعلق به پروژه انتخاب‌شده باشد.")
+        if activity and activity.site_id != getattr(site, "pk", None):
+            self.add_error(
+                "activity",
+                "فعالیت باید با کارگاه انتخاب‌شده سازگار باشد؛ کارگاه فعالیت قابل استنباط نیست.",
+            )
+        return cleaned
+
 
 class ImportForm(StyledForm):
     idempotency_key = forms.CharField(label="کلید یکتای درخواست")

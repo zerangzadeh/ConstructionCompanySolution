@@ -989,6 +989,12 @@ class TimesheetEntry(UUIDModel, TimeStampedModel):
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
         if self.activity_id and self.activity.project_id != self.project_id:
             raise ValidationError({"activity": "فعالیت باید متعلق به پروژه باشد."})
+        if self.activity_id and self.activity.site_id != self.site_id:
+            raise ValidationError(
+                {
+                    "activity": "فعالیت باید با کارگاه انتخاب‌شده سازگار باشد؛ کارگاه فعالیت قابل استنباط نیست."
+                }
+            )
 
     def save(self, *args: object, **kwargs: object) -> None:
         self.full_clean(validate_constraints=False)
