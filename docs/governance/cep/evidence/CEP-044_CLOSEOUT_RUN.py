@@ -54,6 +54,9 @@ for cep, path, expected in re.findall(
     identities[cep] = actual
 assert len(identities) == 79
 head = git("rev-parse", "HEAD")
+assert head == read("CEP-044_VALIDATION_INPUTS.json")["head"], (
+    "Execution closeout is bound to its tested baseline; do not replay after checkpoint."
+)
 assert (
     head
     == git("rev-parse", "origin/main")
