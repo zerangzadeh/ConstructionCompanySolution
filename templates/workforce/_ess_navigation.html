@@ -3,5 +3,6 @@
   <a class="text-blue-700" href="{% url 'workforce:ess_profile' %}"{% if request.resolver_match.url_name == 'ess_profile' or request.resolver_match.url_name == 'ess_profile_relationship' %} aria-current="page"{% endif %}>پروفایل من</a>
   {% if "payroll_ess.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_history' %}">سوابق حقوق من</a>{% endif %}
   {% if "payroll_inquiries.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_inquiries' %}">پرسش‌های حقوق</a>{% endif %}
-  {% if my_requests_workspace_available %}<a class="text-blue-700" href="{% url 'workflows:my_requests' %}">درخواست‌های من</a>{% endif %}
+  {% if my_requests_workspace_available %}<a class="text-blue-700" href="{% url 'workforce:ess_requests' %}">درخواست‌های من</a>{% endif %}
+  {% if "personal_data.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:personal_change_inbox' %}">تغییر اطلاعات شخصی</a>{% endif %}
 </nav>

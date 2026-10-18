@@ -11,7 +11,7 @@ from django.utils import timezone
 from apps.accounts.models import validate_profile_image
 from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
-from core.models import TimeStampedModel, UUIDModel
+from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
 
@@ -385,6 +385,8 @@ class Employee(UUIDModel, TimeStampedModel):
     last_name = models.CharField("نام خانوادگی", max_length=150)
     email = models.EmailField("ایمیل", blank=True)
     phone_number = models.CharField("شماره تلفن", max_length=32, blank=True)
+    address = models.TextField("نشانی", blank=True, max_length=1000)
+    emergency_contact = models.TextField("تماس اضطراری", blank=True, max_length=1000)
     profile_image = models.FileField(
         "عکس پرسنلی",
         upload_to=employee_profile_image_upload_path,
@@ -1338,3 +1340,167 @@ class EmployeeProjectAssignment(UUIDModel, TimeStampedModel):
 
     def __str__(self) -> str:
         return f"{self.employee} · {self.project}"
+
+
+# Source-bound request history, not another contact master or Workflow engine.
+class PersonalDataHistoryQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError("سابقه درخواست اطلاعات شخصی تغییرپذیر نیست.")
+
+    def delete(self):
+        raise ValidationError("سابقه درخواست اطلاعات شخصی حذف‌پذیر نیست.")
+
+
+class PersonalDataRecord(UUIDModel, CreatedAtModel):
+    objects = models.Manager.from_queryset(PersonalDataHistoryQuerySet)()
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("سابقه درخواست اطلاعات شخصی تغییرپذیر نیست.")
+        self.full_clean(validate_constraints=False)
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("سابقه درخواست اطلاعات شخصی حذف‌پذیر نیست.")
+
+
+class PersonalDataEnrollment(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    family = models.CharField(
+        max_length=30,
+        choices=[
+            ("phone", "تلفن"),
+            ("email", "ایمیل"),
+            ("address", "نشانی"),
+            ("emergency", "تماس اضطراری"),
+            ("enrolled_contact", "فیلد ارتباطی ثبت‌شده"),
+        ],
+    )
+    source_field = models.CharField(
+        max_length=30,
+        choices=[
+            ("phone_number", "تلفن"),
+            ("email", "ایمیل"),
+            ("address", "نشانی"),
+            ("emergency_contact", "تماس اضطراری"),
+        ],
+    )
+    version = models.PositiveIntegerField()
+    workflow_version = models.ForeignKey(
+        "workflows.WorkflowVersion", on_delete=models.PROTECT
+    )
+    cancellation_allowed = models.BooleanField(default=False)
+    reason = models.TextField()
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "family", "source_field", "version"],
+                name="personal_data_enrollment_version_uq",
+            )
+        ]
+
+    def clean(self):
+        validate_related_organizations(self, workflow_version=self.workflow_version)
+        expected = {
+            "phone": "phone_number",
+            "email": "email",
+            "address": "address",
+            "emergency": "emergency_contact",
+        }
+        if self.family in expected and expected[self.family] != self.source_field:
+            raise ValidationError("خانواده و فیلد منبع هم‌خوان نیستند.")
+        if (
+            self.workflow_version.status != "published"
+            or self.workflow_version.definition.workflow_type.code
+            != "workforce.personal_data_change"
+            or not self.reason.strip()
+        ):
+            raise ValidationError("نسخه مجاز گردش‌کار و دلیل ثبت لازم است.")
+
+    def __str__(self):
+        return self.get_source_field_display()
+
+
+class PersonalDataRequest(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    work_relationship = models.ForeignKey(WorkRelationship, on_delete=models.PROTECT)
+    enrollment = models.ForeignKey(PersonalDataEnrollment, on_delete=models.PROTECT)
+    previous_value = models.TextField(blank=True, max_length=1000)
+    proposed_value = models.TextField(blank=True, max_length=1000)
+    reason = models.TextField(max_length=2000)
+    idempotency_key = models.CharField(max_length=128)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "requested_by", "idempotency_key"],
+                name="personal_data_request_key_uq",
+            )
+        ]
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            person=self.person,
+            work_relationship=self.work_relationship,
+            enrollment=self.enrollment,
+        )
+        if (
+            self.work_relationship.person_id != self.person_id
+            or self.person.user_id != self.requested_by_id
+            or not self.work_relationship.legacy_employee_id
+        ):
+            raise ValidationError("پیوند صریح هویت و منبع لازم است.")
+        if (
+            not self.reason.strip()
+            or self.previous_value == self.proposed_value
+            or not self.idempotency_key.strip()
+        ):
+            raise ValidationError("تغییر واقعی، دلیل و کلید تکرارپذیری لازم است.")
+
+
+class PersonalDataDecision(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    request = models.OneToOneField(
+        PersonalDataRequest, on_delete=models.PROTECT, related_name="decision"
+    )
+    action = models.CharField(
+        max_length=20,
+        choices=[
+            ("accepted", "پذیرفته"),
+            ("rejected", "ردشده"),
+            ("cancelled", "لغوشده"),
+        ],
+    )
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    work_item = models.ForeignKey(
+        "workflows.WorkItem", on_delete=models.PROTECT, null=True, blank=True
+    )
+    reason = models.TextField(max_length=2000)
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            request=self.request,
+            work_item=self.work_item if self.work_item_id else None,
+        )
+        if not self.reason.strip():
+            raise ValidationError("دلیل تصمیم لازم است.")
+        if self.work_item_id and (
+            self.work_item.instance.subject_id != self.request_id
+            or self.work_item.instance.subject_type != "workforce.personal_data_change"
+        ):
+            raise ValidationError("کار تصمیم متعلق به همین درخواست نیست.")

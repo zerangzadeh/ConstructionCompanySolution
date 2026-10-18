@@ -17,6 +17,10 @@ class PermissionResource:
 P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+    PermissionResource("personal_data", "درخواست تغییر اطلاعات شخصی",
+        ("workforce.PersonalDataEnrollment", "workforce.PersonalDataRequest", "workforce.PersonalDataDecision"),
+        (P.PERSONAL_DATA_VIEW,P.PERSONAL_DATA_REQUEST,P.PERSONAL_DATA_REVIEW,P.PERSONAL_DATA_CONFIGURE),
+        ("apps.workforce.personal_change_services","apps.workforce.personal_change_views","apps.workforce.personal_change_workflow")),
     PermissionResource(
         "membership",
         "اعضا و نقش‌های سازمانی",

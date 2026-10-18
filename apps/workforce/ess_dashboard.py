@@ -17,6 +17,7 @@ from apps.timekeeping.models import (
 from apps.workflows.personal_workspaces import RequestWorkspaceRow, build_my_requests
 
 from .ess_services import ESSOwnProfile, get_own_profile
+from .models import PersonalDataRequest
 
 
 @dataclass(frozen=True)
@@ -41,6 +42,7 @@ def build_ess_dashboard(*, user: User, organization: Organization) -> ESSDashboa
             allowed = {}
             for kind, model, field in (
                 ("payroll_inquiry", PayrollInquiry, "work_relationship__legacy_employee_id"),
+                ("personal_data", PersonalDataRequest, "work_relationship__legacy_employee_id"),
                 ("leave", LeaveMissionRequest, "employee_id"),
                 ("overtime", OvertimeRequest, "employee_id"),
                 ("correction", AttendanceCorrectionRequest, "attendance__employee_id"),

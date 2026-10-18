@@ -1,0 +1,85 @@
+$ .venv/Scripts/ruff check apps/organizations/models.py apps/organizations/permission_registry.py apps/organizations/role_defaults.py apps/workflows/personal_workspaces.py apps/workflows/registry.py apps/workforce/apps.py apps/workforce/ess_dashboard.py apps/workforce/models.py apps/workforce/urls.py apps/organizations/migrations/0112_cep055_personal_data_permissions.py apps/workforce/migrations/0011_cep055_personal_data_change.py apps/workforce/personal_change_forms.py apps/workforce/personal_change_services.py apps/workforce/personal_change_views.py apps/workforce/personal_change_workflow.py apps/workforce/test_cep055.py apps/workforce/test_cep055_migration.py
+All checks passed!
+
+exit=0
+
+$ .venv/Scripts/ruff format --check apps/organizations/migrations/0112_cep055_personal_data_permissions.py apps/workforce/migrations/0011_cep055_personal_data_change.py apps/workforce/personal_change_forms.py apps/workforce/personal_change_services.py apps/workforce/personal_change_views.py apps/workforce/personal_change_workflow.py apps/workforce/test_cep055.py apps/workforce/test_cep055_migration.py
+8 files already formatted
+
+exit=0
+
+$ .venv/Scripts/python manage.py check
+System check identified no issues (0 silenced).
+
+exit=0
+
+$ .venv/Scripts/python manage.py makemigrations --check --dry-run
+No changes detected
+
+exit=0
+
+$ git diff --check
+
+exit=0
+
+SOURCE: cep055-final
+Using existing test database for alias 'default'...
+
+...................................................
+----------------------------------------------------------------------
+Ran 51 tests in 25.560s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 51 test(s).
+System check identified no issues (0 silenced).
+
+SOURCE: cep055-migration
+Using existing test database for alias 'default'...
+
+.
+Found 1 test(s).
+System check identified no issues (0 silenced).
+----------------------------------------------------------------------
+Ran 1 test in 25.994s
+
+OK
+Preserving test database for alias 'default'...
+
+
+SOURCE: cep055-dev-plan
+Planned operations:
+workforce.0010_workrelationshipdocumentlink
+    Create model WorkRelationshipDocumentLink
+organizations.0111_cep054_payroll_inquiry_permissions
+    Raw Python operation
+organizations.0112_cep055_personal_data_permissions
+    Raw Python operation
+workforce.0011_cep055_personal_data_change
+    Add field address to employee
+    Add field emergency_contact to employee
+    Create model PersonalDataEnrollment
+    Create model PersonalDataRequest
+    Create model PersonalDataDecision
+    Create constraint personal_data_enrollment_version_uq on model personaldataenrollment
+    Create constraint personal_data_request_key_uq on model personaldatarequest
+
+SOURCE: cep055-development
+478 objects imported automatically (use -v 2 for details).
+
+Verified configured local development PostgreSQL; additive named migrations only.
+Operations to perform:
+  Target specific migration: 0008_cep054_payroll_inquiry, from payroll
+Running migrations:
+  Applying workforce.0010_workrelationshipdocumentlink... OK
+  Applying organizations.0111_cep054_payroll_inquiry_permissions... OK
+  Applying payroll.0006_cep025_operational_cumulative_ytd... OK
+  Applying payroll.0007_statutorysourcepackage... OK
+  Applying payroll.0008_cep054_payroll_inquiry... OK
+Operations to perform:
+  Target specific migration: 0011_cep055_personal_data_change, from workforce
+Running migrations:
+  Applying organizations.0112_cep055_personal_data_permissions... OK
+  Applying workforce.0011_cep055_personal_data_change... OK
+Reconciliation PASS; existing source and role-grant digests unchanged; no default grants, enrollment or statutory activation.

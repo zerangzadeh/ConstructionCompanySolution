@@ -1083,6 +1083,10 @@ class BusinessPermissionCode(models.TextChoices):
     WORK_TEAMS_VIEW = "work_teams.view", "مشاهده تیم‌های کاری"
     WORK_TEAMS_CREATE = "work_teams.create", "ایجاد تیم کاری"
     WORK_TEAMS_ARCHIVE = "work_teams.archive", "بایگانی تیم کاری"
+    PERSONAL_DATA_VIEW = "personal_data.view", "مشاهده درخواست تغییر اطلاعات مجاز"
+    PERSONAL_DATA_REQUEST = "personal_data.request", "درخواست تغییر اطلاعات شخصی"
+    PERSONAL_DATA_REVIEW = "personal_data.review", "تصمیم تغییر اطلاعات تخصیص‌یافته"
+    PERSONAL_DATA_CONFIGURE = "personal_data.configure", "پیکربندی ثبت تغییر اطلاعات"
     EMPLOYEES_VIEW = "employees.view", "مشاهده کارکنان"
     EMPLOYEES_CREATE = "employees.create", "ایجاد پرونده کارمند"
     EMPLOYEES_CHANGE_PROFILE_IMAGE = (

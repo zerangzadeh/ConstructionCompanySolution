@@ -1,10 +1,18 @@
 from django.urls import path
 
+from apps.workforce import personal_change_views as personal
 from apps.workforce import views
 
 app_name = "workforce"
 
 urlpatterns = [
+    path("ess/requests/",personal.requests,name="ess_requests"),
+    path("ess/requests/<str:source_type>/<uuid:source_id>/",personal.request_status,name="ess_request_status"),
+    path("ess/changes/",personal.inbox,name="personal_change_inbox"),
+    path("ess/changes/new/",personal.create,name="personal_change_create"),
+    path("ess/changes/<uuid:request_id>/",personal.detail,name="personal_change_detail"),
+    path("ess/changes/<uuid:request_id>/claim/<uuid:work_item_id>/",personal.claim,name="personal_change_claim"),
+    path("ess/changes/<uuid:request_id>/cancel/",personal.cancel,name="personal_change_cancel"),
     path("", views.employee_list, name="employee_list"),
     path("ess/", views.ess_dashboard, name="ess_dashboard"),
     path("ess/profile/", views.ess_profile, name="ess_profile"),

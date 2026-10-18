@@ -31,6 +31,7 @@ REQUEST_PERMISSION_CODES = frozenset(
         BusinessPermissionCode.LEAVE_MISSION_REQUEST,
         BusinessPermissionCode.OVERTIME_REQUEST,
         BusinessPermissionCode.ATTENDANCE_CORRECT,
+        BusinessPermissionCode.PERSONAL_DATA_VIEW,
     }
 )
 MANAGER_PERMISSION_CODES = frozenset(
@@ -262,6 +263,57 @@ def build_my_requests(
                 occurred_at=latest.created_at if latest else item.created_at,
                 source_url=reverse("payroll:ess_inquiry_detail", kwargs={"inquiry_id": item.pk}),
             ))
+    if BusinessPermissionCode.PERSONAL_DATA_VIEW in codes:
+        from apps.workforce.personal_change_services import (
+            instance_for,
+            visible_requests,
+        )
+
+        for item in visible_requests(actor=actor, organization=organization):
+            if item.requested_by_id != actor.pk:
+                continue
+            instance = instance_for(item)
+            if instance:
+                decision = getattr(item, "decision", None)
+                rows.append(
+                    RequestWorkspaceRow(
+                        source_type="personal_data",
+                        source_id=item.pk,
+                        source_label="تغییر اطلاعات شخصی",
+                        employee_label=f"{item.person.first_name} {item.person.last_name}",
+                        status=instance.status,
+                        status_label=instance.get_status_display(),
+                        occurred_at=decision.created_at if decision else item.created_at,
+                        source_url=reverse(
+                            "workforce:personal_change_detail",
+                            kwargs={"request_id": item.pk},
+                        ),
+                    )
+                )
+    # Explicit ESS identity permits own-source status deep links even without the
+    # broad back-office Timekeeping view grant. Preserve legacy source behavior.
+    from apps.workforce.ess_services import has_ess_subject
+
+    if has_ess_subject(user=actor, organization=organization):
+        from apps.workforce.personal_change_services import filter_explicit_request_rows
+
+        rows = list(
+            filter_explicit_request_rows(rows=rows, actor=actor, organization=organization)
+        )
+        from dataclasses import replace
+
+        rows = [
+            replace(
+                row,
+                source_url=reverse(
+                    "workforce:ess_request_status",
+                    kwargs={"source_type": row.source_type, "source_id": row.source_id},
+                ),
+            )
+            if row.source_type in {"leave", "overtime", "correction"}
+            else row
+            for row in rows
+        ]
     return tuple(sorted(rows, key=lambda row: row.occurred_at, reverse=True))
 
 

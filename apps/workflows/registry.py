@@ -179,6 +179,40 @@ class WorkflowRegistry:
 
 
 registry = WorkflowRegistry()
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
+        key="workforce.personal_data_change",
+        subject_type="workforce.personal_data_change",
+        exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),
+        start_permission="personal_data.request",
+        view_permission="personal_data.view",
+        detail_url_name="workforce:personal_change_detail",
+        detail_url_kwarg="request_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="workforce.personal_data_change",
+        subject_type="workforce.personal_data_change",
+        subject_adapter="workforce.personal_data_change",
+        allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset(
+            {
+                "workforce.personal_data_change.accept",
+                "workforce.personal_data_change.reject",
+                "workforce.personal_data_change.cancel",
+            }
+        ),
+    )
+)
+for action in ("accept", "reject", "cancel"):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key="workforce.personal_data_change." + action,
+            workflow_type="workforce.personal_data_change",
+            include_work_item=action != "cancel",
+        )
+    )
 
 registry.register_subject_adapter(SubjectAdapterSpec(
     key="payroll.inquiry", subject_type="payroll.inquiry",

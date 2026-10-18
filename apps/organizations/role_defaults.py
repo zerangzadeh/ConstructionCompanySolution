@@ -771,6 +771,10 @@ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     # only through an explicit, organization-specific role assignment.
     _default_permissions.difference_update(WORKFORCE_SENSITIVE_PERMISSIONS)
     _default_permissions.difference_update(PAYROLL_SENSITIVE_PERMISSIONS)
+    _default_permissions.difference_update(permission_codes(
+        BusinessPermissionCode.PERSONAL_DATA_VIEW, BusinessPermissionCode.PERSONAL_DATA_REQUEST,
+        BusinessPermissionCode.PERSONAL_DATA_REVIEW, BusinessPermissionCode.PERSONAL_DATA_CONFIGURE,
+    ))
     _default_permissions.difference_update(UNAUTHORIZED_WRITEOFF_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CLOSE_PERMISSIONS)
     _default_permissions.difference_update(UNAUTHORIZED_RFQ_CUSTODY_PERMISSIONS)
