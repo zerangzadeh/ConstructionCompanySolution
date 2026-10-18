@@ -1,0 +1,52 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_import_preview (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_import_preview) ... ok
+test_legacy_source_boundary (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_legacy_source_boundary) ... ERROR
+test_revision_history (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_revision_history) ... ok
+test_activation_requires_exact_evidence_and_imported_row_set (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_activation_requires_exact_evidence_and_imported_row_set) ... ok
+test_audit_failure_rolls_back_import (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_audit_failure_rolls_back_import) ... ok
+test_changed_draft_requires_explicit_mapping_before_approval (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_changed_draft_requires_explicit_mapping_before_approval) ... ok
+test_explicit_revision_retains_pinned_source_and_historical_reproducibility (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_explicit_revision_retains_pinned_source_and_historical_reproducibility) ... ok
+test_import_provenance_idempotency_and_changed_request_rejection (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_import_provenance_idempotency_and_changed_request_rejection) ... ok
+test_mapping_inactive_and_wrong_effective_date_fail_closed (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_mapping_inactive_and_wrong_effective_date_fail_closed) ... ok
+test_missing_source_or_unit_fails_atomically (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_missing_source_or_unit_fails_atomically) ... ok
+test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history) ... ok
+test_row_set_mismatch_prevents_activation (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_row_set_mismatch_prevents_activation) ... ok
+test_tenant_scope_permissions_and_default_grants (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_tenant_scope_permissions_and_default_grants) ... ok
+test_populated_legacy_sources_and_approved_history_survive_rollback_reapply (apps.estimates.test_cep035_price_books.PriceBookMigrationTests.test_populated_legacy_sources_and_approved_history_survive_rollback_reapply) ... ok
+test_strict_schema_finite_values_and_no_guessed_columns (apps.estimates.test_cep035_price_books.PriceBookParserTests.test_strict_schema_finite_values_and_no_guessed_columns) ... ok
+
+======================================================================
+ERROR: test_legacy_source_boundary (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_legacy_source_boundary)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\estimates\test_p4_depth.py", line 90, in test_source_lineage_requires_same_tenant_and_external_source_is_closed
+    unit = UnitOfMeasure.objects.create(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\materials\models.py", line 197, in save
+    self.full_clean()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'__all__': ['\u200f\u0648\u0627\u062d\u062f \u0627\u0646\u062f\u0627\u0632\u0647\u200c\u06af\u06cc\u0631\u06cc \u0628\u0627 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0648 \u0646\u0645\u0627\u062f \u0648\u062c\u0648\u062f \u062f\u0627\u0631\u062f.']}
+
+----------------------------------------------------------------------
+Ran 15 tests in 42.718s
+
+FAILED (errors=1)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 15 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

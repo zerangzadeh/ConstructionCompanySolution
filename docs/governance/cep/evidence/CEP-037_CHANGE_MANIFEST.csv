@@ -1,0 +1,8 @@
+surface,change
+apps/billing/variation_models.py;models.py;migrations/0017_cep037_variation_billing_eligibility.py,"One immutable target occurrence per source; exact source/series/version, target predecessor, audit snapshot/hash and uniqueness; no money field"
+apps/billing/variation_handoffs.py,Source event acceptance; latest approved chain; explicit retry/view; error savepoint/audit; current projection
+apps/contracts/contractual_services.py,Explicit L2 availability hook after authoritative Variation approval; no source decision or Billing finalization change
+apps/organizations/models.py;permission_registry.py;role_defaults.py;migrations/0119_cep037_variation_eligibility_permissions.py,Two explicitly assigned retry/view capabilities; exclude suffix-derived defaults as well as broad defaults
+apps/audit/models.py,Register source availability acceptance and failure events
+apps/billing/test_cep037_variation_handoff.py,"Nine focused, three unchanged source regression assertions, populated migration and concurrency proof"
+CEP037 canonical prompt;manifest;policy supplement;Registry;CEP037 evidence/report,Two explicit Human decisions; bounded migration and policy provenance; verified closeout/frontier

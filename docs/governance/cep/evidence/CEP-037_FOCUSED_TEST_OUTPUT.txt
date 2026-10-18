@@ -1,0 +1,84 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+Found 13 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying organizations.0119_cep037_variation_eligibility_permissions... OK
+test_source_approval (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_approval) ... ok
+test_source_correction (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_correction) ... ok
+test_source_withdrawal (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_withdrawal) ... ok
+test_auto_handoff_and_amount_independence_create_no_financial_objects (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_auto_handoff_and_amount_independence_create_no_financial_objects) ... ok
+test_false_entitlement_correction_and_cancellation_preserve_old_evidence (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_false_entitlement_correction_and_cancellation_preserve_old_evidence) ... ok
+test_false_entitlement_original_has_no_active_eligibility (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_false_entitlement_original_has_no_active_eligibility) ... ok
+test_latest_approved_chain_ignores_draft_and_timestamp_order (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_latest_approved_chain_ignores_draft_and_timestamp_order) ... ok
+test_target_failure_preserves_approved_source_and_retains_revalidated_retry (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_target_failure_preserves_approved_source_and_retains_revalidated_retry) ... ERROR
+test_tenant_scope_manual_retry_and_default_grants_fail_closed (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_tenant_scope_manual_retry_and_default_grants_fail_closed) ... FAIL
+test_unapproved_and_nonvariation_sources_cannot_be_retried (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_unapproved_and_nonvariation_sources_cannot_be_retried) ... ok
+test_concurrent_retries_preserve_one_source_occurrence (apps.billing.test_cep037_variation_handoff.VariationConcurrencyTests.test_concurrent_retries_preserve_one_source_occurrence) ... ok
+test_populated_source_history_survives_additive_rollback_reapply (apps.billing.test_cep037_variation_handoff.VariationMigrationTests.test_populated_source_history_survives_additive_rollback_reapply) ... ok
+test_only_entitlement_and_action_govern_source_availability (apps.billing.test_cep037_variation_handoff.VariationPredicateTests.test_only_entitlement_and_action_govern_source_availability) ... ok
+
+======================================================================
+ERROR: test_target_failure_preserves_approved_source_and_retains_revalidated_retry (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_target_failure_preserves_approved_source_and_retains_revalidated_retry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.RaiseException: approved contractual record history is immutable
+CONTEXT:  PL/pgSQL function contracts_contractual_record_guard() line 14 at RAISE
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep037_variation_handoff.py", line 270, in test_target_failure_preserves_approved_source_and_retains_revalidated_retry
+    ContractualRecord.objects.filter(pk=source.pk).update(
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 1263, in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 2060, in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1623, in execute_sql
+    cursor.execute(sql, params)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+  Applying billing.0017_cep037_variation_billing_eligibility... OK
+System check identified no issues (0 silenced).
+django.db.utils.ProgrammingError: approved contractual record history is immutable
+CONTEXT:  PL/pgSQL function contracts_contractual_record_guard() line 14 at RAISE
+
+======================================================================
+FAIL: test_tenant_scope_manual_retry_and_default_grants_fail_closed (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_tenant_scope_manual_retry_and_default_grants_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep037_variation_handoff.py", line 278, in test_tenant_scope_manual_retry_and_default_grants_fail_closed
+    self.assertFalse(
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 13 tests in 34.801s
+
+FAILED (failures=1, errors=1)
+Preserving test database for alias 'default' ('test_construction_erp')...
+

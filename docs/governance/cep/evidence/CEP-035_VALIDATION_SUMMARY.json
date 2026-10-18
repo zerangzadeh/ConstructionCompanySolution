@@ -1,0 +1,106 @@
+[
+  {
+    "check": "FINAL_TEST_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "test",
+      "apps.estimates.test_cep035_price_books.PriceBookParserTests",
+      "apps.estimates.test_cep035_price_books.PriceBookServiceTests",
+      "apps.estimates.test_cep035_price_books.PriceBookAffectedRegression",
+      "--keepdb",
+      "--noinput",
+      "-v",
+      "2"
+    ],
+    "result": "PASS",
+    "exit_code": 0,
+    "focused_tests": 11,
+    "affected_assertions": 3
+  },
+  {
+    "check": "POPULATED_MIGRATION",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "test",
+      "apps.estimates.test_cep035_price_books",
+      "--keepdb",
+      "--noinput",
+      "-v",
+      "2"
+    ],
+    "test_result": "PriceBookMigrationTests PASS; source/approved history preserved on rollback/reapply",
+    "suite_result": "One isolated regression-fixture symbol collision; corrected and affected assertions reverified PASS in final run",
+    "reused_without_rerun": "Schema and migration test unchanged since passing populated preservation; no redundant migration rehearsal"
+  },
+  {
+    "check": "LINT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/estimates/models.py",
+      "apps/estimates/services.py",
+      "apps/estimates/price_book_models.py",
+      "apps/estimates/price_books.py",
+      "apps/estimates/test_cep035_price_books.py",
+      "apps/organizations/models.py",
+      "apps/organizations/permission_registry.py",
+      "apps/organizations/role_defaults.py",
+      "apps/audit/models.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "FORMAT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/estimates/models.py",
+      "apps/estimates/services.py",
+      "apps/estimates/price_book_models.py",
+      "apps/estimates/price_books.py",
+      "apps/estimates/test_cep035_price_books.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "SYSTEM_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DRIFT_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DIFF_CHECK",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  }
+]

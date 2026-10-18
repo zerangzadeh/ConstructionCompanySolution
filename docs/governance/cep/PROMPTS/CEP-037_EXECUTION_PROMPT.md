@@ -29,6 +29,7 @@ Current governance applies:
 - `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`
 - `docs/ROADMAP_EXECUTION_PLAYBOOK.md`
 - `CEP_EXECUTION_REGISTRY.yaml` for live state only
+- `docs/governance/cep/supporting/CEP-037_VARIATION_BILLING_ELIGIBILITY_POLICY.md` — Human-approved PD-013 / SPEC-031 eligibility supplement (2026-10-18); governing source-availability predicate and lineage rules, no financial effect
 - CEP-037 Package Card
 - Canonical IMB records
 - Canonical CEP Dependency Model
@@ -136,9 +137,12 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
 If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
 
 ## 16. Data / Migration Requirements
-Migration Impact = `NONE`.
-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
-- If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
+Migration Impact = `BOUNDED ADDITIVE NON-PRODUCTION` under the explicit Human decision of 2026-10-18 in `docs/governance/cep/evidence/CEP-037_HUMAN_MIGRATION_AUTHORIZATION.md`.
+- Required Billing eligibility persistence is in scope. Only minimum additive, backward-compatible persistence and bounded Development / Non-Production migrations necessary for the existing Scope / AC / scoped DoD are authorized.
+- Preserve existing data and schema; no removal or destructive transformation. Run applicable migration preservation, execution/verification and schema-drift checks for this authorized persistence.
+- This supersedes the prior `Migration Impact = NONE` constraint for CEP-037 only to the minimum necessary extent. Scope, AC, DoD, domain ownership, dependencies and unrelated canonical semantics remain unchanged.
+- No production migration, cutover, irreversible production mutation, Human Sign-off, Production Certification or Git writes are authorized.
+- This migration authorization supplies no new business lifecycle or eligibility rules; unresolved material semantics must stop for the specific Human decision before implementation.
 
 ## 17. Integration Requirements
 Preserve approved integration semantics and interaction levels. Financial integrations must not silently escalate authority.
@@ -168,14 +172,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0029:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=REQUIRED; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0029:UNIT; DOMAIN; REGRESSION
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0029:Approved Variation → Billing draft/eligibility handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0029:Approved Variation → Billing draft/eligibility handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
 
 Execution must produce:
 - `CEP-037_EXECUTION_MANIFEST.md`

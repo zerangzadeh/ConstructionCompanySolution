@@ -1,0 +1,1485 @@
+--- a/apps/estimates/models.py
++++ b/apps/estimates/models.py
+@@ -303,6 +303,14 @@
+     )
+     unit_price = models.DecimalField("قیمت واحد", max_digits=18, decimal_places=2)
+     sort_order = models.PositiveIntegerField("ترتیب نمایش", default=0)
++
++    price_book_mapping = models.ForeignKey(
++        "EstimatePriceBookMapping",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="current_uses",
++    )
+ 
+     class Meta:
+         verbose_name = "ردیف برآورد"
+@@ -345,6 +353,15 @@
+                     {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
+                 )
+ 
++        if self.price_book_mapping_id:
++            mapping = self.price_book_mapping
++            if (
++                mapping.organization_id != self.organization_id
++                or mapping.source_item_id != self.pk
++                or mapping.source_revision_id != self.revision_id
++            ):
++                raise ValidationError("نگاشت باید متعلق به همین ردیف و بازنگری باشد.")
++
+     def save(self, *args: object, **kwargs: object) -> None:
+         if (
+             self.pk
+@@ -596,3 +613,12 @@
+             raise ValidationError("فرض بازنگری نهایی‌شده قابل تغییر نیست.")
+         self.full_clean()
+         super().save(*args, **kwargs)
++
++
++from .price_book_models import (  # noqa: F401
++    EstimatePriceBookMapping,
++    PriceBook,
++    PriceBookActivation,
++    PriceBookRow,
++    PriceBookVersion,
++)
+--- a/apps/estimates/services.py
++++ b/apps/estimates/services.py
+@@ -274,6 +274,10 @@
+         locked_estimate.current_revision = revision
+     if revision.status != EstimateRevisionStatus.DRAFT:
+         raise ValueError("فقط بازنگری‌های پیش‌نویس برآورد قابل تأیید هستند.")
++    from .price_books import validate_item_mapping
++
++    for mapped_item in revision.items.select_related("price_book_mapping"):
++        validate_item_mapping(mapped_item)
+     now = timezone.now()
+     EstimateRevision.objects.filter(
+         estimate=locked_estimate, status=EstimateRevisionStatus.APPROVED
+@@ -371,6 +375,9 @@
+             unit_price=item.unit_price,
+             sort_order=item.sort_order,
+         )
++        from .price_books import copy_item_mapping
++
++        copy_item_mapping(source=item, copied=copied_item, actor=actor)
+         for resource in item.resources.all():
+             EstimateResource.objects.create(
+                 organization=locked_estimate.organization,
+--- a/apps/estimates/price_book_models.py
++++ b/apps/estimates/price_book_models.py
+@@ -0,0 +1,254 @@
++"""Governed tenant Price Book sources and immutable mapping history (PD-017)."""
++
++import re
++import uuid
++
++from django.core.exceptions import ValidationError
++from django.db import models
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class PriceBookEvidenceQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("شواهد فهرست‌بها تغییرناپذیر است.")
++
++    def delete(self):
++        raise ValidationError("شواهد فهرست‌بها حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت شواهد فقط از سرویس مجاز است.")
++
++
++class PriceBookEvidence(UUIDModel, CreatedAtModel):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    created_by = models.ForeignKey(
++        "organizations.OrganizationMembership",
++        on_delete=models.PROTECT,
++        related_name="+",
++    )
++    objects = PriceBookEvidenceQuerySet.as_manager()
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding:
++            raise ValidationError("شواهد فهرست‌بها تغییرناپذیر است.")
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("شواهد فهرست‌بها حذف‌پذیر نیست.")
++
++    def clean(self):
++        validate_related_organizations(self, created_by=self.created_by)
++
++
++class PriceBook(PriceBookEvidence):
++    code = models.CharField(max_length=80)
++    name = models.CharField(max_length=255)
++    source_authority = models.CharField(max_length=255)
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "code"], name="price_book_tenant_code_uq"
++            )
++        ]
++
++    def clean(self):
++        super().clean()
++        self.code = self.code.strip().upper()
++        if not all((self.code, self.name.strip(), self.source_authority.strip())):
++            raise ValidationError("هویت و مرجع فهرست‌بها الزامی است.")
++
++
++class PriceBookVersion(PriceBookEvidence):
++    book = models.ForeignKey(
++        PriceBook, on_delete=models.PROTECT, related_name="versions"
++    )
++    version = models.CharField(max_length=80)
++    publication_year = models.CharField(max_length=20)
++    publication_reference = models.CharField(max_length=255)
++    effective_from = models.DateField()
++    effective_to = models.DateField()
++    currency = models.CharField(max_length=3)
++    source_reference = models.TextField()
++    artifact_sha256 = models.CharField(max_length=64)
++    content_sha256 = models.CharField(max_length=64)
++    rows_sha256 = models.CharField(max_length=64)
++    idempotency_key = models.CharField(max_length=120)
++    supersedes = models.ForeignKey(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="successors",
++    )
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["book", "version"], name="pb_version_identity_uq"
++            ),
++            models.UniqueConstraint(
++                fields=["organization", "idempotency_key"], name="pb_version_key_uq"
++            ),
++            models.CheckConstraint(
++                condition=models.Q(effective_to__gte=models.F("effective_from")),
++                name="pb_effective_dates_valid",
++            ),
++        ]
++
++    def clean(self):
++        super().clean()
++        validate_related_organizations(self, book=self.book, supersedes=self.supersedes)
++        if not all(
++            str(getattr(self, n)).strip()
++            for n in (
++                "version",
++                "publication_year",
++                "publication_reference",
++                "source_reference",
++                "idempotency_key",
++            )
++        ) or not re.fullmatch(r"[A-Z]{3}", self.currency):
++            raise ValidationError("هویت انتشار، ارز و شواهد منبع الزامی است.")
++        if any(
++            not re.fullmatch(r"[0-9a-f]{64}", getattr(self, n))
++            for n in ("artifact_sha256", "content_sha256", "rows_sha256")
++        ):
++            raise ValidationError("اثر انگشت منبع معتبر نیست.")
++        if self.effective_to < self.effective_from:
++            raise ValidationError("بازه اثر معتبر نیست.")
++        if self.supersedes_id and (
++            self.supersedes.book_id != self.book_id or self.supersedes_id == self.pk
++        ):
++            raise ValidationError("جانشینی باید به نسخه قبلی همان فهرست‌بها اشاره کند.")
++
++
++class PriceBookRow(PriceBookEvidence):
++    version = models.ForeignKey(
++        PriceBookVersion, on_delete=models.PROTECT, related_name="rows"
++    )
++    code = models.CharField(max_length=80)
++    chapter = models.CharField(max_length=120)
++    description = models.CharField(max_length=255)
++    unit_of_measure = models.ForeignKey(
++        "materials.UnitOfMeasure", on_delete=models.PROTECT
++    )
++    value = models.DecimalField(max_digits=18, decimal_places=4)
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["version", "code"], name="pb_row_version_code_uq"
++            ),
++            models.CheckConstraint(
++                condition=models.Q(value__gte=0), name="pb_row_nonnegative_value"
++            ),
++        ]
++
++    def clean(self):
++        super().clean()
++        validate_related_organizations(
++            self, version=self.version, unit_of_measure=self.unit_of_measure
++        )
++        if not all((self.code.strip(), self.chapter.strip(), self.description.strip())):
++            raise ValidationError("کد، فصل و شرح ردیف الزامی است.")
++        if PriceBookActivation.objects.filter(version=self.version).exists():
++            raise ValidationError("ردیف نسخه فعال قابل افزودن نیست.")
++        if self.value < 0 or not self.value.is_finite():
++            raise ValidationError("مقدار ردیف معتبر نیست.")
++
++
++class PriceBookActivation(PriceBookEvidence):
++    version = models.OneToOneField(
++        PriceBookVersion, on_delete=models.PROTECT, related_name="activation"
++    )
++    approval_reference = models.TextField()
++    reviewed_artifact_sha256 = models.CharField(max_length=64)
++    reviewed_content_sha256 = models.CharField(max_length=64)
++
++    def clean(self):
++        super().clean()
++        validate_related_organizations(self, version=self.version)
++        if (
++            not self.approval_reference.strip()
++            or self.reviewed_artifact_sha256 != self.version.artifact_sha256
++            or self.reviewed_content_sha256 != self.version.content_sha256
++            or not self.version.rows.exists()
++        ):
++            raise ValidationError("تأیید مستند منبع و محتوای واردشده الزامی است.")
++
++
++class EstimatePriceBookMapping(PriceBookEvidence):
++    identity = models.UUIDField(default=uuid.uuid4)
++    version = models.PositiveIntegerField()
++    source_item = models.ForeignKey(
++        "estimates.EstimateItem",
++        on_delete=models.PROTECT,
++        related_name="price_book_history",
++    )
++    source_revision = models.ForeignKey(
++        "estimates.EstimateRevision",
++        on_delete=models.PROTECT,
++        related_name="price_book_mappings",
++    )
++    row = models.ForeignKey(
++        PriceBookRow, on_delete=models.PROTECT, related_name="mappings"
++    )
++    effective_date = models.DateField()
++    evidence_reference = models.TextField()
++    source_snapshot = models.JSONField()
++    supersedes = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="successor",
++    )
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["identity", "version"], name="pb_mapping_identity_version_uq"
++            )
++        ]
++
++    def clean(self):
++        super().clean()
++        validate_related_organizations(
++            self,
++            source_item=self.source_item,
++            source_revision=self.source_revision,
++            row=self.row,
++            supersedes=self.supersedes,
++        )
++        if (
++            self.source_item.revision_id != self.source_revision_id
++            or self.source_item.unit_of_measure_id != self.row.unit_of_measure_id
++            or not self.evidence_reference.strip()
++            or not self.row.version.effective_from
++            <= self.effective_date
++            <= self.row.version.effective_to
++            or not PriceBookActivation.objects.filter(version=self.row.version).exists()
++        ):
++            raise ValidationError(
++                "ردیف، بازنگری، تاریخ و منبع فعال نگاشت باید معتبر باشد."
++            )
++        if self.supersedes_id:
++            if (
++                self.supersedes.organization_id != self.organization_id
++                or self.supersedes.identity != self.identity
++                or self.supersedes.version + 1 != self.version
++                or self.supersedes.source_item.estimate_id
++                != self.source_item.estimate_id
++            ):
++                raise ValidationError("زنجیره نسخه نگاشت معتبر نیست.")
++        elif self.version != 1:
++            raise ValidationError("نسخه نخست نگاشت باید یک باشد.")
+--- a/apps/estimates/price_books.py
++++ b/apps/estimates/price_books.py
+@@ -0,0 +1,445 @@
++"""PD-017/SPEC-022/032: source-controlled import and explicit pinned mappings."""
++
++from __future__ import annotations
++
++import csv
++import hashlib
++import json
++from datetime import date
++from decimal import Decimal, InvalidOperation
++from io import StringIO
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction
++from apps.audit.services import record_audit_event
++from apps.materials.models import UnitOfMeasure
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++
++from .models import (
++    Estimate,
++    EstimateItem,
++    EstimatePriceBookMapping,
++    EstimateRevisionStatus,
++    PriceBook,
++    PriceBookActivation,
++    PriceBookRow,
++    PriceBookVersion,
++)
++
++
++def _digest(payload: object) -> str:
++    return hashlib.sha256(
++        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
++    ).hexdigest()
++
++
++def parse_price_book_csv(content: str) -> tuple[dict[str, str], ...]:
++    """Fixed internal interchange profile; no guessed official column mapping."""
++    if not content.strip() or len(content.encode()) > 5_000_000:
++        raise ValidationError("محتوای ورودی خالی یا بیش از حد مجاز است.")
++    reader = csv.DictReader(StringIO(content))
++    columns = ("code", "chapter", "description", "unit", "value")
++    if tuple(reader.fieldnames or ()) != columns:
++        raise ValidationError("نگاشت ستون‌های ورودی معتبر نیست.")
++    rows = []
++    seen = set()
++    for row in reader:
++        if set(row) != set(columns) or any(v is None for v in row.values()):
++            raise ValidationError("تعداد ستون‌های ردیف معتبر نیست.")
++        row = {k: v.strip() for k, v in row.items()}
++        if any(not v or v.startswith(("=", "+", "@")) for v in row.values()):
++            raise ValidationError("مقدار خالی یا فرمول در ورودی مجاز نیست.")
++        try:
++            value = Decimal(row["value"])
++            if not value.is_finite() or value < 0 or value >= Decimal("1e14"):
++                raise ValueError
++            if value != value.quantize(Decimal(".0001")):
++                raise ValueError
++        except (InvalidOperation, ValueError) as exc:
++            raise ValidationError("مقدار عددی ردیف معتبر نیست.") from exc
++        row["value"] = format(value, ".4f")
++        row["code"], row["unit"] = row["code"].upper(), row["unit"].upper()
++        if row["code"] in seen:
++            raise ValidationError("کد ردیف تکراری است.")
++        seen.add(row["code"])
++        rows.append(row)
++    if not rows:
++        raise ValidationError("حداقل یک ردیف لازم است.")
++    return tuple(sorted(rows, key=lambda row: row["code"]))
++
++
++def _authorize(organization: Organization, actor: User, permission: str, project=None):
++    locked = Organization.objects.select_for_update().get(pk=organization.pk)
++    if not locked.is_active:
++        raise PermissionDenied("سازمان فعال نیست.")
++    membership = require_business_permission(
++        user=actor,
++        organization=locked,
++        permission=permission,
++        project=project,
++        message="اختیار لازم برای فهرست‌بها را ندارید.",
++    )
++    return locked, membership
++
++
++@transaction.atomic
++def create_price_book(
++    *,
++    organization: Organization,
++    actor: User,
++    code: str,
++    name: str,
++    source_authority: str,
++) -> PriceBook:
++    organization, membership = _authorize(organization, actor, P.PRICE_BOOKS_MANAGE)
++    return PriceBook.objects.create(
++        organization=organization,
++        created_by=membership,
++        code=code,
++        name=name.strip(),
++        source_authority=source_authority.strip(),
++    )
++
++
++@transaction.atomic
++def import_price_book_version(
++    *,
++    organization: Organization,
++    actor: User,
++    book: PriceBook,
++    version: str,
++    publication_year: str,
++    publication_reference: str,
++    effective_from: date,
++    effective_to: date,
++    currency: str,
++    source_reference: str,
++    artifact_sha256: str,
++    content: str,
++    idempotency_key: str,
++    supersedes: PriceBookVersion | None = None,
++) -> PriceBookVersion:
++    organization, membership = _authorize(organization, actor, P.PRICE_BOOKS_MANAGE)
++    try:
++        book = PriceBook.objects.get(pk=book.pk, organization=organization)
++    except PriceBook.DoesNotExist as exc:
++        raise PermissionDenied("منبع متعلق به این سازمان نیست.") from exc
++    rows = parse_price_book_csv(content)
++    attributes = {
++        "book": book,
++        "version": version.strip(),
++        "publication_year": publication_year.strip(),
++        "publication_reference": publication_reference.strip(),
++        "effective_from": effective_from,
++        "effective_to": effective_to,
++        "currency": currency.strip(),
++        "source_reference": source_reference.strip(),
++        "artifact_sha256": artifact_sha256,
++        "content_sha256": hashlib.sha256(content.encode()).hexdigest(),
++        "rows_sha256": _digest(rows),
++        "supersedes": supersedes,
++    }
++    prior = PriceBookVersion.objects.filter(
++        organization=organization, idempotency_key=idempotency_key.strip()
++    ).first()
++    if prior:
++        if any(getattr(prior, k) != v for k, v in attributes.items()):
++            raise ValidationError("کلید واردسازی با محتوای متفاوت استفاده شده است.")
++        return prior
++    units = {
++        u.code: u
++        for u in UnitOfMeasure.objects.filter(
++            organization=organization,
++            is_active=True,
++            archived_at__isnull=True,
++            code__in={row["unit"] for row in rows},
++        )
++    }
++    if any(row["unit"] not in units for row in rows):
++        raise ValidationError("واحد مصوب و فعال برای تمام ردیف‌ها الزامی است.")
++    imported = PriceBookVersion.objects.create(
++        organization=organization,
++        created_by=membership,
++        idempotency_key=idempotency_key.strip(),
++        **attributes,
++    )
++    for row in rows:
++        PriceBookRow.objects.create(
++            organization=organization,
++            created_by=membership,
++            version=imported,
++            code=row["code"],
++            chapter=row["chapter"],
++            description=row["description"],
++            unit_of_measure=units[row["unit"]],
++            value=Decimal(row["value"]),
++        )
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=AuditAction.PRICE_BOOK_IMPORTED,
++        entity_type="estimates.PriceBookVersion",
++        entity_id=imported.pk,
++        metadata={
++            "book_id": str(book.pk),
++            "content_sha256": imported.content_sha256,
++            "rows_sha256": imported.rows_sha256,
++            "rows": len(rows),
++        },
++    )
++    return imported
++
++
++@transaction.atomic
++def activate_price_book_version(
++    *,
++    organization: Organization,
++    actor: User,
++    version: PriceBookVersion,
++    approval_reference: str,
++    reviewed_artifact_sha256: str,
++    reviewed_content_sha256: str,
++) -> PriceBookActivation:
++    """Retain explicit authorized source approval; absence of evidence fails closed.
++
++    This records the source reviewer’s attestation over the exact evidence hashes.
++    It does not independently certify a publisher or obtain official content.
++    """
++    organization, membership = _authorize(organization, actor, P.PRICE_BOOKS_ACTIVATE)
++    try:
++        version = PriceBookVersion.objects.select_for_update().get(
++            pk=version.pk, organization=organization
++        )
++    except PriceBookVersion.DoesNotExist as exc:
++        raise PermissionDenied("نسخه متعلق به این سازمان نیست.") from exc
++    rows = tuple(
++        {
++            "code": row.code,
++            "chapter": row.chapter,
++            "description": row.description,
++            "unit": row.unit_of_measure.code,
++            "value": format(row.value, ".4f"),
++        }
++        for row in version.rows.select_related("unit_of_measure").order_by("code")
++    )
++    if not rows or _digest(rows) != version.rows_sha256:
++        raise ValidationError("محتوای نسخه با واردسازی ثبت‌شده هم‌خوان نیست.")
++    attributes = {
++        "approval_reference": approval_reference.strip(),
++        "reviewed_artifact_sha256": reviewed_artifact_sha256,
++        "reviewed_content_sha256": reviewed_content_sha256,
++    }
++    prior = PriceBookActivation.objects.filter(version=version).first()
++    if prior:
++        if any(getattr(prior, k) != v for k, v in attributes.items()):
++            raise ValidationError("تأیید قبلی با شواهد متفاوت جایگزین نمی‌شود.")
++        return prior
++    activation = PriceBookActivation.objects.create(
++        organization=organization,
++        created_by=membership,
++        version=version,
++        **attributes,
++    )
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=AuditAction.PRICE_BOOK_ACTIVATED,
++        entity_type="estimates.PriceBookActivation",
++        entity_id=activation.pk,
++        metadata={"version_id": str(version.pk), **attributes},
++    )
++    return activation
++
++
++def item_snapshot(item: EstimateItem) -> dict[str, str]:
++    return {
++        "item_id": str(item.pk),
++        "revision_id": str(item.revision_id),
++        "quantity": format(item.quantity, ".4f"),
++        "unit_id": str(item.unit_of_measure_id),
++        "unit_price": format(item.unit_price, ".2f"),
++        "description": item.description,
++    }
++
++
++def validate_item_mapping(item: EstimateItem) -> None:
++    if item.price_book_mapping_id:
++        mapping = item.price_book_mapping
++        if (
++            mapping.source_item_id != item.pk
++            or mapping.source_revision_id != item.revision_id
++            or mapping.organization_id != item.organization_id
++            or mapping.source_snapshot != item_snapshot(item)
++        ):
++            raise ValidationError(
++                "شواهد ردیف تغییر کرده است؛ نگاشت صریح جدید لازم است."
++            )
++
++
++def _bind_mapping(
++    *,
++    item: EstimateItem,
++    row: PriceBookRow,
++    effective_date: date,
++    evidence_reference: str,
++    membership,
++    actor: User,
++) -> EstimatePriceBookMapping:
++    prior = item.price_book_mapping
++    attributes = {
++        "organization": item.organization,
++        "created_by": membership,
++        "source_item": item,
++        "source_revision": item.revision,
++        "row": row,
++        "effective_date": effective_date,
++        "evidence_reference": evidence_reference,
++        "source_snapshot": item_snapshot(item),
++        "version": prior.version + 1 if prior else 1,
++        "supersedes": prior,
++    }
++    if prior:
++        attributes["identity"] = prior.identity
++    mapping = EstimatePriceBookMapping.objects.create(**attributes)
++    item.price_book_mapping = mapping
++    item.save(update_fields=["price_book_mapping", "updated_at"])
++    record_audit_event(
++        organization=item.organization,
++        actor=actor,
++        action=AuditAction.PRICE_BOOK_MAPPED,
++        entity_type="estimates.EstimatePriceBookMapping",
++        entity_id=mapping.pk,
++        metadata={
++            "source_item_id": str(item.pk),
++            "source_revision_id": str(item.revision_id),
++            "row_id": str(row.pk),
++            "book_version_id": str(row.version_id),
++            "mapping_identity": str(mapping.identity),
++            "mapping_version": mapping.version,
++            "predecessor_id": str(prior.pk) if prior else None,
++        },
++    )
++    return mapping
++
++
++@transaction.atomic
++def map_estimate_price_book(
++    *,
++    organization: Organization,
++    actor: User,
++    item: EstimateItem,
++    row: PriceBookRow,
++    effective_date: date,
++    evidence_reference: str,
++) -> EstimatePriceBookMapping:
++    # Match revision service lock order: estimate before source-item/pointer mutation.
++    try:
++        reference = EstimateItem.objects.get(pk=item.pk, organization=organization)
++    except EstimateItem.DoesNotExist as exc:
++        raise PermissionDenied("ردیف متعلق به این سازمان نیست.") from exc
++    organization, membership = _authorize(
++        organization, actor, P.PRICE_BOOK_MAPPINGS_MANAGE, reference.estimate.project
++    )
++    estimate = Estimate.objects.select_for_update().get(
++        pk=reference.estimate_id, organization=organization
++    )
++    item = EstimateItem.objects.select_for_update().get(
++        pk=reference.pk, organization=organization
++    )
++    if (
++        not item.revision_id
++        or item.revision.status != EstimateRevisionStatus.DRAFT
++        or estimate.current_revision_id != item.revision_id
++        or estimate.deleted_at
++        or estimate.project.deleted_at
++    ):
++        raise ValidationError("نگاشت فقط در بازنگری جاری و قابل ویرایش مجاز است.")
++    try:
++        row = PriceBookRow.objects.get(pk=row.pk, organization=organization)
++    except PriceBookRow.DoesNotExist as exc:
++        raise PermissionDenied("ردیف منبع متعلق به این سازمان نیست.") from exc
++    return _bind_mapping(
++        item=item,
++        row=row,
++        effective_date=effective_date,
++        evidence_reference=evidence_reference,
++        membership=membership,
++        actor=actor,
++    )
++
++
++def copy_item_mapping(
++    *, source: EstimateItem, copied: EstimateItem, actor: User
++) -> None:
++    """Called only inside the explicit authorized estimate-revision transaction."""
++    validate_item_mapping(source)
++    if source.price_book_mapping_id:
++        # Preserve exact version selection; revision-copy is not a new source selection.
++        prior = source.price_book_mapping
++        copied.price_book_mapping = prior
++        _bind_mapping(
++            item=copied,
++            row=prior.row,
++            effective_date=prior.effective_date,
++            evidence_reference=prior.evidence_reference,
++            membership=copied.organization.memberships.get(user=actor),
++            actor=actor,
++        )
++
++
++def reconcile_estimate_price_books(
++    *, organization: Organization, actor: User, estimate: Estimate
++) -> dict:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.ESTIMATES_VIEW,
++        allow_any_scope=True,
++        message="اختیار مشاهده برآورد لازم است.",
++    )
++    try:
++        estimate = Estimate.objects.get(pk=estimate.pk, organization=organization)
++    except Estimate.DoesNotExist as exc:
++        raise PermissionDenied("برآورد متعلق به این سازمان نیست.") from exc
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.ESTIMATES_VIEW,
++        project=estimate.project,
++        message="دامنه پروژه لازم است.",
++    )
++    rows = []
++    for item in estimate.items.select_related(
++        "price_book_mapping__row__version__book"
++    ).order_by("pk"):
++        mapping = item.price_book_mapping
++        rows.append(
++            {
++                "item_id": str(item.pk),
++                "revision_id": str(item.revision_id),
++                "mapping_id": str(mapping.pk) if mapping else None,
++                "mapping_identity": str(mapping.identity) if mapping else None,
++                "mapping_version": mapping.version if mapping else None,
++                "predecessor_id": str(mapping.supersedes_id)
++                if mapping and mapping.supersedes_id
++                else None,
++                "row_id": str(mapping.row_id) if mapping else None,
++                "book_version_id": str(mapping.row.version_id) if mapping else None,
++                "book_id": str(mapping.row.version.book_id) if mapping else None,
++                "effective_date": str(mapping.effective_date) if mapping else None,
++                "source_evidence": mapping.row.version.source_reference
++                if mapping
++                else None,
++                "exception": None if mapping else "NO_AUTHORITATIVE_PRICE_BOOK_MAPPING",
++            }
++        )
++    return {
++        "estimate_id": str(estimate.pk),
++        "items": rows,
++        "evidence_hash": _digest(rows),
++    }
+--- a/apps/estimates/test_cep035_price_books.py
++++ b/apps/estimates/test_cep035_price_books.py
+@@ -0,0 +1,484 @@
++"""Synthetic source-engine tests; no official Iranian source activation evidence."""
++
++import hashlib
++import json
++import os
++from datetime import date
++from decimal import Decimal
++from pathlib import Path
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import SimpleTestCase, TestCase, TransactionTestCase
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction, AuditEvent
++from apps.estimates import models as m
++from apps.estimates import services as legacy
++from apps.estimates import test_p4_depth as depth_tests
++from apps.estimates.price_books import (
++    activate_price_book_version,
++    create_price_book,
++    import_price_book_version,
++    map_estimate_price_book,
++    parse_price_book_csv,
++    reconcile_estimate_price_books,
++)
++from apps.materials.models import UnitOfMeasure
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationRole,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.projects.models import Project
++
++CSV = "code,chapter,description,unit,value\nTEST-1,TEST,Synthetic test row,EA,12.3400\n"
++
++
++class PriceBookFixture:
++    def setUp(self):
++        self.actor = User.objects.create_user(username="cep035-test")
++        self.organization = Organization.objects.create(name="Synthetic", slug="cep035")
++        self.role = OrganizationRole.objects.create(
++            code="cep035-test", name="Explicit test grants"
++        )
++        self.role.permissions.set(BusinessPermission.objects.filter(is_active=True))
++        self.membership = self.organization.memberships.create(
++            user=self.actor,
++            role="company_owner",
++            role_definition=self.role,
++            status="active",
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=self.membership,
++            scope_type=AuthorizationScopeType.ORGANIZATION,
++            reason="Isolated CEP035 test",
++        )
++        self.unit = UnitOfMeasure.objects.create(
++            organization=self.organization,
++            code="EA",
++            name="Synthetic unit",
++            symbol="ea",
++            category="count",
++        )
++        self.project = Project.objects.create(
++            organization=self.organization, code="PB", name="Synthetic"
++        )
++        self.estimate = legacy.create_estimate(
++            organization=self.organization,
++            actor=self.actor,
++            project=self.project,
++            estimate_number="PB1",
++            title="Synthetic",
++        )
++        self.item = legacy.add_estimate_item(
++            estimate=self.estimate,
++            actor=self.actor,
++            description="Synthetic estimate item",
++            quantity=Decimal(2),
++            unit_price=Decimal(5),
++            unit_of_measure=self.unit,
++        )
++
++    def book(self):
++        return create_price_book(
++            organization=self.organization,
++            actor=self.actor,
++            code="SYNTHETIC",
++            name="Synthetic fixture",
++            source_authority="TEST ONLY",
++        )
++
++    def version(self, book=None, number="1", **changes):
++        arguments = {
++            "organization": self.organization,
++            "actor": self.actor,
++            "book": book or self.book(),
++            "version": number,
++            "publication_year": "TEST-2026",
++            "publication_reference": "TEST publication",
++            "effective_from": date(2026, 1, 1),
++            "effective_to": date(2026, 12, 31),
++            "currency": "IRR",
++            "source_reference": "TEST ONLY; no official source",
++            "artifact_sha256": hashlib.sha256(CSV.encode()).hexdigest(),
++            "content": CSV,
++            "idempotency_key": "import-" + number,
++        }
++        return import_price_book_version(**(arguments | changes))
++
++    def activate(self, version, **changes):
++        return activate_price_book_version(
++            **(
++                {
++                    "organization": self.organization,
++                    "actor": self.actor,
++                    "version": version,
++                    "approval_reference": "SYNTHETIC TEST ATTESTATION ONLY",
++                    "reviewed_artifact_sha256": version.artifact_sha256,
++                    "reviewed_content_sha256": version.content_sha256,
++                }
++                | changes
++            )
++        )
++
++    def mapping(self, row, item=None):
++        return map_estimate_price_book(
++            organization=self.organization,
++            actor=self.actor,
++            item=item or self.item,
++            row=row,
++            effective_date=date(2026, 10, 18),
++            evidence_reference="Synthetic explicit selection",
++        )
++
++
++class PriceBookParserTests(SimpleTestCase):
++    def test_strict_schema_finite_values_and_no_guessed_columns(self):
++        self.assertEqual(parse_price_book_csv(CSV)[0]["value"], "12.3400")
++        for content in (
++            "",
++            CSV.replace("chapter", "unknown"),
++            CSV.replace("12.3400", "NaN"),
++            CSV.replace("12.3400", "Infinity"),
++            CSV.replace("12.3400", "-1"),
++            CSV.replace("12.3400", "1.00001"),
++            CSV.replace("TEST-1", "=A1"),
++            CSV + CSV.splitlines()[1] + "\n",
++        ):
++            with self.subTest(content=content), self.assertRaises(ValidationError):
++                parse_price_book_csv(content)
++
++
++class PriceBookServiceTests(PriceBookFixture, TestCase):
++    def test_import_provenance_idempotency_and_changed_request_rejection(self):
++        book = self.book()
++        version = self.version(book)
++        self.assertEqual(self.version(book).pk, version.pk)
++        self.assertEqual(version.rows.count(), 1)
++        self.assertEqual(version.book.source_authority, "TEST ONLY")
++        self.assertEqual(version.publication_year, "TEST-2026")
++        self.assertFalse(m.PriceBookActivation.objects.exists())
++        with self.assertRaises(ValidationError):
++            self.version(book, content=CSV.replace("12.3400", "20"))
++        self.assertEqual(
++            AuditEvent.objects.filter(action=AuditAction.PRICE_BOOK_IMPORTED).count(), 1
++        )
++
++    def test_missing_source_or_unit_fails_atomically(self):
++        book = self.book()
++        for changes in (
++            {"source_reference": ""},
++            {"artifact_sha256": "invalid"},
++            {"content": CSV.replace("EA", "UNKNOWN")},
++            {"effective_to": date(2025, 1, 1)},
++        ):
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                self.version(book, **changes)
++        self.assertFalse(m.PriceBookVersion.objects.exists())
++        self.assertFalse(m.PriceBookRow.objects.exists())
++
++    def test_activation_requires_exact_evidence_and_imported_row_set(self):
++        version = self.version()
++        for changes in (
++            {"approval_reference": ""},
++            {"reviewed_artifact_sha256": "0" * 64},
++            {"reviewed_content_sha256": "0" * 64},
++        ):
++            with self.assertRaises(ValidationError):
++                self.activate(version, **changes)
++        activation = self.activate(version)
++        self.assertEqual(self.activate(version).pk, activation.pk)
++        with self.assertRaises(ValidationError):
++            self.activate(version, approval_reference="replacement")
++        with self.assertRaises(ValidationError):
++            m.PriceBookRow.objects.create(
++                organization=self.organization,
++                created_by=self.membership,
++                version=version,
++                code="NEW",
++                chapter="TEST",
++                description="Cannot append",
++                unit_of_measure=self.unit,
++                value=Decimal(1),
++            )
++
++    def test_row_set_mismatch_prevents_activation(self):
++        version = self.version()
++        m.PriceBookRow.objects.create(
++            organization=self.organization,
++            created_by=self.membership,
++            version=version,
++            code="EXTRA",
++            chapter="TEST",
++            description="Unvalidated extra row",
++            unit_of_measure=self.unit,
++            value=Decimal(1),
++        )
++        with self.assertRaises(ValidationError):
++            self.activate(version)
++        self.assertFalse(m.PriceBookActivation.objects.exists())
++
++    def test_mapping_inactive_and_wrong_effective_date_fail_closed(self):
++        version = self.version()
++        with self.assertRaises(ValidationError):
++            self.mapping(version.rows.get())
++        self.activate(version)
++        with self.assertRaises(ValidationError):
++            map_estimate_price_book(
++                organization=self.organization,
++                actor=self.actor,
++                item=self.item,
++                row=version.rows.get(),
++                effective_date=date(2027, 1, 1),
++                evidence_reference="Outside source window",
++            )
++        self.assertFalse(m.EstimatePriceBookMapping.objects.exists())
++
++    def test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history(
++        self,
++    ):
++        version = self.version()
++        self.activate(version)
++        first = self.mapping(version.rows.get())
++        replacement = self.version(version.book, "2", supersedes=version)
++        self.activate(replacement)
++        self.item.refresh_from_db()
++        self.assertEqual(self.item.price_book_mapping_id, first.pk)
++        second = self.mapping(replacement.rows.get())
++        self.assertEqual(second.identity, first.identity)
++        self.assertEqual(second.version, 2)
++        self.assertEqual(second.supersedes_id, first.pk)
++        self.assertEqual(first.row.version_id, version.pk)
++        self.item.refresh_from_db()
++        self.assertEqual(self.item.unit_price, Decimal(5))
++        for operation in (
++            first.save,
++            first.delete,
++            lambda: m.EstimatePriceBookMapping.objects.update(version=99),
++            lambda: m.PriceBookVersion.objects.all().delete(),
++        ):
++            with self.assertRaises(ValidationError):
++                operation()
++
++    def test_explicit_revision_retains_pinned_source_and_historical_reproducibility(
++        self,
++    ):
++        version = self.version()
++        self.activate(version)
++        first = self.mapping(version.rows.get())
++        legacy.approve_estimate(estimate=self.estimate, actor=self.actor)
++        with self.assertRaises(ValidationError):
++            self.mapping(version.rows.get())
++        draft = legacy.create_estimate_revision(
++            estimate=self.estimate, actor=self.actor
++        )
++        copied = draft.items.get()
++        mapping = copied.price_book_mapping
++        self.assertEqual(mapping.supersedes_id, first.pk)
++        self.assertEqual(mapping.row_id, first.row_id)
++        self.assertEqual(mapping.source_item_id, copied.pk)
++        self.item.refresh_from_db()
++        self.assertEqual(self.item.price_book_mapping_id, first.pk)
++        self.assertEqual(copied.unit_price, self.item.unit_price)
++        trace = reconcile_estimate_price_books(
++            organization=self.organization, actor=self.actor, estimate=self.estimate
++        )
++        self.assertEqual(len(trace["items"]), 2)
++        if path := os.environ.get("CEP035_TRACE_PATH"):
++            Path(path).write_text(json.dumps(trace, indent=2), encoding="utf-8")
++
++    def test_changed_draft_requires_explicit_mapping_before_approval(self):
++        version = self.version()
++        self.activate(version)
++        self.mapping(version.rows.get())
++        self.item.refresh_from_db()
++        self.item.quantity = Decimal(3)
++        self.item.save()
++        with self.assertRaises(ValidationError):
++            legacy.approve_estimate(estimate=self.estimate, actor=self.actor)
++        self.mapping(version.rows.get())
++        legacy.approve_estimate(estimate=self.estimate, actor=self.actor)
++
++    def test_tenant_scope_permissions_and_default_grants(self):
++        self.assertFalse(
++            OrganizationRole.objects.filter(
++                is_system=True,
++                permissions__code__in=[
++                    P.PRICE_BOOKS_MANAGE,
++                    P.PRICE_BOOKS_ACTIVATE,
++                    P.PRICE_BOOK_MAPPINGS_MANAGE,
++                ],
++            ).exists()
++        )
++        version = self.version()
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.PRICE_BOOKS_ACTIVATE)
++        )
++        with self.assertRaises(PermissionDenied):
++            self.activate(version)
++        other = Organization.objects.create(name="Other", slug="other035")
++        with self.assertRaises(PermissionDenied):
++            import_price_book_version(
++                organization=self.organization,
++                actor=self.actor,
++                book=m.PriceBook.objects.create(
++                    organization=other,
++                    created_by=other.memberships.create(
++                        user=self.actor,
++                        role="company_owner",
++                        role_definition=self.role,
++                        status="active",
++                    ),
++                    code="OTHER",
++                    name="Other",
++                    source_authority="TEST",
++                ),
++                version="bad",
++                publication_year="TEST",
++                publication_reference="TEST",
++                effective_from=date(2026, 1, 1),
++                effective_to=date(2026, 12, 31),
++                currency="IRR",
++                source_reference="TEST",
++                artifact_sha256="0" * 64,
++                content=CSV,
++                idempotency_key="other",
++            )
++        MembershipScopeGrant.objects.filter(membership=self.membership).delete()
++        with self.assertRaises(PermissionDenied):
++            self.book()
++
++    def test_audit_failure_rolls_back_import(self):
++        book = self.book()
++        with (
++            patch(
++                "apps.estimates.price_books.record_audit_event",
++                side_effect=RuntimeError("injected"),
++            ),
++            self.assertRaises(RuntimeError),
++        ):
++            self.version(book)
++        self.assertFalse(m.PriceBookVersion.objects.exists())
++
++
++class PriceBookMigrationTests(PriceBookFixture, TransactionTestCase):
++    def test_populated_legacy_sources_and_approved_history_survive_rollback_reapply(
++        self,
++    ):
++        source = legacy.create_price_source(
++            organization=self.organization,
++            actor=self.actor,
++            code="LEGACY",
++            name="Legacy",
++            version="1",
++            source_reference="legacy evidence",
++            license_reference="internal",
++        )
++        rate = legacy.record_estimate_rate(
++            price_source=source,
++            actor=self.actor,
++            resource_type="labor",
++            code="L1",
++            unit_of_measure=self.unit,
++            rate=Decimal(7),
++        )
++        legacy.approve_estimate(estimate=self.estimate, actor=self.actor)
++        before = {
++            label: list(
++                model.objects.order_by("pk").values(
++                    *[
++                        f.attname
++                        for f in model._meta.concrete_fields
++                        if f.name != "price_book_mapping"
++                    ]
++                )
++            )
++            for label, model in [
++                ("items", m.EstimateItem),
++                ("revisions", m.EstimateRevision),
++                ("sources", m.EstimatePriceSource),
++                ("rates", m.EstimateRate),
++            ]
++        }
++        latest = ("estimates", "0006_cep035_price_book_version_mapping")
++        previous = ("estimates", "0005_p4_s01_s06_estimate_depth")
++        try:
++            MigrationExecutor(connection).migrate([previous])
++            self.assertNotIn(
++                "estimates_pricebook", connection.introspection.table_names()
++            )
++            MigrationExecutor(connection).migrate([latest])
++            for label, model in [
++                ("items", m.EstimateItem),
++                ("revisions", m.EstimateRevision),
++                ("sources", m.EstimatePriceSource),
++                ("rates", m.EstimateRate),
++            ]:
++                self.assertEqual(
++                    list(
++                        model.objects.order_by("pk").values(
++                            *[
++                                f.attname
++                                for f in model._meta.concrete_fields
++                                if f.name != "price_book_mapping"
++                            ]
++                        )
++                    ),
++                    before[label],
++                )
++            self.assertEqual(
++                m.EstimateRate.objects.get(pk=rate.pk).source_version_snapshot, "1"
++            )
++            self.assertFalse(
++                m.EstimateItem.objects.exclude(price_book_mapping=None).exists()
++            )
++            self.assertFalse(m.EstimatePriceBookMapping.objects.exists())
++            if path := os.environ.get("CEP035_MIGRATION_TRACE_PATH"):
++                Path(path).write_text(
++                    json.dumps(
++                        {
++                            "populated_legacy_preservation": "PASS",
++                            "before_after_equal": True,
++                            "rows": {k: len(v) for k, v in before.items()},
++                            "inferred_mappings": 0,
++                            "unmapped_exception": "NO_AUTHORITATIVE_PRICE_BOOK_MAPPING",
++                            "rollback_reapply": "PASS",
++                        },
++                        indent=2,
++                    ),
++                    encoding="utf-8",
++                )
++        finally:
++            MigrationExecutor(connection).migrate([latest])
++
++
++class PriceBookAffectedRegression(PriceBookFixture, TestCase):
++    def setUp(self):
++        super().setUp()
++        self.owner = self.actor
++        self.other = User.objects.create_user(username="cep035-other")
++        self.other_organization = Organization.objects.create(
++            name="Other", slug="cep035-other"
++        )
++        self.other_organization.memberships.create(
++            user=self.other,
++            role="company_owner",
++            role_definition=self.role,
++            status="active",
++        )
++        self.unit.code = "PB-EA"
++        self.unit.symbol = "pb-ea"
++        self.unit.save()
++
++    test_revision_history = depth_tests.EstimateDepthTests.test_comparison_uses_revision_evidence_and_approved_assumption_is_immutable
++    test_legacy_source_boundary = depth_tests.EstimateDepthTests.test_source_lineage_requires_same_tenant_and_external_source_is_closed
++    test_import_preview = depth_tests.EstimateDepthTests.test_preview_rejects_formula_and_unknown_mapping_without_mutation
+--- a/apps/estimates/migrations/0006_cep035_price_book_version_mapping.py
++++ b/apps/estimates/migrations/0006_cep035_price_book_version_mapping.py
+@@ -0,0 +1,141 @@
++# Generated by Django 5.2.17 on 2026-10-18 15:22
++
++import django.db.models.deletion
++import uuid
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('estimates', '0005_p4_s01_s06_estimate_depth'),
++        ('materials', '0010_materialdocumentlink_materialrelationship_and_more'),
++        ('organizations', '0118_cep035_price_book_permissions'),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='EstimatePriceBookMapping',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('identity', models.UUIDField(default=uuid.uuid4)),
++                ('version', models.PositiveIntegerField()),
++                ('effective_date', models.DateField()),
++                ('evidence_reference', models.TextField()),
++                ('source_snapshot', models.JSONField()),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('source_item', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='price_book_history', to='estimates.estimateitem')),
++                ('source_revision', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='price_book_mappings', to='estimates.estimaterevision')),
++                ('supersedes', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='successor', to='estimates.estimatepricebookmapping')),
++            ],
++        ),
++        migrations.AddField(
++            model_name='estimateitem',
++            name='price_book_mapping',
++            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='current_uses', to='estimates.estimatepricebookmapping'),
++        ),
++        migrations.CreateModel(
++            name='PriceBook',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('code', models.CharField(max_length=80)),
++                ('name', models.CharField(max_length=255)),
++                ('source_authority', models.CharField(max_length=255)),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='PriceBookRow',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('code', models.CharField(max_length=80)),
++                ('chapter', models.CharField(max_length=120)),
++                ('description', models.CharField(max_length=255)),
++                ('value', models.DecimalField(decimal_places=4, max_digits=18)),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('unit_of_measure', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='materials.unitofmeasure')),
++            ],
++        ),
++        migrations.AddField(
++            model_name='estimatepricebookmapping',
++            name='row',
++            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='mappings', to='estimates.pricebookrow'),
++        ),
++        migrations.CreateModel(
++            name='PriceBookVersion',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('version', models.CharField(max_length=80)),
++                ('publication_year', models.CharField(max_length=20)),
++                ('publication_reference', models.CharField(max_length=255)),
++                ('effective_from', models.DateField()),
++                ('effective_to', models.DateField()),
++                ('currency', models.CharField(max_length=3)),
++                ('source_reference', models.TextField()),
++                ('artifact_sha256', models.CharField(max_length=64)),
++                ('content_sha256', models.CharField(max_length=64)),
++                ('rows_sha256', models.CharField(max_length=64)),
++                ('idempotency_key', models.CharField(max_length=120)),
++                ('book', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='versions', to='estimates.pricebook')),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('supersedes', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='successors', to='estimates.pricebookversion')),
++            ],
++        ),
++        migrations.AddField(
++            model_name='pricebookrow',
++            name='version',
++            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='rows', to='estimates.pricebookversion'),
++        ),
++        migrations.CreateModel(
++            name='PriceBookActivation',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('approval_reference', models.TextField()),
++                ('reviewed_artifact_sha256', models.CharField(max_length=64)),
++                ('reviewed_content_sha256', models.CharField(max_length=64)),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('version', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='activation', to='estimates.pricebookversion')),
++            ],
++            options={
++                'abstract': False,
++            },
++        ),
++        migrations.AddConstraint(
++            model_name='pricebook',
++            constraint=models.UniqueConstraint(fields=('organization', 'code'), name='price_book_tenant_code_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='estimatepricebookmapping',
++            constraint=models.UniqueConstraint(fields=('identity', 'version'), name='pb_mapping_identity_version_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='pricebookversion',
++            constraint=models.UniqueConstraint(fields=('book', 'version'), name='pb_version_identity_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='pricebookversion',
++            constraint=models.UniqueConstraint(fields=('organization', 'idempotency_key'), name='pb_version_key_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='pricebookversion',
++            constraint=models.CheckConstraint(condition=models.Q(('effective_to__gte', models.F('effective_from'))), name='pb_effective_dates_valid'),
++        ),
++        migrations.AddConstraint(
++            model_name='pricebookrow',
++            constraint=models.UniqueConstraint(fields=('version', 'code'), name='pb_row_version_code_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='pricebookrow',
++            constraint=models.CheckConstraint(condition=models.Q(('value__gte', 0)), name='pb_row_nonnegative_value'),
++        ),
++    ]
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -748,6 +748,9 @@
+         "estimate_rate_sources.manage",
+         "مدیریت منبع و نرخ برآورد",
+     )
++    PRICE_BOOKS_MANAGE = "price_books.manage", "مدیریت منابع فهرست‌بها"
++    PRICE_BOOKS_ACTIVATE = "price_books.activate", "تأیید مستند منبع فهرست‌بها"
++    PRICE_BOOK_MAPPINGS_MANAGE = "price_book_mappings.manage", "نگاشت نسخه‌دار فهرست‌بها"
+     ESTIMATE_IMPORTS_PREVIEW = (
+         "estimate_imports.preview",
+         "پیش‌نمایش ورود برآورد",
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -491,6 +491,12 @@
+             P.ESTIMATE_IMPORTS_PREVIEW,
+         ),
+         ("apps.estimates.services",),
++    ),
++    PermissionResource(
++        "price_books", "منابع و نگاشت فهرست‌بها",
++        ("estimates.PriceBook", "estimates.PriceBookVersion", "estimates.PriceBookRow", "estimates.PriceBookActivation", "estimates.EstimatePriceBookMapping"),
++        (P.PRICE_BOOKS_MANAGE, P.PRICE_BOOKS_ACTIVATE, P.PRICE_BOOK_MAPPINGS_MANAGE),
++        ("apps.estimates.price_books",),
+     ),
+     PermissionResource(
+         "cost_structures",
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -5,7 +5,12 @@
+ )
+ from apps.organizations.permission_registry import registered_permission_codes
+ 
+-ALL_PERMISSIONS = registered_permission_codes()
++# CEP035 source activation/mapping require explicit grants; no implicit role expansion.
++ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
++    BusinessPermissionCode.PRICE_BOOKS_MANAGE,
++    BusinessPermissionCode.PRICE_BOOKS_ACTIVATE,
++    BusinessPermissionCode.PRICE_BOOK_MAPPINGS_MANAGE,
++)
+ REPORTING_PERMISSIONS = frozenset(
+     code for code in ALL_PERMISSIONS if code.startswith("reporting.")
+ )
+--- a/apps/organizations/migrations/0118_cep035_price_book_permissions.py
++++ b/apps/organizations/migrations/0118_cep035_price_book_permissions.py
+@@ -0,0 +1,22 @@
++"""Catalogue governed Price Book capabilities without default grants."""
++from django.db import migrations
++
++PERMISSIONS = (
++    ("price_books.manage", "مدیریت منابع فهرست‌بها"),
++    ("price_books.activate", "تأیید مستند منبع فهرست‌بها"),
++    ("price_book_mappings.manage", "نگاشت نسخه‌دار فهرست‌بها"),
++)
++
++def forward(apps, schema_editor):
++    model = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        model.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True})
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias).filter(code__in=[c for c, _ in PERMISSIONS]).update(is_active=False)
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0117_cep033_ap_source_reversal_permission")]
++    operations = [migrations.RunPython(forward, reverse)]
+--- a/apps/audit/models.py
++++ b/apps/audit/models.py
+@@ -1608,6 +1608,9 @@
+         "inventory.receipt_failed",
+         "Receipt target mutation failed",
+     )
++    PRICE_BOOK_IMPORTED = "estimates.price_book_imported", "نسخه فهرست‌بها وارد شد"
++    PRICE_BOOK_ACTIVATED = "estimates.price_book_activated", "منبع فهرست‌بها تأیید شد"
++    PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
+ 
+ 
+ class AuditEventQuerySet(models.QuerySet):

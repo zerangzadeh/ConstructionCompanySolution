@@ -1,0 +1,14 @@
+id,path,result
+CEP-035-EV-001,CEP-035_ENTRY.json,Grounding; checkpoint; canonical/source hashes; build/gate eligibility
+CEP-035-EV-002,CEP-035_FINAL_TEST_OUTPUT.txt,11 focused + 3 affected PASS
+CEP-035-EV-003,CEP-035_MIGRATION_TRACE.json;CEP-035_MIGRATION_AND_REGRESSION_FIXTURE_OUTPUT.txt,Populated migration PASS; combined regression fixture failure superseded by EV002
+CEP-035-EV-004,CEP-035_DEVELOPMENT_MIGRATION.json,Only two authorized local migrations; legacy digests unchanged; no official activation
+CEP-035-EV-005,CEP-035_MAPPING_TRACE.json,Actual synthetic mapping/revision predecessor proof
+CEP-035-EV-006,CEP-035_CODE_DIFF.patch,Bounded product and migration diff
+CEP-035-EV-007,CEP-035_ACCEPTANCE_MAPPING.csv,13/13 build AC PASS
+CEP-035-EV-008,CEP-035_VALIDATION_SUMMARY.json,Required lint/format/system/drift/diff outputs
+CEP-035-EV-009,CEP-035_CHANGE_MANIFEST.csv,Actual touch set
+CEP-035-EV-010,../manifests/CEP-035_EXECUTION_MANIFEST.md,Pre-mutation entry/touch set; closeout
+CEP-035-EV-011,../reports/CEP-035_COMPLETION_REPORT.md,Complete build; official-content and runtime limits
+CEP-035-EV-012,CEP-035_FRONTIER.json,Recomputed live prerequisite frontier; gates preserved
+CEP-035-EV-013,CEP-035_INITIAL_FIXTURE_FAILURE.txt,Superseded isolated cross-tenant fixture role error

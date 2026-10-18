@@ -453,6 +453,11 @@ def _approve_contractual_record_domain(
             "contract_value_effect": "none",
         },
     )
+    from apps.billing.variation_handoffs import accept_approved_variation_event
+
+    accept_approved_variation_event(
+        organization=organization, actor=actor, source=locked
+    )
     return locked
 
 

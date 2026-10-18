@@ -1,0 +1,57 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+Found 12 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying organizations.0118_cep035_price_book_permissions... OK
+test_activation_requires_exact_evidence_and_imported_row_set (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_activation_requires_exact_evidence_and_imported_row_set) ... ok
+test_audit_failure_rolls_back_import (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_audit_failure_rolls_back_import) ... ok
+test_changed_draft_requires_explicit_mapping_before_approval (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_changed_draft_requires_explicit_mapping_before_approval) ... ok
+test_explicit_revision_retains_pinned_source_and_historical_reproducibility (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_explicit_revision_retains_pinned_source_and_historical_reproducibility) ... ok
+test_import_provenance_idempotency_and_changed_request_rejection (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_import_provenance_idempotency_and_changed_request_rejection) ... ok
+test_mapping_inactive_and_wrong_effective_date_fail_closed (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_mapping_inactive_and_wrong_effective_date_fail_closed) ... ok
+test_missing_source_or_unit_fails_atomically (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_missing_source_or_unit_fails_atomically) ... ok
+test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history) ... ok
+test_row_set_mismatch_prevents_activation (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_row_set_mismatch_prevents_activation) ... ok
+test_tenant_scope_permissions_and_default_grants (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_tenant_scope_permissions_and_default_grants) ... ERROR
+test_populated_legacy_sources_and_approved_history_survive_rollback_reapply (apps.estimates.test_cep035_price_books.PriceBookMigrationTests.test_populated_legacy_sources_and_approved_history_survive_rollback_reapply) ... ok
+test_strict_schema_finite_values_and_no_guessed_columns (apps.estimates.test_cep035_price_books.PriceBookParserTests.test_strict_schema_finite_values_and_no_guessed_columns) ... ok
+
+======================================================================
+ERROR: test_tenant_scope_permissions_and_default_grants (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_tenant_scope_permissions_and_default_grants)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\estimates\test_cep035_price_books.py", line 334, in test_tenant_scope_permissions_and_default_grants
+    created_by=other.memberships.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py", line 856, in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\organizations\models.py", line 2373, in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+
+----------------------------------------------------------------------
+Ran 12 tests in 34.646s
+
+FAILED (errors=1)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+  Applying estimates.0006_cep035_price_book_version_mapping... OK
+System check identified no issues (0 silenced).

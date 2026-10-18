@@ -1,0 +1,111 @@
+{
+  "environment": "Verified configured local development PostgreSQL; no production",
+  "pending_before": [
+    [
+      "organizations",
+      "0119_cep037_variation_eligibility_permissions"
+    ],
+    [
+      "billing",
+      "0017_cep037_variation_billing_eligibility"
+    ]
+  ],
+  "commands": [
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "manage.py",
+        "migrate",
+        "organizations",
+        "0119_cep037_variation_eligibility_permissions",
+        "--noinput"
+      ],
+      "exit_code": 0,
+      "output": "Operations to perform:\n  Target specific migration: 0119_cep037_variation_eligibility_permissions, from organizations\nRunning migrations:\n  Applying organizations.0119_cep037_variation_eligibility_permissions... OK\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "manage.py",
+        "migrate",
+        "billing",
+        "0017_cep037_variation_billing_eligibility",
+        "--noinput"
+      ],
+      "exit_code": 0,
+      "output": "Operations to perform:\n  Target specific migration: 0017_cep037_variation_billing_eligibility, from billing\nRunning migrations:\n  Applying billing.0017_cep037_variation_billing_eligibility... OK\n"
+    }
+  ],
+  "before": {
+    "contracts.ContractualRecord": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "contracts.ContractAmendment": {
+      "count": 32,
+      "sha256": "d145500ae23ea5b88c6bf1a4539048b1ccafc67a20ca3dbb81354662c75e62bc"
+    },
+    "billing.ProgressClaim": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "billing.PayableCertificate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "subledgers.Obligation": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "accounting.JournalEntry": {
+      "count": 1,
+      "sha256": "9e1bedda603750849d33f93987807ebc10cfbdbbed7315adcda05c9a7846baec"
+    },
+    "treasury.TreasuryMovement": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "preexisting_role_grants": {
+      "count": 3792,
+      "sha256": "65299afb677e6858aa4820c2f2977332a50407ab003372fdf63a2ca5b205d18f"
+    }
+  },
+  "after": {
+    "contracts.ContractualRecord": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "contracts.ContractAmendment": {
+      "count": 32,
+      "sha256": "d145500ae23ea5b88c6bf1a4539048b1ccafc67a20ca3dbb81354662c75e62bc"
+    },
+    "billing.ProgressClaim": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "billing.PayableCertificate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "subledgers.Obligation": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "accounting.JournalEntry": {
+      "count": 1,
+      "sha256": "9e1bedda603750849d33f93987807ebc10cfbdbbed7315adcda05c9a7846baec"
+    },
+    "treasury.TreasuryMovement": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "preexisting_role_grants": {
+      "count": 3792,
+      "sha256": "65299afb677e6858aa4820c2f2977332a50407ab003372fdf63a2ca5b205d18f"
+    }
+  },
+  "history_and_preexisting_grants_preserved": true,
+  "pending_after": [],
+  "backfilled_eligibility": 0,
+  "implicit_system_role_grants": 0
+}

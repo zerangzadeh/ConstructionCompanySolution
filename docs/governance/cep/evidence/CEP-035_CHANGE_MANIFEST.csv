@@ -1,0 +1,8 @@
+surface,change
+apps/estimates/price_book_models.py; models.py; migrations/0006_cep035_price_book_version_mapping.py,Add immutable source/version/row/activation/mapping; nullable current mapping pointer; no old data rewrite
+apps/estimates/price_books.py,Strict fixed-profile import and hashing; explicit approval evidence; version-pinned mappings/remap/reconciliation
+apps/estimates/services.py,Validate mapped item evidence before approval; preserve exact pin during explicit revision
+apps/organizations/models.py;permission_registry.py;role_defaults.py;migrations/0118_cep035_price_book_permissions.py,Three explicitly assigned capabilities; no default grants
+apps/audit/models.py,Register import/activation/mapping actions
+apps/estimates/test_cep035_price_books.py,11 focused; populated migration; 3 unchanged old assertions under isolated effective grants
+CEP_EXECUTION_REGISTRY.yaml; CEP035 manifests/reports/evidence,Reconcile Human CEP033/034 integration; CEP035 lifecycle and actual evidence; frontier

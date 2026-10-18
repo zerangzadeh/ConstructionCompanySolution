@@ -748,6 +748,11 @@ class BusinessPermissionCode(models.TextChoices):
         "estimate_rate_sources.manage",
         "مدیریت منبع و نرخ برآورد",
     )
+    BILLING_VARIATION_ELIGIBILITY_VIEW = "billing_variation_eligibility.view", "مشاهده اهلیت منبع تغییر"
+    BILLING_VARIATION_ELIGIBILITY_RETRY = "billing_variation_eligibility.retry", "تلاش مجدد پذیرش منبع تغییر"
+    PRICE_BOOKS_MANAGE = "price_books.manage", "مدیریت منابع فهرست‌بها"
+    PRICE_BOOKS_ACTIVATE = "price_books.activate", "تأیید مستند منبع فهرست‌بها"
+    PRICE_BOOK_MAPPINGS_MANAGE = "price_book_mappings.manage", "نگاشت نسخه‌دار فهرست‌بها"
     ESTIMATE_IMPORTS_PREVIEW = (
         "estimate_imports.preview",
         "پیش‌نمایش ورود برآورد",

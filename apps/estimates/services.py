@@ -274,6 +274,10 @@ def _approve_estimate_domain(
         locked_estimate.current_revision = revision
     if revision.status != EstimateRevisionStatus.DRAFT:
         raise ValueError("فقط بازنگری‌های پیش‌نویس برآورد قابل تأیید هستند.")
+    from .price_books import validate_item_mapping
+
+    for mapped_item in revision.items.select_related("price_book_mapping"):
+        validate_item_mapping(mapped_item)
     now = timezone.now()
     EstimateRevision.objects.filter(
         estimate=locked_estimate, status=EstimateRevisionStatus.APPROVED
@@ -371,6 +375,9 @@ def create_estimate_revision(
             unit_price=item.unit_price,
             sort_order=item.sort_order,
         )
+        from .price_books import copy_item_mapping
+
+        copy_item_mapping(source=item, copied=copied_item, actor=actor)
         for resource in item.resources.all():
             EstimateResource.objects.create(
                 organization=locked_estimate.organization,

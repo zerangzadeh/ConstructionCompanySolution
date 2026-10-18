@@ -5,7 +5,14 @@ from apps.organizations.permission_catalog import (
 )
 from apps.organizations.permission_registry import registered_permission_codes
 
-ALL_PERMISSIONS = registered_permission_codes()
+# CEP035 source activation/mapping require explicit grants; no implicit role expansion.
+ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
+    BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_VIEW,
+    BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_RETRY,
+    BusinessPermissionCode.PRICE_BOOKS_MANAGE,
+    BusinessPermissionCode.PRICE_BOOKS_ACTIVATE,
+    BusinessPermissionCode.PRICE_BOOK_MAPPINGS_MANAGE,
+)
 REPORTING_PERMISSIONS = frozenset(
     code for code in ALL_PERMISSIONS if code.startswith("reporting.")
 )
@@ -767,6 +774,10 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
 # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    _default_permissions.difference_update(permission_codes(
+        BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_VIEW,
+        BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_RETRY,
+    ))
     _default_permissions.difference_update(permission_codes(
         BusinessPermissionCode.EMPLOYMENT_RECORDS_MANAGE, BusinessPermissionCode.EMPLOYMENT_RECORDS_VIEW_OWN,
         BusinessPermissionCode.OFFBOARDING_START, BusinessPermissionCode.OFFBOARDING_VIEW,

@@ -1608,6 +1608,11 @@ class AuditAction(models.TextChoices):
         "inventory.receipt_failed",
         "Receipt target mutation failed",
     )
+    PRICE_BOOK_IMPORTED = "estimates.price_book_imported", "نسخه فهرست‌بها وارد شد"
+    PRICE_BOOK_ACTIVATED = "estimates.price_book_activated", "منبع فهرست‌بها تأیید شد"
+    PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
+    VARIATION_BILLING_ACCEPTED = "billing.variation_accepted", "رخداد اهلیت منبع تغییر ثبت شد"
+    VARIATION_BILLING_FAILED = "billing.variation_failed", "پذیرش منبع تغییر ناموفق بود"
 
 
 class AuditEventQuerySet(models.QuerySet):

@@ -493,6 +493,18 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ("apps.estimates.services",),
     ),
     PermissionResource(
+        "variation_billing_eligibility", "اهلیت منبع تغییر برای Billing",
+        ("billing.VariationBillingEligibility",),
+        (P.BILLING_VARIATION_ELIGIBILITY_VIEW, P.BILLING_VARIATION_ELIGIBILITY_RETRY),
+        ("apps.billing.variation_handoffs",),
+    ),
+    PermissionResource(
+        "price_books", "منابع و نگاشت فهرست‌بها",
+        ("estimates.PriceBook", "estimates.PriceBookVersion", "estimates.PriceBookRow", "estimates.PriceBookActivation", "estimates.EstimatePriceBookMapping"),
+        (P.PRICE_BOOKS_MANAGE, P.PRICE_BOOKS_ACTIVATE, P.PRICE_BOOK_MAPPINGS_MANAGE),
+        ("apps.estimates.price_books",),
+    ),
+    PermissionResource(
         "cost_structures",
         "ساختار هزینه",
         (

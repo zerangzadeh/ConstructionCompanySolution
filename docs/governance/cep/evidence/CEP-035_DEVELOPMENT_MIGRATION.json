@@ -1,0 +1,104 @@
+{
+  "environment": "Verified configured local development PostgreSQL; no production",
+  "pending_before": [
+    [
+      "organizations",
+      "0118_cep035_price_book_permissions"
+    ],
+    [
+      "estimates",
+      "0006_cep035_price_book_version_mapping"
+    ]
+  ],
+  "commands": [
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "manage.py",
+        "migrate",
+        "organizations",
+        "0118_cep035_price_book_permissions",
+        "--noinput"
+      ],
+      "exit_code": 0,
+      "output": "Operations to perform:\n  Target specific migration: 0118_cep035_price_book_permissions, from organizations\nRunning migrations:\n  Applying organizations.0118_cep035_price_book_permissions... OK\n"
+    },
+    {
+      "command": [
+        ".venv/Scripts/python.exe",
+        "manage.py",
+        "migrate",
+        "estimates",
+        "0006_cep035_price_book_version_mapping",
+        "--noinput"
+      ],
+      "exit_code": 0,
+      "output": "Operations to perform:\n  Target specific migration: 0006_cep035_price_book_version_mapping, from estimates\nRunning migrations:\n  Applying estimates.0006_cep035_price_book_version_mapping... OK\n"
+    }
+  ],
+  "before": {
+    "estimates.Estimate": {
+      "count": 32,
+      "sha256": "44b8d6c779abf5609c119fa04ec623addfc696e5cdf032d11679fc1ea449eb2e"
+    },
+    "estimates.EstimateItem": {
+      "count": 96,
+      "sha256": "acfbfc3d2f6332b5d998dbfe13ff6fe8e0021d75558043a9adbeb8f5fac03ad1"
+    },
+    "estimates.EstimateRevision": {
+      "count": 32,
+      "sha256": "e04e7e97515405ed6e867f75fdf6088d60d3dbfcff0470f02c081b88f1558701"
+    },
+    "estimates.EstimatePriceSource": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateRate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateResource": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateAssumption": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "after": {
+    "estimates.Estimate": {
+      "count": 32,
+      "sha256": "44b8d6c779abf5609c119fa04ec623addfc696e5cdf032d11679fc1ea449eb2e"
+    },
+    "estimates.EstimateItem": {
+      "count": 96,
+      "sha256": "acfbfc3d2f6332b5d998dbfe13ff6fe8e0021d75558043a9adbeb8f5fac03ad1"
+    },
+    "estimates.EstimateRevision": {
+      "count": 32,
+      "sha256": "e04e7e97515405ed6e867f75fdf6088d60d3dbfcff0470f02c081b88f1558701"
+    },
+    "estimates.EstimatePriceSource": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateRate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateResource": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "estimates.EstimateAssumption": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "history_preserved": true,
+  "pending_after": [],
+  "official_versions": 0,
+  "official_activations": 0,
+  "inferred_mappings": 0
+}

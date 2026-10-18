@@ -3031,3 +3031,6 @@ class StatutorySubmissionResolution(UUIDModel):
 
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
         raise ValidationError("شاهد حل انسانی قابل حذف نیست.")
+
+
+from .variation_models import VariationBillingEligibility  # noqa: F401

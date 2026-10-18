@@ -304,6 +304,14 @@ class EstimateItem(UUIDModel, TimeStampedModel):
     unit_price = models.DecimalField("قیمت واحد", max_digits=18, decimal_places=2)
     sort_order = models.PositiveIntegerField("ترتیب نمایش", default=0)
 
+    price_book_mapping = models.ForeignKey(
+        "EstimatePriceBookMapping",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="current_uses",
+    )
+
     class Meta:
         verbose_name = "ردیف برآورد"
         verbose_name_plural = "ردیف‌های برآورد"
@@ -344,6 +352,15 @@ class EstimateItem(UUIDModel, TimeStampedModel):
                 raise ValidationError(
                     {"unit_of_measure": "واحد اندازه‌گیری باید فعال باشد."}
                 )
+
+        if self.price_book_mapping_id:
+            mapping = self.price_book_mapping
+            if (
+                mapping.organization_id != self.organization_id
+                or mapping.source_item_id != self.pk
+                or mapping.source_revision_id != self.revision_id
+            ):
+                raise ValidationError("نگاشت باید متعلق به همین ردیف و بازنگری باشد.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         if (
@@ -596,3 +613,12 @@ class EstimateAssumption(UUIDModel, TimeStampedModel):
             raise ValidationError("فرض بازنگری نهایی‌شده قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)
+
+
+from .price_book_models import (  # noqa: F401
+    EstimatePriceBookMapping,
+    PriceBook,
+    PriceBookActivation,
+    PriceBookRow,
+    PriceBookVersion,
+)

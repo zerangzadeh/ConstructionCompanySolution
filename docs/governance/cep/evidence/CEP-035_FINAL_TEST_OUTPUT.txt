@@ -1,0 +1,33 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_activation_requires_exact_evidence_and_imported_row_set (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_activation_requires_exact_evidence_and_imported_row_set) ... ok
+test_audit_failure_rolls_back_import (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_audit_failure_rolls_back_import) ... ok
+test_changed_draft_requires_explicit_mapping_before_approval (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_changed_draft_requires_explicit_mapping_before_approval) ... ok
+test_explicit_revision_retains_pinned_source_and_historical_reproducibility (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_explicit_revision_retains_pinned_source_and_historical_reproducibility) ... ok
+test_import_provenance_idempotency_and_changed_request_rejection (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_import_provenance_idempotency_and_changed_request_rejection) ... ok
+test_mapping_inactive_and_wrong_effective_date_fail_closed (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_mapping_inactive_and_wrong_effective_date_fail_closed) ... ok
+test_missing_source_or_unit_fails_atomically (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_missing_source_or_unit_fails_atomically) ... ok
+test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_new_source_version_never_automatically_remaps_and_explicit_remap_retains_history) ... ok
+test_row_set_mismatch_prevents_activation (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_row_set_mismatch_prevents_activation) ... ok
+test_tenant_scope_permissions_and_default_grants (apps.estimates.test_cep035_price_books.PriceBookServiceTests.test_tenant_scope_permissions_and_default_grants) ... ok
+test_import_preview (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_import_preview) ... ok
+test_legacy_source_boundary (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_legacy_source_boundary) ... ok
+test_revision_history (apps.estimates.test_cep035_price_books.PriceBookAffectedRegression.test_revision_history) ... ok
+test_strict_schema_finite_values_and_no_guessed_columns (apps.estimates.test_cep035_price_books.PriceBookParserTests.test_strict_schema_finite_values_and_no_guessed_columns) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.756s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 14 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

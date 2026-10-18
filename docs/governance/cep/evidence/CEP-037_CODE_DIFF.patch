@@ -1,0 +1,1043 @@
+--- a/apps/billing/models.py
++++ b/apps/billing/models.py
+@@ -3031,3 +3031,6 @@
+ 
+     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
+         raise ValidationError("شاهد حل انسانی قابل حذف نیست.")
++
++
++from .variation_models import VariationBillingEligibility  # noqa: F401
+--- a/apps/billing/variation_models.py
++++ b/apps/billing/variation_models.py
+@@ -0,0 +1,103 @@
++"""INT-C02 immutable source-availability occurrences, never billing amounts."""
++
++from django.core.exceptions import ValidationError
++from django.db import models
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class VariationEligibilityQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("شواهد اهلیت تغییرناپذیر است.")
++
++    def delete(self):
++        raise ValidationError("شواهد اهلیت حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت اهلیت فقط از سرویس مجاز است.")
++
++
++class VariationBillingEligibility(UUIDModel, CreatedAtModel):
++    """Historical eligibility at a source occurrence; current state is source-derived."""
++
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    project = models.ForeignKey("projects.Project", on_delete=models.PROTECT)
++    contract = models.ForeignKey("contracts.Contract", on_delete=models.PROTECT)
++    source = models.OneToOneField(
++        "contracts.ContractualRecord",
++        on_delete=models.PROTECT,
++        related_name="billing_eligibility",
++    )
++    series_id = models.UUIDField()
++    source_version = models.PositiveIntegerField()
++    source_snapshot = models.JSONField()
++    source_sha256 = models.CharField(max_length=64)
++    active_at_occurrence = models.BooleanField()
++    predecessor = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="successor",
++    )
++    idempotency_key = models.CharField(max_length=120)
++    created_by = models.ForeignKey(
++        "organizations.OrganizationMembership", on_delete=models.PROTECT
++    )
++
++    objects = VariationEligibilityQuerySet.as_manager()
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "series_id", "source_version"],
++                name="variation_eligibility_occurrence_uq",
++            ),
++            models.UniqueConstraint(
++                fields=["organization", "idempotency_key"],
++                name="variation_eligibility_key_uq",
++            ),
++        ]
++
++    def clean(self):
++        from .variation_handoffs import eligibility_for_source, source_digest
++
++        validate_related_organizations(
++            self,
++            source=self.source,
++            project=self.project,
++            contract=self.contract,
++            created_by=self.created_by,
++            predecessor=self.predecessor,
++        )
++        if (
++            self.source.kind != "variation"
++            or self.source.series_id != self.series_id
++            or self.source.version != self.source_version
++            or self.source.project_id != self.project_id
++            or self.source.contract_id != self.contract_id
++            or not self.source.approved_at
++            or not self.source.approved_by_id
++            or not self.idempotency_key.strip()
++            or self.active_at_occurrence != eligibility_for_source(self.source)
++            or self.source_sha256 != source_digest(self.source_snapshot)
++        ):
++            raise ValidationError("هویت یا شواهد رخداد اهلیت معتبر نیست.")
++        if self.predecessor_id and (
++            self.predecessor.series_id != self.series_id
++            or self.predecessor.contract_id != self.contract_id
++            or self.predecessor.source_version >= self.source_version
++        ):
++            raise ValidationError("زنجیره اهلیت معتبر نیست.")
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding:
++            raise ValidationError("شواهد اهلیت تغییرناپذیر است.")
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("شواهد اهلیت حذف‌پذیر نیست.")
+--- a/apps/billing/variation_handoffs.py
++++ b/apps/billing/variation_handoffs.py
+@@ -0,0 +1,351 @@
++"""INT-C02: approved source availability, with no financial decision authority."""
++
++from __future__ import annotations
++
++import hashlib
++import json
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import DatabaseError, transaction
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction
++from apps.audit.services import record_audit_event
++from apps.contracts.models import ContractualRecord
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++
++from .variation_models import VariationBillingEligibility
++
++APPROVED_HISTORY = ("approved", "superseded", "cancelled")
++POLICY = "HUMAN-CEP037-ELIGIBILITY-20261018"
++
++
++def source_digest(payload: object) -> str:
++    return hashlib.sha256(
++        json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode()
++    ).hexdigest()
++
++
++def eligibility_for_source(source: ContractualRecord) -> bool:
++    """Approved source amount is deliberately absent from this predicate."""
++    return (
++        source.revision_action in ("original", "correction")
++        and source.entitlement_approved is True
++    )
++
++
++def _permission(
++    organization: Organization, actor: User, source: ContractualRecord, permission: str
++):
++    return require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=source.project,
++        message="اختیار و دامنه منبع اهلیت لازم است.",
++    )
++
++
++def _latest_source(organization: Organization, series_id) -> ContractualRecord | None:
++    # Domain version/chain authority, not created_at or a later unapproved draft.
++    return (
++        ContractualRecord.objects.filter(
++            organization=organization,
++            series_id=series_id,
++            kind="variation",
++            status__in=APPROVED_HISTORY,
++            approved_at__isnull=False,
++            approved_by__isnull=False,
++        )
++        .order_by("-version")
++        .first()
++    )
++
++
++def _source_snapshot(source: ContractualRecord) -> dict:
++    chain = []
++    current = source
++    while current is not None:
++        if (
++            current.organization_id != source.organization_id
++            or current.series_id != source.series_id
++            or current.contract_id != source.contract_id
++            or current.kind != "variation"
++        ):
++            raise ValidationError("زنجیره منبع تأییدشده معتبر نیست.")
++        if current.supersedes_id:
++            previous = current.supersedes
++            if (
++                previous.version + 1 != current.version
++                or current.revision_action not in ("correction", "cancellation")
++            ):
++                raise ValidationError("پیوند نسخه منبع معتبر نیست.")
++        else:
++            previous = None
++            if current.version != 1 or current.revision_action != "original":
++                raise ValidationError("ریشه منبع معتبر نیست.")
++        chain.append(
++            {
++                "source_id": str(current.pk),
++                "version": current.version,
++                "action": current.revision_action,
++                "approved_at": current.approved_at.isoformat()
++                if current.approved_at
++                else None,
++                "approved_by_id": str(current.approved_by_id),
++                "entitlement_approved": current.entitlement_approved,
++            }
++        )
++        current = previous
++    return {
++        "policy": POLICY,
++        "source_id": str(source.pk),
++        "series_id": str(source.series_id),
++        "source_version": source.version,
++        "project_id": str(source.project_id),
++        "contract_id": str(source.contract_id),
++        "revision_action": source.revision_action,
++        "entitlement_approved": source.entitlement_approved,
++        "approved_amount_evidence_only": str(source.approved_amount)
++        if source.approved_amount is not None
++        else None,
++        "approval_reason": source.approval_reason,
++        "source_chain": chain,
++    }
++
++
++@transaction.atomic
++def _accept(
++    *,
++    organization: Organization,
++    actor: User,
++    source: ContractualRecord,
++    idempotency_key: str,
++    source_event: bool,
++) -> VariationBillingEligibility:
++    try:
++        source = ContractualRecord.objects.select_for_update(of=("self",)).get(
++            pk=source.pk, organization=organization
++        )
++    except ContractualRecord.DoesNotExist as exc:
++        raise PermissionDenied("منبع متعلق به این سازمان نیست.") from exc
++    membership = _permission(
++        organization,
++        actor,
++        source,
++        P.CONTRACTUAL_RECORDS_APPROVE
++        if source_event
++        else P.BILLING_VARIATION_ELIGIBILITY_RETRY,
++    )
++    if source_event and source.approved_by_id != actor.pk:
++        raise PermissionDenied("رخداد تأیید باید متعلق به تأییدکننده ثبت‌شده باشد.")
++    latest = _latest_source(organization, source.series_id)
++    if (
++        source.kind != "variation"
++        or source.status != "approved"
++        or latest is None
++        or latest.pk != source.pk
++        or not isinstance(source.entitlement_approved, bool)
++        or source.project.deleted_at is not None
++        or source.contract.deleted_at is not None
++    ):
++        raise ValidationError("آخرین حالت مؤثر و تأییدشده تغییر لازم است.")
++    snapshot = _source_snapshot(source)
++    digest = source_digest(snapshot)
++    key = idempotency_key.strip()
++    if not key or len(key) > 120:
++        raise ValidationError("کلید رخداد معتبر لازم است.")
++    by_key = VariationBillingEligibility.objects.filter(
++        organization=organization, idempotency_key=key
++    ).first()
++    prior = VariationBillingEligibility.objects.filter(
++        organization=organization, source=source
++    ).first()
++    if by_key and by_key.source_id != source.pk:
++        raise ValidationError("کلید عملیات به منبع دیگری تعلق دارد.")
++    if prior:
++        if prior.source_sha256 != digest:
++            raise ValidationError("شواهد منبع با پذیرش قبلی هم‌خوان نیست.")
++        return prior
++    predecessor = (
++        VariationBillingEligibility.objects.select_for_update()
++        .filter(
++            organization=organization,
++            series_id=source.series_id,
++            source_version__lt=source.version,
++        )
++        .order_by("-source_version")
++        .first()
++    )
++    target = VariationBillingEligibility.objects.create(
++        organization=organization,
++        project=source.project,
++        contract=source.contract,
++        source=source,
++        series_id=source.series_id,
++        source_version=source.version,
++        source_snapshot=snapshot,
++        source_sha256=digest,
++        active_at_occurrence=eligibility_for_source(source),
++        predecessor=predecessor,
++        idempotency_key=key,
++        created_by=membership,
++    )
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=AuditAction.VARIATION_BILLING_ACCEPTED,
++        entity_type="billing.VariationBillingEligibility",
++        entity_id=target.pk,
++        metadata={
++            "source_id": str(source.pk),
++            "series_id": str(source.series_id),
++            "source_version": source.version,
++            "active": target.active_at_occurrence,
++            "predecessor_id": str(predecessor.pk) if predecessor else None,
++            "source_sha256": digest,
++            "policy": POLICY,
++        },
++    )
++    return target
++
++
++def _failure(
++    *,
++    organization: Organization,
++    actor: User,
++    source: ContractualRecord,
++    error: Exception,
++    permission: str,
++) -> None:
++    actual = ContractualRecord.objects.filter(
++        pk=source.pk, organization=organization, kind="variation"
++    ).first()
++    if actual is None:
++        return
++    _permission(organization, actor, actual, permission)
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=AuditAction.VARIATION_BILLING_FAILED,
++        entity_type="contracts.ContractualRecord",
++        entity_id=actual.pk,
++        metadata={
++            "source_version": actual.version,
++            "error_type": type(error).__name__,
++            "policy": POLICY,
++            "target_effect": "rolled_back",
++        },
++    )
++
++
++def accept_approved_variation_event(
++    *, organization: Organization, actor: User, source: ContractualRecord
++) -> None:
++    """Registered L2 consequence inside source approval, not Billing approval.
++
++    A failed target savepoint leaves the approved source and explicit retry audit
++    intact. Current availability then fails closed until a successful retry.
++    """
++    if source.kind != "variation":
++        return
++    try:
++        _accept(
++            organization=organization,
++            actor=actor,
++            source=source,
++            idempotency_key=f"int-c02:{source.pk}:{source.version}",
++            source_event=True,
++        )
++    except (ValidationError, PermissionDenied, DatabaseError) as exc:
++        _failure(
++            organization=organization,
++            actor=actor,
++            source=source,
++            error=exc,
++            permission=P.CONTRACTUAL_RECORDS_APPROVE,
++        )
++
++
++def retry_variation_billing_handoff(
++    *,
++    organization: Organization,
++    actor: User,
++    source: ContractualRecord,
++    idempotency_key: str,
++) -> VariationBillingEligibility:
++    try:
++        return _accept(
++            organization=organization,
++            actor=actor,
++            source=source,
++            idempotency_key=idempotency_key,
++            source_event=False,
++        )
++    except (ValidationError, PermissionDenied, DatabaseError) as exc:
++        # Never retain failure evidence to a tenant or object the actor cannot access.
++        try:
++            _failure(
++                organization=organization,
++                actor=actor,
++                source=source,
++                error=exc,
++                permission=P.BILLING_VARIATION_ELIGIBILITY_RETRY,
++            )
++        except PermissionDenied:
++            raise exc
++        raise
++
++
++@transaction.atomic
++def reconcile_variation_billing(
++    *, organization: Organization, actor: User, source: ContractualRecord
++) -> dict:
++    try:
++        source = ContractualRecord.objects.select_for_update(of=("self",)).get(
++            pk=source.pk, organization=organization, kind="variation"
++        )
++    except ContractualRecord.DoesNotExist as exc:
++        raise PermissionDenied("منبع متعلق به این سازمان نیست.") from exc
++    _permission(organization, actor, source, P.BILLING_VARIATION_ELIGIBILITY_VIEW)
++    latest = _latest_source(organization, source.series_id)
++    targets = list(
++        VariationBillingEligibility.objects.filter(
++            organization=organization, series_id=source.series_id
++        ).order_by("source_version")
++    )
++    current = next((t for t in targets if latest and t.source_id == latest.pk), None)
++    current_valid = bool(
++        current
++        and latest
++        and latest.status == "approved"
++        and current.source_sha256 == source_digest(_source_snapshot(latest))
++        and current.active_at_occurrence == eligibility_for_source(latest)
++    )
++    result = {
++        "series_id": str(source.series_id),
++        "policy": POLICY,
++        "latest_approved_source_id": str(latest.pk) if latest else None,
++        "latest_approved_version": latest.version if latest else None,
++        "active_eligibility_id": str(current.pk)
++        if current_valid and current.active_at_occurrence
++        else None,
++        "handoff_pending": bool(latest and not current_valid),
++        "targets": [
++            {
++                "target_id": str(t.pk),
++                "source_id": str(t.source_id),
++                "source_version": t.source_version,
++                "active_at_occurrence": t.active_at_occurrence,
++                "is_current_source": bool(latest and t.source_id == latest.pk),
++                "predecessor_id": str(t.predecessor_id) if t.predecessor_id else None,
++                "source_snapshot": t.source_snapshot,
++                "source_sha256": t.source_sha256,
++            }
++            for t in targets
++        ],
++    }
++    result["evidence_hash"] = source_digest(result)
++    return result
+--- a/apps/billing/test_cep037_variation_handoff.py
++++ b/apps/billing/test_cep037_variation_handoff.py
+@@ -0,0 +1,414 @@
++"""INT-C02 source availability, amount independence and retained lineage."""
++
++import json
++import os
++from concurrent.futures import ThreadPoolExecutor
++from decimal import Decimal
++from pathlib import Path
++from threading import Barrier
++from types import SimpleNamespace
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError, close_old_connections, connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import SimpleTestCase, TestCase, TransactionTestCase
++
++from apps.accounting.models import JournalEntry
++from apps.accounts.models import User
++from apps.audit.models import AuditAction, AuditEvent
++from apps.audit.services import record_audit_event
++from apps.billing.models import (
++    PayableCertificate,
++    ProgressClaim,
++    VariationBillingEligibility,
++)
++from apps.billing.variation_handoffs import (
++    eligibility_for_source,
++    reconcile_variation_billing,
++    retry_variation_billing_handoff,
++)
++from apps.contracts import test_contractual_records as existing_tests
++from apps.contracts.contractual_services import (
++    create_contractual_revision,
++    decide_contractual_record,
++    submit_contractual_record,
++)
++from apps.contracts.models import ContractualRecord
++from apps.contracts.services import create_contract, transition_contract_status
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationRole,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.parties.services import create_business_party
++from apps.projects.models import Project
++from apps.subledgers.models import Obligation
++from apps.treasury.models import TreasuryMovement
++
++
++class VariationFixture:
++    make_record = existing_tests.ContractualRecordTests.make_record
++
++    def setUp(self):
++        self.organization = Organization.objects.create(
++            name="CEP037 test", slug="cep037"
++        )
++        self.owner = User.objects.create_user(username="cep037-preparer")
++        self.approver = User.objects.create_user(username="cep037-checker")
++        for user in (self.owner, self.approver):
++            role = OrganizationRole.objects.create(
++                code=f"cep037-{user.pk}", name="Isolated explicit grants"
++            )
++            role.permissions.set(BusinessPermission.objects.filter(is_active=True))
++            membership = self.organization.memberships.create(
++                user=user, role="company_owner", role_definition=role, status="active"
++            )
++            MembershipScopeGrant.objects.create(
++                organization=self.organization,
++                membership=membership,
++                scope_type=AuthorizationScopeType.ORGANIZATION,
++                reason="CEP037 fixture",
++            )
++        self.project = Project.objects.create(
++            organization=self.organization, code="VAR", name="Variation test"
++        )
++        self.party = create_business_party(
++            organization=self.organization,
++            actor=self.owner,
++            party_kind="company",
++            display_name="Synthetic counterparty",
++        )
++        self.contract = create_contract(
++            organization=self.organization,
++            project=self.project,
++            actor=self.owner,
++            contract_number="VAR037",
++            title="Test",
++            counterparty_name="Synthetic",
++            party=self.party,
++            contract_value=Decimal(1000),
++        )
++        transition_contract_status(
++            organization=self.organization,
++            actor=self.owner,
++            contract=self.contract,
++            status="active",
++        )
++        self.contract.refresh_from_db()
++
++    def approve(self, source, entitlement=True, amount=None):
++        submit_contractual_record(
++            organization=self.organization, actor=self.owner, record=source
++        )
++        return decide_contractual_record(
++            organization=self.organization,
++            actor=self.approver,
++            record=source,
++            approved=True,
++            reason="Explicit source decision",
++            entitlement_approved=entitlement,
++            approved_amount=amount,
++        )
++
++    def original(self, entitlement=True, amount=None):
++        return self.approve(self.make_record(kind="variation"), entitlement, amount)
++
++    def correction(self, source, action="correction", entitlement=True, amount=None):
++        revised = create_contractual_revision(
++            organization=self.organization,
++            actor=self.owner,
++            predecessor=source,
++            revision_action=action,
++            reason="Explicit source revision",
++            idempotency_key=f"{source.pk}-{action}",
++        )
++        return self.approve(revised, entitlement, amount)
++
++    def retry(self, source, key="retry037"):
++        return retry_variation_billing_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            source=source,
++            idempotency_key=key,
++        )
++
++    def reconcile(self, source):
++        return reconcile_variation_billing(
++            organization=self.organization, actor=self.owner, source=source
++        )
++
++
++class VariationPredicateTests(SimpleTestCase):
++    def test_only_entitlement_and_action_govern_source_availability(self):
++        for amount in (None, Decimal(0), Decimal(12)):
++            for action in ("original", "correction", "cancellation"):
++                for entitlement in (True, False):
++                    self.assertEqual(
++                        eligibility_for_source(
++                            SimpleNamespace(
++                                revision_action=action,
++                                entitlement_approved=entitlement,
++                                approved_amount=amount,
++                            )
++                        ),
++                        entitlement and action != "cancellation",
++                    )
++
++
++class VariationHandoffTests(VariationFixture, TestCase):
++    def test_auto_handoff_and_amount_independence_create_no_financial_objects(self):
++        source = self.original()
++        target = VariationBillingEligibility.objects.get(source=source)
++        self.assertTrue(target.active_at_occurrence)
++        self.assertEqual(self.retry(source).pk, target.pk)
++        self.assertEqual(self.retry(source, "other-key").pk, target.pk)
++        self.assertEqual(VariationBillingEligibility.objects.count(), 1)
++        self.assertIsNone(target.source_snapshot["approved_amount_evidence_only"])
++        zero = self.correction(source, amount=Decimal(0))
++        self.assertTrue(
++            VariationBillingEligibility.objects.get(source=zero).active_at_occurrence
++        )
++        self.assertFalse(ProgressClaim.objects.exists())
++        self.assertFalse(PayableCertificate.objects.exists())
++        self.assertFalse(Obligation.objects.exists())
++        self.assertFalse(JournalEntry.objects.exists())
++        self.assertFalse(TreasuryMovement.objects.exists())
++        self.contract.refresh_from_db()
++        self.assertEqual(self.contract.contract_value, Decimal(1000))
++
++    def test_latest_approved_chain_ignores_draft_and_timestamp_order(self):
++        source = self.original()
++        first = VariationBillingEligibility.objects.get(source=source)
++        draft = create_contractual_revision(
++            organization=self.organization,
++            actor=self.owner,
++            predecessor=source,
++            revision_action="correction",
++            reason="Draft only",
++            idempotency_key="draft037",
++        )
++        self.assertEqual(self.reconcile(draft)["active_eligibility_id"], str(first.pk))
++        replacement = self.approve(draft)
++        with self.assertRaises(ValidationError):
++            self.retry(source)
++        trace = self.reconcile(source)
++        self.assertEqual(trace["latest_approved_source_id"], str(replacement.pk))
++        self.assertEqual(trace["latest_approved_version"], 2)
++        self.assertEqual(len(trace["targets"]), 2)
++        self.assertFalse(trace["targets"][0]["is_current_source"])
++
++    def test_false_entitlement_correction_and_cancellation_preserve_old_evidence(self):
++        source = self.original()
++        original = VariationBillingEligibility.objects.get(source=source)
++        payload = original.source_snapshot.copy()
++        denied = self.correction(source, entitlement=False)
++        inactive = VariationBillingEligibility.objects.get(source=denied)
++        self.assertFalse(inactive.active_at_occurrence)
++        self.assertEqual(inactive.predecessor_id, original.pk)
++        self.assertIsNone(self.reconcile(denied)["active_eligibility_id"])
++        restored = self.correction(denied, entitlement=True, amount=Decimal(0))
++        self.assertIsNotNone(self.reconcile(restored)["active_eligibility_id"])
++        cancelled = self.correction(restored, action="cancellation", entitlement=False)
++        trace = self.reconcile(cancelled)
++        self.assertIsNone(trace["active_eligibility_id"])
++        self.assertFalse(trace["handoff_pending"])
++        original.refresh_from_db()
++        self.assertEqual(original.source_snapshot, payload)
++        self.assertTrue(original.active_at_occurrence)
++        for operation in (
++            original.save,
++            original.delete,
++            lambda: VariationBillingEligibility.objects.update(
++                active_at_occurrence=False
++            ),
++            lambda: VariationBillingEligibility.objects.all().delete(),
++        ):
++            with self.assertRaises(ValidationError):
++                operation()
++        if path := os.environ.get("CEP037_TRACE_PATH"):
++            trace["failure_audit_count"] = AuditEvent.objects.filter(
++                action=AuditAction.VARIATION_BILLING_FAILED
++            ).count()
++            Path(path).write_text(json.dumps(trace, indent=2), encoding="utf-8")
++
++    def test_approved_correction_of_returned_source_uses_approved_effective_state(self):
++        source = self.make_record(kind="variation")
++        submit_contractual_record(
++            organization=self.organization, actor=self.owner, record=source
++        )
++        decide_contractual_record(
++            organization=self.organization,
++            actor=self.approver,
++            record=source,
++            approved=False,
++            reason="Return source for correction",
++        )
++        source.refresh_from_db()
++        approved = self.correction(source)
++        target = VariationBillingEligibility.objects.get(source=approved)
++        self.assertTrue(target.active_at_occurrence)
++        self.assertIsNone(target.predecessor_id)
++        self.assertEqual(
++            target.source_snapshot["source_chain"][1]["source_id"], str(source.pk)
++        )
++        self.assertIsNone(target.source_snapshot["source_chain"][1]["approved_at"])
++        self.assertEqual(
++            self.reconcile(source)["active_eligibility_id"], str(target.pk)
++        )
++
++    def test_false_entitlement_original_has_no_active_eligibility(self):
++        source = self.original(entitlement=False, amount=Decimal(100))
++        self.assertIsNone(self.reconcile(source)["active_eligibility_id"])
++        self.assertFalse(
++            VariationBillingEligibility.objects.get(source=source).active_at_occurrence
++        )
++
++    def test_target_failure_preserves_approved_source_and_retains_revalidated_retry(
++        self,
++    ):
++        def fail_after_insert(**kwargs):
++            if kwargs["action"] == AuditAction.VARIATION_BILLING_ACCEPTED:
++                raise IntegrityError("injected after target insert")
++            return record_audit_event(**kwargs)
++
++        with patch(
++            "apps.billing.variation_handoffs.record_audit_event",
++            side_effect=fail_after_insert,
++        ):
++            source = self.original()
++        source.refresh_from_db()
++        self.assertEqual(source.status, "approved")
++        self.assertFalse(VariationBillingEligibility.objects.exists())
++        self.assertTrue(
++            AuditEvent.objects.filter(
++                action=AuditAction.VARIATION_BILLING_FAILED
++            ).exists()
++        )
++        self.assertTrue(self.reconcile(source)["handoff_pending"])
++        self.assertTrue(self.retry(source).active_at_occurrence)
++        correction = self.correction(source, entitlement=False)
++        with self.assertRaises(ValidationError):
++            self.retry(source)
++        self.assertIsNone(self.reconcile(correction)["active_eligibility_id"])
++
++    def test_tenant_scope_manual_retry_and_default_grants_fail_closed(self):
++        self.assertFalse(
++            OrganizationRole.objects.filter(
++                is_system=True,
++                permissions__code__in=[
++                    P.BILLING_VARIATION_ELIGIBILITY_VIEW,
++                    P.BILLING_VARIATION_ELIGIBILITY_RETRY,
++                ],
++            ).exists()
++        )
++        # L2 source acceptance does not imply manual Billing retry/view rights.
++        checker_role = self.organization.memberships.get(
++            user=self.approver
++        ).role_definition
++        checker_role.permissions.remove(
++            *BusinessPermission.objects.filter(
++                code__in=[
++                    P.BILLING_VARIATION_ELIGIBILITY_VIEW,
++                    P.BILLING_VARIATION_ELIGIBILITY_RETRY,
++                ]
++            )
++        )
++        source = self.original()
++        self.assertTrue(
++            VariationBillingEligibility.objects.get(source=source).active_at_occurrence
++        )
++        with self.assertRaises(PermissionDenied):
++            retry_variation_billing_handoff(
++                organization=self.organization,
++                actor=self.approver,
++                source=source,
++                idempotency_key="no-grant",
++            )
++        other = Organization.objects.create(name="Other", slug="other037")
++        with self.assertRaises(PermissionDenied):
++            retry_variation_billing_handoff(
++                organization=other,
++                actor=self.owner,
++                source=source,
++                idempotency_key="outside",
++            )
++        MembershipScopeGrant.objects.filter(membership__user=self.owner).delete()
++        with self.assertRaises(PermissionDenied):
++            self.retry(source)
++
++    def test_unapproved_and_nonvariation_sources_cannot_be_retried(self):
++        source = self.make_record(kind="variation")
++        with self.assertRaises(ValidationError):
++            self.retry(source)
++        claim = self.make_record(key="claim037", kind="claim")
++        self.approve(claim)
++        with self.assertRaises(ValidationError):
++            self.retry(claim)
++        self.assertFalse(VariationBillingEligibility.objects.exists())
++
++
++class VariationAffectedRegression(VariationFixture, TestCase):
++    test_source_approval = existing_tests.ContractualRecordTests.test_governed_approval_records_explicit_facts_and_no_source_effects
++    test_source_correction = existing_tests.ContractualRecordTests.test_approved_correction_and_cancellation_preserve_final_history
++    test_source_withdrawal = existing_tests.ContractualRecordTests.test_submitted_withdrawal_closes_workflow_atomically
++
++
++class VariationMigrationTests(VariationFixture, TransactionTestCase):
++    def test_populated_source_history_survives_additive_rollback_reapply(self):
++        with patch("apps.billing.variation_handoffs.accept_approved_variation_event"):
++            source = self.original()
++        before = ContractualRecord.objects.filter(pk=source.pk).values().get()
++        latest = ("billing", "0017_cep037_variation_billing_eligibility")
++        previous = ("billing", "0016_cep036_indexation")
++        try:
++            MigrationExecutor(connection).migrate([previous])
++            self.assertNotIn(
++                "billing_variationbillingeligibility",
++                connection.introspection.table_names(),
++            )
++            MigrationExecutor(connection).migrate([latest])
++            self.assertEqual(
++                ContractualRecord.objects.filter(pk=source.pk).values().get(), before
++            )
++            self.assertFalse(VariationBillingEligibility.objects.exists())
++            self.assertEqual(self.retry(source).source_id, source.pk)
++            if path := os.environ.get("CEP037_MIGRATION_TRACE_PATH"):
++                Path(path).write_text(
++                    json.dumps(
++                        {
++                            "populated_source_before_after_equal": True,
++                            "rollback_reapply": "PASS",
++                            "inferred_eligibility_before_explicit_retry": 0,
++                        },
++                        indent=2,
++                    ),
++                    encoding="utf-8",
++                )
++        finally:
++            MigrationExecutor(connection).migrate([latest])
++
++
++class VariationConcurrencyTests(VariationFixture, TransactionTestCase):
++    def test_concurrent_retries_preserve_one_source_occurrence(self):
++        with patch("apps.billing.variation_handoffs.accept_approved_variation_event"):
++            source = self.original()
++        barrier = Barrier(2)
++
++        def accept(index):
++            close_old_connections()
++            try:
++                barrier.wait(timeout=10)
++                return self.retry(source, key=f"race037-{index}").pk
++            finally:
++                close_old_connections()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            results = list(pool.map(accept, (1, 2)))
++        self.assertEqual(results[0], results[1])
++        self.assertEqual(VariationBillingEligibility.objects.count(), 1)
+--- a/apps/billing/migrations/0017_cep037_variation_billing_eligibility.py
++++ b/apps/billing/migrations/0017_cep037_variation_billing_eligibility.py
+@@ -0,0 +1,40 @@
++# Generated by Django 5.2.17 on 2026-10-18 16:38
++
++import django.db.models.deletion
++import uuid
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('billing', '0016_cep036_indexation'),
++        ('contracts', '0009_p6_s33_s38_immutable_history'),
++        ('organizations', '0119_cep037_variation_eligibility_permissions'),
++        ('projects', '0010_projectforecastreview_projectforecasttransition_and_more'),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='VariationBillingEligibility',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('series_id', models.UUIDField()),
++                ('source_version', models.PositiveIntegerField()),
++                ('source_snapshot', models.JSONField()),
++                ('source_sha256', models.CharField(max_length=64)),
++                ('active_at_occurrence', models.BooleanField()),
++                ('idempotency_key', models.CharField(max_length=120)),
++                ('contract', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='contracts.contract')),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('predecessor', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='successor', to='billing.variationbillingeligibility')),
++                ('project', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='projects.project')),
++                ('source', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='billing_eligibility', to='contracts.contractualrecord')),
++            ],
++            options={
++                'constraints': [models.UniqueConstraint(fields=('organization', 'series_id', 'source_version'), name='variation_eligibility_occurrence_uq'), models.UniqueConstraint(fields=('organization', 'idempotency_key'), name='variation_eligibility_key_uq')],
++            },
++        ),
++    ]
+--- a/apps/contracts/contractual_services.py
++++ b/apps/contracts/contractual_services.py
+@@ -453,6 +453,11 @@
+             "contract_value_effect": "none",
+         },
+     )
++    from apps.billing.variation_handoffs import accept_approved_variation_event
++
++    accept_approved_variation_event(
++        organization=organization, actor=actor, source=locked
++    )
+     return locked
+ 
+ 
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -748,6 +748,11 @@
+         "estimate_rate_sources.manage",
+         "مدیریت منبع و نرخ برآورد",
+     )
++    BILLING_VARIATION_ELIGIBILITY_VIEW = "billing_variation_eligibility.view", "مشاهده اهلیت منبع تغییر"
++    BILLING_VARIATION_ELIGIBILITY_RETRY = "billing_variation_eligibility.retry", "تلاش مجدد پذیرش منبع تغییر"
++    PRICE_BOOKS_MANAGE = "price_books.manage", "مدیریت منابع فهرست‌بها"
++    PRICE_BOOKS_ACTIVATE = "price_books.activate", "تأیید مستند منبع فهرست‌بها"
++    PRICE_BOOK_MAPPINGS_MANAGE = "price_book_mappings.manage", "نگاشت نسخه‌دار فهرست‌بها"
+     ESTIMATE_IMPORTS_PREVIEW = (
+         "estimate_imports.preview",
+         "پیش‌نمایش ورود برآورد",
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -491,6 +491,18 @@
+             P.ESTIMATE_IMPORTS_PREVIEW,
+         ),
+         ("apps.estimates.services",),
++    ),
++    PermissionResource(
++        "variation_billing_eligibility", "اهلیت منبع تغییر برای Billing",
++        ("billing.VariationBillingEligibility",),
++        (P.BILLING_VARIATION_ELIGIBILITY_VIEW, P.BILLING_VARIATION_ELIGIBILITY_RETRY),
++        ("apps.billing.variation_handoffs",),
++    ),
++    PermissionResource(
++        "price_books", "منابع و نگاشت فهرست‌بها",
++        ("estimates.PriceBook", "estimates.PriceBookVersion", "estimates.PriceBookRow", "estimates.PriceBookActivation", "estimates.EstimatePriceBookMapping"),
++        (P.PRICE_BOOKS_MANAGE, P.PRICE_BOOKS_ACTIVATE, P.PRICE_BOOK_MAPPINGS_MANAGE),
++        ("apps.estimates.price_books",),
+     ),
+     PermissionResource(
+         "cost_structures",
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -5,7 +5,14 @@
+ )
+ from apps.organizations.permission_registry import registered_permission_codes
+ 
+-ALL_PERMISSIONS = registered_permission_codes()
++# CEP035 source activation/mapping require explicit grants; no implicit role expansion.
++ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
++    BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_VIEW,
++    BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_RETRY,
++    BusinessPermissionCode.PRICE_BOOKS_MANAGE,
++    BusinessPermissionCode.PRICE_BOOKS_ACTIVATE,
++    BusinessPermissionCode.PRICE_BOOK_MAPPINGS_MANAGE,
++)
+ REPORTING_PERMISSIONS = frozenset(
+     code for code in ALL_PERMISSIONS if code.startswith("reporting.")
+ )
+@@ -768,6 +775,10 @@
+ # nor reversal to any default role until authority and SoD policy are accepted.
+ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+     _default_permissions.difference_update(permission_codes(
++        BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_VIEW,
++        BusinessPermissionCode.BILLING_VARIATION_ELIGIBILITY_RETRY,
++    ))
++    _default_permissions.difference_update(permission_codes(
+         BusinessPermissionCode.EMPLOYMENT_RECORDS_MANAGE, BusinessPermissionCode.EMPLOYMENT_RECORDS_VIEW_OWN,
+         BusinessPermissionCode.OFFBOARDING_START, BusinessPermissionCode.OFFBOARDING_VIEW,
+         BusinessPermissionCode.OFFBOARDING_REVIEW, BusinessPermissionCode.ROSTERS_MANAGE, BusinessPermissionCode.ROSTERS_VIEW,
+--- a/apps/organizations/migrations/0119_cep037_variation_eligibility_permissions.py
++++ b/apps/organizations/migrations/0119_cep037_variation_eligibility_permissions.py
+@@ -0,0 +1,19 @@
++"""Explicit Variation eligibility retry/view catalogue; no default grants."""
++from django.db import migrations
++
++PERMISSIONS = (
++    ("billing_variation_eligibility.view", "مشاهده اهلیت منبع تغییر"),
++    ("billing_variation_eligibility.retry", "تلاش مجدد پذیرش منبع تغییر"),
++)
++
++def forward(apps, schema_editor):
++    model = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        model.objects.using(schema_editor.connection.alias).update_or_create(code=code, defaults={"name":name,"description":name,"is_active":True})
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(schema_editor.connection.alias).filter(code__in=[c for c,_ in PERMISSIONS]).update(is_active=False)
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0118_cep035_price_book_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]
+--- a/apps/audit/models.py
++++ b/apps/audit/models.py
+@@ -1608,6 +1608,11 @@
+         "inventory.receipt_failed",
+         "Receipt target mutation failed",
+     )
++    PRICE_BOOK_IMPORTED = "estimates.price_book_imported", "نسخه فهرست‌بها وارد شد"
++    PRICE_BOOK_ACTIVATED = "estimates.price_book_activated", "منبع فهرست‌بها تأیید شد"
++    PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
++    VARIATION_BILLING_ACCEPTED = "billing.variation_accepted", "رخداد اهلیت منبع تغییر ثبت شد"
++    VARIATION_BILLING_FAILED = "billing.variation_failed", "پذیرش منبع تغییر ناموفق بود"
+ 
+ 
+ class AuditEventQuerySet(models.QuerySet):

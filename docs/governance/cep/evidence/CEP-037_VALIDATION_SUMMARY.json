@@ -1,0 +1,90 @@
+[
+  {
+    "check": "FINAL_FOCUSED_AFFECTED",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "test",
+      "apps.billing.test_cep037_variation_handoff.VariationPredicateTests",
+      "apps.billing.test_cep037_variation_handoff.VariationHandoffTests",
+      "apps.billing.test_cep037_variation_handoff.VariationAffectedRegression",
+      "--keepdb",
+      "--noinput",
+      "-v",
+      "2"
+    ],
+    "result": "PASS",
+    "executed_tests": 11,
+    "additional_chain_recheck": "Two tests PASS, one newly added returned-ancestor assertion and one repeated trace generator; source_chain JSON key now names all governed ancestors accurately.",
+    "supplementary_passes": "VariationConcurrencyTests and VariationMigrationTests PASS in initial combined run; unaffected by subsequent role-default/test correction; no repeated migration rehearsal.",
+    "distinct_verified_tests": 14
+  },
+  {
+    "check": "LINT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/billing/variation_models.py",
+      "apps/billing/variation_handoffs.py",
+      "apps/billing/test_cep037_variation_handoff.py",
+      "apps/billing/models.py",
+      "apps/contracts/contractual_services.py",
+      "apps/organizations/models.py",
+      "apps/organizations/permission_registry.py",
+      "apps/organizations/role_defaults.py",
+      "apps/audit/models.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "FORMAT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/billing/variation_models.py",
+      "apps/billing/variation_handoffs.py",
+      "apps/billing/test_cep037_variation_handoff.py",
+      "apps/contracts/contractual_services.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "SYSTEM_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DRIFT_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DIFF_CHECK",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  }
+]

@@ -1,0 +1,30 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_auto_handoff_and_amount_independence_create_no_financial_objects (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_auto_handoff_and_amount_independence_create_no_financial_objects) ... ok
+test_false_entitlement_correction_and_cancellation_preserve_old_evidence (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_false_entitlement_correction_and_cancellation_preserve_old_evidence) ... ok
+test_false_entitlement_original_has_no_active_eligibility (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_false_entitlement_original_has_no_active_eligibility) ... ok
+test_latest_approved_chain_ignores_draft_and_timestamp_order (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_latest_approved_chain_ignores_draft_and_timestamp_order) ... ok
+test_target_failure_preserves_approved_source_and_retains_revalidated_retry (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_target_failure_preserves_approved_source_and_retains_revalidated_retry) ... ok
+test_tenant_scope_manual_retry_and_default_grants_fail_closed (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_tenant_scope_manual_retry_and_default_grants_fail_closed) ... ok
+test_unapproved_and_nonvariation_sources_cannot_be_retried (apps.billing.test_cep037_variation_handoff.VariationHandoffTests.test_unapproved_and_nonvariation_sources_cannot_be_retried) ... ok
+test_source_approval (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_approval) ... ok
+test_source_correction (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_correction) ... ok
+test_source_withdrawal (apps.billing.test_cep037_variation_handoff.VariationAffectedRegression.test_source_withdrawal) ... ok
+test_only_entitlement_and_action_govern_source_availability (apps.billing.test_cep037_variation_handoff.VariationPredicateTests.test_only_entitlement_and_action_govern_source_availability) ... ok
+
+----------------------------------------------------------------------
+Ran 11 tests in 30.507s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 11 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

@@ -1,0 +1,23 @@
+# CEP-037-FINDING-001 — BLOCKER-MIGRATION
+
+Verified 2026-10-18 before any CEP037 product mutation. Canonical PD013/SPEC031/IMB0029 require Billing-owned source-version-aware Eligibility or Draft, retaining idempotency and correction/reversal/supersession lineage. Source ContractualRecord supports approved Variation identity, series/version, correction/cancellation and decision evidence. No source business rule is missing and no new recognition/valuation rule is requested.
+
+Repository evidence: apps/contracts/models.py ContractualRecord and contractual_services.py _approve_contractual_record_domain retain source decisions with no downstream effects. apps/billing/models.py contains no Billing Eligibility/Variation handoff entity. ProgressClaim requires approved ProjectBaseline, period/cutoff, contract term version, regulatory rule version and calculated measurement lines; services.create_progress_claim resolves that separate Billing context and immediately recalculates. ProgressClaimSource references a ProgressRecord through a measured BaselineItem; it cannot represent source-only Variation eligibility. ProgressRecord is a quantity/measurement authority, not a Variation proposal. IndexationCalculation has independent rule/formula ownership; ContractAmendment has independent contract-value semantics. None may be repurposed as eligibility. Whole apps/core search found only the declarative no-recognition INT-C02 policy, not a target persistence contract.
+
+A claim snapshot/audit event cannot substitute for authoritative Billing eligibility: doing so would either force unapproved period/valuation/rate inputs or turn projection/audit evidence into a competing business authority. Existing retry and correction history require a real retained target, not a fabricated passing trace or returning the Contract source as the Billing target.
+
+Migration Impact NONE forbids creating the required minimum persistence. Execution Policy section 13: "If a package states `Migration Impact = NONE`, do not create schema or data migrations." It further requires bounded Human resolution if migration is necessary. This is a migration-contract decision, not a request to expand the six AC, DoD, dependency graph, PD013, source authority or financial rules.
+
+## Concrete bounded resolution proposed
+
+Authorize only minimum additive Billing-owned Variation eligibility persistence and its non-production/development migration, with a migration-only amendment to CEP037 and corresponding manifest hash. Candidate record: tenant/project/contract; exact ContractualRecord series/UUID/version and approved-event snapshot/hash; durable request/occurrence uniqueness; target eligibility state; predecessor/superseding or reversing target linkage; actor/time/reason/audit evidence. Retain finalized history. Exact safe table/constraint layout is ordinary implementation detail after authorization. Add only explicitly assigned permission catalogue entries if required; no default grants.
+
+Eligibility conveys approved source availability only. No default valuation percentage, period, baseline, retention, tax, Billing approval, claim certification, GL/AP/AR/Treasury or Project Cost effect. No automatic progression from eligibility to final Billing. Existing source/target services remain authoritative and critical transitions stay transactional and tenant/object scoped. Run focused integration/service/security, affected regression, populated migration preservation and schema checks under the authorized non-production boundary. No production or Git authority requested.
+
+Alternative resolution: provide an already approved existing no-migration Billing target contract with authoritative repository evidence; re-ground it before implementation. Do not use this finding as authority to create tables or amend the canonical prompt.
+
+Impact: AC01-06 UNVERIFIED, scoped DoD BLOCKED, EXECUTION FAILED at entry. No CEP037 product/model/migration/test/data changes or tests claimed. CEP035 completed changes are preserved. Stop the serial queue on this material blocker; no dependent convergence or GATE05 PASS inferred.
+
+## Resolution and correction — 2026-10-18
+
+RESOLVED by explicit HUMAN-CEP037-PERSISTENCE-20261018. Minimum additive non-production persistence and migration-only prompt amendment approved; see CEP037_HUMAN_MIGRATION_AUTHORIZATION.md and CEP037_AMENDMENT.json. This original finding is retained as historical evidence. Its broad assertion that no business-rule gap remained is corrected by Finding002: Contract source lifecycle is defined, but the Billing eligibility predicate for approved false-entitlement sources is not supplied by the inspected canonical sources. No product mutation occurred before that separate semantic stop.
