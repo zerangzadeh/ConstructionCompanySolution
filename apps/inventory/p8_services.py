@@ -245,7 +245,7 @@ def finalize_valuation(
             "updated_at",
         ]
     )
-    return InventoryValuationEvent.objects.create(
+    event = InventoryValuationEvent.objects.create(
         organization=organization,
         stock_transaction=stock,
         material=stock.material,
@@ -271,6 +271,11 @@ def finalize_valuation(
         value_after=v_after,
         average_cost_after=average,
     )
+
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=event.organization, actor=actor, source_kind="inventory", source_id=event.pk)
+    return event
 
 
 @transaction.atomic
@@ -379,7 +384,7 @@ def reverse_valuation(
         Decimal(0) if pool.quantity == 0 else pool.value_amount / pool.quantity
     )
     pool.save(update_fields=["quantity", "value_amount", "average_cost", "updated_at"])
-    return InventoryValuationEvent.objects.create(
+    event = InventoryValuationEvent.objects.create(
         organization=organization,
         stock_transaction=reversal,
         material=original.material,
@@ -402,6 +407,11 @@ def reverse_valuation(
         value_after=pool.value_amount,
         average_cost_after=pool.average_cost,
     )
+
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=event.organization, actor=actor, source_kind="inventory", source_id=event.pk)
+    return event
 
 
 @transaction.atomic

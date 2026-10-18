@@ -664,6 +664,9 @@ def approve_expense(*, expense: Expense, actor: User) -> Expense:
         actor=actor,
         metadata={"financial_handoff": "none"},
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=locked.organization, actor=actor, source_kind="expense", source_id=locked.pk)
     return locked
 
 
@@ -905,6 +908,9 @@ def void_expense(*, expense: Expense, actor: User, reason: str) -> Expense:
         actor=actor,
         metadata={"reason": locked_expense.void_reason},
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=locked_expense.organization, actor=actor, source_kind="expense", source_id=locked_expense.pk)
     return locked_expense
 
 

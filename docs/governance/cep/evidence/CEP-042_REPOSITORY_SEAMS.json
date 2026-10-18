@@ -1,0 +1,388 @@
+{
+  "settings_module": "config.settings.development",
+  "database_vendor": "postgresql",
+  "local_database": true,
+  "pending_relevant_migrations": [],
+  "registered_journal_contracts": [
+    {
+      "source_kind": "manual",
+      "event_kind": "manual_entry",
+      "source_owner": "accounting",
+      "operational_producer": false
+    },
+    {
+      "source_kind": "opening",
+      "event_kind": "opening_balance",
+      "source_owner": "accounting",
+      "operational_producer": false
+    },
+    {
+      "source_kind": "accounting",
+      "event_kind": "reversal",
+      "source_owner": "accounting",
+      "operational_producer": false
+    },
+    {
+      "source_kind": "accounting",
+      "event_kind": "replacement",
+      "source_owner": "accounting",
+      "operational_producer": false
+    },
+    {
+      "source_kind": "treasury",
+      "event_kind": "movement_posted",
+      "source_owner": "treasury",
+      "operational_producer": true
+    },
+    {
+      "source_kind": "billing.progress_claim.v1",
+      "event_kind": "claim_approved",
+      "source_owner": "billing",
+      "operational_producer": false
+    },
+    {
+      "source_kind": "billing.payable_certificate.v1",
+      "event_kind": "certificate_approved",
+      "source_owner": "billing",
+      "operational_producer": false
+    }
+  ],
+  "control_account_mapping_directions": [
+    "receivable",
+    "payable"
+  ],
+  "candidate_models": [
+    {
+      "model": "accounting.ControlAccountMappingVersion",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "source_kind",
+        "direction",
+        "version",
+        "control_account",
+        "effective_from",
+        "effective_to",
+        "reason",
+        "created_by"
+      ]
+    },
+    {
+      "model": "accounting.JournalEntry",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "period",
+        "kind",
+        "status",
+        "number",
+        "document_date",
+        "accounting_date",
+        "currency",
+        "description",
+        "source_key",
+        "source_kind",
+        "source_uuid",
+        "source_version",
+        "event_kind",
+        "occurrence_id",
+        "payload_hash",
+        "posting_rule_code",
+        "posting_rule_version",
+        "evidence_reference",
+        "reconciliation_reference",
+        "cutoff_date",
+        "precision_policy_version",
+        "rounding_policy_version",
+        "prepared_by",
+        "submitted_by",
+        "submitted_at",
+        "posted_by",
+        "posted_at",
+        "reverses",
+        "replaces",
+        "adjusts",
+        "adjustment_reason"
+      ]
+    },
+    {
+      "model": "accounting.JournalLine",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "journal",
+        "line_number",
+        "account",
+        "description",
+        "debit",
+        "credit",
+        "project",
+        "site",
+        "wbs_node",
+        "party",
+        "source_line_uuid",
+        "account_snapshot",
+        "dimension_snapshot"
+      ]
+    },
+    {
+      "model": "accounting.JournalNumberSequence",
+      "fields": [
+        "organization",
+        "next_number"
+      ]
+    },
+    {
+      "model": "treasury.TreasuryAccountMappingVersion",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "treasury_account",
+        "version",
+        "cash_ledger_account",
+        "clearing_ledger_account",
+        "effective_from",
+        "effective_to",
+        "is_active",
+        "reason",
+        "created_by",
+        "approval_policy_version",
+        "approved_by"
+      ]
+    },
+    {
+      "model": "treasury.TreasuryGLReconciliationJournalLineEvidence",
+      "fields": [
+        "id",
+        "created_at",
+        "slice",
+        "organization",
+        "movement",
+        "journal",
+        "journal_line",
+        "journal_source_uuid",
+        "journal_source_version",
+        "debit",
+        "credit"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffProposal",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "family",
+        "run",
+        "record_kind",
+        "predecessor",
+        "idempotency_key",
+        "source_digest",
+        "currency",
+        "precision_policy_version",
+        "rounding_policy_version",
+        "monetary_policy_snapshot",
+        "proposed_accounting_date",
+        "mapping_reference",
+        "total_amount",
+        "allocated_amount",
+        "unallocated_amount",
+        "has_exceptions",
+        "exception_codes",
+        "source_snapshot",
+        "reason",
+        "prepared_by"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffLine",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "proposal",
+        "run_employee",
+        "employee",
+        "result_line",
+        "statutory_result",
+        "timesheet",
+        "timesheet_entry",
+        "project",
+        "site",
+        "activity",
+        "line_kind",
+        "payee_reference",
+        "component_reference",
+        "amount",
+        "allocation_minutes",
+        "source_lineage",
+        "content_digest"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffReview",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "proposal",
+        "disposition",
+        "reason",
+        "reviewed_by",
+        "reviewed_at"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffAcknowledgement",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "proposal",
+        "downstream_reference",
+        "downstream_status",
+        "acknowledged_source_digest",
+        "acknowledged_amount",
+        "evidence",
+        "recorded_by"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffReconciliation",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "proposal",
+        "acknowledgement",
+        "status",
+        "issue_codes",
+        "expected_amount",
+        "observed_amount",
+        "evidence",
+        "prepared_by"
+      ]
+    },
+    {
+      "model": "payroll.FinancialHandoffReconciliationReview",
+      "fields": [
+        "id",
+        "created_at",
+        "organization",
+        "reconciliation",
+        "disposition",
+        "reason",
+        "reviewed_by",
+        "reviewed_at"
+      ]
+    },
+    {
+      "model": "inventory.InventoryValuationEvent",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "stock_transaction",
+        "material",
+        "event_type",
+        "status",
+        "quantity",
+        "unit_cost",
+        "value_amount",
+        "currency",
+        "source_reference",
+        "source_version",
+        "idempotency_key",
+        "reversal_of",
+        "monetary_precision_version",
+        "rounding_policy_version",
+        "finalized_by",
+        "finalized_at",
+        "quantity_before",
+        "value_before",
+        "quantity_after",
+        "value_after",
+        "average_cost_after"
+      ]
+    },
+    {
+      "model": "inventory.InventoryValuationPool",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "material",
+        "quantity",
+        "value_amount",
+        "average_cost",
+        "currency",
+        "monetary_precision_version",
+        "rounding_policy_version"
+      ]
+    },
+    {
+      "model": "inventory.InventoryValuationException",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "stock_transaction",
+        "material",
+        "reason",
+        "required_authority",
+        "source_reference",
+        "source_version",
+        "resolved_by_event",
+        "resolved_at"
+      ]
+    },
+    {
+      "model": "inventory.DownstreamCostSourceEnvelope",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "valuation_event",
+        "consumer",
+        "idempotency_key",
+        "project",
+        "payload",
+        "supplied_by",
+        "supplied_at"
+      ]
+    },
+    {
+      "model": "fixed_assets.FixedAssetSourceEnvelope",
+      "fields": [
+        "id",
+        "created_at",
+        "updated_at",
+        "organization",
+        "consumer",
+        "asset_transaction",
+        "depreciation_line",
+        "status",
+        "occurrence_key",
+        "amount",
+        "prepared_by",
+        "reviewed_by",
+        "reviewed_at",
+        "consumer_reference",
+        "reconciliation_note",
+        "supersedes"
+      ]
+    }
+  ],
+  "read_only": true,
+  "business_data_mutated": false
+}

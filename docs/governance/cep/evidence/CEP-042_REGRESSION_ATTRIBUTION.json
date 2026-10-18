@@ -1,0 +1,42 @@
+{
+  "classification": "BASELINE TEST DEBT",
+  "failures": 4,
+  "evidence": "CEP-042_REGRESSION_OUTPUT.txt",
+  "failure_boundary": "Unchanged authorization guard before CEP042 source hooks or journal creation",
+  "unchanged_guard_proof": {
+    "apps/fixed_assets/services.py::create_asset_class": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "fedd7436faeaac0da3c3ef7debe0cc6bc3a70fe40768da9f1a2356c7a5fafe15"
+    },
+    "apps/fixed_assets/services.py::_require": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "3c847bb790543c781a4ae745bc8bf86a805c85fe370865221fed396400d1ef6e"
+    },
+    "apps/payroll/financial_handoff_services.py::prepare_financial_handoff": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "85e2838232b533ad2d34ef97e4c1a58f367e80cf739fbf9484d8d096d4920bc2"
+    },
+    "apps/payroll/financial_handoff_services.py::_require": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "e83f5003fc0298550ffaae068256f96f1fbbbeb30a26a5ebae9f22698309939d"
+    },
+    "apps/organizations/authorization.py::require_business_permission": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "c364dfa90d2901aeddf5ef62583ac29bd4915ab987144840037ba726f4cb397f"
+    },
+    "apps/organizations/authorization.py::membership_has_permission": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "6666382eb0b5b7dba1144a2a3cce7fb55fef1d66527e2e7dc941c6cd97e0affb"
+    },
+    "apps/organizations/authorization.py::membership_has_scope": {
+      "unchanged_against_HEAD": true,
+      "ast_sha256": "dba1262030e865e6cf5afaf078c2284158e3e333f2dd2f197449ede7b0616eb0"
+    }
+  },
+  "legacy_fixture_gap": {
+    "Fixed Assets": "Equipment owner/reviewer memberships are created without explicit role assignment/scope required by current authorization",
+    "Payroll": "Custom role_definition assigned but no MembershipRoleAssignment or MembershipScopeGrant"
+  },
+  "bounded_verification": "CEP042-local scenario subclasses add only explicit test authority; original tests/product authorization unchanged",
+  "full_regression_PASS_claim": false
+}

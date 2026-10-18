@@ -1,0 +1,226 @@
+.......FF.FF..........                       [100%]
+================================== FAILURES ===================================
+_ P8CostAndFixedAssetTests.test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual _
+
+self = <apps.fixed_assets.test_p8_s24_s27.P8CostAndFixedAssetTests testMethod=test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual>
+
+    def test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual(self):
+>       asset, book = self._capitalized_asset()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\fixed_assets\test_p8_s24_s27.py:301: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\fixed_assets\test_p8_s24_s27.py:149: in _capitalized_asset
+    asset_class, book = self._published_asset_policies(convention)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\fixed_assets\test_p8_s24_s27.py:108: in _published_asset_policies
+    asset_class = create_asset_class(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\fixed_assets\services.py:61: in create_asset_class
+    _require(
+apps\fixed_assets\services.py:38: in _require
+    return require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: equipment-owner>, organization = <Organization: Equipment Co>
+permission = BusinessPermissionCode.FIXED_ASSET_CLASS_POLICY_MANAGE
+message = '\u0627\u062c\u0627\u0632\u0647 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0627\u0631\u0627\u06cc\u06cc \u062b\u0627\u0628\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.', project = None, site = None
+allow_any_scope = True, allow_site_parent = True
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0627\u0631\u0627\u06cc\u06cc \u062b\u0627\u0628\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+apps\organizations\authorization.py:437: PermissionDenied
+_ P8CostAndFixedAssetTests.test_transfer_is_prospective_and_disposal_stops_depreciation _
+
+self = <apps.fixed_assets.test_p8_s24_s27.P8CostAndFixedAssetTests testMethod=test_transfer_is_prospective_and_disposal_stops_depreciation>
+
+    def test_transfer_is_prospective_and_disposal_stops_depreciation(self):
+>       asset, book = self._capitalized_asset()
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\fixed_assets\test_p8_s24_s27.py:415: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\fixed_assets\test_p8_s24_s27.py:149: in _capitalized_asset
+    asset_class, book = self._published_asset_policies(convention)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\fixed_assets\test_p8_s24_s27.py:108: in _published_asset_policies
+    asset_class = create_asset_class(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\fixed_assets\services.py:61: in create_asset_class
+    _require(
+apps\fixed_assets\services.py:38: in _require
+    return require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: equipment-owner>, organization = <Organization: Equipment Co>
+permission = BusinessPermissionCode.FIXED_ASSET_CLASS_POLICY_MANAGE
+message = '\u0627\u062c\u0627\u0632\u0647 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0627\u0631\u0627\u06cc\u06cc \u062b\u0627\u0628\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.', project = None, site = None
+allow_any_scope = True, allow_site_parent = True
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0627\u0631\u0627\u06cc\u06cc \u062b\u0627\u0628\u062a \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+apps\organizations\authorization.py:437: PermissionDenied
+_ PayrollFinancialHandoffTests.test_finalized_only_idempotent_pinned_and_non_posting _
+
+self = <apps.payroll.test_p7_s29_s32_financial_handoffs.PayrollFinancialHandoffTests testMethod=test_finalized_only_idempotent_pinned_and_non_posting>
+
+    def test_finalized_only_idempotent_pinned_and_non_posting(self) -> None:
+        PayrollRun.objects.filter(pk=self.run.pk).update(
+            status=PayrollRunStatus.APPROVED
+        )
+        with self.assertRaises(ValidationError):
+>           self._prepare(FinancialHandoffFamily.LIABILITY)
+
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:249: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:234: in _prepare
+    return prepare_financial_handoff(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\payroll\financial_handoff_services.py:297: in prepare_financial_handoff
+    _require(
+apps\payroll\financial_handoff_services.py:88: in _require
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062a\u062d\u0648\u06cc\u0644 \u0645\u0627\u0644\u06cc \u062d\u0642\u0648\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+apps\organizations\authorization.py:437: PermissionDenied
+_ PayrollFinancialHandoffTests.test_accounting_and_payment_fail_closed_without_downstream_authority _
+
+self = <apps.payroll.test_p7_s29_s32_financial_handoffs.PayrollFinancialHandoffTests testMethod=test_accounting_and_payment_fail_closed_without_downstream_authority>
+
+    def test_accounting_and_payment_fail_closed_without_downstream_authority(
+        self,
+    ) -> None:
+>       accounting = self._prepare(FinancialHandoffFamily.ACCOUNTING)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:282: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:234: in _prepare
+    return prepare_financial_handoff(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\payroll\financial_handoff_services.py:297: in prepare_financial_handoff
+    _require(
+apps\payroll\financial_handoff_services.py:88: in _require
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: handoff-actor>, organization = <Organization: Handoff Tenant>
+permission = BusinessPermissionCode.PAYROLL_ACCOUNTING_HANDOFF_PREPARE
+message = '\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062a\u062d\u0648\u06cc\u0644 \u0645\u0627\u0644\u06cc \u062d\u0642\u0648\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+    
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062a\u062d\u0648\u06cc\u0644 \u0645\u0627\u0644\u06cc \u062d\u0642\u0648\u0642 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+apps\organizations\authorization.py:437: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/fixed_assets/test_p8_s24_s27.py::P8CostAndFixedAssetTests::test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual
+FAILED apps/fixed_assets/test_p8_s24_s27.py::P8CostAndFixedAssetTests::test_transfer_is_prospective_and_disposal_stops_depreciation
+FAILED apps/payroll/test_p7_s29_s32_financial_handoffs.py::PayrollFinancialHandoffTests::test_finalized_only_idempotent_pinned_and_non_posting
+FAILED apps/payroll/test_p7_s29_s32_financial_handoffs.py::PayrollFinancialHandoffTests::test_accounting_and_payment_fail_closed_without_downstream_authority
+4 failed, 18 passed, 28 subtests passed in 71.67s (0:01:11)

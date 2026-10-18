@@ -1613,6 +1613,11 @@ class AuditAction(models.TextChoices):
     PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
     VARIATION_BILLING_ACCEPTED = "billing.variation_accepted", "رخداد اهلیت منبع تغییر ثبت شد"
     VARIATION_BILLING_FAILED = "billing.variation_failed", "پذیرش منبع تغییر ناموفق بود"
+    ACCOUNTING_RECOGNITION_MAPPING_PREPARED = "accounting.recognition_mapping_prepared", "نگاشت شناسایی تهیه شد"
+    ACCOUNTING_RECOGNITION_MAPPING_APPROVED = "accounting.recognition_mapping_approved", "نگاشت شناسایی پذیرفته شد"
+    ACCOUNTING_SOURCE_RECOGNIZED = "accounting.source_recognized", "پیش‌نویس شناسایی منبع تهیه شد"
+    ACCOUNTING_SOURCE_RECOGNITION_FAILED = "accounting.source_recognition_failed", "پذیرش منبع شناسایی ناموفق بود"
+    ACCOUNTING_SOURCE_RECONCILED = "accounting.source_reconciled", "منبع شناسایی تطبیق شد"
 
 
 class AuditEventQuerySet(models.QuerySet):

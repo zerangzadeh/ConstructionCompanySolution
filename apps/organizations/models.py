@@ -748,6 +748,10 @@ class BusinessPermissionCode(models.TextChoices):
         "estimate_rate_sources.manage",
         "مدیریت منبع و نرخ برآورد",
     )
+    ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE = "accounting_recognition.mappings_manage", "تهیه نگاشت شناسایی حسابداری"
+    ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE = "accounting_recognition.mappings_approve", "پذیرش مستقل نگاشت شناسایی"
+    ACCOUNTING_RECOGNITION_PREPARE = "accounting_recognition.prepare", "تهیه و تلاش مجدد پیش‌نویس شناسایی"
+    ACCOUNTING_RECOGNITION_VIEW = "accounting_recognition.view", "مشاهده و تطبیق شناسایی حسابداری"
     BILLING_VARIATION_ELIGIBILITY_VIEW = "billing_variation_eligibility.view", "مشاهده اهلیت منبع تغییر"
     BILLING_VARIATION_ELIGIBILITY_RETRY = "billing_variation_eligibility.retry", "تلاش مجدد پذیرش منبع تغییر"
     PRICE_BOOKS_MANAGE = "price_books.manage", "مدیریت منابع فهرست‌بها"

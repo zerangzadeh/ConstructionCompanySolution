@@ -17,6 +17,12 @@ class PermissionResource:
 P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+    PermissionResource(
+        "accounting_recognition", "نگاشت و شواهد شناسایی حسابداری",
+        ("accounting.RecognitionMappingVersion", "accounting.RecognitionMappingApproval", "accounting.SourceRecognitionDraft"),
+        (P.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE, P.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE, P.ACCOUNTING_RECOGNITION_PREPARE, P.ACCOUNTING_RECOGNITION_VIEW),
+        ("apps.accounting.recognition_services", "apps.accounting.recognition_sources"),
+    ),
     PermissionResource("employment_records", "سوابق مؤثر استخدام", ("workforce.EmploymentRecord",),
         (P.EMPLOYMENT_RECORDS_MANAGE, P.EMPLOYMENT_RECORDS_VIEW_OWN), ("apps.workforce.employment_services",)),
     PermissionResource("offboarding", "بررسی پایان همکاری", ("workforce.OffboardingCase", "workforce.OffboardingReview"),

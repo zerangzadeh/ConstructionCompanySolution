@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 47
+  execution_state_complete: 48
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 0
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 30
+  not_started_other_current_governed: 29
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-18'
@@ -107,8 +107,8 @@ gates:
   GATE-05:
     status: NOT_PASSED
     evaluated_at: '2026-10-18'
-    evidence: docs/governance/cep/evidence/CEP-037_GATE05_FRONTIER.json
-    note: IMB-0023, IMB-0024 and IMB-0029 contributions verified; remaining unimplemented contributors prevent global convergence PASS. Canonical failure consequence permits unrelated contract build.
+    evidence: docs/governance/cep/evidence/CEP-042_GATE05_FRONTIER.json
+    note: CEP042 IMB0056/0057/0059/0060 source-contract contributions verified with earlier IMB0023/0024/0029; required other contracts remain incomplete or unverified. GATE05 stays NOT_PASSED; no production or UAT convergence inferred.
 authorization_batches:
   AUTH-BATCH-003:
     execution_mode: SERIAL
@@ -149,6 +149,14 @@ human_decisions:
     authority: HUMAN_DECISION_AUTHORITY / Product Owner
     status: APPROVED
     scope: CEP037 source-availability only; latest approved effective source lineage; entitlement predicate and amount independence; retained correction/cancellation deactivation
+    production_authorized: false
+    git_writes_authorized: false
+  HUMAN-CEP042-PERSISTENCE-20261018:
+    source: docs/governance/cep/evidence/CEP-042_HUMAN_MIGRATION_AUTHORIZATION.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED
+    scope: CEP042 minimum additive Accounting recognition source-mapping persistence; bounded Development/Non-Production migrations and migration-only canonical amendment
+    invented_financial_semantics_authorized: false
     production_authorized: false
     git_writes_authorized: false
 registry_update_rules:
@@ -1767,11 +1775,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-035_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: 90a1b2803936f5a95ce5322151c492ee7bafef11
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: COMPLETE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 0a272328eddf32c9a8d91a3a7e7ec05e4b58d287
@@ -1786,7 +1796,9 @@ ceps:
     - date: '2026-10-18'
       status: COMPLETE
       reason: 13/13 build AC and both scoped DoD PASS; 11 focused plus 3 affected regression PASS, populated migration PASS; lint/format/system/drift/diff checks PASS. Exact version/row pins and explicit remap/revision history retained; no repricing or inferred official content. EXT0002 official activation and runtime UTV preserved. No Git writes or production action.
-
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Human direct checkpoint 90a1b2803936f5a95ce5322151c492ee7bafef11 verified on local main, origin/main and remote main; implementation and report paths are contained in that commit. Execution baseline and prior evidence preserved; no merge or agent Git writes.
   CEP-036:
     title: Governed Indexation engine
     phase: V1_IMPLEMENTATION
@@ -1867,11 +1879,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-037_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: 90a1b2803936f5a95ce5322151c492ee7bafef11
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: COMPLETE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 0a272328eddf32c9a8d91a3a7e7ec05e4b58d287
@@ -1906,7 +1920,9 @@ ceps:
     - date: '2026-10-18'
       status: COMPLETE
       reason: 6/6 AC and scoped IMB0029 DoD PASS under both bounded Human decisions. Nine focused plus three affected assertions PASS; populated migration and concurrent retry PASS. Amount-independent latest-approved-effective source policy implemented with append-only deactivation lineage, auto source-event handoff and failure/retry audit; no financial execution. Default view-grant regression corrected before development migration. Checks PASS, both findings resolved, GATE05 NOT_PASSED and runtime UTV retained. No Git writes or production action.
-
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Human direct checkpoint 90a1b2803936f5a95ce5322151c492ee7bafef11 verified on local main, origin/main and remote main; implementation and report paths are contained in that commit. Execution baseline and prior evidence preserved; no merge or agent Git writes.
   CEP-038:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2064,39 +2080,64 @@ ceps:
       status: GIT_INTEGRATED
       reason: Authorized direct commit/push f37310f verified on local and remote main; clean tree; no merge.
   CEP-042:
-    title: null
+    title: Accounting recognition source adapters
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-CEP042-PERSISTENCE-20261018
+      source: Explicit Human minimum additive non-production recognition mapping persistence and migration-only amendment
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 24
+      total: 24
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - performance_concurrency_runtime
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-042_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
+      pushed: false
+      merged_to_main: false
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 90a1b2803936f5a95ce5322151c492ee7bafef11
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP008/021 COMPLETE; all79 canonical prompt hashes verified; GATE05 exit-only and NOT_PASSED. Human CEP035/037 direct checkpoint reconciled inline at 90a1b28 without a material conflict. Dependency readiness does not prove mapping-seam eligibility.
+    - date: '2026-10-18'
+      status: FAILED
+      reason: EXECUTION FAILED AT ENTRY before product mutation. Read-only repository/schema/source review found no applicable immutable Accounting source mapping version/line store; free-text references are not resolvable mappings. Adding required persistence exceeds Migration Impact NONE; 0/24 AC PASS and scoped DoD NOT MET. Owner-registry prerequisite baseline 10 tests/28 subtests PASS only.
+    - date: '2026-10-18'
+      status: BLOCKED
+      reason: Finding001 BLOCKER-MIGRATION; minimum additive non-production mapping persistence/catalog authority and migration-only canonical amendment, or an approved existing no-migration mapping contract, required. No invented debit/credit mapping, ownership, source/target data, posting, migration, production or Git writes. Serial queue stops; independent candidates remain unreviewed.
+    - date: '2026-10-18'
+      status: AUTHORIZED
+      reason: Human confirms recognition mapping persistence in scope and authorizes minimum additive non-production migrations plus migration-only canonical amendment; no financial semantics, new posting rule, production or Git authority.
+    - date: '2026-10-18'
+      status: BLOCKER_RESOLVED
+      reason: Finding001 migration restriction superseded only to authorized extent; original prompt hash preserved, sections16/21/22 migration language amended and manifest hash reverified. Other sections unchanged.
+    - date: '2026-10-18'
+      status: RESUMED
+      reason: Same main90a1b28; prior entry evidence and checkpoint reconciliation preserved. Implement explicit immutable tenant mappings with no defaults; final Accounting posting remains separate and fail-closed without approved posting contracts.
+    - date: '2026-10-18'
+      status: MIGRATION_STATE_CHANGED
+      reason: Authorized organizations0120 catalogue and additive accounting0013 applied only to verified loopback local Development PostgreSQL. Existing financial/source/audit history, preexisting catalogue and role-grant counts/digests unchanged; new mapping/approval/effect tables empty; no default grant, inferred mapping, backfill or production mutation. Populated disposable rollback/reapply PASS; see CEP-042_DEVELOPMENT_MIGRATION.json and CEP-042_MIGRATION_TRACE.json.
+    - date: '2026-10-18'
+      status: COMPLETE
+      reason: 24/24 AC and four scoped IMB DoD PASS. Explicit independently accepted tenant mappings produce only L2 drafts for canonical finalized sources; retained native versions, pinned mapping, balanced inverse reversal, correction lineage, idempotency/error/retry and source-target/header reconciliation verified. Eighteen focused tests plus two targeted checks PASS, populated migration and concurrent retry PASS; 11 affected scenarios verified (four original legacy fixture failures attributed to unchanged guards and rerun with explicit test-only authority). No new posting contract/default account/grant or inferred treatment. Two authorized local Development migrations preserve history/grants; production and Git writes not executed. GATE05 remains NOT_PASSED; clean completed financial boundary retained.
   CEP-043:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3775,9 +3816,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 0a272328eddf32c9a8d91a3a7e7ec05e4b58d287
-  origin_main: 0a272328eddf32c9a8d91a3a7e7ec05e4b58d287
-  integration_checkpoint: 0a272328eddf32c9a8d91a3a7e7ec05e4b58d287
+  last_reconciled_head: 90a1b2803936f5a95ce5322151c492ee7bafef11
+  origin_main: 90a1b2803936f5a95ce5322151c492ee7bafef11
+  integration_checkpoint: 90a1b2803936f5a95ce5322151c492ee7bafef11
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3786,7 +3827,6 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-028
-  - CEP-042
   - CEP-043
   - CEP-044
   - CEP-045
@@ -3807,8 +3847,8 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CLEAN_COMPLETED_CEP037_BOUNDARY_REVIEW_ATTRIBUTION
+  current_session_continuation: CLEAN_COMPLETED_CEP042_FINANCIAL_REVIEW_BOUNDARY
   current_independent_cep: null
-  next_entry_review_candidate: CEP-042
+  next_entry_review_candidate: CEP-043
   production_authorized: false
   human_signoff_executed: false

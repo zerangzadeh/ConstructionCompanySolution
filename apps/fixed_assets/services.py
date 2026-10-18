@@ -350,6 +350,9 @@ def capitalize_asset(
     locked.reviewed_at = timezone.now()
     locked.save(update_fields=["status", "reviewed_by", "reviewed_at", "updated_at"])
     _audit_asset(locked, actor, "capitalized")
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=tx.organization, actor=actor, source_kind="asset", source_id=tx.pk)
     return tx
 
 
@@ -555,6 +558,9 @@ def finalize_asset_transaction(
             "amount": str(locked.amount),
         },
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=locked.organization, actor=actor, source_kind="asset", source_id=locked.pk)
     return locked
 
 
@@ -633,6 +639,9 @@ def reverse_asset_transaction(
             "reversal_of": str(locked.pk),
         },
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=reversal.organization, actor=actor, source_kind="asset", source_id=reversal.pk)
     return reversal
 
 
@@ -815,6 +824,9 @@ def finalize_depreciation(
     locked.finalized_at = timezone.now()
     locked.save(update_fields=["status", "finalized_by", "finalized_at", "updated_at"])
     _audit_depreciation(locked, actor)
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=locked.organization, actor=actor, source_kind="depreciation", source_id=locked.pk)
     return locked
 
 
@@ -880,6 +892,9 @@ def reverse_depreciation(
     locked.status = DepreciationRunStatus.REVERSED
     locked.save(update_fields=["status", "updated_at"])
     _audit_depreciation(reversal, actor)
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=reversal.organization, actor=actor, source_kind="depreciation", source_id=reversal.pk)
     return reversal
 
 

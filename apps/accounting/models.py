@@ -654,7 +654,19 @@ class JournalEntry(UUIDModel, TimeStampedModel):
             JournalKind.REPLACEMENT: ("accounting", "replacement"),
             JournalKind.OPERATIONAL: ("treasury", "movement_posted"),
         }[self.kind]
-        if (self.source_kind, self.event_kind) != expected_contract:
+        from .recognition_sources import (
+            DRAFT_EVENT,
+            DRAFT_REVERSAL_EVENT,
+            DRAFT_SOURCE_KINDS,
+        )
+
+        recognition_draft = (
+            self.kind == JournalKind.OPERATIONAL
+            and self.source_kind in DRAFT_SOURCE_KINDS
+            and self.event_kind in {DRAFT_EVENT, DRAFT_REVERSAL_EVENT}
+            and self.status == JournalStatus.DRAFT
+        )
+        if not recognition_draft and (self.source_kind, self.event_kind) != expected_contract:
             raise ValidationError("نوع سند با قرارداد منبع/رویداد سازگار نیست.")
         for field_name in ("submitted_by", "posted_by"):
             membership = getattr(self, field_name, None)
@@ -1541,3 +1553,11 @@ class FiscalPeriodControlEvent(UUIDModel, CreatedAtModel):
 
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
         raise ValidationError("سابقه کنترل دوره قابل حذف نیست.")
+
+
+# Accounting-owned CEP-042 mapping and immutable source/draft evidence.
+from .recognition_models import (  # noqa: F401
+    RecognitionMappingApproval,
+    RecognitionMappingVersion,
+    SourceRecognitionDraft,
+)

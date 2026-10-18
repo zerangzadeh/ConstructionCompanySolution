@@ -1497,6 +1497,9 @@ def finalize_run(
         run=run,
         require_approved_year=False,
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=run.organization, actor=actor, source_kind="payroll", source_id=run.pk)
     return run
 
 
@@ -1805,6 +1808,9 @@ def reverse_run(
         run=reversal_run,
         require_approved_year=False,
     )
+    from apps.accounting.recognition_services import attempt_source_recognition
+
+    attempt_source_recognition(organization=reversal.reversal_run.organization, actor=actor, source_kind="payroll", source_id=reversal.reversal_run.pk)
     return reversal
 
 
