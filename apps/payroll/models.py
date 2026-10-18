@@ -57,6 +57,41 @@ class ImmutablePayrollRecord(UUIDModel, CreatedAtModel):
         raise ValidationError("سابقه قطعی حقوق و دستمزد قابل حذف نیست.")
 
 
+class StatutorySourcePackage(ImmutablePayrollRecord):
+    """Immutable source envelope; the linked Platform policy owns publication."""
+
+    policy_version = models.OneToOneField(
+        "organizations.PlatformPolicyVersion",
+        on_delete=models.PROTECT,
+        related_name="payroll_source_package",
+    )
+    schema_version = models.PositiveIntegerField()
+    content = models.JSONField()
+    content_digest = models.CharField(max_length=64)
+    supersedes = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="successors",
+    )
+    imported_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(schema_version=1), name="payroll_source_package_schema_v1"
+            ),
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        from .source_package_services import validate_source_package
+
+        validate_source_package(self)
+
+
 class PayModel(models.TextChoices):
     SALARIED = "salaried", "حقوق ثابت"
     HOURLY = "hourly", "ساعتی"

@@ -62,9 +62,9 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 33
+  execution_state_complete: 34
   authorized_not_started: 0
-  eligible_under_standing_authority: 7
+  eligible_under_standing_authority: 6
   in_progress: 0
   blocked_current: 0
   partial_current: 1
@@ -1807,11 +1807,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-041_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: f37310fd5c3e6568e959849867427f96d5fd95cd
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: COMPLETE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: f7e89e43726b1494baf40017e6b1276657e224cf
@@ -1829,6 +1831,9 @@ ceps:
     - date: '2026-10-18'
       status: CLOSED_VERIFIED
       reason: Required closeout complete; source-family activation remains gated; runtime UTV retained.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit/push f37310f verified on local and remote main; clean tree; no merge.
   CEP-042:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2207,42 +2212,54 @@ ceps:
       status: GIT_INTEGRATED
       reason: Existing Human direct commit/push to main at 21476e7b583e87bb22775c8cbca33f61702a926c verified from Git; no merge command claimed.
   CEP-052:
-    title: null
+    title: Versioned statutory Payroll source engine
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_STARTED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - current_statutory_values_and_activation_evidence
+    - development_deployment_and_migration
+    - broader_performance_concurrency_runtime
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-052_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
+      pushed: false
+      merged_to_main: false
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
+      branch: main
+      sha: f37310fd5c3e6568e959849867427f96d5fd95cd
     updated_at: '2026-10-18'
     history:
     - date: '2026-10-18'
       status: DEPENDENCY_READY
       reason: CEP-025 COMPLETE; EXT-0018 and GATE-03 remain activation-only, so non-production fail-closed build is eligible.
+    - date: '2026-10-18'
+      status: STARTED
+      reason: Canonical hash, CEP-025 prerequisite and standing non-production build authority verified; touch set recorded before mutation; activation stays gated.
+    - date: '2026-10-18'
+      status: COMPLETE
+      reason: Immutable source-package import/schema/effective policy/activation validation and evidence hooks implemented; 6/6 AC and scoped Build DoD PASS; 21 behavioral tests and one separate PostgreSQL migration rollback/reapply test PASS; no current statutory values invented.
+    - date: '2026-10-18'
+      status: CLOSED_VERIFIED
+      reason: Required manifests/report/checks complete; actual current-value activation, development deployment and production remain unverified or unauthorized.
   CEP-053:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2802,7 +2819,7 @@ ceps:
   CEP-069:
     title: null
     phase: PRODUCTION_CERTIFICATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+    dependency_status: SATISFIED
     eligibility_status: NOT_ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
@@ -2831,8 +2848,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: CEP-052 COMPLETE; certification entry/current statutory evidence and Human production decisions remain unverified and are not inferred from Build completion.
   CEP-070:
     title: null
     phase: PRODUCTION_CERTIFICATION
@@ -3433,9 +3453,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: f7e89e43726b1494baf40017e6b1276657e224cf
-  origin_main: f7e89e43726b1494baf40017e6b1276657e224cf
-  integration_checkpoint: f7e89e43726b1494baf40017e6b1276657e224cf
+  last_reconciled_head: f37310fd5c3e6568e959849867427f96d5fd95cd
+  origin_main: f37310fd5c3e6568e959849867427f96d5fd95cd
+  integration_checkpoint: f37310fd5c3e6568e959849867427f96d5fd95cd
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3445,11 +3465,10 @@ execution_frontier:
   dependency_ready_current_governed:
   - CEP-022
   - CEP-036
-  - CEP-052
   - CEP-053
   - CEP-054
   - CEP-055
   - CEP-056
-  next_autonomous_cep: CEP-052
+  next_autonomous_cep: CEP-053
   production_authorized: false
   human_signoff_executed: false

@@ -46,6 +46,7 @@ from .models import (
     StatutoryReviewEvidence,
     StatutorySubmissionResolution,
 )
+from .source_package_services import resolve_statutory_source_package
 
 ROUNDING_METHODS = {
     "ROUND_HALF_UP": ROUND_HALF_UP,
@@ -402,7 +403,7 @@ def calculate_statutory(
             "payroll.employee_insurance.calculate",
         ),
     }[kind]
-    policy = resolve_effective_platform_regulatory_policy(
+    policy, source_package = resolve_statutory_source_package(
         code=policy_code, consumer=consumer, on_date=locked_run.period.ends_on
     )
     if record_kind == StatutoryRecordKind.CANCELLATION:
@@ -447,6 +448,11 @@ def calculate_statutory(
         ],
     }
     policy_snapshot = {
+        "source_package_id": str(source_package.pk),
+        "source_package_digest": source_package.content_digest,
+        "source_package_schema_version": source_package.schema_version,
+        "ytd_treatment": source_package.content["ytd_treatment"],
+        "retroactivity": source_package.content["retroactivity"],
         "policy_id": str(policy.policy_id),
         "policy_version_id": str(policy.pk),
         "version": policy.version,

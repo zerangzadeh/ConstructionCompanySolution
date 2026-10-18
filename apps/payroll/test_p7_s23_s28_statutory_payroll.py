@@ -60,7 +60,9 @@ from .models import (
     StatutoryExportStatus,
     StatutoryRecordKind,
     StatutoryReviewDisposition,
+    StatutorySourcePackage,
 )
+from .source_package_services import _digest, package_content
 from .statutory_services import (
     calculate_statutory,
     generate_statutory_output,
@@ -321,6 +323,34 @@ class StatutoryPayrollTests(TestCase):
             disposition=PlatformPolicyReviewDisposition.ACCEPTED,
             created_by=self.owner,
         )
+        if code in {
+            PAYROLL_TAX_REGULATORY_POLICY_CODE,
+            EMPLOYEE_INSURANCE_REGULATORY_POLICY_CODE,
+        }:
+            # Synthetic evidence, never a current Iranian statutory assertion.
+            content = package_content(
+                policy=policy_version,
+                payload={
+                    "schema_version": 1,
+                    "ytd_treatment": {
+                        "source_reference": source.source_identifier,
+                        "description": "Period fixture only; cumulative calculation stays gated",
+                    },
+                    "retroactivity": {
+                        "source_reference": source.source_identifier,
+                        "description": "Explicit successor-only fixture policy",
+                    },
+                    "evidence_references": [source.source_identifier],
+                },
+            )
+            StatutorySourcePackage.objects.create(
+                policy_version=policy_version,
+                schema_version=1,
+                content=content,
+                content_digest=_digest(content),
+                imported_by=self.owner,
+                reason="Synthetic test fixture",
+            )
         PlatformPolicyVersion.objects.filter(pk=policy_version.pk).update(
             status=PolicyVersionStatus.PUBLISHED,
             published_by=self.owner,

@@ -1,0 +1,112 @@
+Actual retained output; final clean behavior run and separate migration run are PASS. The combined attempt at the end is TEST INFRASTRUCTURE DEBT: nonserialized transaction teardown creates content types before the serialized migration class deserializes. No failed application test remains. Initial test-import path error was corrected before these final runs. Development plan is read-only, NOT execution.
+
+=== behavior_validation.txt ===
+Using existing test database for alias 'default'...
+
+.....................
+----------------------------------------------------------------------
+Ran 21 tests in 29.919s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 21 test(s).
+System check identified no issues (0 silenced).
+
+
+=== migration_validation.txt ===
+Using existing test database for alias 'default'...
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 12.468s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 1 test(s).
+System check identified no issues (0 silenced).
+
+
+=== migration_plan.txt ===
+Planned operations:
+workforce.0010_workrelationshipdocumentlink
+    Create model WorkRelationshipDocumentLink
+payroll.0006_cep025_operational_cumulative_ytd
+    Create model PayrollYearInterval
+    Create model PayrollCumulativeState
+    Create constraint payroll_year_org_code_version_uq on model payrollyearinterval
+    Create constraint payroll_year_dates_ck on model payrollyearinterval
+    Create constraint payroll_year_approved_no_overlap on model payrollyearinterval
+    Create constraint payroll_ytd_year_line_uq on model payrollcumulativestate
+    Create constraint payroll_ytd_bucket_version_uq on model payrollcumulativestate
+payroll.0007_statutorysourcepackage
+    Create model StatutorySourcePackage
+
+
+=== final_validation.txt ===
+Using existing test database for alias 'default'...
+
+.....................E
+======================================================================
+ERROR: setUpClass (apps.payroll.test_cep052_migration.SourcePackageMigrationTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "django_content_type_app_label_model_76bd3d3b_uniq"
+DETAIL:  Key (app_label, model)=(admin, logentry) already exists.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\creation.py", line 163, in deserialize_db_from_string
+    obj.save()
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\serializers\base.py", line 265, in save
+    models.Model.save_base(self.object, using=using, raw=True, **kwargs)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1008, in save_base
+    updated = self._save_table(
+              ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1169, in _save_table
+    results = self._do_insert(
+              ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1210, in _do_insert
+    return manager._insert(
+           ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 1873, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\sql\compiler.py", line 1882, in execute_sql
+    cursor.execute(sql, params)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\psycopg\cursor.py", line 117, in execute
+    raise ex.with_traceback(None)
+django.db.utils.IntegrityError: duplicate key value violates unique constraint "django_content_type_app_label_model_76bd3d3b_uniq"
+DETAIL:  Key (app_label, model)=(admin, logentry) already exists.
+
+----------------------------------------------------------------------
+Ran 21 tests in 31.002s
+
+FAILED (errors=1)
+Preserving test database for alias 'default'...
+
+Found 22 test(s).
+System check identified no issues (0 silenced).
