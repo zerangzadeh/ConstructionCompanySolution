@@ -6,7 +6,7 @@ import io
 import json
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -28,6 +28,7 @@ from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.procurement.models import GoodsReceipt, GoodsReceiptStatus
 from apps.projects.models import (
     BudgetAllocation,
+    BudgetVersionStatus,
     Project,
     ProjectCostFact,
     ProjectCostFactKind,
@@ -117,23 +118,64 @@ class Calculation:
     sources: dict[str, object]
 
 
-def _budget(organization: Organization, projects) -> Calculation:
+def _budget(
+    organization: Organization, projects, *, as_of: datetime | None = None
+) -> Calculation:
+    as_of = as_of or timezone.now()
     rows = BudgetAllocation.objects.filter(
         organization=organization,
+        manifest_line__manifest__budget__status=BudgetVersionStatus.ACCEPTED,
+        manifest_line__manifest__budget__accepted_at__lte=as_of,
         manifest_line__manifest__budget__governing_for__project__in=projects,
+        created_at__lte=as_of,
     )
-    total = rows.aggregate(total=Sum("amount"))["total"]
-    ids = list(rows.order_by("pk").values_list("pk", flat=True))
+    lines = list(
+        rows.order_by("pk").values_list(
+            "pk",
+            "amount",
+            "manifest_line__manifest__budget_id",
+            "manifest_line__manifest__budget__version_number",
+            "manifest_line__manifest__budget__currency",
+            "manifest_line__manifest__budget__project_id",
+        )
+    )
+    currencies = {line[4] for line in lines}
+    total = sum((line[1] for line in lines), Decimal("0.00"))
+    covered_projects = len({line[5] for line in lines})
+    eligible_projects = projects.count()
+    complete = (
+        bool(lines)
+        and len(currencies) == 1
+        and covered_projects == eligible_projects
+    )
     return Calculation(
-        {"amount": format(total, "f") if total is not None else None},
-        "IRR",
+        {"amount": format(total, "f") if complete else None},
+        next(iter(currencies)) if len(currencies) == 1 else "",
         "money",
-        {"complete": bool(ids), "source_count": len(ids)},
-        {"model": "projects.BudgetAllocation", "ids": [str(v) for v in ids]},
+        {
+            "complete": complete,
+            "source_count": len(lines),
+            "covered_projects": covered_projects,
+            "eligible_projects": eligible_projects,
+        },
+        {
+            "model": "projects.BudgetAllocation",
+            "ids": [str(line[0]) for line in lines],
+            "budget_versions": sorted(
+                {f"{line[2]}:v{line[3]}" for line in lines}
+            ),
+        },
     )
 
 
-def _cost(organization: Organization, projects, *, actual: bool) -> Calculation:
+def _cost(
+    organization: Organization,
+    projects,
+    *,
+    actual: bool,
+    as_of: datetime | None = None,
+) -> Calculation:
+    as_of = as_of or timezone.now()
     kinds = (
         [ProjectCostFactKind.ACTUAL_RECOGNIZED, ProjectCostFactKind.ACTUAL_REVERSAL]
         if actual
@@ -144,24 +186,60 @@ def _cost(organization: Organization, projects, *, actual: bool) -> Calculation:
         ]
     )
     rows = ProjectCostFact.objects.filter(
-        organization=organization, project__in=projects, kind__in=kinds
+        organization=organization,
+        project__in=projects,
+        kind__in=kinds,
+        recognition_date__lte=as_of.date(),
+        created_at__lte=as_of,
     )
-    total = rows.aggregate(total=Sum("amount"))["total"]
-    ids = list(rows.order_by("pk").values_list("pk", flat=True))
-    covered_projects = rows.values("project_id").distinct().count()
+    facts = list(
+        rows.order_by("pk").values_list(
+            "pk", "project_id", "kind", "amount", "currency",
+            "source_id", "source_version", "source_line_id",
+            "contract__producer_key", "contract__version",
+        )
+    )
+    currencies = {fact[4] for fact in facts}
+    total = sum(
+        (
+            -fact[3]
+            if fact[2] == ProjectCostFactKind.COMMITMENT_RELIEF
+            else fact[3]
+            for fact in facts
+        ),
+        Decimal("0.00"),
+    )
+    covered_projects = len({fact[1] for fact in facts})
     total_projects = projects.count()
-    complete = total_projects == covered_projects and total_projects > 0
+    # Project Controls does not certify complete producer coverage in this phase.
+    # Fact presence is evidence of a partial projection, never coverage proof.
+    complete = False
     return Calculation(
-        {"amount": format(total, "f") if total is not None else None},
-        "IRR",
+        {"amount": format(total, "f") if facts and len(currencies) == 1 else None},
+        next(iter(currencies)) if len(currencies) == 1 else "",
         "money",
         {
             "complete": complete,
             "covered_projects": covered_projects,
             "eligible_projects": total_projects,
-            "source_count": len(ids),
+            "source_count": len(facts),
+            "coverage_reason": "project_cost_producer_coverage_not_certified",
         },
-        {"model": "projects.ProjectCostFact", "ids": [str(v) for v in ids]},
+        {
+            "model": "projects.ProjectCostFact",
+            "ids": [str(fact[0]) for fact in facts],
+            "source_versions": [
+                {
+                    "fact_id": str(fact[0]),
+                    "source_id": fact[5],
+                    "source_version": fact[6],
+                    "source_line_id": fact[7],
+                    "producer_key": fact[8],
+                    "contract_version": fact[9],
+                }
+                for fact in facts
+            ],
+        },
     )
 
 
@@ -345,7 +423,17 @@ def refresh_metric(
         requested_by=actor,
         started_at=now,
     )
-    calculation = CALCULATORS[metric_code](organization, projects)
+    if metric_code == "approved_budget":
+        calculation = _budget(organization, projects, as_of=now)
+    elif metric_code in {"committed_cost", "actual_cost_coverage"}:
+        calculation = _cost(
+            organization,
+            projects,
+            actual=metric_code == "actual_cost_coverage",
+            as_of=now,
+        )
+    else:
+        calculation = CALCULATORS[metric_code](organization, projects)
     sources = {
         **calculation.sources,
         "scope_kind": "organization" if organization_wide else "project_set",
