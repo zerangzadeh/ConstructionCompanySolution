@@ -1,0 +1,155 @@
+Using existing test database for alias 'default'...
+
+EEEEEEEE
+======================================================================
+ERROR: test_correction_is_atomic_and_reconciles_versions_without_overwriting_history (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_correction_is_atomic_and_reconciles_versions_without_overwriting_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_failure_after_target_insert_rolls_back_and_retains_retry_evidence (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_failure_after_target_insert_rolls_back_and_retains_retry_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_mapping_failure_is_retained_and_retry_revalidates_source (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_mapping_failure_is_retained_and_retry_revalidates_source)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_only_current_approved_unblocked_complete_source_is_accepted (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_only_current_approved_unblocked_complete_source_is_accepted)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_reversal_preserves_aging_cutoff_and_reconciliation_amount (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_reversal_preserves_aging_cutoff_and_reconciliation_amount)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+======================================================================
+ERROR: test_tenant_permission_scope_and_reversal_grant_fail_closed (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_tenant_permission_scope_and_reversal_grant_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\subledgers\test_cep033_invoice_handoff.py", line 76, in setUp
+    membership = self.organization.memberships.get(user=user)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\accounting\models.py", line 164, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'created_by': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u067e\u0648\u0686 \u0628\u0627\u0634\u062f.']}
+
+----------------------------------------------------------------------
+Ran 8 tests in 12.326s
+
+FAILED (errors=8)
+Preserving test database for alias 'default'...
+
+Found 8 test(s).
+System check identified no issues (0 silenced).

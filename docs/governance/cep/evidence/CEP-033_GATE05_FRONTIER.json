@@ -1,0 +1,151 @@
+{
+  "evaluated_at": "2026-10-18",
+  "status": "NOT_PASSED",
+  "source_archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+  "archive_sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+  "source_member": "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv",
+  "member_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+  "canonical_requirement": {
+    "Gate ID": "GATE-05",
+    "Gate Name": "Integration Convergence",
+    "Gate Type": "INTEGRATION CONVERGENCE GATE",
+    "Purpose": "Confirm source-specific cross-domain contracts are stable and reconcilable before closeout/UAT convergence.",
+    "Required IMB IDs": "IMB-0023; IMB-0024; IMB-0029; IMB-0031; IMB-0032; IMB-0033; IMB-0034; IMB-0035; IMB-0036; IMB-0037; IMB-0038; IMB-0054; IMB-0056; IMB-0057; IMB-0058; IMB-0059; IMB-0060; IMB-0061; IMB-0062; IMB-0078",
+    "Required External Dependencies": "EXT-0005..EXT-0010; EXT-0013; EXT-0016 where activation applies",
+    "Evidence Required": "Source identity/version; idempotency; correction/reversal; target authority; reconciliation; failure/retry tests.",
+    "Pass Condition": "Implemented contracts preserve source/target authority and activated contracts have their required policy mapping.",
+    "Failure Consequence": "Affected closeout, reporting, UAT or activation paths remain blocked; unrelated contracts may continue.",
+    "Downstream Work Unlocked": "RW-06 convergence/closeout and scenario-specific UAT readiness",
+    "UTV?": "NO for contract build; runtime verification remains UTV",
+    "Human Sign-off?": "NO",
+    "Notes": "Conditional producer mappings are evaluated per source family."
+  },
+  "contributors": {
+    "IMB-0023": {
+      "cep": "CEP-033",
+      "execution": "COMPLETE",
+      "contribution": "VERIFIED"
+    },
+    "IMB-0024": {
+      "cep": "CEP-034",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0029": {
+      "cep": "CEP-037",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0031": {
+      "cep": "CEP-038",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0032": {
+      "cep": "CEP-039",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0033": {
+      "cep": "CEP-038",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0034": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0035": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0036": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0037": {
+      "cep": "CEP-048",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0038": {
+      "cep": "CEP-059",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0054": {
+      "cep": "CEP-061",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0056": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0057": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0058": {
+      "cep": "CEP-061",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0059": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0060": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0061": {
+      "cep": "CEP-043",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0062": {
+      "cep": "CEP-044",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0078": {
+      "cep": "CEP-062",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    }
+  },
+  "conclusion": "IMB-0023 verified against EV007/009/010 and final code; remaining unimplemented contributors prevent global PASS. Unrelated contract build may continue. No production or Human sign-off authority.",
+  "dependency_ready_current_governed": [
+    "CEP-028",
+    "CEP-034",
+    "CEP-035",
+    "CEP-037",
+    "CEP-042",
+    "CEP-043",
+    "CEP-044",
+    "CEP-045",
+    "CEP-046",
+    "CEP-047",
+    "CEP-048",
+    "CEP-050",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-067",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "frontier_rule": "Canonical prompt section 8 prerequisite sets evaluated against COMPLETE records; not entry/activation eligibility."
+}

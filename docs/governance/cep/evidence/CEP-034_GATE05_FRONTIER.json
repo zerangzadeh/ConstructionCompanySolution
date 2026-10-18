@@ -1,0 +1,232 @@
+{
+  "evaluated_at": "2026-10-18",
+  "status": "NOT_PASSED",
+  "source_archive": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+  "archive_sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+  "source_member": "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv",
+  "member_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+  "canonical_requirement": {
+    "Gate ID": "GATE-05",
+    "Gate Name": "Integration Convergence",
+    "Gate Type": "INTEGRATION CONVERGENCE GATE",
+    "Purpose": "Confirm source-specific cross-domain contracts are stable and reconcilable before closeout/UAT convergence.",
+    "Required IMB IDs": "IMB-0023; IMB-0024; IMB-0029; IMB-0031; IMB-0032; IMB-0033; IMB-0034; IMB-0035; IMB-0036; IMB-0037; IMB-0038; IMB-0054; IMB-0056; IMB-0057; IMB-0058; IMB-0059; IMB-0060; IMB-0061; IMB-0062; IMB-0078",
+    "Required External Dependencies": "EXT-0005..EXT-0010; EXT-0013; EXT-0016 where activation applies",
+    "Evidence Required": "Source identity/version; idempotency; correction/reversal; target authority; reconciliation; failure/retry tests.",
+    "Pass Condition": "Implemented contracts preserve source/target authority and activated contracts have their required policy mapping.",
+    "Failure Consequence": "Affected closeout, reporting, UAT or activation paths remain blocked; unrelated contracts may continue.",
+    "Downstream Work Unlocked": "RW-06 convergence/closeout and scenario-specific UAT readiness",
+    "UTV?": "NO for contract build; runtime verification remains UTV",
+    "Human Sign-off?": "NO",
+    "Notes": "Conditional producer mappings are evaluated per source family."
+  },
+  "contributors": {
+    "IMB-0023": {
+      "cep": "CEP-033",
+      "execution": "COMPLETE",
+      "contribution": "VERIFIED"
+    },
+    "IMB-0024": {
+      "cep": "CEP-034",
+      "execution": "COMPLETE",
+      "contribution": "VERIFIED"
+    },
+    "IMB-0029": {
+      "cep": "CEP-037",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0031": {
+      "cep": "CEP-038",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0032": {
+      "cep": "CEP-039",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0033": {
+      "cep": "CEP-038",
+      "execution": "COMPLETE",
+      "contribution": "REQUIRES_CONTRIBUTOR_EVIDENCE_REVIEW"
+    },
+    "IMB-0034": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0035": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0036": {
+      "cep": "CEP-047",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0037": {
+      "cep": "CEP-048",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0038": {
+      "cep": "CEP-059",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0054": {
+      "cep": "CEP-061",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0056": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0057": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0058": {
+      "cep": "CEP-061",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0059": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0060": {
+      "cep": "CEP-042",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0061": {
+      "cep": "CEP-043",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0062": {
+      "cep": "CEP-044",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    },
+    "IMB-0078": {
+      "cep": "CEP-062",
+      "execution": "NOT_STARTED",
+      "contribution": "NOT_IMPLEMENTED"
+    }
+  },
+  "conclusion": "IMB-0023 and IMB-0024 contributions verified. Remaining unimplemented contributors prevent global PASS. Unrelated contract build may continue. No activation, production or Human sign-off authority.",
+  "dependency_ready_current_governed": [
+    "CEP-028",
+    "CEP-035",
+    "CEP-037",
+    "CEP-042",
+    "CEP-043",
+    "CEP-044",
+    "CEP-045",
+    "CEP-046",
+    "CEP-047",
+    "CEP-048",
+    "CEP-050",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-067",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "frontier_rule": "Canonical prompt section 8 prerequisite sets evaluated against COMPLETE records; not entry/activation eligibility.",
+  "verified_prompt_hashes": {
+    "CEP-001": "ec8401745855e080dd46fa3ed6dc0fb31b31ba1cdadc283699226c9f5e2315bb",
+    "CEP-002": "1df0ba8558617a12fab260cabf126eb563da9699fb976cc3be966e2de91098eb",
+    "CEP-003": "17589d700d9ae3b4d17f2adca362439dda3ea3eda32e8ab1b5771937954b7048",
+    "CEP-004": "efdead9fec23489162abef34fe5984b22b9d66bf75a99ae4d26791f4b09ee8ee",
+    "CEP-005": "ebc5fecfa73792cad00819ec6135df5b75f3ae8ac1b66718cce1d8da831ca61e",
+    "CEP-006": "dfe2b61a485320d0347ebc40cb45a30569936481a52f11f033a3ed2970e0ea2a",
+    "CEP-007": "c38e2d9462191d3782abd91c7d294c7cddd3256916b4ce9bb5aa9b6eaa50d893",
+    "CEP-008": "7246bfd8f8b9d0286e0fcfcf57946f01ea3938598a8a58565473e32f8d932eeb",
+    "CEP-009": "e4191bc53748ab6194d0563237437e401b849f6805fe8b24bc950d8345f542da",
+    "CEP-010": "9ce54a67f96cf017790ed62caba44cd7167fff46839858fda32bd90c269af6b2",
+    "CEP-011": "c12dd32528f2159c9254d9084f9d333cc85d8e5c6f42b9659d72d6f5de6cded7",
+    "CEP-012": "c75ba3ea83131b3dc49d6acfcf5f7c41648cfe4109402e527f14723f253c89d8",
+    "CEP-013": "299869be89c0ccd01dda6a395424bbac3c0bda64594ac589c19f88ddcb4dd0c1",
+    "CEP-014": "a9c142eee2cf324b495080ff919eb2d5941b79f0feca78a1dad5260278c0a9e4",
+    "CEP-015": "f8b50d828578735f4ec4ea60a87252e06d84a20fe6e4a6db388d95a2e78fa031",
+    "CEP-016": "c5e9300323f4daa9324670cd501fc5d5f39afd9a10a36adea1a123444c4a112e",
+    "CEP-017": "c4b318780c224a2f9126b6b69e4123fd8ed6b6ecd4fe703155ba6e831424c400",
+    "CEP-018": "bbefae22557ca49b82e22424a99ac2caa766c00928a45d3b2c5890680d19f0b4",
+    "CEP-019": "985904a4ffe2892eb844d34d4c19373cbc3ef2c323569dd6ae85cbc24e02dd66",
+    "CEP-020": "b6602bfca639bb005c89a5ecf222df11e87adf3d2c4c519b547b324ee7f12afb",
+    "CEP-021": "d724e1fdd5e691087f7d04de27b60a69e14e9ef0936bbf78fbeb6e921b1dda45",
+    "CEP-022": "995a0b498a752bb64369896b946ef5ef59b2277868447a12df807e7cc0f8c230",
+    "CEP-023": "b0b06c4b7f2395485749de134f28fe11ae62650b29347e3352a6ab2b7acfd7c8",
+    "CEP-024": "88c0183c5fb8415c9d614f8999ddeed66cea1d424692431b047233a246000c97",
+    "CEP-025": "aba57062896f23108f74bcc389ae03c4380190b95429e83ca609ed65403fac33",
+    "CEP-026": "a9a8c61c5bb1b68c8f988ec4d085801af44dfff4993e6c8ba49c2c098ac9fe8a",
+    "CEP-027": "0eb30b40d0775fa390163533b28667b5f88d472f0fa615d6e84b03eb19942e1b",
+    "CEP-028": "d740c17628f4e2282fa9dde68891f7d0f4f3945802345c4c0aa917a7c7a49e50",
+    "CEP-029": "2e5afec0c5fa4ef42dc5aef2439e3fd7458e64c5227a30129076a2bd6a33d93e",
+    "CEP-030": "f5c75d30f807f1330e20ceb56e6e2164907f08ea750552d822c765264e63a008",
+    "CEP-031": "8228d91eeadfcbdd345ced20a7b8071a8ce0cc4dd7fc8ab176b7f31e64e2e787",
+    "CEP-032": "a2f789dd2dc8821ed2e8a71914f9d95ea53ca7d52321d7b19635f560ce82db8a",
+    "CEP-033": "87eafe9c112a564c9f35450c233b16ab20228f02bb10a3cb6809ec56a41ba8a7",
+    "CEP-034": "30ef0f2442940b8a94f093c2b45ecb60b4ec9580d61e9da4d6b5ca0b1eb49b16",
+    "CEP-035": "2c915a874dca011d8e9e2d418908be78e4cb72acc700aafef626226b18027a26",
+    "CEP-036": "2f716418ba5608f876cd6fbe6bb14d03bbbf8c4936adb0611a3d21ceb78c19e4",
+    "CEP-037": "f989006496029cd88203506d9d36cfa3ab81bec14e5281c4b5ff22bded797e18",
+    "CEP-038": "4a596b5154a0b457fc57eea5f58288d432c76e08d32329ce8436a97f1ea99e43",
+    "CEP-039": "8386b4434ca410d309d6e115a85a4d9f0d570a8527b5164c90910f9e507949e8",
+    "CEP-040": "37f8fc137679ec2f9c177d5ced32e85a44c88d4cbc4ba12c85c3dbb9bd13e092",
+    "CEP-041": "9c568ab27c05fd92da56c3c899ab629c62ac90d058e183da25daec48f4e9f27a",
+    "CEP-042": "1ea96efb37812bafe03934fed447450af35b862d049a0b388e4f4ab1f8ec4f93",
+    "CEP-043": "2a5089c14f8afb3e4b118bd6f266d1c907fda8d1e6e9639a26d7b734c32eb19c",
+    "CEP-044": "15059d1c942991817080cbb8fe8c1791dd34d6228f9a81de8e35d79ad2a7b73c",
+    "CEP-045": "aa6d8f287391d7e9a9931bc44b37ee2c73670984b683f0bdf0070a3c00f23c45",
+    "CEP-046": "1dc277df321ad6f30d217f0a84b441cf27aafe1c4fda909c790c6d9b0979ccc6",
+    "CEP-047": "1d7ffbc058175705046389c4f1e0b9e923d236bd89300916edea7303c5106adb",
+    "CEP-048": "7d4ac74ce888d0fda0413cccd5838ad3c9fbe687f0887763e2e30b71aba19cc1",
+    "CEP-049": "6d6658933f4dfeba9c8ebbf48226ee80ab31d8a07876d2fb0537f3815c963805",
+    "CEP-050": "b108a223f83522f706a5be2e68c495099a5838c2d021b8075410a91145574e4b",
+    "CEP-051": "dac5f1fda2de50209405c57f324b421c089642d7aeaf2daa94d59017aaa8682f",
+    "CEP-052": "eaf9362eb18ab80b97f867b2c8d3ab2e20e458de5772173d28f85c464f66aa25",
+    "CEP-053": "6e2eb63215509c29bbd5c221ad82dbf244e6ab5b9294152c8d0704aa99890bc5",
+    "CEP-054": "78e210b460e214c766eec2e439f4e12f11b744e4865ce41462a7f50d6170bc84",
+    "CEP-055": "0b7ef725e1a8d59d7bc1e6fe34989385c13ca7f75cb6a59b8a558792c588c5f2",
+    "CEP-056": "6ee6d2b2f25affed49547b74d4e4fd3be8f2dd7a3c4528729ebf75ab0deb6c15",
+    "CEP-057": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+    "CEP-058": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1",
+    "CEP-059": "f2749d8216e8c62cacfe86a1e52ec267fc3ce763ea749b848c9e7e138133836a",
+    "CEP-060": "d301eee76e17a3e620964429592e941bbcc95cd6d8d9ac291aa9295d731e9bb7",
+    "CEP-061": "5446718cdc01fef8b1bf21c92cbdd0835b80ff80c119cfc1b7545447d823dabf",
+    "CEP-062": "de636c4166ce39794607dabd819c78d3791016151bc61b4db225043912b48d87",
+    "CEP-063": "36eec04a4d2f47405d537d23c7e2c5f2f5f1172a7d03cd218304ad710bef3792",
+    "CEP-064": "643801a9d55948b75aa261653f7ceadd3bfeb720462d8def2e778da06b0c3132",
+    "CEP-065": "535bad1d9143c0c8e474872b683e70f899ceb7f13bebca9d71fcdf94b31599fc",
+    "CEP-066": "700eff25934b7c5aa0c0609bf852421fc45da5f46d584acdcafcb5cefbaccd6c",
+    "CEP-067": "64a1eb4be6ac4e6f0877ad0970915ea9a9e37e7d2419d395a5429b942cd19182",
+    "CEP-068": "6f157ca68cff50e8d5d94757b3065ffb40dddeba32803cec32179225a4ad9156",
+    "CEP-069": "41d138764cb8fcde81dfea26f6c6df82202c54e4da3a641b2b18382811f2ebba",
+    "CEP-070": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+    "CEP-071": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+    "CEP-072": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+    "CEP-073": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+    "CEP-074": "7e723b4147d417418f6033b2185a843af92d14e297c649418624d805b34811b9",
+    "CEP-075": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+    "CEP-076": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa",
+    "CEP-077": "acba1a8bfc7825534ef660ac3e0c63097b957485a70c73f384b4309f69ace7e7",
+    "CEP-078": "313eb92ea69db33fe2ccaa6d881a6346949286aa8d9c688ac87dd820b0e92030",
+    "CEP-079": "c02eb0bf068da7a036cf20776fd212be9d5146e994a9e6364ad4ddff9f6fb342"
+  },
+  "operational_boundary": "CEP033 and CEP034 complete; accumulated financial/Inventory changes and evidence left reviewable and uncommitted. CEP035 is the next entry-review candidate, not verified build eligibility."
+}

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from zoneinfo import ZoneInfo
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q, Sum
+from django.utils import timezone
 
 from core.models import CreatedAtModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
@@ -630,6 +633,15 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
 
     @property
     def outstanding_amount(self):
+        reversal = self.source_reversals.first()
+        if reversal is not None:
+            from apps.organizations.services import get_organization_settings
+
+            settings = get_organization_settings(organization=self.organization)
+            if reversal.effective_date <= timezone.localdate(
+                timezone=ZoneInfo(settings.timezone)
+            ):
+                return self.original_amount * 0
         settled = (
             self.settlement_allocations.filter(reversal__isnull=True).aggregate(
                 total=Sum("amount")
@@ -647,12 +659,84 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
 
     @property
     def settlement_status(self) -> str:
+        if self.source_reversals.exists():
+            return "reversed"
         outstanding = self.outstanding_amount
         if outstanding == self.original_amount:
             return "open"
         if outstanding == 0:
             return "settled"
         return "partial"
+
+
+class APSourceReversalQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError("شواهد برگشت منبع AP تغییرناپذیر است.")
+
+    def delete(self):
+        raise ValidationError("شواهد برگشت منبع AP حذف‌پذیر نیست.")
+
+    def bulk_create(self, *args, **kwargs):
+        raise ValidationError("ثبت برگشت منبع AP فقط از سرویس مجاز است.")
+
+
+class SupplierInvoiceAPReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+    """AP source reversal; never a cash reversal, write-off or GL journal."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    obligation = models.ForeignKey(
+        Obligation, on_delete=models.PROTECT, related_name="source_reversals"
+    )
+    replacement_match = models.ForeignKey(
+        SupplierInvoiceMatch,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="ap_corrections",
+    )
+    effective_date = models.DateField()
+    reason = models.TextField()
+    idempotency_key = models.CharField(max_length=120)
+    payload_hash = models.CharField(max_length=64)
+    reversed_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    objects = APSourceReversalQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["obligation"], name="ap_source_reversal_once"
+            ),
+            models.UniqueConstraint(
+                fields=["organization", "idempotency_key"],
+                name="ap_source_reversal_unique_key",
+            ),
+        ]
+
+    def clean(self) -> None:
+        validate_related_organizations(
+            self,
+            obligation=self.obligation,
+            replacement_match=self.replacement_match,
+            reversed_by=self.reversed_by,
+        )
+        if (
+            self.obligation.source_kind != "procurement.supplier_invoice_match.v1"
+            or self.obligation.direction != ObligationDirection.PAYABLE
+            or self.effective_date < self.obligation.recognized_on
+            or not self.reason.strip()
+        ):
+            raise ValidationError("منبع یا تاریخ و دلیل برگشت AP نامعتبر است.")
+        if self.replacement_match_id and (
+            str(self.replacement_match.invoice_version.invoice_id)
+            != self.obligation.source_snapshot.get("invoice_id")
+            or self.replacement_match_id == self.obligation.source_uuid
+        ):
+            raise ValidationError("اصلاح AP باید منبع جانشین همان صورتحساب باشد.")
 
 
 class SettlementAllocation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):

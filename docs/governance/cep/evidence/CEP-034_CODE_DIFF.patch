@@ -1,0 +1,718 @@
+--- a/apps/inventory/services.py
++++ b/apps/inventory/services.py
+@@ -3,7 +3,7 @@
+ from uuid import UUID
+ 
+ from django.core.exceptions import PermissionDenied, ValidationError
+-from django.db import IntegrityError, transaction
++from django.db import DatabaseError, IntegrityError, transaction
+ from django.db.models import Q, QuerySet, Sum
+ from django.utils import timezone
+ 
+@@ -308,8 +308,62 @@
+     return locked
+ 
+ 
++def create_stock_transaction(
++    *,
++    organization: Organization,
++    actor: User,
++    transaction_number: str,
++    transaction_type: str,
++    material: Material,
++    unit_of_measure: UnitOfMeasure,
++    quantity: Decimal,
++    occurred_at: datetime,
++    source_warehouse: Warehouse | None = None,
++    destination_warehouse: Warehouse | None = None,
++    project: Project | None = None,
++    goods_receipt_item: GoodsReceiptItem | None = None,
++    reference: str = "",
++    notes: str = "",
++) -> StockTransaction:
++    """Create a draft; equivalent receipt retries retain the original target."""
++    arguments = locals().copy()
++    try:
++        with transaction.atomic():
++            if goods_receipt_item is not None:
++                # Serialize receipt contract acceptance without changing other flows.
++                Organization.objects.select_for_update().get(pk=organization.pk)
++            return _create_stock_transaction_domain(**arguments)
++    except (ValueError, ValidationError, PermissionDenied, DatabaseError) as exc:
++        if goods_receipt_item is not None:
++            source = (
++                GoodsReceiptItem.objects.select_related("goods_receipt")
++                .filter(pk=goods_receipt_item.pk, organization=organization)
++                .first()
++            )
++            if source is not None:
++                try:
++                    _require_role(
++                        organization=organization,
++                        actor=actor,
++                        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
++                        project=source.goods_receipt.project,
++                        message="Receipt object scope required.",
++                    )
++                except PermissionDenied:
++                    raise exc
++                record_audit_event(
++                    organization=organization,
++                    actor=actor,
++                    action=AuditAction.STOCK_RECEIPT_FAILED,
++                    entity_type="goods_receipt_item",
++                    entity_id=source.pk,
++                    metadata={"error_type": type(exc).__name__},
++                )
++        raise
++
++
+ @transaction.atomic
+-def create_stock_transaction(
++def _create_stock_transaction_domain(
+     *,
+     organization: Organization,
+     actor: User,
+@@ -407,6 +461,26 @@
+         created_by=actor,
+         updated_by=actor,
+     )
++    contract_evidence = None
++    if goods_receipt_item is not None:
++        from .receipt_contract import receipt_evidence, retained_receipt_target
++
++        # Validate every retry, including current scope and related master state.
++        try:
++            transaction_record.full_clean(
++                validate_unique=False, validate_constraints=False
++            )
++            contract_evidence = receipt_evidence(transaction_record)
++            retained = retained_receipt_target(
++                candidate=transaction_record, evidence=contract_evidence, actor=actor
++            )
++        except ValidationError as exc:
++            # Preserve the existing public create-service validation exception.
++            raise ValueError(
++                "Stock receipt data or retained contract is invalid."
++            ) from exc
++        if retained is not None:
++            return retained
+     _save_validated(
+         transaction_record,
+         "Stock transaction data is invalid or its number/source is in use.",
+@@ -422,6 +496,7 @@
+             "transaction_type": transaction_type,
+             "quantity": str(quantity),
+             "material_id": str(material.pk),
++            **({"receipt_contract": contract_evidence} if contract_evidence else {}),
+         },
+     )
+     return transaction_record
+--- a/apps/inventory/receipt_contract.py
++++ b/apps/inventory/receipt_contract.py
+@@ -0,0 +1,233 @@
++"""INT-R04 retained comparison evidence; Inventory remains stock authority."""
++
++from __future__ import annotations
++
++import hashlib
++import json
++from datetime import UTC, datetime
++from decimal import Decimal
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction, AuditEvent
++from apps.audit.services import record_audit_event
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode, Organization
++from apps.procurement.models import GoodsReceipt, GoodsReceiptItem, GoodsReceiptStatus
++
++from .models import StockTransaction
++
++CONTRACT = "procurement.goods_receipt_item.v1"
++
++
++def fingerprint(payload: object) -> str:
++    """Normalize numeric and datetime representation without losing precision."""
++
++    def encode(value: object) -> str:
++        if isinstance(value, Decimal):
++            return format(value.normalize(), "f") if value else "0"
++        if isinstance(value, datetime):
++            return value.astimezone(UTC).isoformat()
++        if isinstance(value, UUID):
++            return str(value)
++        raise TypeError(f"Unsupported fingerprint type: {type(value).__name__}")
++
++    return hashlib.sha256(
++        json.dumps(
++            payload, sort_keys=True, separators=(",", ":"), default=encode
++        ).encode()
++    ).hexdigest()
++
++
++def receipt_evidence(target: StockTransaction) -> dict[str, object]:
++    """Called after locked source, material, warehouse and scope validation."""
++    item = target.goods_receipt_item
++    receipt = item.goods_receipt
++    version = receipt.purchase_order_version
++    if (
++        receipt.status != GoodsReceiptStatus.POSTED
++        or not receipt.posted_at
++        or not receipt.posted_by_id
++        or version is None
++        or version.organization_id != target.organization_id
++        or version.purchase_order_id != receipt.purchase_order_id
++    ):
++        raise ValidationError(
++            "Approved receipt occurrence and pinned version required."
++        )
++    source = source_snapshot(item)
++    return {
++        "contract": CONTRACT,
++        "source": source,
++        "source_fingerprint": fingerprint(source),
++        "request_fingerprint": target_fingerprint(target),
++    }
++
++
++def source_snapshot(item: GoodsReceiptItem) -> dict[str, object]:
++    receipt = item.goods_receipt
++    version = receipt.purchase_order_version
++    return {
++        "receipt_id": str(receipt.pk),
++        "receipt_item_id": str(item.pk),
++        "purchase_order_id": str(receipt.purchase_order_id),
++        "purchase_order_version_id": str(version.pk) if version else None,
++        "purchase_order_version": version.version_number if version else None,
++        "purchase_order_hash": version.payload_hash if version else None,
++        "posted_at": receipt.posted_at.isoformat() if receipt.posted_at else None,
++        "posted_by_id": str(receipt.posted_by_id),
++        "received_at": receipt.received_at.isoformat(),
++        "project_id": str(receipt.project_id),
++        "material_id": str(item.material_id),
++        "unit_id": str(item.unit_of_measure_id),
++        "quantity": format(item.quantity.normalize(), "f"),
++    }
++
++
++def target_fingerprint(target: StockTransaction) -> str:
++    return fingerprint(
++        {
++            name: getattr(target, name)
++            for name in (
++                "organization_id",
++                "transaction_number",
++                "transaction_type",
++                "source_warehouse_id",
++                "destination_warehouse_id",
++                "material_id",
++                "unit_of_measure_id",
++                "project_id",
++                "goods_receipt_item_id",
++                "quantity",
++                "occurred_at",
++                "reference",
++                "notes",
++            )
++        }
++    )
++
++
++def retained_receipt_target(
++    *, candidate: StockTransaction, evidence: dict[str, object], actor: User
++) -> StockTransaction | None:
++    """Replay retains original state, including reversal; never reactivates stock."""
++    targets = list(
++        StockTransaction.objects.select_for_update().filter(
++            organization_id=candidate.organization_id,
++            goods_receipt_item_id=candidate.goods_receipt_item_id,
++        )
++    )
++    events = AuditEvent.objects.filter(
++        organization_id=candidate.organization_id,
++        action=AuditAction.STOCK_TRANSACTION_CREATED,
++        entity_type="stock_transaction",
++        metadata__receipt_contract__contract=CONTRACT,
++        metadata__receipt_contract__source__receipt_item_id=str(
++            candidate.goods_receipt_item_id
++        ),
++    )
++    if not targets and not events.exists():
++        return None
++    if len(targets) != 1 or events.count() != 1:
++        raise ValidationError("Receipt history lacks one retained contract occurrence.")
++    target = targets[0]
++    event = events.first()
++    if (
++        event.entity_id != str(target.pk)
++        or event.metadata["receipt_contract"] != evidence
++        or target_fingerprint(target) != evidence["request_fingerprint"]
++    ):
++        raise ValidationError(
++            "Receipt occurrence payload or original evidence differs."
++        )
++    record_audit_event(
++        organization=candidate.organization,
++        actor=actor,
++        action=AuditAction.STOCK_RECEIPT_RETRIED,
++        entity_type="stock_transaction",
++        entity_id=target.pk,
++        metadata={"receipt_contract": evidence, "retained_status": target.status},
++    )
++    return target
++
++
++@transaction.atomic
++def reconcile_goods_receipt_inventory(
++    *, organization: Organization, actor: User, receipt: GoodsReceipt
++) -> dict[str, object]:
++    """Source/target projection including legacy gaps and Inventory reversals."""
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW,
++        allow_any_scope=True,
++        message="Inventory receipt reconciliation permission required.",
++    )
++    try:
++        receipt = GoodsReceipt.objects.select_for_update().get(
++            pk=receipt.pk, organization=organization
++        )
++    except GoodsReceipt.DoesNotExist as exc:
++        raise PermissionDenied("Receipt belongs to another tenant.") from exc
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_VIEW,
++        project=receipt.project,
++        message="Inventory receipt project scope required.",
++    )
++    rows = []
++    for item in receipt.items.filter(organization=organization).order_by("pk"):
++        current_source = source_snapshot(item)
++        targets = []
++        for target in StockTransaction.objects.filter(
++            organization=organization, goods_receipt_item=item
++        ).order_by("created_at", "pk"):
++            event = AuditEvent.objects.filter(
++                organization=organization,
++                action=AuditAction.STOCK_TRANSACTION_CREATED,
++                entity_type="stock_transaction",
++                entity_id=str(target.pk),
++            ).first()
++            retained = event.metadata.get("receipt_contract") if event else None
++            reversal = StockTransaction.objects.filter(
++                organization=organization, reversal_of=target
++            ).first()
++            targets.append(
++                {
++                    "target_id": str(target.pk),
++                    "status": target.status,
++                    "quantity": str(target.quantity),
++                    "retained_contract": retained,
++                    "source_payload_matches": bool(
++                        retained
++                        and retained["source_fingerprint"]
++                        == fingerprint(current_source)
++                    ),
++                    "target_payload_matches": bool(
++                        retained
++                        and retained["request_fingerprint"]
++                        == target_fingerprint(target)
++                    ),
++                    "reversal_id": str(reversal.pk) if reversal else None,
++                    "reversal_quantity": str(reversal.quantity) if reversal else None,
++                }
++            )
++        rows.append(
++            {
++                "source_item_id": str(item.pk),
++                "current_source": current_source,
++                "targets": targets,
++            }
++        )
++    result = {
++        "receipt_id": str(receipt.pk),
++        "source_status": receipt.status,
++        "active_order_version_id": str(receipt.purchase_order_version_id),
++        "items": rows,
++    }
++    result["evidence_hash"] = fingerprint(result)
++    return result
+--- a/apps/inventory/test_cep034_receipt_contract.py
++++ b/apps/inventory/test_cep034_receipt_contract.py
+@@ -0,0 +1,339 @@
++"""INT-R04 equivalent retries, retained evidence and independent reversals."""
++
++import json
++import os
++from concurrent.futures import ThreadPoolExecutor
++from datetime import UTC, datetime, timedelta
++from datetime import timezone as datetime_timezone
++from decimal import Decimal
++from pathlib import Path
++from threading import Barrier
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError, close_old_connections
++from django.test import SimpleTestCase, TestCase, TransactionTestCase
++
++from apps.audit.models import AuditAction, AuditEvent
++from apps.inventory import tests as inventory_tests
++from apps.inventory.models import StockTransaction
++from apps.inventory.receipt_contract import (
++    fingerprint,
++    reconcile_goods_receipt_inventory,
++)
++from apps.inventory.services import (
++    create_stock_transaction,
++    create_warehouse,
++    get_stock_balance,
++    post_stock_transaction,
++    reverse_stock_transaction,
++)
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    OrganizationRole,
++)
++from apps.procurement.models import GoodsReceipt, GoodsReceiptItem
++from apps.procurement.services import void_goods_receipt
++from apps.procurement.tests import ProcurementFixtureMixin
++
++
++class ReceiptContractFixture(ProcurementFixtureMixin):
++    create_posted_goods_receipt = (
++        inventory_tests.InventoryFixtureMixin.create_posted_goods_receipt
++    )
++    create_and_post = inventory_tests.InventoryFixtureMixin.create_and_post
++
++    def setUp(self):
++        super().setUp()
++        for organization, user in (
++            (self.organization, self.owner),
++            (self.organization, self.member),
++            (self.organization, self.viewer),
++            (self.other_organization, self.outsider),
++        ):
++            membership = organization.memberships.get(user=user)
++            role = OrganizationRole.objects.create(
++                code=f"cep034-{user.pk}", name="Explicit isolated test grants"
++            )
++            permissions = BusinessPermission.objects.filter(is_active=True)
++            if user == self.viewer:
++                permissions = permissions.filter(code__endswith=".view")
++            role.permissions.set(permissions)
++            membership.role_definition = role
++            membership.save(update_fields=["role_definition"])
++            MembershipScopeGrant.objects.create(
++                organization=organization,
++                membership=membership,
++                scope_type=AuthorizationScopeType.ORGANIZATION,
++                reason="CEP034 isolated fixture",
++            )
++        self.central = create_warehouse(
++            organization=self.organization,
++            actor=self.owner,
++            code="central",
++            name="Main",
++        )
++        self.site = create_warehouse(
++            organization=self.organization,
++            actor=self.owner,
++            code="site",
++            name="Site",
++            project=self.project,
++        )
++        self.other_warehouse = create_warehouse(
++            organization=self.other_organization,
++            actor=self.outsider,
++            code="other",
++            name="Other site",
++            project=self.other_project,
++        )
++
++
++class ReceiptFingerprintTests(SimpleTestCase):
++    def test_numeric_timezone_and_key_order_equivalence(self):
++        now = datetime(2026, 10, 18, tzinfo=UTC)
++        self.assertEqual(
++            fingerprint({"q": Decimal("8.0000"), "at": now}),
++            fingerprint(
++                {
++                    "at": now.astimezone(datetime_timezone(timedelta(hours=3.5))),
++                    "q": Decimal(8),
++                }
++            ),
++        )
++        self.assertNotEqual(
++            fingerprint({"q": Decimal(8)}), fingerprint({"q": Decimal(9)})
++        )
++
++
++class ReceiptContractTests(ReceiptContractFixture, TestCase):
++    def setUp(self):
++        super().setUp()
++        self.receipt, self.item = self.create_posted_goods_receipt()
++        self.arguments = {
++            "organization": self.organization,
++            "actor": self.owner,
++            "transaction_number": "R034",
++            "transaction_type": "receipt",
++            "material": self.material,
++            "unit_of_measure": self.unit,
++            "quantity": self.item.quantity,
++            "occurred_at": self.receipt.received_at,
++            "destination_warehouse": self.site,
++            "project": self.project,
++            "goods_receipt_item": self.item,
++        }
++
++    def accept(self, **changes):
++        return create_stock_transaction(**(self.arguments | changes))
++
++    def reconcile(self):
++        return reconcile_goods_receipt_inventory(
++            organization=self.organization, actor=self.owner, receipt=self.receipt
++        )
++
++    def test_equivalent_retry_in_draft_and_posted_state_has_one_target(self):
++        target = self.accept()
++        self.assertEqual(self.accept(transaction_number=" r034 ").pk, target.pk)
++        self.assertEqual(StockTransaction.objects.count(), 1)
++        self.assertEqual(self.receipt.status, "posted")
++        self.assertEqual(
++            get_stock_balance(
++                user=self.owner,
++                organization=self.organization,
++                warehouse=self.site,
++                material=self.material,
++            ),
++            0,
++        )
++        post_stock_transaction(
++            organization=self.organization, actor=self.owner, stock_transaction=target
++        )
++        self.assertEqual(self.accept().status, "posted")
++        self.assertEqual(StockTransaction.objects.count(), 1)
++        retained = self.reconcile()["items"][0]["targets"][0]["retained_contract"]
++        self.assertEqual(retained["source"]["receipt_item_id"], str(self.item.pk))
++        self.assertEqual(
++            retained["source"]["purchase_order_version_id"],
++            str(self.receipt.purchase_order_version_id),
++        )
++        self.assertEqual(
++            AuditEvent.objects.filter(
++                action=AuditAction.STOCK_TRANSACTION_CREATED
++            ).count(),
++            1,
++        )
++
++    def test_changed_payload_and_changed_source_fail_closed(self):
++        original = self.accept()
++        for changes in (
++            {"destination_warehouse": self.central},
++            {"occurred_at": self.receipt.received_at + timedelta(seconds=1)},
++            {"transaction_number": "OTHER034"},
++            {"quantity": Decimal(9)},
++            {"notes": "changed"},
++        ):
++            with self.assertRaises((ValueError, ValidationError)):
++                self.accept(**changes)
++        GoodsReceiptItem.objects.filter(pk=self.item.pk).update(quantity=Decimal(9))
++        with self.assertRaises(ValueError):
++            self.accept(quantity=Decimal(9))
++        self.assertEqual(StockTransaction.objects.get().pk, original.pk)
++
++    def test_failure_rolls_back_target_and_retry_revalidates_source(self):
++        source_before = GoodsReceipt.objects.filter(pk=self.receipt.pk).values().get()
++        original_audit = __import__(
++            "apps.inventory.services", fromlist=["record_audit_event"]
++        ).record_audit_event
++
++        def fail_created(**kwargs):
++            if kwargs["action"] == AuditAction.STOCK_TRANSACTION_CREATED:
++                raise IntegrityError("injected after target insert")
++            return original_audit(**kwargs)
++
++        with (
++            patch(
++                "apps.inventory.services.record_audit_event", side_effect=fail_created
++            ),
++            self.assertRaises(IntegrityError),
++        ):
++            self.accept()
++        self.assertFalse(StockTransaction.objects.exists())
++        self.assertEqual(
++            GoodsReceipt.objects.filter(pk=self.receipt.pk).values().get(),
++            source_before,
++        )
++        self.assertTrue(
++            AuditEvent.objects.filter(action=AuditAction.STOCK_RECEIPT_FAILED).exists()
++        )
++        GoodsReceipt.objects.filter(pk=self.receipt.pk).update(status="void")
++        with self.assertRaises(ValueError):
++            self.accept()
++        GoodsReceipt.objects.filter(pk=self.receipt.pk).update(status="posted")
++        self.assertEqual(self.accept().goods_receipt_item_id, self.item.pk)
++
++    def test_replay_rechecks_permission_scope_tenant_and_related_state(self):
++        self.accept()
++        with self.assertRaises(PermissionDenied):
++            self.accept(organization=self.other_organization, actor=self.outsider)
++        with self.assertRaises(PermissionDenied):
++            self.accept(actor=self.viewer)
++        self.material.is_active = False
++        self.material.save()
++        with self.assertRaises((ValueError, ValidationError, PermissionDenied)):
++            self.accept()
++        self.material.is_active = True
++        self.material.save()
++        MembershipScopeGrant.objects.filter(membership__user=self.owner).delete()
++        with self.assertRaises(PermissionDenied):
++            self.accept()
++        self.assertEqual(StockTransaction.objects.count(), 1)
++
++    def test_retry_rejects_changed_draft_and_suspended_tenant(self):
++        target = self.accept()
++        StockTransaction.objects.filter(pk=target.pk).update(notes="changed draft")
++        with self.assertRaises(ValueError):
++            self.accept()
++        self.assertFalse(
++            self.reconcile()["items"][0]["targets"][0]["target_payload_matches"]
++        )
++        StockTransaction.objects.filter(pk=target.pk).update(notes="")
++        self.organization.status = "suspended"
++        self.organization.save(update_fields=["status"])
++        with self.assertRaises(PermissionDenied):
++            self.accept()
++        self.assertEqual(StockTransaction.objects.count(), 1)
++
++    def test_legacy_target_without_retained_evidence_is_not_retroactively_attested(
++        self,
++    ):
++        # A legacy record is created through the existing model path with no INT-R04 audit.
++        StockTransaction.objects.create(
++            **{k: v for k, v in self.arguments.items() if k != "actor"},
++            created_by=self.owner,
++        )
++        with self.assertRaises(ValueError):
++            self.accept()
++        self.assertEqual(StockTransaction.objects.count(), 1)
++        self.assertIsNone(
++            self.reconcile()["items"][0]["targets"][0]["retained_contract"]
++        )
++
++    def test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage(self):
++        target = self.accept()
++        post_stock_transaction(
++            organization=self.organization, actor=self.owner, stock_transaction=target
++        )
++        reverse = reverse_stock_transaction(
++            organization=self.organization,
++            actor=self.owner,
++            stock_transaction=target,
++            reversal_number="REV034",
++            reason="Explicit Inventory correction",
++        )
++        self.assertEqual(self.accept().status, "reversed")
++        self.assertEqual(StockTransaction.objects.count(), 2)
++        trace = self.reconcile()
++        row = trace["items"][0]["targets"][0]
++        self.assertEqual(row["reversal_id"], str(reverse.pk))
++        self.assertTrue(row["target_payload_matches"])
++        self.assertEqual(
++            get_stock_balance(
++                user=self.owner,
++                organization=self.organization,
++                warehouse=self.site,
++                material=self.material,
++            ),
++            0,
++        )
++        if path := os.environ.get("CEP034_TRACE_PATH"):
++            Path(path).write_text(json.dumps(trace, indent=2), encoding="utf-8")
++        void_goods_receipt(
++            organization=self.organization,
++            actor=self.owner,
++            goods_receipt=self.receipt,
++            reason="Source correction after stock reversal",
++        )
++        self.assertEqual(self.reconcile()["source_status"], "void")
++        with self.assertRaises(ValueError):
++            self.accept()
++
++
++class ReceiptContractConcurrencyTests(ReceiptContractFixture, TransactionTestCase):
++    def test_concurrent_equivalent_acceptance_retains_one_target(self):
++        receipt, item = self.create_posted_goods_receipt()
++        barrier = Barrier(2)
++
++        def accept(_):
++            close_old_connections()
++            try:
++                barrier.wait(timeout=10)
++                return create_stock_transaction(
++                    organization=self.organization,
++                    actor=self.owner,
++                    transaction_number="RACE034",
++                    transaction_type="receipt",
++                    material=self.material,
++                    unit_of_measure=self.unit,
++                    quantity=item.quantity,
++                    occurred_at=receipt.received_at,
++                    destination_warehouse=self.site,
++                    project=self.project,
++                    goods_receipt_item=item,
++                ).pk
++            finally:
++                close_old_connections()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            results = list(pool.map(accept, (1, 2)))
++        self.assertEqual(results[0], results[1])
++        self.assertEqual(StockTransaction.objects.count(), 1)
++
++
++class ReceiptAffectedRegression(ReceiptContractFixture, TestCase):
++    # Reuse existing affected assertions with explicit current-authority fixture only.
++    test_goods_receipt = inventory_tests.StockTransactionServiceTests.test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void
++    test_draft_posting = inventory_tests.StockTransactionServiceTests.test_draft_does_not_change_balance_and_posting_does
++    test_reversal = inventory_tests.StockTransactionServiceTests.test_reversal_adds_opposite_entry_and_preserves_original
+--- a/apps/audit/models.py
++++ b/apps/audit/models.py
+@@ -8,6 +8,12 @@
+ 
+ 
+ class AuditAction(models.TextChoices):
++    SUPPLIER_INVOICE_AP_FAILED = (
++        "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
++    )
++    SUPPLIER_INVOICE_AP_REVERSED = (
++        "subledgers.invoice_ap_reversed", "منبع تعهد صورتحساب AP برگشت شد"
++    )
+     TENDER_BID_CREATED = "commercial.tender_bid_created", "فرصت مناقصه ثبت شد"
+     TENDER_BID_REVISED = "commercial.tender_bid_revised", "نسخه مناقصه ثبت شد"
+     TENDER_BID_EVIDENCE_LINKED = "commercial.tender_bid_evidence_linked", "شاهد مناقصه پیوند شد"
+@@ -1594,6 +1600,14 @@
+         "reporting.project_closeout_exported",
+         "خروجی اختتام پروژه ایجاد شد",
+     )
++    STOCK_RECEIPT_RETRIED = (
++        "inventory.receipt_retried",
++        "Receipt retry retained original stock transaction",
++    )
++    STOCK_RECEIPT_FAILED = (
++        "inventory.receipt_failed",
++        "Receipt target mutation failed",
++    )
+ 
+ 
+ class AuditEventQuerySet(models.QuerySet):

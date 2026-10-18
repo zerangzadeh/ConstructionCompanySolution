@@ -1865,6 +1865,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         "تعهدات، تسویه، aging و تطبیق AP/AR",
         (
             "subledgers.Obligation",
+            "subledgers.SupplierInvoiceAPReversal",
             "subledgers.SettlementAllocation",
             "subledgers.SettlementReversal",
             "subledgers.WriteOffProposal",
@@ -1882,6 +1883,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             P.SUBLEDGERS_VIEW,
             P.SUBLEDGERS_OBLIGATIONS_RECOGNIZE,
+            P.SUBLEDGERS_SOURCES_REVERSE,
             P.SUBLEDGERS_SETTLEMENTS_ALLOCATE,
             P.SUBLEDGERS_SETTLEMENTS_REVERSE,
             P.SUBLEDGERS_AGING_RUN,
@@ -1891,7 +1893,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.SUBLEDGERS_WRITEOFFS_APPROVE,
             P.SUBLEDGERS_WRITEOFFS_REVERSE,
         ),
-        ("apps.subledgers.services",),
+        ("apps.subledgers.services", "apps.subledgers.supplier_invoice_handoffs"),
     ),
     PermissionResource(
         "supplier_invoices",

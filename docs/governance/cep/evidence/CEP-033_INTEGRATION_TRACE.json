@@ -1,0 +1,139 @@
+{
+  "scenario": "Approved invoice/match -> L2 AP -> atomic source correction",
+  "trace": {
+    "invoice_id": "61ff9b57-5740-4f97-8179-99437dbbdb23",
+    "active_invoice_version": 2,
+    "active_match_id": "715f70b6-8291-4081-b02d-1a84ccdb1a0c",
+    "active_match_version": 1,
+    "active_match_status": "matched",
+    "targets": [
+      {
+        "obligation_id": "8f95ac8c-c815-4b05-800b-5dfab6ce7baa",
+        "source": {
+          "lines": [
+            {
+              "gross_amount": "61.700000",
+              "invoice_line_id": "842067c4-0035-4ac4-a695-b4544314b5f8"
+            }
+          ],
+          "match_id": "c68de838-e5f3-417a-a62e-bcd28eda5755",
+          "invoice_id": "61ff9b57-5740-4f97-8179-99437dbbdb23",
+          "matched_at": "2026-10-18T12:43:29.179872+00:00",
+          "approved_at": "2026-10-18T12:43:29.163886+00:00",
+          "invoice_hash": "8cb4d428bc4e2903f2c604dacb966dd42dad88618952474b9ae8ba0a75f32114",
+          "match_version": 1,
+          "matched_by_id": "c8f7db7e-364e-442a-9f13-30b0b074e7c9",
+          "approved_by_id": "a0f198ec-4658-4fc2-8fa9-763a9df0162c",
+          "match_line_ids": [
+            "1fdb885c-d220-43d3-afdc-f92ca993fe1b"
+          ],
+          "invoice_version": 1,
+          "match_fingerprint": "bcaf63959e35995899e9c6438de8eaaeda8678978e28660b4c4f99650a9e9bfe",
+          "recognition_event": "approved_supplier_invoice_match",
+          "invoice_version_id": "bb3d672c-7672-4638-a632-0dd9e355ea1d",
+          "tolerance_policy_id": "2f11fca6-e354-4dc2-8c4e-fa2ae0458bc2",
+          "recognition_timezone": "UTC",
+          "tolerance_policy_hash": "a7a106d131e2d166047c6ba082185f24c73884d1adfce4d0956a7d6e42ddeb77"
+        },
+        "original_amount": "61.700000",
+        "outstanding_amount": "0.000000",
+        "reversal_id": "dbae4c44-ef49-4bde-943b-11bb73081f1e",
+        "reversal_effective_date": "2026-10-18",
+        "replacement_obligation_id": "9a1a52d6-cb1c-4a69-a48e-ae83fcab41ca",
+        "current_source": false,
+        "recognition_journal_id": null
+      },
+      {
+        "obligation_id": "9a1a52d6-cb1c-4a69-a48e-ae83fcab41ca",
+        "source": {
+          "lines": [
+            {
+              "gross_amount": "49.360000",
+              "invoice_line_id": "5ee85870-3ec1-4836-8024-a1a75f58ff72"
+            }
+          ],
+          "match_id": "715f70b6-8291-4081-b02d-1a84ccdb1a0c",
+          "invoice_id": "61ff9b57-5740-4f97-8179-99437dbbdb23",
+          "matched_at": "2026-10-18T12:43:29.399836+00:00",
+          "approved_at": "2026-10-18T12:43:29.370575+00:00",
+          "invoice_hash": "3d489afe69faa17ec4bfd469d87d47a5dd7bf0d5a86ee358da90d77ab1755d2f",
+          "match_version": 1,
+          "matched_by_id": "c8f7db7e-364e-442a-9f13-30b0b074e7c9",
+          "approved_by_id": "a0f198ec-4658-4fc2-8fa9-763a9df0162c",
+          "match_line_ids": [
+            "2de21964-a36a-4f01-bba4-12d6d5c1219b"
+          ],
+          "invoice_version": 2,
+          "match_fingerprint": "b498edb61defa4599c5c810b3ee1dd0963c32cd362c30c3df04c150b75fb47bc",
+          "recognition_event": "approved_supplier_invoice_match",
+          "invoice_version_id": "3737202b-48b6-42fb-be76-928a376bbdb2",
+          "tolerance_policy_id": "2f11fca6-e354-4dc2-8c4e-fa2ae0458bc2",
+          "recognition_timezone": "UTC",
+          "tolerance_policy_hash": "a7a106d131e2d166047c6ba082185f24c73884d1adfce4d0956a7d6e42ddeb77"
+        },
+        "original_amount": "49.360000",
+        "outstanding_amount": "49.360000",
+        "reversal_id": null,
+        "reversal_effective_date": null,
+        "replacement_obligation_id": null,
+        "current_source": true,
+        "recognition_journal_id": null
+      }
+    ],
+    "evidence_hash": "9d3639d83b71c599748455b2a7fc7b43a13ec6cd0228f9b0f4c4d91e5baca25b"
+  },
+  "source_versions_retained": 2,
+  "reversal_count": 1,
+  "audit": [
+    {
+      "action": "subledger.obligation_recognized",
+      "entity_id": "8f95ac8c-c815-4b05-800b-5dfab6ce7baa",
+      "metadata": {
+        "source_kind": "procurement.supplier_invoice_match.v1",
+        "source_uuid": "c68de838-e5f3-417a-a62e-bcd28eda5755"
+      }
+    },
+    {
+      "action": "subledgers.invoice_ap_failed",
+      "entity_id": "715f70b6-8291-4081-b02d-1a84ccdb1a0c",
+      "metadata": {
+        "error_type": "ValidationError",
+        "request_hash": "085931b8e2281b6f2b9b6106a89daf2a6ed108c79630bba93ea4aae627c01130",
+        "failure_phase": "target_acceptance",
+        "match_version": 1
+      }
+    },
+    {
+      "action": "subledgers.invoice_ap_failed",
+      "entity_id": "715f70b6-8291-4081-b02d-1a84ccdb1a0c",
+      "metadata": {
+        "error_type": "ValidationError",
+        "request_hash": "0550ae484794f044816f2d9aa91a608adf4f20aef8f26dcd57a014159f9e0318",
+        "failure_phase": "target_acceptance",
+        "match_version": 1
+      }
+    },
+    {
+      "action": "subledgers.invoice_ap_reversed",
+      "entity_id": "dbae4c44-ef49-4bde-943b-11bb73081f1e",
+      "metadata": {
+        "obligation": "8f95ac8c-c815-4b05-800b-5dfab6ce7baa",
+        "replacement_match": "715f70b6-8291-4081-b02d-1a84ccdb1a0c"
+      }
+    },
+    {
+      "action": "subledger.obligation_recognized",
+      "entity_id": "9a1a52d6-cb1c-4a69-a48e-ae83fcab41ca",
+      "metadata": {
+        "source_kind": "procurement.supplier_invoice_match.v1",
+        "source_uuid": "715f70b6-8291-4081-b02d-1a84ccdb1a0c"
+      }
+    }
+  ],
+  "automatic_gl_journals": 0,
+  "failed_target_before_retry": {
+    "obligations": 1,
+    "source_reversals": 0
+  },
+  "assertions": "PASS"
+}

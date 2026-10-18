@@ -1,0 +1,27 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_changed_payload_and_changed_source_fail_closed (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_changed_payload_and_changed_source_fail_closed) ... ok
+test_equivalent_retry_in_draft_and_posted_state_has_one_target (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_equivalent_retry_in_draft_and_posted_state_has_one_target) ... ok
+test_failure_rolls_back_target_and_retry_revalidates_source (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_failure_rolls_back_target_and_retry_revalidates_source) ... ok
+test_legacy_target_without_retained_evidence_is_not_retroactively_attested (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_legacy_target_without_retained_evidence_is_not_retroactively_attested) ... ok
+test_replay_rechecks_permission_scope_tenant_and_related_state (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_replay_rechecks_permission_scope_tenant_and_related_state) ... ok
+test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage) ... ok
+test_numeric_timezone_and_key_order_equivalence (apps.inventory.test_cep034_receipt_contract.ReceiptFingerprintTests.test_numeric_timezone_and_key_order_equivalence) ... ok
+test_concurrent_equivalent_acceptance_retains_one_target (apps.inventory.test_cep034_receipt_contract.ReceiptContractConcurrencyTests.test_concurrent_equivalent_acceptance_retains_one_target) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 10.787s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 8 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

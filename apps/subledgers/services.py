@@ -327,6 +327,7 @@ def resolve_pinned_control_account_for_posting(
     ).get(pk=obligation.pk)
     if obligation.organization_id != organization.pk:
         raise PermissionDenied("تعهد متعلق به Tenant دیگری است.")
+    _require_unreversed_source(obligation)
     if not obligation.control_account_id or not obligation.control_account_mapping_id:
         raise ValidationError("تعهد فاقد شواهد نگاشت حساب کنترل تأییدشده است.")
     mapping = obligation.control_account_mapping
@@ -415,6 +416,7 @@ def allocate_settlement(
                 "کلید idempotency تخصیص با محتوای متفاوت استفاده شده است."
             )
         return existing
+    _require_unreversed_source(obligation)
     obligation_used = _active_settlement_amount(
         obligation=obligation
     ) + _approved_writeoff_amount(obligation=obligation)
@@ -569,6 +571,7 @@ def propose_write_off(
                 "کلید idempotency سوخت با محتوای متفاوت استفاده شده است."
             )
         return existing
+    _require_unreversed_source(obligation)
     remaining = (
         obligation.original_amount
         - _active_settlement_amount(obligation=obligation)
@@ -610,6 +613,17 @@ def reverse_write_off(*args: object, **kwargs: object) -> None:
     raise ValidationError(
         "اختیار و سیاست برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
     )
+
+
+def _require_unreversed_source(obligation: Obligation) -> None:
+    if obligation.source_reversals.exists():
+        raise ValidationError("منبع تعهد برگشت شده است؛ عملیات جدید مجاز نیست.")
+
+
+def _source_reversed_amount_as_of(obligation: Obligation, as_of_date: date) -> Decimal:
+    if obligation.source_reversals.filter(effective_date__lte=as_of_date).exists():
+        return obligation.original_amount
+    return ZERO
 
 
 def _amounts_as_of(obligation: Obligation, as_of_date: date) -> tuple[Decimal, Decimal]:
@@ -675,12 +689,16 @@ def run_aging(
     original_total = settled_total = written_off_total = outstanding_total = ZERO
     for obligation in obligations:
         settled, written_off = _amounts_as_of(obligation, as_of_date)
-        outstanding = obligation.original_amount - settled - written_off
+        reversed_amount = _source_reversed_amount_as_of(obligation, as_of_date)
+        outstanding = (
+            obligation.original_amount - settled - written_off - reversed_amount
+        )
         item = {
             "obligation_id": str(obligation.pk),
             "original_amount": str(obligation.original_amount),
             "settled_amount": str(settled),
             "written_off_amount": str(written_off),
+            "source_reversed_amount": str(reversed_amount),
             "outstanding_amount": str(outstanding),
             "due_date": obligation.due_date.isoformat()
             if obligation.due_date
@@ -781,7 +799,12 @@ def run_subledger_reconciliation(
     exceptions: list[dict[str, str]] = []
     for obligation in obligations:
         settled, written_off = _amounts_as_of(obligation, as_of_date)
-        outstanding = obligation.original_amount - settled - written_off
+        outstanding = (
+            obligation.original_amount
+            - settled
+            - written_off
+            - _source_reversed_amount_as_of(obligation, as_of_date)
+        )
         if (
             not obligation.control_account_id
             or not obligation.control_account_mapping_id

@@ -8,6 +8,12 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    SUPPLIER_INVOICE_AP_FAILED = (
+        "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
+    )
+    SUPPLIER_INVOICE_AP_REVERSED = (
+        "subledgers.invoice_ap_reversed", "منبع تعهد صورتحساب AP برگشت شد"
+    )
     TENDER_BID_CREATED = "commercial.tender_bid_created", "فرصت مناقصه ثبت شد"
     TENDER_BID_REVISED = "commercial.tender_bid_revised", "نسخه مناقصه ثبت شد"
     TENDER_BID_EVIDENCE_LINKED = "commercial.tender_bid_evidence_linked", "شاهد مناقصه پیوند شد"
@@ -1593,6 +1599,14 @@ class AuditAction(models.TextChoices):
     REPORTING_PROJECT_CLOSEOUT_EXPORTED = (
         "reporting.project_closeout_exported",
         "خروجی اختتام پروژه ایجاد شد",
+    )
+    STOCK_RECEIPT_RETRIED = (
+        "inventory.receipt_retried",
+        "Receipt retry retained original stock transaction",
+    )
+    STOCK_RECEIPT_FAILED = (
+        "inventory.receipt_failed",
+        "Receipt target mutation failed",
     )
 
 

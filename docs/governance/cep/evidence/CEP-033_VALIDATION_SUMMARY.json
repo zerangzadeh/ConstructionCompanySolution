@@ -1,0 +1,67 @@
+[
+  {
+    "check": "LINT_OUTPUT",
+    "exit_code": 0,
+    "command": [
+      "-m",
+      "ruff",
+      "check",
+      "apps/subledgers/apps.py",
+      "apps/subledgers/models.py",
+      "apps/subledgers/services.py",
+      "apps/subledgers/supplier_invoice_handoffs.py",
+      "apps/subledgers/test_cep033_invoice_handoff.py",
+      "apps/organizations/models.py",
+      "apps/organizations/permission_registry.py",
+      "apps/organizations/role_defaults.py",
+      "apps/audit/models.py"
+    ],
+    "result": "PASS"
+  },
+  {
+    "check": "FORMAT_OUTPUT",
+    "exit_code": 0,
+    "command": [
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/subledgers/apps.py",
+      "apps/subledgers/models.py",
+      "apps/subledgers/services.py",
+      "apps/subledgers/supplier_invoice_handoffs.py",
+      "apps/subledgers/test_cep033_invoice_handoff.py"
+    ],
+    "result": "PASS"
+  },
+  {
+    "check": "DRIFT_CHECK",
+    "exit_code": 0,
+    "command": [
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "result": "PASS"
+  },
+  {
+    "check": "SYSTEM_CHECK",
+    "exit_code": 0,
+    "command": [
+      "manage.py",
+      "check"
+    ],
+    "result": "PASS"
+  },
+  {
+    "check": "DIFF_CHECK",
+    "exit_code": 0,
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "result": "PASS"
+  }
+]

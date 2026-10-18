@@ -1,0 +1,7 @@
+criterion,status,evidence,verification
+AC-01,PASS,CEP-034-EV-003;CEP-034-EV-004,Normalized request/source fingerprint governs equivalent replay; changed payload fails closed
+AC-02,PASS,CEP-034-EV-003;CEP-034-EV-004,Posted receipt/item identity with pinned PO version hash and retained posting event; revalidated source
+AC-03,PASS,CEP-034-EV-003,Draft/posted/reversed equivalent retries and concurrent acceptance retain one original target
+AC-04,PASS,CEP-034-EV-003,Injected post-insert failure rolls back target; failure audit retained; retry rejects void source
+AC-05,PASS,CEP-034-EV-002;CEP-034-EV-003,Only Inventory creates draft or posts/reverses stock through existing services; Procurement source unchanged by retries
+AC-06,PASS,CEP-034-EV-003;CEP-034-EV-004;CEP-034-EV-005,Current/retained source comparison plus target/reversal identity and zero net quantity

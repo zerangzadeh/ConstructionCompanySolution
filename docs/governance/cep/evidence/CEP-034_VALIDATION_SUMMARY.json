@@ -1,0 +1,84 @@
+[
+  {
+    "check": "FINAL_TEST_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "test",
+      "apps.inventory.test_cep034_receipt_contract",
+      "--keepdb",
+      "--noinput",
+      "-v",
+      "2"
+    ],
+    "trace_environment": "CEP034_TRACE_PATH=docs/governance/cep/evidence/CEP-034_INTEGRATION_TRACE.json",
+    "exit_code": 0,
+    "result": "PASS",
+    "tests": 12,
+    "focused": 9,
+    "affected_regression": 3,
+    "environment": "Configured local PostgreSQL disposable test_construction_erp retained under --keepdb; no migration to apply; no development business data written."
+  },
+  {
+    "check": "LINT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "check",
+      "apps/inventory/services.py",
+      "apps/inventory/receipt_contract.py",
+      "apps/inventory/test_cep034_receipt_contract.py",
+      "apps/audit/models.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "FORMAT_OUTPUT",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "ruff",
+      "format",
+      "--check",
+      "apps/inventory/services.py",
+      "apps/inventory/receipt_contract.py",
+      "apps/inventory/test_cep034_receipt_contract.py"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "SYSTEM_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DRIFT_CHECK",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "manage.py",
+      "makemigrations",
+      "--check",
+      "--dry-run"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  },
+  {
+    "check": "DIFF_CHECK",
+    "command": [
+      "git",
+      "diff",
+      "--check"
+    ],
+    "exit_code": 0,
+    "result": "PASS"
+  }
+]

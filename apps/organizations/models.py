@@ -423,6 +423,9 @@ class BusinessPermissionCode(models.TextChoices):
         "اجرای تطبیق بانکی",
     )
 
+    SUBLEDGERS_SOURCES_REVERSE = (
+        "subledgers.sources_reverse", "برگشت کنترل‌شده منبع تعهد AP"
+    )
     SUBLEDGERS_VIEW = "subledgers.view", "مشاهده تعهدات AP/AR"
     SUBLEDGERS_OBLIGATIONS_RECOGNIZE = (
         "subledgers.obligations_recognize",

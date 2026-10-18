@@ -1,0 +1,7 @@
+# CEP-033 bounded Human migration decision — 2026-10-18
+
+Human Decision Authority explicitly confirmed required AP correction/reversal persistence in scope and authorized minimum bounded schema changes and development/non-production migrations. For CEP-033 only, Migration Impact NONE is superseded solely to implement that persistence correctly. Scope, AC, DoD, dependencies, AP domain ownership and Accounting semantics are unchanged. No unrelated schema, production migration, cutover, irreversible production data change, Human Sign-off or Git write is authorized by this decision.
+
+Finding 001 BLOCKER-MIGRATION is resolved by this decision. Implementation must preserve existing data/history, use the smallest safe migration surface and run migration/drift validation. Evidence/report/Registry must be updated and serial execution continued when complete.
+
+Planned bounded touch set: new AP-owned immutable supplier invoice source reversal evidence and its additive migration; registered supplier invoice match source adapter and explicit idempotent AP handoff/correction/reversal/reconciliation services; existing obligation balance/aging/reconciliation/settlement/posting guards where necessary to prevent reversed payable reuse; explicit deny-by-default reversal permission catalogue (no default role grants); focused integration/service and affected regression/migration validation; package evidence and Registry. No source workflow, GL posting policy, UI or legacy fixture remediation.

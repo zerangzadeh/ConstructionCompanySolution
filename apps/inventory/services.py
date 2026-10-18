@@ -3,7 +3,7 @@ from decimal import Decimal
 from uuid import UUID
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import IntegrityError, transaction
+from django.db import DatabaseError, IntegrityError, transaction
 from django.db.models import Q, QuerySet, Sum
 from django.utils import timezone
 
@@ -308,8 +308,62 @@ def archive_warehouse(
     return locked
 
 
-@transaction.atomic
 def create_stock_transaction(
+    *,
+    organization: Organization,
+    actor: User,
+    transaction_number: str,
+    transaction_type: str,
+    material: Material,
+    unit_of_measure: UnitOfMeasure,
+    quantity: Decimal,
+    occurred_at: datetime,
+    source_warehouse: Warehouse | None = None,
+    destination_warehouse: Warehouse | None = None,
+    project: Project | None = None,
+    goods_receipt_item: GoodsReceiptItem | None = None,
+    reference: str = "",
+    notes: str = "",
+) -> StockTransaction:
+    """Create a draft; equivalent receipt retries retain the original target."""
+    arguments = locals().copy()
+    try:
+        with transaction.atomic():
+            if goods_receipt_item is not None:
+                # Serialize receipt contract acceptance without changing other flows.
+                Organization.objects.select_for_update().get(pk=organization.pk)
+            return _create_stock_transaction_domain(**arguments)
+    except (ValueError, ValidationError, PermissionDenied, DatabaseError) as exc:
+        if goods_receipt_item is not None:
+            source = (
+                GoodsReceiptItem.objects.select_related("goods_receipt")
+                .filter(pk=goods_receipt_item.pk, organization=organization)
+                .first()
+            )
+            if source is not None:
+                try:
+                    _require_role(
+                        organization=organization,
+                        actor=actor,
+                        permission=BusinessPermissionCode.STOCK_TRANSACTIONS_CREATE,
+                        project=source.goods_receipt.project,
+                        message="Receipt object scope required.",
+                    )
+                except PermissionDenied:
+                    raise exc
+                record_audit_event(
+                    organization=organization,
+                    actor=actor,
+                    action=AuditAction.STOCK_RECEIPT_FAILED,
+                    entity_type="goods_receipt_item",
+                    entity_id=source.pk,
+                    metadata={"error_type": type(exc).__name__},
+                )
+        raise
+
+
+@transaction.atomic
+def _create_stock_transaction_domain(
     *,
     organization: Organization,
     actor: User,
@@ -407,6 +461,26 @@ def create_stock_transaction(
         created_by=actor,
         updated_by=actor,
     )
+    contract_evidence = None
+    if goods_receipt_item is not None:
+        from .receipt_contract import receipt_evidence, retained_receipt_target
+
+        # Validate every retry, including current scope and related master state.
+        try:
+            transaction_record.full_clean(
+                validate_unique=False, validate_constraints=False
+            )
+            contract_evidence = receipt_evidence(transaction_record)
+            retained = retained_receipt_target(
+                candidate=transaction_record, evidence=contract_evidence, actor=actor
+            )
+        except ValidationError as exc:
+            # Preserve the existing public create-service validation exception.
+            raise ValueError(
+                "Stock receipt data or retained contract is invalid."
+            ) from exc
+        if retained is not None:
+            return retained
     _save_validated(
         transaction_record,
         "Stock transaction data is invalid or its number/source is in use.",
@@ -422,6 +496,7 @@ def create_stock_transaction(
             "transaction_type": transaction_type,
             "quantity": str(quantity),
             "material_id": str(material.pk),
+            **({"receipt_contract": contract_evidence} if contract_evidence else {}),
         },
     )
     return transaction_record

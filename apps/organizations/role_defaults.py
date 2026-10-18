@@ -804,6 +804,14 @@ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(REPORTING_PERMISSIONS)
 
 
+# CEP-033: accepting an AP source does not implicitly grant source reversal.
+# Assignment of this new sensitive operation remains explicit and tenant-scoped.
+for _role_code, _permissions in DEFAULT_ROLE_PERMISSIONS.items():
+    DEFAULT_ROLE_PERMISSIONS[_role_code] = _permissions - {
+        BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE
+    }
+
+
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
     MembershipRole.TENANT_OWNER: {
         "name": "Tenant Owner",

@@ -1,0 +1,9 @@
+surface,change,authority
+apps/subledgers/models.py; migrations/0005_supplierinvoiceapreversal.py,Append-only AP source reversal with uniqueness and tenant validation; current balances,Human CEP033 persistence decision; INT-B01 correction/reversal
+apps/subledgers/supplier_invoice_handoffs.py; apps.py,Explicit AP source adapter; atomic handoff/correction/reversal; failure audit; reconciliation,CEP033 Scope AC01-06
+apps/subledgers/services.py,Guard reversed source consumption/posting; cutoff aging/reconciliation,Prevent duplicate actionable AP and preserve historical cutoffs
+apps/organizations/models.py; permission_registry.py; role_defaults.py; migrations/0117_cep033_ap_source_reversal_permission.py,Catalogue explicit source-reversal permission; no default grants,Persistent authorization invariants; bounded lifecycle capability
+apps/audit/models.py,Register AP handoff failure and source reversal audit actions,CEP033 audit/source linkage
+apps/subledgers/test_cep033_invoice_handoff.py,14 focused tests and optional actual trace; isolated effective fixture only,CEP033 integration/domain/security/migration evidence
+docs/governance/cep/PROMPTS/CEP-033_EXECUTION_PROMPT.md; CEP_PROMPT_MANIFEST.yaml,Migration-only bounded Human amendment and SHA synchronization,Explicit Human decision 2026-10-18
+CEP_EXECUTION_REGISTRY.yaml; CEP033 manifests/reports/evidence,Resolve original migration blocker; retain history; resume; final six-AC/DoD closeout; gate evaluation and frontier reconciliation,Standing governance plus explicit Human migration authority

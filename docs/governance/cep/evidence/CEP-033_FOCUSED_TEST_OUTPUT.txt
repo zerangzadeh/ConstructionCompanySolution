@@ -1,0 +1,33 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_correction_is_atomic_and_reconciles_versions_without_overwriting_history (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_correction_is_atomic_and_reconciles_versions_without_overwriting_history) ... ok
+test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_exactly_once_explicit_ap_acceptance_preserves_source_and_has_no_gl) ... ok
+test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_explicit_reversal_is_idempotent_and_cannot_reactivate_or_post) ... ok
+test_failure_after_target_insert_rolls_back_and_retains_retry_evidence (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_failure_after_target_insert_rolls_back_and_retains_retry_evidence) ... ok
+test_mapping_failure_is_retained_and_retry_revalidates_source (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_mapping_failure_is_retained_and_retry_revalidates_source) ... ok
+test_only_current_approved_unblocked_complete_source_is_accepted (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_only_current_approved_unblocked_complete_source_is_accepted) ... ok
+test_rematch_supersedes_source_and_never_falls_back_to_older_match (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_rematch_supersedes_source_and_never_falls_back_to_older_match) ... ok
+test_reversal_permission_has_no_implicit_system_role_grants (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_reversal_permission_has_no_implicit_system_role_grants) ... ok
+test_reversal_preserves_aging_cutoff_and_reconciliation_amount (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_reversal_preserves_aging_cutoff_and_reconciliation_amount) ... ok
+test_settlement_writeoff_and_source_reversal_keep_their_own_authorities (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_settlement_writeoff_and_source_reversal_keep_their_own_authorities) ... ok
+test_source_identity_version_fingerprint_and_full_line_evidence_are_required (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_source_identity_version_fingerprint_and_full_line_evidence_are_required) ... ok
+test_tenant_permission_scope_and_reversal_grant_fail_closed (apps.subledgers.test_cep033_invoice_handoff.SupplierInvoiceAPHandoffTests.test_tenant_permission_scope_and_reversal_grant_fail_closed) ... ok
+test_concurrent_acceptance_creates_one_target_occurrence (apps.subledgers.test_cep033_invoice_handoff.InvoiceAPConcurrencyTests.test_concurrent_acceptance_creates_one_target_occurrence) ... ok
+test_additive_migration_preserves_existing_obligation_and_source_history (apps.subledgers.test_cep033_invoice_handoff.InvoiceAPMigrationTests.test_additive_migration_preserves_existing_obligation_and_source_history) ... ok
+
+Found 14 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+----------------------------------------------------------------------
+Ran 14 tests in 38.611s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+

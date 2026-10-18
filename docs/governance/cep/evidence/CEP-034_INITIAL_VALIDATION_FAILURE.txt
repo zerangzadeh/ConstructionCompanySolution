@@ -1,0 +1,100 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_changed_payload_and_changed_source_fail_closed (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_changed_payload_and_changed_source_fail_closed) ... ok
+test_equivalent_retry_in_draft_and_posted_state_has_one_target (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_equivalent_retry_in_draft_and_posted_state_has_one_target) ... ERROR
+test_failure_rolls_back_target_and_retry_revalidates_source (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_failure_rolls_back_target_and_retry_revalidates_source) ... ok
+test_legacy_target_without_retained_evidence_is_not_retroactively_attested (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_legacy_target_without_retained_evidence_is_not_retroactively_attested) ... ERROR
+test_replay_rechecks_permission_scope_tenant_and_related_state (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_replay_rechecks_permission_scope_tenant_and_related_state) ... ERROR
+test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage) ... ERROR
+test_numeric_timezone_and_key_order_equivalence (apps.inventory.test_cep034_receipt_contract.ReceiptFingerprintTests.test_numeric_timezone_and_key_order_equivalence) ... ok
+test_concurrent_equivalent_acceptance_retains_one_target (apps.inventory.test_cep034_receipt_contract.ReceiptContractConcurrencyTests.test_concurrent_equivalent_acceptance_retains_one_target) ... ok
+
+======================================================================
+ERROR: test_equivalent_retry_in_draft_and_posted_state_has_one_target (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_equivalent_retry_in_draft_and_posted_state_has_one_target)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 154, in test_equivalent_retry_in_draft_and_posted_state_has_one_target
+    retained = self.reconcile()["items"][0]["targets"][0]["retained_contract"]
+               ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 131, in reconcile
+    return reconcile_goods_receipt_inventory(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\receipt_contract.py", line 153, in reconcile_goods_receipt_inventory
+    require_business_permission(
+TypeError: require_business_permission() missing 1 required keyword-only argument: 'message'
+
+======================================================================
+ERROR: test_legacy_target_without_retained_evidence_is_not_retroactively_attested (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_legacy_target_without_retained_evidence_is_not_retroactively_attested)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 244, in test_legacy_target_without_retained_evidence_is_not_retroactively_attested
+    self.reconcile()["items"][0]["targets"][0]["retained_contract"]
+    ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 131, in reconcile
+    return reconcile_goods_receipt_inventory(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\receipt_contract.py", line 153, in reconcile_goods_receipt_inventory
+    require_business_permission(
+TypeError: require_business_permission() missing 1 required keyword-only argument: 'message'
+
+======================================================================
+ERROR: test_replay_rechecks_permission_scope_tenant_and_related_state (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_replay_rechecks_permission_scope_tenant_and_related_state)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 224, in test_replay_rechecks_permission_scope_tenant_and_related_state
+    self.accept()
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 128, in accept
+    return create_stock_transaction(**(self.arguments | changes))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\services.py", line 335, in create_stock_transaction
+    return _create_stock_transaction_domain(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\services.py", line 408, in _create_stock_transaction_domain
+    material, unit_of_measure = _validate_material(
+                                ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\services.py", line 112, in _validate_material
+    raise PermissionDenied(
+django.core.exceptions.PermissionDenied: \u0645\u0635\u0627\u0644\u062d \u0648 \u0648\u0627\u062d\u062f \u0627\u0646\u062f\u0627\u0632\u0647\u200c\u06af\u06cc\u0631\u06cc \u0628\u0627\u06cc\u062f \u0631\u06a9\u0648\u0631\u062f\u0647\u0627\u06cc \u0641\u0639\u0627\u0644 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0628\u0627\u0634\u0646\u062f.
+
+======================================================================
+ERROR: test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage (apps.inventory.test_cep034_receipt_contract.ReceiptContractTests.test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 261, in test_reversed_occurrence_does_not_reactivate_and_reconciles_lineage
+    trace = self.reconcile()
+            ^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\test_cep034_receipt_contract.py", line 131, in reconcile
+    return reconcile_goods_receipt_inventory(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\receipt_contract.py", line 153, in reconcile_goods_receipt_inventory
+    require_business_permission(
+TypeError: require_business_permission() missing 1 required keyword-only argument: 'message'
+
+----------------------------------------------------------------------
+Ran 8 tests in 9.758s
+
+FAILED (errors=4)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 8 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

@@ -1,0 +1,41 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_draft_posting (apps.inventory.test_cep034_receipt_contract.ReceiptAffectedRegression.test_draft_posting) ... ok
+test_goods_receipt (apps.inventory.test_cep034_receipt_contract.ReceiptAffectedRegression.test_goods_receipt) ... ERROR
+test_reversal (apps.inventory.test_cep034_receipt_contract.ReceiptAffectedRegression.test_reversal) ... ok
+
+======================================================================
+ERROR: test_goods_receipt (apps.inventory.test_cep034_receipt_contract.ReceiptAffectedRegression.test_goods_receipt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\inventory\tests.py", line 607, in test_goods_receipt_can_enter_inventory_once_and_must_reverse_before_void
+    create_stock_transaction(
+  File "E:\Construction_Company_Solution\apps\inventory\services.py", line 335, in create_stock_transaction
+    return _create_stock_transaction_domain(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\services.py", line 471, in _create_stock_transaction_domain
+    retained = retained_receipt_target(
+               ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\inventory\receipt_contract.py", line 136, in retained_receipt_target
+    raise ValidationError(
+django.core.exceptions.ValidationError: ['Receipt occurrence payload or original evidence differs.']
+
+----------------------------------------------------------------------
+Ran 3 tests in 2.079s
+
+FAILED (errors=1)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 3 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

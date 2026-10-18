@@ -1,0 +1,7 @@
+criterion,status,evidence,remaining
+AC-01,PASS,CEP-033-EV-007;CEP-033-EV-009,Explicit AP acceptance creates one payable; independent GL remains absent
+AC-02,PASS,CEP-033-EV-007;CEP-033-EV-009,Current approved complete match only; invoice/match identity version hash and actor retained
+AC-03,PASS,CEP-033-EV-007,Same/different request keys and concurrent acceptance resolve one source occurrence
+AC-04,PASS,CEP-033-EV-007;CEP-033-EV-009,Injected target and correction failures roll back; failure audit retained; retry revalidates source
+AC-05,PASS,CEP-033-EV-007;CEP-033-EV-009,No implicit journal; consumed targets fail closed to Treasury/write-off/Accounting owners
+AC-06,PASS,CEP-033-EV-007;CEP-033-EV-009;CEP-033-EV-010,Current version replacement and reversal lineage reconciled; immutable history and effective cutoff preserved
