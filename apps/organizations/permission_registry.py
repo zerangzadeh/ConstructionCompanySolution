@@ -993,6 +993,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "payroll.PayrollComponent",
             "payroll.PayrollRule",
             "payroll.PayrollPeriod",
+            "payroll.PayrollInquiryCategory",
             "payroll.PayrollYearInterval",
         ),
         (P.PAYROLL_CONFIGURATION_VIEW, P.PAYROLL_CONFIGURATION_MANAGE),
@@ -1049,6 +1050,18 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (),
         (P.PAYROLL_AUDIT_VIEW,),
         ("apps.payroll.views",),
+    ),
+    PermissionResource(
+        "payroll_inquiries",
+        "پرسش‌های شخصی و تخصیص‌یافته حقوق",
+        ("payroll.PayrollInquiry", "payroll.PayrollInquiryResponse", "payroll.PayrollInquiryEvidenceLink"),
+        (P.PAYROLL_INQUIRIES_VIEW, P.PAYROLL_INQUIRIES_REQUEST, P.PAYROLL_INQUIRIES_RESPOND),
+        ("apps.payroll.ess_services", "apps.payroll.ess_views", "apps.payroll.inquiry_workflow", "apps.documents.services"),
+    ),
+    PermissionResource(
+        "payroll_ess", "حقوق قطعی شخصی", ("payroll.Payslip",),
+        (P.PAYROLL_ESS_VIEW, P.PAYROLL_ESS_EXPORT),
+        ("apps.payroll.ess_services", "apps.payroll.ess_views"),
     ),
     PermissionResource(
         "payroll_statutory",

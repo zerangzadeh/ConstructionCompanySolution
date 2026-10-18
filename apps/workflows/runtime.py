@@ -1482,6 +1482,7 @@ def complete_work_item(
             outcome=outcome,
             context=command_context or {},
             idempotency_key=idempotency_key,
+            **({"work_item": item} if command.include_work_item else {}),
         )
         refreshed = _load_subject(
             organization=organization,
@@ -1883,6 +1884,8 @@ def cancel_workflow_for_domain(
     subject_state = str(snapshot.attributes.get("status", ""))
     if command.from_states and subject_state not in command.from_states:
         raise WorkflowConflict("وضعیت موضوع با فرمان لغو سازگار نیست.")
+    if command.include_work_item:
+        raise ValidationError("این فرمان فقط در تکمیل کار تخصیص‌یافته مجاز است.")
     command.executor(
         subject=snapshot.subject,
         actor=actor,

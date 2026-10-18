@@ -42,6 +42,11 @@ TIME_ATTENDANCE_PERMISSIONS = permission_codes(
     BusinessPermissionCode.TIMESHEETS_PREVIEW,
 )
 PAYROLL_SENSITIVE_PERMISSIONS = permission_codes(
+    BusinessPermissionCode.PAYROLL_ESS_VIEW,
+    BusinessPermissionCode.PAYROLL_ESS_EXPORT,
+    BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
+    BusinessPermissionCode.PAYROLL_INQUIRIES_REQUEST,
+    BusinessPermissionCode.PAYROLL_INQUIRIES_RESPOND,
     BusinessPermissionCode.PAYROLL_CONFIGURATION_VIEW,
     BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE,
     BusinessPermissionCode.PAYROLL_PREPARE,

@@ -66,6 +66,8 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "timesheets",
         "payroll_results",
         "payslips",
+        "payroll_inquiries",
+        "payroll_ess",
         "purchase_requests",
         "purchase_request_items",
         "purchase_orders",

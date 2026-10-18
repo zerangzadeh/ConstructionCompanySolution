@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
@@ -2096,3 +2097,97 @@ class FinancialHandoffReconciliationReview(ImmutablePayrollRecord):
 
     def clean(self) -> None:
         validate_related_organizations(self, reconciliation=self.reconciliation if self.reconciliation_id else None)
+
+
+class PayrollInquiryCategory(ImmutablePayrollRecord):
+    """Explicit tenant configuration; never a seeded category or review depth."""
+
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
+    code = models.SlugField(max_length=50)
+    name = models.CharField(max_length=150)
+    version = models.PositiveIntegerField()
+    workflow_version = models.ForeignKey("workflows.WorkflowVersion", on_delete=models.PROTECT)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["organization", "code", "version"], name="payroll_inquiry_category_version_uq")]
+
+    def clean(self) -> None:
+        validate_related_organizations(self, workflow_version=self.workflow_version)
+        if self.workflow_version.status != "published" or self.workflow_version.definition.workflow_type.code != "payroll.inquiry":
+            raise ValidationError("دسته پرسش به نسخه منتشرشده گردش‌کار پرسش حقوق نیاز دارد.")
+        if not self.reason.strip() or self.version < 1:
+            raise ValidationError("نسخه و دلیل پیکربندی پرسش الزامی است.")
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class PayrollInquiry(ImmutablePayrollRecord):
+    """Communication source. Status/assignment remain in shared Workflow."""
+
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    person = models.ForeignKey("workforce.Person", on_delete=models.PROTECT)
+    work_relationship = models.ForeignKey("workforce.WorkRelationship", on_delete=models.PROTECT)
+    payslip = models.ForeignKey(Payslip, on_delete=models.PROTECT, related_name="inquiries")
+    period = models.ForeignKey(PayrollPeriod, on_delete=models.PROTECT)
+    category = models.ForeignKey(PayrollInquiryCategory, on_delete=models.PROTECT)
+    subject = models.CharField(max_length=255)
+    description = models.TextField(max_length=4000)
+    idempotency_key = models.CharField(max_length=128)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["organization", "requested_by", "idempotency_key"], name="payroll_inquiry_request_key_uq")]
+
+    @property
+    def project(self):
+        return self.payslip.run_employee.project
+
+    @property
+    def site(self):
+        return self.payslip.run_employee.site
+
+    def clean(self) -> None:
+        validate_related_organizations(self, person=self.person, work_relationship=self.work_relationship, payslip=self.payslip, period=self.period, category=self.category)
+        if self.work_relationship.person_id != self.person_id or self.person.user_id != self.requested_by_id:
+            raise ValidationError("هویت صریح پرسش با درخواست‌کننده هم‌خوان نیست.")
+        if self.work_relationship.legacy_employee_id != self.payslip.run_employee.employee_id or self.payslip.run.period_id != self.period_id:
+            raise ValidationError("مرجع حقوق با رابطه کاری و دوره پرسش هم‌خوان نیست.")
+        if not self.subject.strip() or not self.description.strip() or not self.idempotency_key.strip():
+            raise ValidationError("عنوان، شرح و کلید تکرارپذیری پرسش الزامی است.")
+
+
+class PayrollInquiryResponse(ImmutablePayrollRecord):
+    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
+    inquiry = models.ForeignKey(PayrollInquiry, on_delete=models.PROTECT, related_name="responses")
+    work_item = models.ForeignKey("workflows.WorkItem", on_delete=models.PROTECT)
+    responded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    body = models.TextField(max_length=4000)
+    idempotency_key = models.CharField(max_length=128)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=["inquiry", "idempotency_key"], name="payroll_inquiry_response_key_uq")]
+
+    def clean(self) -> None:
+        validate_related_organizations(self, inquiry=self.inquiry, work_item=self.work_item)
+        if self.work_item.instance.subject_id != self.inquiry_id or self.work_item.instance.subject_type != "payroll.inquiry":
+            raise ValidationError("کار تخصیص‌یافته متعلق به همین پرسش نیست.")
+        if not self.body.strip():
+            raise ValidationError("متن پاسخ قابل نمایش به کارمند الزامی است.")
+
+
+class PayrollInquiryEvidenceLink(AbstractTypedDocumentLink):
+    target_field_name = "payroll_inquiry"
+    objects = ImmutableManager()
+    payroll_inquiry = models.ForeignKey(PayrollInquiry, on_delete=models.PROTECT, related_name="evidence_links")
+    document_version = models.ForeignKey("documents.DocumentVersion", on_delete=models.PROTECT)
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [models.UniqueConstraint(fields=["payroll_inquiry", "document_version"], name="payroll_inquiry_document_version_uq")]
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("سابقه شواهد پرسش تغییرپذیر نیست.")
+        super().save(*args, **kwargs)

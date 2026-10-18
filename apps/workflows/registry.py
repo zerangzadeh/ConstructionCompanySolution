@@ -108,6 +108,7 @@ class DomainCommandSpec:
     from_states: frozenset[str] = field(default_factory=frozenset)
     to_state: str = ""
     executor: DomainCommandExecutor | None = None
+    include_work_item: bool = False
 
 
 @dataclass(frozen=True, slots=True)
@@ -178,6 +179,22 @@ class WorkflowRegistry:
 
 
 registry = WorkflowRegistry()
+
+registry.register_subject_adapter(SubjectAdapterSpec(
+    key="payroll.inquiry", subject_type="payroll.inquiry",
+    exposed_attributes=frozenset({"project_id", "site_id", "created_by_id"}),
+    start_permission="payroll_inquiries.request",
+    view_permission="payroll_inquiries.view",
+    detail_url_name="payroll:ess_inquiry_detail", detail_url_kwarg="inquiry_id",
+))
+registry.register_workflow_type(WorkflowTypeSpec(
+    code="payroll.inquiry", subject_type="payroll.inquiry",
+    subject_adapter="payroll.inquiry", allowed_scope_fields=frozenset({"project_id", "site_id"}),
+    domain_commands=frozenset({"payroll.inquiry.respond"}),
+))
+registry.register_domain_command(DomainCommandSpec(
+    key="payroll.inquiry.respond", workflow_type="payroll.inquiry", include_work_item=True,
+))
 
 registry.register_subject_adapter(
     SubjectAdapterSpec(

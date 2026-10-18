@@ -1,0 +1,204 @@
+$ .venv/Scripts/ruff check apps/documents/link_registry.py apps/documents/services.py apps/organizations/authorization.py apps/organizations/models.py apps/organizations/permission_registry.py apps/organizations/role_defaults.py apps/payroll/apps.py apps/payroll/models.py apps/payroll/urls.py apps/workflows/personal_workspaces.py apps/workflows/registry.py apps/workflows/runtime.py apps/workforce/ess_dashboard.py apps/organizations/migrations/0111_cep054_payroll_inquiry_permissions.py apps/payroll/ess_forms.py apps/payroll/ess_services.py apps/payroll/ess_views.py apps/payroll/inquiry_workflow.py apps/payroll/migrations/0008_cep054_payroll_inquiry.py apps/payroll/test_cep054.py apps/payroll/test_cep054_migration.py
+All checks passed!
+
+exit=0
+
+$ .venv/Scripts/ruff format --check apps/payroll/ess_services.py apps/payroll/ess_views.py apps/payroll/ess_forms.py apps/payroll/inquiry_workflow.py apps/payroll/test_cep054.py apps/payroll/test_cep054_migration.py apps/payroll/migrations/0008_cep054_payroll_inquiry.py apps/organizations/migrations/0111_cep054_payroll_inquiry_permissions.py
+8 files already formatted
+
+exit=0
+
+$ .venv/Scripts/python manage.py check
+System check identified no issues (0 silenced).
+
+exit=0
+
+$ .venv/Scripts/python manage.py makemigrations --check --dry-run
+No changes detected
+
+exit=0
+
+$ git diff --check
+warning: in the working copy of 'CEP_EXECUTION_REGISTRY.yaml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/organizations/models.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/payroll/apps.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/payroll/models.py', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'apps/workflows/registry.py', LF will be replaced by CRLF the next time Git touches it
+
+exit=0
+
+
+SOURCE: cep054-final
+Using existing test database for alias 'default'...
+
+..............................................
+----------------------------------------------------------------------
+Ran 46 tests in 41.114s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 46 test(s).
+System check identified no issues (0 silenced).
+
+
+SOURCE: cep054-focused-final
+Using existing test database for alias 'default'...
+
+.................
+----------------------------------------------------------------------
+Ran 17 tests in 14.097s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 17 test(s).
+System check identified no issues (0 silenced).
+
+
+SOURCE: cep054-migration
+Using existing test database for alias 'default'...
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 65.051s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 1 test(s).
+System check identified no issues (0 silenced).
+
+
+SOURCE: cep054-baseline
+Using existing test database for alias 'default'...
+
+EEEFFFFF
+======================================================================
+ERROR: test_claim_release_reassign_history_and_immutability (apps.workflows.test_runtime.WorkflowRuntimeTests.test_claim_release_reassign_history_and_immutability)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 712, in test_claim_release_reassign_history_and_immutability
+    item = reassign_work_item(
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "HEAD:apps/workflows/runtime.py", line 1288, in reassign_work_item
+    raise PermissionDenied("\u0639\u0636\u0648\u06cc\u062a \u0645\u0642\u0635\u062f \u062f\u0627\u0645\u0646\u0647 \u0645\u0624\u062b\u0631 \u0627\u06cc\u0646 \u06a9\u0627\u0631 \u0631\u0627 \u0646\u062f\u0627\u0631\u062f.")
+django.core.exceptions.PermissionDenied: \u0639\u0636\u0648\u06cc\u062a \u0645\u0642\u0635\u062f \u062f\u0627\u0645\u0646\u0647 \u0645\u0624\u062b\u0631 \u0627\u06cc\u0646 \u06a9\u0627\u0631 \u0631\u0627 \u0646\u062f\u0627\u0631\u062f.
+
+======================================================================
+ERROR: test_effective_delegation_adds_only_current_delegate (apps.workflows.test_runtime.WorkflowRuntimeTests.test_effective_delegation_adds_only_current_delegate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 611, in test_effective_delegation_adds_only_current_delegate
+    active = create_workflow_delegation(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "HEAD:apps/workflows/runtime.py", line 2169, in create_workflow_delegation
+    raise PermissionDenied("\u06a9\u0627\u0631\u06af\u0627\u0647 \u0648\u0627\u06af\u0630\u0627\u0631\u06cc \u062f\u0631 \u0627\u06cc\u0646 \u067e\u0631\u0648\u0698\u0647 \u06cc\u0627\u0641\u062a \u0646\u0634\u062f.")
+django.core.exceptions.PermissionDenied: \u062f\u0627\u0645\u0646\u0647 \u0648\u0627\u06af\u0630\u0627\u0631\u06cc \u062e\u0627\u0631\u062c \u0627\u0632 \u0627\u062e\u062a\u06cc\u0627\u0631 \u0645\u0624\u062b\u0631 \u06cc\u06a9\u06cc \u0627\u0632 \u0639\u0648\u0627\u0645\u0644 \u0627\u0633\u062a.
+
+======================================================================
+ERROR: test_unresolved_route_recovers_after_position_assignment (apps.workflows.test_runtime.WorkflowRuntimeTests.test_unresolved_route_recovers_after_position_assignment)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 548, in test_unresolved_route_recovers_after_position_assignment
+    recovered = recover_unresolved_work_item(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "HEAD:apps/workflows/runtime.py", line 965, in recover_unresolved_work_item
+    raise ValidationError("\u0647\u0646\u0648\u0632 \u0646\u0627\u0645\u0632\u062f \u0648\u0627\u062c\u062f \u0634\u0631\u0627\u06cc\u0637\u06cc \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u06a9\u0627\u0631 \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f.")
+django.core.exceptions.ValidationError: ['\u0647\u0646\u0648\u0632 \u0646\u0627\u0645\u0632\u062f \u0648\u0627\u062c\u062f \u0634\u0631\u0627\u06cc\u0637\u06cc \u0628\u0631\u0627\u06cc \u0627\u06cc\u0646 \u06a9\u0627\u0631 \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f.']
+
+======================================================================
+FAIL: test_large_role_candidate_pool_is_deduplicated_with_bounded_queries (apps.workflows.test_runtime.WorkflowRuntimeTests.test_large_role_candidate_pool_is_deduplicated_with_bounded_queries)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 994, in test_large_role_candidate_pool_is_deduplicated_with_bounded_queries
+    self.assertEqual(item.candidates.count(), 250)
+AssertionError: 0 != 250
+
+======================================================================
+FAIL: test_large_tenant_publishes_multi_stage_position_and_separation_flow (apps.workflows.test_runtime.WorkflowRuntimeTests.test_large_tenant_publishes_multi_stage_position_and_separation_flow)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 1113, in test_large_tenant_publishes_multi_stage_position_and_separation_flow
+    self.assertEqual(triage.candidates.count(), 101)
+AssertionError: 0 != 101
+
+======================================================================
+FAIL: test_membership_role_team_and_record_context_resolvers (apps.workflows.test_runtime.WorkflowRuntimeTests.test_membership_role_team_and_record_context_resolvers)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 427, in test_membership_role_team_and_record_context_resolvers
+    self.assertEqual(
+AssertionError: Lists differ: [] != [UUID('cd706e3f-ccda-4243-8883-3a161a96a183')]
+
+Second list contains 1 additional elements.
+First extra element 0:
+UUID('cd706e3f-ccda-4243-8883-3a161a96a183')
+
+- []
++ [UUID('cd706e3f-ccda-4243-8883-3a161a96a183')]
+
+======================================================================
+FAIL: test_position_single_multi_and_multi_position_deduplication (apps.workflows.test_runtime.WorkflowRuntimeTests.test_position_single_multi_and_multi_position_deduplication)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 482, in test_position_single_multi_and_multi_position_deduplication
+    self.assertEqual(item.candidates.count(), 2)
+AssertionError: 1 != 2
+
+======================================================================
+FAIL: test_two_person_starter_completes_without_workforce_structures (apps.workflows.test_runtime.WorkflowRuntimeTests.test_two_person_starter_completes_without_workforce_structures)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workflows\test_runtime.py", line 340, in test_two_person_starter_completes_without_workforce_structures
+    self.assertEqual(
+AssertionError: Items in the second set but not the first:
+UUID('ee39adbd-26ad-4dc5-8946-3250602e1912')
+
+----------------------------------------------------------------------
+Ran 8 tests in 22.170s
+
+FAILED (failures=5, errors=3)
+Preserving test database for alias 'default'...
+
+475 objects imported automatically (use -v 2 for details).
+
+Read-only HEAD runtime SHA256: 0cf82992e0787aee996641a72c8c7e7082ce0d70e318de5d04e52768ecc96ab6
+Found 8 test(s).
+System check identified no issues (0 silenced).
+
+
+SOURCE: cep054-dev-plan
+Planned operations:
+workforce.0010_workrelationshipdocumentlink
+    Create model WorkRelationshipDocumentLink
+payroll.0006_cep025_operational_cumulative_ytd
+    Create model PayrollYearInterval
+    Create model PayrollCumulativeState
+    Create constraint payroll_year_org_code_version_uq on model payrollyearinterval
+    Create constraint payroll_year_dates_ck on model payrollyearinterval
+    Create constraint payroll_year_approved_no_overlap on model payrollyearinterval
+    Create constraint payroll_ytd_year_line_uq on model payrollcumulativestate
+    Create constraint payroll_ytd_bucket_version_uq on model payrollcumulativestate
+payroll.0007_statutorysourcepackage
+    Create model StatutorySourcePackage
+organizations.0111_cep054_payroll_inquiry_permissions
+    Raw Python operation
+payroll.0008_cep054_payroll_inquiry
+    Create model PayrollInquiryCategory
+    Create model PayrollInquiry
+    Create model PayrollInquiryEvidenceLink
+    Create model PayrollInquiryResponse
+    Create constraint payroll_inquiry_category_version_uq on model payrollinquirycategory
+    Create constraint payroll_inquiry_request_key_uq on model payrollinquiry
+    Create constraint payroll_inquiry_document_version_uq on model payrollinquiryevidencelink
+    Create constraint payroll_inquiry_response_key_uq on model payrollinquiryresponse

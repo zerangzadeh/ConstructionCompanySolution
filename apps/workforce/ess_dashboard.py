@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.organizations.models import Organization
+from apps.payroll.models import PayrollInquiry
 from apps.timekeeping.models import (
     AttendanceCorrectionRequest,
     LeaveMissionRequest,
@@ -39,6 +40,7 @@ def build_ess_dashboard(*, user: User, organization: Organization) -> ESSDashboa
             # expose another legacy employee merely because User happens to match.
             allowed = {}
             for kind, model, field in (
+                ("payroll_inquiry", PayrollInquiry, "work_relationship__legacy_employee_id"),
                 ("leave", LeaveMissionRequest, "employee_id"),
                 ("overtime", OvertimeRequest, "employee_id"),
                 ("correction", AttendanceCorrectionRequest, "attendance__employee_id"),

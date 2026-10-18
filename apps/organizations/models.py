@@ -1177,6 +1177,11 @@ class BusinessPermissionCode(models.TextChoices):
     PAYROLL_RESULTS_VIEW = "payroll_results.view", "مشاهده نتایج حساس حقوق"
     PAYSLIPS_VIEW = "payslips.view", "مشاهده فیش حقوق"
     PAYSLIPS_EXPORT = "payslips.export", "خروجی فیش حقوق"
+    PAYROLL_ESS_VIEW = "payroll_ess.view_own", "مشاهده حقوق قطعی شخصی"
+    PAYROLL_ESS_EXPORT = "payroll_ess.export_own", "دریافت فیش قطعی شخصی"
+    PAYROLL_INQUIRIES_VIEW = "payroll_inquiries.view", "مشاهده پرسش مجاز حقوق"
+    PAYROLL_INQUIRIES_REQUEST = "payroll_inquiries.request", "ثبت پرسش حقوق شخصی"
+    PAYROLL_INQUIRIES_RESPOND = "payroll_inquiries.respond", "پاسخ به پرسش تخصیص‌یافته حقوق"
     PAYROLL_AUDIT_VIEW = "payroll_audit.view", "مشاهده ممیزی حساس حقوق"
     PAYROLL_STATUTORY_CONFIGURATION_VIEW = (
         "payroll_statutory_configuration.view",

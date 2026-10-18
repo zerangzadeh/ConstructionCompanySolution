@@ -1,10 +1,17 @@
 from django.urls import path
 
-from . import views
+from . import ess_views, views
 
 app_name = "payroll"
 
 urlpatterns = [
+    path("ess/", ess_views.history, name="ess_history"),
+    path("ess/payslips/<uuid:payslip_id>/", ess_views.payslip, name="ess_payslip"),
+    path("ess/payslips/<uuid:payslip_id>/export/", ess_views.export, name="ess_payslip_export"),
+    path("ess/inquiries/", ess_views.inquiries, name="ess_inquiries"),
+    path("ess/inquiries/new/", ess_views.inquiry_create, name="ess_inquiry_create"),
+    path("ess/inquiries/<uuid:inquiry_id>/", ess_views.inquiry_detail, name="ess_inquiry_detail"),
+    path("ess/inquiries/<uuid:inquiry_id>/claim/<uuid:work_item_id>/", ess_views.inquiry_claim, name="ess_inquiry_claim"),
     path("", views.workbench, name="workbench"),
     path("configuration/", views.configuration, name="configuration"),
     path("configuration/employment/new/", views.employment_configuration_create, name="employment_configuration_create"),

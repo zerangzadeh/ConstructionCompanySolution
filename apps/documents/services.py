@@ -83,6 +83,7 @@ from apps.organizations.models import (
 )
 from apps.partner_qualification.models import PartnerQualification
 from apps.payments.models import Payment
+from apps.payroll.models import PayrollInquiry, PayrollInquiryEvidenceLink
 from apps.projects.models import Project, ProjectSite
 from apps.workforce.models import (
     EmployeeQualification,
@@ -111,6 +112,7 @@ FILE_SIGNATURES = {
 }
 
 TARGET_MODELS = {
+    "payroll_inquiry": PayrollInquiry,
     "material": Material,
     "project": Project,
     "project_site": ProjectSite,
@@ -134,6 +136,7 @@ TARGET_MODELS = {
     "partner_qualification": PartnerQualification,
 }
 TARGET_VIEW_PERMISSIONS = {
+    "payroll_inquiry": BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
     "material": BusinessPermissionCode.MATERIALS_VIEW,
     "project": BusinessPermissionCode.PROJECTS_VIEW,
     "project_site": BusinessPermissionCode.PROJECT_SITES_VIEW,
@@ -224,6 +227,9 @@ def _validate_target_access(
         site=site,
         message="اجازه مشاهده موجودیت مرتبط با سند را ندارید.",
     )
+    if field_name == "payroll_inquiry":
+        from apps.payroll.ess_services import get_inquiry
+        get_inquiry(actor=actor, organization=organization, inquiry_id=target.pk)
     return field_name
 
 
@@ -232,6 +238,8 @@ def _validate_field_observation_attachment_access(
 ) -> None:
     """Apply Field Operations' write boundary without restricting DMS reads."""
 
+    if target_field == "payroll_inquiry":
+        raise PermissionDenied("پیوست پرسش فقط در تراکنش ثبت اولیه پذیرفته می‌شود.")
     if target_field != "field_observation":
         return
     observation = (
@@ -702,6 +710,13 @@ def get_organization_documents(
         registered_links = link_type.model.objects.filter(organization=organization)
         if not membership_has_permission(membership, link_type.view_permission):
             documents = documents.exclude(pk__in=registered_links.values("document_id"))
+    from apps.payroll.ess_services import visible_inquiries
+    try:
+        inquiry_ids = [item.pk for item in visible_inquiries(actor=user, organization=organization)]
+    except PermissionDenied:
+        inquiry_ids = []
+    denied_inquiry_documents = PayrollInquiryEvidenceLink.objects.filter(organization=organization).exclude(payroll_inquiry_id__in=inquiry_ids).values("document_id")
+    documents = documents.exclude(pk__in=denied_inquiry_documents)
     grants = effective_scope_grants(membership)
     if not membership_has_scope(membership):
         project_ids = list(

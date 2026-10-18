@@ -101,14 +101,24 @@ def _explicit_employee_ids(
     return employee_ids
 
 
+def _payroll_requests_available(*, actor, organization, codes):
+    from apps.workforce.ess_services import has_ess_subject
+    return (
+        BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW in codes
+        and BusinessPermissionCode.PAYROLL_ESS_VIEW in codes
+        and has_ess_subject(user=actor, organization=organization)
+    )
+
+
 def my_requests_available(*, actor: User, organization: Organization) -> bool:
     try:
         codes = _permission_codes(actor=actor, organization=organization)
     except PermissionDenied:
         return False
     return bool(
-        codes & REQUEST_PERMISSION_CODES
-        and _explicit_employee_ids(actor=actor, organization=organization)
+        (codes & REQUEST_PERMISSION_CODES
+        and _explicit_employee_ids(actor=actor, organization=organization))
+        or _payroll_requests_available(actor=actor, organization=organization, codes=codes)
     )
 
 
@@ -195,7 +205,8 @@ def build_my_requests(
 ) -> tuple[RequestWorkspaceRow, ...]:
     codes = _permission_codes(actor=actor, organization=organization)
     employee_ids = _explicit_employee_ids(actor=actor, organization=organization)
-    if not employee_ids or not codes & REQUEST_PERMISSION_CODES:
+    payroll_allowed = _payroll_requests_available(actor=actor, organization=organization, codes=codes)
+    if (not employee_ids or not codes & REQUEST_PERMISSION_CODES) and not payroll_allowed:
         raise PermissionDenied(
             "هویت نیروی کار یا مجوز درخواست برای این فضا موجود نیست."
         )
@@ -235,6 +246,22 @@ def build_my_requests(
                 source_links=source_links,
             )
         )
+    if payroll_allowed:
+        from apps.payroll.ess_services import inquiry_instance, visible_inquiries
+        for item in visible_inquiries(actor=actor, organization=organization):
+            if item.requested_by_id != actor.pk:
+                continue
+            instance = inquiry_instance(item)
+            if instance is None:
+                continue
+            latest = item.responses.order_by("-created_at").first()
+            rows.append(RequestWorkspaceRow(
+                source_type="payroll_inquiry", source_id=item.pk,
+                source_label="پرسش حقوق", employee_label=str(item.person),
+                status=instance.status, status_label=instance.get_status_display(),
+                occurred_at=latest.created_at if latest else item.created_at,
+                source_url=reverse("payroll:ess_inquiry_detail", kwargs={"inquiry_id": item.pk}),
+            ))
     return tuple(sorted(rows, key=lambda row: row.occurred_at, reverse=True))
 
 

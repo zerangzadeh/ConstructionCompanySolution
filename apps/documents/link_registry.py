@@ -29,6 +29,13 @@ class DocumentLinkType:
 
 DOCUMENT_LINK_TYPES = (
     DocumentLinkType(
+        key="payroll_inquiry", owner="payroll",
+        model_label="payroll.PayrollInquiryEvidenceLink", target_field="payroll_inquiry",
+        view_permission=BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
+        project_lookup="payroll_inquiry__payslip__run_employee__project_id",
+        site_lookup="payroll_inquiry__payslip__run_employee__site_id", legacy_compatible=False,
+    ),
+    DocumentLinkType(
         key="material",
         owner="materials",
         model_label="materials.MaterialDocumentLink",

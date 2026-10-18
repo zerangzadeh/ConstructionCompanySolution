@@ -1,0 +1,2491 @@
+diff --git a/apps/documents/link_registry.py b/apps/documents/link_registry.py
+index a74cf53..b9fee0c 100644
+--- a/apps/documents/link_registry.py
++++ b/apps/documents/link_registry.py
+@@ -28,6 +28,13 @@ class DocumentLinkType:
+ 
+ 
+ DOCUMENT_LINK_TYPES = (
++    DocumentLinkType(
++        key="payroll_inquiry", owner="payroll",
++        model_label="payroll.PayrollInquiryEvidenceLink", target_field="payroll_inquiry",
++        view_permission=BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
++        project_lookup="payroll_inquiry__payslip__run_employee__project_id",
++        site_lookup="payroll_inquiry__payslip__run_employee__site_id", legacy_compatible=False,
++    ),
+     DocumentLinkType(
+         key="material",
+         owner="materials",
+diff --git a/apps/documents/services.py b/apps/documents/services.py
+index 7cb0458..3e3c6e8 100644
+--- a/apps/documents/services.py
++++ b/apps/documents/services.py
+@@ -83,6 +83,7 @@ from apps.organizations.models import (
+ )
+ from apps.partner_qualification.models import PartnerQualification
+ from apps.payments.models import Payment
++from apps.payroll.models import PayrollInquiry, PayrollInquiryEvidenceLink
+ from apps.projects.models import Project, ProjectSite
+ from apps.workforce.models import (
+     EmployeeQualification,
+@@ -111,6 +112,7 @@ FILE_SIGNATURES = {
+ }
+ 
+ TARGET_MODELS = {
++    "payroll_inquiry": PayrollInquiry,
+     "material": Material,
+     "project": Project,
+     "project_site": ProjectSite,
+@@ -134,6 +136,7 @@ TARGET_MODELS = {
+     "partner_qualification": PartnerQualification,
+ }
+ TARGET_VIEW_PERMISSIONS = {
++    "payroll_inquiry": BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
+     "material": BusinessPermissionCode.MATERIALS_VIEW,
+     "project": BusinessPermissionCode.PROJECTS_VIEW,
+     "project_site": BusinessPermissionCode.PROJECT_SITES_VIEW,
+@@ -224,6 +227,9 @@ def _validate_target_access(
+         site=site,
+         message="اجازه مشاهده موجودیت مرتبط با سند را ندارید.",
+     )
++    if field_name == "payroll_inquiry":
++        from apps.payroll.ess_services import get_inquiry
++        get_inquiry(actor=actor, organization=organization, inquiry_id=target.pk)
+     return field_name
+ 
+ 
+@@ -232,6 +238,8 @@ def _validate_field_observation_attachment_access(
+ ) -> None:
+     """Apply Field Operations' write boundary without restricting DMS reads."""
+ 
++    if target_field == "payroll_inquiry":
++        raise PermissionDenied("پیوست پرسش فقط در تراکنش ثبت اولیه پذیرفته می‌شود.")
+     if target_field != "field_observation":
+         return
+     observation = (
+@@ -702,6 +710,13 @@ def get_organization_documents(
+         registered_links = link_type.model.objects.filter(organization=organization)
+         if not membership_has_permission(membership, link_type.view_permission):
+             documents = documents.exclude(pk__in=registered_links.values("document_id"))
++    from apps.payroll.ess_services import visible_inquiries
++    try:
++        inquiry_ids = [item.pk for item in visible_inquiries(actor=user, organization=organization)]
++    except PermissionDenied:
++        inquiry_ids = []
++    denied_inquiry_documents = PayrollInquiryEvidenceLink.objects.filter(organization=organization).exclude(payroll_inquiry_id__in=inquiry_ids).values("document_id")
++    documents = documents.exclude(pk__in=denied_inquiry_documents)
+     grants = effective_scope_grants(membership)
+     if not membership_has_scope(membership):
+         project_ids = list(
+diff --git a/apps/organizations/authorization.py b/apps/organizations/authorization.py
+index 1b71d8f..3080c23 100644
+--- a/apps/organizations/authorization.py
++++ b/apps/organizations/authorization.py
+@@ -66,6 +66,8 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
+         "timesheets",
+         "payroll_results",
+         "payslips",
++        "payroll_inquiries",
++        "payroll_ess",
+         "purchase_requests",
+         "purchase_request_items",
+         "purchase_orders",
+diff --git a/apps/organizations/models.py b/apps/organizations/models.py
+index a89eaa6..b97113b 100644
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -1177,6 +1177,11 @@ class BusinessPermissionCode(models.TextChoices):
+     PAYROLL_RESULTS_VIEW = "payroll_results.view", "مشاهده نتایج حساس حقوق"
+     PAYSLIPS_VIEW = "payslips.view", "مشاهده فیش حقوق"
+     PAYSLIPS_EXPORT = "payslips.export", "خروجی فیش حقوق"
++    PAYROLL_ESS_VIEW = "payroll_ess.view_own", "مشاهده حقوق قطعی شخصی"
++    PAYROLL_ESS_EXPORT = "payroll_ess.export_own", "دریافت فیش قطعی شخصی"
++    PAYROLL_INQUIRIES_VIEW = "payroll_inquiries.view", "مشاهده پرسش مجاز حقوق"
++    PAYROLL_INQUIRIES_REQUEST = "payroll_inquiries.request", "ثبت پرسش حقوق شخصی"
++    PAYROLL_INQUIRIES_RESPOND = "payroll_inquiries.respond", "پاسخ به پرسش تخصیص‌یافته حقوق"
+     PAYROLL_AUDIT_VIEW = "payroll_audit.view", "مشاهده ممیزی حساس حقوق"
+     PAYROLL_STATUTORY_CONFIGURATION_VIEW = (
+         "payroll_statutory_configuration.view",
+diff --git a/apps/organizations/permission_registry.py b/apps/organizations/permission_registry.py
+index bb3783e..35f47ef 100644
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -993,6 +993,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+             "payroll.PayrollComponent",
+             "payroll.PayrollRule",
+             "payroll.PayrollPeriod",
++            "payroll.PayrollInquiryCategory",
+             "payroll.PayrollYearInterval",
+         ),
+         (P.PAYROLL_CONFIGURATION_VIEW, P.PAYROLL_CONFIGURATION_MANAGE),
+@@ -1050,6 +1051,18 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+         (P.PAYROLL_AUDIT_VIEW,),
+         ("apps.payroll.views",),
+     ),
++    PermissionResource(
++        "payroll_inquiries",
++        "پرسش‌های شخصی و تخصیص‌یافته حقوق",
++        ("payroll.PayrollInquiry", "payroll.PayrollInquiryResponse", "payroll.PayrollInquiryEvidenceLink"),
++        (P.PAYROLL_INQUIRIES_VIEW, P.PAYROLL_INQUIRIES_REQUEST, P.PAYROLL_INQUIRIES_RESPOND),
++        ("apps.payroll.ess_services", "apps.payroll.ess_views", "apps.payroll.inquiry_workflow", "apps.documents.services"),
++    ),
++    PermissionResource(
++        "payroll_ess", "حقوق قطعی شخصی", ("payroll.Payslip",),
++        (P.PAYROLL_ESS_VIEW, P.PAYROLL_ESS_EXPORT),
++        ("apps.payroll.ess_services", "apps.payroll.ess_views"),
++    ),
+     PermissionResource(
+         "payroll_statutory",
+         "محاسبه و بررسی مقرراتی حقوق",
+diff --git a/apps/organizations/role_defaults.py b/apps/organizations/role_defaults.py
+index ebc3974..83a065b 100644
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -42,6 +42,11 @@ TIME_ATTENDANCE_PERMISSIONS = permission_codes(
+     BusinessPermissionCode.TIMESHEETS_PREVIEW,
+ )
+ PAYROLL_SENSITIVE_PERMISSIONS = permission_codes(
++    BusinessPermissionCode.PAYROLL_ESS_VIEW,
++    BusinessPermissionCode.PAYROLL_ESS_EXPORT,
++    BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
++    BusinessPermissionCode.PAYROLL_INQUIRIES_REQUEST,
++    BusinessPermissionCode.PAYROLL_INQUIRIES_RESPOND,
+     BusinessPermissionCode.PAYROLL_CONFIGURATION_VIEW,
+     BusinessPermissionCode.PAYROLL_CONFIGURATION_MANAGE,
+     BusinessPermissionCode.PAYROLL_PREPARE,
+diff --git a/apps/payroll/apps.py b/apps/payroll/apps.py
+index 96cbcf7..665f968 100644
+--- a/apps/payroll/apps.py
++++ b/apps/payroll/apps.py
+@@ -5,3 +5,7 @@ class PayrollConfig(AppConfig):
+     default_auto_field = "django.db.models.BigAutoField"
+     name = "apps.payroll"
+     verbose_name = "حقوق و دستمزد"
++
++    def ready(self) -> None:
++        from .inquiry_workflow import register_inquiry_workflow
++        register_inquiry_workflow()
+diff --git a/apps/payroll/models.py b/apps/payroll/models.py
+index d0323b3..08f7369 100644
+--- a/apps/payroll/models.py
++++ b/apps/payroll/models.py
+@@ -16,6 +16,7 @@ from django.core.exceptions import ValidationError
+ from django.db import models
+ from django.db.models import Q
+ 
++from apps.documents.models import AbstractTypedDocumentLink
+ from core.identifiers import canonicalize_upper_identifier
+ from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
+ from core.tenant_validation import validate_related_organizations
+@@ -2096,3 +2097,97 @@ class FinancialHandoffReconciliationReview(ImmutablePayrollRecord):
+ 
+     def clean(self) -> None:
+         validate_related_organizations(self, reconciliation=self.reconciliation if self.reconciliation_id else None)
++
++
++class PayrollInquiryCategory(ImmutablePayrollRecord):
++    """Explicit tenant configuration; never a seeded category or review depth."""
++
++    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
++    code = models.SlugField(max_length=50)
++    name = models.CharField(max_length=150)
++    version = models.PositiveIntegerField()
++    workflow_version = models.ForeignKey("workflows.WorkflowVersion", on_delete=models.PROTECT)
++    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField()
++
++    class Meta:
++        constraints = [models.UniqueConstraint(fields=["organization", "code", "version"], name="payroll_inquiry_category_version_uq")]
++
++    def clean(self) -> None:
++        validate_related_organizations(self, workflow_version=self.workflow_version)
++        if self.workflow_version.status != "published" or self.workflow_version.definition.workflow_type.code != "payroll.inquiry":
++            raise ValidationError("دسته پرسش به نسخه منتشرشده گردش‌کار پرسش حقوق نیاز دارد.")
++        if not self.reason.strip() or self.version < 1:
++            raise ValidationError("نسخه و دلیل پیکربندی پرسش الزامی است.")
++
++    def __str__(self) -> str:
++        return self.name
++
++
++class PayrollInquiry(ImmutablePayrollRecord):
++    """Communication source. Status/assignment remain in shared Workflow."""
++
++    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
++    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    person = models.ForeignKey("workforce.Person", on_delete=models.PROTECT)
++    work_relationship = models.ForeignKey("workforce.WorkRelationship", on_delete=models.PROTECT)
++    payslip = models.ForeignKey(Payslip, on_delete=models.PROTECT, related_name="inquiries")
++    period = models.ForeignKey(PayrollPeriod, on_delete=models.PROTECT)
++    category = models.ForeignKey(PayrollInquiryCategory, on_delete=models.PROTECT)
++    subject = models.CharField(max_length=255)
++    description = models.TextField(max_length=4000)
++    idempotency_key = models.CharField(max_length=128)
++
++    class Meta:
++        constraints = [models.UniqueConstraint(fields=["organization", "requested_by", "idempotency_key"], name="payroll_inquiry_request_key_uq")]
++
++    @property
++    def project(self):
++        return self.payslip.run_employee.project
++
++    @property
++    def site(self):
++        return self.payslip.run_employee.site
++
++    def clean(self) -> None:
++        validate_related_organizations(self, person=self.person, work_relationship=self.work_relationship, payslip=self.payslip, period=self.period, category=self.category)
++        if self.work_relationship.person_id != self.person_id or self.person.user_id != self.requested_by_id:
++            raise ValidationError("هویت صریح پرسش با درخواست‌کننده هم‌خوان نیست.")
++        if self.work_relationship.legacy_employee_id != self.payslip.run_employee.employee_id or self.payslip.run.period_id != self.period_id:
++            raise ValidationError("مرجع حقوق با رابطه کاری و دوره پرسش هم‌خوان نیست.")
++        if not self.subject.strip() or not self.description.strip() or not self.idempotency_key.strip():
++            raise ValidationError("عنوان، شرح و کلید تکرارپذیری پرسش الزامی است.")
++
++
++class PayrollInquiryResponse(ImmutablePayrollRecord):
++    organization = models.ForeignKey("organizations.Organization", on_delete=models.PROTECT)
++    inquiry = models.ForeignKey(PayrollInquiry, on_delete=models.PROTECT, related_name="responses")
++    work_item = models.ForeignKey("workflows.WorkItem", on_delete=models.PROTECT)
++    responded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    body = models.TextField(max_length=4000)
++    idempotency_key = models.CharField(max_length=128)
++
++    class Meta:
++        constraints = [models.UniqueConstraint(fields=["inquiry", "idempotency_key"], name="payroll_inquiry_response_key_uq")]
++
++    def clean(self) -> None:
++        validate_related_organizations(self, inquiry=self.inquiry, work_item=self.work_item)
++        if self.work_item.instance.subject_id != self.inquiry_id or self.work_item.instance.subject_type != "payroll.inquiry":
++            raise ValidationError("کار تخصیص‌یافته متعلق به همین پرسش نیست.")
++        if not self.body.strip():
++            raise ValidationError("متن پاسخ قابل نمایش به کارمند الزامی است.")
++
++
++class PayrollInquiryEvidenceLink(AbstractTypedDocumentLink):
++    target_field_name = "payroll_inquiry"
++    objects = ImmutableManager()
++    payroll_inquiry = models.ForeignKey(PayrollInquiry, on_delete=models.PROTECT, related_name="evidence_links")
++    document_version = models.ForeignKey("documents.DocumentVersion", on_delete=models.PROTECT)
++
++    class Meta(AbstractTypedDocumentLink.Meta):
++        constraints = [models.UniqueConstraint(fields=["payroll_inquiry", "document_version"], name="payroll_inquiry_document_version_uq")]
++
++    def save(self, *args: object, **kwargs: object) -> None:
++        if not self._state.adding:
++            raise ValidationError("سابقه شواهد پرسش تغییرپذیر نیست.")
++        super().save(*args, **kwargs)
+diff --git a/apps/payroll/urls.py b/apps/payroll/urls.py
+index f9771da..c543bba 100644
+--- a/apps/payroll/urls.py
++++ b/apps/payroll/urls.py
+@@ -1,10 +1,17 @@
+ from django.urls import path
+ 
+-from . import views
++from . import ess_views, views
+ 
+ app_name = "payroll"
+ 
+ urlpatterns = [
++    path("ess/", ess_views.history, name="ess_history"),
++    path("ess/payslips/<uuid:payslip_id>/", ess_views.payslip, name="ess_payslip"),
++    path("ess/payslips/<uuid:payslip_id>/export/", ess_views.export, name="ess_payslip_export"),
++    path("ess/inquiries/", ess_views.inquiries, name="ess_inquiries"),
++    path("ess/inquiries/new/", ess_views.inquiry_create, name="ess_inquiry_create"),
++    path("ess/inquiries/<uuid:inquiry_id>/", ess_views.inquiry_detail, name="ess_inquiry_detail"),
++    path("ess/inquiries/<uuid:inquiry_id>/claim/<uuid:work_item_id>/", ess_views.inquiry_claim, name="ess_inquiry_claim"),
+     path("", views.workbench, name="workbench"),
+     path("configuration/", views.configuration, name="configuration"),
+     path("configuration/employment/new/", views.employment_configuration_create, name="employment_configuration_create"),
+diff --git a/apps/workflows/personal_workspaces.py b/apps/workflows/personal_workspaces.py
+index e528c18..344d9eb 100644
+--- a/apps/workflows/personal_workspaces.py
++++ b/apps/workflows/personal_workspaces.py
+@@ -101,14 +101,24 @@ def _explicit_employee_ids(
+     return employee_ids
+ 
+ 
++def _payroll_requests_available(*, actor, organization, codes):
++    from apps.workforce.ess_services import has_ess_subject
++    return (
++        BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW in codes
++        and BusinessPermissionCode.PAYROLL_ESS_VIEW in codes
++        and has_ess_subject(user=actor, organization=organization)
++    )
++
++
+ def my_requests_available(*, actor: User, organization: Organization) -> bool:
+     try:
+         codes = _permission_codes(actor=actor, organization=organization)
+     except PermissionDenied:
+         return False
+     return bool(
+-        codes & REQUEST_PERMISSION_CODES
+-        and _explicit_employee_ids(actor=actor, organization=organization)
++        (codes & REQUEST_PERMISSION_CODES
++        and _explicit_employee_ids(actor=actor, organization=organization))
++        or _payroll_requests_available(actor=actor, organization=organization, codes=codes)
+     )
+ 
+ 
+@@ -195,7 +205,8 @@ def build_my_requests(
+ ) -> tuple[RequestWorkspaceRow, ...]:
+     codes = _permission_codes(actor=actor, organization=organization)
+     employee_ids = _explicit_employee_ids(actor=actor, organization=organization)
+-    if not employee_ids or not codes & REQUEST_PERMISSION_CODES:
++    payroll_allowed = _payroll_requests_available(actor=actor, organization=organization, codes=codes)
++    if (not employee_ids or not codes & REQUEST_PERMISSION_CODES) and not payroll_allowed:
+         raise PermissionDenied(
+             "هویت نیروی کار یا مجوز درخواست برای این فضا موجود نیست."
+         )
+@@ -235,6 +246,22 @@ def build_my_requests(
+                 source_links=source_links,
+             )
+         )
++    if payroll_allowed:
++        from apps.payroll.ess_services import inquiry_instance, visible_inquiries
++        for item in visible_inquiries(actor=actor, organization=organization):
++            if item.requested_by_id != actor.pk:
++                continue
++            instance = inquiry_instance(item)
++            if instance is None:
++                continue
++            latest = item.responses.order_by("-created_at").first()
++            rows.append(RequestWorkspaceRow(
++                source_type="payroll_inquiry", source_id=item.pk,
++                source_label="پرسش حقوق", employee_label=str(item.person),
++                status=instance.status, status_label=instance.get_status_display(),
++                occurred_at=latest.created_at if latest else item.created_at,
++                source_url=reverse("payroll:ess_inquiry_detail", kwargs={"inquiry_id": item.pk}),
++            ))
+     return tuple(sorted(rows, key=lambda row: row.occurred_at, reverse=True))
+ 
+ 
+diff --git a/apps/workflows/registry.py b/apps/workflows/registry.py
+index 92dab38..dceee78 100644
+--- a/apps/workflows/registry.py
++++ b/apps/workflows/registry.py
+@@ -108,6 +108,7 @@ class DomainCommandSpec:
+     from_states: frozenset[str] = field(default_factory=frozenset)
+     to_state: str = ""
+     executor: DomainCommandExecutor | None = None
++    include_work_item: bool = False
+ 
+ 
+ @dataclass(frozen=True, slots=True)
+@@ -179,6 +180,22 @@ class WorkflowRegistry:
+ 
+ registry = WorkflowRegistry()
+ 
++registry.register_subject_adapter(SubjectAdapterSpec(
++    key="payroll.inquiry", subject_type="payroll.inquiry",
++    exposed_attributes=frozenset({"project_id", "site_id", "created_by_id"}),
++    start_permission="payroll_inquiries.request",
++    view_permission="payroll_inquiries.view",
++    detail_url_name="payroll:ess_inquiry_detail", detail_url_kwarg="inquiry_id",
++))
++registry.register_workflow_type(WorkflowTypeSpec(
++    code="payroll.inquiry", subject_type="payroll.inquiry",
++    subject_adapter="payroll.inquiry", allowed_scope_fields=frozenset({"project_id", "site_id"}),
++    domain_commands=frozenset({"payroll.inquiry.respond"}),
++))
++registry.register_domain_command(DomainCommandSpec(
++    key="payroll.inquiry.respond", workflow_type="payroll.inquiry", include_work_item=True,
++))
++
+ registry.register_subject_adapter(
+     SubjectAdapterSpec(
+         key="estimates.estimate",
+diff --git a/apps/workflows/runtime.py b/apps/workflows/runtime.py
+index 810c927..00ac3ed 100644
+--- a/apps/workflows/runtime.py
++++ b/apps/workflows/runtime.py
+@@ -1482,6 +1482,7 @@ def complete_work_item(
+             outcome=outcome,
+             context=command_context or {},
+             idempotency_key=idempotency_key,
++            **({"work_item": item} if command.include_work_item else {}),
+         )
+         refreshed = _load_subject(
+             organization=organization,
+@@ -1883,6 +1884,8 @@ def cancel_workflow_for_domain(
+     subject_state = str(snapshot.attributes.get("status", ""))
+     if command.from_states and subject_state not in command.from_states:
+         raise WorkflowConflict("وضعیت موضوع با فرمان لغو سازگار نیست.")
++    if command.include_work_item:
++        raise ValidationError("این فرمان فقط در تکمیل کار تخصیص‌یافته مجاز است.")
+     command.executor(
+         subject=snapshot.subject,
+         actor=actor,
+diff --git a/apps/workforce/ess_dashboard.py b/apps/workforce/ess_dashboard.py
+index b7c05ed..9877ecd 100644
+--- a/apps/workforce/ess_dashboard.py
++++ b/apps/workforce/ess_dashboard.py
+@@ -8,6 +8,7 @@ from django.utils import timezone
+ 
+ from apps.accounts.models import User
+ from apps.organizations.models import Organization
++from apps.payroll.models import PayrollInquiry
+ from apps.timekeeping.models import (
+     AttendanceCorrectionRequest,
+     LeaveMissionRequest,
+@@ -39,6 +40,7 @@ def build_ess_dashboard(*, user: User, organization: Organization) -> ESSDashboa
+             # expose another legacy employee merely because User happens to match.
+             allowed = {}
+             for kind, model, field in (
++                ("payroll_inquiry", PayrollInquiry, "work_relationship__legacy_employee_id"),
+                 ("leave", LeaveMissionRequest, "employee_id"),
+                 ("overtime", OvertimeRequest, "employee_id"),
+                 ("correction", AttendanceCorrectionRequest, "attendance__employee_id"),
+diff --git a/templates/payroll/payslip.html b/templates/payroll/payslip.html
+index 9457f8f..9c01e80 100644
+--- a/templates/payroll/payslip.html
++++ b/templates/payroll/payslip.html
+@@ -2,8 +2,9 @@
+ {% load erp_format %}
+ {% block title %}فیش {{ payslip.number }} | حقوق{% endblock %}
+ {% block content %}
++{% if ess_mode %}{% include "workforce/_ess_navigation.html" %}{% endif %}
+ <section class="mx-auto max-w-4xl" dir="rtl">
+ {% include "components/page_header.html" with page_eyebrow="فیش حقوق محدود" page_title=data.employee_name page_description="این فیش نمایش نتیجه قطعی است و سند پرداخت یا ثبت حسابداری نیست." only %}
+-<div class="erp-surface mt-5 rounded-2xl p-6"><div class="grid gap-3 sm:grid-cols-3"><div><span class="text-xs text-slate-500">شماره</span><b class="block" dir="ltr">{{ payslip.number }}</b></div><div><span class="text-xs text-slate-500">دوره</span><b class="block" dir="ltr">{{ data.period_code }}</b></div><div><span class="text-xs text-slate-500">هش محتوا</span><b class="block truncate text-xs" dir="ltr">{{ payslip.content_digest }}</b></div></div><div class="mt-5 overflow-x-auto"><table class="min-w-full text-sm"><thead><tr class="text-right text-xs text-slate-500"><th class="p-2">جزء</th><th class="p-2">نوع</th><th class="p-2">مقدار</th><th class="p-2">نرخ</th><th class="p-2">مبلغ</th></tr></thead><tbody>{% for line in data.lines %}<tr class="border-t"><td class="p-2">{{ line.component_name }} <span dir="ltr" class="text-xs">{{ line.component_code }}</span></td><td class="p-2">{{ line.component_kind }}</td><td class="p-2" dir="ltr">{{ line.quantity|erp_number|default:"—" }}</td><td class="p-2" dir="ltr">{{ line.rate|erp_number|default:"—" }}</td><td class="p-2" dir="ltr">{{ line.amount|rial }}</td></tr>{% endfor %}</tbody></table></div><div class="mt-5 grid gap-3 sm:grid-cols-4"><div class="rounded-lg bg-slate-50 p-3">ناخالص <b class="block" dir="ltr">{{ data.gross_amount|rial }}</b></div><div class="rounded-lg bg-slate-50 p-3">کسور <b class="block" dir="ltr">{{ data.deduction_amount|rial }}</b></div><div class="rounded-lg bg-slate-50 p-3">بازپرداخت <b class="block" dir="ltr">{{ data.reimbursement_amount|rial }}</b></div><div class="rounded-lg bg-blue-50 p-3">خالص <b class="block" dir="ltr">{{ data.net_amount|rial }}</b></div></div>{% if "payslips.export" in business_permission_codes %}<form class="mt-5" method="post" action="{% url 'payroll:payslip_export' payslip.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">خروجی JSON کنترل‌شده</button></form>{% endif %}</div>
++<div class="erp-surface mt-5 rounded-2xl p-6"><div class="grid gap-3 sm:grid-cols-3"><div><span class="text-xs text-slate-500">شماره</span><b class="block" dir="ltr">{{ payslip.number }}</b></div><div><span class="text-xs text-slate-500">دوره</span><b class="block" dir="ltr">{{ data.period_code }}</b></div><div class="min-w-0"><span class="text-xs text-slate-500">هش محتوا</span><b class="block truncate text-xs" dir="ltr">{{ payslip.content_digest }}</b></div></div><div class="mt-5 overflow-x-auto"><table class="min-w-full text-sm"><thead><tr class="text-right text-xs text-slate-500"><th class="p-2">جزء</th><th class="p-2">نوع</th><th class="p-2">مقدار</th><th class="p-2">نرخ</th><th class="p-2">مبلغ</th></tr></thead><tbody>{% for line in data.lines %}<tr class="border-t"><td class="p-2">{{ line.component_name }} <span dir="ltr" class="text-xs">{{ line.component_code }}</span></td><td class="p-2">{{ line.component_kind }}</td><td class="p-2" dir="ltr">{{ line.quantity|erp_number|default:"—" }}</td><td class="p-2" dir="ltr">{{ line.rate|erp_number|default:"—" }}</td><td class="p-2" dir="ltr">{{ line.amount|rial }}</td></tr>{% endfor %}</tbody></table></div><div class="mt-5 grid gap-3 sm:grid-cols-4"><div class="rounded-lg bg-slate-50 p-3">ناخالص <b class="block" dir="ltr">{{ data.gross_amount|rial }}</b></div><div class="rounded-lg bg-slate-50 p-3">کسور <b class="block" dir="ltr">{{ data.deduction_amount|rial }}</b></div><div class="rounded-lg bg-slate-50 p-3">بازپرداخت <b class="block" dir="ltr">{{ data.reimbursement_amount|rial }}</b></div><div class="rounded-lg bg-blue-50 p-3">خالص <b class="block" dir="ltr">{{ data.net_amount|rial }}</b></div></div>{% if ess_mode %}{% if ess_can_export %}<form class="mt-5" method="post" action="{{ ess_export_url }}">{% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">دریافت فیش قطعی</button></form>{% endif %}{% for related in ess_lineage %}<a class="erp-btn erp-btn--secondary mt-3" href="{% url 'payroll:ess_payslip' related.pk %}">فیش مرتبط در زنجیره جایگزینی: {{ related.number }}</a>{% endfor %}{% elif "payslips.export" in business_permission_codes %}<form class="mt-5" method="post" action="{% url 'payroll:payslip_export' payslip.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--secondary" type="submit">خروجی JSON کنترل‌شده</button></form>{% endif %}</div>
+ </section>
+ {% endblock %}
+diff --git a/templates/workforce/_ess_navigation.html b/templates/workforce/_ess_navigation.html
+index 604f4c2..6538f4b 100644
+--- a/templates/workforce/_ess_navigation.html
++++ b/templates/workforce/_ess_navigation.html
+@@ -1,5 +1,7 @@
+ <nav class="erp-surface mb-5 flex flex-wrap gap-4 rounded-2xl p-4 text-sm font-bold" aria-label="خدمات شخصی کارکنان">
+   <a class="text-blue-700" href="{% url 'workforce:ess_dashboard' %}"{% if request.resolver_match.url_name == 'ess_dashboard' %} aria-current="page"{% endif %}>داشبورد من</a>
+   <a class="text-blue-700" href="{% url 'workforce:ess_profile' %}"{% if request.resolver_match.url_name == 'ess_profile' or request.resolver_match.url_name == 'ess_profile_relationship' %} aria-current="page"{% endif %}>پروفایل من</a>
++  {% if "payroll_ess.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_history' %}">سوابق حقوق من</a>{% endif %}
++  {% if "payroll_inquiries.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_inquiries' %}">پرسش‌های حقوق</a>{% endif %}
+   {% if my_requests_workspace_available %}<a class="text-blue-700" href="{% url 'workflows:my_requests' %}">درخواست‌های من</a>{% endif %}
+ </nav>
+--- /dev/null
++++ b/apps/organizations/migrations/0111_cep054_payroll_inquiry_permissions.py
+@@ -0,0 +1,31 @@
++# ruff: noqa: RUF012
++"""Register distinct inquiry operations without assigning any tenant role."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("payroll_ess.view_own", "مشاهده حقوق قطعی شخصی"),
++    ("payroll_ess.export_own", "دریافت فیش قطعی شخصی"),
++    ("payroll_inquiries.view", "مشاهده پرسش مجاز حقوق"),
++    ("payroll_inquiries.request", "ثبت پرسش حقوق شخصی"),
++    ("payroll_inquiries.respond", "پاسخ به پرسش تخصیص‌یافته حقوق"),
++)
++
++
++def forward(apps, schema_editor):
++    model = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        model.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0110_cep027_record_review_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]
+--- /dev/null
++++ b/apps/payroll/ess_forms.py
+@@ -0,0 +1,22 @@
++"""Input shapes; authoritative checks remain inside transactional services."""
++
++from django import forms
++
++
++class InquiryForm(forms.Form):
++    payslip_id = forms.ChoiceField(label="فیش قطعی")
++    category_id = forms.ChoiceField(label="دسته پرسش")
++    subject = forms.CharField(label="عنوان", max_length=255)
++    description = forms.CharField(label="شرح", max_length=4000, widget=forms.Textarea)
++    document_version_ids = forms.MultipleChoiceField(
++        label="نسخه شواهد مجاز (اختیاری)", required=False
++    )
++    idempotency_key = forms.CharField(widget=forms.HiddenInput, max_length=128)
++
++
++class ResponseForm(forms.Form):
++    outcome = forms.ChoiceField(label="نتیجه تعریف‌شده گردش‌کار")
++    body = forms.CharField(
++        label="پاسخ قابل نمایش به کارمند", max_length=4000, widget=forms.Textarea
++    )
++    idempotency_key = forms.CharField(widget=forms.HiddenInput, max_length=128)
+--- /dev/null
++++ b/apps/payroll/ess_services.py
+@@ -0,0 +1,592 @@
++"""Own finalized Payroll reads and communication through the shared Workflow."""
++
++from __future__ import annotations
++
++from typing import Any
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.db.models import Max
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction
++from apps.audit.services import record_audit_event
++from apps.organizations.authorization import (
++    get_active_membership,
++    require_business_permission,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.workflows.models import (
++    WorkflowInstance,
++    WorkflowInstanceStatus,
++    WorkflowVersion,
++    WorkItem,
++    WorkItemStatus,
++)
++from apps.workflows.runtime import (
++    complete_work_item,
++    list_member_work_items,
++    start_workflow,
++)
++from apps.workforce.ess_services import resolve_ess_subject
++from apps.workforce.models import WorkRelationship
++
++from .models import (
++    PayrollInquiry,
++    PayrollInquiryCategory,
++    PayrollInquiryEvidenceLink,
++    PayrollInquiryResponse,
++    Payslip,
++)
++
++SUBJECT = "payroll.inquiry"
++DENIED = "اطلاعات مجاز در این شرکت یافت نشد."
++
++
++def _require(
++    *,
++    actor: User,
++    organization: Organization,
++    code: str,
++    payslip: Payslip | None = None,
++):
++    return require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=code,
++        project=payslip.run_employee.project if payslip else None,
++        site=payslip.run_employee.site if payslip else None,
++        allow_any_scope=payslip is None,
++        message=DENIED,
++    )
++
++
++def _own_sources(
++    *, actor: User, organization: Organization
++) -> tuple[tuple[Payslip, WorkRelationship], ...]:
++    _require(actor=actor, organization=organization, code=P.PAYROLL_ESS_VIEW)
++    subject = resolve_ess_subject(user=actor, organization=organization)
++    relationships = tuple(
++        WorkRelationship.objects.filter(
++            organization=organization,
++            person=subject.person,
++            legacy_employee_id__isnull=False,
++        )
++    )
++    slips = Payslip.objects.filter(
++        organization=organization,
++        run_employee__employee_id__in=[
++            item.legacy_employee_id for item in relationships
++        ],
++        run__organization=organization,
++        run_employee__organization=organization,
++        run__status__in=["finalized", "reversed"],
++        run__finalized_at__isnull=False,
++        run_employee__status__in=["finalized", "reversed"],
++    ).select_related(
++        "run__period",
++        "run_employee__employee",
++        "run_employee__project",
++        "run_employee__site",
++    )
++    result = []
++    for slip in slips.order_by("-run__period__ends_on", "-issued_at"):
++        # A finalized source must belong to the exact retained employment episode.
++        if slip.run_employee.run_id != slip.run_id:
++            continue
++        episode = next(
++            (
++                item
++                for item in relationships
++                if item.legacy_employee_id == slip.run_employee.employee_id
++                and item.effective_start <= slip.run.period.ends_on
++                and (
++                    item.effective_end is None
++                    or item.effective_end >= slip.run.period.starts_on
++                )
++            ),
++            None,
++        )
++        if episode is None:
++            continue
++        try:
++            _require(
++                actor=actor,
++                organization=organization,
++                code=P.PAYROLL_ESS_VIEW,
++                payslip=slip,
++            )
++        except PermissionDenied:
++            continue
++        result.append((slip, episode))
++    return tuple(result)
++
++
++def _audit_payslip(
++    *,
++    actor: User,
++    organization: Organization,
++    slip: Payslip,
++    episode: WorkRelationship,
++    export: bool = False,
++) -> None:
++    record_audit_event(
++        action=AuditAction.PAYSLIP_EXPORTED if export else AuditAction.PAYSLIP_VIEWED,
++        organization=organization,
++        actor=actor,
++        entity_type="payroll.payslip",
++        entity_id=slip.pk,
++        metadata={
++            "ess": True,
++            "run_id": str(slip.run_id),
++            "work_relationship_id": str(episode.pk),
++            "content_digest": slip.content_digest,
++        },
++    )
++
++
++def own_payroll_history(
++    *, actor: User, organization: Organization
++) -> tuple[Payslip, ...]:
++    sources = _own_sources(actor=actor, organization=organization)
++    for slip, episode in sources:
++        _audit_payslip(
++            actor=actor, organization=organization, slip=slip, episode=episode
++        )
++    return tuple(slip for slip, _ in sources)
++
++
++def own_payslip(
++    *, actor: User, organization: Organization, payslip_id: object, export: bool = False
++) -> Payslip:
++    source = next(
++        (
++            (slip, episode)
++            for slip, episode in _own_sources(actor=actor, organization=organization)
++            if str(slip.pk) == str(payslip_id)
++        ),
++        None,
++    )
++    if source is None:
++        raise PermissionDenied(DENIED)
++    slip, episode = source
++    if export:
++        _require(
++            actor=actor,
++            organization=organization,
++            code=P.PAYROLL_ESS_EXPORT,
++            payslip=slip,
++        )
++    _audit_payslip(
++        actor=actor,
++        organization=organization,
++        slip=slip,
++        episode=episode,
++        export=export,
++    )
++    return slip
++
++
++@transaction.atomic
++def configure_inquiry_category(
++    *,
++    actor: User,
++    organization: Organization,
++    code: str,
++    name: str,
++    workflow_version: WorkflowVersion,
++    reason: str,
++) -> PayrollInquiryCategory:
++    _require(
++        actor=actor, organization=organization, code=P.PAYROLL_CONFIGURATION_MANAGE
++    )
++    # Serialize versions on the tenant; no seeded category or implicit grants.
++    Organization.objects.select_for_update().get(pk=organization.pk)
++    _require(
++        actor=actor, organization=organization, code=P.PAYROLL_CONFIGURATION_MANAGE
++    )
++    version = (
++        PayrollInquiryCategory.objects.filter(
++            organization=organization, code=code
++        ).aggregate(number=Max("version"))["number"]
++        or 0
++    ) + 1
++    if (
++        workflow_version.organization_id != organization.pk
++        or workflow_version.status != "published"
++        or workflow_version.definition.workflow_type.code != SUBJECT
++    ):
++        raise ValidationError("گردش‌کار منتشرشده و مجاز پرسش حقوق لازم است.")
++    decisions = workflow_version.steps.filter(step_type="approval")
++    if not decisions.exists() or any(
++        item.required_permission != P.PAYROLL_INQUIRIES_RESPOND
++        or item.configuration.get("due_hours") is not None
++        for item in decisions
++    ):
++        raise ValidationError(
++            "مسیر پاسخ باید مجوز صریح پاسخ‌گویی و بدون زمان‌سنج خودکار داشته باشد."
++        )
++    for step in decisions:
++        if not step.outgoing_transitions.exists() or any(
++            (transition.domain_command or step.domain_command)
++            != "payroll.inquiry.respond"
++            for transition in step.outgoing_transitions.all()
++        ):
++            raise ValidationError(
++                "مسیر هر پاسخ باید فرمان ثبت پاسخ قابل نمایش را فراخوانی کند."
++            )
++    return PayrollInquiryCategory.objects.create(
++        organization=organization,
++        code=code,
++        name=name,
++        version=version,
++        workflow_version=workflow_version,
++        created_by=actor,
++        reason=reason,
++    )
++
++
++def inquiry_instance(inquiry: PayrollInquiry) -> WorkflowInstance | None:
++    return WorkflowInstance.objects.filter(
++        organization_id=inquiry.organization_id,
++        subject_type=SUBJECT,
++        subject_id=inquiry.pk,
++        version_id=inquiry.category.workflow_version_id,
++    ).first()
++
++
++def visible_inquiries(
++    *, actor: User, organization: Organization
++) -> tuple[PayrollInquiry, ...]:
++    _require(actor=actor, organization=organization, code=P.PAYROLL_INQUIRIES_VIEW)
++    own_person_id = None
++    own_payslip_ids = set()
++    try:
++        _require(actor=actor, organization=organization, code=P.PAYROLL_ESS_VIEW)
++        own_person_id = resolve_ess_subject(
++            user=actor, organization=organization
++        ).person.pk
++        own_payslip_ids = {
++            slip.pk for slip, _ in _own_sources(actor=actor, organization=organization)
++        }
++    except PermissionDenied:
++        pass
++    assigned_ids = set()
++    try:
++        _require(actor=actor, organization=organization, code=P.PAYROLL_RESULTS_VIEW)
++        assigned_ids = set(
++            list_member_work_items(
++                actor=actor, organization=organization, include_terminal=True
++            )
++            .filter(instance__subject_type=SUBJECT)
++            .values_list("instance__subject_id", flat=True)
++        )
++    except PermissionDenied:
++        pass
++    rows = PayrollInquiry.objects.filter(organization=organization).select_related(
++        "category__workflow_version",
++        "payslip__run_employee__project",
++        "payslip__run_employee__site",
++        "period",
++        "person",
++        "work_relationship",
++    )
++    allowed = []
++    for item in rows.order_by("-created_at"):
++        own = (
++            item.requested_by_id == actor.pk
++            and item.person_id == own_person_id
++            and item.payslip_id in own_payslip_ids
++        )
++        handler = item.pk in assigned_ids
++        if not own and not handler:
++            continue
++        try:
++            _require(
++                actor=actor,
++                organization=organization,
++                code=P.PAYROLL_INQUIRIES_VIEW,
++                payslip=item.payslip,
++            )
++            if not own:
++                _require(
++                    actor=actor,
++                    organization=organization,
++                    code=P.PAYROLL_RESULTS_VIEW,
++                    payslip=item.payslip,
++                )
++        except PermissionDenied:
++            continue
++        allowed.append(item)
++    return tuple(allowed)
++
++
++def get_inquiry(
++    *, actor: User, organization: Organization, inquiry_id: object
++) -> PayrollInquiry:
++    item = next(
++        (
++            item
++            for item in visible_inquiries(actor=actor, organization=organization)
++            if str(item.pk) == str(inquiry_id)
++        ),
++        None,
++    )
++    if item is None:
++        raise PermissionDenied(DENIED)
++    return item
++
++
++@transaction.atomic
++def submit_inquiry(
++    *,
++    actor: User,
++    organization: Organization,
++    payslip_id: object,
++    category_id: object,
++    subject: str,
++    description: str,
++    idempotency_key: str,
++    document_version_ids: tuple[object, ...] = (),
++) -> PayrollInquiry:
++    slip = own_payslip(actor=actor, organization=organization, payslip_id=payslip_id)
++    _require(
++        actor=actor,
++        organization=organization,
++        code=P.PAYROLL_INQUIRIES_REQUEST,
++        payslip=slip,
++    )
++    _require(
++        actor=actor,
++        organization=organization,
++        code=P.PAYROLL_INQUIRIES_VIEW,
++        payslip=slip,
++    )
++    membership = get_active_membership(user=actor, organization=organization)
++    type(membership).objects.select_for_update().get(pk=membership.pk)
++    _require(
++        actor=actor,
++        organization=organization,
++        code=P.PAYROLL_INQUIRIES_REQUEST,
++        payslip=slip,
++    )
++    source = next(
++        (
++            episode
++            for item, episode in _own_sources(actor=actor, organization=organization)
++            if item.pk == slip.pk
++        ),
++        None,
++    )
++    if source is None:
++        raise PermissionDenied(DENIED)
++    try:
++        category = (
++            PayrollInquiryCategory.objects.select_for_update()
++            .select_related("workflow_version__definition__workflow_type")
++            .get(
++                pk=category_id,
++                organization=organization,
++                workflow_version__status="published",
++            )
++        )
++    except (PayrollInquiryCategory.DoesNotExist, ValueError, ValidationError) as exc:
++        raise ValidationError("دسته و مسیر پاسخ‌گویی مجاز در دسترس نیست.") from exc
++    for key, expected in category.workflow_version.definition.scope.items():
++        actual = {
++            "project_id": slip.run_employee.project_id,
++            "site_id": slip.run_employee.site_id,
++        }.get(key)
++        if str(actual) != str(expected):
++            raise PermissionDenied(DENIED)
++    existing = PayrollInquiry.objects.filter(
++        organization=organization, requested_by=actor, idempotency_key=idempotency_key
++    ).first()
++    if existing:
++        linked = {
++            str(value)
++            for value in existing.evidence_links.values_list(
++                "document_version_id", flat=True
++            )
++        }
++        if (
++            existing.payslip_id != slip.pk
++            or str(existing.category_id) != str(category_id)
++            or existing.subject != subject.strip()
++            or existing.description != description.strip()
++            or linked != {str(value) for value in document_version_ids}
++        ):
++            raise ValidationError("کلید تکرارپذیری برای پرسش دیگری استفاده شده است.")
++        return existing
++    item = PayrollInquiry.objects.create(
++        organization=organization,
++        requested_by=actor,
++        person=source.person,
++        work_relationship=source,
++        payslip=slip,
++        period=slip.run.period,
++        category=category,
++        subject=subject.strip(),
++        description=description.strip(),
++        idempotency_key=idempotency_key,
++    )
++    if document_version_ids:
++        from apps.documents import services as dms
++        from apps.documents.models import DocumentVersion
++
++        for identifier in set(document_version_ids):
++            version = (
++                DocumentVersion.objects.filter(pk=identifier, organization=organization)
++                .select_related("document")
++                .first()
++            )
++            if version is None:
++                raise PermissionDenied(DENIED)
++            document = dms.get_organization_document(
++                user=actor,
++                organization=organization,
++                document_id=str(version.document_id),
++            )
++            dms.get_document_version_for_download(
++                document=document, version_id=str(version.pk), actor=actor
++            )
++            PayrollInquiryEvidenceLink.objects.create(
++                organization=organization,
++                payroll_inquiry=item,
++                document=document,
++                document_version=version,
++                created_by=actor,
++            )
++    instance = start_workflow(
++        actor=actor,
++        organization=organization,
++        version_id=category.workflow_version_id,
++        subject_id=item.pk,
++        idempotency_key=f"payroll-inquiry:{item.pk}",
++    )
++    active_items = instance.work_items.filter(
++        status__in=[WorkItemStatus.OPEN, WorkItemStatus.CLAIMED]
++    )
++    usable = bool(active_items)
++    for task in active_items:
++        task_usable = False
++        for candidate in task.candidates.filter(is_active=True).select_related(
++            "membership__user"
++        ):
++            try:
++                for code in (
++                    P.PAYROLL_RESULTS_VIEW,
++                    P.PAYROLL_INQUIRIES_VIEW,
++                    P.PAYROLL_INQUIRIES_RESPOND,
++                    P.WORK_ITEMS_VIEW,
++                    P.WORK_ITEMS_CLAIM,
++                    P.WORK_ITEMS_ACT,
++                ):
++                    _require(
++                        actor=candidate.membership.user,
++                        organization=organization,
++                        code=code,
++                        payslip=slip,
++                    )
++            except PermissionDenied:
++                continue
++            task_usable = True
++            break
++        usable = usable and task_usable
++    if instance.status != WorkflowInstanceStatus.ACTIVE or not usable:
++        raise ValidationError("مسیر پاسخ‌گویی مجاز حل نشد؛ پرسشی ثبت نشد.")
++    return item
++
++
++@transaction.atomic
++def respond_inquiry(
++    *,
++    actor: User,
++    organization: Organization,
++    inquiry_id: object,
++    work_item_id: object,
++    outcome: str,
++    body: str,
++    idempotency_key: str,
++) -> None:
++    item = get_inquiry(actor=actor, organization=organization, inquiry_id=inquiry_id)
++    _require(
++        actor=actor,
++        organization=organization,
++        code=P.PAYROLL_INQUIRIES_RESPOND,
++        payslip=item.payslip,
++    )
++    work_item = WorkItem.objects.filter(
++        pk=work_item_id,
++        organization=organization,
++        instance__subject_type=SUBJECT,
++        instance__subject_id=item.pk,
++    ).first()
++    if work_item is None:
++        raise PermissionDenied(DENIED)
++    completed = complete_work_item(
++        actor=actor,
++        organization=organization,
++        work_item_id=work_item.pk,
++        outcome=outcome,
++        idempotency_key=idempotency_key,
++        command_context={"employee_visible_response": body},
++    )
++    # A multi-actor step may not reach its threshold on this action. Retain this
++    # explicit response too, atomically with the authoritative completion.
++    append_workflow_response(
++        subject=item,
++        actor=actor,
++        organization=organization,
++        work_item=completed,
++        context={"employee_visible_response": body},
++        idempotency_key=idempotency_key,
++    )
++
++
++def append_workflow_response(
++    *,
++    subject: PayrollInquiry,
++    actor: User,
++    organization: Organization,
++    work_item: WorkItem,
++    context: dict[str, Any],
++    idempotency_key: str,
++    **kwargs: Any,
++) -> None:
++    del kwargs
++    _require(
++        actor=actor,
++        organization=organization,
++        code=P.PAYROLL_INQUIRIES_RESPOND,
++        payslip=subject.payslip,
++    )
++    membership = get_active_membership(user=actor, organization=organization)
++    if (
++        work_item.organization_id != organization.pk
++        or work_item.instance.subject_id != subject.pk
++        or work_item.status not in {WorkItemStatus.CLAIMED, WorkItemStatus.COMPLETED}
++        or work_item.current_assignee_id != membership.pk
++    ):
++        raise PermissionDenied(DENIED)
++    body = context.get("employee_visible_response")
++    if not isinstance(body, str) or not body.strip():
++        raise ValidationError(
++            "پاسخ قابل نمایش به کارمند باید صریح باشد؛ یادداشت داخلی منتشر نمی‌شود."
++        )
++    previous = PayrollInquiryResponse.objects.filter(
++        inquiry=subject, idempotency_key=idempotency_key
++    ).first()
++    if previous:
++        if previous.body != body.strip() or previous.work_item_id != work_item.pk:
++            raise ValidationError("کلید تکرارپذیری پاسخ با سابقه هم‌خوان نیست.")
++        return
++    PayrollInquiryResponse.objects.create(
++        organization=organization,
++        inquiry=subject,
++        work_item=work_item,
++        responded_by=actor,
++        body=body.strip(),
++        idempotency_key=idempotency_key,
++    )
+--- /dev/null
++++ b/apps/payroll/ess_views.py
+@@ -0,0 +1,324 @@
++"""Thin ESS adapters; no salary calculations or independent inquiry states."""
++
++import json
++from functools import wraps
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.http import HttpResponse
++from django.shortcuts import redirect, render
++from django.template.loader import render_to_string
++from django.urls import reverse
++from django.views.decorators.http import require_GET, require_http_methods, require_POST
++
++from apps.organizations.authorization import (
++    get_active_membership,
++    has_business_permission,
++)
++from apps.organizations.decorators import active_organization_required
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.workflows.models import WorkflowTransitionDefinition, WorkItemStatus
++from apps.workflows.runtime import claim_work_item, list_member_work_items
++
++from . import ess_services as services
++from .ess_forms import InquiryForm, ResponseForm
++from .models import PayrollInquiryCategory
++
++
++def private_surface(view):
++    @wraps(view)
++    def wrapped(request, *args, **kwargs):
++        try:
++            return view(request, *args, **kwargs)
++        except PermissionDenied:
++            return HttpResponse(
++                render_to_string("workforce/ess_unavailable.html"), status=403
++            )
++        except ValidationError:
++            return render(request, "payroll/ess_error.html", status=400)
++
++    return wrapped
++
++
++@active_organization_required
++@require_GET
++@private_surface
++def history(request):
++    slips = services.own_payroll_history(
++        actor=request.user, organization=request.organization
++    )
++    return render(request, "payroll/ess_history.html", {"payslips": slips})
++
++
++@active_organization_required
++@require_GET
++@private_surface
++def payslip(request, payslip_id):
++    slip = services.own_payslip(
++        actor=request.user, organization=request.organization, payslip_id=payslip_id
++    )
++    own = services.own_payroll_history(
++        actor=request.user, organization=request.organization
++    )
++    lineage = [
++        item
++        for item in own
++        if item.pk != slip.pk
++        and (item.run.replaces_id == slip.run_id or slip.run.replaces_id == item.run_id)
++    ]
++    can_export = has_business_permission(
++        user=request.user,
++        organization=request.organization,
++        permission=P.PAYROLL_ESS_EXPORT,
++        project=slip.run_employee.project,
++        site=slip.run_employee.site,
++    )
++    return render(
++        request,
++        "payroll/payslip.html",
++        {
++            "payslip": slip,
++            "data": slip.presentation_snapshot,
++            "ess_mode": True,
++            "ess_export_url": reverse("payroll:ess_payslip_export", args=[slip.pk]),
++            "ess_can_export": can_export,
++            "ess_lineage": lineage,
++        },
++    )
++
++
++@active_organization_required
++@require_POST
++@private_surface
++def export(request, payslip_id):
++    slip = services.own_payslip(
++        actor=request.user,
++        organization=request.organization,
++        payslip_id=payslip_id,
++        export=True,
++    )
++    response = HttpResponse(
++        json.dumps(slip.presentation_snapshot, ensure_ascii=False, indent=2),
++        content_type="application/json; charset=utf-8",
++    )
++    response["Content-Disposition"] = f'attachment; filename="payslip-{slip.pk}.json"'
++    return response
++
++
++@active_organization_required
++@require_GET
++@private_surface
++def inquiries(request):
++    rows = [
++        (item, services.inquiry_instance(item))
++        for item in services.visible_inquiries(
++            actor=request.user, organization=request.organization
++        )
++    ]
++    return render(request, "payroll/ess_inquiries.html", {"rows": rows})
++
++
++def _inquiry_form(request):
++    slips = services.own_payroll_history(
++        actor=request.user, organization=request.organization
++    )
++    services._require(
++        actor=request.user,
++        organization=request.organization,
++        code=P.PAYROLL_INQUIRIES_REQUEST,
++    )
++    # Latest version of each explicitly registered category; never seed a list.
++    categories = (
++        PayrollInquiryCategory.objects.filter(
++            organization=request.organization, workflow_version__status="published"
++        )
++        .order_by("code", "-version")
++        .distinct("code")
++    )
++    form = InquiryForm(request.POST or None, initial={"idempotency_key": str(uuid4())})
++    form.fields["payslip_id"].choices = [
++        (str(item.pk), f"{item.run.period.name} — {item.number}") for item in slips
++    ]
++    form.fields["category_id"].choices = [
++        (str(item.pk), item.name) for item in categories
++    ]
++    from apps.documents.services import (
++        get_document_version_for_download,
++        get_organization_documents,
++    )
++
++    choices = []
++    try:
++        for document in get_organization_documents(
++            user=request.user, organization=request.organization
++        ):
++            try:
++                version = get_document_version_for_download(
++                    document=document,
++                    version_id=str(document.current_version_id),
++                    actor=request.user,
++                )
++                choices.append((str(version.pk), document.title))
++            except PermissionDenied:
++                continue
++    except PermissionDenied:
++        pass
++    form.fields["document_version_ids"].choices = choices
++    return form
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++@private_surface
++def inquiry_create(request):
++    form = _inquiry_form(request)
++    if request.method == "POST" and form.is_valid():
++        try:
++            item = services.submit_inquiry(
++                actor=request.user,
++                organization=request.organization,
++                **form.cleaned_data,
++            )
++            return redirect("payroll:ess_inquiry_detail", inquiry_id=item.pk)
++        except ValidationError:
++            form.add_error(
++                None, "ثبت پرسش ممکن نشد؛ دسته، فیش و مسیر پاسخ‌گویی را بررسی کنید."
++            )
++    return render(request, "payroll/ess_inquiry_form.html", {"form": form})
++
++
++def _handler_item(request, inquiry):
++    try:
++        membership = get_active_membership(
++            user=request.user, organization=request.organization
++        )
++        return (
++            list_member_work_items(
++                actor=request.user, organization=request.organization
++            )
++            .filter(
++                instance__subject_type=services.SUBJECT,
++                instance__subject_id=inquiry.pk,
++                current_assignee=membership,
++                status=WorkItemStatus.CLAIMED,
++            )
++            .first()
++        )
++    except PermissionDenied:
++        return None
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++@private_surface
++def inquiry_detail(request, inquiry_id):
++    item = services.get_inquiry(
++        actor=request.user, organization=request.organization, inquiry_id=inquiry_id
++    )
++    instance = services.inquiry_instance(item)
++    work_item = _handler_item(request, item)
++    form = None
++    if work_item:
++        step = work_item.step_instance.step_definition
++        transitions = WorkflowTransitionDefinition.objects.filter(
++            version=instance.version, source_step=step
++        )
++        choices = [
++            (t.outcome, t.outcome)
++            for t in transitions
++            if (t.domain_command or step.domain_command) == "payroll.inquiry.respond"
++        ]
++        form = ResponseForm(
++            request.POST or None, initial={"idempotency_key": str(uuid4())}
++        )
++        form.fields["outcome"].choices = choices
++    if request.method == "POST":
++        if not form:
++            raise PermissionDenied(services.DENIED)
++        if form.is_valid():
++            try:
++                services.respond_inquiry(
++                    actor=request.user,
++                    organization=request.organization,
++                    inquiry_id=item.pk,
++                    work_item_id=work_item.pk,
++                    **form.cleaned_data,
++                )
++                return redirect("payroll:ess_inquiry_detail", inquiry_id=item.pk)
++            except ValidationError:
++                form.add_error(
++                    None, "ثبت پاسخ ممکن نشد؛ وضعیت و مسیر مجاز را بررسی کنید."
++                )
++    claimable = []
++    if work_item is None:
++        try:
++            claimable = list(
++                list_member_work_items(
++                    actor=request.user, organization=request.organization
++                ).filter(
++                    instance__subject_type=services.SUBJECT,
++                    instance__subject_id=item.pk,
++                    status=WorkItemStatus.OPEN,
++                )
++            )
++        except PermissionDenied:
++            pass
++    attachments = []
++    from apps.documents.services import (
++        get_document_version_for_download,
++        get_organization_document,
++    )
++
++    for link in item.evidence_links.select_related("document", "document_version"):
++        try:
++            document = get_organization_document(
++                user=request.user,
++                organization=request.organization,
++                document_id=str(link.document_id),
++            )
++            version = get_document_version_for_download(
++                document=document,
++                version_id=str(link.document_version_id),
++                actor=request.user,
++            )
++            attachments.append((document, version))
++        except PermissionDenied:
++            continue
++    return render(
++        request,
++        "payroll/ess_inquiry_detail.html",
++        {
++            "inquiry": item,
++            "instance": instance,
++            "responses": item.responses.order_by("created_at"),
++            "form": form,
++            "attachments": attachments,
++            "claimable": claimable,
++            "claim_key": str(uuid4()),
++        },
++    )
++
++
++@active_organization_required
++@require_POST
++@private_surface
++def inquiry_claim(request, inquiry_id, work_item_id):
++    item = services.get_inquiry(
++        actor=request.user, organization=request.organization, inquiry_id=inquiry_id
++    )
++    from apps.workflows.models import WorkItem
++
++    if not WorkItem.objects.filter(
++        pk=work_item_id,
++        organization=request.organization,
++        instance__subject_type=services.SUBJECT,
++        instance__subject_id=item.pk,
++    ).exists():
++        raise PermissionDenied(services.DENIED)
++    claim_work_item(
++        actor=request.user,
++        organization=request.organization,
++        work_item_id=work_item_id,
++        idempotency_key=request.POST.get("idempotency_key", ""),
++    )
++    return redirect("payroll:ess_inquiry_detail", inquiry_id=item.pk)
+--- /dev/null
++++ b/apps/payroll/inquiry_workflow.py
+@@ -0,0 +1,40 @@
++"""Bind Payroll communication to registered shared Workflow mechanisms."""
++
++from apps.organizations.models import OrganizationMembership
++from apps.workflows.registry import SubjectSnapshot, registry
++
++
++def load_inquiry(*, organization, subject_id, actor, for_update):
++    from .ess_services import get_inquiry
++    from .models import PayrollInquiry
++
++    visible = get_inquiry(actor=actor, organization=organization, inquiry_id=subject_id)
++    query = (
++        PayrollInquiry.objects.select_for_update()
++        if for_update
++        else PayrollInquiry.objects
++    )
++    inquiry = query.get(pk=visible.pk, organization=organization)
++    owner = OrganizationMembership.objects.get(
++        user=inquiry.requested_by, organization=organization
++    )
++    return SubjectSnapshot(
++        subject=inquiry,
++        subject_id=str(inquiry.pk),
++        organization_id=str(organization.pk),
++        attributes={
++            "project_id": str(inquiry.project.pk) if inquiry.project else None,
++            "site_id": str(inquiry.site.pk) if inquiry.site else None,
++            "created_by_id": str(inquiry.requested_by_id),
++        },
++        creator_membership_id=str(owner.pk),
++        submitter_membership_id=str(owner.pk),
++        display=inquiry.subject,
++    )
++
++
++def register_inquiry_workflow() -> None:
++    from .ess_services import append_workflow_response
++
++    registry.bind_subject_loader("payroll.inquiry", load_inquiry)
++    registry.bind_domain_command("payroll.inquiry.respond", append_workflow_response)
+--- /dev/null
++++ b/apps/payroll/migrations/0008_cep054_payroll_inquiry.py
+@@ -0,0 +1,284 @@
++# ruff: noqa: RUF012
++# Generated by Django 5.2.17 on 2026-10-18 05:36
++
++import uuid
++
++import django.db.models.deletion
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++    dependencies = [
++        ("documents", "0011_documentcategory_employee_current_visible_and_more"),
++        ("organizations", "0111_cep054_payroll_inquiry_permissions"),
++        ("payroll", "0007_statutorysourcepackage"),
++        ("workflows", "0027_p6_s33_s38_contractual_record_catalog"),
++        ("workforce", "0010_workrelationshipdocumentlink"),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name="PayrollInquiryCategory",
++            fields=[
++                (
++                    "id",
++                    models.UUIDField(
++                        default=uuid.uuid4,
++                        editable=False,
++                        primary_key=True,
++                        serialize=False,
++                        verbose_name="شناسه",
++                    ),
++                ),
++                (
++                    "created_at",
++                    models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد"),
++                ),
++                ("code", models.SlugField()),
++                ("name", models.CharField(max_length=150)),
++                ("version", models.PositiveIntegerField()),
++                ("reason", models.TextField()),
++                (
++                    "created_by",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to=settings.AUTH_USER_MODEL,
++                    ),
++                ),
++                (
++                    "organization",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="organizations.organization",
++                    ),
++                ),
++                (
++                    "workflow_version",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="workflows.workflowversion",
++                    ),
++                ),
++            ],
++        ),
++        migrations.CreateModel(
++            name="PayrollInquiry",
++            fields=[
++                (
++                    "id",
++                    models.UUIDField(
++                        default=uuid.uuid4,
++                        editable=False,
++                        primary_key=True,
++                        serialize=False,
++                        verbose_name="شناسه",
++                    ),
++                ),
++                (
++                    "created_at",
++                    models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد"),
++                ),
++                ("subject", models.CharField(max_length=255)),
++                ("description", models.TextField(max_length=4000)),
++                ("idempotency_key", models.CharField(max_length=128)),
++                (
++                    "organization",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="organizations.organization",
++                    ),
++                ),
++                (
++                    "payslip",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="inquiries",
++                        to="payroll.payslip",
++                    ),
++                ),
++                (
++                    "period",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="payroll.payrollperiod",
++                    ),
++                ),
++                (
++                    "person",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="workforce.person",
++                    ),
++                ),
++                (
++                    "requested_by",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to=settings.AUTH_USER_MODEL,
++                    ),
++                ),
++                (
++                    "work_relationship",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="workforce.workrelationship",
++                    ),
++                ),
++                (
++                    "category",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="payroll.payrollinquirycategory",
++                    ),
++                ),
++            ],
++        ),
++        migrations.CreateModel(
++            name="PayrollInquiryEvidenceLink",
++            fields=[
++                (
++                    "id",
++                    models.UUIDField(
++                        default=uuid.uuid4,
++                        editable=False,
++                        primary_key=True,
++                        serialize=False,
++                        verbose_name="شناسه",
++                    ),
++                ),
++                (
++                    "created_at",
++                    models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد"),
++                ),
++                (
++                    "legacy_link_id",
++                    models.UUIDField(blank=True, null=True, unique=True),
++                ),
++                (
++                    "created_by",
++                    models.ForeignKey(
++                        blank=True,
++                        null=True,
++                        on_delete=django.db.models.deletion.SET_NULL,
++                        related_name="+",
++                        to=settings.AUTH_USER_MODEL,
++                    ),
++                ),
++                (
++                    "document",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="+",
++                        to="documents.document",
++                    ),
++                ),
++                (
++                    "document_version",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="documents.documentversion",
++                    ),
++                ),
++                (
++                    "organization",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="+",
++                        to="organizations.organization",
++                    ),
++                ),
++                (
++                    "payroll_inquiry",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="evidence_links",
++                        to="payroll.payrollinquiry",
++                    ),
++                ),
++            ],
++            options={
++                "ordering": ["created_at"],
++                "abstract": False,
++            },
++        ),
++        migrations.CreateModel(
++            name="PayrollInquiryResponse",
++            fields=[
++                (
++                    "id",
++                    models.UUIDField(
++                        default=uuid.uuid4,
++                        editable=False,
++                        primary_key=True,
++                        serialize=False,
++                        verbose_name="شناسه",
++                    ),
++                ),
++                (
++                    "created_at",
++                    models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد"),
++                ),
++                ("body", models.TextField(max_length=4000)),
++                ("idempotency_key", models.CharField(max_length=128)),
++                (
++                    "inquiry",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="responses",
++                        to="payroll.payrollinquiry",
++                    ),
++                ),
++                (
++                    "organization",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="organizations.organization",
++                    ),
++                ),
++                (
++                    "responded_by",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to=settings.AUTH_USER_MODEL,
++                    ),
++                ),
++                (
++                    "work_item",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="workflows.workitem",
++                    ),
++                ),
++            ],
++        ),
++        migrations.AddConstraint(
++            model_name="payrollinquirycategory",
++            constraint=models.UniqueConstraint(
++                fields=("organization", "code", "version"),
++                name="payroll_inquiry_category_version_uq",
++            ),
++        ),
++        migrations.AddConstraint(
++            model_name="payrollinquiry",
++            constraint=models.UniqueConstraint(
++                fields=("organization", "requested_by", "idempotency_key"),
++                name="payroll_inquiry_request_key_uq",
++            ),
++        ),
++        migrations.AddConstraint(
++            model_name="payrollinquiryevidencelink",
++            constraint=models.UniqueConstraint(
++                fields=("payroll_inquiry", "document_version"),
++                name="payroll_inquiry_document_version_uq",
++            ),
++        ),
++        migrations.AddConstraint(
++            model_name="payrollinquiryresponse",
++            constraint=models.UniqueConstraint(
++                fields=("inquiry", "idempotency_key"),
++                name="payroll_inquiry_response_key_uq",
++            ),
++        ),
++    ]
+--- /dev/null
++++ b/apps/payroll/test_cep054.py
+@@ -0,0 +1,628 @@
++"""Synthetic source and shared-Workflow proofs; no statutory activation."""
++
++import os
++from datetime import timedelta
++from pathlib import Path
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.audit.models import AuditEvent
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import OrganizationMembership
++from apps.workflows.models import WorkflowInstance, WorkItem, WorkItemStatus
++from apps.workflows.personal_workspaces import build_my_requests
++from apps.workflows.runtime import claim_work_item
++from apps.workflows.services import (
++    create_workflow_draft,
++    edit_workflow_draft,
++    publish_workflow_version,
++)
++from apps.workforce.person_services import create_person, create_work_relationship
++
++from . import ess_services as ess
++from . import test_p7_s23_s28_statutory_payroll as baseline
++from .models import (
++    PayrollInquiry,
++    PayrollInquiryResponse,
++    PayrollRun,
++    PayrollRunEmployee,
++    Payslip,
++)
++from .services import _payslip_payload
++
++OWN = [
++    P.PAYROLL_ESS_VIEW,
++    P.PAYROLL_ESS_EXPORT,
++    P.PAYROLL_INQUIRIES_VIEW,
++    P.PAYROLL_INQUIRIES_REQUEST,
++]
++HANDLER = [
++    P.PAYROLL_RESULTS_VIEW,
++    P.PAYROLL_INQUIRIES_VIEW,
++    P.PAYROLL_INQUIRIES_RESPOND,
++    P.WORK_ITEMS_VIEW,
++    P.WORK_ITEMS_CLAIM,
++    P.WORK_ITEMS_ACT,
++]
++
++
++class ESSPayrollTests(baseline.StatutoryPayrollTests):
++    def setUp(self):
++        super().setUp()
++        self.employee_user = self._member("ess-payroll", OWN)
++        self.handler = self._member("inquiry-handler", HANDLER)
++        self.unassigned = self._member("inquiry-unassigned", HANDLER)
++        self.configurator = self._member(
++            "inquiry-configurator",
++            [
++                P.PAYROLL_CONFIGURATION_MANAGE,
++                P.WORKFLOWS_CREATE,
++                P.WORKFLOWS_CHANGE_DRAFT,
++                P.WORKFLOWS_PUBLISH,
++            ],
++        )
++        person = create_person(
++            organization=self.organization,
++            actor=self.owner,
++            first_name="کارمند",
++            last_name="نمونه",
++            user=self.employee_user,
++        )
++        self.relationship = create_work_relationship(
++            organization=self.organization,
++            actor=self.owner,
++            person=person,
++            employee_number=self.employee.employee_number,
++            effective_start=timezone.localdate() - timedelta(days=90),
++            legacy_employee=self.employee,
++        )
++        payload = _payslip_payload(self.run_employee)
++        self.slip = Payslip.objects.create(
++            organization=self.organization,
++            run=self.run,
++            run_employee=self.run_employee,
++            number="ESS-SYNTHETIC-01",
++            issued_at=timezone.now(),
++            content_digest=Payslip.digest_payload(payload),
++            presentation_snapshot=payload,
++        )
++
++    def _login(self, actor):
++        self.client.force_login(actor)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++
++    def _capture(self, name, response):
++        directory = os.environ.get("BONIRA_CEP054_CAPTURE_DIR")
++        if directory:
++            Path(directory, name + ".html").write_bytes(response.content)
++
++    def _category(self, decision_policy="any"):
++        version = create_workflow_draft(
++            actor=self.configurator,
++            organization=self.organization,
++            workflow_type_code="payroll.inquiry",
++            code="synthetic-inquiry",
++            name="پاسخ‌گویی حقوق آزمون",
++            scope={},
++        )
++        config = {
++            "steps": [
++                {"key": "start", "step_type": "start", "is_start": True},
++                {
++                    "key": "response",
++                    "step_type": "approval",
++                    "required_permission": P.PAYROLL_INQUIRIES_RESPOND,
++                    "configuration": {"decision_policy": decision_policy},
++                    "routing": [
++                        {
++                            "resolver_type": "business_permission",
++                            "configuration": {
++                                "permission": P.PAYROLL_INQUIRIES_RESPOND
++                            },
++                        }
++                    ],
++                },
++                {"key": "end", "step_type": "end", "is_terminal": True},
++            ],
++            "transitions": [
++                {
++                    "source": "start",
++                    "target": "response",
++                    "outcome": "submitted",
++                    "is_default": True,
++                },
++                {
++                    "source": "response",
++                    "target": "end",
++                    "outcome": "answered",
++                    "domain_command": "payroll.inquiry.respond",
++                    "required_permission": P.PAYROLL_INQUIRIES_RESPOND,
++                },
++            ],
++        }
++        version = edit_workflow_draft(
++            actor=self.configurator,
++            organization=self.organization,
++            version_id=version.pk,
++            configuration=config,
++        )
++        version = publish_workflow_version(
++            actor=self.configurator,
++            organization=self.organization,
++            version_id=version.pk,
++        )
++        return ess.configure_inquiry_category(
++            actor=self.configurator,
++            organization=self.organization,
++            code="synthetic",
++            name="پرسش آزمایشی",
++            workflow_version=version,
++            reason="Explicit synthetic fixture; no default category",
++        )
++
++    def _submit(self, category=None, **overrides):
++        values = {
++            "actor": self.employee_user,
++            "organization": self.organization,
++            "payslip_id": self.slip.pk,
++            "category_id": (category or self._category()).pk,
++            "subject": "پرسش درباره فیش قطعی",
++            "description": "شرح پرسش نمونه",
++            "idempotency_key": "question-1",
++        }
++        values.update(overrides)
++        return ess.submit_inquiry(**values)
++
++    def test_finalized_own_artifact_and_export_preserve_source(self):
++        self._login(self.employee_user)
++        history = self.client.get(reverse("payroll:ess_history"))
++        self.assertContains(history, self.slip.number)
++        self.assertContains(history, "1405/07/01")
++        self._capture("history", history)
++        response = self.client.get(reverse("payroll:ess_payslip", args=[self.slip.pk]))
++        self.assertContains(response, "دریافت فیش قطعی")
++        self.assertNotContains(
++            response, reverse("payroll:payslip_export", args=[self.slip.pk])
++        )
++        self._capture("payslip", response)
++        output = self.client.post(
++            reverse("payroll:ess_payslip_export", args=[self.slip.pk])
++        )
++        self.assertEqual(output.status_code, 200)
++        self.assertEqual(output.json(), self.slip.presentation_snapshot)
++        self.assertEqual(
++            self.client.get(
++                reverse("payroll:ess_payslip_export", args=[self.slip.pk])
++            ).status_code,
++            405,
++        )
++        self.assertEqual(
++            self.client.get(
++                reverse("payroll:payslip_detail", args=[self.slip.pk])
++            ).status_code,
++            403,
++        )
++        self.run_employee.refresh_from_db()
++        self.assertEqual(str(self.run_employee.net_amount), "1000.00")
++        self.assertTrue(
++            AuditEvent.objects.filter(
++                actor=self.employee_user,
++                entity_id=str(self.slip.pk),
++                action="payroll.payslip_exported",
++            ).exists()
++        )
++
++    def test_own_identity_and_source_state_fail_closed(self):
++        self._login(self.unassigned)
++        denied = self.client.get(reverse("payroll:ess_payslip", args=[self.slip.pk]))
++        missing = self.client.get(reverse("payroll:ess_payslip", args=[uuid4()]))
++        self.assertEqual(denied.status_code, 403)
++        self.assertEqual(denied.content, missing.content)
++        self._capture("unauthorized", denied)
++        self._login(self.employee_user)
++        with patch(
++            "apps.payroll.ess_views.services.own_payroll_history",
++            side_effect=ValidationError("secret diagnostic"),
++        ):
++            error = self.client.get(reverse("payroll:ess_history"))
++        self.assertEqual(error.status_code, 400)
++        self.assertNotIn(b"secret diagnostic", error.content)
++        self._capture("error", error)
++        with patch(
++            "apps.payroll.ess_views.services.own_payroll_history", return_value=()
++        ):
++            empty = self.client.get(reverse("payroll:ess_history"))
++        self.assertContains(empty, "فیش قطعی مجازی برای نمایش موجود نیست.")
++        self._capture("empty", empty)
++        # A forged retained artifact for a draft run is never surfaced.
++        PayrollRun.objects.filter(pk=self.run.pk).update(
++            status="draft", finalized_at=None
++        )
++        self.assertEqual(
++            ess.own_payroll_history(
++                actor=self.employee_user, organization=self.organization
++            ),
++            (),
++        )
++
++    def test_submit_idempotency_and_my_requests_keep_workflow_authority(self):
++        category = self._category()
++        item = self._submit(category)
++        self.assertEqual(self._submit(category).pk, item.pk)
++        with self.assertRaises(ValidationError):
++            self._submit(category, subject="different")
++        instance = ess.inquiry_instance(item)
++        self.assertEqual(instance.status, "active")
++        self.assertEqual(WorkItem.objects.filter(instance=instance).count(), 1)
++        self.assertEqual(WorkItem.objects.get(instance=instance).due_at, None)
++        rows = build_my_requests(
++            actor=self.employee_user, organization=self.organization
++        )
++        self.assertEqual(len(rows), 1)
++        self.assertEqual(rows[0].status, instance.status)
++        self._login(self.employee_user)
++        response = self.client.get(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk])
++        )
++        self.assertContains(response, item.subject)
++        self.assertNotContains(response, "ثبت پاسخ و نتیجه")
++        self._capture("inquiry", response)
++        form = self.client.get(reverse("payroll:ess_inquiry_create"))
++        self.assertEqual(form.status_code, 200)
++        self._capture("inquiry-form", form)
++
++    def test_missing_configuration_or_route_never_creates_orphan(self):
++        with self.assertRaises(ValidationError):
++            self._submit(category=type("Missing", (), {"pk": uuid4()})())
++        self.assertEqual(PayrollInquiry.objects.count(), 0)
++        category = self._category()
++        # Explicitly configured route has no eligible responders after revocation.
++        for user in (self.handler, self.unassigned):
++            OrganizationMembership.objects.get(
++                user=user, organization=self.organization
++            ).role_definition.permissions.clear()
++        with self.assertRaises(ValidationError):
++            self._submit(category)
++        self.assertEqual(PayrollInquiry.objects.count(), 0)
++        self.assertEqual(
++            WorkflowInstance.objects.filter(subject_type=ess.SUBJECT).count(), 0
++        )
++
++    def test_assigned_response_atomicity_privacy_and_no_financial_mutation(self):
++        item = self._submit()
++        work_item = WorkItem.objects.get(instance=ess.inquiry_instance(item))
++        # Unassigned role alone will be tested by deactivating its candidacy.
++        work_item.candidates.filter(membership__user=self.unassigned).update(
++            is_active=False
++        )
++        with self.assertRaises(PermissionDenied):
++            ess.get_inquiry(
++                actor=self.unassigned,
++                organization=self.organization,
++                inquiry_id=item.pk,
++            )
++        claim_work_item(
++            actor=self.handler,
++            organization=self.organization,
++            work_item_id=work_item.pk,
++            idempotency_key="claim-1",
++        )
++        args = {
++            "actor": self.handler,
++            "organization": self.organization,
++            "inquiry_id": item.pk,
++            "work_item_id": work_item.pk,
++            "outcome": "answered",
++            "body": "پاسخ صریح برای کارمند",
++            "idempotency_key": "response-1",
++        }
++        with self.assertRaises(ValidationError):
++            ess.respond_inquiry(**(args | {"body": ""}))
++        self.assertEqual(PayrollInquiryResponse.objects.count(), 0)
++        work_item.refresh_from_db()
++        self.assertEqual(work_item.status, WorkItemStatus.CLAIMED)
++        with (
++            patch(
++                "apps.workflows.runtime.record_audit_event",
++                side_effect=RuntimeError("audit-failure"),
++            ),
++            self.assertRaises(RuntimeError),
++        ):
++            ess.respond_inquiry(**args)
++        self.assertEqual(PayrollInquiryResponse.objects.count(), 0)
++        work_item.refresh_from_db()
++        self.assertEqual(work_item.status, WorkItemStatus.CLAIMED)
++        ess.respond_inquiry(**args)
++        self.assertEqual(PayrollInquiryResponse.objects.count(), 1)
++        with self.assertRaises(ValidationError):
++            response = PayrollInquiryResponse.objects.get()
++            response.body = "mutated"
++            response.save()
++        self.assertEqual(ess.inquiry_instance(item).status, "completed")
++        self._login(self.employee_user)
++        response = self.client.get(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk])
++        )
++        self.assertContains(response, args["body"])
++        self._capture("response", response)
++        self.slip.refresh_from_db()
++        self.run.refresh_from_db()
++        self.assertEqual(
++            self.slip.content_digest,
++            Payslip.digest_payload(self.slip.presentation_snapshot),
++        )
++        self.assertEqual(self.run.calculation_digest, "calculation-digest")
++        self.assertEqual(
++            PayrollRunEmployee.objects.get(pk=self.run_employee.pk).net_amount, 1000
++        )
++
++    def test_new_sensitive_permissions_have_no_builtin_default_grants(self):
++        from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
++
++        codes = set(map(str, OWN + HANDLER)) & {
++            "payroll_ess.view_own",
++            "payroll_ess.export_own",
++            "payroll_inquiries.view",
++            "payroll_inquiries.request",
++            "payroll_inquiries.respond",
++        }
++        for grants in DEFAULT_ROLE_PERMISSIONS.values():
++            self.assertFalse(codes & grants)
++
++    def test_foreign_inquiry_and_payslip_urls_are_uniformly_denied(self):
++        from apps.organizations.services import create_organization_with_owner
++
++        foreign = create_organization_with_owner(
++            owner=self.unassigned, name="Foreign tenant", slug="cep054-foreign"
++        )
++        with self.assertRaises(PermissionDenied):
++            ess.own_payslip(
++                actor=self.employee_user, organization=foreign, payslip_id=self.slip.pk
++            )
++        item = self._submit()
++        self._login(self.denied)
++        foreign_response = self.client.get(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk])
++        )
++        missing = self.client.get(reverse("payroll:ess_inquiry_detail", args=[uuid4()]))
++        self.assertEqual(foreign_response.status_code, 403)
++        self.assertEqual(foreign_response.content, missing.content)
++        with self.assertRaises(PermissionDenied):
++            self._submit(
++                category=item.category, actor=self.unassigned, idempotency_key="forged"
++            )
++
++    def test_ui_handler_claim_response_uses_configured_outcome_only(self):
++        item = self._submit()
++        work_item = WorkItem.objects.get(instance=ess.inquiry_instance(item))
++        self._login(self.handler)
++        response = self.client.get(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk])
++        )
++        self.assertContains(response, "اخذ کار پاسخ‌گویی مجاز")
++        self.assertEqual(
++            self.client.post(
++                reverse("payroll:ess_inquiry_claim", args=[item.pk, work_item.pk]),
++                {"idempotency_key": "ui-claim"},
++            ).status_code,
++            302,
++        )
++        response = self.client.get(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk])
++        )
++        self.assertContains(response, 'value="answered"')
++        self._capture("handler", response)
++        invalid = self.client.post(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk]),
++            {"outcome": "invented", "body": "پاسخ", "idempotency_key": "ui-response"},
++        )
++        self.assertEqual(invalid.status_code, 200)
++        self.assertEqual(PayrollInquiryResponse.objects.count(), 0)
++        result = self.client.post(
++            reverse("payroll:ess_inquiry_detail", args=[item.pk]),
++            {
++                "outcome": "answered",
++                "body": "پاسخ مجاز",
++                "idempotency_key": "ui-response",
++            },
++        )
++        self.assertEqual(result.status_code, 302)
++        self.assertEqual(PayrollInquiryResponse.objects.count(), 1)
++
++    def test_replacement_lineage_is_source_linked_and_own_only(self):
++        replacement = PayrollRun.objects.create(
++            organization=self.organization,
++            period=self.period,
++            code="ESS-REPLACEMENT",
++            kind="replacement",
++            replaces=self.run,
++            status="finalized",
++            idempotency_key="replacement",
++            created_by=self.owner,
++            finalized_by=self.owner,
++            finalized_at=timezone.now(),
++        )
++        result = PayrollRunEmployee.objects.create(
++            organization=self.organization,
++            run=replacement,
++            employee=self.employee,
++            status="finalized",
++            gross_amount=1200,
++            net_amount=1200,
++        )
++        payload = _payslip_payload(result)
++        slip = Payslip.objects.create(
++            organization=self.organization,
++            run=replacement,
++            run_employee=result,
++            number="ESS-REPLACED-02",
++            issued_at=timezone.now(),
++            content_digest=Payslip.digest_payload(payload),
++            presentation_snapshot=payload,
++        )
++        self._login(self.employee_user)
++        response = self.client.get(reverse("payroll:ess_payslip", args=[self.slip.pk]))
++        self.assertContains(response, reverse("payroll:ess_payslip", args=[slip.pk]))
++        self.assertContains(response, "زنجیره جایگزینی")
++        self.assertEqual(
++            len(
++                ess.own_payroll_history(
++                    actor=self.employee_user, organization=self.organization
++                )
++            ),
++            2,
++        )
++        self._capture("lineage", response)
++
++    def test_pinned_dms_evidence_obeys_own_assigned_privacy_on_all_paths(self):
++        from apps.documents.models import (
++            Document,
++            DocumentProcessingAssessment,
++            DocumentVersion,
++        )
++        from apps.documents.services import (
++            add_document_link,
++            get_document_version_for_download,
++            get_organization_document,
++            get_organization_documents,
++        )
++        from apps.organizations.models import BusinessPermission
++        from apps.workforce.models import WorkRelationshipDocumentLink
++
++        from .models import PayrollInquiryEvidenceLink
++
++        for user in (self.employee_user, self.handler, self.unassigned):
++            membership = OrganizationMembership.objects.get(
++                organization=self.organization, user=user
++            )
++            membership.role_definition.permissions.add(
++                *BusinessPermission.objects.filter(
++                    code__in=[
++                        P.DOCUMENTS_VIEW,
++                        P.DOCUMENTS_DOWNLOAD,
++                        P.DOCUMENTS_UPLOAD,
++                        P.EMPLOYEES_VIEW,
++                    ]
++                )
++            )
++        document = Document.objects.create(
++            organization=self.organization,
++            document_number="CEP054-EVIDENCE",
++            title="شاهد مصنوعی پرسش",
++            created_by=self.owner,
++        )
++        version = DocumentVersion.objects.create(
++            organization=self.organization,
++            document=document,
++            version_number=1,
++            original_file_name="synthetic.pdf",
++            file="synthetic/never-read.pdf",
++            content_type="application/pdf",
++            file_size=8,
++            sha256="a" * 64,
++            uploaded_by=self.owner,
++        )
++        DocumentProcessingAssessment.objects.create(
++            organization=self.organization,
++            version=version,
++            sequence=1,
++            verdict="clean",
++            input_sha256=version.sha256,
++            adapter_code="synthetic-test",
++            recorded_by=self.owner,
++        )
++        document.current_version = version
++        document.save()
++        WorkRelationshipDocumentLink.objects.create(
++            organization=self.organization,
++            document=document,
++            work_relationship=self.relationship,
++            created_by=self.owner,
++        )
++        item = self._submit(document_version_ids=(version.pk,))
++        link = PayrollInquiryEvidenceLink.objects.get(payroll_inquiry=item)
++        self.assertEqual(link.document_version_id, version.pk)
++        task = WorkItem.objects.get(instance=ess.inquiry_instance(item))
++        task.candidates.filter(membership__user=self.unassigned).update(is_active=False)
++        self.assertFalse(
++            get_organization_documents(
++                user=self.unassigned, organization=self.organization
++            )
++            .filter(pk=document.pk)
++            .exists()
++        )
++        with self.assertRaises(PermissionDenied):
++            get_organization_document(
++                user=self.unassigned,
++                organization=self.organization,
++                document_id=str(document.pk),
++            )
++        with self.assertRaises(PermissionDenied):
++            get_document_version_for_download(
++                document=document, version_id=str(version.pk), actor=self.unassigned
++            )
++        for user in (self.employee_user, self.handler):
++            self.assertTrue(
++                get_organization_documents(user=user, organization=self.organization)
++                .filter(pk=document.pk)
++                .exists()
++            )
++            self.assertEqual(
++                get_document_version_for_download(
++                    document=document, version_id=str(version.pk), actor=user
++                ).pk,
++                version.pk,
++            )
++        with self.assertRaises(PermissionDenied):
++            add_document_link(document=document, actor=self.employee_user, target=item)
++        with self.assertRaises(ValidationError):
++            link.delete()
++        with self.assertRaises(ValidationError):
++            PayrollInquiryEvidenceLink.objects.filter(pk=link.pk).update(
++                document_version_id=uuid4()
++            )
++        self._login(self.employee_user)
++        self.assertContains(
++            self.client.get(reverse("payroll:ess_inquiry_detail", args=[item.pk])),
++            "شاهد مصنوعی پرسش",
++        )
++
++    def test_multi_actor_response_retained_before_shared_threshold(self):
++        item = self._submit(category=self._category(decision_policy="all"))
++        tasks = list(
++            WorkItem.objects.filter(instance=ess.inquiry_instance(item)).order_by("pk")
++        )
++        for index, user in enumerate((self.handler, self.unassigned)):
++            # All-policy creates one candidate-specific work item per actor.
++            membership = OrganizationMembership.objects.get(
++                user=user, organization=self.organization
++            )
++            task = next(
++                t for t in tasks if t.candidates.filter(membership=membership).exists()
++            )
++            claim_work_item(
++                actor=user,
++                organization=self.organization,
++                work_item_id=task.pk,
++                idempotency_key=f"all-claim-{index}",
++            )
++            ess.respond_inquiry(
++                actor=user,
++                organization=self.organization,
++                inquiry_id=item.pk,
++                work_item_id=task.pk,
++                outcome="answered",
++                body=f"پاسخ صریح {index}",
++                idempotency_key=f"all-response-{index}",
++            )
++            self.assertEqual(PayrollInquiryResponse.objects.count(), index + 1)
++            self.assertEqual(
++                ess.inquiry_instance(item).status,
++                "active" if index == 0 else "completed",
++            )
+--- /dev/null
++++ b/apps/payroll/test_cep054_migration.py
+@@ -0,0 +1,59 @@
++"""Expand-only inquiry schema retains existing finalized Payroll history."""
++
++from datetime import date
++
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.models import Organization, OrganizationSettings
++from apps.payroll.models import PayrollPeriod, PayrollRun, PayrollRunStatus
++
++
++class InquiryMigrationTests(TransactionTestCase):
++    serialized_rollback = True
++
++    def test_rollback_reapply_preserves_finalized_source_without_inferred_inquiry(self):
++        actor = User.objects.create_user(username="cep054-migration")
++        organization = Organization.objects.create(
++            name="CEP-054", slug="cep054-migration"
++        )
++        OrganizationSettings.objects.create(organization=organization, currency="IRR")
++        period = PayrollPeriod.objects.create(
++            organization=organization,
++            code="MIG54",
++            name="Retained period",
++            starts_on=date(2026, 10, 1),
++            ends_on=date(2026, 10, 31),
++            cutoff_at=timezone.now(),
++            created_by=actor,
++        )
++        run = PayrollRun.objects.create(
++            organization=organization,
++            period=period,
++            code="MIG54",
++            status=PayrollRunStatus.FINALIZED,
++            idempotency_key="cep054-migration",
++            calculation_digest="b" * 64,
++            created_by=actor,
++        )
++        previous = [("payroll", "0007_statutorysourcepackage")]
++        current = [("payroll", "0008_cep054_payroll_inquiry")]
++        try:
++            MigrationExecutor(connection).migrate(previous)
++            self.assertTrue(PayrollRun.objects.filter(pk=run.pk).exists())
++            executor = MigrationExecutor(connection)
++            executor.migrate(current)
++            restored = PayrollRun.objects.get(pk=run.pk)
++            self.assertEqual(restored.calculation_digest, "b" * 64)
++            self.assertEqual(restored.status, PayrollRunStatus.FINALIZED)
++            self.assertEqual(restored.period_id, period.pk)
++            historical = executor.loader.project_state(current).apps
++            self.assertEqual(
++                historical.get_model("payroll", "PayrollInquiry").objects.count(),
++                0,
++            )
++        finally:
++            MigrationExecutor(connection).migrate(current)
+--- /dev/null
++++ b/templates/payroll/ess_error.html
+@@ -0,0 +1 @@
++{% extends "base.html" %}{% load erp_format %}{% block content %}<section class="mx-auto max-w-4xl" dir="rtl">{% include "workforce/_ess_navigation.html" %}<h1 class="text-2xl font-bold">دریافت اطلاعات ممکن نشد</h1><p class="mt-4" role="alert">اطلاعات حقوق یا مسیر پاسخ‌گویی در دسترس نیست. دوباره تلاش کنید یا با مسئول مجاز تماس بگیرید.</p></section>{% endblock %}
+--- /dev/null
++++ b/templates/payroll/ess_history.html
+@@ -0,0 +1 @@
++{% extends "base.html" %}{% load erp_format %}{% block content %}<section class="mx-auto max-w-4xl" dir="rtl">{% include "workforce/_ess_navigation.html" %}<h1 class="text-2xl font-bold">سوابق حقوق من</h1><p class="mt-2 text-sm text-slate-600">فقط فیش‌های قطعی مجاز منبع حقوق نمایش داده می‌شوند.</p><div class="mt-4 grid gap-4">{% for slip in payslips %}<article class="erp-surface rounded-2xl p-5"><h2 class="font-bold">{{ slip.run.period.name }}</h2><p class="mt-2">{{ slip.run.period.starts_on|jalali_date }} تا {{ slip.run.period.ends_on|jalali_date }}</p><p class="mt-2">وضعیت منبع: {{ slip.run.get_status_display }} <span dir="ltr">{{ slip.run.status }}</span></p><a class="erp-btn erp-btn--secondary mt-3" href="{% url 'payroll:ess_payslip' slip.pk %}">مشاهده فیش {{ slip.number }}</a></article>{% empty %}<p class="erp-surface rounded-2xl p-5" role="status">فیش قطعی مجازی برای نمایش موجود نیست.</p>{% endfor %}</div></section>{% endblock %}
+--- /dev/null
++++ b/templates/payroll/ess_inquiries.html
+@@ -0,0 +1 @@
++{% extends "base.html" %}{% load erp_format %}{% block content %}<section class="mx-auto max-w-4xl" dir="rtl">{% include "workforce/_ess_navigation.html" %}<h1 class="text-2xl font-bold">پرسش‌های حقوق</h1>{% if "payroll_inquiries.request" in business_permission_codes %}<a class="erp-btn erp-btn--primary mt-4" href="{% url 'payroll:ess_inquiry_create' %}">پرسش جدید</a>{% endif %}<div class="mt-4 grid gap-4">{% for inquiry, instance in rows %}<article class="erp-surface rounded-2xl p-5"><a class="font-bold text-blue-700" href="{% url 'payroll:ess_inquiry_detail' inquiry.pk %}">{{ inquiry.subject }}</a><p class="mt-2">{{ inquiry.period.name }} · {{ inquiry.created_at|jalali_date }}</p><p>وضعیت منبع: {{ instance.get_status_display }} <span dir="ltr">{{ instance.status }}</span></p></article>{% empty %}<p class="erp-surface rounded-2xl p-5" role="status">پرسش مجازی برای نمایش موجود نیست.</p>{% endfor %}</div></section>{% endblock %}
+--- /dev/null
++++ b/templates/payroll/ess_inquiry_detail.html
+@@ -0,0 +1 @@
++{% extends "base.html" %}{% load erp_format %}{% block content %}<section class="mx-auto max-w-4xl" dir="rtl">{% include "workforce/_ess_navigation.html" %}<h1 class="text-2xl font-bold break-words">{{ inquiry.subject }}</h1><div class="erp-surface mt-5 rounded-2xl p-5"><p>{{ inquiry.period.name }} · {{ inquiry.category.name }} · {{ inquiry.created_at|jalali_date }}</p><p class="mt-3">وضعیت منبع: {{ instance.get_status_display }} <span dir="ltr">{{ instance.status }}</span></p><p class="mt-4 whitespace-pre-wrap break-words">{{ inquiry.description }}</p><p class="mt-4 text-sm text-slate-600">پرسش و پاسخ صرفاً ارتباط با مسئول حقوق است و محاسبه، پرداخت یا اصلاح حقوق انجام نمی‌دهد.</p>{% for document, version in attachments %}<a class="erp-btn erp-btn--secondary mt-3" href="{% url 'documents:version-download' document.pk version.pk %}">شاهد مجاز: {{ document.title }}</a>{% endfor %}</div><h2 class="mt-5 text-xl font-bold">تاریخچه پاسخ‌های قابل نمایش</h2>{% for response in responses %}<article class="erp-surface mt-4 rounded-2xl p-5"><time>{{ response.created_at|jalali_date }}</time><p class="mt-3 whitespace-pre-wrap break-words">{{ response.body }}</p></article>{% empty %}<p class="mt-4" role="status">پاسخی برای نمایش ثبت نشده است.</p>{% endfor %}{% for task in claimable %}<form class="mt-4" method="post" action="{% url 'payroll:ess_inquiry_claim' inquiry.pk task.pk %}">{% csrf_token %}<input type="hidden" name="idempotency_key" value="{{ claim_key }}"><button class="erp-btn erp-btn--secondary" type="submit">اخذ کار پاسخ‌گویی مجاز</button></form>{% endfor %}{% if form %}<form class="erp-surface mt-5 grid gap-4 rounded-2xl p-5" method="post">{% csrf_token %}{{ form.as_div }}<button class="erp-btn erp-btn--primary" type="submit">ثبت پاسخ و نتیجه گردش‌کار</button></form>{% endif %}</section>{% endblock %}
+--- /dev/null
++++ b/templates/payroll/ess_inquiry_form.html
+@@ -0,0 +1 @@
++{% extends "base.html" %}{% load erp_format %}{% block content %}<section class="mx-auto max-w-4xl" dir="rtl">{% include "workforce/_ess_navigation.html" %}<h1 class="text-2xl font-bold">پرسش جدید حقوق</h1><p class="mt-2">پاسخ به پرسش، نتیجه حقوق را تغییر نمی‌دهد. نبود دسته یا مسئول مجاز مانع ثبت است.</p><form class="erp-surface mt-5 grid gap-4 rounded-2xl p-5" method="post">{% csrf_token %}{{ form.as_div }}<button class="erp-btn erp-btn--primary" type="submit">ثبت پرسش</button></form></section>{% endblock %}
