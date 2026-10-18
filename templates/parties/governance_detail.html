@@ -1,0 +1,43 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}حاکمیت {{ party.display_name }} | بنیرا{% endblock %}
+{% block content %}
+{% include "parties/_surface_navigation.html" %}
+<header class="erp-surface rounded-2xl p-5 sm:p-6">
+  <p class="text-xs font-bold text-blue-700">حاکمیت طرف تجاری · {{ request.organization.name }}</p>
+  <h1 class="mt-2 text-2xl font-black">{{ party.display_name }}</h1>
+  <p class="mt-3 text-sm text-slate-600">وضعیت منبع: {% if party.merged_into_id %}ادغام‌شده{% elif party.archived_at %}بایگانی‌شده{% else %}فعال{% endif %}</p>
+  {% if party_source_active %}<a class="mt-3 inline-flex font-bold text-blue-700" href="{% url 'parties:detail' party.pk %}">مشاهده نمای عملیاتی</a>{% endif %}
+  {% if can_merge_history and party.merged_into_id %}<p class="mt-3">مرجع ادغام: <a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' party.merged_into_id %}">{{ party.merged_into.display_name }}</a></p><p class="mt-2">{{ party.merge_reason }}</p>{% endif %}
+</header>
+<div class="mt-5 grid min-w-0 gap-5 xl:grid-cols-2">
+  <section class="erp-surface min-w-0 rounded-2xl p-5"><h2 class="text-lg font-bold">هویت طرف تجاری</h2>
+    {% if can_edit %}<form class="mt-4 space-y-4" method="post" action="{% url 'parties:governance_detail' party.pk %}">{% csrf_token %}
+      {% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field %}{% endfor %}
+      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">ثبت نسخه هویت</button>
+    </form>{% else %}<dl class="mt-4 grid gap-3"><div><dt class="text-sm text-slate-500">نام قانونی</dt><dd>{{ party.legal_name|default:"ثبت نشده" }}</dd></div><div><dt class="text-sm text-slate-500">شناسه مالیاتی</dt><dd><bdi>{{ party.tax_identifier|default:"ثبت نشده" }}</bdi></dd></div></dl>{% endif %}
+    {% if can_archive %}<form class="mt-5 border-t border-slate-100 pt-4" method="post" action="{% url 'parties:archive' party.pk %}">{% csrf_token %}<button class="rounded-xl border border-red-200 px-4 py-2 font-bold text-red-700">بایگانی طرف تجاری</button></form>{% endif %}
+  </section>
+  <section class="erp-surface min-w-0 rounded-2xl p-5"><h2 class="text-lg font-bold">نقش‌ها و ارتباطات ثبت‌شده</h2>
+    <p class="mt-3 text-sm">{% for role in roles %}{{ role.get_role_display }}{% if not forloop.last %} · {% endif %}{% empty %}نقشی ثبت نشده است.{% endfor %}</p>
+    {% if can_assign_role %}<form class="mt-4 space-y-3" method="post" action="{% url 'parties:role_create' party.pk %}">{% csrf_token %}{% for field in role_form %}{% include "components/form_field.html" with field=field %}{% endfor %}<button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">ثبت نقش</button></form>{% endif %}
+    <ul class="mt-5 space-y-2 border-t border-slate-100 pt-4">{% for contact in contacts %}<li>{{ contact.get_contact_type_display }}: <bdi>{{ contact.value }}</bdi></li>{% empty %}<li class="text-sm text-slate-500">راه ارتباطی ثبت نشده است.</li>{% endfor %}</ul>
+    {% if can_add_contact %}<form class="mt-4 space-y-3" method="post" action="{% url 'parties:contact_create' party.pk %}">{% csrf_token %}{% for field in contact_form %}{% include "components/form_field.html" with field=field %}{% endfor %}<button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">ثبت راه ارتباطی</button></form>{% endif %}
+  </section>
+</div>
+<section class="mt-6" aria-labelledby="actions-heading"><h2 id="actions-heading" class="text-xl font-bold">اقدامات مجاز منبع</h2><p class="mt-2 text-sm text-slate-600">زمان‌های ثبت‌شده بر اساس منطقه زمانی شرکت نمایش داده می‌شوند.</p>
+  <div class="mt-4 grid min-w-0 gap-4 lg:grid-cols-2">{% for item in actions %}<details class="erp-surface min-w-0 rounded-2xl p-5"{% if item.form.is_bound %} open{% endif %}>
+    <summary class="cursor-pointer font-bold">{{ item.title }}</summary>
+    {% if item.key == 'merge' %}<p class="mt-4 text-sm text-slate-600">طرف مرجع را صریح انتخاب کنید. سابقه هویت و ارجاع تراکنش‌های قبلی حفظ می‌شود.</p>{% endif %}
+    <form class="mt-4 space-y-4" method="post" action="{% url 'parties:governance_action' party.pk item.key %}">{% csrf_token %}
+      {% include "components/form_errors.html" with form=item.form %}{% for field in item.form %}{% include "components/form_field.html" with field=field %}{% endfor %}
+      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">ثبت در منبع</button>
+    </form>
+  </details>{% empty %}<p class="erp-surface rounded-2xl p-5 text-sm text-slate-600" role="status">اقدام تکمیلی مجازی برای این وضعیت منبع در دسترس نیست.</p>{% endfor %}</div>
+</section>
+{% if identity_history != None %}<section class="erp-surface mt-6 min-w-0 overflow-hidden rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه نسخه‌های هویت</h2><div class="erp-table-wrap mt-4"><table class="w-full min-w-[600px] text-right"><thead><tr><th class="p-3">نسخه</th><th class="p-3">نام ثبت‌شده</th><th class="p-3">شناسه مالیاتی</th><th class="p-3">زمان ثبت</th></tr></thead><tbody>{% for row in identity_history %}<tr class="border-t border-slate-100"><td class="p-3">{{ row.sequence|erp_number }}</td><td class="p-3">{{ row.display_name }}</td><td class="p-3"><bdi>{{ row.tax_identifier|default:"ثبت نشده" }}</bdi></td><td class="p-3">{{ row.recorded_at|jalali_datetime }}</td></tr>{% empty %}<tr><td class="p-3" colspan="4">نسخه هویت ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
+{% if aliases != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">شواهد نام و شناسه جایگزین</h2><ul class="mt-4 space-y-3">{% for row in aliases %}<li><p class="font-bold">{{ row.get_alias_type_display }} · <bdi>{{ row.value }}</bdi></p><p class="mt-1 text-sm text-slate-600">{{ row.reason }} · {{ row.created_at|jalali_datetime }}</p></li>{% empty %}<li role="status">شاهدی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
+{% if classifications != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه دسته‌ها و برچسب‌ها</h2><ul class="mt-4 space-y-3">{% for row in classifications %}<li><p class="font-bold">{{ row.classification.name }} · {% if row.revoked_at %}لغوشده{% else %}ثبت‌شده{% endif %}</p><p class="mt-1 text-sm text-slate-600">{{ row.assigned_at|jalali_datetime }}{% if row.revoked_at %} · لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}{% endif %}</p></li>{% empty %}<li role="status">انتسابی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
+{% if representatives != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">سوابق نمایندگان و امضاداران</h2><ul class="mt-4 space-y-4">{% for row in representatives %}<li class="border-t border-slate-100 pt-3"><h3 class="font-bold">{{ row.full_name }} · {{ row.get_authority_display }}</h3><p class="mt-1 text-sm">{{ row.title }} · مدرک: {{ row.evidence_reference }}</p><p class="mt-1 text-sm text-slate-600">{{ row.effective_from|jalali_datetime }} تا {{ row.effective_until|jalali_datetime|default:"پایان ثبت نشده" }}</p>{% if row.revoked_at %}<p class="mt-1 text-sm">لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}</p>{% endif %}</li>{% empty %}<li role="status">نماینده‌ای ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
+{% if restrictions != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه محدودیت‌های همین شرکت</h2><ul class="mt-4 space-y-4">{% for row in restrictions %}<li class="border-t border-slate-100 pt-3"><h3 class="font-bold"><bdi>{{ row.code }}</bdi> · {{ row.get_effect_display }}</h3><p class="mt-1 text-sm">{{ row.reason }}</p><p class="mt-1 text-sm text-slate-600">{{ row.effective_from|jalali_datetime }} تا {{ row.effective_until|jalali_datetime|default:"پایان ثبت نشده" }}</p>{% if row.revoked_at %}<p class="mt-1 text-sm">لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}</p>{% endif %}</li>{% empty %}<li role="status">محدودیت شرکتی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
+{% if can_merge_history %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">سوابق ارجاع ادغام</h2><ul class="mt-3 space-y-3">{% for source in merged_sources %}<li><a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' source.pk %}">{{ source.display_name }}</a><p class="mt-1 text-sm">{{ source.merge_reason }} · {{ source.merged_at|jalali_datetime }}</p></li>{% empty %}<li role="status">طرفی به این مرجع ارجاع نشده است.</li>{% endfor %}</ul></section>{% endif %}
+{% endblock %}

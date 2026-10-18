@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}حاکمیت طرف‌های تجاری | بنیرا{% endblock %}
+{% block content %}
+{% include "parties/_surface_navigation.html" %}
+<header class="erp-surface rounded-2xl p-5 sm:p-6">
+  <p class="text-xs font-bold text-blue-700">مدیریت داده‌های پایه · شرکت فعال</p>
+  <h1 class="mt-2 text-2xl font-black">حاکمیت طرف‌های تجاری</h1>
+  <p class="mt-3 text-sm text-slate-600">هویت، سوابق و اقدامات مجاز از همان منبع طرف‌های تجاری مدیریت می‌شوند.</p>
+  {% if "parties.create" in business_permission_codes %}<a class="mt-4 inline-flex rounded-xl bg-blue-700 px-4 py-2 font-bold text-white" href="{% url 'parties:create' %}">ثبت طرف تجاری</a>{% endif %}
+</header>
+<form method="get" class="erp-surface mt-5 flex flex-wrap items-end gap-3 rounded-2xl p-5" aria-label="جستجوی حاکمیت طرف‌ها">
+  <div><label class="mb-2 block text-sm" for="governance-name">نام طرف تجاری</label><input class="rounded-xl border border-slate-200 px-3 py-2" id="governance-name" name="name" value="{{ request.GET.name }}" maxlength="255"></div>
+  <button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">جستجو</button>
+</form>
+<section class="erp-surface mt-5 min-w-0 overflow-hidden rounded-2xl">
+  {% if parties %}<div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right">
+    <caption class="sr-only">طرف‌های تجاری و وضعیت ثبت‌شده منبع</caption>
+    <thead><tr><th class="px-5 py-3">طرف تجاری</th><th class="px-5 py-3">نوع</th><th class="px-5 py-3">وضعیت منبع</th><th class="px-5 py-3">آخرین تغییر</th><th class="px-5 py-3">دسترسی</th></tr></thead>
+    <tbody>{% for party in parties %}<tr class="border-t border-slate-100">
+      <td class="px-5 py-4 font-bold">{{ party.display_name }}</td><td class="px-5 py-4">{{ party.get_party_kind_display }}</td>
+      <td class="px-5 py-4">{% if party.merged_into_id %}ادغام‌شده{% elif party.archived_at %}بایگانی‌شده{% else %}فعال{% endif %}</td>
+      <td class="px-5 py-4">{{ party.updated_at|jalali_datetime }}</td>
+      <td class="px-5 py-4"><a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' party.pk %}">سوابق و اقدامات مجاز</a></td>
+    </tr>{% endfor %}</tbody>
+  </table></div>{% include "components/table_pagination.html" %}
+  {% else %}<p class="p-5 text-slate-600" role="status">طرف تجاری مجازی متناسب با جستجو برای نمایش موجود نیست.</p>{% endif %}
+</section>
+{% endblock %}

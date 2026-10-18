@@ -26,7 +26,7 @@
         {% if "goods_receipts.view" in business_permission_codes %}<a data-nav-id="NAV-021" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:receipt_list' %}">رسید کالا</a>{% endif %}
         {% if "materials.view" in business_permission_codes %}<a data-nav-id="NAV-022" class="erp-nav-link{% if current_namespace == 'materials' %} is-active{% endif %}" href="{% url 'materials:material_list' %}">مصالح و کالا</a>{% endif %}
         {% if "warehouses.view" in business_permission_codes %}<a data-nav-id="NAV-023" class="erp-nav-link{% if current_namespace == 'inventory' %} is-active{% endif %}" href="{% url 'inventory:warehouse_list' %}">انبار</a>{% endif %}
-        {% if "parties.view" in business_permission_codes %}<a data-nav-id="NAV-024" class="erp-nav-link{% if current_namespace == 'parties' %} is-active{% endif %}" href="{% url 'parties:list' %}">طرف‌های تجاری</a>{% endif %}
+        {% if "parties.view" in business_permission_codes %}<a data-nav-id="NAV-024" class="erp-nav-link{% if current_namespace == 'parties' and not party_governance_surface %} is-active{% endif %}" href="{% url 'parties:list' %}">طرف‌های تجاری</a>{% endif %}
     </div></details>
     <details data-nav-id="NAV-025" class="erp-nav-group" open><summary><span>مالی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
         {% if "treasury.view" in business_permission_codes %}<a data-nav-id="NAV-026" class="erp-nav-link{% if current_namespace == 'treasury' %} is-active{% endif %}" href="{% url 'treasury:workbench' %}">خزانه‌داری</a>{% endif %}
@@ -45,7 +45,7 @@
     <details data-nav-id="NAV-038" class="erp-nav-group" open><summary><span>مدیریت سامانه</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
         <span data-nav-id="NAV-039" class="erp-nav-link is-unavailable" aria-disabled="true">گردش‌کارها</span>
         {% if "company.settings.view" in business_permission_codes %}<a data-nav-id="NAV-040" class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'settings' %} is-active{% endif %}" href="{% url 'organizations:settings' %}">پیکربندی و داده‌های پایه</a>{% endif %}
-        <span data-nav-id="NAV-043" class="erp-nav-link is-unavailable" aria-disabled="true">حاکمیت طرف‌های تجاری</span>
+        {% if party_governance_available %}<a data-nav-id="NAV-043" class="erp-nav-link{% if current_namespace == 'parties' and party_governance_surface %} is-active{% endif %}" href="{% url 'parties:governance' %}">حاکمیت طرف‌های تجاری</a>{% endif %}
     </div></details>
     <a data-nav-id="NAV-041" class="erp-nav-link{% if current_namespace == 'accounts' and current_url_name == 'settings' %} is-active{% endif %}" href="{% url 'accounts:settings' %}">پروفایل کاربر</a>
 </nav>

@@ -10,6 +10,7 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.context import scoped_context_projects, scoped_context_sites
 from apps.organizations.models import BusinessPermissionCode
+from apps.parties.presentation import GOVERNANCE_PERMISSIONS
 from apps.workflows.personal_workspaces import (
     manager_workspace_available,
     my_requests_available,
@@ -95,6 +96,7 @@ def business_permissions(request: HttpRequest) -> dict[str, object]:
 
     return {
         "business_permission_codes": permission_codes,
+        "party_governance_available": BusinessPermissionCode.PARTIES_VIEW in permission_codes and bool(permission_codes & GOVERNANCE_PERMISSIONS),
         "platform_navigation_access": bool(
             request.user.is_authenticated and is_platform_admin(request.user)
         ),

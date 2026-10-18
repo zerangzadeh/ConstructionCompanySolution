@@ -1,10 +1,13 @@
 from django.urls import path
 
-from apps.parties import views
+from apps.parties import governance_views, views
 
 app_name = "parties"
 
 urlpatterns = [
+    path("governance/", governance_views.index, name="governance"),
+    path("governance/<uuid:party_id>/", governance_views.detail, name="governance_detail"),
+    path("governance/<uuid:party_id>/actions/<slug:action>/", governance_views.action, name="governance_action"),
     path("", views.party_list, name="list"),
     path("create/", views.party_create, name="create"),
     path("<uuid:party_id>/", views.party_detail, name="detail"),

@@ -3,9 +3,10 @@
 {% block title %}طرف‌های تجاری | سامانه مدیریت ساخت{% endblock %}
 
 {% block content %}
+{% include "parties/_surface_navigation.html" %}
 {% table_filters filters "party-filters" %}
-    {% if "parties.create" in business_permission_codes %}{% url "parties:create" as create_url %}{% endif %}
-    {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
+    {% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
+    {% include "components/page_header.html" with page_eyebrow="نمای عملیاتی" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=governance_url page_action_label="ورود به حاکمیت" only %}
 
     <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="فهرست طرف‌های تجاری">
         {% if parties %}
@@ -18,7 +19,7 @@
                             <tr>
                                 <td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'parties:detail' party.pk %}">{{ party.display_name }}</a>{% if party.legal_name and party.legal_name != party.display_name %}<p class="mt-0.5 text-[11px] text-slate-500">{{ party.legal_name }}</p>{% endif %}</td>
                                 <td class="px-4 py-3.5 text-slate-600">{{ party.get_party_kind_display }}</td>
-                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.roles.all %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
+                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.operational_roles %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
                                 <td class="whitespace-nowrap px-4 py-3.5 text-slate-600" dir="ltr">{{ party.tax_identifier|default:"—" }}</td>
                                 <td class="px-4 py-3.5 text-center"><a class="inline-grid h-8 w-8 place-items-center rounded-lg border border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-700" href="{% url 'parties:detail' party.pk %}" aria-label="مشاهده {{ party.display_name }}"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></a></td>
                             </tr>
@@ -27,7 +28,7 @@
                 </table>
             </div>
         {% else %}
-            {% include "components/empty_state.html" with empty_title="هنوز طرف تجاری ثبت نشده است" empty_description="برای شروع، یک طرف تجاری جدید ایجاد کنید." empty_action_url=create_url empty_action_label="ایجاد طرف تجاری" only %}
+            {% include "components/empty_state.html" with empty_title="طرف تجاری مجازی برای نمایش موجود نیست" empty_description="جستجو و فیلترهای انتخاب‌شده را بررسی کنید." only %}
         {% endif %}
     </section>
 {% endblock %}

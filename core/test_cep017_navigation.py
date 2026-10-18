@@ -43,7 +43,6 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
             "NAV-015",
             "NAV-019",
             "NAV-039",
-            "NAV-043",
         ):
             marker = f'data-nav-id="{node_id}"'
             fragment = navigation[

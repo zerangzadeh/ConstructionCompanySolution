@@ -1,0 +1,1368 @@
+--- a/apps/organizations/context_processors.py
++++ b/apps/organizations/context_processors.py
+@@ -12,0 +13 @@
++from apps.parties.presentation import GOVERNANCE_PERMISSIONS
+@@ -97,0 +99 @@
++        "party_governance_available": BusinessPermissionCode.PARTIES_VIEW in permission_codes and bool(permission_codes & GOVERNANCE_PERMISSIONS),
+--- a/apps/parties/governance_forms.py
++++ b/apps/parties/governance_forms.py
+@@ -0,0 +1,189 @@
++from django import forms
++
++from core.forms import JalaliDateMixin
++
++from .models import (
++    BusinessParty,
++    PartyAliasType,
++    PartyClassification,
++    PartyClassificationAssignment,
++    PartyClassificationKind,
++    PartyRepresentative,
++    PartyRepresentativeAuthority,
++    PartyRestriction,
++    PartyRestrictionEffect,
++    PartyRestrictionScope,
++)
++
++
++class ScopedSourceForm(forms.Form):
++    def __init__(self, *args, organization, party, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.organization = organization
++        self.party = party
++
++
++class AliasForm(ScopedSourceForm):
++    alias_type = forms.ChoiceField(
++        label="نوع نام جایگزین", choices=PartyAliasType.choices
++    )
++    value = forms.CharField(label="نام یا شناسه جایگزین", max_length=255)
++    reason = forms.CharField(
++        label="دلیل ثبت", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++
++
++class PartyChoice(forms.ModelChoiceField):
++    def label_from_instance(self, obj):
++        identity = obj.tax_identifier or str(obj.pk)[:8]
++        return f"{obj.display_name} — {identity}"
++
++
++class MergeForm(ScopedSourceForm):
++    survivor = PartyChoice(label="طرف مرجع", queryset=BusinessParty.objects.none())
++    reason = forms.CharField(
++        label="دلیل ادغام", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++    confirm = forms.BooleanField(
++        label="طرف مبدأ و مرجع را بررسی کردم و ثبت سابقه ادغام را تأیید می‌کنم."
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["survivor"].queryset = (
++            BusinessParty.objects.filter(
++                organization=self.organization,
++                archived_at__isnull=True,
++                merged_into__isnull=True,
++            )
++            .exclude(pk=self.party.pk)
++            .order_by("display_name", "pk")
++        )
++
++
++class RestrictionForm(JalaliDateMixin, ScopedSourceForm):
++    code = forms.CharField(label="کد محدودیت", max_length=80)
++    effect = forms.ChoiceField(
++        label="اثر ثبت‌شده", choices=PartyRestrictionEffect.choices
++    )
++    reason = forms.CharField(
++        label="دلیل محدودیت", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++    effective_from = forms.DateTimeField(
++        label="شروع اثر",
++        required=False,
++        help_text="در صورت خالی بودن، زمان ثبت منبع استفاده می‌شود.",
++    )
++    effective_until = forms.DateTimeField(label="پایان اثر", required=False)
++
++
++class ClassificationForm(ScopedSourceForm):
++    kind = forms.ChoiceField(
++        label="نوع واژگان", choices=PartyClassificationKind.choices
++    )
++    code = forms.CharField(label="کد واژگان", max_length=50)
++    name = forms.CharField(label="نام واژگان", max_length=120)
++    description = forms.CharField(
++        label="توضیح", required=False, widget=forms.Textarea(attrs={"rows": 2})
++    )
++
++
++class VocabularyChoice(forms.ModelChoiceField):
++    def label_from_instance(self, obj):
++        return f"{obj.get_kind_display()} — {obj.name} — {obj.code}"
++
++
++class ClassificationAssignmentForm(ScopedSourceForm):
++    classification = VocabularyChoice(
++        label="دسته یا برچسب", queryset=PartyClassification.objects.none()
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["classification"].queryset = PartyClassification.objects.filter(
++            organization=self.organization, archived_at__isnull=True
++        ).order_by("kind", "name", "pk")
++
++
++class RepresentativeForm(JalaliDateMixin, ScopedSourceForm):
++    authority = forms.ChoiceField(
++        label="نوع اختیار", choices=PartyRepresentativeAuthority.choices
++    )
++    full_name = forms.CharField(label="نام نماینده", max_length=255)
++    title = forms.CharField(label="سمت ثبت‌شده", max_length=120, required=False)
++    evidence_reference = forms.CharField(label="مرجع مدرک اختیار", max_length=255)
++    effective_from = forms.DateTimeField(
++        label="شروع اثر",
++        required=False,
++        help_text="در صورت خالی بودن، زمان ثبت منبع استفاده می‌شود.",
++    )
++    effective_until = forms.DateTimeField(label="پایان اثر", required=False)
++
++
++class RestrictionChoice(forms.ModelChoiceField):
++    def label_from_instance(self, obj):
++        return f"{obj.code} — {obj.get_effect_display()}"
++
++
++class ClassificationChoice(forms.ModelChoiceField):
++    def label_from_instance(self, obj):
++        return f"{obj.classification.get_kind_display()} — {obj.classification.name} — {obj.classification.code}"
++
++
++class RepresentativeChoice(forms.ModelChoiceField):
++    def label_from_instance(self, obj):
++        return f"{obj.full_name} — {obj.get_authority_display()} — {obj.evidence_reference}"
++
++
++class RevokeRestrictionForm(ScopedSourceForm):
++    restriction = RestrictionChoice(
++        label="محدودیت شرکتی", queryset=PartyRestriction.objects.none()
++    )
++    reason = forms.CharField(
++        label="دلیل لغو", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["restriction"].queryset = PartyRestriction.objects.filter(
++            organization=self.organization,
++            party=self.party,
++            scope=PartyRestrictionScope.TENANT,
++            revoked_at__isnull=True,
++        ).order_by("code", "pk")
++
++
++class RevokeClassificationForm(ScopedSourceForm):
++    assignment = ClassificationChoice(
++        label="انتساب ثبت‌شده", queryset=PartyClassificationAssignment.objects.none()
++    )
++    reason = forms.CharField(
++        label="دلیل لغو", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["assignment"].queryset = (
++            PartyClassificationAssignment.objects.filter(
++                organization=self.organization,
++                party=self.party,
++                revoked_at__isnull=True,
++            )
++            .select_related("classification")
++            .order_by("classification__name", "pk")
++        )
++
++
++class RevokeRepresentativeForm(ScopedSourceForm):
++    representative = RepresentativeChoice(
++        label="نماینده ثبت‌شده", queryset=PartyRepresentative.objects.none()
++    )
++    reason = forms.CharField(
++        label="دلیل لغو", max_length=2000, widget=forms.Textarea(attrs={"rows": 2})
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["representative"].queryset = PartyRepresentative.objects.filter(
++            organization=self.organization, party=self.party, revoked_at__isnull=True
++        ).order_by("full_name", "pk")
+--- a/apps/parties/governance_views.py
++++ b/apps/parties/governance_views.py
+@@ -0,0 +1,312 @@
++from contextlib import nullcontext
++from dataclasses import dataclass
++from functools import wraps
++from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
++
++from django.contrib import messages
++from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
++from django.http import HttpRequest, HttpResponse
++from django.shortcuts import redirect, render
++from django.utils import timezone
++from django.utils.cache import patch_vary_headers
++from django.views.decorators.http import require_GET, require_http_methods, require_POST
++
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.decorators import active_organization_required
++from apps.organizations.models import BusinessPermissionCode
++from core.list_filters import (
++    apply_table_filters,
++    paginate_table,
++    table_pagination_query,
++)
++
++from . import governance_forms as forms
++from . import services
++from .forms import BusinessPartyForm, PartyContactForm, PartyRoleForm
++from .models import BusinessParty, PartyKind
++from .presentation import (
++    governance_history,
++    governance_parties,
++    governance_party,
++    governance_permissions,
++)
++
++
++def private_party_surface(view=None, *, tenant_time=False):
++    def decorate(function):
++        @wraps(function)
++        def wrapped(request, *args, **kwargs):
++            try:
++                context = nullcontext()
++                if tenant_time:
++                    # Match the repository's governed tenant/legacy timezone seam.
++                    try:
++                        zone = request.organization.settings.timezone
++                    except ObjectDoesNotExist:
++                        zone = request.organization.timezone
++                    context = timezone.override(ZoneInfo(zone))
++                with context:
++                    response = function(request, *args, **kwargs)
++            except PermissionDenied:
++                response = render(request, "parties/unavailable.html", status=403)
++            except (ObjectDoesNotExist, ZoneInfoNotFoundError):
++                response = render(request, "parties/unavailable.html", status=503)
++            response["Cache-Control"] = "private, no-store"
++            patch_vary_headers(response, ["Cookie"])
++            return response
++
++        return wrapped
++
++    return decorate(view) if view else decorate
++
++
++@dataclass(frozen=True)
++class Action:
++    title: str
++    permission: BusinessPermissionCode
++    form_class: type[forms.ScopedSourceForm]
++    requires_active: bool = True
++
++
++ACTIONS = {
++    "alias": Action(
++        "ثبت نام یا شناسه جایگزین",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.AliasForm,
++    ),
++    "classification_create": Action(
++        "ایجاد واژگان دسته یا برچسب",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.ClassificationForm,
++        False,
++    ),
++    "classification_assign": Action(
++        "انتساب دسته یا برچسب",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.ClassificationAssignmentForm,
++    ),
++    "classification_revoke": Action(
++        "لغو انتساب با حفظ سابقه",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.RevokeClassificationForm,
++        False,
++    ),
++    "representative": Action(
++        "ثبت مدرک نماینده یا امضادار",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.RepresentativeForm,
++    ),
++    "representative_revoke": Action(
++        "لغو اختیار ثبت‌شده با حفظ سابقه",
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        forms.RevokeRepresentativeForm,
++        False,
++    ),
++    "restriction": Action(
++        "ثبت محدودیت شرکتی",
++        BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE,
++        forms.RestrictionForm,
++    ),
++    "restriction_revoke": Action(
++        "لغو محدودیت شرکتی",
++        BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE,
++        forms.RevokeRestrictionForm,
++        False,
++    ),
++    "merge": Action(
++        "ثبت ادغام غیرمخرب", BusinessPermissionCode.PARTIES_MERGE, forms.MergeForm
++    ),
++}
++
++
++def _render_detail(
++    request,
++    party,
++    *,
++    status=200,
++    bound_action=None,
++    bound_form=None,
++    identity_form=None,
++):
++    codes = governance_permissions(user=request.user, organization=request.organization)
++    active = party.archived_at is None and party.merged_into_id is None
++    actions = []
++    for key, spec in ACTIONS.items():
++        if spec.permission not in codes or (spec.requires_active and not active):
++            continue
++        form = (
++            bound_form
++            if key == bound_action
++            else spec.form_class(
++                organization=request.organization, party=party, prefix=key
++            )
++        )
++        actions.append({"key": key, "title": spec.title, "form": form})
++    context = {
++        "party": party,
++        "party_governance_surface": True,
++        "party_source_active": active,
++        "can_edit": active and BusinessPermissionCode.PARTIES_CHANGE in codes,
++        "can_archive": active and BusinessPermissionCode.PARTIES_ARCHIVE in codes,
++        "can_assign_role": active
++        and BusinessPermissionCode.PARTY_ROLES_ASSIGN in codes,
++        "can_add_contact": active
++        and BusinessPermissionCode.PARTY_CONTACTS_ADD in codes,
++        "can_merge_history": bool(
++            codes
++            & {
++                BusinessPermissionCode.PARTIES_MERGE,
++                BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++            }
++        ),
++        "form": identity_form or BusinessPartyForm(instance=party),
++        "role_form": PartyRoleForm(),
++        "contact_form": PartyContactForm(),
++        "actions": actions,
++        "roles": party.roles.filter(organization=request.organization, is_active=True),
++        "contacts": party.contacts.filter(
++            organization=request.organization, archived_at__isnull=True
++        ),
++        **governance_history(party=party, codes=codes),
++    }
++    if context["can_merge_history"]:
++        context["merged_sources"] = BusinessParty.objects.filter(
++            organization=request.organization, merged_into=party
++        ).order_by("display_name", "pk")
++    return render(request, "parties/governance_detail.html", context, status=status)
++
++
++@active_organization_required
++@private_party_surface(tenant_time=True)
++@require_GET
++def index(request: HttpRequest) -> HttpResponse:
++    query = governance_parties(user=request.user, organization=request.organization)
++    query = apply_table_filters(
++        query,
++        request,
++        text_fields={
++            "name": ("display_name", "legal_name"),
++            "tax_id": ("tax_identifier",),
++        },
++        choice_fields={"kind": ("party_kind", PartyKind.values)},
++    )
++    page = paginate_table(
++        query,
++        request,
++        sort_fields={"name": "display_name", "kind": "party_kind"},
++        default_ordering=("display_name", "pk"),
++    )
++    return render(
++        request,
++        "parties/governance_list.html",
++        {
++            "parties": page.object_list,
++            "page_obj": page,
++            "pagination_query": table_pagination_query(request),
++            "party_governance_surface": True,
++        },
++    )
++
++
++@active_organization_required
++@private_party_surface(tenant_time=True)
++@require_http_methods(["GET", "POST"])
++def detail(request: HttpRequest, party_id: object) -> HttpResponse:
++    # Preserve the existing authorized detail POST through this single source path.
++    governance_permissions(user=request.user, organization=request.organization)
++    if request.method == "POST":
++        require_business_permission(
++            user=request.user,
++            organization=request.organization,
++            permission=BusinessPermissionCode.PARTIES_CHANGE,
++            message="اجازه ویرایش طرف تجاری را ندارید.",
++        )
++    party = governance_party(
++        user=request.user, organization=request.organization, party_id=party_id
++    )
++    if request.method == "GET":
++        return _render_detail(request, party)
++    form = BusinessPartyForm(request.POST, instance=party)
++    if form.is_valid():
++        try:
++            services.update_business_party(
++                actor=request.user,
++                organization=request.organization,
++                party=party,
++                **form.cleaned_data,
++            )
++        except (ValueError, ValidationError):
++            form.add_error(
++                None, "ثبت تغییر ممکن نشد؛ ورودی و وضعیت منبع را بررسی کنید."
++            )
++        else:
++            messages.success(request, "نسخه هویت در منبع ثبت شد.")
++            return redirect("parties:governance_detail", party_id=party.pk)
++    party.refresh_from_db()
++    return _render_detail(request, party, identity_form=form, status=400)
++
++
++def _execute(action, *, actor, organization, party, data):
++    # Closed UI wiring only; all business rules/transactions stay in domain services.
++    common = {"actor": actor, "organization": organization}
++    if action == "alias":
++        return services.record_party_alias(**common, party=party, **data)
++    if action == "classification_create":
++        return services.create_party_classification(**common, **data)
++    if action == "classification_assign":
++        return services.assign_party_classification(**common, party=party, **data)
++    if action == "classification_revoke":
++        return services.revoke_party_classification(**common, **data)
++    if action == "representative":
++        return services.record_party_representative(**common, party=party, **data)
++    if action == "representative_revoke":
++        return services.revoke_party_representative(**common, **data)
++    if action == "restriction":
++        return services.create_tenant_party_restriction(**common, party=party, **data)
++    if action == "restriction_revoke":
++        return services.revoke_tenant_party_restriction(**common, **data)
++    if action == "merge":
++        data.pop("confirm")
++        return services.record_business_party_merge(**common, source=party, **data)
++    raise ValidationError("اقدام ثبت‌شده نیست.")
++
++
++@active_organization_required
++@private_party_surface(tenant_time=True)
++@require_POST
++def action(request: HttpRequest, party_id: object, action: str) -> HttpResponse:
++    governance_permissions(user=request.user, organization=request.organization)
++    spec = ACTIONS.get(action)
++    if spec is None:
++        return render(request, "parties/unavailable.html", status=404)
++    require_business_permission(
++        user=request.user,
++        organization=request.organization,
++        permission=spec.permission,
++        message="اجازه انجام این اقدام را ندارید.",
++    )
++    party = governance_party(
++        user=request.user, organization=request.organization, party_id=party_id
++    )
++    form = spec.form_class(
++        request.POST, organization=request.organization, party=party, prefix=action
++    )
++    if form.is_valid():
++        try:
++            _execute(
++                action,
++                actor=request.user,
++                organization=request.organization,
++                party=party,
++                data=form.cleaned_data.copy(),
++            )
++        except (ValueError, ValidationError):
++            form.add_error(
++                None, "ثبت اقدام ممکن نشد؛ ورودی و وضعیت منبع را بررسی کنید."
++            )
++        else:
++            messages.success(request, "اقدام با حفظ سابقه در منبع ثبت شد.")
++            return redirect("parties:governance_detail", party_id=party.pk)
++    return _render_detail(
++        request, party, status=400, bound_action=action, bound_form=form
++    )
+--- a/apps/parties/presentation.py
++++ b/apps/parties/presentation.py
+@@ -0,0 +1,106 @@
++"""Permission-aware UI projections over the existing Party master source."""
++
++from django.core.exceptions import PermissionDenied
++from django.db.models import Prefetch, Q, QuerySet
++
++from apps.accounts.models import User
++from apps.organizations.authorization import (
++    membership_permission_codes,
++    require_business_permission,
++)
++from apps.organizations.models import BusinessPermissionCode, Organization
++
++from .models import BusinessParty, PartyRestrictionScope, PartyRole
++from .services import get_organization_parties
++
++GOVERNANCE_PERMISSIONS = frozenset(
++    {
++        BusinessPermissionCode.PARTIES_CREATE,
++        BusinessPermissionCode.PARTIES_CHANGE,
++        BusinessPermissionCode.PARTIES_ARCHIVE,
++        BusinessPermissionCode.PARTIES_MERGE,
++        BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE,
++        BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE,
++        BusinessPermissionCode.PARTY_ROLES_ASSIGN,
++        BusinessPermissionCode.PARTY_CONTACTS_ADD,
++    }
++)
++DENIED = "اطلاعات مجاز طرف تجاری در این شرکت در دسترس نیست."
++
++
++def governance_permissions(*, user: User, organization: Organization) -> frozenset[str]:
++    member = require_business_permission(
++        user=user,
++        organization=organization,
++        permission=BusinessPermissionCode.PARTIES_VIEW,
++        message=DENIED,
++    )
++    codes = membership_permission_codes(member)
++    if not (codes & GOVERNANCE_PERMISSIONS):
++        raise PermissionDenied(DENIED)
++    return codes
++
++
++def operational_parties(
++    *, user: User, organization: Organization
++) -> QuerySet[BusinessParty]:
++    return get_organization_parties(
++        user=user, organization=organization
++    ).prefetch_related(
++        Prefetch(
++            "roles",
++            queryset=PartyRole.objects.filter(
++                organization=organization, is_active=True
++            ),
++            to_attr="operational_roles",
++        )
++    )
++
++
++def governance_parties(
++    *, user: User, organization: Organization
++) -> QuerySet[BusinessParty]:
++    governance_permissions(user=user, organization=organization)
++    return (
++        BusinessParty.objects.filter(organization=organization)
++        .filter(Q(merged_into__isnull=True) | Q(merged_into__organization=organization))
++        .select_related("merged_into")
++    )
++
++
++def governance_party(
++    *, user: User, organization: Organization, party_id: object
++) -> BusinessParty:
++    try:
++        return governance_parties(user=user, organization=organization).get(pk=party_id)
++    except BusinessParty.DoesNotExist as exc:
++        raise PermissionDenied(DENIED) from exc
++
++
++def governance_history(*, party: BusinessParty, codes: frozenset[str]) -> dict:
++    context = {}
++    if BusinessPermissionCode.PARTY_GOVERNANCE_MANAGE in codes:
++        context.update(
++            {
++                "identity_history": party.identity_snapshots.filter(
++                    organization_id=party.organization_id
++                ).order_by("sequence"),
++                "aliases": party.aliases.filter(
++                    organization_id=party.organization_id
++                ).order_by("-created_at", "pk"),
++                "classifications": party.classification_assignments.filter(
++                    organization_id=party.organization_id,
++                    classification__organization_id=party.organization_id,
++                )
++                .select_related("classification")
++                .order_by("-assigned_at", "pk"),
++                "representatives": party.representatives.filter(
++                    organization_id=party.organization_id
++                ).order_by("-effective_from", "pk"),
++            }
++        )
++    if BusinessPermissionCode.PARTY_RESTRICTIONS_MANAGE in codes:
++        context["restrictions"] = party.restrictions.filter(
++            organization_id=party.organization_id, scope=PartyRestrictionScope.TENANT
++        ).order_by("-effective_from", "pk")
++    return context
+--- a/apps/parties/test_cep030.py
++++ b/apps/parties/test_cep030.py
+@@ -0,0 +1,488 @@
++"""CEP-030: real source delegation, granular authority and tenant-safe UI."""
++
++import os
++from pathlib import Path
++from uuid import uuid4
++
++from django.test import Client, TestCase
++from django.urls import reverse
++
++from apps.accounts.models import User
++from apps.audit.models import AuditEvent
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationMembership,
++    OrganizationRole,
++    OrganizationSettings,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++
++from . import services
++from .models import BusinessParty, PartyRestriction
++from .presentation import GOVERNANCE_PERMISSIONS
++
++
++class PartySurfaceTests(TestCase):
++    def setUp(self):
++        self.organization = Organization.objects.create(
++            name="شرکت آزمایشی بنیرا", slug="cep030"
++        )
++        OrganizationSettings.objects.create(
++            organization=self.organization, timezone="Asia/Tehran"
++        )
++        self.other = Organization.objects.create(name="Other", slug="cep030-other")
++        self.owner = self.member("steward", {P.PARTIES_VIEW, *GOVERNANCE_PERMISSIONS})
++        self.reader = self.member("reader", {P.PARTIES_VIEW})
++        self.party = services.create_business_party(
++            actor=self.owner,
++            organization=self.organization,
++            party_kind="company",
++            display_name="شرکت سازه پارس",
++            tax_identifier="SYNTHETIC-030",
++        )
++        self.foreign = BusinessParty.objects.create(
++            organization=self.other,
++            party_kind="company",
++            display_name="PRIVATE-FOREIGN",
++        )
++        self.login(self.owner)
++
++    def member(self, name, codes, *, scoped=True):
++        user = User.objects.create_user(username="cep030-" + name)
++        role = OrganizationRole.objects.create(code="cep030-" + name, name=name)
++        role.permissions.set(BusinessPermission.objects.filter(code__in=codes))
++        membership = OrganizationMembership.objects.create(
++            organization=self.organization,
++            user=user,
++            role_definition=role,
++            status="active",
++        )
++        if scoped:
++            MembershipScopeGrant.objects.create(
++                organization=self.organization,
++                membership=membership,
++                scope_type=AuthorizationScopeType.ORGANIZATION,
++                reason="Synthetic CEP030",
++            )
++        return user
++
++    def login(self, user):
++        self.client.force_login(user)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++
++    def url(self, name="governance_detail", party=None, **kwargs):
++        if name in {
++            "governance_detail",
++            "governance_action",
++            "detail",
++            "archive",
++            "role_create",
++            "contact_create",
++        }:
++            kwargs["party_id"] = (party or self.party).pk
++        return reverse("parties:" + name, kwargs=kwargs)
++
++    def action(self, name, data, party=None):
++        return self.client.post(
++            self.url("governance_action", party, action=name),
++            {f"{name}-{key}": value for key, value in data.items()},
++        )
++
++    def capture(self, name, response):
++        if root := os.environ.get("CEP030_CAPTURE_DIR"):
++            path = Path(root)
++            path.mkdir(parents=True, exist_ok=True)
++            import re
++
++            html = re.sub(
++                r'(<input[^>]+name="csrfmiddlewaretoken"[^>]+value=")[^"]+',
++                r"\1SYNTHETIC",
++                response.content.decode(),
++            )
++            (path / f"{name}.html").write_text(html, encoding="utf-8")
++
++    def test_operational_filters_and_sort_use_source_fields(self):
++        self.login(self.reader)
++        response = self.client.get(
++            self.url("list"),
++            {"kind": "company", "tax_id": "SYNTHETIC", "sort": "tax_id"},
++        )
++        self.assertContains(response, self.party.display_name)
++        self.assertNotContains(response, self.foreign.display_name)
++        self.assertNotContains(response, self.url("governance"))
++        self.capture("operational", response)
++
++    def test_operational_detail_is_read_only(self):
++        self.login(self.reader)
++        response = self.client.get(self.url("detail"))
++        self.assertEqual(response.status_code, 200)
++        self.assertNotIn(
++            'method="post"',
++            response.content.decode().split("<main", 1)[1].split("</main>", 1)[0],
++        )
++        self.assertNotContains(response, "تاریخچه نسخه‌های هویت")
++
++    def test_reader_cannot_enter_or_mutate_master(self):
++        self.login(self.reader)
++        for name in ("governance", "governance_detail"):
++            response = self.client.get(self.url(name))
++            self.assertEqual(response.status_code, 403)
++            self.capture("denied", response)
++        self.assertEqual(
++            self.client.post(
++                self.url("detail"), {"display_name": "ATTACK"}
++            ).status_code,
++            403,
++        )
++        self.assertEqual(self.action("alias", {"value": "ATTACK"}).status_code, 403)
++        self.party.refresh_from_db()
++        self.assertEqual(self.party.display_name, "شرکت سازه پارس")
++        self.assertFalse(self.party.aliases.exists())
++
++    def test_master_entry_needs_view_and_explicit_scope(self):
++        for user in (
++            self.member("no-view", {P.PARTY_GOVERNANCE_MANAGE}),
++            self.member(
++                "no-scope", {P.PARTIES_VIEW, P.PARTY_GOVERNANCE_MANAGE}, scoped=False
++            ),
++        ):
++            self.login(user)
++            self.assertEqual(self.client.get(self.url("governance")).status_code, 403)
++
++    def test_granular_permissions_do_not_imply_one_another(self):
++        user = self.member("merge-only", {P.PARTIES_VIEW, P.PARTIES_MERGE})
++        self.login(user)
++        response = self.client.get(self.url())
++        self.assertContains(response, self.url("governance_action", action="merge"))
++        for action in (
++            "alias",
++            "restriction",
++            "representative",
++            "classification_create",
++        ):
++            self.assertNotContains(
++                response, self.url("governance_action", action=action)
++            )
++            self.assertEqual(self.action(action, {}).status_code, 403)
++        self.assertNotContains(response, "تاریخچه نسخه‌های هویت")
++
++    def test_missing_and_foreign_master_are_indistinguishable(self):
++        foreign = self.client.get(self.url(party=self.foreign))
++        missing = self.client.get(
++            reverse("parties:governance_detail", kwargs={"party_id": uuid4()})
++        )
++        self.assertEqual(foreign.status_code, 403)
++        self.assertEqual(foreign.status_code, missing.status_code)
++        self.assertTemplateUsed(foreign, "parties/unavailable.html")
++        self.assertTemplateUsed(missing, "parties/unavailable.html")
++        self.assertNotContains(missing, "PRIVATE-FOREIGN", status_code=403)
++        self.assertNotContains(foreign, "PRIVATE-FOREIGN", status_code=403)
++        self.assertEqual(
++            self.action("alias", {"value": "ATTACK"}, self.foreign).status_code, 403
++        )
++
++    def test_alias_delegates_audited_source_and_ignores_posted_tenant(self):
++        response = self.action(
++            "alias",
++            {
++                "alias_type": "other",
++                "value": "نام پیشین",
++                "reason": "شاهد آزمایشی",
++                "organization": str(self.other.pk),
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        alias = self.party.aliases.get()
++        self.assertEqual(alias.organization_id, self.organization.pk)
++        self.assertEqual(alias.recorded_by_id, self.owner.pk)
++        self.assertTrue(AuditEvent.objects.filter(entity_id=str(alias.pk)).exists())
++
++    def test_classification_lifecycle_uses_source_history(self):
++        self.assertEqual(
++            self.action(
++                "classification_create",
++                {"kind": "tag", "code": "SYNTHETIC", "name": "همکار آزمایشی"},
++            ).status_code,
++            302,
++        )
++        classification = self.organization.party_classifications.get()
++        self.assertEqual(
++            self.action(
++                "classification_assign", {"classification": str(classification.pk)}
++            ).status_code,
++            302,
++        )
++        assignment = self.party.classification_assignments.get()
++        self.assertEqual(
++            self.action(
++                "classification_revoke",
++                {"assignment": str(assignment.pk), "reason": "پایان انتساب"},
++            ).status_code,
++            302,
++        )
++        assignment.refresh_from_db()
++        self.assertIsNotNone(assignment.revoked_at)
++
++    def test_representative_evidence_jalali_timezone_and_revocation(self):
++        response = self.action(
++            "representative",
++            {
++                "authority": "signatory",
++                "full_name": "نماینده آزمایشی",
++                "evidence_reference": "SYNTHETIC-EVIDENCE",
++                "effective_from": "1405/01/02 09:30",
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        row = self.party.representatives.get()
++        self.assertEqual(row.effective_from.utcoffset().total_seconds(), 0)
++        self.assertEqual(row.effective_from.hour, 6)
++        self.assertEqual(
++            self.action(
++                "representative_revoke",
++                {"representative": str(row.pk), "reason": "پایان اختیار"},
++            ).status_code,
++            302,
++        )
++        row.refresh_from_db()
++        self.assertIsNotNone(row.revoked_at)
++
++    def test_tenant_restriction_revoke_preserves_record(self):
++        self.assertEqual(
++            self.action(
++                "restriction",
++                {
++                    "code": "SYNTHETIC",
++                    "effect": "information_only",
++                    "reason": "شاهد آزمایشی",
++                },
++            ).status_code,
++            302,
++        )
++        row = self.party.restrictions.get()
++        self.assertEqual(row.scope, "tenant")
++        self.assertEqual(
++            self.action(
++                "restriction_revoke", {"restriction": str(row.pk), "reason": "پایان"}
++            ).status_code,
++            302,
++        )
++        row.refresh_from_db()
++        self.assertIsNotNone(row.revoked_at)
++
++    def test_platform_restriction_is_never_exposed_or_revocable(self):
++        from django.utils import timezone
++
++        row = PartyRestriction.objects.create(
++            organization=self.organization,
++            party=self.party,
++            scope="platform",
++            code="PRIVATE-PLATFORM",
++            effect="information_only",
++            reason="PRIVATE-PLATFORM-REASON",
++            effective_from=timezone.now(),
++            created_by=self.owner,
++        )
++        response = self.client.get(self.url())
++        self.assertNotContains(response, "PRIVATE-PLATFORM")
++        self.assertEqual(
++            self.action(
++                "restriction_revoke", {"restriction": str(row.pk), "reason": "ATTACK"}
++            ).status_code,
++            400,
++        )
++        row.refresh_from_db()
++        self.assertIsNone(row.revoked_at)
++
++    def test_related_choices_reject_foreign_and_wrong_party(self):
++        self.assertEqual(
++            self.action(
++                "merge",
++                {"survivor": str(self.foreign.pk), "reason": "ATTACK", "confirm": "on"},
++            ).status_code,
++            400,
++        )
++        self.assertEqual(
++            self.action(
++                "classification_assign", {"classification": str(uuid4())}
++            ).status_code,
++            400,
++        )
++        second = services.create_business_party(
++            actor=self.owner,
++            organization=self.organization,
++            party_kind="company",
++            display_name="دوم",
++        )
++        alias = services.record_party_representative(
++            actor=self.owner,
++            organization=self.organization,
++            party=second,
++            authority="representative",
++            full_name="Private second",
++            evidence_reference="SYNTHETIC",
++        )
++        self.assertEqual(
++            self.action(
++                "representative_revoke",
++                {"representative": str(alias.pk), "reason": "ATTACK"},
++            ).status_code,
++            400,
++        )
++
++    def test_merge_requires_confirmation_and_preserves_source_identity(self):
++        target = services.create_business_party(
++            actor=self.owner,
++            organization=self.organization,
++            party_kind="company",
++            display_name="طرف مرجع",
++        )
++        data = {"survivor": str(target.pk), "reason": "تأیید هویت یکسان"}
++        self.assertEqual(self.action("merge", data).status_code, 400)
++        self.assertEqual(
++            self.action("merge", data | {"confirm": "on"}).status_code, 302
++        )
++        self.party.refresh_from_db()
++        self.assertEqual(self.party.merged_into_id, target.pk)
++        self.assertIsNotNone(self.party.archived_at)
++        self.assertTrue(self.party.identity_snapshots.exists())
++        self.capture("merged", self.client.get(self.url()))
++        self.assertNotContains(
++            self.client.get(self.url("list")), self.party.display_name
++        )
++
++    def test_identity_revision_legacy_post_uses_single_service(self):
++        response = self.client.post(
++            self.url("detail"),
++            {
++                "party_kind": "company",
++                "display_name": "نام جدید",
++                "legal_name": "",
++                "tax_identifier": "SYNTHETIC-030",
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        self.party.refresh_from_db()
++        self.assertEqual(self.party.display_name, "نام جدید")
++        self.assertEqual(self.party.identity_snapshots.count(), 2)
++
++    def test_invalid_and_empty_states_are_explicit(self):
++        response = self.action(
++            "alias", {"alias_type": "other", "value": "", "reason": ""}
++        )
++        self.assertEqual(response.status_code, 400)
++        self.assertTrue(response.context["actions"][0]["form"].errors)
++        self.capture("validation", response)
++        empty = self.client.get(self.url("list"), {"name": "NO-SYNTHETIC-MATCH"})
++        self.assertContains(empty, "طرف تجاری مجازی برای نمایش موجود نیست")
++        self.capture("empty", empty)
++
++    def test_governance_layout_dates_cache_and_navigation(self):
++        response = self.client.get(self.url())
++        self.assertContains(response, 'dir="rtl"')
++        self.assertContains(response, "تاریخچه نسخه‌های هویت")
++        self.assertContains(response, 'data-nav-id="NAV-043"')
++        self.assertIn("private, no-store", response["Cache-Control"])
++        self.assertIn("Cookie", response["Vary"])
++        self.capture("governance", response)
++        self.capture("master-list", self.client.get(self.url("governance")))
++
++    def test_csrf_and_method_restrictions(self):
++        secure = Client(enforce_csrf_checks=True)
++        secure.force_login(self.owner)
++        session = secure.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        self.assertEqual(
++            secure.post(self.url("governance_action", action="alias"), {}).status_code,
++            403,
++        )
++        self.assertEqual(
++            self.client.get(self.url("governance_action", action="alias")).status_code,
++            405,
++        )
++        self.assertEqual(self.action("unknown", {}).status_code, 404)
++
++    def test_suspended_tenant_and_inactive_membership_cannot_mutate(self):
++        self.organization.status = "suspended"
++        self.organization.save(update_fields=["status"])
++        self.assertEqual(
++            self.action(
++                "alias", {"alias_type": "other", "value": "ATTACK", "reason": "ATTACK"}
++            ).status_code,
++            403,
++        )
++        self.assertFalse(self.party.aliases.exists())
++
++    def test_existing_create_role_contact_and_archive_routes(self):
++        response = self.client.post(
++            self.url("create"),
++            {
++                "party_kind": "individual",
++                "display_name": "شخص آزمایشی",
++                "legal_name": "",
++                "tax_identifier": "",
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        self.assertEqual(
++            self.client.post(self.url("role_create"), {"role": "supplier"}).status_code,
++            302,
++        )
++        self.assertEqual(
++            self.client.post(
++                self.url("contact_create"),
++                {
++                    "contact_type": "email",
++                    "value": "synthetic@example.invalid",
++                    "label": "آزمایشی",
++                    "is_primary": "on",
++                },
++            ).status_code,
++            302,
++        )
++        self.assertEqual(self.party.roles.get().role, "supplier")
++        self.assertEqual(self.party.contacts.get().value, "synthetic@example.invalid")
++        self.assertEqual(self.client.post(self.url("archive")).status_code, 302)
++        self.party.refresh_from_db()
++        self.assertIsNotNone(self.party.archived_at)
++        self.assertEqual(
++            self.action(
++                "alias", {"alias_type": "other", "value": "ATTACK", "reason": "ATTACK"}
++            ).status_code,
++            400,
++        )
++
++    def test_reader_cannot_use_existing_mutation_routes(self):
++        self.login(self.reader)
++        for name in ("create", "archive", "role_create", "contact_create"):
++            self.assertEqual(self.client.post(self.url(name), {}).status_code, 403)
++
++    def test_revoked_membership_and_missing_session_fail_closed(self):
++        OrganizationMembership.objects.filter(
++            user=self.owner, organization=self.organization
++        ).update(status="inactive")
++        self.assertEqual(self.action("alias", {}).status_code, 403)
++        self.client.logout()
++        self.assertEqual(self.client.get(self.url()).status_code, 302)
++
++    def test_governance_grant_does_not_imply_merge_or_restriction(self):
++        self.login(
++            self.member("governance-only", {P.PARTIES_VIEW, P.PARTY_GOVERNANCE_MANAGE})
++        )
++        self.assertEqual(
++            self.action(
++                "alias",
++                {"alias_type": "other", "value": "آزمایشی", "reason": "آزمایشی"},
++            ).status_code,
++            302,
++        )
++        self.assertEqual(self.action("merge", {}).status_code, 403)
++        self.assertEqual(self.action("restriction", {}).status_code, 403)
+--- a/apps/parties/urls.py
++++ b/apps/parties/urls.py
+@@ -3 +3 @@
+-from apps.parties import views
++from apps.parties import governance_views, views
+@@ -7,0 +8,3 @@
++    path("governance/", governance_views.index, name="governance"),
++    path("governance/<uuid:party_id>/", governance_views.detail, name="governance_detail"),
++    path("governance/<uuid:party_id>/actions/<slug:action>/", governance_views.action, name="governance_action"),
+--- a/apps/parties/views.py
++++ b/apps/parties/views.py
+@@ -1 +1 @@
+-from django.core.exceptions import PermissionDenied
++from django.core.exceptions import PermissionDenied, ValidationError
+@@ -15 +14,0 @@
+-    require_organization_permission,
+@@ -17,0 +17 @@
++from apps.parties import governance_views
+@@ -18,0 +19 @@
++from apps.parties.governance_views import private_party_surface
+@@ -19,0 +21 @@
++from apps.parties.presentation import operational_parties
+@@ -25,2 +26,0 @@
+-    get_organization_parties,
+-    update_business_party,
+@@ -43,0 +44 @@
++@private_party_surface
+@@ -46 +47 @@
+-    parties = get_organization_parties(
++    parties = operational_parties(
+@@ -52,2 +53,2 @@
+-        text_fields={"name": ("display_name",), "tax_id": ("tax_id",)},
+-        choice_fields={"kind": ("kind", PartyKind.values)},
++        text_fields={"name": ("display_name", "legal_name"), "tax_id": ("tax_identifier",)},
++        choice_fields={"kind": ("party_kind", PartyKind.values)},
+@@ -58 +59 @@
+-        sort_fields={"name": "display_name", "kind": "kind", "tax_id": "tax_id"},
++        sort_fields={"name": "display_name", "kind": "party_kind", "tax_id": "tax_identifier"},
+@@ -88,0 +90 @@
++@private_party_surface
+@@ -99,2 +101,2 @@
+-        except (PermissionDenied, ValueError) as exc:
+-            form.add_error(None, str(exc))
++        except (ValueError, ValidationError):
++            form.add_error(None, "ثبت اطلاعات ممکن نشد؛ ورودی و وضعیت منبع را بررسی کنید.")
+@@ -102,2 +104,4 @@
+-            return redirect("parties:detail", party_id=party.pk)
+-    return render(request, "parties/form.html", {"form": form, "party": None})
++            if has_business_permission(user=request.user, organization=request.organization, permission=BusinessPermissionCode.PARTIES_VIEW):
++                return redirect("parties:governance_detail", party_id=party.pk)
++            return redirect("parties:create")
++    return render(request, "parties/form.html", {"form": form, "party": None, "party_governance_surface": True}, status=400 if form.is_bound else 200)
+@@ -106,0 +111 @@
++@private_party_surface
+@@ -110,5 +115 @@
+-        require_organization_permission(
+-            request,
+-            BusinessPermissionCode.PARTIES_CHANGE,
+-            "اجازه ویرایش طرف تجاری را ندارید.",
+-        )
++        return governance_views.detail(request, party_id=party_id)
+@@ -118,20 +118,0 @@
+-    form = BusinessPartyForm(request.POST or None, instance=party)
+-    if request.method == "GET" and not has_business_permission(
+-        user=request.user,
+-        organization=request.organization,
+-        permission=BusinessPermissionCode.PARTIES_CHANGE,
+-    ):
+-        for field in form.fields.values():
+-            field.disabled = True
+-    if request.method == "POST" and form.is_valid():
+-        try:
+-            party = update_business_party(
+-                organization=request.organization,
+-                actor=request.user,
+-                party=party,
+-                **form.cleaned_data,
+-            )
+-        except (PermissionDenied, ValueError) as exc:
+-            form.add_error(None, str(exc))
+-        else:
+-            return redirect("parties:detail", party_id=party.pk)
+@@ -143,3 +124,2 @@
+-            "form": form,
+-            "role_form": PartyRoleForm(),
+-            "contact_form": PartyContactForm(),
++            "roles": party.roles.filter(organization=request.organization, is_active=True),
++            "contacts": party.contacts.filter(organization=request.organization, archived_at__isnull=True),
+@@ -150,0 +131 @@
++@private_party_surface
+@@ -163 +144 @@
+-    return redirect("parties:list")
++    return redirect("parties:governance")
+@@ -166,0 +148 @@
++@private_party_surface
+@@ -185 +167 @@
+-    return redirect("parties:detail", party_id=party.pk)
++    return redirect("parties:governance_detail", party_id=party.pk)
+@@ -188,0 +171 @@
++@private_party_surface
+@@ -207 +190 @@
+-    return redirect("parties:detail", party_id=party.pk)
++    return redirect("parties:governance_detail", party_id=party.pk)
+--- a/core/test_cep017_navigation.py
++++ b/core/test_cep017_navigation.py
+@@ -46 +45,0 @@
+-            "NAV-043",
+--- a/templates/base.html
++++ b/templates/base.html
+@@ -677 +677 @@
+-                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available only %}
++                {% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface only %}
+@@ -701 +701 @@
+-                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available only %}</div>
++                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>{% include "components/navigation_links.html" with navigation_is_authenticated=True navigation_is_superuser=request.user.is_superuser navigation_is_platform_admin=platform_navigation_access current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name csrf_token=csrf_token business_permission_codes=business_permission_codes ess_subject_available=ess_subject_available party_governance_available=party_governance_available party_governance_surface=party_governance_surface only %}</div>
+--- a/templates/components/navigation_links.html
++++ b/templates/components/navigation_links.html
+@@ -29 +29 @@
+-        {% if "parties.view" in business_permission_codes %}<a data-nav-id="NAV-024" class="erp-nav-link{% if current_namespace == 'parties' %} is-active{% endif %}" href="{% url 'parties:list' %}">طرف‌های تجاری</a>{% endif %}
++        {% if "parties.view" in business_permission_codes %}<a data-nav-id="NAV-024" class="erp-nav-link{% if current_namespace == 'parties' and not party_governance_surface %} is-active{% endif %}" href="{% url 'parties:list' %}">طرف‌های تجاری</a>{% endif %}
+@@ -48 +48 @@
+-        <span data-nav-id="NAV-043" class="erp-nav-link is-unavailable" aria-disabled="true">حاکمیت طرف‌های تجاری</span>
++        {% if party_governance_available %}<a data-nav-id="NAV-043" class="erp-nav-link{% if current_namespace == 'parties' and party_governance_surface %} is-active{% endif %}" href="{% url 'parties:governance' %}">حاکمیت طرف‌های تجاری</a>{% endif %}
+--- a/templates/parties/_surface_navigation.html
++++ b/templates/parties/_surface_navigation.html
+@@ -0,0 +1,4 @@
++<nav class="erp-surface mb-5 flex flex-wrap gap-4 rounded-2xl p-4 text-sm font-bold" aria-label="سطوح طرف تجاری">
++  {% if "parties.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'parties:list' %}">نمای عملیاتی طرف‌ها</a>{% endif %}
++  {% if party_governance_available %}<a class="text-blue-700" href="{% url 'parties:governance' %}">حاکمیت طرف‌های تجاری</a>{% endif %}
++</nav>
+--- a/templates/parties/detail.html
++++ b/templates/parties/detail.html
+@@ -2 +2 @@
+-{% block title %}{{ party.display_name }} | سامانه مدیریت ساخت{% endblock %}
++{% block title %}{{ party.display_name }} | بنیرا{% endblock %}
+@@ -4,7 +4,5 @@
+-<div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><div><p class="text-xs font-semibold text-blue-600">طرف تجاری</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">{{ party.display_name }}</h1></div>{% if "parties.archive" in business_permission_codes %}<form method="post" action="{% url 'parties:archive' party.pk %}">{% csrf_token %}<button class="h-10 rounded-lg border border-red-200 bg-white px-4 text-sm font-semibold text-red-700" type="submit">بایگانی</button></form>{% endif %}</div>
+-<div class="mt-6 grid gap-5 lg:grid-cols-2">
+-    <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">مشخصات</h2><form method="post" class="mt-4 space-y-4">{% csrf_token %}{% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field %}{% endfor %}{% if "parties.change" in business_permission_codes %}<button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white">ذخیره تغییرات</button>{% endif %}</form></section>
+-    <div class="space-y-5">
+-        <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">نقش‌ها</h2><p class="mt-2 text-sm text-slate-500">{% for role in party.roles.all %}{{ role.get_role_display }}{% if not forloop.last %}، {% endif %}{% empty %}نقشی ثبت نشده است.{% endfor %}</p>{% if "party_roles.assign" in business_permission_codes %}<form method="post" action="{% url 'parties:role_create' party.pk %}" class="mt-4 flex gap-2">{% csrf_token %}{{ role_form.role }}<button class="h-11 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white">افزودن</button></form>{% endif %}</section>
+-        <section class="erp-surface rounded-xl p-5"><h2 class="text-sm font-bold">راه‌های ارتباطی</h2>{% for contact in party.contacts.all %}<p class="mt-2 text-sm">{% if contact.is_primary %}<span class="text-blue-600">اصلی · </span>{% endif %}{{ contact.get_contact_type_display }}: <span dir="ltr">{{ contact.value }}</span></p>{% empty %}<p class="mt-2 text-sm text-slate-500">راه ارتباطی ثبت نشده است.</p>{% endfor %}{% if "party_contacts.add" in business_permission_codes %}<form method="post" action="{% url 'parties:contact_create' party.pk %}" class="mt-4 space-y-3">{% csrf_token %}{% for field in contact_form %}{% include "components/form_field.html" with field=field %}{% endfor %}<button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white">افزودن راه ارتباطی</button></form>{% endif %}</section>
+-    </div>
++{% include "parties/_surface_navigation.html" %}
++<header class="erp-surface rounded-2xl p-5 sm:p-6"><p class="text-xs font-bold text-blue-700">نمای عملیاتی طرف تجاری</p><h1 class="mt-2 text-2xl font-black">{{ party.display_name }}</h1><p class="mt-3 text-sm text-slate-600">مشخصات و ارتباطات مجاز از منبع شرکت نمایش داده می‌شوند.</p>{% if party_governance_available %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'parties:governance_detail' party.pk %}">سوابق و اقدامات حاکمیتی</a>{% endif %}</header>
++<div class="mt-5 grid min-w-0 gap-5 lg:grid-cols-2">
++<section class="erp-surface rounded-2xl p-5"><h2 class="text-lg font-bold">مشخصات ثبت‌شده</h2><dl class="mt-4 grid gap-4"><div><dt class="text-sm text-slate-500">نوع</dt><dd class="mt-1 font-bold">{{ party.get_party_kind_display }}</dd></div><div><dt class="text-sm text-slate-500">نام قانونی</dt><dd class="mt-1">{{ party.legal_name|default:"ثبت نشده" }}</dd></div><div><dt class="text-sm text-slate-500">شناسه مالیاتی</dt><dd class="mt-1"><bdi>{{ party.tax_identifier|default:"ثبت نشده" }}</bdi></dd></div></dl></section>
++<section class="erp-surface rounded-2xl p-5"><h2 class="text-lg font-bold">نقش‌ها و راه‌های ارتباطی</h2><p class="mt-3">{% for role in roles %}{{ role.get_role_display }}{% if not forloop.last %} · {% endif %}{% empty %}نقشی ثبت نشده است.{% endfor %}</p><ul class="mt-4 space-y-3 border-t border-slate-100 pt-4">{% for contact in contacts %}<li>{{ contact.get_contact_type_display }}: <bdi>{{ contact.value }}</bdi>{% if contact.is_primary %}<span class="mr-2 text-sm text-blue-700">اصلی</span>{% endif %}</li>{% empty %}<li class="text-sm text-slate-500" role="status">راه ارتباطی ثبت نشده است.</li>{% endfor %}</ul></section>
+--- a/templates/parties/form.html
++++ b/templates/parties/form.html
+@@ -1 +1 @@
+-{% extends "base.html" %}{% block title %}افزودن طرف تجاری | سامانه مدیریت ساخت{% endblock %}{% block content %}<div class="max-w-2xl"><p class="text-xs font-semibold text-blue-600">اطلاعات پایه</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">افزودن طرف تجاری</h1><form method="post" class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6">{% csrf_token %}{% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field %}{% endfor %}<div class="flex justify-end border-t border-slate-100 pt-5"><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ذخیره طرف تجاری</button></div></form></div>{% endblock %}
++{% extends "base.html" %}{% block title %}افزودن طرف تجاری | سامانه مدیریت ساخت{% endblock %}{% block content %}{% include "parties/_surface_navigation.html" %}<div class="max-w-2xl"><p class="text-xs font-semibold text-blue-600">حاکمیت طرف تجاری</p><h1 class="mt-1 text-2xl font-bold text-slate-950 sm:text-3xl">افزودن طرف تجاری</h1><form method="post" class="erp-surface mt-6 space-y-5 rounded-xl p-5 sm:p-6">{% csrf_token %}{% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field %}{% endfor %}<div class="flex justify-end border-t border-slate-100 pt-5"><button class="h-10 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white" type="submit">ذخیره طرف تجاری</button></div></form></div>{% endblock %}
+--- a/templates/parties/governance_detail.html
++++ b/templates/parties/governance_detail.html
+@@ -0,0 +1,43 @@
++{% extends "base.html" %}{% load erp_format %}
++{% block title %}حاکمیت {{ party.display_name }} | بنیرا{% endblock %}
++{% block content %}
++{% include "parties/_surface_navigation.html" %}
++<header class="erp-surface rounded-2xl p-5 sm:p-6">
++  <p class="text-xs font-bold text-blue-700">حاکمیت طرف تجاری · {{ request.organization.name }}</p>
++  <h1 class="mt-2 text-2xl font-black">{{ party.display_name }}</h1>
++  <p class="mt-3 text-sm text-slate-600">وضعیت منبع: {% if party.merged_into_id %}ادغام‌شده{% elif party.archived_at %}بایگانی‌شده{% else %}فعال{% endif %}</p>
++  {% if party_source_active %}<a class="mt-3 inline-flex font-bold text-blue-700" href="{% url 'parties:detail' party.pk %}">مشاهده نمای عملیاتی</a>{% endif %}
++  {% if can_merge_history and party.merged_into_id %}<p class="mt-3">مرجع ادغام: <a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' party.merged_into_id %}">{{ party.merged_into.display_name }}</a></p><p class="mt-2">{{ party.merge_reason }}</p>{% endif %}
++</header>
++<div class="mt-5 grid min-w-0 gap-5 xl:grid-cols-2">
++  <section class="erp-surface min-w-0 rounded-2xl p-5"><h2 class="text-lg font-bold">هویت طرف تجاری</h2>
++    {% if can_edit %}<form class="mt-4 space-y-4" method="post" action="{% url 'parties:governance_detail' party.pk %}">{% csrf_token %}
++      {% include "components/form_errors.html" with form=form %}{% for field in form %}{% include "components/form_field.html" with field=field %}{% endfor %}
++      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">ثبت نسخه هویت</button>
++    </form>{% else %}<dl class="mt-4 grid gap-3"><div><dt class="text-sm text-slate-500">نام قانونی</dt><dd>{{ party.legal_name|default:"ثبت نشده" }}</dd></div><div><dt class="text-sm text-slate-500">شناسه مالیاتی</dt><dd><bdi>{{ party.tax_identifier|default:"ثبت نشده" }}</bdi></dd></div></dl>{% endif %}
++    {% if can_archive %}<form class="mt-5 border-t border-slate-100 pt-4" method="post" action="{% url 'parties:archive' party.pk %}">{% csrf_token %}<button class="rounded-xl border border-red-200 px-4 py-2 font-bold text-red-700">بایگانی طرف تجاری</button></form>{% endif %}
++  </section>
++  <section class="erp-surface min-w-0 rounded-2xl p-5"><h2 class="text-lg font-bold">نقش‌ها و ارتباطات ثبت‌شده</h2>
++    <p class="mt-3 text-sm">{% for role in roles %}{{ role.get_role_display }}{% if not forloop.last %} · {% endif %}{% empty %}نقشی ثبت نشده است.{% endfor %}</p>
++    {% if can_assign_role %}<form class="mt-4 space-y-3" method="post" action="{% url 'parties:role_create' party.pk %}">{% csrf_token %}{% for field in role_form %}{% include "components/form_field.html" with field=field %}{% endfor %}<button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">ثبت نقش</button></form>{% endif %}
++    <ul class="mt-5 space-y-2 border-t border-slate-100 pt-4">{% for contact in contacts %}<li>{{ contact.get_contact_type_display }}: <bdi>{{ contact.value }}</bdi></li>{% empty %}<li class="text-sm text-slate-500">راه ارتباطی ثبت نشده است.</li>{% endfor %}</ul>
++    {% if can_add_contact %}<form class="mt-4 space-y-3" method="post" action="{% url 'parties:contact_create' party.pk %}">{% csrf_token %}{% for field in contact_form %}{% include "components/form_field.html" with field=field %}{% endfor %}<button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">ثبت راه ارتباطی</button></form>{% endif %}
++  </section>
++</div>
++<section class="mt-6" aria-labelledby="actions-heading"><h2 id="actions-heading" class="text-xl font-bold">اقدامات مجاز منبع</h2><p class="mt-2 text-sm text-slate-600">زمان‌های ثبت‌شده بر اساس منطقه زمانی شرکت نمایش داده می‌شوند.</p>
++  <div class="mt-4 grid min-w-0 gap-4 lg:grid-cols-2">{% for item in actions %}<details class="erp-surface min-w-0 rounded-2xl p-5"{% if item.form.is_bound %} open{% endif %}>
++    <summary class="cursor-pointer font-bold">{{ item.title }}</summary>
++    {% if item.key == 'merge' %}<p class="mt-4 text-sm text-slate-600">طرف مرجع را صریح انتخاب کنید. سابقه هویت و ارجاع تراکنش‌های قبلی حفظ می‌شود.</p>{% endif %}
++    <form class="mt-4 space-y-4" method="post" action="{% url 'parties:governance_action' party.pk item.key %}">{% csrf_token %}
++      {% include "components/form_errors.html" with form=item.form %}{% for field in item.form %}{% include "components/form_field.html" with field=field %}{% endfor %}
++      <button class="rounded-xl bg-blue-700 px-4 py-2 font-bold text-white">ثبت در منبع</button>
++    </form>
++  </details>{% empty %}<p class="erp-surface rounded-2xl p-5 text-sm text-slate-600" role="status">اقدام تکمیلی مجازی برای این وضعیت منبع در دسترس نیست.</p>{% endfor %}</div>
++</section>
++{% if identity_history != None %}<section class="erp-surface mt-6 min-w-0 overflow-hidden rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه نسخه‌های هویت</h2><div class="erp-table-wrap mt-4"><table class="w-full min-w-[600px] text-right"><thead><tr><th class="p-3">نسخه</th><th class="p-3">نام ثبت‌شده</th><th class="p-3">شناسه مالیاتی</th><th class="p-3">زمان ثبت</th></tr></thead><tbody>{% for row in identity_history %}<tr class="border-t border-slate-100"><td class="p-3">{{ row.sequence|erp_number }}</td><td class="p-3">{{ row.display_name }}</td><td class="p-3"><bdi>{{ row.tax_identifier|default:"ثبت نشده" }}</bdi></td><td class="p-3">{{ row.recorded_at|jalali_datetime }}</td></tr>{% empty %}<tr><td class="p-3" colspan="4">نسخه هویت ثبت نشده است.</td></tr>{% endfor %}</tbody></table></div></section>{% endif %}
++{% if aliases != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">شواهد نام و شناسه جایگزین</h2><ul class="mt-4 space-y-3">{% for row in aliases %}<li><p class="font-bold">{{ row.get_alias_type_display }} · <bdi>{{ row.value }}</bdi></p><p class="mt-1 text-sm text-slate-600">{{ row.reason }} · {{ row.created_at|jalali_datetime }}</p></li>{% empty %}<li role="status">شاهدی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
++{% if classifications != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه دسته‌ها و برچسب‌ها</h2><ul class="mt-4 space-y-3">{% for row in classifications %}<li><p class="font-bold">{{ row.classification.name }} · {% if row.revoked_at %}لغوشده{% else %}ثبت‌شده{% endif %}</p><p class="mt-1 text-sm text-slate-600">{{ row.assigned_at|jalali_datetime }}{% if row.revoked_at %} · لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}{% endif %}</p></li>{% empty %}<li role="status">انتسابی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
++{% if representatives != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">سوابق نمایندگان و امضاداران</h2><ul class="mt-4 space-y-4">{% for row in representatives %}<li class="border-t border-slate-100 pt-3"><h3 class="font-bold">{{ row.full_name }} · {{ row.get_authority_display }}</h3><p class="mt-1 text-sm">{{ row.title }} · مدرک: {{ row.evidence_reference }}</p><p class="mt-1 text-sm text-slate-600">{{ row.effective_from|jalali_datetime }} تا {{ row.effective_until|jalali_datetime|default:"پایان ثبت نشده" }}</p>{% if row.revoked_at %}<p class="mt-1 text-sm">لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}</p>{% endif %}</li>{% empty %}<li role="status">نماینده‌ای ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
++{% if restrictions != None %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">تاریخچه محدودیت‌های همین شرکت</h2><ul class="mt-4 space-y-4">{% for row in restrictions %}<li class="border-t border-slate-100 pt-3"><h3 class="font-bold"><bdi>{{ row.code }}</bdi> · {{ row.get_effect_display }}</h3><p class="mt-1 text-sm">{{ row.reason }}</p><p class="mt-1 text-sm text-slate-600">{{ row.effective_from|jalali_datetime }} تا {{ row.effective_until|jalali_datetime|default:"پایان ثبت نشده" }}</p>{% if row.revoked_at %}<p class="mt-1 text-sm">لغو: {{ row.revoked_at|jalali_datetime }} · {{ row.revocation_reason }}</p>{% endif %}</li>{% empty %}<li role="status">محدودیت شرکتی ثبت نشده است.</li>{% endfor %}</ul></section>{% endif %}
++{% if can_merge_history %}<section class="erp-surface mt-5 rounded-2xl p-5"><h2 class="text-lg font-bold">سوابق ارجاع ادغام</h2><ul class="mt-3 space-y-3">{% for source in merged_sources %}<li><a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' source.pk %}">{{ source.display_name }}</a><p class="mt-1 text-sm">{{ source.merge_reason }} · {{ source.merged_at|jalali_datetime }}</p></li>{% empty %}<li role="status">طرفی به این مرجع ارجاع نشده است.</li>{% endfor %}</ul></section>{% endif %}
++{% endblock %}
+--- a/templates/parties/governance_list.html
++++ b/templates/parties/governance_list.html
+@@ -0,0 +1,28 @@
++{% extends "base.html" %}{% load erp_format %}
++{% block title %}حاکمیت طرف‌های تجاری | بنیرا{% endblock %}
++{% block content %}
++{% include "parties/_surface_navigation.html" %}
++<header class="erp-surface rounded-2xl p-5 sm:p-6">
++  <p class="text-xs font-bold text-blue-700">مدیریت داده‌های پایه · شرکت فعال</p>
++  <h1 class="mt-2 text-2xl font-black">حاکمیت طرف‌های تجاری</h1>
++  <p class="mt-3 text-sm text-slate-600">هویت، سوابق و اقدامات مجاز از همان منبع طرف‌های تجاری مدیریت می‌شوند.</p>
++  {% if "parties.create" in business_permission_codes %}<a class="mt-4 inline-flex rounded-xl bg-blue-700 px-4 py-2 font-bold text-white" href="{% url 'parties:create' %}">ثبت طرف تجاری</a>{% endif %}
++</header>
++<form method="get" class="erp-surface mt-5 flex flex-wrap items-end gap-3 rounded-2xl p-5" aria-label="جستجوی حاکمیت طرف‌ها">
++  <div><label class="mb-2 block text-sm" for="governance-name">نام طرف تجاری</label><input class="rounded-xl border border-slate-200 px-3 py-2" id="governance-name" name="name" value="{{ request.GET.name }}" maxlength="255"></div>
++  <button class="rounded-xl border border-slate-300 px-4 py-2 font-bold">جستجو</button>
++</form>
++<section class="erp-surface mt-5 min-w-0 overflow-hidden rounded-2xl">
++  {% if parties %}<div class="erp-table-wrap"><table class="w-full min-w-[640px] text-right">
++    <caption class="sr-only">طرف‌های تجاری و وضعیت ثبت‌شده منبع</caption>
++    <thead><tr><th class="px-5 py-3">طرف تجاری</th><th class="px-5 py-3">نوع</th><th class="px-5 py-3">وضعیت منبع</th><th class="px-5 py-3">آخرین تغییر</th><th class="px-5 py-3">دسترسی</th></tr></thead>
++    <tbody>{% for party in parties %}<tr class="border-t border-slate-100">
++      <td class="px-5 py-4 font-bold">{{ party.display_name }}</td><td class="px-5 py-4">{{ party.get_party_kind_display }}</td>
++      <td class="px-5 py-4">{% if party.merged_into_id %}ادغام‌شده{% elif party.archived_at %}بایگانی‌شده{% else %}فعال{% endif %}</td>
++      <td class="px-5 py-4">{{ party.updated_at|jalali_datetime }}</td>
++      <td class="px-5 py-4"><a class="font-bold text-blue-700" href="{% url 'parties:governance_detail' party.pk %}">سوابق و اقدامات مجاز</a></td>
++    </tr>{% endfor %}</tbody>
++  </table></div>{% include "components/table_pagination.html" %}
++  {% else %}<p class="p-5 text-slate-600" role="status">طرف تجاری مجازی متناسب با جستجو برای نمایش موجود نیست.</p>{% endif %}
++</section>
++{% endblock %}
+--- a/templates/parties/list.html
++++ b/templates/parties/list.html
+@@ -5,0 +6 @@
++{% include "parties/_surface_navigation.html" %}
+@@ -7,2 +8,2 @@
+-    {% if "parties.create" in business_permission_codes %}{% url "parties:create" as create_url %}{% endif %}
+-    {% include "components/page_header.html" with page_eyebrow="اطلاعات پایه" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=create_url page_action_label="طرف تجاری جدید" only %}
++    {% if party_governance_available %}{% url "parties:governance" as governance_url %}{% endif %}
++    {% include "components/page_header.html" with page_eyebrow="نمای عملیاتی" page_title="طرف‌های تجاری" page_description=request.organization.name page_action_url=governance_url page_action_label="ورود به حاکمیت" only %}
+@@ -21 +22 @@
+-                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.roles.all %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
++                                <td class="px-4 py-3.5"><div class="flex flex-wrap gap-1">{% for role in party.operational_roles %}<span class="erp-badge erp-badge--info">{{ role.get_role_display }}</span>{% empty %}<span class="text-xs text-slate-400">بدون نقش</span>{% endfor %}</div></td>
+@@ -30 +31 @@
+-            {% include "components/empty_state.html" with empty_title="هنوز طرف تجاری ثبت نشده است" empty_description="برای شروع، یک طرف تجاری جدید ایجاد کنید." empty_action_url=create_url empty_action_label="ایجاد طرف تجاری" only %}
++            {% include "components/empty_state.html" with empty_title="طرف تجاری مجازی برای نمایش موجود نیست" empty_description="جستجو و فیلترهای انتخاب‌شده را بررسی کنید." only %}
+--- a/templates/parties/unavailable.html
++++ b/templates/parties/unavailable.html
+@@ -0,0 +1,7 @@
++{% extends "base.html" %}
++{% block title %}طرف تجاری در دسترس نیست | بنیرا{% endblock %}
++{% block content %}<section class="erp-surface mx-auto max-w-3xl rounded-2xl p-5 sm:p-6" dir="rtl">
++  <h1 class="text-xl font-bold">اطلاعات مجاز طرف تجاری در دسترس نیست</h1>
++  <p class="mt-3 text-slate-600" role="alert">این بخش یا اقدام برای حساب شما در شرکت فعال در دسترس نیست.</p>
++  <a class="mt-5 inline-flex font-bold text-blue-700" href="{% url 'home' %}">بازگشت به خانه</a>
++</section>{% endblock %}
