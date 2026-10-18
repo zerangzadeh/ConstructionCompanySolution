@@ -567,6 +567,9 @@ class BusinessPermissionCode(models.TextChoices):
         "تأیید الحاقیه قرارداد",
     )
     CONTRACT_TERMS_MANAGE = "contract_terms.manage", "تهیه نسخه شرایط تجاری قرارداد"
+    INDEXATION_RULES_MANAGE = "indexation_rules.manage", "تهیه نسخه قانون تعدیل"
+    INDEXATION_CALCULATE = "indexation.calculate", "محاسبه تعدیل با سیاست مجاز"
+    INDEXATION_CORRECT = "indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"
     CONTRACT_TERMS_APPROVE = (
         "contract_terms.approve",
         "تأیید مستقل نسخه شرایط تجاری قرارداد",

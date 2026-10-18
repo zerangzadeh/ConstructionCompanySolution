@@ -7,11 +7,142 @@ from django.db import models
 from django.db.models import F, Q
 
 from apps.contracts.models import ContractDirection
-from core.models import TimeStampedModel, UUIDModel
+from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
 MONEY_QUANTUM = Decimal("0.01")
 QUANTITY_QUANTUM = Decimal("0.0001")
+
+
+class IndexationHistoryQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError("سابقه تعدیل تغییرپذیر نیست.")
+
+    def delete(self):
+        raise ValidationError("سابقه تعدیل حذف‌پذیر نیست.")
+
+    def bulk_create(self, *args, **kwargs):
+        raise ValidationError("ثبت گروهی سابقه تعدیل مجاز نیست.")
+
+
+class IndexationHistory(UUIDModel, CreatedAtModel):
+    objects = models.Manager.from_queryset(IndexationHistoryQuerySet)()
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    contract = models.ForeignKey("contracts.Contract", on_delete=models.PROTECT)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("سابقه تعدیل تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("سابقه تعدیل حذف‌پذیر نیست.")
+
+    def clean(self):
+        super().clean()
+        validate_related_organizations(self, contract=self.contract)
+        if not self.reason.strip():
+            raise ValidationError("دلیل لازم است.")
+
+
+class IndexationRuleVersion(IndexationHistory):
+    """Staging is immutable and never constitutes approval or activation."""
+
+    code = models.CharField(max_length=80)
+    version = models.PositiveIntegerField()
+    effective_from = models.DateField()
+    effective_to = models.DateField()
+    adapter_key = models.CharField(max_length=100)
+    specification = models.JSONField()
+    sha256 = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "contract", "code", "version"],
+                name="idx_rule_contract_version_uq",
+            ),
+            models.CheckConstraint(condition=Q(version__gte=1), name="idx_version_pos"),
+            models.CheckConstraint(
+                condition=Q(effective_to__gte=F("effective_from")),
+                name="idx_effective_range",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        from .indexation import rule_digest, validate_specification
+
+        validate_specification(self.specification)
+        if not self.code.strip() or not self.adapter_key.strip():
+            raise ValidationError("شناسه قانون و تطبیق‌دهنده لازم است.")
+        if self.effective_to < self.effective_from or self.version < 1:
+            raise ValidationError("نسخه و بازه اثر معتبر لازم است.")
+        if self.sha256 != rule_digest(self):
+            raise ValidationError("چکیده قانون معتبر نیست.")
+
+
+class IndexationCalculation(IndexationHistory):
+    rule = models.ForeignKey(IndexationRuleVersion, on_delete=models.PROTECT)
+    operation = models.CharField(
+        max_length=12,
+        choices=[("calculate", "محاسبه"), ("correct", "اصلاح"), ("reverse", "برگشت")],
+    )
+    prior = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="replacement",
+    )
+    calculation_date = models.DateField()
+    idempotency_key = models.CharField(max_length=100)
+    request_sha256 = models.CharField(max_length=64)
+    snapshot = models.JSONField()
+    sha256 = models.CharField(max_length=64)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "contract", "idempotency_key"],
+                name="idx_calculation_key_uq",
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(operation="calculate", prior__isnull=True)
+                    | Q(operation__in=["correct", "reverse"], prior__isnull=False)
+                ),
+                name="idx_operation_lineage",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        from .indexation import digest, validate_calculation_snapshot
+
+        validate_related_organizations(self, rule=self.rule, prior=self.prior)
+        if self.rule.contract_id != self.contract_id or (
+            self.prior_id
+            and (
+                self.prior.contract_id != self.contract_id
+                or self.prior_id == self.pk
+                or self.prior.operation == "reverse"
+            )
+        ):
+            raise ValidationError("پیوند قرارداد و سابقه معتبر نیست.")
+        if (self.operation == "calculate") != (self.prior_id is None):
+            raise ValidationError("عملیات و سابقه سازگار نیست.")
+        validate_calculation_snapshot(self)
+        if self.sha256 != digest(self.snapshot):
+            raise ValidationError("چکیده محاسبه معتبر نیست.")
 
 
 class ProjectBaselineStatus(models.TextChoices):

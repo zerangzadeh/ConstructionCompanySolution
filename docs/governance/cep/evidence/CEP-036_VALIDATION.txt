@@ -1,0 +1,1335 @@
+CEP-036 validation; baseline343391c; .venv-2 Python / Django PostgreSQL.
+Commands: manage.py test apps.billing.test_cep036 [apps.billing.test_cep036_migration]; test apps.contracts.tests.ContractServiceTests apps.billing.test_commercial_controls.CommercialControlTests; test apps.organizations.test_permission_registry; ruff check changed Python; ruff format --check new Python; manage.py check; makemigrations --check --dry-run; migrate --plan; development reconcile script.
+Final focused24 plus migration1 =25 PASS. Combined registry run33:27 PASS /6 global failures; final HEAD/current diagnostic equivalence in separate JSON. Existing Contracts/Billing21 fixture errors before036; not full regression PASS. Earlier initial036 fixture/static errors and catalogue timestamp assertion retained below with later corrected PASS. Diagnostic Timeout entries are periodic stack snapshots during long successful migration-state reconstruction, not test timeouts/failures.
+
+ACTUAL CAPTURE: cep036-checks-pass.txt
+All checks passed!
+3 files already formatted
+System check identified no issues (0 silenced).
+No changes detected
+
+
+ACTUAL CAPTURE: cep036-development-2.txt
+Operations to perform:
+  Target specific migration: 0016_cep036_indexation, from billing
+Running migrations:
+  Applying billing.0016_cep036_indexation... OK
+Reconciliation PASS; all existing Billing/Contracts and role assignment/scope/grant rows unchanged; no indexation activation.
+
+
+ACTUAL CAPTURE: cep036-development-final.txt
+Operations to perform:
+  Target specific migration: 0114_cep036_indexation_permissions, from organizations
+Running migrations:
+  Applying organizations.0114_cep036_indexation_permissions... OK
+Operations to perform:
+  Target specific migration: 0016_cep036_indexation, from billing
+Running migrations:
+  No migrations to apply.
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\output\cep-036\reconcile.py", line 31, in <module>
+    assert catalog_before==list(BusinessPermission.objects.exclude(code__in=codes).order_by('pk').values())
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
+
+
+ACTUAL CAPTURE: cep036-development-verified.txt
+Operations to perform:
+  Target specific migration: 0114_cep036_indexation_permissions, from organizations
+Running migrations:
+  No migrations to apply.
+Operations to perform:
+  Target specific migration: 0016_cep036_indexation, from billing
+Running migrations:
+  No migrations to apply.
+Reconciliation PASS; all existing Billing/Contracts and role assignment/scope/grant rows unchanged; no indexation activation.
+
+
+ACTUAL CAPTURE: cep036-development.txt
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\output\cep-036\reconcile.py", line 5, in <module>
+    django.setup()
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\__init__.py", line 19, in setup
+    configure_logging(settings.LOGGING_CONFIG, settings.LOGGING)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\conf\__init__.py", line 81, in __getattr__
+    self._setup(name)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\conf\__init__.py", line 68, in _setup
+    self._wrapped = Settings(settings_module)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\conf\__init__.py", line 166, in __init__
+    mod = importlib.import_module(self.SETTINGS_MODULE)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\importlib\__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1128, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1128, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1206, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1178, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1142, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'config'
+
+
+ACTUAL CAPTURE: cep036-diagnostic-tests.txt
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_adapter_cannot_mutate_pinned_input (apps.billing.test_cep036.IndexationTests.test_adapter_cannot_mutate_pinned_input) ... ok
+test_adapter_failure_rolls_back_without_partial_history (apps.billing.test_cep036.IndexationTests.test_adapter_failure_rolls_back_without_partial_history) ... ok
+test_approval_cannot_be_replayed_for_other_rule_request_or_source (apps.billing.test_cep036.IndexationTests.test_approval_cannot_be_replayed_for_other_rule_request_or_source) ... ok
+test_contract_scope_and_current_tenant_state_are_rechecked (apps.billing.test_cep036.IndexationTests.test_contract_scope_and_current_tenant_state_are_rechecked) ... ok
+test_correction_and_reversal_append_history_and_prevent_forks (apps.billing.test_cep036.IndexationTests.test_correction_and_reversal_append_history_and_prevent_forks) ... ok
+test_correction_requires_explicit_adapter_approval (apps.billing.test_cep036.IndexationTests.test_correction_requires_explicit_adapter_approval) ... ok
+test_decimal_result_is_required_and_never_implicitly_rounded (apps.billing.test_cep036.IndexationTests.test_decimal_result_is_required_and_never_implicitly_rounded) ... ok
+test_effective_date_bounds_fail_closed (apps.billing.test_cep036.IndexationTests.test_effective_date_bounds_fail_closed) ... ok
+test_failure_after_insert_rolls_back_calculation (apps.billing.test_cep036.IndexationTests.test_failure_after_insert_rolls_back_calculation) ... ok
+test_forged_snapshot_or_rule_digest_rejected_by_model (apps.billing.test_cep036.IndexationTests.test_forged_snapshot_or_rule_digest_rejected_by_model) ... ok
+test_idempotent_retry_and_collision (apps.billing.test_cep036.IndexationTests.test_idempotent_retry_and_collision) ... ok
+test_invalid_indexes_periods_values_and_floats_fail_before_adapter (apps.billing.test_cep036.IndexationTests.test_invalid_indexes_periods_values_and_floats_fail_before_adapter) ... ok
+test_invalid_transition_shapes_fail (apps.billing.test_cep036.IndexationTests.test_invalid_transition_shapes_fail) ... ok
+test_missing_adapter_and_staging_never_activate (apps.billing.test_cep036.IndexationTests.test_missing_adapter_and_staging_never_activate) ... ok
+test_missing_or_mismatched_approval_fails_closed (apps.billing.test_cep036.IndexationTests.test_missing_or_mismatched_approval_fails_closed) ... ok
+test_new_capabilities_are_explicit_and_never_default_granted (apps.billing.test_cep036.IndexationTests.test_new_capabilities_are_explicit_and_never_default_granted) ... ok
+test_no_hidden_specification_defaults (apps.billing.test_cep036.IndexationTests.test_no_hidden_specification_defaults) ... ok
+test_no_membership_authority_fails_closed (apps.billing.test_cep036.IndexationTests.test_no_membership_authority_fails_closed) ... ok
+test_other_contract_rule_and_prior_cannot_be_used (apps.billing.test_cep036.IndexationTests.test_other_contract_rule_and_prior_cannot_be_used) ... ok
+test_project_scope_does_not_expand_contract_authority (apps.billing.test_cep036.IndexationTests.test_project_scope_does_not_expand_contract_authority) ... ok
+test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written (apps.billing.test_cep036.IndexationTests.test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written) ... ok
+test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal (apps.billing.test_cep036.IndexationTests.test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal) ... ok
+test_unregistered_and_duplicate_adapter_keys_rejected (apps.billing.test_cep036.IndexationTests.test_unregistered_and_duplicate_adapter_keys_rejected) ... ok
+test_versioning_does_not_rewrite_calculation_or_old_rule (apps.billing.test_cep036.IndexationTests.test_versioning_does_not_rewrite_calculation_or_old_rule) ... ok
+test_rollback_reapply_preserves_existing_contract_source (apps.billing.test_cep036_migration.IndexationMigrationTests.test_rollback_reapply_preserves_existing_contract_source) ... Timeout (0:01:00)!
+Thread 0x00005fe4 (most recent call first):
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\apps\registry.py", line 185 in get_models
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\apps\registry.py", line 297 in get_swappable_settings_name
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 439 in swappable_setting
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 732 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 1096 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\__init__.py", line 671 in clone
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 978 in <dictcomp>
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 978 in render
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 688 in render_multiple
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 458 in _reload
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 423 in reload_model
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 266 in add_field
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\operations\fields.py", line 95 in state_forwards
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\migration.py", line 91 in mutate_state
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\executor.py", line 214 in _migrate_all_backwards
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\executor.py", line 141 in migrate
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036_migration.py", line 37 in test_rollback_reapply_preserves_existing_contract_source
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 579 in _callTestMethod
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 623 in run
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 678 in __call__
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\testcases.py", line 376 in _setup_and_call
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\testcases.py", line 321 in __call__
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\suite.py", line 122 in run
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\suite.py", line 84 in __call__
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\runner.py", line 217 in run
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 1014 in run_suite
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 1087 in run_tests
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 63 in handle
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 464 in execute
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 420 in run_from_argv
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 24 in run_from_argv
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 436 in execute
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 442 in execute_from_command_line
+  File "<stdin>", line 5 in <module>
+Timeout (0:01:00)!
+Thread 0x00005fe4 (most recent call first):
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\apps\registry.py", line 185 in get_models
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\apps\registry.py", line 296 in get_swappable_settings_name
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 439 in swappable_setting
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 732 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 1096 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\__init__.py", line 671 in clone
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 978 in <dictcomp>
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 978 in render
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 688 in render_multiple
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 458 in _reload
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 423 in reload_model
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 206 in _append_option
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\state.py", line 243 in add_constraint
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\operations\models.py", line 1206 in state_forwards
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\migration.py", line 91 in mutate_state
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\executor.py", line 214 in _migrate_all_backwards
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\migrations\executor.py", line 141 in migrate
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036_migration.py", line 37 in test_rollback_reapply_preserves_existing_contract_source
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 579 in _callTestMethod
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 623 in run
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\case.py", line 678 in __call__
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\testcases.py", line 376 in _setup_and_call
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\testcases.py", line 321 in __call__
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\suite.py", line 122 in run
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\suite.py", line 84 in __call__
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\runner.py", line 217 in run
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 1014 in run_suite
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 1087 in run_tests
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 63 in handle
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 464 in execute
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 420 in run_from_argv
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 24 in run_from_argv
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 436 in execute
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 442 in execute_from_command_line
+  File "<stdin>", line 5 in <module>
+Timeout (0:01:00)!
+Thread 0x00005fe4 (most recent call first):
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\apps\registry.py", line 297 in get_swappable_settings_name
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 439 in swappable_setting
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 732 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\related.py", line 1096 in deconstruct
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\fields\__init__.py", line 1319064624 in clone
+ok
+
+----------------------------------------------------------------------
+Ran 25 tests in 222.782s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 25 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-final-focused.txt
+Using existing test database for alias 'default'...
+
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 1.963s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 23 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-final-tests.txt
+Using existing test database for alias 'default'...
+
+........................F.FFFF.F.
+======================================================================
+FAIL: test_database_catalog_matches_registry (apps.organizations.test_permission_registry.PermissionRegistryDatabaseTests.test_database_catalog_matches_registry)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 142, in test_database_catalog_matches_registry
+    self.assertEqual(
+AssertionError: Items in the first set but not the second:
+'support.evidence_sensitive_view'
+'support.access_tenant_confirm'
+'support.access_revoke'
+'support.case_reopen'
+'support.case_resolve'
+'support.evidence_link'
+'support.access_request'
+'support.calendar_view'
+'support.access_use'
+'support.access_platform_approve'
+'support.notifications_acknowledge'
+'support.notifications_view'
+'support.audit_reconcile'
+'support.case_create'
+'support.case_update'
+'support.case_assign'
+'support.case_view'
+
+======================================================================
+FAIL: test_flush_recreates_code_owned_authorization_catalog (apps.organizations.test_permission_registry.AuthorizationCatalogFlushTests.test_flush_recreates_code_owned_authorization_catalog)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 168, in test_flush_recreates_code_owned_authorization_catalog
+    self.assertEqual(
+AssertionError: Items in the first set but not the second:
+'support.evidence_sensitive_view'
+'support.access_tenant_confirm'
+'support.access_revoke'
+'support.case_reopen'
+'support.case_resolve'
+'support.evidence_link'
+'support.access_request'
+'support.calendar_view'
+'support.access_use'
+'support.access_platform_approve'
+'support.notifications_acknowledge'
+'support.notifications_view'
+'support.audit_reconcile'
+'support.case_create'
+'support.case_update'
+'support.case_assign'
+'support.case_view'
+
+======================================================================
+FAIL: test_every_managed_business_model_is_registered_exactly_once (apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests.test_every_managed_business_model_is_registered_exactly_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 92, in test_every_managed_business_model_is_registered_exactly_once
+    self.assertEqual(duplicates, [])
+AssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []
+
+First list contains 4 additional elements.
+First extra element 0:
+'payroll.FinancialHandoffLine'
+
++ []
+- ['payroll.FinancialHandoffLine',
+-  'payroll.FinancialHandoffProposal',
+-  'payroll.FinancialHandoffReview',
+-  'payroll.Payslip']
+
+======================================================================
+FAIL: test_every_permission_code_is_registered_exactly_once (apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests.test_every_permission_code_is_registered_exactly_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 60, in test_every_permission_code_is_registered_exactly_once
+    self.assertEqual(set(registered), set(BusinessPermissionCode.values))
+AssertionError: Items in the second set but not the first:
+'support.evidence_sensitive_view'
+'support.access_tenant_confirm'
+'support.access_revoke'
+'support.case_reopen'
+'support.case_resolve'
+'support.evidence_link'
+'support.access_request'
+'support.calendar_view'
+'support.access_use'
+'support.access_platform_approve'
+'support.notifications_acknowledge'
+'support.notifications_view'
+'support.audit_reconcile'
+'support.case_create'
+'support.case_update'
+'support.case_assign'
+'support.case_view'
+
+======================================================================
+FAIL: test_every_registered_permission_is_referenced_by_its_enforcement_module (apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests.test_every_registered_permission_is_referenced_by_its_enforcement_module)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 109, in test_every_registered_permission_is_referenced_by_its_enforcement_module
+    self.assertEqual(missing, {})
+AssertionError: {'hr_certificates': ['HR_CERTIFICATES_CANC[1125 chars]EN']} != {}
+Diff is 1576 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_resource_keys_are_unique_and_match_permission_namespaces (apps.organizations.test_permission_registry.PermissionRegistryArchitectureTests.test_resource_keys_are_unique_and_match_permission_namespaces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\organizations\test_permission_registry.py", line 75, in test_resource_keys_are_unique_and_match_permission_namespaces
+    self.assertEqual(namespace_mismatches, [])
+AssertionError: Lists differ: ['compliance.audit_reconcile', 'compliance[2070 chars]iew'] != []
+
+First list contains 72 additional elements.
+First extra element 0:
+'compliance.audit_reconcile'
+
+Diff is 2338 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 33 tests in 211.699s
+
+FAILED (failures=6)
+Preserving test database for alias 'default'...
+
+Found 33 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-focused-2.txt
+Using existing test database for alias 'default'...
+
+EEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_adapter_cannot_mutate_pinned_input (apps.billing.test_cep036.IndexationTests.test_adapter_cannot_mutate_pinned_input)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_adapter_failure_rolls_back_without_partial_history (apps.billing.test_cep036.IndexationTests.test_adapter_failure_rolls_back_without_partial_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_scope_and_current_tenant_state_are_rechecked (apps.billing.test_cep036.IndexationTests.test_contract_scope_and_current_tenant_state_are_rechecked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_correction_and_reversal_append_history_and_prevent_forks (apps.billing.test_cep036.IndexationTests.test_correction_and_reversal_append_history_and_prevent_forks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_correction_requires_explicit_adapter_approval (apps.billing.test_cep036.IndexationTests.test_correction_requires_explicit_adapter_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_decimal_result_is_required_and_never_implicitly_rounded (apps.billing.test_cep036.IndexationTests.test_decimal_result_is_required_and_never_implicitly_rounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_effective_date_bounds_fail_closed (apps.billing.test_cep036.IndexationTests.test_effective_date_bounds_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_forged_snapshot_or_rule_digest_rejected_by_model (apps.billing.test_cep036.IndexationTests.test_forged_snapshot_or_rule_digest_rejected_by_model)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_idempotent_retry_and_collision (apps.billing.test_cep036.IndexationTests.test_idempotent_retry_and_collision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_invalid_indexes_periods_values_and_floats_fail_before_adapter (apps.billing.test_cep036.IndexationTests.test_invalid_indexes_periods_values_and_floats_fail_before_adapter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_invalid_transition_shapes_fail (apps.billing.test_cep036.IndexationTests.test_invalid_transition_shapes_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_adapter_and_staging_never_activate (apps.billing.test_cep036.IndexationTests.test_missing_adapter_and_staging_never_activate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_or_mismatched_approval_fails_closed (apps.billing.test_cep036.IndexationTests.test_missing_or_mismatched_approval_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_no_hidden_specification_defaults (apps.billing.test_cep036.IndexationTests.test_no_hidden_specification_defaults)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_no_membership_authority_fails_closed (apps.billing.test_cep036.IndexationTests.test_no_membership_authority_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written (apps.billing.test_cep036.IndexationTests.test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal (apps.billing.test_cep036.IndexationTests.test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_unregistered_and_duplicate_adapter_keys_rejected (apps.billing.test_cep036.IndexationTests.test_unregistered_and_duplicate_adapter_keys_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_versioning_does_not_rewrite_calculation_or_old_rule (apps.billing.test_cep036.IndexationTests.test_versioning_does_not_rewrite_calculation_or_old_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.207s
+
+FAILED (errors=19)
+Preserving test database for alias 'default'...
+
+Found 19 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-focused-3.txt
+Using existing test database for alias 'default'...
+
+...................
+----------------------------------------------------------------------
+Ran 19 tests in 1.690s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 19 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-focused.txt
+Using existing test database for alias 'default'...
+
+EEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_adapter_cannot_mutate_pinned_input (apps.billing.test_cep036.IndexationTests.test_adapter_cannot_mutate_pinned_input)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_adapter_failure_rolls_back_without_partial_history (apps.billing.test_cep036.IndexationTests.test_adapter_failure_rolls_back_without_partial_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_scope_and_current_tenant_state_are_rechecked (apps.billing.test_cep036.IndexationTests.test_contract_scope_and_current_tenant_state_are_rechecked)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_correction_and_reversal_append_history_and_prevent_forks (apps.billing.test_cep036.IndexationTests.test_correction_and_reversal_append_history_and_prevent_forks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_correction_requires_explicit_adapter_approval (apps.billing.test_cep036.IndexationTests.test_correction_requires_explicit_adapter_approval)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_decimal_result_is_required_and_never_implicitly_rounded (apps.billing.test_cep036.IndexationTests.test_decimal_result_is_required_and_never_implicitly_rounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_effective_date_bounds_fail_closed (apps.billing.test_cep036.IndexationTests.test_effective_date_bounds_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_forged_snapshot_or_rule_digest_rejected_by_model (apps.billing.test_cep036.IndexationTests.test_forged_snapshot_or_rule_digest_rejected_by_model)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_idempotent_retry_and_collision (apps.billing.test_cep036.IndexationTests.test_idempotent_retry_and_collision)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_invalid_indexes_periods_values_and_floats_fail_before_adapter (apps.billing.test_cep036.IndexationTests.test_invalid_indexes_periods_values_and_floats_fail_before_adapter)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_invalid_transition_shapes_fail (apps.billing.test_cep036.IndexationTests.test_invalid_transition_shapes_fail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_adapter_and_staging_never_activate (apps.billing.test_cep036.IndexationTests.test_missing_adapter_and_staging_never_activate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_or_mismatched_approval_fails_closed (apps.billing.test_cep036.IndexationTests.test_missing_or_mismatched_approval_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_no_hidden_specification_defaults (apps.billing.test_cep036.IndexationTests.test_no_hidden_specification_defaults)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_no_membership_authority_fails_closed (apps.billing.test_cep036.IndexationTests.test_no_membership_authority_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written (apps.billing.test_cep036.IndexationTests.test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal (apps.billing.test_cep036.IndexationTests.test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_unregistered_and_duplicate_adapter_keys_rejected (apps.billing.test_cep036.IndexationTests.test_unregistered_and_duplicate_adapter_keys_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_versioning_does_not_rewrite_calculation_or_old_rule (apps.billing.test_cep036.IndexationTests.test_versioning_does_not_rewrite_calculation_or_old_rule)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_cep036.py", line 28, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.195s
+
+FAILED (errors=19)
+Preserving test database for alias 'default'...
+
+Found 19 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-permission-plan.txt
+Planned operations:
+organizations.0114_cep036_indexation_permissions
+    Raw Python operation
+
+
+ACTUAL CAPTURE: cep036-regression.txt
+Using existing test database for alias 'default'...
+
+EEEEEEEEEEEEEEEEEEEEE
+======================================================================
+ERROR: test_active_member_without_view_permission_cannot_see_contracts (apps.contracts.tests.ContractServiceTests.test_active_member_without_view_permission_cannot_see_contracts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_create_view_creates_contract (apps.contracts.tests.ContractServiceTests.test_contract_create_view_creates_contract)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_create_view_exposes_only_active_tenant_projects (apps.contracts.tests.ContractServiceTests.test_contract_create_view_exposes_only_active_tenant_projects)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_detail_returns_not_found_for_another_organization (apps.contracts.tests.ContractServiceTests.test_contract_detail_returns_not_found_for_another_organization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_list_filters_can_be_combined_and_cleared (apps.contracts.tests.ContractServiceTests.test_contract_list_filters_can_be_combined_and_cleared)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_list_links_to_tenant_scoped_detail (apps.contracts.tests.ContractServiceTests.test_contract_list_links_to_tenant_scoped_detail)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_list_requires_active_organization (apps.contracts.tests.ContractServiceTests.test_contract_list_requires_active_organization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_number_is_unique_per_organization (apps.contracts.tests.ContractServiceTests.test_contract_number_is_unique_per_organization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_queryset_is_tenant_scoped (apps.contracts.tests.ContractServiceTests.test_contract_queryset_is_tenant_scoped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_rejects_negative_value (apps.contracts.tests.ContractServiceTests.test_contract_rejects_negative_value)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_rejects_project_from_other_organization (apps.contracts.tests.ContractServiceTests.test_contract_rejects_project_from_other_organization)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_create_contract_scopes_project_and_records_audit (apps.contracts.tests.ContractServiceTests.test_create_contract_scopes_project_and_records_audit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_view_permission_allows_read_but_not_contract_management (apps.contracts.tests.ContractServiceTests.test_view_permission_allows_read_but_not_contract_management)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\contracts\tests.py", line 49, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_audit_records_lifecycle_without_financial_side_effect (apps.billing.test_commercial_controls.CommercialControlTests.test_audit_records_lifecycle_without_financial_side_effect)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_clearance_requirement_is_explicit_and_effective_dated (apps.billing.test_commercial_controls.CommercialControlTests.test_clearance_requirement_is_explicit_and_effective_dated)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_expiry_and_compliance_renewal_preserve_history (apps.billing.test_commercial_controls.CommercialControlTests.test_expiry_and_compliance_renewal_preserve_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_guarantee_workflow_exposure_release_and_immutable_history (apps.billing.test_commercial_controls.CommercialControlTests.test_guarantee_workflow_exposure_release_and_immutable_history)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed (apps.billing.test_commercial_controls.CommercialControlTests.test_missing_contract_authority_unsafe_evidence_and_tenant_scope_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_retention_release_calculation_correction_and_fail_closed_cap (apps.billing.test_commercial_controls.CommercialControlTests.test_retention_release_calculation_correction_and_fail_closed_cap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_rtl_operational_dashboard_is_tenant_scoped (apps.billing.test_commercial_controls.CommercialControlTests.test_rtl_operational_dashboard_is_tenant_scoped)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_workflow_domain_and_audit_failure_roll_back_atomically (apps.billing.test_commercial_controls.CommercialControlTests.test_workflow_domain_and_audit_failure_roll_back_atomically)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 241, in setUp
+    self.base_setup(
+  File "E:\Construction_Company_Solution\apps\billing\test_commercial_controls.py", line 135, in base_setup
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 21 tests in 8.812s
+
+FAILED (errors=21)
+Preserving test database for alias 'default'...
+
+Found 21 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep036-static-final.txt
+I001 [*] Import block is un-sorted or un-formatted
+  --> apps\billing\indexation.py:8:1
+   |
+ 6 |   """
+ 7 |
+ 8 | / from __future__ import annotations
+ 9 | |
+10 | | import hashlib
+11 | | import json
+12 | | from collections.abc import Callable
+13 | | from dataclasses import asdict, dataclass
+14 | | from datetime import date
+15 | | from decimal import Decimal
+16 | | from typing import Any
+17 | |
+18 | | from django.core.exceptions import PermissionDenied, ValidationError
+19 | | from django.db import transaction
+20 | | from django.db.models import Max
+21 | |
+22 | | from apps.accounts.models import User
+23 | | from apps.contracts.models import Contract
+24 | | from apps.organizations.authorization import require_business_permission
+25 | | from apps.organizations.models import BusinessPermissionCode
+26 | | from apps.organizations.models import Organization
+27 | |
+28 | | from .models import IndexationCalculation, IndexationRuleVersion
+   | |________________________________________________________________^
+29 |
+30 |   SPECIFICATION_FIELDS = frozenset(
+   |
+help: Organize imports
+   |
+24 | from apps.organizations.authorization import require_business_permission
+   - from apps.organizations.models import BusinessPermissionCode
+   - from apps.organizations.models import Organization
+25 + from apps.organizations.models import BusinessPermissionCode, Organization
+26 |
+   |
+
+Found 1 error.
+[*] 1 fixable with the `--fix` option.
+unformatted: File would be reformatted
+   --> apps\billing\indexation.py:162:7
+    |
+161 | def _contract(
+    -     *, actor: User, organization: Organization, contract: Contract, permission: BusinessPermissionCode
+162 +     *,
+163 +     actor: User,
+164 +     organization: Organization,
+165 +     contract: Contract,
+166 +     permission: BusinessPermissionCode,
+167 | ) -> Contract:
+    |
+
+1 file would be reformatted, 2 files already formatted
+System check identified no issues (0 silenced).
+No changes detected
+
+
+ACTUAL CAPTURE: cep036-static.txt
+All checks passed!
+3 files already formatted
+System check identified no issues (0 silenced).
+No changes detected
+Planned operations:
+  No planned migration operations.
+
+
+ACTUAL CAPTURE: cep036-tests.txt
+Using existing test database for alias 'default'...
+
+.......................
+----------------------------------------------------------------------
+Ran 23 tests in 29.354s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 23 test(s).
+System check identified no issues (0 silenced).

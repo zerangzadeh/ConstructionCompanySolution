@@ -1,0 +1,1196 @@
+--- a/apps/billing/models.py
++++ b/apps/billing/models.py
+@@ -10 +10 @@
+-from core.models import TimeStampedModel, UUIDModel
++from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
+@@ -14,0 +15,131 @@
++
++
++class IndexationHistoryQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("سابقه تعدیل تغییرپذیر نیست.")
++
++    def delete(self):
++        raise ValidationError("سابقه تعدیل حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت گروهی سابقه تعدیل مجاز نیست.")
++
++
++class IndexationHistory(UUIDModel, CreatedAtModel):
++    objects = models.Manager.from_queryset(IndexationHistoryQuerySet)()
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    contract = models.ForeignKey("contracts.Contract", on_delete=models.PROTECT)
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField(max_length=2000)
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding:
++            raise ValidationError("سابقه تعدیل تغییرپذیر نیست.")
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("سابقه تعدیل حذف‌پذیر نیست.")
++
++    def clean(self):
++        super().clean()
++        validate_related_organizations(self, contract=self.contract)
++        if not self.reason.strip():
++            raise ValidationError("دلیل لازم است.")
++
++
++class IndexationRuleVersion(IndexationHistory):
++    """Staging is immutable and never constitutes approval or activation."""
++
++    code = models.CharField(max_length=80)
++    version = models.PositiveIntegerField()
++    effective_from = models.DateField()
++    effective_to = models.DateField()
++    adapter_key = models.CharField(max_length=100)
++    specification = models.JSONField()
++    sha256 = models.CharField(max_length=64)
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "contract", "code", "version"],
++                name="idx_rule_contract_version_uq",
++            ),
++            models.CheckConstraint(condition=Q(version__gte=1), name="idx_version_pos"),
++            models.CheckConstraint(
++                condition=Q(effective_to__gte=F("effective_from")),
++                name="idx_effective_range",
++            ),
++        ]
++
++    def clean(self):
++        super().clean()
++        from .indexation import rule_digest, validate_specification
++
++        validate_specification(self.specification)
++        if not self.code.strip() or not self.adapter_key.strip():
++            raise ValidationError("شناسه قانون و تطبیق‌دهنده لازم است.")
++        if self.effective_to < self.effective_from or self.version < 1:
++            raise ValidationError("نسخه و بازه اثر معتبر لازم است.")
++        if self.sha256 != rule_digest(self):
++            raise ValidationError("چکیده قانون معتبر نیست.")
++
++
++class IndexationCalculation(IndexationHistory):
++    rule = models.ForeignKey(IndexationRuleVersion, on_delete=models.PROTECT)
++    operation = models.CharField(
++        max_length=12,
++        choices=[("calculate", "محاسبه"), ("correct", "اصلاح"), ("reverse", "برگشت")],
++    )
++    prior = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement",
++    )
++    calculation_date = models.DateField()
++    idempotency_key = models.CharField(max_length=100)
++    request_sha256 = models.CharField(max_length=64)
++    snapshot = models.JSONField()
++    sha256 = models.CharField(max_length=64)
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "contract", "idempotency_key"],
++                name="idx_calculation_key_uq",
++            ),
++            models.CheckConstraint(
++                condition=(
++                    Q(operation="calculate", prior__isnull=True)
++                    | Q(operation__in=["correct", "reverse"], prior__isnull=False)
++                ),
++                name="idx_operation_lineage",
++            ),
++        ]
++
++    def clean(self):
++        super().clean()
++        from .indexation import digest, validate_calculation_snapshot
++
++        validate_related_organizations(self, rule=self.rule, prior=self.prior)
++        if self.rule.contract_id != self.contract_id or (
++            self.prior_id
++            and (
++                self.prior.contract_id != self.contract_id
++                or self.prior_id == self.pk
++                or self.prior.operation == "reverse"
++            )
++        ):
++            raise ValidationError("پیوند قرارداد و سابقه معتبر نیست.")
++        if (self.operation == "calculate") != (self.prior_id is None):
++            raise ValidationError("عملیات و سابقه سازگار نیست.")
++        validate_calculation_snapshot(self)
++        if self.sha256 != digest(self.snapshot):
++            raise ValidationError("چکیده محاسبه معتبر نیست.")
+--- a/apps/billing/indexation.py
++++ b/apps/billing/indexation.py
+@@ -0,0 +1,398 @@
++"""Governed indexation construction; no official rule or adapter ships here.
++
++Adapters are trusted deployed code, never tenant expressions. Activation requires
++an independently verified approval receipt bound to the complete request. Results
++are billing snapshots only; no posting, claim adjustment or settlement occurs.
++"""
++
++from __future__ import annotations
++
++import hashlib
++import json
++from collections.abc import Callable
++from dataclasses import asdict, dataclass
++from datetime import date
++from decimal import Decimal
++from typing import Any
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.db.models import Max
++
++from apps.accounts.models import User
++from apps.contracts.models import Contract
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode, Organization
++
++from .models import IndexationCalculation, IndexationRuleVersion
++
++SPECIFICATION_FIELDS = frozenset(
++    {
++        "measurement_basis",
++        "index_source",
++        "formula_reference",
++        "rounding_policy",
++        "adjustment_target",
++        "evidence_reference",
++    }
++)
++INPUT_FIELDS = frozenset({"base_period", "current_period", "indexes", "values"})
++
++
++def _text(value: object) -> bool:
++    return isinstance(value, str) and bool(value.strip())
++
++
++def _json(value: Any, depth: int = 0) -> None:
++    # Decimal quantities must be explicit strings; binary floats are forbidden.
++    if depth > 12:
++        raise ValidationError("ساختار ورودی بیش از حد پیچیده است.")
++    if isinstance(value, dict) and value:
++        if not all(_text(k) for k in value):
++            raise ValidationError("کلید ورودی معتبر نیست.")
++        for v in value.values():
++            _json(v, depth + 1)
++    elif isinstance(value, list) and value:
++        for v in value:
++            _json(v, depth + 1)
++    elif not _text(value):
++        raise ValidationError("مقادیر صریح متنی لازم است؛ عدد اعشاری دودویی مجاز نیست.")
++
++
++def digest(value: dict[str, Any]) -> str:
++    _json(value)
++    encoded = json.dumps(
++        value, sort_keys=True, separators=(",", ":"), ensure_ascii=False
++    )
++    if len(encoded.encode()) > 100_000:
++        raise ValidationError("اندازه تصویر ورودی مجاز نیست.")
++    return hashlib.sha256(encoded.encode()).hexdigest()
++
++
++def validate_specification(specification: dict[str, str]) -> None:
++    if (
++        not isinstance(specification, dict)
++        or set(specification) != SPECIFICATION_FIELDS
++    ):
++        raise ValidationError("تمام ارجاعات صریح قانون لازم است.")
++    if not all(_text(v) for v in specification.values()):
++        raise ValidationError("سیاست پیش‌فرض یا خالی مجاز نیست.")
++
++
++def validate_inputs(inputs: dict[str, Any]) -> None:
++    if (
++        not isinstance(inputs, dict)
++        or set(inputs) != INPUT_FIELDS
++        or not _text(inputs["base_period"])
++        or not _text(inputs["current_period"])
++        or not isinstance(inputs["indexes"], dict)
++        or not inputs["indexes"]
++        or not isinstance(inputs["values"], dict)
++        or not inputs["values"]
++    ):
++        raise ValidationError("دوره‌ها، شاخص‌ها و مقادیر صریح لازم است.")
++    for index in inputs["indexes"].values():
++        if (
++            not isinstance(index, dict)
++            or set(index)
++            != {
++                "source_reference",
++                "source_version",
++                "evidence_reference",
++                "period",
++                "value",
++            }
++            or not all(_text(v) for v in index.values())
++        ):
++            raise ValidationError("منبع، نسخه، مدرک، دوره و مقدار شاخص لازم است.")
++        try:
++            if not Decimal(index["value"]).is_finite():
++                raise ValueError
++        except (ArithmeticError, ValueError) as exc:
++            raise ValidationError("مقدار شاخص معتبر نیست.") from exc
++    digest(inputs)
++
++
++def rule_snapshot(rule: IndexationRuleVersion) -> dict[str, Any]:
++    return {
++        "organization": str(rule.organization_id),
++        "contract": str(rule.contract_id),
++        "code": rule.code,
++        "version": str(rule.version),
++        "effective_from": rule.effective_from.isoformat(),
++        "effective_to": rule.effective_to.isoformat(),
++        "adapter_key": rule.adapter_key,
++        "specification": rule.specification,
++    }
++
++
++def rule_digest(rule: IndexationRuleVersion) -> str:
++    return digest(rule_snapshot(rule))
++
++
++@dataclass(frozen=True)
++class ApprovalReceipt:
++    rule_sha256: str
++    request_sha256: str
++    source_snapshot_sha256: str
++    approval_reference: str
++    evidence_reference: str
++    adapter_version: str
++
++
++@dataclass(frozen=True)
++class IndexationAdapter:
++    # resolve_approval must verify source authenticity, contract applicability,
++    # periods, effective dates, formula, rounding and operation eligibility.
++    resolve_approval: Callable[[dict[str, Any]], ApprovalReceipt | None]
++    calculate: Callable[[dict[str, Any]], Decimal]
++
++
++ADAPTERS: dict[str, IndexationAdapter] = {}
++
++
++def register_adapter(key: str, adapter: IndexationAdapter) -> None:
++    if not _text(key) or key in ADAPTERS or not isinstance(adapter, IndexationAdapter):
++        raise ValueError("شناسه یکتای تطبیق‌دهنده لازم است.")
++    ADAPTERS[key] = adapter
++
++
++def _contract(
++    *,
++    actor: User,
++    organization: Organization,
++    contract: Contract,
++    permission: BusinessPermissionCode,
++) -> Contract:
++    # Refresh/lock tenant state; do not trust a caller's stale Organization object.
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    try:
++        locked = (
++            Contract.objects.select_for_update()
++            .select_related("project")
++            .get(pk=contract.pk, organization=organization, deleted_at__isnull=True)
++        )
++    except Contract.DoesNotExist as exc:
++        raise PermissionDenied("قرارداد مجاز یافت نشد.") from exc
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=BusinessPermissionCode.CONTRACT_TERMS_MANAGE,
++        project=locked.project,
++        message="اجازه مدیریت شرایط قرارداد را ندارید.",
++    )
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=locked.project,
++        message="مجوز عملیات تعدیل را ندارید.",
++    )
++    return locked
++
++
++@transaction.atomic
++def stage_rule(
++    *,
++    actor: User,
++    organization: Organization,
++    contract: Contract,
++    code: str,
++    effective_from: date,
++    effective_to: date,
++    adapter_key: str,
++    specification: dict[str, str],
++    reason: str,
++) -> IndexationRuleVersion:
++    locked = _contract(
++        actor=actor,
++        organization=organization,
++        contract=contract,
++        permission=BusinessPermissionCode.INDEXATION_RULES_MANAGE,
++    )
++    version = (
++        IndexationRuleVersion.objects.filter(contract=locked, code=code).aggregate(
++            v=Max("version")
++        )["v"]
++        or 0
++    ) + 1
++    rule = IndexationRuleVersion(
++        organization_id=locked.organization_id,
++        contract=locked,
++        actor=actor,
++        code=code,
++        version=version,
++        effective_from=effective_from,
++        effective_to=effective_to,
++        adapter_key=adapter_key,
++        specification=specification,
++        reason=reason,
++    )
++    rule.sha256 = rule_digest(rule)
++    rule.save()
++    return rule
++
++
++def validate_calculation_snapshot(record: IndexationCalculation) -> None:
++    snapshot = record.snapshot
++    if not isinstance(snapshot, dict) or set(snapshot) != {
++        "request",
++        "approval",
++        "result",
++    }:
++        raise ValidationError("تصویر محاسبه کامل نیست.")
++    request = snapshot["request"]
++    if not isinstance(request, dict) or set(request) != {
++        "rule",
++        "rule_id",
++        "rule_sha256",
++        "calculation_date",
++        "operation",
++        "inputs",
++        "prior_id",
++        "prior_sha256",
++        "reason",
++    }:
++        raise ValidationError("درخواست محاسبه کامل نیست.")
++    if (
++        request["rule"] != rule_snapshot(record.rule)
++        or request["rule_id"] != str(record.rule_id)
++        or request["rule_sha256"] != record.rule.sha256
++        or request["operation"] != record.operation
++        or request["calculation_date"] != record.calculation_date.isoformat()
++        or request["reason"] != record.reason
++        or request["prior_id"] != (str(record.prior_id) if record.prior_id else "NONE")
++        or request["prior_sha256"]
++        != (record.prior.sha256 if record.prior_id else "NONE")
++        or digest(request) != record.request_sha256
++    ):
++        raise ValidationError("هویت منبع محاسبه سازگار نیست.")
++    inputs = request["inputs"]
++    validate_inputs(inputs)
++    try:
++        receipt = ApprovalReceipt(**snapshot["approval"])
++        result = snapshot["result"]
++        if not _text(result) or not Decimal(result).is_finite():
++            raise ValueError
++    except (TypeError, ValueError, ArithmeticError) as exc:
++        raise ValidationError("مدرک تأیید و نتیجه معتبر لازم است.") from exc
++    _validate_receipt(receipt, record.rule, request)
++    if (
++        not record.rule.effective_from
++        <= record.calculation_date
++        <= record.rule.effective_to
++    ):
++        raise ValidationError("تاریخ محاسبه خارج از بازه اثر است.")
++
++
++def _validate_receipt(
++    receipt: ApprovalReceipt | None,
++    rule: IndexationRuleVersion,
++    request: dict[str, Any],
++) -> None:
++    if (
++        not isinstance(receipt, ApprovalReceipt)
++        or not all(_text(v) for v in asdict(receipt).values())
++        or receipt.rule_sha256 != rule.sha256
++        or receipt.request_sha256 != digest(request)
++        or receipt.source_snapshot_sha256 != digest(request["inputs"]["indexes"])
++    ):
++        raise ValidationError("سیاست و منبع رسمی تأییدشده برای محاسبه وجود ندارد.")
++
++
++@transaction.atomic
++def calculate(
++    *,
++    actor: User,
++    organization: Organization,
++    contract: Contract,
++    rule: IndexationRuleVersion,
++    calculation_date: date,
++    inputs: dict[str, Any],
++    idempotency_key: str,
++    reason: str,
++    operation: str = "calculate",
++    prior: IndexationCalculation | None = None,
++) -> IndexationCalculation:
++    locked = _contract(
++        actor=actor,
++        organization=organization,
++        contract=contract,
++        permission=BusinessPermissionCode.INDEXATION_CALCULATE
++        if operation == "calculate"
++        else BusinessPermissionCode.INDEXATION_CORRECT,
++    )
++    if not _text(idempotency_key) or not _text(reason):
++        raise ValidationError("کلید تکرارپذیری و دلیل لازم است.")
++    try:
++        rule = IndexationRuleVersion.objects.get(pk=rule.pk, contract=locked)
++        if prior is not None:
++            prior = IndexationCalculation.objects.select_for_update().get(
++                pk=prior.pk, contract=locked
++            )
++    except (
++        IndexationRuleVersion.DoesNotExist,
++        IndexationCalculation.DoesNotExist,
++    ) as exc:
++        raise PermissionDenied("منبع مجاز یافت نشد.") from exc
++    rule.full_clean()
++    if (
++        operation not in {"calculate", "correct", "reverse"}
++        or ((operation == "calculate") != (prior is None))
++        or (prior is not None and prior.operation == "reverse")
++    ):
++        raise ValidationError("عملیات و سابقه معتبر لازم است.")
++    if not rule.effective_from <= calculation_date <= rule.effective_to:
++        raise ValidationError("قانون در تاریخ محاسبه مؤثر نیست.")
++    validate_inputs(inputs)
++    request = {
++        "rule": rule_snapshot(rule),
++        "rule_id": str(rule.pk),
++        "rule_sha256": rule.sha256,
++        "calculation_date": calculation_date.isoformat(),
++        "operation": operation,
++        "inputs": inputs,
++        "prior_id": str(prior.pk) if prior else "NONE",
++        "prior_sha256": prior.sha256 if prior else "NONE",
++        "reason": reason,
++    }
++    request_hash = digest(request)
++    existing = IndexationCalculation.objects.filter(
++        contract=locked, idempotency_key=idempotency_key
++    ).first()
++    if existing:
++        if existing.request_sha256 != request_hash:
++            raise ValidationError(
++                "کلید تکرارپذیری قبلاً برای ورودی متفاوت مصرف شده است."
++            )
++        return existing
++    if prior and IndexationCalculation.objects.filter(prior=prior).exists():
++        raise ValidationError("این سابقه قبلاً اصلاح یا برگشت شده است.")
++    if prior:
++        prior.full_clean()
++    adapter = ADAPTERS.get(rule.adapter_key)
++    if adapter is None:
++        raise ValidationError("سیاست تعدیل فعال نیست؛ محاسبه مجاز نیست.")
++    # Pass copies to trusted adapters so their mutation cannot corrupt pinned input.
++    receipt = adapter.resolve_approval(json.loads(json.dumps(request)))
++    _validate_receipt(receipt, rule, request)
++    result = adapter.calculate(json.loads(json.dumps(request)))
++    if not isinstance(result, Decimal) or not result.is_finite():
++        raise ValidationError("نتیجه اعشاری معتبر لازم است.")
++    snapshot = {"request": request, "approval": asdict(receipt), "result": str(result)}
++    record = IndexationCalculation(
++        organization_id=locked.organization_id,
++        contract=locked,
++        actor=actor,
++        rule=rule,
++        calculation_date=calculation_date,
++        idempotency_key=idempotency_key,
++        reason=reason,
++        operation=operation,
++        prior=prior,
++        request_sha256=request_hash,
++        snapshot=snapshot,
++        sha256=digest(snapshot),
++    )
++    record.save()
++    return record
+--- a/apps/billing/migrations/0016_cep036_indexation.py
++++ b/apps/billing/migrations/0016_cep036_indexation.py
+@@ -0,0 +1,76 @@
++# Generated by Django 5.2.17 on 2026-10-18 07:16
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('billing', '0015_p6_s26_s32_taxpayer_submission_snapshot'),
++        ('contracts', '0009_p6_s33_s38_immutable_history'),
++        ('organizations', '0113_cep056_certificate_permissions'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='IndexationRuleVersion',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('reason', models.TextField(max_length=2000)),
++                ('code', models.CharField(max_length=80)),
++                ('version', models.PositiveIntegerField()),
++                ('effective_from', models.DateField()),
++                ('effective_to', models.DateField()),
++                ('adapter_key', models.CharField(max_length=100)),
++                ('specification', models.JSONField()),
++                ('sha256', models.CharField(max_length=64)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('contract', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='contracts.contract')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='IndexationCalculation',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('reason', models.TextField(max_length=2000)),
++                ('operation', models.CharField(choices=[('calculate', 'محاسبه'), ('correct', 'اصلاح'), ('reverse', 'برگشت')], max_length=12)),
++                ('calculation_date', models.DateField()),
++                ('idempotency_key', models.CharField(max_length=100)),
++                ('request_sha256', models.CharField(max_length=64)),
++                ('snapshot', models.JSONField()),
++                ('sha256', models.CharField(max_length=64)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('contract', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='contracts.contract')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('prior', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='replacement', to='billing.indexationcalculation')),
++                ('rule', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='billing.indexationruleversion')),
++            ],
++        ),
++        migrations.AddConstraint(
++            model_name='indexationruleversion',
++            constraint=models.UniqueConstraint(fields=('organization', 'contract', 'code', 'version'), name='idx_rule_contract_version_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='indexationruleversion',
++            constraint=models.CheckConstraint(condition=models.Q(('version__gte', 1)), name='idx_version_pos'),
++        ),
++        migrations.AddConstraint(
++            model_name='indexationruleversion',
++            constraint=models.CheckConstraint(condition=models.Q(('effective_to__gte', models.F('effective_from'))), name='idx_effective_range'),
++        ),
++        migrations.AddConstraint(
++            model_name='indexationcalculation',
++            constraint=models.UniqueConstraint(fields=('organization', 'contract', 'idempotency_key'), name='idx_calculation_key_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='indexationcalculation',
++            constraint=models.CheckConstraint(condition=models.Q(models.Q(('operation', 'calculate'), ('prior__isnull', True)), models.Q(('operation__in', ['correct', 'reverse']), ('prior__isnull', False)), _connector='OR'), name='idx_operation_lineage'),
++        ),
++    ]
+--- a/apps/billing/test_cep036.py
++++ b/apps/billing/test_cep036.py
+@@ -0,0 +1,446 @@
++"""Synthetic code adapter fixtures only; no official formula or activation."""
++
++from copy import deepcopy
++from dataclasses import replace
++from datetime import date
++from decimal import Decimal
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++
++from apps.accounts.models import User
++from apps.contracts.models import Contract, ContractDirection, ContractStatus
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipRole,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationRole,
++    OrganizationStatus,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.projects.services import create_project
++
++from . import indexation as service
++from .models import IndexationCalculation, IndexationRuleVersion, ProgressClaim
++
++
++class IndexationTests(TestCase):
++    def setUp(self):
++        self.owner = User.objects.create_user(username="idx-owner")
++        self.organization = Organization.objects.create(name="IDX", slug="idx")
++        role = OrganizationRole.objects.create(
++            code="idx-test", name="Synthetic operator"
++        )
++        role.permissions.set(
++            BusinessPermission.objects.filter(
++                code__in=[
++                    P.PROJECTS_CREATE,
++                    P.CONTRACT_TERMS_MANAGE,
++                    P.INDEXATION_RULES_MANAGE,
++                    P.INDEXATION_CALCULATE,
++                    P.INDEXATION_CORRECT,
++                ]
++            )
++        )
++        self.membership = self.organization.memberships.create(
++            user=self.owner,
++            role=MembershipRole.COMPANY_OWNER,
++            status="active",
++            role_definition=role,
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=self.membership,
++            scope_type=AuthorizationScopeType.ORGANIZATION,
++            reason="Synthetic fixture",
++        )
++        self.project = create_project(
++            organization=self.organization, actor=self.owner, code="IDX", name="IDX"
++        )
++        self.contract = Contract.objects.create(
++            organization=self.organization,
++            project=self.project,
++            contract_number="IDX",
++            title="Synthetic",
++            counterparty_name="Synthetic",
++            direction=ContractDirection.RECEIVABLE,
++            status=ContractStatus.ACTIVE,
++            contract_value=Decimal(100),
++        )
++        self.context = {
++            "actor": self.owner,
++            "organization": self.organization,
++            "contract": self.contract,
++        }
++        self.specification = {k: "SYNTHETIC-" + k for k in service.SPECIFICATION_FIELDS}
++        self.inputs = {
++            "base_period": "synthetic-base",
++            "current_period": "synthetic-current",
++            "indexes": {
++                "base": {
++                    "source_reference": "SYNTHETIC-SOURCE",
++                    "source_version": "fixture-1",
++                    "evidence_reference": "SYNTHETIC-EVIDENCE",
++                    "period": "synthetic-base",
++                    "value": "100.00",
++                }
++            },
++            "values": {"amount": "12.34567890"},
++        }
++        self.rule = self.stage()
++        self.registry = patch.dict(service.ADAPTERS, {}, clear=True)
++        self.registry.start()
++        self.addCleanup(self.registry.stop)
++        service.register_adapter(
++            "synthetic", service.IndexationAdapter(self.receipt, self.result)
++        )
++
++    def stage(self, **changes):
++        data = dict(
++            self.context,
++            code="SYNTHETIC",
++            effective_from=date(2026, 1, 1),
++            effective_to=date(2026, 12, 31),
++            adapter_key="synthetic",
++            specification=deepcopy(self.specification),
++            reason="Synthetic staging",
++        )
++        return service.stage_rule(**(data | changes))
++
++    def receipt(self, request):
++        return service.ApprovalReceipt(
++            request["rule_sha256"],
++            service.digest(request),
++            service.digest(request["inputs"]["indexes"]),
++            "SYNTHETIC-APPROVAL",
++            "SYNTHETIC-EVIDENCE",
++            "test-v1",
++        )
++
++    def result(self, request):
++        # Test-only values; reversal is deliberately not a generic negative amount.
++        return {
++            "calculate": Decimal("12.34567890"),
++            "correct": Decimal(15),
++            "reverse": Decimal(0),
++        }[request["operation"]]
++
++    def calculate(self, **changes):
++        data = dict(
++            self.context,
++            rule=self.rule,
++            calculation_date=date(2026, 6, 1),
++            inputs=deepcopy(self.inputs),
++            idempotency_key="first",
++            reason="Synthetic case",
++        )
++        return service.calculate(**(data | changes))
++
++    def test_snapshot_pins_rule_source_period_evidence_approval_actor_and_decimal(self):
++        record = self.calculate()
++        record.refresh_from_db()
++        self.assertEqual(record.snapshot["result"], "12.34567890")
++        self.assertEqual(record.snapshot["request"]["inputs"], self.inputs)
++        self.assertEqual(record.snapshot["request"]["rule_sha256"], self.rule.sha256)
++        self.assertEqual(record.snapshot["approval"]["adapter_version"], "test-v1")
++        self.assertEqual(record.actor_id, self.owner.pk)
++        self.assertIsNotNone(record.created_at)
++        record.full_clean()
++        self.assertEqual(ProgressClaim.objects.count(), 0)
++        self.contract.refresh_from_db()
++        self.assertEqual(self.contract.contract_value, Decimal(100))
++
++    def test_versioning_does_not_rewrite_calculation_or_old_rule(self):
++        record = self.calculate()
++        before = deepcopy(record.snapshot)
++        second = self.stage(
++            specification=self.specification | {"formula_reference": "SYNTHETIC-2"}
++        )
++        self.assertEqual(second.version, 2)
++        self.assertNotEqual(second.sha256, self.rule.sha256)
++        record.refresh_from_db()
++        self.assertEqual(record.snapshot, before)
++        self.assertEqual(record.rule_id, self.rule.pk)
++
++    def test_missing_adapter_and_staging_never_activate(self):
++        service.ADAPTERS.clear()
++        with self.assertRaises(ValidationError):
++            self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_missing_or_mismatched_approval_fails_closed(self):
++        for field in (
++            None,
++            "rule_sha256",
++            "request_sha256",
++            "source_snapshot_sha256",
++            "approval_reference",
++            "evidence_reference",
++            "adapter_version",
++        ):
++
++            def receipt(request, field=field):
++                return (
++                    None
++                    if field is None
++                    else replace(self.receipt(request), **{field: ""})
++                )
++
++            service.ADAPTERS["synthetic"] = service.IndexationAdapter(
++                receipt, self.result
++            )
++            with self.subTest(field=field), self.assertRaises(ValidationError):
++                self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_approval_cannot_be_replayed_for_other_rule_request_or_source(self):
++        for field in ("rule_sha256", "request_sha256", "source_snapshot_sha256"):
++
++            def receipt(request, field=field):
++                return replace(self.receipt(request), **{field: "0" * 64})
++
++            service.ADAPTERS["synthetic"] = service.IndexationAdapter(
++                receipt, self.result
++            )
++            with self.subTest(field=field), self.assertRaises(ValidationError):
++                self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_no_hidden_specification_defaults(self):
++        for key in service.SPECIFICATION_FIELDS:
++            for value in (None, "", 0, 0.1):
++                with (
++                    self.subTest(key=key, value=value),
++                    self.assertRaises(ValidationError),
++                ):
++                    self.stage(specification=self.specification | {key: value})
++        with self.assertRaises(ValidationError):
++            self.stage(specification={})
++        self.assertEqual(IndexationRuleVersion.objects.count(), 1)
++
++    def test_invalid_indexes_periods_values_and_floats_fail_before_adapter(self):
++        bad = [
++            self.inputs | {"base_period": ""},
++            self.inputs | {"indexes": {}},
++            self.inputs | {"values": {"amount": 0.1}},
++            self.inputs | {"extra": "x"},
++            self.inputs | {"indexes": {"x": {"value": "1"}}},
++        ]
++        for value in ("NaN", "Infinity", "invalid"):
++            bad.append(
++                self.inputs
++                | {
++                    "indexes": {
++                        "base": self.inputs["indexes"]["base"] | {"value": value}
++                    }
++                }
++            )
++        for inputs in bad:
++            with self.subTest(inputs=inputs), self.assertRaises(ValidationError):
++                self.calculate(inputs=inputs)
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_effective_date_bounds_fail_closed(self):
++        for when in (date(2025, 12, 31), date(2027, 1, 1)):
++            with self.assertRaises(ValidationError):
++                self.calculate(calculation_date=when)
++        for when in (date(2026, 1, 1), date(2026, 12, 31)):
++            self.calculate(calculation_date=when, idempotency_key=str(when))
++
++    def test_decimal_result_is_required_and_never_implicitly_rounded(self):
++        for result in (0.1, "1", Decimal("NaN"), Decimal("Infinity")):
++            service.ADAPTERS["synthetic"] = service.IndexationAdapter(
++                self.receipt, lambda r, result=result: result
++            )
++            with self.subTest(result=result), self.assertRaises(ValidationError):
++                self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_idempotent_retry_and_collision(self):
++        first = self.calculate()
++        self.assertEqual(self.calculate().pk, first.pk)
++        with self.assertRaises(ValidationError):
++            self.calculate(reason="Different intent")
++        self.assertEqual(IndexationCalculation.objects.count(), 1)
++
++    def test_correction_and_reversal_append_history_and_prevent_forks(self):
++        first = self.calculate()
++        before = deepcopy(first.snapshot)
++        corrected = self.calculate(
++            operation="correct", prior=first, idempotency_key="correct"
++        )
++        reversed_record = self.calculate(
++            operation="reverse", prior=corrected, idempotency_key="reverse"
++        )
++        self.assertEqual(reversed_record.snapshot["result"], "0")
++        self.assertEqual(corrected.snapshot["request"]["prior_sha256"], first.sha256)
++        self.assertEqual(reversed_record.prior_id, corrected.pk)
++        first.refresh_from_db()
++        self.assertEqual(first.snapshot, before)
++        self.assertEqual(
++            self.calculate(
++                operation="correct", prior=first, idempotency_key="correct"
++            ).pk,
++            corrected.pk,
++        )
++        for prior in (first, corrected, reversed_record):
++            with self.assertRaises(ValidationError):
++                self.calculate(operation="reverse", prior=prior, idempotency_key="fork")
++
++    def test_correction_requires_explicit_adapter_approval(self):
++        first = self.calculate()
++        service.ADAPTERS["synthetic"] = service.IndexationAdapter(
++            lambda r: None, self.result
++        )
++        with self.assertRaises(ValidationError):
++            self.calculate(operation="reverse", prior=first, idempotency_key="reverse")
++        self.assertFalse(IndexationCalculation.objects.filter(prior=first).exists())
++
++    def test_invalid_transition_shapes_fail(self):
++        first = self.calculate()
++        for changes in (
++            {"operation": "calculate", "prior": first},
++            {"operation": "correct"},
++            {"operation": "reverse"},
++            {"operation": "invented"},
++        ):
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                self.calculate(**(changes | {"idempotency_key": "invalid"}))
++
++    def test_rule_and_calculation_history_cannot_be_edited_deleted_or_bulk_written(
++        self,
++    ):
++        record = self.calculate()
++        for obj in (self.rule, record):
++            for action in (
++                obj.save,
++                obj.delete,
++                lambda obj=obj: (
++                    type(obj).objects.filter(pk=obj.pk).update(reason="rewrite")
++                ),
++                lambda obj=obj: type(obj).objects.filter(pk=obj.pk).delete(),
++                lambda obj=obj: type(obj).objects.bulk_create([obj]),
++            ):
++                with self.assertRaises(ValidationError):
++                    action()
++
++    def test_forged_snapshot_or_rule_digest_rejected_by_model(self):
++        record = self.calculate()
++        record.snapshot["result"] = "999"
++        with self.assertRaises(ValidationError):
++            record.full_clean()
++        self.rule.sha256 = "0" * 64
++        with self.assertRaises(ValidationError):
++            self.rule.full_clean()
++
++    def test_adapter_failure_rolls_back_without_partial_history(self):
++        def fail(request):
++            raise RuntimeError("synthetic failure")
++
++        service.ADAPTERS["synthetic"] = service.IndexationAdapter(self.receipt, fail)
++        with self.assertRaises(RuntimeError):
++            self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
++
++    def test_adapter_cannot_mutate_pinned_input(self):
++        def calculate(request):
++            request["inputs"]["base_period"] = "mutated"
++            return Decimal(1)
++
++        service.ADAPTERS["synthetic"] = service.IndexationAdapter(
++            self.receipt, calculate
++        )
++        self.assertEqual(self.calculate().snapshot["request"]["inputs"], self.inputs)
++
++    def test_unregistered_and_duplicate_adapter_keys_rejected(self):
++        with self.assertRaises(ValueError):
++            service.register_adapter("synthetic", service.ADAPTERS["synthetic"])
++        with self.assertRaises(ValueError):
++            service.register_adapter("", service.ADAPTERS["synthetic"])
++
++    def test_contract_scope_and_current_tenant_state_are_rechecked(self):
++        other = Organization.objects.create(name="Other", slug="idx-other")
++        with self.assertRaises(PermissionDenied):
++            self.calculate(organization=other)
++        self.organization.status = OrganizationStatus.SUSPENDED
++        self.organization.save()
++        with self.assertRaises(PermissionDenied):
++            self.calculate()
++
++    def test_no_membership_authority_fails_closed(self):
++        outsider = User.objects.create_user(username="idx-outsider")
++        with self.assertRaises(PermissionDenied):
++            self.calculate(actor=outsider)
++
++    def test_new_capabilities_are_explicit_and_never_default_granted(self):
++        from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
++
++        codes = {
++            P.INDEXATION_RULES_MANAGE,
++            P.INDEXATION_CALCULATE,
++            P.INDEXATION_CORRECT,
++        }
++        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
++            self.assertFalse(codes & set(permissions))
++        first = self.calculate()
++        for code, action in (
++            (P.INDEXATION_RULES_MANAGE, self.stage),
++            (P.INDEXATION_CALCULATE, self.calculate),
++            (
++                P.INDEXATION_CORRECT,
++                lambda: self.calculate(
++                    operation="reverse", prior=first, idempotency_key="denied"
++                ),
++            ),
++        ):
++            permission = BusinessPermission.objects.get(code=code)
++            self.membership.role_definition.permissions.remove(permission)
++            with self.subTest(code=code), self.assertRaises(PermissionDenied):
++                action()
++            self.membership.role_definition.permissions.add(permission)
++
++    def test_project_scope_does_not_expand_contract_authority(self):
++        MembershipScopeGrant.objects.filter(membership=self.membership).delete()
++        with self.assertRaises(PermissionDenied):
++            self.calculate()
++
++    def test_other_contract_rule_and_prior_cannot_be_used(self):
++        other_contract = Contract.objects.create(
++            organization=self.organization,
++            project=self.project,
++            contract_number="IDX2",
++            title="Other",
++            counterparty_name="Synthetic",
++            contract_value=Decimal(100),
++        )
++        other_rule = self.stage(contract=other_contract)
++        first = self.calculate()
++        with self.assertRaises(PermissionDenied):
++            self.calculate(rule=other_rule)
++        with self.assertRaises(PermissionDenied):
++            self.calculate(
++                contract=other_contract,
++                rule=other_rule,
++                prior=first,
++                operation="reverse",
++                idempotency_key="other",
++            )
++
++    def test_failure_after_insert_rolls_back_calculation(self):
++        original = IndexationCalculation.save
++
++        def fail_after_save(record, *args, **kwargs):
++            original(record, *args, **kwargs)
++            raise RuntimeError("Synthetic post-insert failure")
++
++        with (
++            patch.object(IndexationCalculation, "save", fail_after_save),
++            self.assertRaises(RuntimeError),
++        ):
++            self.calculate()
++        self.assertEqual(IndexationCalculation.objects.count(), 0)
+--- a/apps/billing/test_cep036_migration.py
++++ b/apps/billing/test_cep036_migration.py
+@@ -0,0 +1,66 @@
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from apps.organizations.models import BusinessPermission, OrganizationRole
++
++from . import test_cep036 as fixtures
++from .models import IndexationCalculation, IndexationRuleVersion
++
++
++class IndexationMigrationTests(TransactionTestCase):
++    serialized_rollback = True
++
++    def test_rollback_reapply_preserves_existing_contract_source(self):
++        fixture = fixtures.IndexationTests()
++        fixture.setUp()
++        self.addCleanup(fixture.doCleanups)
++        before = type(fixture.contract).objects.values().get(pk=fixture.contract.pk)
++        codes = [
++            "indexation_rules.manage",
++            "indexation.calculate",
++            "indexation.correct",
++        ]
++        # Synthetic explicit fixture grants are unrelated to migration defaults.
++        OrganizationRole.permissions.through.objects.filter(
++            businesspermission__code__in=codes
++        ).delete()
++        previous = [
++            ("billing", "0015_p6_s26_s32_taxpayer_submission_snapshot"),
++            ("organizations", "0113_cep056_certificate_permissions"),
++        ]
++        current = [
++            ("billing", "0016_cep036_indexation"),
++            ("organizations", "0114_cep036_indexation_permissions"),
++        ]
++        try:
++            MigrationExecutor(connection).migrate(previous)
++            self.assertFalse(
++                BusinessPermission.objects.filter(
++                    code__in=codes, is_active=True
++                ).exists()
++            )
++            self.assertEqual(
++                type(fixture.contract).objects.values().get(pk=fixture.contract.pk),
++                before,
++            )
++            MigrationExecutor(connection).migrate(current)
++            self.assertEqual(
++                BusinessPermission.objects.filter(
++                    code__in=codes, is_active=True
++                ).count(),
++                3,
++            )
++            self.assertFalse(
++                OrganizationRole.permissions.through.objects.filter(
++                    businesspermission__code__in=codes
++                ).exists()
++            )
++            self.assertEqual(
++                type(fixture.contract).objects.values().get(pk=fixture.contract.pk),
++                before,
++            )
++            self.assertEqual(IndexationRuleVersion.objects.count(), 0)
++            self.assertEqual(IndexationCalculation.objects.count(), 0)
++        finally:
++            MigrationExecutor(connection).migrate(current)
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -569,0 +570,3 @@
++    INDEXATION_RULES_MANAGE = "indexation_rules.manage", "تهیه نسخه قانون تعدیل"
++    INDEXATION_CALCULATE = "indexation.calculate", "محاسبه تعدیل با سیاست مجاز"
++    INDEXATION_CORRECT = "indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -19,0 +20,12 @@
++    PermissionResource(
++        "indexation_rules", "قوانین تعدیل حاکم‌شده",
++        ("billing.IndexationRuleVersion",),
++        (P.INDEXATION_RULES_MANAGE,),
++        ("apps.billing.indexation",),
++    ),
++    PermissionResource(
++        "indexation", "محاسبات تعدیل حاکم‌شده",
++        ("billing.IndexationCalculation",),
++        (P.INDEXATION_CALCULATE, P.INDEXATION_CORRECT),
++        ("apps.billing.indexation",),
++    ),
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -770,0 +771,5 @@
++        BusinessPermissionCode.INDEXATION_RULES_MANAGE,
++        BusinessPermissionCode.INDEXATION_CALCULATE,
++        BusinessPermissionCode.INDEXATION_CORRECT,
++    ))
++    _default_permissions.difference_update(permission_codes(
+--- a/apps/organizations/migrations/0114_cep036_indexation_permissions.py
++++ b/apps/organizations/migrations/0114_cep036_indexation_permissions.py
+@@ -0,0 +1,29 @@
++# ruff: noqa: RUF012
++"""Catalogue indexation capabilities without assigning any tenant role."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("indexation_rules.manage", "تهیه نسخه قانون تعدیل"),
++    ("indexation.calculate", "محاسبه تعدیل با سیاست مجاز"),
++    ("indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"),
++)
++
++
++def forward(apps, schema_editor):
++    model = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        model.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0113_cep056_certificate_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]

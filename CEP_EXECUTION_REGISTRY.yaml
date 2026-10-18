@@ -62,9 +62,9 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 38
+  execution_state_complete: 39
   authorized_not_started: 0
-  eligible_under_standing_authority: 2
+  eligible_under_standing_authority: 1
   in_progress: 0
   blocked_current: 0
   partial_current: 2
@@ -1614,28 +1614,32 @@ ceps:
     updated_at: null
     history: []
   CEP-036:
-    title: null
+    title: Governed Indexation engine
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_STARTED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - PERFORMANCE_CONCURRENCY_RUNTIME
+    - OFFICIAL_INDEXATION_ACTIVATION_EVIDENCE_EXT0003
+    - BASELINE_CONTRACT_BILLING_SCOPE_FIXTURE_FAILURES
+    - BASELINE_PERMISSION_REGISTRY_DEBT
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-036_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
       committed: null
       commit_sha: null
@@ -1643,13 +1647,22 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
+      branch: main
+      sha: 343391c2384fdf302b35d198843196a945b63b27
     updated_at: '2026-10-18'
     history:
     - date: '2026-10-18'
       status: DEPENDENCY_READY
       reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
+    - date: '2026-10-18'
+      status: STARTED
+      reason: Canonical2f716418 verified; no CEP prerequisites; normal build entry satisfied; smaller independent rule/schema surface than022 three-IMB lifecycle; EXT0003 activation held closed.
+    - date: '2026-10-18'
+      status: PREFLIGHT_HANDOFF
+      reason: Human offered new-session continuation; main/origin/remote343391c reverified. Only Registry and036 manifest dirty; no036 product mutation or AC claim. Resume from manifest under freshly grounded authority.
+    - date: '2026-10-18'
+      status: CLOSED_VERIFIED
+      reason: Six AC and scoped build DoD PASS; immutable governed rule/calculation/correction framework, no shipped adapter or policy; explicit operation capabilities with zero defaults. Focused/model/service/migration checks PASS. Contracts/Billing fixture and registry failures attributable to unchanged baseline; evidence comparison retained. Development source/grant reconciliation PASS; EXT0003 activation remains closed.
   CEP-037:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2462,11 +2475,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-056_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 343391c2384fdf302b35d198843196a945b63b27
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: COMPLETE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 60778c8127bf0d5df494c47ad45c1b2605d1f228
@@ -2481,6 +2496,9 @@ ceps:
     - date: '2026-10-18'
       status: CLOSED_VERIFIED
       reason: 12/12 AC and both scoped DoDs PASS; 68 affected tests and separate migration rollback/reapply PASS; 16 captures and local additive development reconciliation retained. No active renderer/template/signature policy or default grants. Earlier eight Workflow scope-fixture failures remain independently attributed baseline debt.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit/push343391c verified main/origin and clean tree; no production action.
   CEP-057:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3547,9 +3565,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 60778c8127bf0d5df494c47ad45c1b2605d1f228
-  origin_main: 60778c8127bf0d5df494c47ad45c1b2605d1f228
-  integration_checkpoint: 60778c8127bf0d5df494c47ad45c1b2605d1f228
+  last_reconciled_head: 343391c2384fdf302b35d198843196a945b63b27
+  origin_main: 343391c2384fdf302b35d198843196a945b63b27
+  integration_checkpoint: 343391c2384fdf302b35d198843196a945b63b27
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3558,7 +3576,6 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-022
-  - CEP-036
   next_autonomous_cep: CEP-022
   current_session_continuation: RESUMED_INDEPENDENT_NON_PRODUCTION_ON_HUMAN_CONTINUE
   current_independent_cep: null

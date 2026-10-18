@@ -1,0 +1,7 @@
+evidence_id,kind,source_or_command,result,status
+CEP-036-EV-001,Canonical entry and frontier,CEP-036_EXECUTION_MANIFEST.md; CEP-036_FRONTIER.json,79 hashes; PD018/SPEC003 recovered; no prerequisites; build permitted; activation closed,PASS
+CEP-036-EV-002,Code and domain transaction trace,CEP-036_CODE_DIFF.patch; apps/billing/test_cep036.py,Snapshot and prior lineage; policy-boundary negatives; rollback after insert; source authority preserved,PASS
+CEP-036-EV-003,Focused/model/service tests,CEP-036_VALIDATION.txt,24 focused plus1 schema/catalogue migration rollback/reapply PASS; exact raw counts retained,PASS
+CEP-036-EV-004,Development migration and reconciliation,CEP-036_VALIDATION.txt; CEP-036_DEVELOPMENT_RECONCILIATION.json,0016 tables and0114 catalogue only; local PostgreSQL; sources and grants unchanged; no deployed adapter/rules/calculations,PASS
+CEP-036-EV-005,Regression attribution,CEP-036_VALIDATION.txt; CEP-036_REGRESSION_ATTRIBUTION.json; CEP-036_REGISTRY_BASELINE_COMPARISON.json,21 existing fixture failures before036; six registry failures; HEAD/current equivalent violations; new entries independently PASS; not full regression PASS,ATTRIBUTED_BASELINE_DEBT
+CEP-036-EV-006,Lint/system/drift/whitespace,CEP-036_VALIDATION.txt,Ruff; new file format; Django check; no migration drift; diff check,PASS

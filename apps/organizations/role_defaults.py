@@ -768,6 +768,11 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
     _default_permissions.difference_update(permission_codes(
+        BusinessPermissionCode.INDEXATION_RULES_MANAGE,
+        BusinessPermissionCode.INDEXATION_CALCULATE,
+        BusinessPermissionCode.INDEXATION_CORRECT,
+    ))
+    _default_permissions.difference_update(permission_codes(
         BusinessPermissionCode.ESS_EVIDENCE_VIEW,
         BusinessPermissionCode.HR_CERTIFICATES_VIEW,BusinessPermissionCode.HR_CERTIFICATES_REQUEST,
         BusinessPermissionCode.HR_CERTIFICATES_REVIEW,BusinessPermissionCode.HR_CERTIFICATES_GENERATE,
