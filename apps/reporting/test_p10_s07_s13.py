@@ -224,7 +224,7 @@ class P10S07S13AcceptanceTests(TestCase):
         self.assertEqual(run.tie_out.outcome, ReconciliationOutcome.GATED)
         self.assertEqual(run.tie_out.coverage["right"], "gated_not_activated")
 
-    def test_10_exact_tolerance_and_materiality_are_deterministic(self) -> None:
+    def test_10_unapproved_tolerance_does_not_hide_a_difference(self) -> None:
         data = PairData(
             SideData("L", "left.Model", "ready", {"amount": "10.00"}, {"ids": ["1"]}),
             SideData("R", "right.Model", "ready", {"amount": "9.99"}, {"ids": ["2"]}),
@@ -234,10 +234,11 @@ class P10S07S13AcceptanceTests(TestCase):
             data,
             {"tolerance": {"absolute": "0.01"}, "materiality": {"absolute": "1.00"}},
         )
-        self.assertEqual(outcome, ReconciliationOutcome.MATCHED_WITHIN_TOLERANCE)
+        self.assertEqual(outcome, ReconciliationOutcome.MISMATCH)
         self.assertEqual(Decimal(difference["amount"]), Decimal("0.01"))
         self.assertTrue(tolerance["difference_visible"])
-        self.assertFalse(materiality["material"])
+        self.assertFalse(tolerance["applied"])
+        self.assertTrue(materiality["material"])
 
     def test_11_side_and_tieout_snapshots_are_immutable(self) -> None:
         run = self._run(key="immutable")

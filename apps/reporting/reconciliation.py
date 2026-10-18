@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -644,36 +644,72 @@ ORGANIZATION_ONLY_PAIRS = frozenset(
 )
 
 
+def resolve_reconciliation_tolerance(
+    data: PairData, specification: dict[str, object]
+) -> dict[str, object]:
+    """Resolve only governed comparison rules; never borrow a matching policy.
+
+    No approved source-family aggregate tolerance contract is configured today.
+    Native run amounts and invoice-match basis points do not supply that contract.
+    Keep this boundary explicit until a source-owned resolver is approved.
+    """
+    rule = specification.get("tolerance")
+    kind = rule.get("kind") if isinstance(rule, dict) else None
+    result: dict[str, object] = {
+        "kind": kind,
+        "source_models": [data.left.model, data.right.model],
+        "applied": False,
+        "absolute": None,
+        "difference_visible": True,
+        "status": "unconfigured",
+        "reason": "approved_source_tolerance_absent",
+    }
+    if kind == "exact":
+        try:
+            absolute = Decimal(str(rule.get("absolute")))
+        except (InvalidOperation, TypeError, ValueError) as exc:
+            raise ValidationError("قاعده تطبیق دقیق معتبر نیست.") from exc
+        if not absolute.is_finite() or absolute != 0:
+            raise ValidationError("تطبیق دقیق فقط اختلاف صفر را می‌پذیرد.")
+        result.update(
+            absolute="0",
+            status="resolved",
+            reason="catalogue_exact_comparison",
+        )
+    return result
+
+
 def _compare(
     data: PairData, specification: dict[str, object]
 ) -> tuple[str, dict[str, object], dict[str, object], dict[str, object]]:
+    tolerance_result = resolve_reconciliation_tolerance(data, specification)
     readiness = {data.left.readiness, data.right.readiness}
     if "gated_not_activated" in readiness:
         return (
             ReconciliationOutcome.GATED,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "gated_dependency"},
         )
     if "uncomparable" in readiness:
         return (
             ReconciliationOutcome.UNCOMPARABLE,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "unaligned_dimension"},
         )
     if "incomplete" in readiness:
         return (
             ReconciliationOutcome.INCOMPLETE,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "incomplete_coverage"},
         )
     if "unknown" in readiness or data.comparable_key is None:
         return (
             ReconciliationOutcome.UNKNOWN,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "unknown_value"},
         )
     left_value = data.left.value.get(data.comparable_key)
@@ -682,21 +718,21 @@ def _compare(
         return (
             ReconciliationOutcome.UNKNOWN,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "unknown_value"},
         )
     if left_value is None:
         return (
             ReconciliationOutcome.MISSING_LEFT,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "missing_expected_side"},
         )
     if right_value is None:
         return (
             ReconciliationOutcome.MISSING_RIGHT,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "missing_expected_side"},
         )
     left_decimal = _decimal(left_value)
@@ -705,17 +741,16 @@ def _compare(
         return (
             ReconciliationOutcome.UNKNOWN,
             {},
-            {"applied": False},
+            tolerance_result,
             {"material": True, "reason": "unknown_value"},
         )
     difference = left_decimal - right_decimal
-    tolerance_spec = dict(specification.get("tolerance", {}))
-    tolerance = _decimal(tolerance_spec.get("absolute")) or Decimal(0)
+    # Exact equality requires no tolerance approval. Any non-zero difference
+    # remains an exception when the source-family policy is absent.
+    tolerance_result["applied"] = tolerance_result["status"] == "resolved"
     outcome = (
         ReconciliationOutcome.MATCHED_EXACT
         if difference == 0
-        else ReconciliationOutcome.MATCHED_WITHIN_TOLERANCE
-        if abs(difference) <= tolerance
         else ReconciliationOutcome.MISMATCH
     )
     materiality_spec = dict(specification.get("materiality", {}))
@@ -727,14 +762,15 @@ def _compare(
     return (
         outcome,
         {"key": data.comparable_key, "amount": format(difference, "f")},
-        {
-            "applied": True,
-            "absolute": format(tolerance, "f"),
-            "difference_visible": True,
-        },
+        tolerance_result,
         {
             "material": qualitative or abs(difference) > materiality,
             "absolute": format(materiality, "f"),
+            **(
+                {"reason": "approved_source_tolerance_absent"}
+                if difference != 0 and tolerance_result["status"] != "resolved"
+                else {}
+            ),
         },
     )
 
@@ -863,6 +899,8 @@ def execute_reconciliation(
         status=ReconciliationRunStatus.COMPARING
     )
     outcome, difference, tolerance_result, materiality_result = _compare(data, spec)
+    tolerance_result["pair_version_id"] = str(version.pk)
+    tolerance_result["specification_hash"] = _hash(spec)
     tie_payload = {
         "pair": pair_code,
         "version": version.version,
@@ -933,7 +971,11 @@ def execute_reconciliation(
         entity_id=str(run.pk),
         organization=organization,
         actor=actor,
-        metadata={"pair_code": pair_code, "outcome": outcome},
+        metadata={
+            "pair_code": pair_code,
+            "outcome": outcome,
+            "tolerance": tolerance_result,
+        },
     )
     return run
 

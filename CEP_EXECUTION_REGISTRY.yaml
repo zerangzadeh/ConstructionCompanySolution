@@ -62,13 +62,13 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 32
+  execution_state_complete: 33
   authorized_not_started: 0
-  eligible_under_standing_authority: 3
+  eligible_under_standing_authority: 7
   in_progress: 0
   blocked_current: 0
   partial_current: 1
-  not_started_other_current_governed: 43
+  not_started_other_current_governed: 38
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-18'
@@ -1610,15 +1610,15 @@ ceps:
   CEP-036:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -1639,8 +1639,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
   CEP-037:
     title: null
     phase: V1_IMPLEMENTATION
@@ -1778,39 +1781,54 @@ ceps:
     updated_at: '2026-10-16'
     history: []
   CEP-041:
-    title: null
+    title: Source-aware reconciliation tolerance
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - source_family_tolerance_activation_evidence
+    - performance_concurrency_runtime
+    - browser_accessibility_runtime
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-041_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
+      pushed: false
+      merged_to_main: false
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: f7e89e43726b1494baf40017e6b1276657e224cf
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
+    - date: '2026-10-18'
+      status: STARTED
+      reason: Canonical identity and CEP-006 evidence verified; narrow policy hook selected after full prompt-frontier recomputation.
+    - date: '2026-10-18'
+      status: COMPLETE
+      reason: Explicit source-family tolerance hook and fail-closed exception/audit/version evidence; 6/6 AC and scoped DoD PASS; 32 focused and affected PostgreSQL tests PASS; no migration.
+    - date: '2026-10-18'
+      status: CLOSED_VERIFIED
+      reason: Required closeout complete; source-family activation remains gated; runtime UTV retained.
   CEP-042:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2075,12 +2093,14 @@ ceps:
       path: docs/governance/cep/reports/CEP-049_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: f7e89e43726b1494baf40017e6b1276657e224cf
+      pushed: true
       merged_to_main: false
-      integrated_to_main: false
-      remote_main_evidence: NOT_INTEGRATED_WORKTREE
+      integrated_to_main: true
+      remote_main_evidence: COMPLETE
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      integration_commit_sha: f7e89e43726b1494baf40017e6b1276657e224cf
     last_execution:
       branch: main
       sha: 21476e7b583e87bb22775c8cbca33f61702a926c
@@ -2098,6 +2118,9 @@ ceps:
     - date: '2026-10-18'
       status: CLOSED_VERIFIED
       reason: Completion Report and manifests reconciled; Ruff, Django check, migration drift and diff whitespace checks PASS; headless fixture screenshot retained; browser/accessibility and performance/concurrency runtime remain UTV.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Direct main commit and remote refs/heads/main f7e89e4 verified; no merge performed.
   CEP-050:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2223,15 +2246,15 @@ ceps:
   CEP-053:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2252,8 +2275,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
   CEP-054:
     title: null
     phase: V1_IMPLEMENTATION
@@ -2294,15 +2320,15 @@ ceps:
   CEP-055:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2323,20 +2349,23 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
   CEP-056:
     title: null
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -2357,8 +2386,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: Canonical direct prerequisites COMPLETE and entry gate permits non-production build; activation-only conditions remain closed. Full package entry checks still required before mutation.
   CEP-057:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3401,9 +3433,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 21476e7b583e87bb22775c8cbca33f61702a926c
-  origin_main: 21476e7b583e87bb22775c8cbca33f61702a926c
-  integration_checkpoint: 21476e7b583e87bb22775c8cbca33f61702a926c
+  last_reconciled_head: f7e89e43726b1494baf40017e6b1276657e224cf
+  origin_main: f7e89e43726b1494baf40017e6b1276657e224cf
+  integration_checkpoint: f7e89e43726b1494baf40017e6b1276657e224cf
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3412,8 +3444,12 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-022
+  - CEP-036
   - CEP-052
+  - CEP-053
   - CEP-054
+  - CEP-055
+  - CEP-056
   next_autonomous_cep: CEP-052
   production_authorized: false
   human_signoff_executed: false

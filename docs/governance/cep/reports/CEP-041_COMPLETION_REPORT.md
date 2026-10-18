@@ -1,0 +1,15 @@
+# CEP-041 Completion Report
+
+**EXECUTION COMPLETE.** Lifecycle: CLOSED_VERIFIED. IMB-0045; 6/6 canonical AC and scoped DoD PASS. [Acceptance mapping](../evidence/CEP-041_ACCEPTANCE_MAPPING.csv), [evidence](../evidence/CEP-041_EVIDENCE_MANIFEST.csv), [actual touch set](../manifests/CEP-041_EXECUTION_MANIFEST.md).
+
+Baseline: clean `main` / `origin/main` / remote `f7e89e43726b1494baf40017e6b1276657e224cf`. Canonical SHA-256 `9c568ab27c05fd92da56c3c899ab629c62ac90d058e183da25daec48f4e9f27a`. Standing non-production authority applies; CEP-006 implementation and final validation verified. This session separately authorizes bounded Git checkpoints.
+
+Reconciliation now resolves its exact catalogue rule explicitly and records absent source-family/native policy without substituting a numeric default. Exact equality remains exact equality; a nonzero difference without approved policy remains a visible material exception. Unsupported tolerance kinds and arbitrary untyped thresholds cannot enable auto-acceptance. Invalid exact rules fail validation. Tie-outs pin the pair version, specification hash and source models; audit carries the same decision. New runs leave immutable prior snapshots and source identities unchanged. No source financial records, models, schema, migrations, UI or settings changed.
+
+Validation: 32 PostgreSQL tests PASS (7 new unit/model/service/history tests plus 25 affected regression). Baseline 25/25 PASS before mutation. Ruff check/format, Django check, migration drift and diff whitespace PASS. No failing required test or unresolved in-scope blocker. The old test accepting an arbitrary untyped 0.01 tolerance was updated to require the canonical fail-closed outcome; this is the approved behavior change, not baseline debt. Full unrelated regression was not run.
+
+Registry: CEP-049 direct integration reconciled from Git; incomplete handoff frontier expanded by inspecting and hashing all 79 current canonical prompts. The detailed dependency/entry obligations are in [frontier evidence](../evidence/CEP-041_FRONTIER.json). After this completion: 33 COMPLETE; remaining verified build candidates CEP-022/036/052/053/054/055/056. CEP-028 remains PARTIAL/BLOCKER-DATA. Packages with other prior-wave/schema/authority/verification entry obligations remain unverified, not inferred eligible. Next selected CEP-052: isolated backend build; other remaining candidates have wider workflow/UI/lifecycle surfaces.
+
+EXT-0012/GATE-03 tolerance activation remains closed: no approved source-family aggregate tolerance was supplied. The build hook is complete; there is no active nonzero policy, invented threshold, policy schema, source-authority transfer or production claim. Performance/concurrency and broader browser/accessibility runtime remain UTV. Human Sign-off / Production Certification / Production Cutover: NOT EXECUTED.
+
+Git at execution closeout: no branch/worktree/merge; add/commit/push pending the authorized checkpoint, recorded separately from this execution baseline in the Registry. Next CEP: CONTINUED after safe checkpoint and re-grounding.

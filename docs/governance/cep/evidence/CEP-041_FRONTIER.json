@@ -1,0 +1,552 @@
+{
+  "baseline": "f7e89e43726b1494baf40017e6b1276657e224cf",
+  "complete_count": 32,
+  "verified_build_frontier": [
+    "CEP-022",
+    "CEP-036",
+    "CEP-041",
+    "CEP-052",
+    "CEP-053",
+    "CEP-054",
+    "CEP-055",
+    "CEP-056"
+  ],
+  "selection": "CEP-041",
+  "other_entry_conditions": "UNVERIFIED; direct dependency satisfaction alone does not establish entry gates or external verification readiness",
+  "candidates": [
+    {
+      "cep": "CEP-022",
+      "prompt_sha256": "995a0b498a752bb64369896b946ef5ef59b2277868447a12df807e7cc0f8c230",
+      "prerequisites": [
+        "CEP-010"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-01",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-028",
+      "prompt_sha256": "d740c17628f4e2282fa9dde68891f7d0f4f3945802345c4c0aa917a7c7a49e50",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant schema/authority prerequisite",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-030",
+      "prompt_sha256": "f5c75d30f807f1330e20ceb56e6e2164907f08ea750552d822c765264e63a008",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-031",
+      "prompt_sha256": "8228d91eeadfcbdd345ced20a7b8071a8ce0cc4dd7fc8ab176b7f31e64e2e787",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-032",
+      "prompt_sha256": "cd6b2bfff46890ed2a92a2a6a541e0703e64159e3b2952da39022075b5eb13eb",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Normal build prerequisites; Prior-wave contract/schema foundations",
+      "external_phase_contract": "- `EXT-0004` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-03 (activation only); Wave contract stabilization / relevant domain gate`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-033",
+      "prompt_sha256": "a33f2ff5ac202c15c245c7b21b1ec1dba2b1c0cf6a1f8749290bb38d8c81efbf",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-034",
+      "prompt_sha256": "30ef0f2442940b8a94f093c2b45ecb60b4ec9580d61e9da4d6b5ca0b1eb49b16",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-035",
+      "prompt_sha256": "2c915a874dca011d8e9e2d418908be78e4cb72acc700aafef626226b18027a26",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Normal build prerequisites; Prior-wave contract/schema foundations",
+      "external_phase_contract": "- `EXT-0002` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-03 (activation only); Wave contract stabilization / relevant domain gate`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; NOT YET PROVIDED IN THIS PHASE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-036",
+      "prompt_sha256": "2f716418ba5608f876cd6fbe6bb14d03bbbf8c4936adb0611a3d21ceb78c19e4",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Normal build prerequisites",
+      "external_phase_contract": "- `EXT-0003` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-03 (activation only)`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; NOT YET PROVIDED IN THIS PHASE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-037",
+      "prompt_sha256": "f989006496029cd88203506d9d36cfa3ab81bec14e5281c4b5ff22bded797e18",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-041",
+      "prompt_sha256": "9c568ab27c05fd92da56c3c899ab629c62ac90d058e183da25daec48f4e9f27a",
+      "prerequisites": [
+        "CEP-006"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Normal build prerequisites",
+      "external_phase_contract": "- `EXT-0012` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-03 (activation only)`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; OPTIONAL / REQUIRED ONLY FOR TOLERANCE AUTO-ACCEPTANCE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-042",
+      "prompt_sha256": "1ea96efb37812bafe03934fed447450af35b862d049a0b388e4f4ab1f8ec4f93",
+      "prerequisites": [
+        "CEP-008",
+        "CEP-021"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-043",
+      "prompt_sha256": "2a5089c14f8afb3e4b118bd6f266d1c907fda8d1e6e9639a26d7b734c32eb19c",
+      "prerequisites": [
+        "CEP-008"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "- `EXT-0013` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR INT-B07 ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-044",
+      "prompt_sha256": "15059d1c942991817080cbb8fe8c1791dd34d6228f9a81de8e35d79ad2a7b73c",
+      "prerequisites": [
+        "CEP-008"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations; Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-045",
+      "prompt_sha256": "aa6d8f287391d7e9a9931bc44b37ee2c73670984b683f0bdf0070a3c00f23c45",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-046",
+      "prompt_sha256": "1dc277df321ad6f30d217f0a84b441cf27aafe1c4fda909c790c6d9b0979ccc6",
+      "prerequisites": [
+        "CEP-014"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-047",
+      "prompt_sha256": "1d7ffbc058175705046389c4f1e0b9e923d236bd89300916edea7303c5106adb",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "- `EXT-0006` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n- `EXT-0007` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n- `EXT-0008` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-048",
+      "prompt_sha256": "7d4ac74ce888d0fda0413cccd5838ad3c9fbe687f0887763e2e30b71aba19cc1",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "- `EXT-0009` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-050",
+      "prompt_sha256": "b108a223f83522f706a5be2e68c495099a5838c2d021b8075410a91145574e4b",
+      "prerequisites": [
+        "CEP-010",
+        "CEP-024"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Prior-wave contract/schema foundations",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-052",
+      "prompt_sha256": "eaf9362eb18ab80b97f867b2c8d3ab2e20e458de5772173d28f85c464f66aa25",
+      "prerequisites": [
+        "CEP-025"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Normal build prerequisites",
+      "external_phase_contract": "- `EXT-0018` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-03 (activation only)`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; CURRENT VALUES/EVIDENCE UTV\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-053",
+      "prompt_sha256": "6e2eb63215509c29bbd5c221ad82dbf244e6ab5b9294152c8d0704aa99890bc5",
+      "prerequisites": [
+        "CEP-017",
+        "CEP-026"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-054",
+      "prompt_sha256": "78e210b460e214c766eec2e439f4e12f11b744e4865ce41462a7f50d6170bc84",
+      "prerequisites": [
+        "CEP-025",
+        "CEP-026"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-055",
+      "prompt_sha256": "0b7ef725e1a8d59d7bc1e6fe34989385c13ca7f75cb6a59b8a558792c588c5f2",
+      "prerequisites": [
+        "CEP-018",
+        "CEP-026"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-056",
+      "prompt_sha256": "6ee6d2b2f25affed49547b74d4e4fd3be8f2dd7a3c4528729ebf75ab0deb6c15",
+      "prerequisites": [
+        "CEP-011",
+        "CEP-026"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "- `EXT-0019` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-07`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE CERTIFICATE GENERATION ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-057",
+      "prompt_sha256": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+      "prerequisites": [
+        "CEP-023",
+        "CEP-029"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant schema/authority prerequisite",
+      "external_phase_contract": "- `EXT-0015` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-06`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE MIGRATION EXECUTION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-058",
+      "prompt_sha256": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1",
+      "prerequisites": [
+        "CEP-025",
+        "CEP-029"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant schema/authority prerequisite",
+      "external_phase_contract": "- `EXT-0017` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-06`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE MIGRATION EXECUTION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-059",
+      "prompt_sha256": "f2749d8216e8c62cacfe86a1e52ec267fc3ce763ea749b848c9e7e138133836a",
+      "prerequisites": [
+        "CEP-008",
+        "CEP-064"
+      ],
+      "unmet_prerequisites": [
+        "CEP-064"
+      ],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "- `EXT-0010` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-060",
+      "prompt_sha256": "d301eee76e17a3e620964429592e941bbcc95cd6d8d9ac291aa9295d731e9bb7",
+      "prerequisites": [
+        "CEP-064"
+      ],
+      "unmet_prerequisites": [
+        "CEP-064"
+      ],
+      "entry_gate": "GATE-04 where financial authority applies",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-061",
+      "prompt_sha256": "5446718cdc01fef8b1bf21c92cbdd0835b80ff80c119cfc1b7545447d823dabf",
+      "prerequisites": [
+        "CEP-064"
+      ],
+      "unmet_prerequisites": [
+        "CEP-064"
+      ],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-062",
+      "prompt_sha256": "de636c4166ce39794607dabd819c78d3791016151bc61b4db225043912b48d87",
+      "prerequisites": [
+        "CEP-021",
+        "CEP-064"
+      ],
+      "unmet_prerequisites": [
+        "CEP-064"
+      ],
+      "entry_gate": "Relevant authority/contract prerequisites",
+      "external_phase_contract": "- `EXT-0016` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-05`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR MONETARY ROUTE ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-063",
+      "prompt_sha256": "36eec04a4d2f47405d537d23c7e2c5f2f5f1172a7d03cd218304ad710bef3792",
+      "prerequisites": [
+        "CEP-023",
+        "CEP-026",
+        "CEP-050"
+      ],
+      "unmet_prerequisites": [
+        "CEP-050"
+      ],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-064",
+      "prompt_sha256": "643801a9d55948b75aa261653f7ceadd3bfeb720462d8def2e778da06b0c3132",
+      "prerequisites": [
+        "CEP-007",
+        "CEP-028"
+      ],
+      "unmet_prerequisites": [
+        "CEP-028"
+      ],
+      "entry_gate": "Migration/idempotency prerequisites; Relevant schema/authority prerequisite",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-065",
+      "prompt_sha256": "535bad1d9143c0c8e474872b683e70f899ceb7f13bebca9d71fcdf94b31599fc",
+      "prerequisites": [
+        "CEP-049"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-05/relevant domain convergence",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-066",
+      "prompt_sha256": "700eff25934b7c5aa0c0609bf852421fc45da5f46d584acdcafcb5cefbaccd6c",
+      "prerequisites": [
+        "CEP-006",
+        "CEP-040",
+        "CEP-044",
+        "CEP-061"
+      ],
+      "unmet_prerequisites": [
+        "CEP-044",
+        "CEP-061"
+      ],
+      "entry_gate": "GATE-05/relevant domain convergence",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-067",
+      "prompt_sha256": "64a1eb4be6ac4e6f0877ad0970915ea9a9e37e7d2419d395a5429b942cd19182",
+      "prerequisites": [
+        "CEP-004",
+        "CEP-049"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "GATE-05/relevant domain convergence",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-068",
+      "prompt_sha256": "6f157ca68cff50e8d5d94757b3065ffb40dddeba32803cec32179225a4ad9156",
+      "prerequisites": [
+        "CEP-026",
+        "CEP-062"
+      ],
+      "unmet_prerequisites": [
+        "CEP-062"
+      ],
+      "entry_gate": "GATE-02 + domain prerequisites",
+      "external_phase_contract": "- `EXT-0016` \u2014 Phase `ACTIVATION`; Blocks Build `NO`; Activation `YES`; Verification `NO`; Production `NO`; Gate `GATE-07`; Fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR MONETARY ROUTE ACTIVATION\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-069",
+      "prompt_sha256": "41d138764cb8fcde81dfea26f6c6df82202c54e4da3a641b2b18382811f2ebba",
+      "prerequisites": [
+        "CEP-052"
+      ],
+      "unmet_prerequisites": [
+        "CEP-052"
+      ],
+      "entry_gate": "Relevant implementation foundation",
+      "external_phase_contract": "- `EXT-0018` \u2014 Phase `PRODUCTION`; Blocks Build `NO`; Activation `NO`; Verification `NO`; Production `YES`; Gate `GATE-11`; Fail-closed: CURRENT VALUES/EVIDENCE UTV\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-070",
+      "prompt_sha256": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant implementation foundation",
+      "external_phase_contract": "- `EXT-0020` \u2014 Phase `PRODUCTION`; Blocks Build `NO`; Activation `NO`; Verification `NO`; Production `YES`; Gate `GATE-11`; Fail-closed: UNSPECIFIED / NOT PRODUCTION-CERTIFIED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-071",
+      "prompt_sha256": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant implementation foundation",
+      "external_phase_contract": "- `EXT-0021` \u2014 Phase `PRODUCTION`; Blocks Build `NO`; Activation `NO`; Verification `NO`; Production `YES`; Gate `GATE-11`; Fail-closed: UNSPECIFIED / NOT PRODUCTION-VALIDATED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-072",
+      "prompt_sha256": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+      "prerequisites": [],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant implementation foundation",
+      "external_phase_contract": "- `EXT-0022` \u2014 Phase `PRODUCTION`; Blocks Build `NO`; Activation `NO`; Verification `NO`; Production `YES`; Gate `GATE-11`; Fail-closed: NOT YET PROVEN\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-073",
+      "prompt_sha256": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+      "prerequisites": [
+        "CEP-006",
+        "CEP-009",
+        "CEP-012",
+        "CEP-028",
+        "CEP-029",
+        "CEP-057",
+        "CEP-058"
+      ],
+      "unmet_prerequisites": [
+        "CEP-028",
+        "CEP-057",
+        "CEP-058"
+      ],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "- `EXT-0023` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `Relevant implementation gate + external verification dependency`; Fail-closed: NOT EXECUTED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-074",
+      "prompt_sha256": "7e723b4147d417418f6033b2185a843af92d14e297c649418624d805b34811b9",
+      "prerequisites": [
+        "CEP-070"
+      ],
+      "unmet_prerequisites": [
+        "CEP-070"
+      ],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "- `EXT-0020` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `Relevant implementation gate + external verification dependency`; Fail-closed: UNSPECIFIED / NOT PRODUCTION-CERTIFIED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-075",
+      "prompt_sha256": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+      "prerequisites": [
+        "CEP-071"
+      ],
+      "unmet_prerequisites": [
+        "CEP-071"
+      ],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "- `EXT-0021` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `Relevant implementation gate + external verification dependency`; Fail-closed: UNSPECIFIED / NOT PRODUCTION-VALIDATED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-076",
+      "prompt_sha256": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa",
+      "prerequisites": [
+        "CEP-072"
+      ],
+      "unmet_prerequisites": [
+        "CEP-072"
+      ],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "- `EXT-0022` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `Relevant implementation gate + external verification dependency`; Fail-closed: NOT YET PROVEN\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-077",
+      "prompt_sha256": "acba1a8bfc7825534ef660ac3e0c63097b957485a70c73f384b4309f69ace7e7",
+      "prerequisites": [
+        "CEP-013"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "NONE\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-078",
+      "prompt_sha256": "313eb92ea69db33fe2ccaa6d881a6346949286aa8d9c688ac87dd820b0e92030",
+      "prerequisites": [
+        "CEP-003",
+        "CEP-017"
+      ],
+      "unmet_prerequisites": [],
+      "entry_gate": "Relevant implementation gate + external verification dependency",
+      "external_phase_contract": "- `EXT-0024` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `Relevant implementation gate + external verification dependency`; Fail-closed: NOT EXECUTED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    },
+    {
+      "cep": "CEP-079",
+      "prompt_sha256": "c02eb0bf068da7a036cf20776fd212be9d5146e994a9e6364ad4ddff9f6fb342",
+      "prerequisites": [
+        "CEP-001",
+        "CEP-002",
+        "CEP-003",
+        "CEP-006",
+        "CEP-007",
+        "CEP-010",
+        "CEP-011",
+        "CEP-016",
+        "CEP-017",
+        "CEP-018",
+        "CEP-024",
+        "CEP-027",
+        "CEP-030",
+        "CEP-031",
+        "CEP-032",
+        "CEP-033",
+        "CEP-034",
+        "CEP-040",
+        "CEP-041",
+        "CEP-045",
+        "CEP-046",
+        "CEP-049",
+        "CEP-060",
+        "CEP-061",
+        "CEP-064",
+        "CEP-066",
+        "CEP-067"
+      ],
+      "unmet_prerequisites": [
+        "CEP-030",
+        "CEP-031",
+        "CEP-032",
+        "CEP-033",
+        "CEP-034",
+        "CEP-041",
+        "CEP-045",
+        "CEP-046",
+        "CEP-060",
+        "CEP-061",
+        "CEP-064",
+        "CEP-066",
+        "CEP-067"
+      ],
+      "entry_gate": "GATE-09",
+      "external_phase_contract": "- `EXT-0025` \u2014 Phase `VERIFICATION`; Blocks Build `NO`; Activation `NO`; Verification `YES`; Production `NO`; Gate `GATE-09`; Fail-closed: NOT EXECUTED\n\nRespect phase semantics. A dependency that blocks Activation/Verification/Production does not automatically block Build. Where canonical scope allows build-before-activation, use:\n`BUILD MAY PROCEED / ACTIVATION MUST FAIL CLOSED`."
+    }
+  ]
+}
