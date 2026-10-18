@@ -14,4 +14,4 @@ Acceptance: **6/6 PASS.** Scoped DoD PASS: target workspace and item states exis
 
 Registry: CEP-031 is synchronized as `COMPLETE / CLOSED_VERIFIED`; the re-evaluated frontier has 42 complete, two partial and no in-progress CEPs. CEP-028 `BLOCKER-DATA`, CEP-069 `BLOCKER-EXTERNAL`, closed GATE-03 activation and NOT_READY GATE-07 are unchanged. The next serial entry review is CEP-032; it is not started or authorized by this closeout. [Frontier](../evidence/CEP-031_FRONTIER.json).
 
-Git: the bounded main checkpoint is authorized only after this completed validation. Its exact commit and fast-forward remote result are recorded in post-push reconciliation. No Human Sign-off, Production Certification, production deployment, cutover, data mutation or scope expansion occurred.
+Git: direct main commit `e35847fec5691006899d84719a6a146d0039a5b3` contains the validated implementation and was pushed fast-forward from `cef89e2` to `origin/main`; remote main was verified at that implementation commit before this integration record. No Human Sign-off, Production Certification, production deployment, cutover, data mutation or scope expansion occurred.

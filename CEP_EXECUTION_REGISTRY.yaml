@@ -1508,14 +1508,16 @@ ceps:
       path: docs/governance/cep/reports/CEP-031_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: e35847fec5691006899d84719a6a146d0039a5b3
+      pushed: true
       merged_to_main: null
-      remote_main_evidence: PENDING_AUTHORIZED_CHECKPOINT
+      remote_main_evidence: VERIFIED_E35847F_REMOTE_MAIN
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
-      sha: cef89e23b7835c44713970b1de2ee48a1f0d69a9
+      sha: e35847fec5691006899d84719a6a146d0039a5b3
     updated_at: '2026-10-18'
     history:
     - date: '2026-10-18'
@@ -1524,6 +1526,9 @@ ceps:
     - date: '2026-10-18'
       status: EXECUTION_COMPLETE
       reason: 6/6 AC and scoped DoD PASS. Focused4/4 and required broader Materials17/17 PASS after test-only explicit effective-role/scope fixture repair. Authenticated existing local development demo browser screenshots verify Persian RTL Jalali responsive workspace; no demo data or action form mutation. Performance/concurrency and browser accessibility remain UTV; Git checkpoint follows complete validation.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Direct main commit e35847f contains validated CEP-031 implementation, tests and evidence. Push origin main completed as fast-forward from cef89e2; origin/main and remote main verified at e35847f before integration evidence reconciliation.
   CEP-032:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3617,9 +3622,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: cef89e23b7835c44713970b1de2ee48a1f0d69a9
-  origin_main: cef89e23b7835c44713970b1de2ee48a1f0d69a9
-  integration_checkpoint: cef89e23b7835c44713970b1de2ee48a1f0d69a9
+  last_reconciled_head: e35847fec5691006899d84719a6a146d0039a5b3
+  origin_main: e35847fec5691006899d84719a6a146d0039a5b3
+  integration_checkpoint: e35847fec5691006899d84719a6a146d0039a5b3
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
