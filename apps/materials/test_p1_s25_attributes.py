@@ -17,6 +17,7 @@ from apps.materials.services import (
     record_material_price_observation,
     search_organization_materials,
 )
+from apps.materials.test_support import grant_material_test_owner
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 
 
@@ -29,14 +30,17 @@ class P1S25GovernedMaterialAttributeTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="S25 Other", slug="s25-other"
         )
-        for organization, user, role in (
-            (self.organization, self.owner, MembershipRole.COMPANY_OWNER),
-            (self.organization, self.member, MembershipRole.MEMBER),
-            (self.other_organization, self.other_owner, MembershipRole.COMPANY_OWNER),
-        ):
-            organization.memberships.create(
-                user=user, role=role, status=MembershipStatus.ACTIVE
-            )
+        grant_material_test_owner(
+            organization=self.organization, user=self.owner, code="test-s25-owner"
+        )
+        self.organization.memberships.create(
+            user=self.member, role=MembershipRole.MEMBER, status=MembershipStatus.ACTIVE
+        )
+        grant_material_test_owner(
+            organization=self.other_organization,
+            user=self.other_owner,
+            code="test-s25-other-owner",
+        )
         self.category = create_material_category(
             organization=self.organization,
             actor=self.owner,

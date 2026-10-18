@@ -12,6 +12,7 @@ from apps.materials.services import (
     resolve_material_identifier,
     supersede_material,
 )
+from apps.materials.test_support import grant_material_test_owner
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 from apps.procurement.services import add_purchase_request_item, create_purchase_request
 from apps.projects.services import create_project
@@ -26,20 +27,18 @@ class P1S23MaterialIdentityTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="S23 Other", slug="s23-other"
         )
-        self.organization.memberships.create(
-            user=self.owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+        grant_material_test_owner(
+            organization=self.organization, user=self.owner, code="test-s23-owner"
         )
         self.organization.memberships.create(
             user=self.member,
             role=MembershipRole.MEMBER,
             status=MembershipStatus.ACTIVE,
         )
-        self.other_organization.memberships.create(
+        grant_material_test_owner(
+            organization=self.other_organization,
             user=self.other_owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+            code="test-s23-other-owner",
         )
         self.unit = create_unit_of_measure(
             organization=self.organization,

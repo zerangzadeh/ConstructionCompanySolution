@@ -62,7 +62,7 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 41
+  execution_state_complete: 42
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
@@ -1483,39 +1483,47 @@ ceps:
       status: GIT_INTEGRATED
       reason: Existing direct main commit1501920 contains all030 implementation and screenshot evidence;HEAD/origin/main/remote main equal and tree clean. Current Human instruction authorizes attributable validated closeout checkpoint and serial continuation.
   CEP-031:
-    title: null
+    title: Materials and UOM operational governance UI
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: PASS
+    dod: PASS
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - performance_concurrency_runtime
+    - browser_accessibility_runtime
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-031_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
+      pushed: false
       merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: PENDING_AUTHORIZED_CHECKPOINT
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: cef89e23b7835c44713970b1de2ee48a1f0d69a9
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: STARTED
+      reason: Standing bounded non-production authority and current serial instruction;canonical8228d91e verified;no direct dependencies or external blocker;configured Materials0001-0010 source/schema foundations available;UIA029/044 and actual touch set recorded before mutation. No migration or source authority change.
+    - date: '2026-10-18'
+      status: EXECUTION_COMPLETE
+      reason: 6/6 AC and scoped DoD PASS. Focused4/4 and required broader Materials17/17 PASS after test-only explicit effective-role/scope fixture repair. Authenticated existing local development demo browser screenshots verify Persian RTL Jalali responsive workspace; no demo data or action form mutation. Performance/concurrency and browser accessibility remain UTV; Git checkpoint follows complete validation.
   CEP-032:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3609,9 +3617,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 1501920ee724222b6256326ef5122f3ecc1d6297
-  origin_main: 1501920ee724222b6256326ef5122f3ecc1d6297
-  integration_checkpoint: 1501920ee724222b6256326ef5122f3ecc1d6297
+  last_reconciled_head: cef89e23b7835c44713970b1de2ee48a1f0d69a9
+  origin_main: cef89e23b7835c44713970b1de2ee48a1f0d69a9
+  integration_checkpoint: cef89e23b7835c44713970b1de2ee48a1f0d69a9
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3647,7 +3655,7 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP030_CLOSED_VERIFIED_NEXT_ENTRY_REVIEW_CEP031
+  current_session_continuation: CEP031_CLOSED_VERIFIED_NEXT_ENTRY_REVIEW_CEP032
   current_independent_cep: null
   production_authorized: false
   human_signoff_executed: false

@@ -1,0 +1,15 @@
+path,purpose,boundary
+apps/materials/governance_forms.py,Tenant-scoped forms for existing Materials/UOM services,No model/migration/service/permission/default-grant change
+apps/materials/governance_views.py,Secondary governed UI and fixed action dispatch,Delegates only to existing authorized services; no new authority or substitution policy
+apps/materials/urls.py,Governance routes,Authenticated existing surface only
+apps/materials/test_cep031.py,CEP-focused authorization/isolation/error/RTL regression,No production behavior outside approved UI wiring
+apps/materials/test_support.py,Explicit effective role and tenant-scope fixture helper for broader Materials regression,Test-only repair; preserves denied-member and cross-tenant checks
+apps/materials/tests.py,Current authorization fixtures for existing Materials regression,Test-only fixture compatibility
+apps/materials/test_p1_s23_identity.py,Current authorization fixture for existing Materials regression,Test-only fixture compatibility
+apps/materials/test_p1_s24_units.py,Current authorization fixture for existing Materials regression,Test-only fixture compatibility
+apps/materials/test_p1_s25_attributes.py,Current authorization fixture for existing Materials regression,Test-only fixture compatibility
+apps/materials/test_p1_s26_technical.py,Current authorization fixture for existing Materials regression,Test-only fixture compatibility
+templates/materials/governance.html,Persian RTL secondary governance workspace,Existing services and immutable histories only
+templates/materials/unavailable.html,Generic fail-closed unavailable state,No protected object disclosure
+templates/materials/material_list.html,Authorized deep link to secondary governance workspace,UI visibility remains independent from backend authorization
+CEP_EXECUTION_REGISTRY.yaml,CEP lifecycle and live frontier synchronization,No dependency/gate scope change

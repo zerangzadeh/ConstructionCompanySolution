@@ -17,12 +17,8 @@ from apps.materials.services import (
     record_material_relationship,
     transition_material_technical_revision,
 )
-from apps.organizations.models import (
-    MembershipRole,
-    MembershipStatus,
-    Organization,
-    OrganizationSettings,
-)
+from apps.materials.test_support import grant_material_test_owner
+from apps.organizations.models import Organization, OrganizationSettings
 
 
 class P1S26TechnicalGovernanceTests(TestCase):
@@ -31,8 +27,14 @@ class P1S26TechnicalGovernanceTests(TestCase):
         self.approver = User.objects.create_user(username="s26-approver")
         self.organization = Organization.objects.create(name="S26", slug="s26")
         OrganizationSettings.objects.create(organization=self.organization)
-        for user in (self.author, self.approver):
-            self.organization.memberships.create(user=user, role=MembershipRole.COMPANY_OWNER, status=MembershipStatus.ACTIVE)
+        grant_material_test_owner(
+            organization=self.organization, user=self.author, code="test-s26-author"
+        )
+        grant_material_test_owner(
+            organization=self.organization,
+            user=self.approver,
+            code="test-s26-approver",
+        )
         category = create_material_category(organization=self.organization, actor=self.author, code="STEEL", name="Steel")
         unit = create_unit_of_measure(organization=self.organization, actor=self.author, code="KG", name="Kilogram", symbol="kg", category="weight")
         self.source = create_material(organization=self.organization, actor=self.author, code="A", name="A", category=category, unit_of_measure=unit)

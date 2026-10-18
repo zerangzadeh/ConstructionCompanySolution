@@ -1,0 +1,33 @@
+CEP-031 validation record — 2026-10-18
+
+Focused implementation suite (before broader repair):
+  .venv\Scripts\python.exe manage.py test apps.materials.test_cep031 --keepdb -v 1
+  Result: 4 tests, PASS.
+
+Required broader Materials regression, initial attribution:
+  .venv\Scripts\python.exe manage.py test apps.materials --keepdb --noinput -v 1
+  Result: 17 tests, 4 PASS and 13 setup errors.
+  Attribution: each error occurred in a pre-existing test setUp at
+  apps.materials.services._require_active_management_access ->
+  apps.organizations.authorization.require_business_permission. Historical
+  fixtures created only legacy MembershipRole strings. They supplied neither an
+  effective OrganizationRole permission assignment nor an organization scope
+  grant. The affected suites predate the P1 central authorization requirements.
+
+Scoped fixture repair:
+  apps/materials/test_support.py gives test-only Company Owner fixtures an active
+  effective role with catalog permissions and an explicit organization-scope
+  grant. Member/negative fixtures remain ungranted. No product authorization,
+  model, migration, seed data, default role, service, or permission catalog changed.
+
+Required broader Materials regression, final:
+  .venv\Scripts\python.exe manage.py test apps.materials --keepdb --noinput -v 1
+  Result: Ran 17 tests in 37.905s — OK.
+
+Static validation:
+  .venv\Scripts\python.exe -m ruff check [CEP-031 production and Materials regression files]
+  Result: All checks passed.
+  .venv\Scripts\python.exe manage.py check
+  Result: System check identified no issues (0 silenced).
+  git diff --check
+  Result: PASS (line-ending notices only).

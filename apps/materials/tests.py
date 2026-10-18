@@ -14,6 +14,7 @@ from apps.materials.services import (
     get_organization_units,
     update_material_category,
 )
+from apps.materials.test_support import grant_material_test_owner
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
 
 
@@ -31,15 +32,13 @@ class UnitOfMeasureServiceTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="Other Unit Company", slug="other-unit-company"
         )
-        self.organization.memberships.create(
-            user=self.owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+        grant_material_test_owner(
+            organization=self.organization, user=self.owner, code="test-unit-owner"
         )
-        self.other_organization.memberships.create(
+        grant_material_test_owner(
+            organization=self.other_organization,
             user=self.other_owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+            code="test-unit-other-owner",
         )
 
     def test_unit_code_is_normalized_unique_per_tenant_and_precision_is_validated(
@@ -126,18 +125,18 @@ class MaterialMasterServiceTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="Other Material Company", slug="other-material-company"
         )
-        self.organization.memberships.create(
+        grant_material_test_owner(
+            organization=self.organization,
             user=self.owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+            code="test-material-owner",
         )
         self.organization.memberships.create(
             user=self.member, role=MembershipRole.MEMBER, status=MembershipStatus.ACTIVE
         )
-        self.other_organization.memberships.create(
+        grant_material_test_owner(
+            organization=self.other_organization,
             user=self.other_owner,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
+            code="test-material-other-owner",
         )
         self.unit = create_unit_of_measure(
             organization=self.organization,

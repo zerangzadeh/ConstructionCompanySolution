@@ -15,7 +15,8 @@ from apps.materials.services import (
     create_unit_conversion_version,
     create_unit_of_measure,
 )
-from apps.organizations.models import MembershipRole, MembershipStatus, Organization
+from apps.materials.test_support import grant_material_test_owner
+from apps.organizations.models import Organization
 
 
 class P1S24VersionedUnitConversionTests(TestCase):
@@ -26,15 +27,11 @@ class P1S24VersionedUnitConversionTests(TestCase):
         self.other_organization = Organization.objects.create(
             name="S24 Other", slug="s24-other"
         )
-        for organization, user in (
-            (self.organization, self.owner),
-            (self.other_organization, self.other_owner),
+        for organization, user, code in (
+            (self.organization, self.owner, "test-s24-owner"),
+            (self.other_organization, self.other_owner, "test-s24-other-owner"),
         ):
-            organization.memberships.create(
-                user=user,
-                role=MembershipRole.COMPANY_OWNER,
-                status=MembershipStatus.ACTIVE,
-            )
+            grant_material_test_owner(organization=organization, user=user, code=code)
         self.metre = create_unit_of_measure(
             organization=self.organization,
             actor=self.owner,

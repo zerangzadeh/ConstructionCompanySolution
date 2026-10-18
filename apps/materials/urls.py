@@ -1,10 +1,12 @@
 from django.urls import path
 
-from apps.materials import views
+from apps.materials import governance_views, views
 
 app_name = "materials"
 
 urlpatterns = [
+    path("governance/", governance_views.index, name="governance"),
+    path("governance/actions/<str:action>/", governance_views.action, name="governance_action"),
     path("", views.material_list, name="material_list"),
     path("create/", views.material_create, name="material_create"),
     path("<uuid:material_id>/", views.material_detail, name="material_detail"),

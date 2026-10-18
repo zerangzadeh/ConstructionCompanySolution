@@ -1,0 +1,27 @@
+{
+  "result": "PASS",
+  "browser": "ChatGPT in-app browser via cua_repl",
+  "target": "authenticated existing local development demo tenant only",
+  "authentication": "approved repository-local development seed path; pre-existing account and data; no seed command, user creation, credential change, or business mutation",
+  "interaction": "read-only navigation to the existing Materials/UOM governance surface and existing material history; no form submitted",
+  "desktop": {
+    "viewport": {"width": 1280, "height": 720, "scrollWidth": 1265},
+    "screenshot": {"bytes": 63885, "sha256": "d80ffabb1b0e055b385c7b6c90ea2d38fe6e742c6bc7216859e3c3d1c0bbd658"}
+  },
+  "mobile": {
+    "viewport": {"width": 390, "height": 844, "scrollWidth": 375},
+    "screenshot": {"bytes": 30683, "sha256": "14192b37d618bf8580aece7194cb1487135bc95aa84e0facc37a114d8d763234"}
+  },
+  "observed": [
+    "authenticated tenant-bound governance surface",
+    "existing material selector and material-history deep link",
+    "alias, relationship, technical-review, attribute, unit-family, conversion and rounding source-action sections",
+    "Persian labels, lang=fa, dir=rtl and seven Jalali input controls",
+    "no horizontal overflow at the recorded desktop and mobile viewports"
+  ],
+  "limits": [
+    "browser/accessibility certification and performance/concurrency remain UTV",
+    "unauthorized and validation error states are covered by the required automated permission, tenant-isolation and form tests"
+  ],
+  "cleanup": "temporary mobile viewport override reset; no local development data changed"
+}
