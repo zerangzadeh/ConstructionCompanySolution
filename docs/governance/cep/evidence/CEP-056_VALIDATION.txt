@@ -1,0 +1,72 @@
+$ .venv/Scripts/ruff check apps/documents/employee_access.py apps/documents/services.py apps/organizations/models.py apps/organizations/permission_registry.py apps/organizations/role_defaults.py apps/workflows/personal_workspaces.py apps/workflows/registry.py apps/workforce/apps.py apps/workforce/ess_dashboard.py apps/workforce/models.py apps/workforce/personal_change_services.py apps/workforce/urls.py apps/organizations/migrations/0113_cep056_certificate_permissions.py apps/workforce/certificate_forms.py apps/workforce/certificate_services.py apps/workforce/certificate_views.py apps/workforce/certificate_workflow.py apps/workforce/migrations/0012_cep056_certificate_framework.py apps/workforce/own_evidence.py apps/workforce/test_cep056.py apps/workforce/test_cep056_migration.py
+All checks passed!
+
+exit=0
+$ .venv/Scripts/ruff format --check apps/organizations/migrations/0113_cep056_certificate_permissions.py apps/workforce/certificate_forms.py apps/workforce/certificate_services.py apps/workforce/certificate_views.py apps/workforce/certificate_workflow.py apps/workforce/migrations/0012_cep056_certificate_framework.py apps/workforce/own_evidence.py apps/workforce/test_cep056.py apps/workforce/test_cep056_migration.py
+9 files already formatted
+
+exit=0
+$ .venv/Scripts/python manage.py check
+System check identified no issues (0 silenced).
+
+exit=0
+$ .venv/Scripts/python manage.py makemigrations --check --dry-run
+No changes detected
+
+exit=0
+$ git diff --check
+
+exit=0
+
+ACTUAL CAPTURE: cep056-final-privacy.txt
+Using existing test database for alias 'default'...
+
+....................................................................
+----------------------------------------------------------------------
+Ran 68 tests in 52.152s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 68 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep056-migration.txt
+Using existing test database for alias 'default'...
+
+.
+Found 1 test(s).
+System check identified no issues (0 silenced).
+----------------------------------------------------------------------
+Ran 1 test in 29.171s
+
+OK
+Preserving test database for alias 'default'...
+
+
+
+ACTUAL CAPTURE: cep056-development.txt
+483 objects imported automatically (use -v 2 for details).
+
+Operations to perform:
+  Target specific migration: 0012_cep056_certificate_framework, from workforce
+Running migrations:
+  Applying organizations.0113_cep056_certificate_permissions... OK
+  Applying workforce.0012_cep056_certificate_framework... OK
+Reconciliation PASS; source/document/grant digests unchanged; zero certificate activation.
+
+
+ACTUAL CAPTURE: cep056-dev-plan.txt
+Planned operations:
+organizations.0113_cep056_certificate_permissions
+    Raw Python operation
+workforce.0012_cep056_certificate_framework
+    Create model HRCertificateRequest
+    Create model HRCertificateGeneration
+    Create model HRCertificateCancellation
+    Create model HRCertificateReview
+    Create model HRCertificateType
+    Add field certificate_type to hrcertificaterequest
+    Create constraint hr_certificate_type_version_uq on model hrcertificatetype
+    Create constraint hr_certificate_request_key_uq on model hrcertificaterequest

@@ -9,3 +9,5 @@ class WorkforceConfig(AppConfig):
     def ready(self):
         from .personal_change_workflow import register_personal_change
         register_personal_change()
+        from .certificate_workflow import register_certificate_workflow
+        register_certificate_workflow()

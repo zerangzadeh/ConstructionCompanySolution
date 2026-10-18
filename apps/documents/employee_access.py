@@ -15,7 +15,12 @@ from apps.documents.models import (
     DocumentRetentionClassification,
     DocumentVersion,
 )
-from apps.documents.services import _validate_access, _validate_target_access
+from apps.documents.services import (
+    _validate_access,
+    _validate_certificate_context_access,
+    _validate_target_access,
+)
+from apps.organizations.authorization import has_business_permission
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.workforce.ess_services import resolve_ess_subject
 from apps.workforce.models import Person, WorkRelationship
@@ -118,7 +123,7 @@ def _authorize(
                 episode.pk not in current_ids and not category.employee_history_visible
             ):
                 raise PermissionDenied(_DENIED)
-            if link.target_type in {"qualification", "training_record"}:
+            if link.target_type in {"qualification", "training_record"} and not has_business_permission(user=user,organization=organization,permission=BusinessPermissionCode.ESS_EVIDENCE_VIEW):
                 _validate_target_access(
                     actor=user, organization=organization, target=link.target
                 )
@@ -128,6 +133,7 @@ def _authorize(
             )
     if not has_employee_source:
         raise PermissionDenied(_DENIED)
+    _validate_certificate_context_access(document=document,actor=user)
     versions = tuple(
         version
         for version in document.versions.order_by("version_number")

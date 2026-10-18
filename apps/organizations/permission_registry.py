@@ -17,6 +17,8 @@ class PermissionResource:
 P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+    PermissionResource("ess_evidence","سوابق شخصی",(),(P.ESS_EVIDENCE_VIEW,),("apps.workforce.own_evidence","apps.documents.employee_access")),
+    PermissionResource("hr_certificates","چارچوب گواهی منابع انسانی",("workforce.HRCertificateType","workforce.HRCertificateRequest","workforce.HRCertificateReview","workforce.HRCertificateGeneration","workforce.HRCertificateCancellation"),(P.HR_CERTIFICATES_VIEW,P.HR_CERTIFICATES_REQUEST,P.HR_CERTIFICATES_REVIEW,P.HR_CERTIFICATES_GENERATE,P.HR_CERTIFICATES_CONFIGURE,P.HR_CERTIFICATES_CANCEL),("apps.workforce.certificate_services","apps.workforce.certificate_workflow","apps.workforce.certificate_views")),
     PermissionResource("personal_data", "درخواست تغییر اطلاعات شخصی",
         ("workforce.PersonalDataEnrollment", "workforce.PersonalDataRequest", "workforce.PersonalDataDecision"),
         (P.PERSONAL_DATA_VIEW,P.PERSONAL_DATA_REQUEST,P.PERSONAL_DATA_REVIEW,P.PERSONAL_DATA_CONFIGURE),

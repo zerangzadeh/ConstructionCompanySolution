@@ -261,6 +261,14 @@ def _validate_field_observation_attachment_access(
     )
 
 
+def _validate_certificate_context_access(*, document: Document, actor: User) -> None:
+    """A pinned generated artifact retains its certificate case privacy too."""
+    from apps.workforce.certificate_services import get_request
+    from apps.workforce.models import HRCertificateGeneration
+    for request_id in HRCertificateGeneration.objects.filter(organization_id=document.organization_id,document_version__document_id=document.pk).values_list("request_id",flat=True):
+        get_request(actor=actor,organization=document.organization,request_id=request_id)
+
+
 def _validate_document_context_access(
     *, document: Document, actor: User, permission: BusinessPermissionCode
 ) -> None:
@@ -298,6 +306,7 @@ def _validate_document_context_access(
             organization=document.organization,
             target=target,
         )
+    _validate_certificate_context_access(document=document,actor=actor)
 
 
 def _validate_uploaded_file(upload: "UploadedFile") -> tuple[str, int, str, str]:
@@ -330,10 +339,22 @@ def _create_version(
     actor: User,
     upload: "UploadedFile",
     version_number: int,
+    stored_names: list[str] | None = None,
 ) -> DocumentVersion:
     original_file_name, file_size, content_type, sha256 = _validate_uploaded_file(
         upload
     )
+    if stored_names is not None:
+        version = DocumentVersion(
+            organization=document.organization, document=document,
+            version_number=version_number, original_file_name=original_file_name,
+            content_type=content_type, file_size=file_size, sha256=sha256,
+            uploaded_by=actor,
+        )
+        version.file.save(original_file_name, upload, save=False)
+        stored_names.append(version.file.name)
+        version.save()
+        return version
     return DocumentVersion.objects.create(
         organization=document.organization,
         document=document,
@@ -362,6 +383,7 @@ def create_document(
     confidentiality: str = DocumentConfidentiality.INTERNAL,
     access_expires_at: datetime | None = None,
     audit_metadata: dict[str, object] | None = None,
+    stored_names: list[str] | None = None,
 ) -> Document:
     """Create a document, its first immutable version, and its initial link."""
 
@@ -416,6 +438,7 @@ def create_document(
         actor=actor,
         upload=upload,
         version_number=1,
+        stored_names=stored_names,
     )
     document.current_version = version
     document.save(update_fields=["current_version", "updated_at"])
@@ -717,6 +740,15 @@ def get_organization_documents(
         inquiry_ids = []
     denied_inquiry_documents = PayrollInquiryEvidenceLink.objects.filter(organization=organization).exclude(payroll_inquiry_id__in=inquiry_ids).values("document_id")
     documents = documents.exclude(pk__in=denied_inquiry_documents)
+    from apps.workforce.certificate_services import visible_requests as certificates
+    from apps.workforce.models import HRCertificateGeneration
+    generated=HRCertificateGeneration.objects.filter(organization=organization)
+    if generated.exists():
+        try:
+            visible_certificate_ids=[item.pk for item in certificates(actor=user,organization=organization)]
+        except PermissionDenied:
+            visible_certificate_ids=[]
+        documents=documents.exclude(pk__in=generated.exclude(request_id__in=visible_certificate_ids).values("document_version__document_id"))
     grants = effective_scope_grants(membership)
     if not membership_has_scope(membership):
         project_ids = list(

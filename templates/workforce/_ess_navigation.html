@@ -5,4 +5,6 @@
   {% if "payroll_inquiries.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'payroll:ess_inquiries' %}">پرسش‌های حقوق</a>{% endif %}
   {% if my_requests_workspace_available %}<a class="text-blue-700" href="{% url 'workforce:ess_requests' %}">درخواست‌های من</a>{% endif %}
   {% if "personal_data.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:personal_change_inbox' %}">تغییر اطلاعات شخصی</a>{% endif %}
+  {% if "ess_evidence.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:own_evidence' %}">سوابق و اسناد من</a>{% endif %}
+  {% if "hr_certificates.view" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:certificate_index' %}">گواهی‌های من</a>{% endif %}
 </nav>

@@ -1,11 +1,19 @@
 from django.urls import path
 
+from apps.workforce import certificate_views as certificates
 from apps.workforce import personal_change_views as personal
 from apps.workforce import views
 
 app_name = "workforce"
 
 urlpatterns = [
+    path("ess/evidence/",certificates.evidence,name="own_evidence"),
+    path("ess/certificates/",certificates.index,name="certificate_index"),
+    path("ess/certificates/new/",certificates.create,name="certificate_create"),
+    path("ess/certificates/<uuid:request_id>/",certificates.detail,name="certificate_detail"),
+    path("ess/certificates/<uuid:request_id>/generate/",certificates.generate,name="certificate_generate"),
+    path("ess/certificates/<uuid:request_id>/claim/<uuid:work_item_id>/",certificates.claim,name="certificate_claim"),
+    path("ess/certificates/<uuid:request_id>/cancel/",certificates.cancel,name="certificate_cancel"),
     path("ess/requests/",personal.requests,name="ess_requests"),
     path("ess/requests/<str:source_type>/<uuid:source_id>/",personal.request_status,name="ess_request_status"),
     path("ess/changes/",personal.inbox,name="personal_change_inbox"),

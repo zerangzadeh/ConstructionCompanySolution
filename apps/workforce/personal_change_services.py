@@ -465,6 +465,7 @@ def filter_explicit_request_rows(
         person=subject.person,
         legacy_employee_id__isnull=False,
     ).values_list("legacy_employee_id", flat=True)
+    from .models import HRCertificateRequest
     definitions = {
         "leave": (LeaveMissionRequest, "employee_id"),
         "overtime": (OvertimeRequest, "employee_id"),
@@ -482,6 +483,7 @@ def filter_explicit_request_rows(
                 **{field + "__in": employee_ids},
             ).values_list("pk", flat=True)
         )
+    allowed["certificate"]=set(HRCertificateRequest.objects.filter(organization=organization,requested_by=actor,person=subject.person,work_relationship__person=subject.person,pk__in=[row.source_id for row in rows if row.source_type=="certificate"]).values_list("pk",flat=True))
     return tuple(
         row for row in rows if row.source_id in allowed.get(row.source_type, set())
     )

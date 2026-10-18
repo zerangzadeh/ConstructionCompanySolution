@@ -17,7 +17,7 @@ from apps.timekeeping.models import (
 from apps.workflows.personal_workspaces import RequestWorkspaceRow, build_my_requests
 
 from .ess_services import ESSOwnProfile, get_own_profile
-from .models import PersonalDataRequest
+from .models import HRCertificateRequest, PersonalDataRequest
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ def build_ess_dashboard(*, user: User, organization: Organization) -> ESSDashboa
     rows: tuple[RequestWorkspaceRow, ...] = ()
     state = "unavailable"
     employee_id = profile.relationship.legacy_employee_id
-    if employee_id is not None:
+    if profile.person is not None:
         try:
             source_rows = build_my_requests(actor=user, organization=organization)
             # The source read model supports legacy identities too. ESS additionally
@@ -59,6 +59,7 @@ def build_ess_dashboard(*, user: User, organization: Organization) -> ESSDashboa
                         **{field: employee_id},
                     ).values_list("pk", flat=True)
                 )
+            allowed["certificate"]=set(HRCertificateRequest.objects.filter(organization=organization,requested_by=user,person=profile.person,work_relationship__person=profile.person,pk__in=[row.source_id for row in source_rows if row.source_type=="certificate"]).values_list("pk",flat=True))
             rows = tuple(
                 row
                 for row in source_rows

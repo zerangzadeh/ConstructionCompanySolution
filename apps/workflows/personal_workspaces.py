@@ -32,6 +32,7 @@ REQUEST_PERMISSION_CODES = frozenset(
         BusinessPermissionCode.OVERTIME_REQUEST,
         BusinessPermissionCode.ATTENDANCE_CORRECT,
         BusinessPermissionCode.PERSONAL_DATA_VIEW,
+        BusinessPermissionCode.HR_CERTIFICATES_VIEW,
     }
 )
 MANAGER_PERMISSION_CODES = frozenset(
@@ -111,6 +112,11 @@ def _payroll_requests_available(*, actor, organization, codes):
     )
 
 
+def _certificate_requests_available(*,actor,organization,codes):
+    from apps.workforce.ess_services import has_ess_subject
+    return BusinessPermissionCode.HR_CERTIFICATES_VIEW in codes and has_ess_subject(user=actor,organization=organization)
+
+
 def my_requests_available(*, actor: User, organization: Organization) -> bool:
     try:
         codes = _permission_codes(actor=actor, organization=organization)
@@ -120,6 +126,7 @@ def my_requests_available(*, actor: User, organization: Organization) -> bool:
         (codes & REQUEST_PERMISSION_CODES
         and _explicit_employee_ids(actor=actor, organization=organization))
         or _payroll_requests_available(actor=actor, organization=organization, codes=codes)
+        or _certificate_requests_available(actor=actor,organization=organization,codes=codes)
     )
 
 
@@ -207,7 +214,8 @@ def build_my_requests(
     codes = _permission_codes(actor=actor, organization=organization)
     employee_ids = _explicit_employee_ids(actor=actor, organization=organization)
     payroll_allowed = _payroll_requests_available(actor=actor, organization=organization, codes=codes)
-    if (not employee_ids or not codes & REQUEST_PERMISSION_CODES) and not payroll_allowed:
+    certificate_allowed=_certificate_requests_available(actor=actor,organization=organization,codes=codes)
+    if (not employee_ids or not codes & REQUEST_PERMISSION_CODES) and not payroll_allowed and not certificate_allowed:
         raise PermissionDenied(
             "هویت نیروی کار یا مجوز درخواست برای این فضا موجود نیست."
         )
@@ -290,6 +298,56 @@ def build_my_requests(
                         ),
                     )
                 )
+    if BusinessPermissionCode.HR_CERTIFICATES_VIEW in codes:
+        from apps.workforce.certificate_services import (
+            instance_for as certificate_instance,
+        )
+        from apps.workforce.certificate_services import visible_requests as certificates
+
+        for item in certificates(actor=actor, organization=organization):
+            if item.requested_by_id != actor.pk:
+                continue
+            instance = certificate_instance(item)
+            cancellation = getattr(item, "cancellation", None)
+            generated = getattr(item, "generation", None)
+            review = getattr(item, "review", None)
+            latest = cancellation or generated or review or item
+            state = (
+                "cancelled"
+                if cancellation
+                else "generated"
+                if generated
+                else review.outcome
+                if review
+                else instance.status
+                if instance
+                else "requested"
+            )
+            label = (
+                "لغو ثبت‌شده"
+                if cancellation
+                else "خروجی ثبت‌شده"
+                if generated
+                else review.get_outcome_display()
+                if review
+                else instance.get_status_display()
+                if instance
+                else "درخواست ثبت‌شده"
+            )
+            rows.append(
+                RequestWorkspaceRow(
+                    source_type="certificate",
+                    source_id=item.pk,
+                    source_label="درخواست گواهی",
+                    employee_label=f"{item.person.first_name} {item.person.last_name}",
+                    status=state,
+                    status_label=label,
+                    occurred_at=latest.created_at,
+                    source_url=reverse(
+                        "workforce:certificate_detail", kwargs={"request_id": item.pk}
+                    ),
+                )
+            )
     # Explicit ESS identity permits own-source status deep links even without the
     # broad back-office Timekeeping view grant. Preserve legacy source behavior.
     from apps.workforce.ess_services import has_ess_subject

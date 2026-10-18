@@ -181,6 +181,41 @@ class WorkflowRegistry:
 registry = WorkflowRegistry()
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="workforce.hr_certificate_review",
+        subject_type="workforce.hr_certificate_review",
+        exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),
+        start_permission="hr_certificates.request",
+        view_permission="hr_certificates.view",
+        detail_url_name="workforce:certificate_detail",
+        detail_url_kwarg="request_id",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(
+        code="workforce.hr_certificate_review",
+        subject_type="workforce.hr_certificate_review",
+        subject_adapter="workforce.hr_certificate_review",
+        allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset(
+            {
+                "workforce.hr_certificate_review.accept",
+                "workforce.hr_certificate_review.reject",
+                "workforce.hr_certificate_review.cancel",
+            }
+        ),
+    )
+)
+for action in ("accept", "reject", "cancel"):
+    registry.register_domain_command(
+        DomainCommandSpec(
+            key="workforce.hr_certificate_review." + action,
+            workflow_type="workforce.hr_certificate_review",
+            include_work_item=action != "cancel",
+        )
+    )
+
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="workforce.personal_data_change",
         subject_type="workforce.personal_data_change",
         exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),

@@ -1504,3 +1504,216 @@ class PersonalDataDecision(PersonalDataRecord):
             or self.work_item.instance.subject_type != "workforce.personal_data_change"
         ):
             raise ValidationError("کار تصمیم متعلق به همین درخواست نیست.")
+
+
+CERTIFICATE_SOURCE_FIELDS = frozenset(
+    {
+        "person.first_name",
+        "person.last_name",
+        "relationship.employee_number",
+        "relationship.effective_start",
+        "relationship.effective_end",
+    }
+)
+
+
+class HRCertificateType(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    code = models.SlugField(max_length=60)
+    name = models.CharField(max_length=150)
+    version = models.PositiveIntegerField()
+    enabled = models.BooleanField(default=False)
+    employee_visible = models.BooleanField(default=False)
+    cancellation_before_output = models.BooleanField(default=False)
+    source_map = models.JSONField()
+    template_version = models.ForeignKey(
+        "documents.DocumentVersion", on_delete=models.PROTECT, null=True, blank=True
+    )
+    category = models.ForeignKey("documents.DocumentCategory", on_delete=models.PROTECT)
+    renderer_key = models.SlugField(max_length=80)
+    generator = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+    review_version = models.ForeignKey(
+        "workflows.WorkflowVersion", on_delete=models.PROTECT, null=True, blank=True
+    )
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "code", "version"],
+                name="hr_certificate_type_version_uq",
+            )
+        ]
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            template_version=self.template_version
+            if self.template_version_id
+            else None,
+            category=self.category,
+            generator=self.generator,
+            review_version=self.review_version if self.review_version_id else None,
+        )
+        if (
+            not isinstance(self.source_map, dict)
+            or not self.source_map
+            or any(
+                not isinstance(k, str)
+                or not k.isidentifier()
+                or not isinstance(v, str)
+                or v not in CERTIFICATE_SOURCE_FIELDS
+                for k, v in self.source_map.items()
+            )
+        ):
+            raise ValidationError(
+                "نگاشت فقط به فیلدهای صریح هویت و رابطه کاری مجاز است."
+            )
+        if not self.reason.strip() or self.version < 1 or self.category.archived_at:
+            raise ValidationError("نسخه، دلیل و دسته فعال لازم است.")
+        if self.review_version_id and (
+            self.review_version.status != "published"
+            or self.review_version.definition.workflow_type.code
+            != "workforce.hr_certificate_review"
+            or self.review_version.definition.scope
+        ):
+            raise ValidationError("بررسی گواهی به گردش‌کار منتشرشده هم‌شرکت نیاز دارد.")
+        if self.enabled and not self.template_version_id:
+            raise ValidationError("قالب و سیاست فعال در دسترس نیست.")
+
+    def __str__(self):
+        return self.name
+
+
+class HRCertificateRequest(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    requested_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    person = models.ForeignKey(Person, on_delete=models.PROTECT)
+    work_relationship = models.ForeignKey(WorkRelationship, on_delete=models.PROTECT)
+    certificate_type = models.ForeignKey(HRCertificateType, on_delete=models.PROTECT)
+    source_snapshot = models.JSONField()
+    source_digest = models.CharField(max_length=64)
+    reason = models.TextField(max_length=2000)
+    idempotency_key = models.CharField(max_length=128)
+    replaces = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="replacement",
+    )
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "requested_by", "idempotency_key"],
+                name="hr_certificate_request_key_uq",
+            )
+        ]
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            person=self.person,
+            work_relationship=self.work_relationship,
+            certificate_type=self.certificate_type,
+            replaces=self.replaces if self.replaces_id else None,
+        )
+        if (
+            self.person.user_id != self.requested_by_id
+            or self.work_relationship.person_id != self.person_id
+            or not self.reason.strip()
+            or not self.idempotency_key.strip()
+        ):
+            raise ValidationError("هویت و دلیل درخواست معتبر لازم است.")
+        if self.replaces_id and (
+            self.replaces.person_id != self.person_id
+            or self.replaces.work_relationship_id != self.work_relationship_id
+            or self.replaces.certificate_type.code != self.certificate_type.code
+        ):
+            raise ValidationError(
+                "مرجع جایگزینی باید همان شخص، رابطه و نوع گواهی باشد."
+            )
+
+
+class HRCertificateReview(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    request = models.OneToOneField(
+        HRCertificateRequest, on_delete=models.PROTECT, related_name="review"
+    )
+    outcome = models.CharField(
+        max_length=20, choices=[("accepted", "پذیرفته"), ("rejected", "ردشده")]
+    )
+    work_item = models.ForeignKey("workflows.WorkItem", on_delete=models.PROTECT)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+
+    def clean(self):
+        validate_related_organizations(
+            self, request=self.request, work_item=self.work_item
+        )
+        if (
+            self.work_item.instance.subject_id != self.request_id
+            or self.work_item.instance.subject_type != "workforce.hr_certificate_review"
+            or not self.reason.strip()
+        ):
+            raise ValidationError("مدرک تصمیم باید به همین درخواست مربوط باشد.")
+
+
+class HRCertificateGeneration(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    request = models.OneToOneField(
+        HRCertificateRequest, on_delete=models.PROTECT, related_name="generation"
+    )
+    document_version = models.ForeignKey(
+        "documents.DocumentVersion", on_delete=models.PROTECT
+    )
+    template_version = models.ForeignKey(
+        "documents.DocumentVersion",
+        on_delete=models.PROTECT,
+        related_name="certificate_generations",
+    )
+    source_digest = models.CharField(max_length=64)
+    activation_receipt = models.JSONField()
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            request=self.request,
+            document_version=self.document_version,
+            template_version=self.template_version,
+        )
+        if (
+            self.template_version_id
+            != self.request.certificate_type.template_version_id
+            or self.source_digest != self.request.source_digest
+        ):
+            raise ValidationError("قالب و داده باید به نسخه منبع درخواست مقید بمانند.")
+
+
+class HRCertificateCancellation(PersonalDataRecord):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    request = models.OneToOneField(
+        HRCertificateRequest, on_delete=models.PROTECT, related_name="cancellation"
+    )
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+
+    def clean(self):
+        validate_related_organizations(self, request=self.request)
+        if not self.reason.strip():
+            raise ValidationError("دلیل لغو لازم است.")

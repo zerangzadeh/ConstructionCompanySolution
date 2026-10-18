@@ -1,0 +1,8 @@
+evidence_id,kind,source_or_command,result,status
+CEP-056-EV-001,Canonical and entry,CEP-056_EXECUTION_MANIFEST.md; CEP-056_FRONTIER.json,79 hashes verified; 011/026 COMPLETE; GATE02 PASS; SPEC015/017 recovered; activation held closed,PASS
+CEP-056-EV-002,Code diff and integration,Git diff main60778c8 to checkpoint; CEP-056_CHANGE_MANIFEST.csv; test_cep056.py,Immutable source snapshot -> optional shared review -> authenticated configured generator -> pinned DMS output; cleanup exact new files on rollback; own/assigned DMS scope,PASS
+CEP-056-EV-003,Focused and regression,CEP-056_VALIDATION.txt,68 affected PostgreSQL tests PASS including13 new certificate cases; existing DMS/ESS/personal-change/Payroll inquiry regressions,PASS
+CEP-056-EV-004,Migration and reconciliation,CEP-056_VALIDATION.txt; CEP-056_DEVELOPMENT_RECONCILIATION.json; test_cep056_migration.py,Separate rollback/reapply PASS; reviewed additive development migrations applied; existing source/DMS/grant hashes unchanged; zero new grants/types/requests/renderers,PASS
+CEP-056-EV-005,UI evidence,CEP-056_*_desktop.png; CEP-056_*_mobile.png; CEP-056_BROWSER.json,Eight fixture states desktop1366/mobile390; representative screenshots inspected; Persian RTL/Jalali; no measured horizontal overflow,PASS
+CEP-056-EV-006,Static checks,CEP-056_VALIDATION.txt,Ruff changed Python; new-file formatting; Django check; migration drift; whitespace PASS,PASS
+CEP-056-EV-007,Frontier and gate evaluation,CEP-056_FRONTIER.json; CEP-056_GATE07.json,38 COMPLETE; frontier022/036. GATE07 NOT_READY:046/063/068 incomplete; no activation or final browser/UAT clearance,PASS

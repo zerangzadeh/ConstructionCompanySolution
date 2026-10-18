@@ -767,6 +767,12 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
 # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    _default_permissions.difference_update(permission_codes(
+        BusinessPermissionCode.ESS_EVIDENCE_VIEW,
+        BusinessPermissionCode.HR_CERTIFICATES_VIEW,BusinessPermissionCode.HR_CERTIFICATES_REQUEST,
+        BusinessPermissionCode.HR_CERTIFICATES_REVIEW,BusinessPermissionCode.HR_CERTIFICATES_GENERATE,
+        BusinessPermissionCode.HR_CERTIFICATES_CONFIGURE,BusinessPermissionCode.HR_CERTIFICATES_CANCEL,
+    ))
     # P7-S01–S05 sensitive employee data is deny-by-default.  It may be granted
     # only through an explicit, organization-specific role assignment.
     _default_permissions.difference_update(WORKFORCE_SENSITIVE_PERMISSIONS)
