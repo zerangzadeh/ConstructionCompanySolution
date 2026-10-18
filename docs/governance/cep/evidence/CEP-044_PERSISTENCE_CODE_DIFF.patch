@@ -1,0 +1,406 @@
+diff --git a/apps/subledgers/models.py b/apps/subledgers/models.py
+index 4d427cd..83e46df 100644
+--- a/apps/subledgers/models.py
++++ b/apps/subledgers/models.py
+@@ -839,6 +839,22 @@ class SettlementReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+             raise ValidationError({"reason": "دلیل برگشت الزامی است."})
+ 
+ 
++class WriteOffProposalQuerySet(models.QuerySet):
++    """A retained source link cannot be rewritten through queryset shortcuts."""
++
++    def update(self, **kwargs):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
++
++    def delete(self):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت پیشنهاد سوخت نیازمند اعتبارسنجی منبع است.")
++
++    def bulk_update(self, *args, **kwargs):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
++
++
+ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+     organization = models.ForeignKey(
+         "organizations.Organization", on_delete=models.PROTECT
+@@ -854,6 +870,17 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+     proposed_by = models.ForeignKey(
+         "organizations.OrganizationMembership", on_delete=models.PROTECT
+     )
++    # Source-owned provenance only. This link does not approve a replacement or
++    # reverse the predecessor's financial effect; governed services own actions.
++    corrects = models.ForeignKey(
++        "WriteOffDecision",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement_proposals",
++    )
++
++    objects = WriteOffProposalQuerySet.as_manager()
+ 
+     class Meta:
+         constraints = [  # noqa: RUF012
+@@ -868,10 +895,20 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+ 
+     def clean(self) -> None:
+         validate_related_organizations(
+-            self, obligation=self.obligation, proposed_by=self.proposed_by
++            self,
++            obligation=self.obligation,
++            proposed_by=self.proposed_by,
++            corrects=self.corrects if self.corrects_id else None,
+         )
+         if not self.reason.strip():
+             raise ValidationError({"reason": "دلیل پیشنهاد سوخت الزامی است."})
++        if self.corrects_id and (
++            self.corrects.proposal.obligation_id != self.obligation_id
++            or self.corrects.proposal_id == self.pk
++        ):
++            raise ValidationError(
++                {"corrects": "پیوند اصلاح باید به پیشنهاد پیشین همان تعهد باشد."}
++            )
+ 
+ 
+ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+--- /dev/null
++++ b/apps/subledgers/migrations/0007_cep044_writeoff_correction_lineage.py
+@@ -0,0 +1,36 @@
++"""Add retained source lineage without modifying existing financial history."""
++
++import django.db.models.deletion
++from django.db import migrations, models
++
++
++def refuse_populated_lineage_rollback(apps, schema_editor):
++    proposal = apps.get_model("subledgers", "WriteOffProposal")
++    if proposal.objects.using(schema_editor.connection.alias).filter(
++        corrects__isnull=False
++    ).exists():
++        raise RuntimeError(
++            "Retained write-off correction lineage exists; use forward recovery."
++        )
++
++
++class Migration(migrations.Migration):
++    dependencies = [("subledgers", "0006_cep043_payroll_ap")]
++
++    operations = [
++        migrations.AddField(
++            model_name="writeoffproposal",
++            name="corrects",
++            field=models.ForeignKey(
++                blank=True,
++                null=True,
++                on_delete=django.db.models.deletion.PROTECT,
++                related_name="replacement_proposals",
++                to="subledgers.writeoffdecision",
++            ),
++        ),
++        migrations.RunPython(
++            migrations.RunPython.noop,
++            reverse_code=refuse_populated_lineage_rollback,
++        ),
++    ]
+--- /dev/null
++++ b/apps/subledgers/test_cep044_lineage.py
+@@ -0,0 +1,175 @@
++"""Structural persistence only; no write-off financial policy is activated."""
++
++from datetime import date
++from decimal import Decimal
++from uuid import uuid4
++
++from django.core.exceptions import ValidationError
++from django.db import IntegrityError, transaction
++from django.db.models.deletion import ProtectedError
++from django.test import TestCase
++
++from apps.accounts.models import User
++from apps.organizations.models import OrganizationMembership
++from apps.organizations.services import create_organization_with_owner
++
++from .models import Obligation, WriteOffDecision, WriteOffProposal
++from .services import approve_write_off, reverse_write_off
++
++
++class WriteOffLineageFixture:
++    def setUp(self):
++        self.actor = User.objects.create_user(username="cep044-source-owner")
++        self.organization = create_organization_with_owner(
++            owner=self.actor, name="CEP044 synthetic", slug="cep044-source"
++        )
++        self.membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        self.obligation = self.make_obligation()
++        self.original = self.make_proposal("original")
++        # Rejection is an existing supported model state. Structural lineage
++        # neither assumes an approval nor changes the predecessor's balance.
++        self.decision = WriteOffDecision.objects.create(
++            organization=self.organization,
++            proposal=self.original,
++            decision="rejected",
++            reason="Retained synthetic decision",
++            decided_by=self.membership,
++        )
++
++    def make_obligation(self, **overrides):
++        identity = uuid4()
++        values = {
++            "organization": self.organization,
++            "direction": "payable",
++            "source_kind": "synthetic.retained.cep044",
++            "source_uuid": identity,
++            "source_version": 1,
++            "source_status": "retained",
++            "source_hash": "retained",
++            "source_snapshot": {"source_id": str(identity), "version": 1},
++            "party_name_snapshot": "Synthetic retained party",
++            "original_amount": Decimal("100.000000"),
++            "recognized_on": date(2026, 10, 19),
++            "idempotency_key": str(identity),
++            "payload_hash": "retained",
++            "recognized_by": self.membership,
++        }
++        values.update(overrides)
++        return Obligation.objects.create(**values)
++
++    def make_proposal(self, key, **overrides):
++        values = {
++            "organization": self.organization,
++            "obligation": self.obligation,
++            "amount": Decimal("5.000000"),
++            "effective_date": date(2026, 10, 19),
++            "reason": "Synthetic retained source proposal",
++            "idempotency_key": key,
++            "payload_hash": key,
++            "proposed_by": self.membership,
++        }
++        values.update(overrides)
++        return WriteOffProposal.objects.create(**values)
++
++
++class WriteOffLineageTests(WriteOffLineageFixture, TestCase):
++    def test_optional_link_preserves_existing_source_and_exact_predecessor(self):
++        before = Obligation.objects.values().get(pk=self.obligation.pk)
++        replacement = self.make_proposal("linked", corrects=self.decision)
++        replacement.refresh_from_db()
++        self.original.refresh_from_db()
++        self.assertIsNone(self.original.corrects_id)
++        self.assertEqual(replacement.corrects_id, self.decision.pk)
++        self.assertEqual(self.decision.replacement_proposals.get().pk, replacement.pk)
++        self.assertEqual(Obligation.objects.values().get(pk=self.obligation.pk), before)
++        self.assertEqual(self.obligation.outstanding_amount, Decimal("100.000000"))
++        self.assertFalse(hasattr(replacement, "decision"))
++
++    def test_foreign_tenant_predecessor_and_foreign_actor_are_rejected(self):
++        outsider = User.objects.create_user(username="cep044-other-owner")
++        other = create_organization_with_owner(
++            owner=outsider, name="Other synthetic", slug="cep044-other"
++        )
++        other_member = OrganizationMembership.objects.get(
++            organization=other, user=outsider
++        )
++        other_obligation = self.make_obligation(
++            organization=other, recognized_by=other_member
++        )
++        other_proposal = self.make_proposal(
++            "other",
++            organization=other,
++            obligation=other_obligation,
++            proposed_by=other_member,
++        )
++        other_decision = WriteOffDecision.objects.create(
++            organization=other,
++            proposal=other_proposal,
++            decision="rejected",
++            reason="Other retained decision",
++            decided_by=other_member,
++        )
++        for changes in (
++            {"corrects": other_decision},
++            {"corrects": self.decision, "proposed_by": other_member},
++            {
++                "organization": other,
++                "obligation": other_obligation,
++                "proposed_by": other_member,
++                "corrects": self.decision,
++            },
++        ):
++            with (
++                self.subTest(changes=tuple(changes)),
++                self.assertRaises(ValidationError),
++            ):
++                self.make_proposal("denied", **changes)
++        self.assertFalse(
++            WriteOffProposal.objects.filter(idempotency_key="denied").exists()
++        )
++
++    def test_different_obligation_and_self_reference_are_rejected(self):
++        second = self.make_obligation()
++        with self.assertRaises(ValidationError):
++            self.make_proposal(
++                "wrong-obligation", obligation=second, corrects=self.decision
++            )
++        self.original.corrects = self.decision
++        with self.assertRaises(ValidationError):
++            self.original.clean()
++
++    def test_source_link_cannot_be_rewritten_deleted_or_bulk_bypassed(self):
++        replacement = self.make_proposal("immutable", corrects=self.decision)
++        replacement.corrects = None
++        with self.assertRaises(ValidationError):
++            replacement.save()
++        queryset = WriteOffProposal.objects.filter(pk=replacement.pk)
++        for action in (
++            lambda: queryset.update(corrects=None),
++            lambda: queryset.bulk_update([replacement], ["corrects"]),
++            queryset.delete,
++            replacement.delete,
++            lambda: WriteOffProposal.objects.bulk_create([replacement]),
++        ):
++            with self.subTest(action=action), self.assertRaises(ValidationError):
++                action()
++        replacement.refresh_from_db()
++        self.assertEqual(replacement.corrects_id, self.decision.pk)
++        with self.assertRaises(ProtectedError):
++            WriteOffDecision.objects.filter(pk=self.decision.pk).delete()
++
++    def test_existing_unique_business_key_remains_database_enforced(self):
++        self.make_proposal("duplicate", corrects=self.decision)
++        with self.assertRaises(IntegrityError), transaction.atomic():
++            self.make_proposal("duplicate", corrects=self.decision)
++
++    def test_persistence_does_not_activate_approval_or_reversal(self):
++        self.make_proposal("held", corrects=self.decision)
++        for operation in (approve_write_off, reverse_write_off):
++            with (
++                self.subTest(operation=operation.__name__),
++                self.assertRaisesMessage(ValidationError, "P3-S27-Q03"),
++            ):
++                operation()
+--- /dev/null
++++ b/apps/subledgers/test_cep044_migration.py
+@@ -0,0 +1,119 @@
++"""Narrow disposable migration rehearsal; preserve populated prior evidence."""
++
++import json
++import os
++from pathlib import Path
++
++from django.apps import apps
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from .models import WriteOffDecision, WriteOffProposal
++from .services import _canonical_hash
++from .test_cep044_lineage import WriteOffLineageFixture
++
++
++class WriteOffLineageMigrationTests(WriteOffLineageFixture, TransactionTestCase):
++    def test_populated_history_preserved_and_used_lineage_cannot_be_dropped(self):
++        self.assertTrue(connection.settings_dict["NAME"].startswith("test_"))
++        old = [("subledgers", "0006_cep043_payroll_ap")]
++        new = [("subledgers", "0007_cep044_writeoff_correction_lineage")]
++        historical = MigrationExecutor(connection).loader.project_state(old).apps
++        approved_proposal = self.make_proposal("synthetic-finalized-legacy")
++        # Historical migration models intentionally seed synthetic finalized
++        # legacy facts without activating the application's gated transitions.
++        historical_decision = historical.get_model(
++            "subledgers", "WriteOffDecision"
++        ).objects.create(
++            organization_id=self.organization.pk,
++            proposal_id=approved_proposal.pk,
++            decision="approved",
++            reason="Synthetic finalized legacy approval",
++            decided_by_id=self.membership.pk,
++        )
++        historical.get_model("subledgers", "WriteOffReversal").objects.create(
++            organization_id=self.organization.pk,
++            decision_id=historical_decision.pk,
++            effective_date=approved_proposal.effective_date,
++            reason="Synthetic finalized legacy reversal",
++            reversed_by_id=self.membership.pk,
++        )
++        self.decision = WriteOffDecision.objects.get(pk=historical_decision.pk)
++        labels = (
++            "subledgers.Obligation",
++            "subledgers.WriteOffProposal",
++            "subledgers.WriteOffDecision",
++            "subledgers.WriteOffReversal",
++            "accounting.JournalEntry",
++            "audit.AuditEvent",
++            "organizations.BusinessPermission",
++            "organizations.OrganizationRole",
++            "organizations.MembershipRoleAssignment",
++            "organizations.MembershipScopeGrant",
++            "organizations.TenantPolicySelection",
++        )
++
++        def snapshot():
++            result = {}
++            for label in labels:
++                model = apps.get_model(label)
++                # Compare only pre-existing columns on both sides of the expand.
++                fields = [f.attname for f in model._meta.fields if f.name != "corrects"]
++                rows = list(model.objects.order_by("pk").values(*fields))
++                result[label] = {"count": len(rows), "sha256": _canonical_hash(rows)}
++            model = apps.get_model("organizations.OrganizationRole").permissions.through
++            rows = list(model.objects.order_by("pk").values())
++            result["role_grants"] = {
++                "count": len(rows),
++                "sha256": _canonical_hash(rows),
++            }
++            return result
++
++        before = snapshot()
++        try:
++            plan = MigrationExecutor(connection).migration_plan(old)
++            self.assertEqual(
++                [(m.app_label, m.name, backwards) for m, backwards in plan],
++                [("subledgers", new[0][1], True)],
++            )
++            MigrationExecutor(connection).migrate(old)
++            self.assertEqual(before, snapshot())
++            with connection.cursor() as cursor:
++                columns = connection.introspection.get_table_description(
++                    cursor, WriteOffProposal._meta.db_table
++                )
++            self.assertNotIn("corrects_id", [c.name for c in columns])
++            MigrationExecutor(connection).migrate(new)
++            after_reapply = snapshot()
++            self.assertEqual(before, after_reapply)
++            self.assertFalse(
++                WriteOffProposal.objects.filter(corrects__isnull=False).exists()
++            )
++            linked = self.make_proposal("retained-lineage", corrects=self.decision)
++            populated = snapshot()
++            with self.assertRaisesMessage(RuntimeError, "forward recovery"):
++                MigrationExecutor(connection).migrate(old)
++            self.assertEqual(populated, snapshot())
++            linked.refresh_from_db()
++            self.assertEqual(linked.corrects_id, self.decision.pk)
++        finally:
++            MigrationExecutor(connection).migrate(new)
++        if os.getenv("BONIRA_CEP044_MIGRATION_TRACE"):
++            Path(os.environ["BONIRA_CEP044_MIGRATION_TRACE"]).write_text(
++                json.dumps(
++                    {
++                        "database": "disposable test PostgreSQL only",
++                        "before": before,
++                        "after_reapply": after_reapply,
++                        "after_new_lineage_and_refused_rollback": populated,
++                        "preexisting_history_preserved": True,
++                        "all_legacy_links_null_after_reapply": True,
++                        "populated_lineage_drop_refused": True,
++                        "production": False,
++                    },
++                    indent=2,
++                )
++                + "\n",
++                encoding="utf-8",
++            )

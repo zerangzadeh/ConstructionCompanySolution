@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.utils import timezone
 
 from core.models import CreatedAtModel, UUIDModel
@@ -648,19 +648,13 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
                 timezone=ZoneInfo(settings.timezone)
             ):
                 return self.original_amount * 0
-        settled = (
-            self.settlement_allocations.filter(reversal__isnull=True).aggregate(
-                total=Sum("amount")
-            )["total"]
-            or 0
-        )
-        written_off = (
-            self.write_off_proposals.filter(
-                decision__decision=WriteOffDecisionKind.APPROVED,
-                decision__reversal__isnull=True,
-            ).aggregate(total=Sum("amount"))["total"]
-            or 0
-        )
+        from apps.organizations.services import get_organization_settings
+
+        from .services import _amounts_as_of
+
+        configured = get_organization_settings(organization=self.organization)
+        today = timezone.localdate(timezone=ZoneInfo(configured.timezone))
+        settled, written_off = _amounts_as_of(self, today)
         return self.original_amount - settled - written_off
 
     @property
@@ -839,6 +833,22 @@ class SettlementReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
             raise ValidationError({"reason": "دلیل برگشت الزامی است."})
 
 
+class WriteOffProposalQuerySet(models.QuerySet):
+    """A retained source link cannot be rewritten through queryset shortcuts."""
+
+    def update(self, **kwargs):
+        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
+
+    def delete(self):
+        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت حذف‌پذیر نیست.")
+
+    def bulk_create(self, *args, **kwargs):
+        raise ValidationError("ثبت پیشنهاد سوخت نیازمند اعتبارسنجی منبع است.")
+
+    def bulk_update(self, *args, **kwargs):
+        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
+
+
 class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
     organization = models.ForeignKey(
         "organizations.Organization", on_delete=models.PROTECT
@@ -854,6 +864,17 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
     proposed_by = models.ForeignKey(
         "organizations.OrganizationMembership", on_delete=models.PROTECT
     )
+    # Source-owned provenance only. This link does not approve a replacement or
+    # reverse the predecessor's financial effect; governed services own actions.
+    corrects = models.ForeignKey(
+        "WriteOffDecision",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="replacement_proposals",
+    )
+
+    objects = WriteOffProposalQuerySet.as_manager()
 
     class Meta:
         constraints = [  # noqa: RUF012
@@ -868,10 +889,20 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
 
     def clean(self) -> None:
         validate_related_organizations(
-            self, obligation=self.obligation, proposed_by=self.proposed_by
+            self,
+            obligation=self.obligation,
+            proposed_by=self.proposed_by,
+            corrects=self.corrects if self.corrects_id else None,
         )
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل پیشنهاد سوخت الزامی است."})
+        if self.corrects_id and (
+            self.corrects.proposal.obligation_id != self.obligation_id
+            or self.corrects.proposal_id == self.pk
+        ):
+            raise ValidationError(
+                {"corrects": "پیوند اصلاح باید به پیشنهاد پیشین همان تعهد باشد."}
+            )
 
 
 class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
@@ -893,6 +924,8 @@ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
         blank=True,
         related_name="subledger_write_off",
     )
+    authority_evidence = models.JSONField(default=dict, blank=True)
+    objects = WriteOffProposalQuerySet.as_manager()
 
     def clean(self) -> None:
         validate_related_organizations(
@@ -903,7 +936,9 @@ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
         )
         if not self.reason.strip():
             raise ValidationError({"reason": "دلیل تصمیم سوخت الزامی است."})
-        if self.decision == WriteOffDecisionKind.APPROVED:
+        if self.decision == WriteOffDecisionKind.APPROVED and not getattr(
+            self, "_writeoff_service", False
+        ):
             raise ValidationError(
                 "اختیار سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
             )
@@ -928,6 +963,8 @@ class WriteOffReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
         blank=True,
         related_name="subledger_write_off_reversal",
     )
+    authority_evidence = models.JSONField(default=dict, blank=True)
+    objects = WriteOffProposalQuerySet.as_manager()
 
     def clean(self) -> None:
         validate_related_organizations(
@@ -936,9 +973,16 @@ class WriteOffReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
             reversed_by=self.reversed_by,
             journal=self.journal,
         )
-        raise ValidationError(
-            "اختیار برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
-        )
+        if not getattr(self, "_writeoff_service", False):
+            raise ValidationError(
+                "اختیار برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
+            )
+        if (
+            self.decision.decision != WriteOffDecisionKind.APPROVED
+            or self.effective_date < self.decision.proposal.effective_date
+            or not self.reason.strip()
+        ):
+            raise ValidationError("هویت و تاریخ برگشت سوخت معتبر نیست.")
 
 
 class AgingRun(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
@@ -1236,3 +1280,4 @@ from .payroll_models import (  # noqa: F401
     PayrollAPOperation,
     PayrollAPReversal,
 )
+from .writeoff_models import WriteOffCorrection  # noqa: F401

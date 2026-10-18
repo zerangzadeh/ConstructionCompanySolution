@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 ACCOUNTING_MONEY_PRECISION_POLICY_CODE = "accounting-money-precision"
 ACCOUNTING_ROUNDING_POLICY_CODE = "accounting-rounding"
 TREASURY_SELF_APPROVAL_POLICY_CODE = "treasury-self-approval"
+SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE = "subledger-writeoff-self-approval"
 RFQ_ADMISSIBILITY_SELF_APPROVAL_POLICY_CODE = "rfq-admissibility-self-approval"
 RFQ_COMPARISON_SELF_FINALIZATION_POLICY_CODE = "rfq-comparison-self-finalization"
 RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE = "rfq-commercial-exception-self-approval"
@@ -53,6 +54,19 @@ class PlatformPolicySpec:
 # technical/business values, not a claim of statutory or regulatory authority.
 # A future change remains a new, effective-dated, historically pinned version.
 PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
+    SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE: PlatformPolicySpec(
+        code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
+        name="خودتأییدی سوخت AP/AR",
+        category="other",
+        sensitivity="accounting",
+        tenant_selectable=True,
+        permitted_consumers=(
+            "subledgers.writeoff.approve",
+            "subledgers.writeoff.reverse",
+        ),
+        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
+        value_schema_approved=True,
+    ),
     PROJECT_BUDGET_RESPONSE_POLICY_CODE: PlatformPolicySpec(
         code=PROJECT_BUDGET_RESPONSE_POLICY_CODE,
         name="پاسخ به عبور از بودجه پروژه",
@@ -79,7 +93,11 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="precision",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
+        permitted_consumers=(
+            "accounting.journal.submit",
+            "payroll.run.lock",
+            "inventory.valuation.finalize",
+        ),
         fields=(
             PolicyFieldSpec("money_scale", int, (0, 2)),
             PolicyFieldSpec("intermediate_calculation_scale", int, (6,)),
@@ -93,7 +111,11 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
         category="rounding",
         sensitivity="accounting",
         tenant_selectable=True,
-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
+        permitted_consumers=(
+            "accounting.journal.submit",
+            "payroll.run.lock",
+            "inventory.valuation.finalize",
+        ),
         fields=(
             PolicyFieldSpec("rounding_method", str, ("ROUND_HALF_UP",)),
             PolicyFieldSpec("output_boundary", str, ("final_monetary_line",)),

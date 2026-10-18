@@ -18,6 +18,41 @@ from apps.organizations.authorization import require_business_permission
 from apps.organizations.models import BusinessPermissionCode as P
 
 FAMILIES = {
+    "ar_claim": (
+        "Billing Progress Claim",
+        "Approved claim recognized as AR obligation",
+        "AR receivable recognition",
+        "Subledgers — source-family AR recognition",
+        P.SUBLEDGERS_VIEW,
+    ),
+    "ap_certificate": (
+        "Billing Payable Certificate",
+        "Approved payable certificate recognized as AP obligation",
+        "AP liability recognition",
+        "Subledgers — source-family AP recognition",
+        P.SUBLEDGERS_VIEW,
+    ),
+    "ap_invoice": (
+        "Procurement Supplier Invoice Match",
+        "Approved supplier invoice/match recognized as AP obligation",
+        "AP liability / source recognition",
+        "Subledgers — explicit AP source-family recognition",
+        P.SUBLEDGERS_VIEW,
+    ),
+    "writeoff": (
+        "AP/AR Write-off",
+        "Approved write-off occurrence",
+        "Write-off recognition",
+        "Subledgers",
+        P.SUBLEDGERS_VIEW,
+    ),
+    "writeoff_reversal": (
+        "AP/AR Write-off",
+        "Write-off reversal/correction",
+        "Write-off reversal recognition",
+        "Subledgers",
+        P.SUBLEDGERS_VIEW,
+    ),
     "inventory": (
         "Inventory",
         "Eligible posted inventory financial-effect event",
@@ -55,6 +90,11 @@ FAMILIES = {
     ),
 }
 SOURCE_MODELS = {
+    "ar_claim": "subledgers.Obligation",
+    "ap_certificate": "subledgers.Obligation",
+    "ap_invoice": "subledgers.Obligation",
+    "writeoff": "subledgers.WriteOffDecision",
+    "writeoff_reversal": "subledgers.WriteOffReversal",
     "inventory": "inventory.InventoryValuationEvent",
     "payroll": "payroll.PayrollRun",
     "asset": "fixed_assets.AssetTransaction",
@@ -62,6 +102,10 @@ SOURCE_MODELS = {
     "expense": "expenses.Expense",
 }
 MAPPING_EVENTS = {
+    "Billing Progress Claim": {"receivable_recognized"},
+    "Billing Payable Certificate": {"payable_recognized"},
+    "Procurement Supplier Invoice Match": {"payable_recognized"},
+    "AP/AR Write-off": {"receivable_written_off", "payable_written_off"},
     "Inventory": {
         "receipt",
         "issue",
@@ -191,6 +235,23 @@ def read_source(
     permission: str,
     historical_event: str | None = None,
 ) -> SourceEvidence:
+    if kind in {
+        "ar_claim",
+        "ap_certificate",
+        "ap_invoice",
+        "writeoff",
+        "writeoff_reversal",
+    }:
+        from apps.subledgers.accounting_sources import read_subledger_source
+
+        return read_subledger_source(
+            organization=organization,
+            actor=actor,
+            kind=kind,
+            identity=identity,
+            permission=permission,
+            historical_event=historical_event,
+        )
     if kind not in SOURCE_MODELS:
         raise ValidationError("خانواده منبع شناسایی مصوب نیست.")
     model = apps.get_model(SOURCE_MODELS[kind])

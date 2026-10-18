@@ -1,0 +1,3151 @@
+diff --git a/apps/accounting/recognition_services.py b/apps/accounting/recognition_services.py
+index 068a44b..1b6f8da 100644
+--- a/apps/accounting/recognition_services.py
++++ b/apps/accounting/recognition_services.py
+@@ -178,7 +178,7 @@ def _prior(organization, source):
+         return None
+     prior = SourceRecognitionDraft.objects.filter(
+         organization=organization,
+-        source_kind=source.kind,
++        source_kind="writeoff" if source.kind == "writeoff_reversal" else source.kind,
+         source_uuid=source.previous_id,
+         is_reversal=False,
+     ).first()
+@@ -317,6 +317,13 @@ def prepare_source_recognition(
+         permission=P.ACCOUNTING_RECOGNITION_PREPARE,
+     )
+     resolution = _policy(organization, source)
++    if source.kind in {"writeoff", "writeoff_reversal"} and accounting_date not in {
++        None,
++        source.occurred_on,
++    }:
++        raise ValidationError(
++            "Write-off Accounting effects must use the explicit source date."
++        )
+     snapshot = source.snapshot()
+     sha = digest(snapshot)
+     existing = (
+@@ -368,6 +375,16 @@ def prepare_source_recognition(
+         if mapping is None:
+             raise ValidationError("نگاشت پذیرفته‌شده و مؤثر حسابداری موجود نیست.")
+         rows = _mapped_rows(source, mapping)
++    if source.kind in {
++        "ar_claim",
++        "ap_certificate",
++        "ap_invoice",
++        "writeoff",
++        "writeoff_reversal",
++    }:
++        from apps.subledgers.accounting_sources import validate_control_rows
++
++        validate_control_rows(source, rows)
+     if source.currency != organization.settings.currency or source.currency != "IRR":
+         raise ValidationError("ارز منبع و حسابداری سازگار نیست.")
+     requested_date = accounting_date or source.occurred_on
+diff --git a/apps/accounting/recognition_sources.py b/apps/accounting/recognition_sources.py
+index d8e4b55..4a3afd9 100644
+--- a/apps/accounting/recognition_sources.py
++++ b/apps/accounting/recognition_sources.py
+@@ -18,6 +18,41 @@ from apps.organizations.authorization import require_business_permission
+ from apps.organizations.models import BusinessPermissionCode as P
+ 
+ FAMILIES = {
++    "ar_claim": (
++        "Billing Progress Claim",
++        "Approved claim recognized as AR obligation",
++        "AR receivable recognition",
++        "Subledgers — source-family AR recognition",
++        P.SUBLEDGERS_VIEW,
++    ),
++    "ap_certificate": (
++        "Billing Payable Certificate",
++        "Approved payable certificate recognized as AP obligation",
++        "AP liability recognition",
++        "Subledgers — source-family AP recognition",
++        P.SUBLEDGERS_VIEW,
++    ),
++    "ap_invoice": (
++        "Procurement Supplier Invoice Match",
++        "Approved supplier invoice/match recognized as AP obligation",
++        "AP liability / source recognition",
++        "Subledgers — explicit AP source-family recognition",
++        P.SUBLEDGERS_VIEW,
++    ),
++    "writeoff": (
++        "AP/AR Write-off",
++        "Approved write-off occurrence",
++        "Write-off recognition",
++        "Subledgers",
++        P.SUBLEDGERS_VIEW,
++    ),
++    "writeoff_reversal": (
++        "AP/AR Write-off",
++        "Write-off reversal/correction",
++        "Write-off reversal recognition",
++        "Subledgers",
++        P.SUBLEDGERS_VIEW,
++    ),
+     "inventory": (
+         "Inventory",
+         "Eligible posted inventory financial-effect event",
+@@ -55,6 +90,11 @@ FAMILIES = {
+     ),
+ }
+ SOURCE_MODELS = {
++    "ar_claim": "subledgers.Obligation",
++    "ap_certificate": "subledgers.Obligation",
++    "ap_invoice": "subledgers.Obligation",
++    "writeoff": "subledgers.WriteOffDecision",
++    "writeoff_reversal": "subledgers.WriteOffReversal",
+     "inventory": "inventory.InventoryValuationEvent",
+     "payroll": "payroll.PayrollRun",
+     "asset": "fixed_assets.AssetTransaction",
+@@ -62,6 +102,10 @@ SOURCE_MODELS = {
+     "expense": "expenses.Expense",
+ }
+ MAPPING_EVENTS = {
++    "Billing Progress Claim": {"receivable_recognized"},
++    "Billing Payable Certificate": {"payable_recognized"},
++    "Procurement Supplier Invoice Match": {"payable_recognized"},
++    "AP/AR Write-off": {"receivable_written_off", "payable_written_off"},
+     "Inventory": {
+         "receipt",
+         "issue",
+@@ -191,6 +235,23 @@ def read_source(
+     permission: str,
+     historical_event: str | None = None,
+ ) -> SourceEvidence:
++    if kind in {
++        "ar_claim",
++        "ap_certificate",
++        "ap_invoice",
++        "writeoff",
++        "writeoff_reversal",
++    }:
++        from apps.subledgers.accounting_sources import read_subledger_source
++
++        return read_subledger_source(
++            organization=organization,
++            actor=actor,
++            kind=kind,
++            identity=identity,
++            permission=permission,
++            historical_event=historical_event,
++        )
+     if kind not in SOURCE_MODELS:
+         raise ValidationError("خانواده منبع شناسایی مصوب نیست.")
+     model = apps.get_model(SOURCE_MODELS[kind])
+diff --git a/apps/audit/models.py b/apps/audit/models.py
+index d616b38..e1c553c 100644
+--- a/apps/audit/models.py
++++ b/apps/audit/models.py
+@@ -8,21 +8,32 @@ from core.models import CreatedAtModel, UUIDModel
+ 
+ 
+ class AuditAction(models.TextChoices):
+-    PAYROLL_AP_ENROLLMENT_PREPARED = "payroll_ap.enrollment_prepared", "تهیه ثبت بدهی حقوق در AP"
+-    PAYROLL_AP_ENROLLMENT_CHANGED = "payroll_ap.enrollment_changed", "فعال‌سازی یا توقف بدهی حقوق در AP"
++    PAYROLL_AP_ENROLLMENT_PREPARED = (
++        "payroll_ap.enrollment_prepared",
++        "تهیه ثبت بدهی حقوق در AP",
++    )
++    PAYROLL_AP_ENROLLMENT_CHANGED = (
++        "payroll_ap.enrollment_changed",
++        "فعال‌سازی یا توقف بدهی حقوق در AP",
++    )
+     PAYROLL_AP_OPERATION = "payroll_ap.operation", "پیش‌نویس یا اصلاح بدهی حقوق در AP"
+     PAYROLL_AP_FAILED = "payroll_ap.failed", "تلاش ناموفق تحویل بدهی حقوق"
+     PAYROLL_AP_RECONCILED = "payroll_ap.reconciled", "تطبیق بدهی حقوق و AP"
+ 
+     SUPPLIER_INVOICE_AP_FAILED = (
+-        "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
++        "subledgers.invoice_ap_failed",
++        "انتقال منبع صورتحساب به AP ناموفق بود",
+     )
+     SUPPLIER_INVOICE_AP_REVERSED = (
+-        "subledgers.invoice_ap_reversed", "منبع تعهد صورتحساب AP برگشت شد"
++        "subledgers.invoice_ap_reversed",
++        "منبع تعهد صورتحساب AP برگشت شد",
+     )
+     TENDER_BID_CREATED = "commercial.tender_bid_created", "فرصت مناقصه ثبت شد"
+     TENDER_BID_REVISED = "commercial.tender_bid_revised", "نسخه مناقصه ثبت شد"
+-    TENDER_BID_EVIDENCE_LINKED = "commercial.tender_bid_evidence_linked", "شاهد مناقصه پیوند شد"
++    TENDER_BID_EVIDENCE_LINKED = (
++        "commercial.tender_bid_evidence_linked",
++        "شاهد مناقصه پیوند شد",
++    )
+     TREASURY_ACCOUNT_CREATED = "treasury.account_created", "حساب خزانه‌داری ایجاد شد"
+     TREASURY_ACCOUNT_TRANSITIONED = (
+         "treasury.account_transitioned",
+@@ -127,6 +138,12 @@ class AuditAction(models.TextChoices):
+         "subledger.writeoff_proposed",
+         "پیشنهاد سوخت AP/AR ثبت شد",
+     )
++    SUBLEDGER_WRITEOFF_DECIDED = "subledger.writeoff_decided", "تصمیم سوخت AP/AR"
++    SUBLEDGER_WRITEOFF_CORRECTED = "subledger.writeoff_corrected", "اصلاح سوخت AP/AR"
++    SUBLEDGER_WRITEOFF_FAILED = (
++        "subledger.writeoff_failed",
++        "عملیات سوخت AP/AR ناموفق بود",
++    )
+     SUBLEDGER_AGING_RETAINED = (
+         "subledger.aging_retained",
+         "شواهد aging AP/AR نگهداری شد",
+@@ -1617,13 +1634,31 @@ class AuditAction(models.TextChoices):
+     PRICE_BOOK_IMPORTED = "estimates.price_book_imported", "نسخه فهرست‌بها وارد شد"
+     PRICE_BOOK_ACTIVATED = "estimates.price_book_activated", "منبع فهرست‌بها تأیید شد"
+     PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
+-    VARIATION_BILLING_ACCEPTED = "billing.variation_accepted", "رخداد اهلیت منبع تغییر ثبت شد"
++    VARIATION_BILLING_ACCEPTED = (
++        "billing.variation_accepted",
++        "رخداد اهلیت منبع تغییر ثبت شد",
++    )
+     VARIATION_BILLING_FAILED = "billing.variation_failed", "پذیرش منبع تغییر ناموفق بود"
+-    ACCOUNTING_RECOGNITION_MAPPING_PREPARED = "accounting.recognition_mapping_prepared", "نگاشت شناسایی تهیه شد"
+-    ACCOUNTING_RECOGNITION_MAPPING_APPROVED = "accounting.recognition_mapping_approved", "نگاشت شناسایی پذیرفته شد"
+-    ACCOUNTING_SOURCE_RECOGNIZED = "accounting.source_recognized", "پیش‌نویس شناسایی منبع تهیه شد"
+-    ACCOUNTING_SOURCE_RECOGNITION_FAILED = "accounting.source_recognition_failed", "پذیرش منبع شناسایی ناموفق بود"
+-    ACCOUNTING_SOURCE_RECONCILED = "accounting.source_reconciled", "منبع شناسایی تطبیق شد"
++    ACCOUNTING_RECOGNITION_MAPPING_PREPARED = (
++        "accounting.recognition_mapping_prepared",
++        "نگاشت شناسایی تهیه شد",
++    )
++    ACCOUNTING_RECOGNITION_MAPPING_APPROVED = (
++        "accounting.recognition_mapping_approved",
++        "نگاشت شناسایی پذیرفته شد",
++    )
++    ACCOUNTING_SOURCE_RECOGNIZED = (
++        "accounting.source_recognized",
++        "پیش‌نویس شناسایی منبع تهیه شد",
++    )
++    ACCOUNTING_SOURCE_RECOGNITION_FAILED = (
++        "accounting.source_recognition_failed",
++        "پذیرش منبع شناسایی ناموفق بود",
++    )
++    ACCOUNTING_SOURCE_RECONCILED = (
++        "accounting.source_reconciled",
++        "منبع شناسایی تطبیق شد",
++    )
+ 
+ 
+ class AuditEventQuerySet(models.QuerySet):
+diff --git a/apps/organizations/policy_specs.py b/apps/organizations/policy_specs.py
+index d174fa3..8b506c5 100644
+--- a/apps/organizations/policy_specs.py
++++ b/apps/organizations/policy_specs.py
+@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
+ ACCOUNTING_MONEY_PRECISION_POLICY_CODE = "accounting-money-precision"
+ ACCOUNTING_ROUNDING_POLICY_CODE = "accounting-rounding"
+ TREASURY_SELF_APPROVAL_POLICY_CODE = "treasury-self-approval"
++SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE = "subledger-writeoff-self-approval"
+ RFQ_ADMISSIBILITY_SELF_APPROVAL_POLICY_CODE = "rfq-admissibility-self-approval"
+ RFQ_COMPARISON_SELF_FINALIZATION_POLICY_CODE = "rfq-comparison-self-finalization"
+ RFQ_EXCEPTION_SELF_APPROVAL_POLICY_CODE = "rfq-commercial-exception-self-approval"
+@@ -53,6 +54,19 @@ class PlatformPolicySpec:
+ # technical/business values, not a claim of statutory or regulatory authority.
+ # A future change remains a new, effective-dated, historically pinned version.
+ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
++    SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE: PlatformPolicySpec(
++        code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++        name="خودتأییدی سوخت AP/AR",
++        category="other",
++        sensitivity="accounting",
++        tenant_selectable=True,
++        permitted_consumers=(
++            "subledgers.writeoff.approve",
++            "subledgers.writeoff.reverse",
++        ),
++        fields=(PolicyFieldSpec("allow_self_approval", bool, (False, True)),),
++        value_schema_approved=True,
++    ),
+     PROJECT_BUDGET_RESPONSE_POLICY_CODE: PlatformPolicySpec(
+         code=PROJECT_BUDGET_RESPONSE_POLICY_CODE,
+         name="پاسخ به عبور از بودجه پروژه",
+@@ -79,7 +93,11 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
+         category="precision",
+         sensitivity="accounting",
+         tenant_selectable=True,
+-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
++        permitted_consumers=(
++            "accounting.journal.submit",
++            "payroll.run.lock",
++            "inventory.valuation.finalize",
++        ),
+         fields=(
+             PolicyFieldSpec("money_scale", int, (0, 2)),
+             PolicyFieldSpec("intermediate_calculation_scale", int, (6,)),
+@@ -93,7 +111,11 @@ PLATFORM_POLICY_SPECS: dict[str, PlatformPolicySpec] = {
+         category="rounding",
+         sensitivity="accounting",
+         tenant_selectable=True,
+-        permitted_consumers=("accounting.journal.submit", "payroll.run.lock", "inventory.valuation.finalize"),
++        permitted_consumers=(
++            "accounting.journal.submit",
++            "payroll.run.lock",
++            "inventory.valuation.finalize",
++        ),
+         fields=(
+             PolicyFieldSpec("rounding_method", str, ("ROUND_HALF_UP",)),
+             PolicyFieldSpec("output_boundary", str, ("final_monetary_line",)),
+diff --git a/apps/subledgers/models.py b/apps/subledgers/models.py
+index 4d427cd..1740d9f 100644
+--- a/apps/subledgers/models.py
++++ b/apps/subledgers/models.py
+@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
+ from django.conf import settings
+ from django.core.exceptions import ValidationError
+ from django.db import models
+-from django.db.models import Q, Sum
++from django.db.models import Q
+ from django.utils import timezone
+ 
+ from core.models import CreatedAtModel, UUIDModel
+@@ -648,19 +648,13 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+                 timezone=ZoneInfo(settings.timezone)
+             ):
+                 return self.original_amount * 0
+-        settled = (
+-            self.settlement_allocations.filter(reversal__isnull=True).aggregate(
+-                total=Sum("amount")
+-            )["total"]
+-            or 0
+-        )
+-        written_off = (
+-            self.write_off_proposals.filter(
+-                decision__decision=WriteOffDecisionKind.APPROVED,
+-                decision__reversal__isnull=True,
+-            ).aggregate(total=Sum("amount"))["total"]
+-            or 0
+-        )
++        from apps.organizations.services import get_organization_settings
++
++        from .services import _amounts_as_of
++
++        configured = get_organization_settings(organization=self.organization)
++        today = timezone.localdate(timezone=ZoneInfo(configured.timezone))
++        settled, written_off = _amounts_as_of(self, today)
+         return self.original_amount - settled - written_off
+ 
+     @property
+@@ -839,6 +833,22 @@ class SettlementReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+             raise ValidationError({"reason": "دلیل برگشت الزامی است."})
+ 
+ 
++class WriteOffProposalQuerySet(models.QuerySet):
++    """A retained source link cannot be rewritten through queryset shortcuts."""
++
++    def update(self, **kwargs):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
++
++    def delete(self):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت پیشنهاد سوخت نیازمند اعتبارسنجی منبع است.")
++
++    def bulk_update(self, *args, **kwargs):
++        raise ValidationError("پیشنهاد و پیوند اصلاح سوخت تغییرناپذیر است.")
++
++
+ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+     organization = models.ForeignKey(
+         "organizations.Organization", on_delete=models.PROTECT
+@@ -854,6 +864,17 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+     proposed_by = models.ForeignKey(
+         "organizations.OrganizationMembership", on_delete=models.PROTECT
+     )
++    # Source-owned provenance only. This link does not approve a replacement or
++    # reverse the predecessor's financial effect; governed services own actions.
++    corrects = models.ForeignKey(
++        "WriteOffDecision",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement_proposals",
++    )
++
++    objects = WriteOffProposalQuerySet.as_manager()
+ 
+     class Meta:
+         constraints = [  # noqa: RUF012
+@@ -868,10 +889,20 @@ class WriteOffProposal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+ 
+     def clean(self) -> None:
+         validate_related_organizations(
+-            self, obligation=self.obligation, proposed_by=self.proposed_by
++            self,
++            obligation=self.obligation,
++            proposed_by=self.proposed_by,
++            corrects=self.corrects if self.corrects_id else None,
+         )
+         if not self.reason.strip():
+             raise ValidationError({"reason": "دلیل پیشنهاد سوخت الزامی است."})
++        if self.corrects_id and (
++            self.corrects.proposal.obligation_id != self.obligation_id
++            or self.corrects.proposal_id == self.pk
++        ):
++            raise ValidationError(
++                {"corrects": "پیوند اصلاح باید به پیشنهاد پیشین همان تعهد باشد."}
++            )
+ 
+ 
+ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+@@ -893,6 +924,8 @@ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+         blank=True,
+         related_name="subledger_write_off",
+     )
++    authority_evidence = models.JSONField(default=dict, blank=True)
++    objects = WriteOffProposalQuerySet.as_manager()
+ 
+     def clean(self) -> None:
+         validate_related_organizations(
+@@ -903,7 +936,9 @@ class WriteOffDecision(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+         )
+         if not self.reason.strip():
+             raise ValidationError({"reason": "دلیل تصمیم سوخت الزامی است."})
+-        if self.decision == WriteOffDecisionKind.APPROVED:
++        if self.decision == WriteOffDecisionKind.APPROVED and not getattr(
++            self, "_writeoff_service", False
++        ):
+             raise ValidationError(
+                 "اختیار سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
+             )
+@@ -928,6 +963,8 @@ class WriteOffReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+         blank=True,
+         related_name="subledger_write_off_reversal",
+     )
++    authority_evidence = models.JSONField(default=dict, blank=True)
++    objects = WriteOffProposalQuerySet.as_manager()
+ 
+     def clean(self) -> None:
+         validate_related_organizations(
+@@ -936,9 +973,16 @@ class WriteOffReversal(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+             reversed_by=self.reversed_by,
+             journal=self.journal,
+         )
+-        raise ValidationError(
+-            "اختیار برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
+-        )
++        if not getattr(self, "_writeoff_service", False):
++            raise ValidationError(
++                "اختیار برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
++            )
++        if (
++            self.decision.decision != WriteOffDecisionKind.APPROVED
++            or self.effective_date < self.decision.proposal.effective_date
++            or not self.reason.strip()
++        ):
++            raise ValidationError("هویت و تاریخ برگشت سوخت معتبر نیست.")
+ 
+ 
+ class AgingRun(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+@@ -1236,3 +1280,4 @@ from .payroll_models import (  # noqa: F401
+     PayrollAPOperation,
+     PayrollAPReversal,
+ )
++from .writeoff_models import WriteOffCorrection  # noqa: F401
+diff --git a/apps/subledgers/services.py b/apps/subledgers/services.py
+index 6e32df3..e9a1d38 100644
+--- a/apps/subledgers/services.py
++++ b/apps/subledgers/services.py
+@@ -170,15 +170,12 @@ def _active_settlement_amount(
+     )
+ 
+ 
+-def _approved_writeoff_amount(*, obligation: Obligation) -> Decimal:
+-    return (
+-        WriteOffProposal.objects.filter(
+-            obligation=obligation,
+-            decision__decision=WriteOffDecisionKind.APPROVED,
+-            decision__reversal__isnull=True,
+-        ).aggregate(total=Sum("amount"))["total"]
+-        or ZERO
+-    )
++def _approved_writeoff_amount(
++    *, obligation: Obligation, on_or_after: date | None = None
++) -> Decimal:
++    from .writeoffs import max_writeoff_exposure
++
++    return max_writeoff_exposure(obligation, on_or_after=on_or_after)
+ 
+ 
+ @transaction.atomic
+@@ -426,7 +423,7 @@ def allocate_settlement(
+     _require_unreversed_source(obligation)
+     obligation_used = _active_settlement_amount(
+         obligation=obligation
+-    ) + _approved_writeoff_amount(obligation=obligation)
++    ) + _approved_writeoff_amount(obligation=obligation, on_or_after=effective_date)
+     movement_used = _active_settlement_amount(movement=movement)
+     if obligation_used + amount > obligation.original_amount:
+         raise ValidationError("مبلغ تخصیص از مانده تعهد بیشتر است.")
+@@ -537,6 +534,7 @@ def propose_write_off(
+     effective_date: date,
+     reason: str,
+     idempotency_key: str,
++    corrects=None,
+ ) -> WriteOffProposal:
+     organization = _lock_organization(organization)
+     membership = require_business_permission(
+@@ -547,7 +545,17 @@ def propose_write_off(
+         project=obligation.project,
+     )
+     membership = _lock_membership(organization=organization, membership=membership)
+-    obligation = Obligation.objects.select_for_update().get(pk=obligation.pk)
++    try:
++        obligation = Obligation.objects.select_for_update().get(
++            pk=obligation.pk, organization=organization
++        )
++    except Obligation.DoesNotExist as exc:
++        raise PermissionDenied(
++            "Write-off source is outside the active tenant."
++        ) from exc
++    from .accounting_sources import require_source_visibility
++
++    require_source_visibility(organization, actor, obligation)
+     require_business_permission(
+         user=actor,
+         organization=organization,
+@@ -561,14 +569,25 @@ def propose_write_off(
+     idempotency_key = _required_text(
+         idempotency_key, message="کلید idempotency پیشنهاد سوخت الزامی است."
+     )
+-    payload_hash = _canonical_hash(
+-        {
+-            "obligation": obligation.pk,
+-            "amount": amount,
+-            "date": effective_date,
+-            "reason": reason,
+-        }
+-    )
++    payload = {
++        "obligation": obligation.pk,
++        "amount": amount,
++        "date": effective_date,
++        "reason": reason,
++    }
++    if corrects is not None:
++        from .models import WriteOffDecision
++
++        try:
++            corrects = (
++                WriteOffDecision.objects.select_for_update(of=("self",))
++                .select_related("proposal")
++                .get(pk=corrects.pk, organization=organization)
++            )
++        except WriteOffDecision.DoesNotExist as exc:
++            raise PermissionDenied("Correction source is outside the tenant.") from exc
++        payload["corrects"] = corrects.pk
++    payload_hash = _canonical_hash(payload)
+     existing = WriteOffProposal.objects.filter(
+         organization=organization, idempotency_key=idempotency_key
+     ).first()
+@@ -578,12 +597,22 @@ def propose_write_off(
+                 "کلید idempotency سوخت با محتوای متفاوت استفاده شده است."
+             )
+         return existing
++    if corrects is not None and (
++        corrects.decision != "approved"
++        or corrects.proposal.obligation_id != obligation.pk
++        or hasattr(corrects, "reversal")
++    ):
++        raise ValidationError(
++            "An active approved predecessor on the same obligation is required."
++        )
+     _require_unreversed_source(obligation)
+     remaining = (
+         obligation.original_amount
+         - _active_settlement_amount(obligation=obligation)
+         - _approved_writeoff_amount(obligation=obligation)
+     )
++    if corrects is not None:
++        remaining += corrects.proposal.amount
+     if amount > remaining:
+         raise ValidationError("مبلغ پیشنهاد سوخت از مانده تعهد بیشتر است.")
+     proposal = WriteOffProposal.objects.create(
+@@ -595,6 +624,7 @@ def propose_write_off(
+         idempotency_key=idempotency_key,
+         payload_hash=payload_hash,
+         proposed_by=membership,
++        corrects=corrects,
+     )
+     record_audit_event(
+         action=AuditAction.SUBLEDGER_WRITEOFF_PROPOSED,
+@@ -607,19 +637,20 @@ def propose_write_off(
+     return proposal
+ 
+ 
+-def approve_write_off(*args: object, **kwargs: object) -> None:
+-    del args, kwargs
+-    assert _UNRESOLVED_WRITE_OFF_PERMISSIONS
+-    raise ValidationError(
+-        "اختیار و سیاست سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
+-    )
++def approve_write_off(*args: object, **kwargs: object):
++    if not args and not kwargs:
++        raise ValidationError("سیاست و منبع صریح سوخت الزامی است؛ P3-S27-Q03.")
++    from .writeoffs import decide_write_off
+ 
++    return decide_write_off(*args, approve=True, **kwargs)
+ 
+-def reverse_write_off(*args: object, **kwargs: object) -> None:
+-    del args, kwargs
+-    raise ValidationError(
+-        "اختیار و سیاست برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
+-    )
++
++def reverse_write_off(*args: object, **kwargs: object):
++    if not args and not kwargs:
++        raise ValidationError("سیاست و منبع صریح برگشت سوخت الزامی است؛ P3-S27-Q03.")
++    from .writeoffs import correct_write_off
++
++    return correct_write_off(*args, **kwargs)
+ 
+ 
+ def _require_unreversed_source(obligation: Obligation) -> None:
+diff --git a/apps/subledgers/supplier_invoice_handoffs.py b/apps/subledgers/supplier_invoice_handoffs.py
+index 676a1e9..389389f 100644
+--- a/apps/subledgers/supplier_invoice_handoffs.py
++++ b/apps/subledgers/supplier_invoice_handoffs.py
+@@ -279,6 +279,24 @@ def _reverse(
+         raise ValidationError(
+             "تعهد مصرف‌شده یا برگشت‌شده نیازمند رفع اثر در مرجع مستقل خود است."
+         )
++    # CEP044 retains Accounting L2 evidence separately from the legacy direct
++    # journal field. Preserve the same fail-closed consumed-target boundary.
++    from apps.accounting.recognition_models import SourceRecognitionDraft
++    from apps.accounting.recognition_services import _target_matches
++
++    effects = (
++        SourceRecognitionDraft.objects.select_for_update(of=("self",))
++        .filter(
++            organization=organization,
++            source_kind="ap_invoice",
++            source_uuid=obligation.source_uuid,
++        )
++        .select_related("journal", "mapping")
++    )
++    if any(not _target_matches(effect) for effect in effects):
++        raise ValidationError(
++            "Consumed or drifted Accounting evidence must be resolved by Accounting."
++        )
+     if obligation.settlement_allocations.filter(
+         reversal__effective_date__gt=effective_date
+     ).exists():
+--- /dev/null
++++ b/apps/subledgers/accounting_sources.py
+@@ -0,0 +1,316 @@
++"""Closed PD-030 source families; AP/AR supplies facts, Accounting owns L2 drafts."""
++
++from dataclasses import asdict
++from uuid import UUID
++
++from django.apps import apps
++from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
++
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.accounting.recognition_sources import SourceEvidence, _row, digest
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++
++from .models import (
++    Obligation,
++    SupplierInvoiceAPReversal,
++    WriteOffDecision,
++    WriteOffReversal,
++)
++from .services import _SOURCE_RESOLVERS, _canonical_hash
++
++OBLIGATION_KINDS = {
++    "ar_claim": (
++        "billing.progress_claim.v1",
++        "billing.ProgressClaim",
++        "receivable_recognized",
++    ),
++    "ap_certificate": (
++        "billing.payable_certificate.v1",
++        "billing.PayableCertificate",
++        "payable_recognized",
++    ),
++    "ap_invoice": (
++        "procurement.supplier_invoice_match.v1",
++        "subledgers.SupplierInvoiceMatch",
++        "payable_recognized",
++    ),
++}
++
++
++def _pin(obligation: Obligation) -> dict:
++    if (
++        obligation.source_hash != _canonical_hash(obligation.source_snapshot)
++        or not obligation.control_account_id
++        or not obligation.control_account_mapping_id
++        or obligation.control_account_mapping.organization_id
++        != obligation.organization_id
++        or obligation.control_account_mapping.control_account_id
++        != obligation.control_account_id
++        or obligation.control_account_mapping.source_kind != obligation.source_kind
++        or obligation.control_account_mapping.direction != obligation.direction
++    ):
++        raise ValidationError(
++            "Retained source/control-account evidence does not match."
++        )
++    return {
++        "obligation_id": str(obligation.pk),
++        "source_kind": obligation.source_kind,
++        "source_uuid": str(obligation.source_uuid),
++        "source_version": obligation.source_version,
++        "source_line_key": obligation.source_line_key,
++        "source_hash": obligation.source_hash,
++        "source_snapshot": obligation.source_snapshot,
++        "control_account_id": str(obligation.control_account_id),
++        "control_mapping_id": str(obligation.control_account_mapping_id),
++        "direction": obligation.direction,
++        "original_amount": str(obligation.original_amount),
++        "currency": obligation.currency,
++        "recognized_on": obligation.recognized_on.isoformat(),
++        "project_id": str(obligation.project_id) if obligation.project_id else None,
++        "party_id": str(obligation.party_id) if obligation.party_id else None,
++        "payload_hash": obligation.payload_hash,
++    }
++
++
++def validate_active_obligation(obligation: Obligation) -> None:
++    resolver = _SOURCE_RESOLVERS.get(obligation.source_kind)
++    if resolver is None:
++        raise ValidationError("Approved native source contract is unavailable.")
++    current = resolver(
++        obligation.organization,
++        obligation.source_uuid,
++        obligation.source_version,
++        obligation.source_line_key,
++    )
++    retained = {
++        "amount": obligation.original_amount,
++        "direction": obligation.direction,
++        "currency": obligation.currency,
++        "recognized_on": obligation.recognized_on,
++        "due_date": obligation.due_date,
++        "party_id": obligation.party_id,
++        "project_id": obligation.project_id,
++        "contract_id": obligation.contract_id,
++        "source_status": obligation.source_status,
++        "source_snapshot": obligation.source_snapshot,
++    }
++    if _canonical_hash(asdict(current)) != obligation.payload_hash or any(
++        getattr(current, name) != value for name, value in retained.items()
++    ):
++        raise ValidationError("Native source/version drifted from the AP/AR pin.")
++
++
++def require_source_visibility(organization, actor, obligation):
++    if obligation.source_kind == "payroll.liability.v1":
++        for code in (P.PAYROLL_RESULTS_VIEW, P.SUBLEDGERS_PAYROLL_VIEW):
++            require_business_permission(
++                user=actor,
++                organization=organization,
++                permission=code,
++                project=obligation.project,
++                message="Sensitive Payroll AP source authority is required.",
++            )
++
++
++def _scope(organization, actor, obligation, permission):
++    for code in (P.SUBLEDGERS_VIEW, permission):
++        require_business_permission(
++            user=actor,
++            organization=organization,
++            permission=code,
++            project=obligation.project,
++            message="AP/AR source object scope is required.",
++        )
++    require_source_visibility(organization, actor, obligation)
++
++
++def read_subledger_source(
++    *,
++    organization,
++    actor,
++    kind: str,
++    identity: UUID,
++    permission: str,
++    historical_event: str | None = None,
++) -> SourceEvidence:
++    try:
++        if kind in OBLIGATION_KINDS:
++            source_kind, label, event = OBLIGATION_KINDS[kind]
++            obligation = (
++                Obligation.objects.select_for_update(of=("self",))
++                .select_related("project", "party", "control_account_mapping")
++                .get(
++                    organization=organization,
++                    source_kind=source_kind,
++                    source_uuid=identity,
++                    source_line_key="",
++                )
++            )
++            _scope(organization, actor, obligation, permission)
++            native = (
++                apps.get_model(label)
++                .objects.select_for_update()
++                .get(organization=organization, pk=identity)
++            )
++            pin = _pin(obligation)
++            reversal = obligation.source_reversal_evidence
++            previous = None
++            if reversal is not None and historical_event != event:
++                # Only an AP-owned finalized native source reversal qualifies;
++                # an unapproved Billing cancellation/request is never substituted.
++                event, occurred, previous = (
++                    "reversed",
++                    reversal.effective_date,
++                    identity,
++                )
++                pin["source_reversal"] = {
++                    "id": str(reversal.pk),
++                    "date": occurred.isoformat(),
++                    "reason": reversal.reason,
++                    "actor": str(reversal.reversed_by_id),
++                }
++            else:
++                if reversal is None:
++                    validate_active_obligation(obligation)
++                # For reversed history, the immutable AP pin and retained native
++                # reversal preserve the original occurrence without reactivation.
++                occurred = obligation.recognized_on
++                if kind == "ap_invoice":
++                    prior = (
++                        SupplierInvoiceAPReversal.objects.filter(
++                            organization=organization, replacement_match=native
++                        )
++                        .select_related("obligation")
++                        .first()
++                    )
++                    if (
++                        prior
++                        and SourceRecognitionDraft.objects.filter(
++                            organization=organization,
++                            source_kind=kind,
++                            source_uuid=prior.obligation.source_uuid,
++                            is_reversal=False,
++                        ).exists()
++                    ):
++                        previous = prior.obligation.source_uuid
++            row = _row(
++                obligation,
++                "amount",
++                obligation.original_amount,
++                project=obligation.project,
++                party=obligation.party,
++            )
++            return SourceEvidence(
++                kind,
++                identity,
++                event,
++                f"{obligation.source_version}:{obligation.source_hash}",
++                occurred,
++                obligation.currency,
++                (row,),
++                pin,
++                previous_id=previous,
++                reversal=event == "reversed",
++            )
++
++        model = WriteOffReversal if kind == "writeoff_reversal" else WriteOffDecision
++        source = model.objects.select_for_update(of=("self",)).get(
++            organization=organization, pk=identity
++        )
++        decision = source.decision if kind == "writeoff_reversal" else source
++        proposal = decision.proposal
++        obligation = (
++            Obligation.objects.select_for_update(of=("self",))
++            .select_related("project", "party", "control_account_mapping")
++            .get(organization=organization, pk=proposal.obligation_id)
++        )
++        _scope(organization, actor, obligation, permission)
++        if decision.decision != "approved" or not decision.authority_evidence:
++            raise ValidationError(
++                "An approved write-off with retained authority is required."
++            )
++        pin = _pin(obligation)
++        pin.update(
++            {
++                "proposal_id": str(proposal.pk),
++                "decision_id": str(decision.pk),
++                "writeoff_version": 1,
++                "amount": str(proposal.amount),
++                "reason": proposal.reason,
++                "decision_reason": decision.reason,
++                "decision_actor": str(decision.decided_by_id),
++                "authority": decision.authority_evidence,
++            }
++        )
++        previous = None
++        if proposal.corrects_id:
++            previous = proposal.corrects_id
++        reversal = kind == "writeoff_reversal"
++        if reversal:
++            event, occurred, previous = "reversed", source.effective_date, decision.pk
++            pin["reversal"] = {
++                "id": str(source.pk),
++                "date": occurred.isoformat(),
++                "reason": source.reason,
++                "actor": str(source.reversed_by_id),
++                "authority": source.authority_evidence,
++            }
++        else:
++            event = f"{obligation.direction}_written_off"
++            occurred = proposal.effective_date
++            if (
++                hasattr(decision, "reversal")
++                and not SourceRecognitionDraft.objects.filter(
++                    organization=organization,
++                    source_kind="writeoff",
++                    source_uuid=decision.pk,
++                ).exists()
++            ):
++                raise ValidationError(
++                    "A reversed occurrence cannot acquire a new original effect."
++                )
++        row = _row(
++            proposal,
++            "amount",
++            proposal.amount,
++            project=obligation.project,
++            party=obligation.party,
++        )
++        return SourceEvidence(
++            kind,
++            identity,
++            event,
++            "1:" + digest(pin),
++            occurred,
++            obligation.currency,
++            (row,),
++            pin,
++            previous_id=previous,
++            reversal=reversal,
++        )
++    except ObjectDoesNotExist as exc:
++        raise PermissionDenied(
++            "Source does not exist in the authorized tenant."
++        ) from exc
++
++
++def validate_control_rows(source: SourceEvidence, rows: list[dict]) -> None:
++    control = source.metadata["control_account_id"]
++    direction = source.metadata["direction"]
++    writeoff = source.kind in {"writeoff", "writeoff_reversal"}
++    debit = (direction == "receivable") != writeoff
++    if source.reversal:
++        debit = not debit
++    matches = [row for row in rows if row["account_id"] == control]
++    side, other = ("debit", "credit") if debit else ("credit", "debit")
++    from decimal import Decimal
++
++    if (
++        len(matches) != 1
++        or Decimal(matches[0][side]) <= 0
++        or Decimal(matches[0][other]) != 0
++    ):
++        raise ValidationError(
++            "Configured rows must use the exact retained directional control account."
++        )
+--- /dev/null
++++ b/apps/subledgers/migrations/0007_cep044_writeoff_correction_lineage.py
+@@ -0,0 +1,36 @@
++"""Add retained source lineage without modifying existing financial history."""
++
++import django.db.models.deletion
++from django.db import migrations, models
++
++
++def refuse_populated_lineage_rollback(apps, schema_editor):
++    proposal = apps.get_model("subledgers", "WriteOffProposal")
++    if proposal.objects.using(schema_editor.connection.alias).filter(
++        corrects__isnull=False
++    ).exists():
++        raise RuntimeError(
++            "Retained write-off correction lineage exists; use forward recovery."
++        )
++
++
++class Migration(migrations.Migration):
++    dependencies = [("subledgers", "0006_cep043_payroll_ap")]
++
++    operations = [
++        migrations.AddField(
++            model_name="writeoffproposal",
++            name="corrects",
++            field=models.ForeignKey(
++                blank=True,
++                null=True,
++                on_delete=django.db.models.deletion.PROTECT,
++                related_name="replacement_proposals",
++                to="subledgers.writeoffdecision",
++            ),
++        ),
++        migrations.RunPython(
++            migrations.RunPython.noop,
++            reverse_code=refuse_populated_lineage_rollback,
++        ),
++    ]
+--- /dev/null
++++ b/apps/subledgers/migrations/0008_cep044_writeoff_actions.py
+@@ -0,0 +1,117 @@
++# Generated by Django 5.2.17 on 2026-10-18 22:53
++
++import django.db.models.deletion
++import uuid
++from django.db import migrations, models
++
++
++def refuse_populated_evidence_rollback(apps, schema_editor):
++    alias = schema_editor.connection.alias
++    correction = apps.get_model("subledgers", "WriteOffCorrection")
++    decision = apps.get_model("subledgers", "WriteOffDecision")
++    reversal = apps.get_model("subledgers", "WriteOffReversal")
++    if (
++        correction.objects.using(alias).exists()
++        or decision.objects.using(alias).exclude(authority_evidence={}).exists()
++        or reversal.objects.using(alias).exclude(authority_evidence={}).exists()
++    ):
++        raise RuntimeError(
++            "Retained write-off authority/correction evidence exists; use forward recovery."
++        )
++
++
++class Migration(migrations.Migration):
++    dependencies = [
++        ("organizations", "0121_cep043_payroll_ap_permissions"),
++        ("subledgers", "0007_cep044_writeoff_correction_lineage"),
++    ]
++
++    operations = [
++        migrations.AddField(
++            model_name="writeoffdecision",
++            name="authority_evidence",
++            field=models.JSONField(blank=True, default=dict),
++        ),
++        migrations.AddField(
++            model_name="writeoffreversal",
++            name="authority_evidence",
++            field=models.JSONField(blank=True, default=dict),
++        ),
++        migrations.CreateModel(
++            name="WriteOffCorrection",
++            fields=[
++                (
++                    "id",
++                    models.UUIDField(
++                        default=uuid.uuid4,
++                        editable=False,
++                        primary_key=True,
++                        serialize=False,
++                        verbose_name="شناسه",
++                    ),
++                ),
++                (
++                    "created_at",
++                    models.DateTimeField(auto_now_add=True, verbose_name="زمان ایجاد"),
++                ),
++                ("effective_date", models.DateField()),
++                ("reason", models.TextField()),
++                ("idempotency_key", models.CharField(max_length=120)),
++                ("payload_hash", models.CharField(max_length=64)),
++                ("source_snapshot", models.JSONField()),
++                ("policy_evidence", models.JSONField()),
++                ("accounting_evidence", models.JSONField()),
++                (
++                    "actor",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="organizations.organizationmembership",
++                    ),
++                ),
++                (
++                    "organization",
++                    models.ForeignKey(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        to="organizations.organization",
++                    ),
++                ),
++                (
++                    "original",
++                    models.OneToOneField(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="correction_set",
++                        to="subledgers.writeoffdecision",
++                    ),
++                ),
++                (
++                    "replacement",
++                    models.OneToOneField(
++                        blank=True,
++                        null=True,
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="replaces_set",
++                        to="subledgers.writeoffdecision",
++                    ),
++                ),
++                (
++                    "reversal",
++                    models.OneToOneField(
++                        on_delete=django.db.models.deletion.PROTECT,
++                        related_name="correction_set",
++                        to="subledgers.writeoffreversal",
++                    ),
++                ),
++            ],
++            options={
++                "constraints": [
++                    models.UniqueConstraint(
++                        fields=("organization", "idempotency_key"),
++                        name="writeoff_correction_idem_uq",
++                    )
++                ],
++            },
++        ),
++        migrations.RunPython(
++            migrations.RunPython.noop, reverse_code=refuse_populated_evidence_rollback
++        ),
++    ]
+--- /dev/null
++++ b/apps/subledgers/test_cep044_billing.py
+@@ -0,0 +1,269 @@
++"""Real Billing workflow -> AP/AR -> source-family Accounting L2 evidence."""
++
++from datetime import date
++from importlib import import_module
++from unittest.mock import patch
++
++from django.apps import apps
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++
++from apps.accounting.models import Account, ControlAccountMappingVersion
++from apps.accounting.recognition_services import (
++    prepare_source_recognition,
++    reconcile_source_recognition,
++)
++from apps.accounting.services import create_fiscal_period, create_fiscal_year
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.billing import test_payable_certificates as certificate_scenarios
++from apps.billing import tests as claim_scenarios
++from apps.organizations.models import (
++    BusinessPermission,
++    OrganizationMembership,
++    OrganizationRole,
++    OrganizationSettings,
++)
++from apps.organizations.policy_specs import SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE
++
++from . import tests as foundation
++from .services import recognize_obligation
++from .test_cep044_writeoffs import CEP044Fixture
++
++
++class BillingRecognitionFixture:
++    accounting_mapping = CEP044Fixture.accounting_mapping
++    proposal = CEP044Fixture.proposal
++    approve = CEP044Fixture.approve
++    correct = CEP044Fixture.correct
++    _activate_policy = foundation.SubledgerFoundationTests._activate_policy
++
++    def set_up_native(self, native):
++        # Historical Billing scenarios predate explicit membership-role cutover.
++        # Supply their authority at fixture creation, never weaken production checks.
++        original_save = OrganizationMembership.save
++        # TransactionTestCase flush does not replay historical data migrations.
++        # Restore only the exact approved Billing templates needed by this fixture.
++        for module, callback in (
++            (
++                "0018_project_baseline_compatibility_catalog",
++                "seed_project_baseline_catalog",
++            ),
++            (
++                "0019_progress_verification_compatibility_catalog",
++                "seed_progress_catalog",
++            ),
++            (
++                "0020_progress_claim_approval_compatibility_catalog",
++                "seed_progress_claim_catalog",
++            ),
++        ):
++            getattr(import_module(f"apps.workflows.migrations.{module}"), callback)(
++                apps, None
++            )
++
++        def save_with_explicit_authority(membership, *args, **kwargs):
++            adding = membership._state.adding
++            original_save(membership, *args, **kwargs)
++            if adding and membership.status == "active":
++                role = OrganizationRole.objects.create(
++                    organization=membership.organization,
++                    code=f"cep044-native-{membership.pk}",
++                    name="Explicit native fixture authority",
++                )
++                role.permissions.set(BusinessPermission.objects.filter(is_active=True))
++                explicit_fixture_authority(membership, role)
++
++        with patch.object(OrganizationMembership, "save", save_with_explicit_authority):
++            native.setUp()
++
++    def configure(self, native, source_kind, direction):
++        self.organization, self.owner, self.approver = (
++            native.organization,
++            native.owner,
++            native.manager,
++        )
++        for actor in (self.owner, self.approver):
++            membership = self.organization.memberships.get(user=actor)
++            role = OrganizationRole.objects.create(
++                code=f"cep044-billing-{actor.pk}", name="Explicit fixture authority"
++            )
++            role.permissions.set(BusinessPermission.objects.filter(is_active=True))
++            explicit_fixture_authority(membership, role)
++        self.owner_membership = self.organization.memberships.get(user=self.owner)
++        OrganizationSettings.objects.get_or_create(
++            organization=self.organization,
++            defaults={"timezone": "UTC", "currency": "IRR"},
++        )
++        self.control = Account.objects.create(
++            organization=self.organization,
++            code="BILL044",
++            name="Explicit control",
++            account_type="asset" if direction == "receivable" else "liability",
++            is_posting=True,
++            created_by=self.owner,
++        )
++        ControlAccountMappingVersion.objects.create(
++            organization=self.organization,
++            source_kind=source_kind,
++            direction=direction,
++            version=1,
++            control_account=self.control,
++            effective_from=date(2026, 1, 1),
++            reason="Explicit test mapping",
++            created_by=self.owner_membership,
++        )
++        self.counterpart = Account.objects.create(
++            organization=self.organization,
++            code="BILL044C",
++            name="Explicit counterpart",
++            account_type="expense",
++            is_posting=True,
++            created_by=self.owner,
++        )
++        year = create_fiscal_year(
++            organization=self.organization,
++            actor=self.owner,
++            code="BILL044",
++            name="Year",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++            calendar_version=1,
++        )
++        create_fiscal_period(
++            organization=self.organization,
++            actor=self.owner,
++            fiscal_year=year,
++            number=1,
++            name="Period",
++            starts_on=year.starts_on,
++            ends_on=year.ends_on,
++        )
++        self._activate_policy(
++            SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE, {"allow_self_approval": False}
++        )
++
++    def handoff(self, native, kind, source_kind, family, direction):
++        self.target = recognize_obligation(
++            organization=self.organization,
++            actor=self.owner,
++            source_kind=source_kind,
++            source_uuid=native.pk,
++            source_version=native.revision_number,
++            idempotency_key=f"{kind}:{native.pk}",
++        )
++        self.day = self.target.recognized_on
++        debit, credit = (
++            (self.control, self.counterpart)
++            if direction == "receivable"
++            else (self.counterpart, self.control)
++        )
++        self.accounting_mapping(
++            family,
++            "receivable_recognized"
++            if direction == "receivable"
++            else "payable_recognized",
++            debit,
++            credit,
++        )
++        self.accounting_mapping(
++            "AP/AR Write-off", f"{direction}_written_off", credit, debit
++        )
++        effect = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind=kind,
++            source_id=native.pk,
++        )
++        self.assertEqual(
++            effect.pk,
++            prepare_source_recognition(
++                organization=self.organization,
++                actor=self.approver,
++                source_kind=kind,
++                source_id=native.pk,
++            ).pk,
++        )
++        self.assertEqual(effect.source_uuid, native.pk)
++        self.assertIn(str(native.revision_number), effect.source_version_reference)
++        self.assertEqual(
++            reconcile_source_recognition(
++                organization=self.organization, actor=self.approver, effect=effect
++            )["status"],
++            "matched",
++        )
++        original = self.approve()
++        correction = self.correct(original)
++        for identity in correction.accounting_evidence.values():
++            if identity:
++                from apps.accounting.recognition_models import SourceRecognitionDraft
++
++                target = SourceRecognitionDraft.objects.get(pk=identity)
++                self.assertEqual(
++                    reconcile_source_recognition(
++                        organization=self.organization,
++                        actor=self.approver,
++                        effect=target,
++                    )["status"],
++                    "matched",
++                )
++
++
++class BillingARRecognitionTests(BillingRecognitionFixture, TestCase):
++    def test_approved_native_claim_and_ar_writeoff_reversal(self):
++        native = claim_scenarios.ProgressClaimApprovalWorkflowTests(
++            methodName="runTest"
++        )
++        self.set_up_native(native)
++        self.configure(native, "billing.progress_claim.v1", "receivable")
++        native._configure_reporting_line()
++        draft = native._claim_for_approval()
++        with self.assertRaises(ValidationError):
++            recognize_obligation(
++                organization=self.organization,
++                actor=self.owner,
++                source_kind="billing.progress_claim.v1",
++                source_uuid=draft.pk,
++                source_version=draft.revision_number,
++                idempotency_key="unapproved",
++            )
++        with self.assertRaises(PermissionDenied):
++            prepare_source_recognition(
++                organization=self.organization,
++                actor=self.approver,
++                source_kind="ar_claim",
++                source_id=draft.pk,
++            )
++        claim = native._approve_claim(draft)
++        self.handoff(
++            claim,
++            "ar_claim",
++            "billing.progress_claim.v1",
++            "Billing Progress Claim",
++            "receivable",
++        )
++
++
++class BillingAPRecognitionTests(BillingRecognitionFixture, TestCase):
++    def test_approved_native_certificate_and_ap_writeoff_reversal(self):
++        native = certificate_scenarios.PayableCertificateTests(methodName="runTest")
++        self.set_up_native(native)
++        self.configure(native, "billing.payable_certificate.v1", "payable")
++        native._measurement()
++        draft = native._certificate()
++        with self.assertRaises(ValidationError):
++            recognize_obligation(
++                organization=self.organization,
++                actor=self.owner,
++                source_kind="billing.payable_certificate.v1",
++                source_uuid=draft.pk,
++                source_version=draft.revision_number,
++                idempotency_key="unapproved",
++            )
++        certificate = native._approve(draft)
++        self.handoff(
++            certificate,
++            "ap_certificate",
++            "billing.payable_certificate.v1",
++            "Billing Payable Certificate",
++            "payable",
++        )
+--- /dev/null
++++ b/apps/subledgers/test_cep044_lineage.py
+@@ -0,0 +1,177 @@
++"""Structural persistence only; no write-off financial policy is activated."""
++
++from datetime import date
++from decimal import Decimal
++from uuid import uuid4
++
++from django.core.exceptions import ValidationError
++from django.db import IntegrityError, transaction
++from django.db.models.deletion import ProtectedError
++from django.test import TestCase
++
++from apps.accounts.models import User
++from apps.organizations.models import OrganizationMembership
++from apps.organizations.services import create_organization_with_owner
++
++from .models import Obligation, WriteOffDecision, WriteOffProposal
++from .services import approve_write_off, reverse_write_off
++
++
++class WriteOffLineageFixture:
++    def setUp(self):
++        self.actor = User.objects.create_user(username="cep044-source-owner")
++        self.organization = create_organization_with_owner(
++            owner=self.actor, name="CEP044 synthetic", slug="cep044-source"
++        )
++        self.membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        self.obligation = self.make_obligation()
++        self.original = self.make_proposal("original")
++        # Rejection is an existing supported model state. Structural lineage
++        # neither assumes an approval nor changes the predecessor's balance.
++        self.decision = WriteOffDecision.objects.create(
++            organization=self.organization,
++            proposal=self.original,
++            decision="rejected",
++            reason="Retained synthetic decision",
++            decided_by=self.membership,
++        )
++
++    def make_obligation(self, **overrides):
++        identity = uuid4()
++        values = {
++            "organization": self.organization,
++            "direction": "payable",
++            "source_kind": "synthetic.retained.cep044",
++            "source_uuid": identity,
++            "source_version": 1,
++            "source_status": "retained",
++            "source_hash": "retained",
++            "source_snapshot": {"source_id": str(identity), "version": 1},
++            "party_name_snapshot": "Synthetic retained party",
++            "original_amount": Decimal("100.000000"),
++            "recognized_on": date(2026, 10, 19),
++            "idempotency_key": str(identity),
++            "payload_hash": "retained",
++            "recognized_by": self.membership,
++        }
++        values.update(overrides)
++        return Obligation.objects.create(**values)
++
++    def make_proposal(self, key, **overrides):
++        values = {
++            "organization": self.organization,
++            "obligation": self.obligation,
++            "amount": Decimal("5.000000"),
++            "effective_date": date(2026, 10, 19),
++            "reason": "Synthetic retained source proposal",
++            "idempotency_key": key,
++            "payload_hash": key,
++            "proposed_by": self.membership,
++        }
++        values.update(overrides)
++        return WriteOffProposal.objects.create(**values)
++
++
++class WriteOffLineageTests(WriteOffLineageFixture, TestCase):
++    def test_optional_link_preserves_existing_source_and_exact_predecessor(self):
++        before = Obligation.objects.values().get(pk=self.obligation.pk)
++        replacement = self.make_proposal("linked", corrects=self.decision)
++        replacement.refresh_from_db()
++        self.original.refresh_from_db()
++        self.assertIsNone(self.original.corrects_id)
++        self.assertEqual(replacement.corrects_id, self.decision.pk)
++        self.assertEqual(self.decision.replacement_proposals.get().pk, replacement.pk)
++        self.assertEqual(Obligation.objects.values().get(pk=self.obligation.pk), before)
++        self.assertEqual(self.obligation.outstanding_amount, Decimal("100.000000"))
++        self.assertFalse(hasattr(replacement, "decision"))
++
++    def test_foreign_tenant_predecessor_and_foreign_actor_are_rejected(self):
++        outsider = User.objects.create_user(username="cep044-other-owner")
++        other = create_organization_with_owner(
++            owner=outsider, name="Other synthetic", slug="cep044-other"
++        )
++        other_member = OrganizationMembership.objects.get(
++            organization=other, user=outsider
++        )
++        other_obligation = self.make_obligation(
++            organization=other, recognized_by=other_member
++        )
++        other_proposal = self.make_proposal(
++            "other",
++            organization=other,
++            obligation=other_obligation,
++            proposed_by=other_member,
++        )
++        other_decision = WriteOffDecision.objects.create(
++            organization=other,
++            proposal=other_proposal,
++            decision="rejected",
++            reason="Other retained decision",
++            decided_by=other_member,
++        )
++        for changes in (
++            {"corrects": other_decision},
++            {"corrects": self.decision, "proposed_by": other_member},
++            {
++                "organization": other,
++                "obligation": other_obligation,
++                "proposed_by": other_member,
++                "corrects": self.decision,
++            },
++        ):
++            with (
++                self.subTest(changes=tuple(changes)),
++                self.assertRaises(ValidationError),
++            ):
++                self.make_proposal("denied", **changes)
++        self.assertFalse(
++            WriteOffProposal.objects.filter(idempotency_key="denied").exists()
++        )
++
++    def test_different_obligation_and_self_reference_are_rejected(self):
++        second = self.make_obligation()
++        with self.assertRaises(ValidationError):
++            self.make_proposal(
++                "wrong-obligation", obligation=second, corrects=self.decision
++            )
++        self.original.corrects = self.decision
++        with self.assertRaises(ValidationError):
++            self.original.clean()
++
++    def test_source_link_cannot_be_rewritten_deleted_or_bulk_bypassed(self):
++        replacement = self.make_proposal("immutable", corrects=self.decision)
++        replacement.corrects = None
++        with self.assertRaises(ValidationError):
++            replacement.save()
++        queryset = WriteOffProposal.objects.filter(pk=replacement.pk)
++        for action in (
++            lambda: queryset.update(corrects=None),
++            lambda: queryset.bulk_update([replacement], ["corrects"]),
++            queryset.delete,
++            replacement.delete,
++            lambda: WriteOffProposal.objects.bulk_create([replacement]),
++        ):
++            with self.subTest(action=action), self.assertRaises(ValidationError):
++                action()
++        replacement.refresh_from_db()
++        self.assertEqual(replacement.corrects_id, self.decision.pk)
++        with self.assertRaises(ValidationError):
++            WriteOffDecision.objects.filter(pk=self.decision.pk).delete()
++        with self.assertRaises(ProtectedError):
++            WriteOffDecision._base_manager.filter(pk=self.decision.pk).delete()
++
++    def test_existing_unique_business_key_remains_database_enforced(self):
++        self.make_proposal("duplicate", corrects=self.decision)
++        with self.assertRaises(IntegrityError), transaction.atomic():
++            self.make_proposal("duplicate", corrects=self.decision)
++
++    def test_persistence_does_not_activate_approval_or_reversal(self):
++        self.make_proposal("held", corrects=self.decision)
++        for operation in (approve_write_off, reverse_write_off):
++            with (
++                self.subTest(operation=operation.__name__),
++                self.assertRaisesMessage(ValidationError, "P3-S27-Q03"),
++            ):
++                operation()
+--- /dev/null
++++ b/apps/subledgers/test_cep044_migration.py
+@@ -0,0 +1,165 @@
++"""Narrow disposable migration rehearsal; preserve populated prior evidence."""
++
++import json
++import os
++from pathlib import Path
++
++from django.apps import apps
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from .models import WriteOffDecision, WriteOffProposal
++from .services import _canonical_hash
++from .test_cep044_lineage import WriteOffLineageFixture
++from .test_cep044_writeoffs import CEP044Fixture
++
++
++class WriteOffLineageMigrationTests(WriteOffLineageFixture, TransactionTestCase):
++    def test_populated_history_preserved_and_used_lineage_cannot_be_dropped(self):
++        self.assertTrue(connection.settings_dict["NAME"].startswith("test_"))
++        old = [("subledgers", "0006_cep043_payroll_ap")]
++        new = [("subledgers", "0008_cep044_writeoff_actions")]
++        historical = MigrationExecutor(connection).loader.project_state(new).apps
++        approved_proposal = self.make_proposal("synthetic-finalized-legacy")
++        # Historical migration models intentionally seed synthetic finalized
++        # legacy facts without activating the application's gated transitions.
++        historical_decision = historical.get_model(
++            "subledgers", "WriteOffDecision"
++        ).objects.create(
++            organization_id=self.organization.pk,
++            proposal_id=approved_proposal.pk,
++            decision="approved",
++            reason="Synthetic finalized legacy approval",
++            decided_by_id=self.membership.pk,
++        )
++        historical.get_model("subledgers", "WriteOffReversal").objects.create(
++            organization_id=self.organization.pk,
++            decision_id=historical_decision.pk,
++            effective_date=approved_proposal.effective_date,
++            reason="Synthetic finalized legacy reversal",
++            reversed_by_id=self.membership.pk,
++        )
++        self.decision = WriteOffDecision.objects.get(pk=historical_decision.pk)
++        labels = (
++            "subledgers.Obligation",
++            "subledgers.WriteOffProposal",
++            "subledgers.WriteOffDecision",
++            "subledgers.WriteOffReversal",
++            "accounting.JournalEntry",
++            "audit.AuditEvent",
++            "organizations.BusinessPermission",
++            "organizations.OrganizationRole",
++            "organizations.MembershipRoleAssignment",
++            "organizations.MembershipScopeGrant",
++            "organizations.TenantPolicySelection",
++        )
++
++        def snapshot():
++            result = {}
++            for label in labels:
++                model = apps.get_model(label)
++                # Compare only pre-existing columns on both sides of the expand.
++                fields = [
++                    f.attname
++                    for f in model._meta.fields
++                    if f.name not in {"corrects", "authority_evidence"}
++                ]
++                rows = list(model.objects.order_by("pk").values(*fields))
++                result[label] = {"count": len(rows), "sha256": _canonical_hash(rows)}
++            model = apps.get_model("organizations.OrganizationRole").permissions.through
++            rows = list(model.objects.order_by("pk").values())
++            result["role_grants"] = {
++                "count": len(rows),
++                "sha256": _canonical_hash(rows),
++            }
++            return result
++
++        before = snapshot()
++        try:
++            plan = MigrationExecutor(connection).migration_plan(old)
++            self.assertEqual(
++                [(m.app_label, m.name, backwards) for m, backwards in plan],
++                [
++                    ("subledgers", new[0][1], True),
++                    ("subledgers", "0007_cep044_writeoff_correction_lineage", True),
++                ],
++            )
++            MigrationExecutor(connection).migrate(old)
++            self.assertEqual(before, snapshot())
++            with connection.cursor() as cursor:
++                columns = connection.introspection.get_table_description(
++                    cursor, WriteOffProposal._meta.db_table
++                )
++            self.assertNotIn("corrects_id", [c.name for c in columns])
++            MigrationExecutor(connection).migrate(new)
++            after_reapply = snapshot()
++            self.assertEqual(before, after_reapply)
++            self.assertFalse(
++                WriteOffProposal.objects.filter(corrects__isnull=False).exists()
++            )
++            linked = self.make_proposal("retained-lineage", corrects=self.decision)
++            populated = snapshot()
++            with self.assertRaisesMessage(RuntimeError, "forward recovery"):
++                MigrationExecutor(connection).migrate(old)
++            self.assertEqual(populated, snapshot())
++            linked.refresh_from_db()
++            self.assertEqual(linked.corrects_id, self.decision.pk)
++        finally:
++            MigrationExecutor(connection).migrate(new)
++        if os.getenv("BONIRA_CEP044_MIGRATION_TRACE"):
++            Path(os.environ["BONIRA_CEP044_MIGRATION_TRACE"]).write_text(
++                json.dumps(
++                    {
++                        "database": "disposable test PostgreSQL only",
++                        "before": before,
++                        "after_reapply": after_reapply,
++                        "after_new_lineage_and_refused_rollback": populated,
++                        "preexisting_history_preserved": True,
++                        "all_legacy_links_null_after_reapply": True,
++                        "populated_lineage_drop_refused": True,
++                        "production": False,
++                    },
++                    indent=2,
++                )
++                + "\n",
++                encoding="utf-8",
++            )
++
++
++class WriteOffActionsMigrationTests(CEP044Fixture, TransactionTestCase):
++    def test_populated_authority_and_correction_cannot_be_dropped(self):
++        self.assertTrue(connection.settings_dict["NAME"].startswith("test_"))
++        original = self.approve()
++        result = self.correct(original)
++        before = {
++            label: _canonical_hash(
++                list(apps.get_model(label).objects.order_by("pk").values())
++            )
++            for label in (
++                "subledgers.Obligation",
++                "subledgers.WriteOffProposal",
++                "subledgers.WriteOffDecision",
++                "subledgers.WriteOffReversal",
++                "subledgers.WriteOffCorrection",
++                "accounting.JournalEntry",
++                "accounting.JournalLine",
++                "accounting.SourceRecognitionDraft",
++                "audit.AuditEvent",
++                "organizations.MembershipRoleAssignment",
++                "organizations.MembershipScopeGrant",
++            )
++        }
++        with self.assertRaisesMessage(RuntimeError, "forward recovery"):
++            MigrationExecutor(connection).migrate(
++                [("subledgers", "0007_cep044_writeoff_correction_lineage")]
++            )
++        after = {
++            label: _canonical_hash(
++                list(apps.get_model(label).objects.order_by("pk").values())
++            )
++            for label in before
++        }
++        self.assertEqual(before, after)
++        result.refresh_from_db()
++        self.assertEqual(result.original_id, original.pk)
+--- /dev/null
++++ b/apps/subledgers/test_cep044_writeoffs.py
+@@ -0,0 +1,719 @@
++"""Governed write-offs against real approved supplier/AP source contracts."""
++
++import json
++import os
++from concurrent.futures import ThreadPoolExecutor
++from datetime import date, timedelta
++from decimal import Decimal
++from pathlib import Path
++from threading import Barrier
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import close_old_connections, connections
++from django.test import TestCase, TransactionTestCase
++
++from apps.accounting.models import Account, FiscalPeriod, JournalLine
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.accounting.recognition_services import (
++    approve_recognition_mapping,
++    prepare_recognition_mapping,
++    prepare_source_recognition,
++    reconcile_source_recognition,
++)
++from apps.accounting.services import create_fiscal_period, create_fiscal_year
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.audit.models import AuditAction, AuditEvent
++from apps.organizations.models import (
++    BusinessPermission,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationRole,
++    TenantPolicySelection,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.organizations.policy_specs import SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE
++from apps.treasury.models import TreasuryMovement
++
++from . import tests as foundation
++from .models import WriteOffCorrection, WriteOffDecision, WriteOffReversal
++from .services import _amounts_as_of, propose_write_off
++from .test_cep033_invoice_handoff import InvoiceAPFixture
++from .writeoffs import correct_write_off, decide_write_off, requester_writeoff_status
++
++
++class CEP044Fixture(InvoiceAPFixture):
++    _activate_policy = foundation.SubledgerFoundationTests._activate_policy
++
++    def setUp(self):
++        super().setUp()
++        for user in (self.owner, self.member, self.approver):
++            membership = self.organization.memberships.get(user=user)
++            explicit_fixture_authority(membership, membership.role_definition)
++        self.target = self.handoff()
++        self.day = self.target.recognized_on
++        self._activate_policy(
++            SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++            {"allow_self_approval": getattr(self, "allow_self_approval", False)},
++        )
++        self.counterpart = Account.objects.create(
++            organization=self.organization,
++            code="CEP044",
++            name="Explicit counterpart",
++            account_type="expense",
++            is_posting=True,
++            created_by=self.owner,
++        )
++        year = create_fiscal_year(
++            organization=self.organization,
++            actor=self.owner,
++            code="CEP044",
++            name="Year",
++            starts_on=date(self.day.year, 1, 1),
++            ends_on=date(self.day.year, 12, 31),
++            calendar_version=1,
++        )
++        self.period = create_fiscal_period(
++            organization=self.organization,
++            actor=self.owner,
++            fiscal_year=year,
++            number=1,
++            name="Period",
++            starts_on=year.starts_on,
++            ends_on=year.ends_on,
++        )
++        self.recognition_mapping = self.accounting_mapping(
++            "Procurement Supplier Invoice Match",
++            "payable_recognized",
++            self.counterpart,
++            self.mapping.control_account,
++        )
++        self.writeoff_mapping = self.accounting_mapping(
++            "AP/AR Write-off",
++            "payable_written_off",
++            self.mapping.control_account,
++            self.counterpart,
++        )
++
++    def accounting_mapping(self, family, event, debit, credit):
++        mapping = prepare_recognition_mapping(
++            organization=self.organization,
++            actor=self.owner,
++            source_family=family,
++            source_event=event,
++            effective_from=date(self.day.year, 1, 1),
++            account_assignments={
++                "amount": {"debit": str(debit.pk), "credit": str(credit.pk)}
++            },
++            evidence_reference="Explicit synthetic CEP044 mapping; no production value",
++        )
++        if family != getattr(self, "unapproved_family", None):
++            approve_recognition_mapping(
++                organization=self.organization,
++                actor=self.approver,
++                mapping=mapping,
++                reason="Independent test mapping approval",
++            )
++        return mapping
++
++    def proposal(self, key="original", amount="10", day=None, corrects=None):
++        return propose_write_off(
++            organization=self.organization,
++            actor=self.owner,
++            obligation=self.target,
++            amount=Decimal(amount),
++            effective_date=day or self.day,
++            reason="Manual request",
++            idempotency_key=key,
++            corrects=corrects,
++        )
++
++    def approve(self, proposal=None, actor=None):
++        return decide_write_off(
++            organization=self.organization,
++            actor=actor or self.approver,
++            proposal=proposal or self.proposal(),
++            approve=True,
++            reason="Explicit approval",
++        )
++
++    def correct(self, original, replacement=None, **overrides):
++        values = {
++            "organization": self.organization,
++            "actor": self.approver,
++            "original": original,
++            "replacement": replacement,
++            "effective_date": self.day + timedelta(days=1),
++            "reason": "Governed correction",
++            "idempotency_key": "correction",
++        }
++        values.update(overrides)
++        return correct_write_off(**values)
++
++    def mark_consumed(self, effect):
++        """Synthetic already-posted target; never activates a posting producer."""
++        from django.utils import timezone
++
++        from apps.accounting.models import JournalEntry
++        from apps.organizations.models import PlatformPolicyVersion
++        from apps.organizations.policy_specs import (
++            ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
++            ACCOUNTING_ROUNDING_POLICY_CODE,
++            initial_accounting_policy_parameters,
++        )
++
++        versions = []
++        for code in (
++            ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
++            ACCOUNTING_ROUNDING_POLICY_CODE,
++        ):
++            version = PlatformPolicyVersion.objects.filter(
++                policy__code=code, status="published"
++            ).first()
++            if version is None:
++                self._activate_policy(code, initial_accounting_policy_parameters(code))
++                version = PlatformPolicyVersion.objects.get(
++                    policy__code=code, status="published"
++                )
++            versions.append(version)
++        JournalEntry.objects.filter(pk=effect.journal_id).update(
++            status="posted",
++            number=44001,
++            posted_by=self.owner_membership,
++            posted_at=timezone.now(),
++            precision_policy_version=versions[0],
++            rounding_policy_version=versions[1],
++        )
++
++
++class WriteOffGovernanceTests(CEP044Fixture, TestCase):
++    def test_rejection_retains_request_and_has_no_financial_effect(self):
++        proposal = self.proposal()
++        decision = decide_write_off(
++            organization=self.organization,
++            actor=self.approver,
++            proposal=proposal,
++            approve=False,
++            reason="Rejected",
++        )
++        self.assertEqual(decision.decision, "rejected")
++        self.assertFalse(SourceRecognitionDraft.objects.exists())
++        with self.assertRaises(ValidationError):
++            self.approve(proposal)
++        self.assertEqual(
++            _amounts_as_of(self.target, self.day), (Decimal(0), Decimal(0))
++        )
++
++    def test_approval_replay_and_requester_minimum_status(self):
++        proposal = self.proposal()
++        self.assertEqual(
++            requester_writeoff_status(
++                organization=self.organization,
++                actor=self.owner,
++                proposal_id=proposal.pk,
++            )["status"],
++            "proposed",
++        )
++        decision = self.approve(proposal)
++        self.assertEqual(self.approve(proposal).pk, decision.pk)
++        with self.assertRaises(ValidationError):
++            decide_write_off(
++                organization=self.organization,
++                actor=self.approver,
++                proposal=proposal,
++                approve=False,
++                reason="Conflict",
++            )
++        self.assertEqual(WriteOffDecision.objects.count(), 1)
++        self.assertEqual(SourceRecognitionDraft.objects.count(), 1)
++        self.assertEqual(
++            _amounts_as_of(self.target, self.day), (Decimal(0), Decimal(10))
++        )
++        status = requester_writeoff_status(
++            organization=self.organization,
++            actor=self.owner,
++            proposal_id=proposal.pk,
++        )
++        self.assertEqual(
++            set(status), {"proposal_id", "status", "amount", "effective_date"}
++        )
++        self.assertEqual(status["status"], "approved")
++        with self.assertRaises(PermissionDenied):
++            requester_writeoff_status(
++                organization=self.organization,
++                actor=self.member,
++                proposal_id=proposal.pk,
++            )
++
++    def test_atomic_replacement_preserves_cutoffs_and_exact_accounting_inverse(self):
++        original = self.approve()
++        replacement = self.proposal(
++            "replacement", "7", self.day + timedelta(days=1), original
++        )
++        before_cash = list(TreasuryMovement.objects.values())
++        result = self.correct(original, replacement)
++        self.assertEqual(self.correct(original, replacement).pk, result.pk)
++        self.assertEqual(result.replacement.proposal.amount, Decimal(7))
++        self.assertEqual(
++            _amounts_as_of(self.target, self.day), (Decimal(0), Decimal(10))
++        )
++        self.assertEqual(
++            _amounts_as_of(self.target, result.effective_date), (Decimal(0), Decimal(7))
++        )
++        self.assertEqual(before_cash, list(TreasuryMovement.objects.values()))
++        self.assertEqual(WriteOffCorrection.objects.count(), 1)
++        self.assertEqual(SourceRecognitionDraft.objects.count(), 3)
++        effect = SourceRecognitionDraft.objects.get(
++            pk=result.accounting_evidence["original"]
++        )
++        inverse = SourceRecognitionDraft.objects.get(
++            pk=result.accounting_evidence["reversal"]
++        )
++        rows = lambda journal: list(
++            JournalLine.objects.filter(journal=journal)
++            .order_by("account_id")
++            .values_list("account_id", "debit", "credit")
++        )
++        self.assertEqual(
++            [(a, c, d) for a, d, c in rows(effect.journal)], rows(inverse.journal)
++        )
++        self.assertEqual(inverse.journal.accounting_date, result.effective_date)
++        with self.assertRaises(ValidationError):
++            self.correct(original, replacement, reason="Conflicting payload")
++        with self.assertRaises(ValidationError):
++            self.correct(original, idempotency_key="second economic correction")
++        for item in (original, original.proposal, result.reversal, result):
++            with self.assertRaises(ValidationError):
++                item.save()
++            with self.assertRaises(ValidationError):
++                type(item).objects.filter(pk=item.pk).update(reason="overwrite")
++        if os.getenv("BONIRA_CEP044_TRACE"):
++            Path(os.environ["BONIRA_CEP044_TRACE"]).write_text(
++                json.dumps(
++                    {
++                        "environment": "Disposable synthetic PostgreSQL test only",
++                        "source_obligation": str(self.target.pk),
++                        "source_uuid": str(self.target.source_uuid),
++                        "source_version": self.target.source_version,
++                        "source_hash": self.target.source_hash,
++                        "control_account_id": str(self.target.control_account_id),
++                        "control_mapping_id": str(
++                            self.target.control_account_mapping_id
++                        ),
++                        "original_decision": str(original.pk),
++                        "original_amount": str(original.proposal.amount),
++                        "original_date": original.proposal.effective_date.isoformat(),
++                        "correction": str(result.pk),
++                        "correction_actor": str(result.actor_id),
++                        "correction_created_at": result.created_at.isoformat(),
++                        "correction_date": result.effective_date.isoformat(),
++                        "reversal": str(result.reversal_id),
++                        "replacement": str(result.replacement_id),
++                        "replacement_amount": str(result.replacement.proposal.amount),
++                        "accounting": result.accounting_evidence,
++                        "policy": result.policy_evidence,
++                        "cutoffs_before_after": ["10.000000", "7.000000"],
++                        "exact_inverse_and_replay": "PASS",
++                        "immutable_history_and_treasury_preserved": "PASS",
++                        "target_level": "L2 draft only",
++                        "production": False,
++                    },
++                    indent=2,
++                )
++                + "\n",
++                encoding="utf-8",
++            )
++
++    def test_full_cancellation_has_no_replacement(self):
++        original = self.approve()
++        result = self.correct(original)
++        self.assertIsNone(result.replacement_id)
++        self.assertEqual(
++            _amounts_as_of(self.target, self.day), (Decimal(0), Decimal(10))
++        )
++        self.assertEqual(
++            _amounts_as_of(self.target, result.effective_date), (Decimal(0), Decimal(0))
++        )
++
++    def test_policy_missing_and_self_approval_fail_closed(self):
++        proposal = self.proposal()
++        with self.assertRaises(PermissionDenied):
++            self.approve(proposal, actor=self.owner)
++        TenantPolicySelection.objects.filter(
++            policy__code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE
++        ).delete()
++        with self.assertRaises(ValidationError):
++            self.approve(proposal)
++        self.assertFalse(WriteOffDecision.objects.exists())
++        self.assertFalse(SourceRecognitionDraft.objects.exists())
++
++    def test_late_failure_rolls_back_entire_set_and_success_audit(self):
++        original = self.approve()
++        replacement = self.proposal(
++            "replacement", "7", self.day + timedelta(days=1), original
++        )
++        original_counts = (
++            WriteOffDecision.objects.count(),
++            SourceRecognitionDraft.objects.count(),
++        )
++        with (
++            patch(
++                "apps.subledgers.writeoffs._capacity",
++                side_effect=ValidationError("injected failure"),
++            ),
++            self.assertRaises(ValidationError),
++        ):
++            self.correct(original, replacement)
++        self.assertFalse(WriteOffReversal.objects.exists())
++        self.assertFalse(WriteOffCorrection.objects.exists())
++        self.assertEqual(
++            original_counts,
++            (WriteOffDecision.objects.count(), SourceRecognitionDraft.objects.count()),
++        )
++        self.assertFalse(
++            AuditEvent.objects.filter(
++                action=AuditAction.SUBLEDGER_WRITEOFF_CORRECTED
++            ).exists()
++        )
++        self.assertTrue(
++            AuditEvent.objects.filter(
++                action=AuditAction.SUBLEDGER_WRITEOFF_FAILED
++            ).exists()
++        )
++        self.correct(original, replacement)
++
++    def test_closed_period_refuses_without_date_substitution(self):
++        original = self.approve()
++        FiscalPeriod.objects.filter(pk=self.period.pk).update(status="closed")
++        with self.assertRaises(ValidationError):
++            self.correct(original)
++        self.assertFalse(WriteOffReversal.objects.exists())
++        self.assertEqual(SourceRecognitionDraft.objects.count(), 1)
++
++    def test_native_ap_control_reconciliation_and_exact_replay(self):
++        effect = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=self.match.pk,
++        )
++        self.assertEqual(
++            effect.pk,
++            prepare_source_recognition(
++                organization=self.organization,
++                actor=self.approver,
++                source_kind="ap_invoice",
++                source_id=self.match.pk,
++            ).pk,
++        )
++        reconciliation = reconcile_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            effect=effect,
++        )
++        self.assertEqual(reconciliation["status"], "matched")
++
++    def test_failed_target_preserves_source_and_retry_revalidates(self):
++        from apps.accounting.recognition_services import attempt_source_recognition
++
++        # A source with an unsupported kind cannot be routed through AP generically.
++        with self.assertRaises(ValidationError):
++            prepare_source_recognition(
++                organization=self.organization,
++                actor=self.approver,
++                source_kind="subledgers",
++                source_id=self.target.pk,
++            )
++        before = self.target.source_hash
++        with patch(
++            "apps.accounting.recognition_services._mapped_rows",
++            side_effect=ValidationError("injected target failure"),
++        ):
++            self.assertIsNone(
++                attempt_source_recognition(
++                    organization=self.organization,
++                    actor=self.approver,
++                    source_kind="ap_invoice",
++                    source_id=self.match.pk,
++                )
++            )
++        self.target.refresh_from_db()
++        self.assertEqual(before, self.target.source_hash)
++        self.assertFalse(SourceRecognitionDraft.objects.exists())
++        effect = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=self.match.pk,
++        )
++        self.assertEqual(effect.source_uuid, self.match.pk)
++
++    def test_denied_permissions_object_scope_and_tenant_state(self):
++        proposal = self.proposal()
++        membership = self.organization.memberships.get(user=self.approver)
++        role = membership.role_definition
++        permission = BusinessPermission.objects.get(code=P.SUBLEDGERS_WRITEOFFS_APPROVE)
++        role.permissions.remove(permission)
++        with self.assertRaises(PermissionDenied):
++            self.approve(proposal)
++        role.permissions.add(permission)
++        scope = MembershipScopeGrant.objects.get(
++            membership=membership, revoked_at__isnull=True
++        )
++        from django.utils import timezone
++
++        MembershipScopeGrant.objects.filter(pk=scope.pk).update(
++            revoked_at=timezone.now()
++        )
++        with self.assertRaises(PermissionDenied):
++            self.approve(proposal)
++        MembershipScopeGrant.objects.filter(pk=scope.pk).update(revoked_at=None)
++        for status in ("suspended", "cancelled"):
++            Organization.objects.filter(pk=self.organization.pk).update(status=status)
++            with self.assertRaises(PermissionDenied):
++                self.approve(proposal)
++        Organization.objects.filter(pk=self.organization.pk).update(status="active")
++        self.approve(proposal)
++
++    def test_foreign_tenant_sources_are_denied_without_targets(self):
++        from apps.accounts.models import User
++        from apps.organizations.services import create_organization_with_owner
++
++        outsider = User.objects.create_user(username="cep044-outsider")
++        other = create_organization_with_owner(
++            owner=outsider, name="Other", slug="other044"
++        )
++        role = OrganizationRole.objects.create(
++            organization=other, code="foreign044", name="Explicit foreign authority"
++        )
++        role.permissions.set(BusinessPermission.objects.filter(is_active=True))
++        explicit_fixture_authority(other.memberships.get(user=outsider), role)
++        proposal = self.proposal()
++        for operation in (
++            lambda: decide_write_off(
++                organization=other,
++                actor=outsider,
++                proposal=proposal,
++                approve=True,
++                reason="forged",
++            ),
++            lambda: prepare_source_recognition(
++                organization=other,
++                actor=outsider,
++                source_kind="ap_invoice",
++                source_id=self.match.pk,
++            ),
++            lambda: requester_writeoff_status(
++                organization=other, actor=outsider, proposal_id=proposal.pk
++            ),
++        ):
++            with self.assertRaises(PermissionDenied):
++                operation()
++        self.assertFalse(WriteOffDecision.objects.exists())
++        self.assertFalse(SourceRecognitionDraft.objects.exists())
++
++    def test_consumed_target_and_mismatched_date_fail_closed(self):
++        original = self.approve()
++        replacement = self.proposal("wrong-date", "7", self.day, original)
++        with self.assertRaises(ValidationError):
++            self.correct(original, replacement)
++        effect = SourceRecognitionDraft.objects.get(source_uuid=original.pk)
++        self.mark_consumed(effect)
++        with self.assertRaises(ValidationError):
++            self.correct(original)
++        self.assertFalse(WriteOffReversal.objects.exists())
++        self.assertFalse(WriteOffCorrection.objects.exists())
++
++    def test_capacity_date_boundaries_and_future_correction(self):
++        original = self.approve(self.proposal(amount=str(self.target.original_amount)))
++        replacement = self.proposal(
++            "replacement", "7", self.day + timedelta(days=1), original
++        )
++        self.correct(original, replacement)
++        from .writeoffs import max_writeoff_exposure
++
++        self.assertEqual(
++            max_writeoff_exposure(self.target, on_or_after=self.day),
++            self.target.original_amount,
++        )
++        self.assertEqual(
++            max_writeoff_exposure(
++                self.target, on_or_after=self.day + timedelta(days=1)
++            ),
++            Decimal(7),
++        )
++        with self.assertRaises(ValidationError):
++            self.approve(self.proposal("overlapping", "1", self.day))
++        with self.assertRaises(ValidationError):
++            self.correct(original, effective_date=self.day - timedelta(days=1))
++
++    def test_native_ap_reversal_and_replacement_accounting_chain(self):
++        original = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=self.match.pk,
++        )
++        corrected_match = self.correction_source()
++        target = self.handoff(
++            match=corrected_match,
++            key="corrected-ap",
++            corrects=self.target,
++            effective_date=self.day,
++            reason="Explicit AP correction",
++        )
++        reversal = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=self.match.pk,
++        )
++        replacement = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=corrected_match.pk,
++        )
++        self.assertTrue(reversal.is_reversal)
++        self.assertEqual(reversal.predecessor_id, original.pk)
++        self.assertEqual(replacement.predecessor_id, original.pk)
++        self.assertEqual(target.source_uuid, corrected_match.pk)
++        for effect in (original, reversal, replacement):
++            self.assertEqual(
++                reconcile_source_recognition(
++                    organization=self.organization, actor=self.approver, effect=effect
++                )["status"],
++                "matched",
++            )
++
++    def test_consumed_native_ap_target_blocks_source_reversal(self):
++        effect = prepare_source_recognition(
++            organization=self.organization,
++            actor=self.approver,
++            source_kind="ap_invoice",
++            source_id=self.match.pk,
++        )
++        self.mark_consumed(effect)
++        with self.assertRaises(ValidationError):
++            self.reverse(self.target)
++        self.assertIsNone(self.target.source_reversal_evidence)
++
++    def test_correction_chain_requires_explicit_reverse_authority_and_pins_each_predecessor(
++        self,
++    ):
++        original = self.approve()
++        permission = BusinessPermission.objects.get(code=P.SUBLEDGERS_WRITEOFFS_REVERSE)
++        role = self.organization.memberships.get(user=self.approver).role_definition
++        role.permissions.remove(permission)
++        with self.assertRaises(PermissionDenied):
++            self.correct(original)
++        self.assertFalse(WriteOffReversal.objects.exists())
++        role.permissions.add(permission)
++        replacement = self.proposal(
++            "replacement", "7", self.day + timedelta(days=1), original
++        )
++        first = self.correct(original, replacement)
++        next_date = self.day + timedelta(days=2)
++        next_proposal = self.proposal(
++            "next replacement", "4", next_date, first.replacement
++        )
++        second = self.correct(
++            first.replacement,
++            next_proposal,
++            effective_date=next_date,
++            idempotency_key="second correction",
++        )
++        self.assertEqual(second.original_id, first.replacement_id)
++        for cutoff, amount in (
++            (self.day, 10),
++            (first.effective_date, 7),
++            (next_date, 4),
++        ):
++            self.assertEqual(_amounts_as_of(self.target, cutoff)[1], Decimal(amount))
++
++
++class WriteOffSelfApprovalTests(CEP044Fixture, TestCase):
++    allow_self_approval = True
++
++    def test_explicit_effective_policy_allows_self_approval_without_new_classification(
++        self,
++    ):
++        original = self.approve(actor=self.owner)
++        result = self.correct(original, actor=self.owner)
++        self.assertTrue(original.authority_evidence["policy"]["self_approval_used"])
++        self.assertTrue(result.policy_evidence["reversal"]["self_approval_used"])
++
++
++class WriteOffConfigurationTests(CEP044Fixture, TestCase):
++    unapproved_family = "AP/AR Write-off"
++
++    def test_unapproved_mapping_fails_then_explicit_approval_allows_retry(self):
++        proposal = self.proposal()
++        with self.assertRaises(ValidationError):
++            self.approve(proposal)
++        self.assertFalse(WriteOffDecision.objects.exists())
++        self.assertFalse(SourceRecognitionDraft.objects.exists())
++        approve_recognition_mapping(
++            organization=self.organization,
++            actor=self.approver,
++            mapping=self.writeoff_mapping,
++            reason="Explicit mapping acceptance for retry",
++        )
++        self.approve(proposal)
++
++
++class WriteOffConcurrencyTests(CEP044Fixture, TransactionTestCase):
++    def test_racing_correction_has_one_atomic_result(self):
++        original = self.approve()
++        replacement = self.proposal(
++            "replacement", "7", self.day + timedelta(days=1), original
++        )
++        barrier = Barrier(2)
++
++        def worker():
++            close_old_connections()
++            try:
++                barrier.wait(timeout=15)
++                return self.correct(original, replacement).pk
++            finally:
++                connections.close_all()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            identities = list(pool.map(lambda _: worker(), range(2)))
++        self.assertEqual(identities[0], identities[1])
++        self.assertEqual(WriteOffCorrection.objects.count(), 1)
++        self.assertEqual(WriteOffReversal.objects.count(), 1)
++        self.assertEqual(WriteOffDecision.objects.count(), 2)
++        self.assertEqual(SourceRecognitionDraft.objects.count(), 3)
++        first = WriteOffCorrection.objects.get(original=original)
++        date2 = self.day + timedelta(days=2)
++        candidates = [
++            self.proposal(f"race-{n}", str(n), date2, first.replacement) for n in (4, 5)
++        ]
++        barrier2 = Barrier(2)
++
++        def conflicting_worker(index):
++            close_old_connections()
++            try:
++                barrier2.wait(timeout=15)
++                self.correct(
++                    first.replacement,
++                    candidates[index],
++                    effective_date=date2,
++                    idempotency_key=f"race-correction-{index}",
++                )
++                return True
++            except ValidationError:
++                return False
++            finally:
++                connections.close_all()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            winners = list(pool.map(conflicting_worker, range(2)))
++        self.assertEqual(sum(winners), 1)
++        self.assertEqual(WriteOffCorrection.objects.count(), 2)
++        self.assertEqual(WriteOffReversal.objects.count(), 2)
++        self.assertEqual(WriteOffDecision.objects.count(), 3)
++        self.assertEqual(SourceRecognitionDraft.objects.count(), 5)
+--- /dev/null
++++ b/apps/subledgers/writeoff_models.py
+@@ -0,0 +1,102 @@
++"""AP/AR-owned immutable economic correction identity; never a cash authority."""
++
++from django.core.exceptions import ValidationError
++from django.db import models
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class WriteOffCorrectionQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("Write-off correction evidence is immutable.")
++
++    def delete(self):
++        raise ValidationError("Write-off correction evidence cannot be deleted.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("Use the governed write-off service.")
++
++    def bulk_update(self, *args, **kwargs):
++        raise ValidationError("Write-off correction evidence is immutable.")
++
++
++class WriteOffCorrection(UUIDModel, CreatedAtModel):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    original = models.OneToOneField(
++        "subledgers.WriteOffDecision",
++        on_delete=models.PROTECT,
++        related_name="correction_set",
++    )
++    reversal = models.OneToOneField(
++        "subledgers.WriteOffReversal",
++        on_delete=models.PROTECT,
++        related_name="correction_set",
++    )
++    replacement = models.OneToOneField(
++        "subledgers.WriteOffDecision",
++        on_delete=models.PROTECT,
++        related_name="replaces_set",
++        null=True,
++        blank=True,
++    )
++    actor = models.ForeignKey(
++        "organizations.OrganizationMembership", on_delete=models.PROTECT
++    )
++    effective_date = models.DateField()
++    reason = models.TextField()
++    idempotency_key = models.CharField(max_length=120)
++    payload_hash = models.CharField(max_length=64)
++    source_snapshot = models.JSONField()
++    policy_evidence = models.JSONField()
++    accounting_evidence = models.JSONField()
++    objects = WriteOffCorrectionQuerySet.as_manager()
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "idempotency_key"],
++                name="writeoff_correction_idem_uq",
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            original=self.original,
++            reversal=self.reversal,
++            replacement=self.replacement if self.replacement_id else None,
++            actor=self.actor,
++        )
++        if (
++            self.original.decision != "approved"
++            or self.reversal.decision_id != self.original_id
++            or self.reversal.effective_date != self.effective_date
++            or not self.reason.strip()
++        ):
++            raise ValidationError(
++                "Exact original/reversal correction lineage is required."
++            )
++        if self.replacement_id and (
++            self.replacement.decision != "approved"
++            or self.replacement.proposal.corrects_id != self.original_id
++            or self.replacement.proposal.obligation_id
++            != self.original.proposal.obligation_id
++            or self.replacement.proposal.effective_date != self.effective_date
++        ):
++            raise ValidationError(
++                "Replacement must pin the same source and correction date."
++            )
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding or not getattr(self, "_writeoff_service", False):
++            raise ValidationError(
++                "Use the governed write-off service; evidence is immutable."
++            )
++        self.full_clean(validate_constraints=False)
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("Write-off correction evidence cannot be deleted.")
+--- /dev/null
++++ b/apps/subledgers/writeoffs.py
+@@ -0,0 +1,590 @@
++"""Manual AP/AR write-offs and the Human-approved atomic correction contract."""
++
++from datetime import date
++from decimal import Decimal
++from uuid import UUID
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
++from django.db import DatabaseError, transaction
++from django.utils import timezone
++
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.accounting.recognition_services import (
++    _target_matches,
++    prepare_source_recognition,
++)
++from apps.accounts.models import User
++from apps.audit.models import AuditAction
++from apps.audit.services import record_audit_event
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import (
++    Organization,
++    OrganizationMembership,
++    PlatformPolicyVersion,
++)
++from apps.organizations.policy_services import resolve_active_tenant_policy
++from apps.organizations.policy_specs import (
++    SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++    validate_policy_for_consumer,
++)
++
++from .accounting_sources import (
++    _pin,
++    require_source_visibility,
++    validate_active_obligation,
++)
++from .models import (
++    Obligation,
++    WriteOffCorrection,
++    WriteOffDecision,
++    WriteOffProposal,
++    WriteOffReversal,
++)
++from .services import (
++    _amounts_as_of,
++    _canonical_hash,
++    _lock_membership,
++    _lock_organization,
++    _require_unreversed_source,
++)
++
++
++def _authority(
++    organization: Organization, actor: User, obligation: Obligation, permission: str
++) -> OrganizationMembership:
++    membership = require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=obligation.project,
++        message="Explicit scoped AP/AR authority is required.",
++    )
++    require_source_visibility(organization, actor, obligation)
++    return _lock_membership(organization=organization, membership=membership)
++
++
++def _policy(
++    organization: Organization,
++    maker: OrganizationMembership,
++    actor: OrganizationMembership,
++    *,
++    reverse: bool = False,
++) -> dict:
++    version = resolve_active_tenant_policy(
++        organization=organization,
++        policy_code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++    )
++    # Tenant configuration changes share the organization lock. Pin the global
++    # published version as well, so retirement cannot race an accepted action.
++    PlatformPolicyVersion.objects.select_for_update().get(pk=version.pk)
++    version = resolve_active_tenant_policy(
++        organization=organization,
++        policy_code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++    )
++    validate_policy_for_consumer(
++        policy_version=version,
++        expected_policy_code=SUBLEDGER_WRITEOFF_SELF_APPROVAL_POLICY_CODE,
++        consumer="subledgers.writeoff.reverse"
++        if reverse
++        else "subledgers.writeoff.approve",
++    )
++    # Q03 A-Revised: do not silently classify write-offs as Protected or add
++    # mandatory independence when the effective, explicitly selected policy allows it.
++    if maker.pk == actor.pk and not version.parameters["allow_self_approval"]:
++        raise PermissionDenied("The effective policy does not permit Self-Approval.")
++    return {
++        "policy_id": str(version.policy_id),
++        "policy_version_id": str(version.pk),
++        "version": version.version,
++        "parameters": version.parameters,
++        "self_approval_used": maker.pk == actor.pk,
++        "maker_membership": str(maker.pk),
++        "actor_membership": str(actor.pk),
++    }
++
++
++def _obligation(organization: Organization, identity: UUID) -> Obligation:
++    try:
++        return (
++            Obligation.objects.select_for_update(of=("self",))
++            .select_related("project", "party", "control_account_mapping")
++            .get(pk=identity, organization=organization)
++        )
++    except Obligation.DoesNotExist as exc:
++        raise PermissionDenied("Source is outside the active tenant.") from exc
++
++
++def _capacity(obligation: Obligation, effective_date: date) -> None:
++    """Prove the existing cap at every affected chronological boundary."""
++    points = {effective_date}
++    for allocation in obligation.settlement_allocations.select_related("reversal"):
++        points.add(allocation.effective_date)
++        reversal = getattr(allocation, "reversal", None)
++        if reversal:
++            points.add(reversal.effective_date)
++    for proposal in obligation.write_off_proposals.filter(
++        decision__decision="approved"
++    ).select_related("decision__reversal"):
++        points.add(proposal.effective_date)
++        reversal = getattr(proposal.decision, "reversal", None)
++        if reversal:
++            points.add(reversal.effective_date)
++    for cutoff in sorted(point for point in points if point >= effective_date):
++        settled, written = _amounts_as_of(obligation, cutoff)
++        if settled + written > obligation.original_amount or written < Decimal(0):
++            raise ValidationError(
++                "Write-off/settlement capacity would be exceeded at a cutoff."
++            )
++
++
++def max_writeoff_exposure(
++    obligation: Obligation, *, on_or_after: date | None = None
++) -> Decimal:
++    """Reserve existing AP allocation capacity through future write-off boundaries."""
++    if on_or_after is None:
++        from apps.organizations.services import get_organization_settings
++
++        configured = get_organization_settings(organization=obligation.organization)
++        on_or_after = timezone.localdate(timezone=ZoneInfo(configured.timezone))
++    points = {on_or_after}
++    for proposal in obligation.write_off_proposals.filter(
++        decision__decision="approved"
++    ).select_related("decision__reversal"):
++        points.add(proposal.effective_date)
++        reversal = getattr(proposal.decision, "reversal", None)
++        if reversal:
++            points.add(reversal.effective_date)
++    return max(
++        (
++            _amounts_as_of(obligation, cutoff)[1]
++            for cutoff in points
++            if cutoff >= on_or_after
++        ),
++        default=Decimal(0),
++    )
++
++
++def _audit(organization, actor, action, identity, metadata):
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=action,
++        entity_type="subledgers.WriteOffDecision",
++        entity_id=str(identity),
++        metadata=metadata,
++    )
++
++
++def _failure(organization, actor, identity, exc):
++    # Never copy exception text, amounts, reviewer data or foreign source facts.
++    source = WriteOffProposal.objects.filter(
++        pk=identity, organization=organization
++    ).first()
++    if source is None:
++        source = WriteOffDecision.objects.filter(
++            pk=identity, organization=organization
++        ).first()
++    if (
++        source is not None
++        and organization.memberships.filter(user=actor, status="active").exists()
++    ):
++        _audit(
++            organization,
++            actor,
++            AuditAction.SUBLEDGER_WRITEOFF_FAILED,
++            identity,
++            {"failure_class": type(exc).__name__, "retry_requires_revalidation": True},
++        )
++
++
++def _effect(
++    organization: Organization, decision: WriteOffDecision
++) -> SourceRecognitionDraft:
++    try:
++        effect = (
++            SourceRecognitionDraft.objects.select_for_update(of=("self",))
++            .select_related("journal", "mapping")
++            .get(
++                organization=organization,
++                source_kind="writeoff",
++                source_uuid=decision.pk,
++            )
++        )
++    except SourceRecognitionDraft.DoesNotExist as exc:
++        raise ValidationError(
++            "Exact original Accounting occurrence is unavailable."
++        ) from exc
++    if not _target_matches(effect):
++        raise ValidationError(
++            "Original Accounting evidence is consumed or has drifted."
++        )
++    return effect
++
++
++def _make_decision(
++    *, organization, actor, membership, proposal, approve, reason, correction=False
++) -> WriteOffDecision:
++    if not reason.strip():
++        raise ValidationError("A decision reason is required.")
++    obligation = _obligation(organization, proposal.obligation_id)
++    policy = _policy(organization, proposal.proposed_by, membership)
++    if proposal.corrects_id and approve and not correction:
++        raise ValidationError(
++            "A replacement must be approved through the atomic correction set."
++        )
++    _require_unreversed_source(obligation)
++    validate_active_obligation(obligation)
++    if proposal.effective_date < obligation.recognized_on:
++        raise ValidationError("Write-off date predates source recognition.")
++    decision = WriteOffDecision(
++        organization=organization,
++        proposal=proposal,
++        decision="approved" if approve else "rejected",
++        reason=reason.strip(),
++        decided_by=membership,
++        authority_evidence={
++            "policy": policy,
++            "source": _pin(obligation),
++            "proposal_hash": proposal.payload_hash,
++        },
++    )
++    decision._writeoff_service = True
++    decision.save(force_insert=True)
++    if approve:
++        _capacity(obligation, proposal.effective_date)
++        prepare_source_recognition(
++            organization=organization,
++            actor=actor,
++            source_kind="writeoff",
++            source_id=decision.pk,
++            accounting_date=proposal.effective_date,
++        )
++    _audit(
++        organization,
++        actor,
++        AuditAction.SUBLEDGER_WRITEOFF_DECIDED,
++        decision.pk,
++        {
++            "proposal_id": str(proposal.pk),
++            "decision": decision.decision,
++            "policy": policy,
++            "source_version": obligation.source_version,
++        },
++    )
++    return decision
++
++
++def decide_write_off(
++    *,
++    organization: Organization,
++    actor: User,
++    proposal: WriteOffProposal,
++    approve: bool,
++    reason: str,
++) -> WriteOffDecision:
++    try:
++        with transaction.atomic():
++            if type(approve) is not bool or not isinstance(reason, str):
++                raise ValidationError(
++                    "Explicit boolean decision and text reason are required."
++                )
++            organization = _lock_organization(organization)
++            try:
++                proposal = (
++                    WriteOffProposal.objects.select_for_update(of=("self",))
++                    .select_related("proposed_by", "obligation__project")
++                    .get(pk=proposal.pk, organization=organization)
++                )
++            except WriteOffProposal.DoesNotExist as exc:
++                raise PermissionDenied(
++                    "Proposal is outside the active tenant."
++                ) from exc
++            obligation = _obligation(organization, proposal.obligation_id)
++            membership = _authority(
++                organization, actor, obligation, P.SUBLEDGERS_WRITEOFFS_APPROVE
++            )
++            _policy(organization, proposal.proposed_by, membership)
++            existing = getattr(proposal, "decision", None)
++            if existing:
++                if (
++                    existing.decision != ("approved" if approve else "rejected")
++                    or existing.reason != reason.strip()
++                    or existing.decided_by_id != membership.pk
++                ):
++                    raise ValidationError("Conflicting write-off decision replay.")
++                if approve:
++                    _effect(organization, existing)
++                return existing
++            return _make_decision(
++                organization=organization,
++                actor=actor,
++                membership=membership,
++                proposal=proposal,
++                approve=approve,
++                reason=reason,
++            )
++    except (
++        ValidationError,
++        PermissionDenied,
++        DatabaseError,
++        ObjectDoesNotExist,
++    ) as exc:
++        _failure(organization, actor, proposal.pk, exc)
++        raise
++
++
++def correct_write_off(
++    *,
++    organization: Organization,
++    actor: User,
++    original: WriteOffDecision,
++    effective_date: date,
++    reason: str,
++    idempotency_key: str,
++    replacement: WriteOffProposal | None = None,
++) -> WriteOffCorrection:
++    """Exact full inverse and optional approved replacement, all-or-nothing."""
++    identity = original.pk
++    try:
++        with transaction.atomic():
++            organization = _lock_organization(organization)
++            try:
++                original = (
++                    WriteOffDecision.objects.select_for_update(of=("self",))
++                    .select_related(
++                        "proposal__proposed_by", "proposal__obligation__project"
++                    )
++                    .get(pk=identity, organization=organization)
++                )
++            except WriteOffDecision.DoesNotExist as exc:
++                raise PermissionDenied(
++                    "Original is outside the active tenant."
++                ) from exc
++            obligation = _obligation(organization, original.proposal.obligation_id)
++            membership = _authority(
++                organization, actor, obligation, P.SUBLEDGERS_WRITEOFFS_REVERSE
++            )
++            reversal_policy = _policy(
++                organization, original.proposal.proposed_by, membership, reverse=True
++            )
++            if not isinstance(reason, str) or not isinstance(idempotency_key, str):
++                raise ValidationError("Correction reason and identity must be text.")
++            reason, idempotency_key = reason.strip(), idempotency_key.strip()
++            if not reason or not idempotency_key or len(idempotency_key) > 120:
++                raise ValidationError(
++                    "Explicit correction reason and identity are required."
++                )
++            if (
++                type(effective_date) is not date
++                or effective_date < original.proposal.effective_date
++            ):
++                raise ValidationError(
++                    "Correction date must preserve the original effective boundary."
++                )
++            payload = {
++                "original": str(identity),
++                "replacement": str(replacement.pk) if replacement else None,
++                "date": effective_date.isoformat(),
++                "reason": reason,
++                "actor": str(membership.pk),
++            }
++            payload_hash = _canonical_hash(payload)
++            existing = (
++                WriteOffCorrection.objects.select_for_update()
++                .filter(organization=organization, idempotency_key=idempotency_key)
++                .first()
++            )
++            if existing:
++                if existing.payload_hash != payload_hash:
++                    raise ValidationError("Conflicting correction identity/payload.")
++                if existing.original_id != original.pk:
++                    raise ValidationError("Retained correction source does not match.")
++                _pin(obligation)
++                if replacement is not None:
++                    _authority(
++                        organization, actor, obligation, P.SUBLEDGERS_WRITEOFFS_APPROVE
++                    )
++                    retained_replacement = existing.replacement.proposal
++                    if retained_replacement.pk != replacement.pk:
++                        raise ValidationError("Retained replacement does not match.")
++                    _policy(organization, retained_replacement.proposed_by, membership)
++                for value in existing.accounting_evidence.values():
++                    if value is not None:
++                        effect = SourceRecognitionDraft.objects.select_related(
++                            "journal", "mapping"
++                        ).get(organization=organization, pk=value)
++                        if not _target_matches(effect):
++                            raise ValidationError(
++                                "Retained Accounting target drift prevents replay."
++                            )
++                        prepare_source_recognition(
++                            organization=organization,
++                            actor=actor,
++                            source_kind=effect.source_kind,
++                            source_id=effect.source_uuid,
++                            accounting_date=effect.journal.accounting_date,
++                        )
++                return existing
++            if original.decision != "approved" or hasattr(original, "reversal"):
++                raise ValidationError(
++                    "Only an active approved write-off can be corrected once."
++                )
++            _require_unreversed_source(obligation)
++            validate_active_obligation(obligation)
++            original_effect = _effect(organization, original)
++            # Locks/pins the original source and Accounting draft, including hash
++            # and existing prepare permission validation, without a new effect.
++            prepare_source_recognition(
++                organization=organization,
++                actor=actor,
++                source_kind="writeoff",
++                source_id=original.pk,
++            )
++            if replacement is not None:
++                try:
++                    replacement = (
++                        WriteOffProposal.objects.select_for_update(of=("self",))
++                        .select_related("proposed_by")
++                        .get(pk=replacement.pk, organization=organization)
++                    )
++                except WriteOffProposal.DoesNotExist as exc:
++                    raise PermissionDenied(
++                        "Replacement is outside the active tenant."
++                    ) from exc
++                _authority(
++                    organization, actor, obligation, P.SUBLEDGERS_WRITEOFFS_APPROVE
++                )
++                if (
++                    replacement.corrects_id != original.pk
++                    or replacement.obligation_id != obligation.pk
++                    or replacement.effective_date != effective_date
++                    or hasattr(replacement, "decision")
++                ):
++                    raise ValidationError(
++                        "Replacement source/date/predecessor must match exactly."
++                    )
++                _policy(organization, replacement.proposed_by, membership)
++            reversal = WriteOffReversal(
++                organization=organization,
++                decision=original,
++                effective_date=effective_date,
++                reason=reason,
++                reversed_by=membership,
++                authority_evidence={
++                    "policy": reversal_policy,
++                    "source": _pin(obligation),
++                    "original_effect": str(original_effect.pk),
++                },
++            )
++            reversal._writeoff_service = True
++            reversal.save(force_insert=True)
++            reversal_effect = prepare_source_recognition(
++                organization=organization,
++                actor=actor,
++                source_kind="writeoff_reversal",
++                source_id=reversal.pk,
++                accounting_date=effective_date,
++            )
++            replacement_decision = None
++            if replacement is not None:
++                replacement_decision = _make_decision(
++                    organization=organization,
++                    actor=actor,
++                    membership=membership,
++                    proposal=replacement,
++                    approve=True,
++                    reason=reason,
++                    correction=True,
++                )
++            _capacity(obligation, effective_date)
++            replacement_effect = (
++                _effect(organization, replacement_decision)
++                if replacement_decision
++                else None
++            )
++            result = WriteOffCorrection(
++                organization=organization,
++                original=original,
++                reversal=reversal,
++                replacement=replacement_decision,
++                actor=membership,
++                effective_date=effective_date,
++                reason=reason,
++                idempotency_key=idempotency_key,
++                payload_hash=payload_hash,
++                source_snapshot={
++                    **_pin(obligation),
++                    "original_decision": str(original.pk),
++                    "original_amount": str(original.proposal.amount),
++                    "replacement_amount": str(replacement.amount)
++                    if replacement
++                    else None,
++                },
++                policy_evidence={
++                    "reversal": reversal_policy,
++                    "replacement": replacement_decision.authority_evidence
++                    if replacement_decision
++                    else None,
++                },
++                accounting_evidence={
++                    "original": str(original_effect.pk),
++                    "reversal": str(reversal_effect.pk),
++                    "replacement": str(replacement_effect.pk)
++                    if replacement_effect
++                    else None,
++                },
++            )
++            result._writeoff_service = True
++            result.save(force_insert=True)
++            _audit(
++                organization,
++                actor,
++                AuditAction.SUBLEDGER_WRITEOFF_CORRECTED,
++                original.pk,
++                {
++                    "correction_id": str(result.pk),
++                    "reversal_id": str(reversal.pk),
++                    "replacement_id": str(replacement_decision.pk)
++                    if replacement_decision
++                    else None,
++                    "source_version": obligation.source_version,
++                    "effective_date": effective_date.isoformat(),
++                    "policy": reversal_policy,
++                    "accounting": result.accounting_evidence,
++                },
++            )
++            return result
++    except (
++        ValidationError,
++        PermissionDenied,
++        DatabaseError,
++        ObjectDoesNotExist,
++    ) as exc:
++        _failure(organization, actor, identity, exc)
++        raise
++
++
++@transaction.atomic
++def requester_writeoff_status(
++    *, organization: Organization, actor: User, proposal_id: UUID
++) -> dict:
++    organization = _lock_organization(organization)
++    try:
++        proposal = WriteOffProposal.objects.select_related("obligation__project").get(
++            pk=proposal_id, organization=organization, proposed_by__user=actor
++        )
++    except WriteOffProposal.DoesNotExist as exc:
++        raise PermissionDenied("Own proposal is unavailable.") from exc
++    _authority(organization, actor, proposal.obligation, P.SUBLEDGERS_WRITEOFFS_PROPOSE)
++    decision = getattr(proposal, "decision", None)
++    state = decision.decision if decision else "proposed"
++    if decision and hasattr(decision, "reversal"):
++        state = "reversed"
++    return {
++        "proposal_id": str(proposal.pk),
++        "status": state,
++        "amount": str(proposal.amount),
++        "effective_date": proposal.effective_date.isoformat(),
++    }

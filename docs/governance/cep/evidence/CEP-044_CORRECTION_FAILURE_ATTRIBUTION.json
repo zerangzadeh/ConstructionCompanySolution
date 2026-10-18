@@ -1,0 +1,54 @@
+{
+  "scope": "Finding002 implementation validation; not baseline debt",
+  "initial_failures": [
+    {
+      "failure": "Three new tests used incorrect API keywords/Journal field names",
+      "classification": "TEST IMPLEMENTATION ERROR",
+      "resolution": "Corrected proposal_id, effect, accounting_date API usage; initial seven lifecycle cases subsequently passed"
+    },
+    {
+      "failure": "Temporary unrelated allocation tenant-filter edit changed expected refusal exception",
+      "classification": "CEP WORKING CHANGE",
+      "resolution": "Reverted allocation edit; explicit tenant-filter guard is limited to new write-off proposal source path"
+    },
+    {
+      "failure": "Synthetic consumed journal omitted posted-state required fields",
+      "classification": "TEST IMPLEMENTATION ERROR",
+      "resolution": "Use the canonical proposed journal state, retaining database invariants; submitted is not a valid state."
+    },
+    {
+      "failure": "AP source correction test omitted native corrects/date/reason contract",
+      "classification": "TEST IMPLEMENTATION ERROR",
+      "resolution": "Supplied existing AP correction contract arguments"
+    },
+    {
+      "failure": "Concurrent pytest processes sharing reusable test DB deadlocked during flush; following preservation test saw leftover rows",
+      "classification": "TEST INFRASTRUCTURE / AGENT SEQUENCING ERROR",
+      "resolution": "All runs now serial; fresh disposable PostgreSQL rebuilt before final serial verification"
+    },
+    {
+      "failure": "Historical Billing scenario setup relies on obsolete implicit role authority",
+      "classification": "HISTORICAL FIXTURE DEBT REACHED BEFORE CEP044",
+      "resolution": "Explicit test-only membership role assignments and scopes supplied at fixture creation; no production authorization changes"
+    }
+  ],
+  "historical_original_tracebacks": "Initial tool outputs; this attribution summary does not claim retained full logs",
+  "final_required_result": "See CEP-044_VALIDATION_RESULTS.json; no failure converted to PASS",
+  "fresh_disposable_rebuild_run": {
+    "result": "19 passed,1 failed in982.82s",
+    "failure": "Consumed fixture used noncanonical submitted state; no new product failure reached",
+    "resolution": "Changed fixture to existing proposed state; final serial run includes all later source/security/capacity changes"
+  },
+  "expanded_initial_run": {
+    "result": "25 passed,4 failed,10 subtests passed in123.61s",
+    "retained_log": "CEP-044_EXPANDED_INITIAL_OUTPUT.txt",
+    "failures": [
+      "New immutable Decision manager rejects deletion earlier than historical PROTECT expectation; verify both application ValidationError and base-manager PROTECT backstop",
+      "Synthetic non-draft Journal requires canonical precision/rounding version pins; fixture now simulates an already-posted target with all database requirements",
+      "Django transaction flush removed migration-seeded Billing workflow templates; restore exact approved historical catalog callbacks in disposable fixtures",
+      "Evidence runner console used cp1252; stdout now explicitly UTF-8; full captured output was retained"
+    ],
+    "targeted_recheck": "4 passed,5 subtests passed in17.59s",
+    "product_security_or_financial_guards_weakened": false
+  }
+}

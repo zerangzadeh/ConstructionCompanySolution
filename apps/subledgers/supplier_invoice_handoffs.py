@@ -279,6 +279,24 @@ def _reverse(
         raise ValidationError(
             "تعهد مصرف‌شده یا برگشت‌شده نیازمند رفع اثر در مرجع مستقل خود است."
         )
+    # CEP044 retains Accounting L2 evidence separately from the legacy direct
+    # journal field. Preserve the same fail-closed consumed-target boundary.
+    from apps.accounting.recognition_models import SourceRecognitionDraft
+    from apps.accounting.recognition_services import _target_matches
+
+    effects = (
+        SourceRecognitionDraft.objects.select_for_update(of=("self",))
+        .filter(
+            organization=organization,
+            source_kind="ap_invoice",
+            source_uuid=obligation.source_uuid,
+        )
+        .select_related("journal", "mapping")
+    )
+    if any(not _target_matches(effect) for effect in effects):
+        raise ValidationError(
+            "Consumed or drifted Accounting evidence must be resolved by Accounting."
+        )
     if obligation.settlement_allocations.filter(
         reversal__effective_date__gt=effective_date
     ).exists():

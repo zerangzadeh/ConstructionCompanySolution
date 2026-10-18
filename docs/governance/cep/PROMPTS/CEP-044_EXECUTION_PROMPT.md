@@ -35,6 +35,7 @@ Current governance applies:
 - BONIRA Implementation Roadmap
 - BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX
 - BONIRA_CONFIGURATION_PROFILE_MATRIX
+- `docs/governance/cep/supporting/CEP-044_WRITE_OFF_CORRECTION_POLICY.md` — HUMAN-CEP044-CORRECTION-20261019; governing Finding002 correction contract
 
 Package-card source traceability:
 - Frozen PDs: `PD-015; PD-030`
@@ -141,9 +142,12 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
 If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
 
 ## 16. Data / Migration Requirements
-Migration Impact = `NONE`.
-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
-- If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
+Migration Impact = `MINIMUM ADDITIVE PERSISTENCE — DEVELOPMENT / NON-PRODUCTION ONLY`.
+- HUMAN-CEP044-PERSISTENCE-20261019 supersedes the prior NONE constraint only for minimum additive AP/AR-owned write-off correction, reversal, cancellation and replacement lineage persistence required by this CEP's unchanged Scope/AC/DoD.
+- Prepare and execute only the necessary bounded Development / Non-Production migrations; preserve existing obligations, write-off history, audit evidence, grants, source/version lineage and finalized financial history. Persistence must be additive and backward-compatible; no destructive historical overwrite or inferred backfill.
+- Run applicable migration, drift and preservation checks with focused/affected validation. Retain amendment provenance and canonical prompt/hash verification.
+- This migration authority defines no new eligibility, thresholds, automatic behavior, approval depth, recognition/posting, settlement, Treasury or correction semantics. Stop before implementing a material rule absent from canonical sources.
+- Production migration, production cutover, irreversible production mutation, Human Sign-off and Production Certification remain unauthorized.
 
 ## 17. Integration Requirements
 Preserve approved integration semantics and interaction levels. Financial integrations must not silently escalate authority.
@@ -173,14 +177,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=REQUIRED; TENANT-ISOLATION=REQUIRED; WORKFLOW=REQUIRED; INTEGRATION=REQUIRED; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0062:UNIT; DOMAIN; REGRESSION | IMB-0063:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=REQUIRED; TENANT-ISOLATION=REQUIRED; WORKFLOW=REQUIRED; INTEGRATION=REQUIRED; MIGRATION=REQUIRED (authorized additive non-production persistence only); UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0062:UNIT; DOMAIN; REGRESSION | IMB-0063:UNIT; DOMAIN; REGRESSION
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=REQUIRED; TENANT-ISOLATION TEST=REQUIRED; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0062:AP/AR source-family recognition to Accounting: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage. | IMB-0063:Governed AP/AR write-off lifecycle: request/transition tests; authorized/denied actor evidence; status/audit history; governed rejection/cancellation evidence; source-record linkage.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED (authorized additive non-production persistence only); DATA RECONCILIATION=REQUIRED; PERMISSION TEST=REQUIRED; TENANT-ISOLATION TEST=REQUIRED; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0062:AP/AR source-family recognition to Accounting: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage. | IMB-0063:Governed AP/AR write-off lifecycle: request/transition tests; authorized/denied actor evidence; status/audit history; governed rejection/cancellation evidence; source-record linkage.
 
 Execution must produce:
 - `CEP-044_EXECUTION_MANIFEST.md`

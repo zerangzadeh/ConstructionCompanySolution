@@ -62,17 +62,17 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 49
+  execution_state_complete: 50
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 0
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 28
+  not_started_other_current_governed: 27
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
-  last_updated: '2026-10-18'
+  last_updated: '2026-10-19'
   remote_main_complete_count_status: REQUIRES_FULL_REPORT_RECONCILIATION
 gates:
   GATE-01:
@@ -106,9 +106,9 @@ gates:
     updated_at: '2026-10-17'
   GATE-05:
     status: NOT_PASSED
-    evaluated_at: '2026-10-18'
-    evidence: docs/governance/cep/evidence/CEP-043_GATE05_EVALUATION.json
-    note: CEP043 IMB0061 contract-build contribution verified; actual EXT0013 tenant mappings remain inactive. Prior CEP042 contributions retained; other required contracts remain incomplete or unverified. GATE05 remains NOT_PASSED; no production or UAT convergence inferred.
+    evaluated_at: '2026-10-19'
+    evidence: docs/governance/cep/evidence/CEP-044_GATE05_EVALUATION.json
+    note: CEP044 IMB0062 source-family L2 contribution verified; prior contributor reviews retained. Other required contracts remain incomplete or unverified. No global convergence PASS, tenant activation, UAT or production authority inferred.
 authorization_batches:
   AUTH-BATCH-003:
     execution_mode: SERIAL
@@ -172,6 +172,21 @@ human_decisions:
     authority: HUMAN_DECISION_AUTHORITY / Product Owner
     status: APPROVED
     scope: Finding002 A/B approved with AP-owned enrollment/version/withdrawal and Payroll-linked AP correction/reversal/replacement clarifications
+    production_authorized: false
+    git_writes_authorized: false
+  HUMAN-CEP044-PERSISTENCE-20261019:
+    source: docs/governance/cep/evidence/CEP-044_HUMAN_MIGRATION_AUTHORIZATION.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED
+    scope: Minimum additive AP/AR write-off correction/reversal/cancellation/replacement lineage persistence and bounded Development/Non-Production migrations; migration-only canonical amendment
+    unresolved_material_semantics_must_stop: true
+    production_authorized: false
+    git_writes_authorized: false
+  HUMAN-CEP044-CORRECTION-20261019:
+    source: docs/governance/cep/supporting/CEP-044_WRITE_OFF_CORRECTION_POLICY.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED
+    scope: Finding002 full exact write-off reversal and optional replacement atomic correction set; explicit date, retained lineage, idempotency, existing permission/Self-Approval and exact Accounting boundary
     production_authorized: false
     git_writes_authorized: false
 registry_update_rules:
@@ -2183,15 +2198,16 @@ ceps:
       path: docs/governance/cep/reports/CEP-043_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: f0034b5589a2155547100aeac425f709c5e53722
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: VERIFIED_DIRECT_MAIN_CHECKPOINT
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: da01c850b6fbacf41c793548426cb53e9bbc6813
-    updated_at: '2026-10-18'
+    updated_at: '2026-10-19'
     history:
     - date: '2026-10-18'
       status: DEPENDENCY_READY
@@ -2229,40 +2245,83 @@ ceps:
     - date: '2026-10-18'
       status: COMPLETE
       reason: EXECUTION COMPLETE;6/6 AC and IMB0061 scoped DoD PASS. Immutable prospective AP enrollment and AP draft-only consumption; separately authorized AP recognition, exact retained source/version/economic identity, atomic reversal/replacement and consumed-target refusal. Final focused/affected regression45 tests plus28 subtests PASS including PostgreSQL creation/correction races; populated migration preservation PASS; local migration/drift/lint/system checks PASS. Findings001/002 resolved by explicit Human decisions; baseline fixture debt and remaining UTV preserved. EXT0013 tenant activation remains fail-closed; GATE05 NOT_PASSED. No Git writes, production, Human Sign-off or certification.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Existing direct main checkpoint f0034b5589a2155547100aeac425f709c5e53722 verified against origin/main and git ls-remote main; single parent is execution baseline da01c850b6fbacf41c793548426cb53e9bbc6813; initial tree/diffs empty. Commit message cep-044 contains the 52 declared CEP043 paths, not CEP044 implementation. No merge or new Git writes. Execution baseline, 6/6 AC, DoD, debt, UTV and GATE05 result preserved. See CEP-044_ENTRY.json.
   CEP-044:
-    title: null
+    title: AP/AR recognition and write-off governance
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-CEP044-PERSISTENCE-20261019
+      source: Explicit Human minimum additive non-production persistence/migrations and migration-only amendment; material absent semantics must stop
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 12
+      total: 12
+      status: PASS
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - performance_concurrency_runtime
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-044_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
+      pushed: false
+      merged_to_main: false
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: f0034b5589a2155547100aeac425f709c5e53722
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: DEPENDENCY_READY
+      reason: All 79 local prompt hashes and prerequisite sets verified against canonical dependency register. CEP008 COMPLETE; no external dependency; GATE05 NOT_PASSED is exit-only. Local HEAD, origin/main, remote main match; prior CEP043 checkpoint reconciled. Full seam eligibility is independently evaluated under standing non-production authority.
+    - date: '2026-10-19'
+      status: FAILED
+      reason: EXECUTION FAILED AT ENTRY before product mutation. Finding001 identifies missing AP/AR-owned correction/replacement source lineage in existing immutable WriteOffProposal/Decision/Reversal persistence; downstream Accounting predecessor or generic audit/workflow JSON cannot become source authority. Canonical Migration Impact NONE prevents required additive source relation. AC 0/12 PASS, all blocked/not executed; DoD NOT MET. Prerequisite baseline 8 tests / 28 subtests PASS only; no implementation/integration/regression or migration PASS claimed.
+    - date: '2026-10-19'
+      status: BLOCKED
+      reason: BLOCKER-MIGRATION requires bounded Human minimum additive Development/Non-Production write-off correction-lineage persistence/migration and migration-only canonical amendment/rehash, or approved existing no-migration source contract. No product/schema/data/permission/catalog or Git writes. Workflow catalog absence alone ruled out as unavoidable migration because existing superuser catalog admin provides configuration. GATE05, debt and UTV preserved; serial queue stopped and independent candidates remain unreviewed.
+    - date: '2026-10-19'
+      status: AUTHORIZED
+      reason: HUMAN-CEP044-PERSISTENCE-20261019 confirms source lineage in scope and approves minimum additive Development/Non-Production persistence/migrations and migration-only canonical amendment. Scope/AC/DoD/dependencies and recognition/approval/settlement semantics unchanged. Missing material lifecycle semantics must stop; no production or new Git authority.
+    - date: '2026-10-19'
+      status: BLOCKER_RESOLVED
+      reason: Finding001 migration restriction superseded only to approved extent. Prompt sections16/21/22 amended only for bounded migration impact/execution/evidence; other27 sections byte-identical. Old/new SHA256 retained in CEP-044_AMENDMENT.json; manifest and all79 identities reverified.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Same main f0034b5589a2155547100aeac425f709c5e53722; attributable prior15 governance paths preserved. Bounded source correction lineage persistence reviewed before mutation. No new financial lifecycle, posting, approval, settlement, cancellation or threshold rule inferred from migration authority.
+    - date: '2026-10-19'
+      status: MIGRATION_STATE_CHANGED
+      reason: Authorized additive subledgers0007 applied only to configured loopback Development PostgreSQL/Psycopg3. Every pre-existing column count/SHA256 across515 managed tables unchanged; no new correction links, backfill, grants/catalog or financial history mutation. Populated disposable legacy approved/rejected/reversal history preserved across rollback/reapply; used-lineage rollback refused. See CEP-044_DEVELOPMENT_MIGRATION.json and MIGRATION_TRACE.
+    - date: '2026-10-19'
+      status: PARTIAL
+      reason: EXECUTION PARTIAL. Minimum nullable protected source predecessor persistence and tenant/obligation/actor/immutability validation implemented; no monetary transition activated. Focused6 tests plus10 subtests, populated migration1 test, affected boundary/prerequisite12 tests plus28 subtests PASS. Drift/lint/system checks PASS for bounded persistence. All12 package AC incomplete,0/12 PASS; scoped DoD NOT MET. Initial new bulk-update guard failure fixed; baseline debt/UTV preserved.
+    - date: '2026-10-19'
+      status: BLOCKED
+      reason: Finding002 BLOCKER-SPEC under Human decision item8. PD015/SPEC024/matrix and accepted P3 Q03/as-of/journey sources do not select full reversal-plus-replacement versus adjustment or the coupled atomic effective-date boundary. Exact proposed minimum financial correction contract retained in Finding002/SEMANTIC_REVIEW for Human approval; not implemented. Finding001 remains resolved and bounded migration authority valid. GATE05 remains NOT_PASSED; serial queue stopped. No Git writes or production action.
+    - date: '2026-10-19'
+      status: BLOCKER_RESOLVED
+      reason: Human Product Decision HUMAN-CEP044-CORRECTION-20261019 approves Finding002 with full exact write-off reversal plus optional corrected replacement, atomic set, one explicit correction date, exact lineage/idempotency and existing scoped permission/Self-Approval/Accounting guards. Underlying obligation and Treasury facts remain unchanged. Local supporting policy retained verbatim and section3 source reference/hash updated only; other29 sections unchanged.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Same main f0034b5589a2155547100aeac425f709c5e53722 and attributable40 prior CEP044 paths preserved. Minimum remaining correction evidence persistence, explicit source-family L2 adapters and approved manual write-off lifecycle implementation under existing bounded non-production authority; no new default grants, thresholds, posting authority or Protected classification.
+    - date: '2026-10-19'
+      status: MIGRATION_STATE_CHANGED
+      reason: Authorized additive subledgers0008 applied only to configured loopback Development PostgreSQL/Psycopg3. Two authority JSON columns and immutable correction-set table; all pre-existing table columns/counts/digests preserved. No inferred backfill, policy selection, grants or finalized financial changes. Populated correction/authority rollback refuses forward-history loss.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: EXECUTION COMPLETE; all12 AC and scoped DoD verified. Explicit closed native Billing AR, Billing AP and supplier-invoice AP L2 adapters plus manual write-off approval/rejection and atomic exact reversal/optional replacement; policy/permission/object/tenant checks, lineage, effective-date cutoffs, replay/conflicting races, rollback/retry, audit and requester confidentiality proved. See final validation, migration/preservation and integration trace. Required lint/format/system/drift checks pass. Findings001/002 resolved; historical failures and baseline debt retained. GATE05 remains NOT_PASSED; runtime UTV and production restrictions unchanged. Git integration is separate from this execution verdict.
   CEP-045:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3873,11 +3932,11 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: da01c850b6fbacf41c793548426cb53e9bbc6813
-  origin_main: da01c850b6fbacf41c793548426cb53e9bbc6813
-  integration_checkpoint: da01c850b6fbacf41c793548426cb53e9bbc6813
+  last_reconciled_head: f0034b5589a2155547100aeac425f709c5e53722
+  origin_main: f0034b5589a2155547100aeac425f709c5e53722
+  integration_checkpoint: f0034b5589a2155547100aeac425f709c5e53722
   integration_method: DIRECT_COMMIT_TO_MAIN
-  last_reconciled_at: '2026-10-18'
+  last_reconciled_at: '2026-10-19'
 execution_frontier:
   standing_authority_active: true
   execution_mode: SERIAL_BY_DEFAULT
@@ -3903,17 +3962,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CLEAN_COMPLETED_CEP043_OPERATIONAL_BOUNDARY
+  current_session_continuation: RESUMED_CEP044_CORRECTION_CONTRACT
   current_independent_cep: null
-  next_entry_review_candidate: CEP-044
-  next_candidate_full_entry_eligibility: NOT_YET_VERIFIED
+  next_entry_review_candidate: null
+  next_candidate_full_entry_eligibility: RESUMED_APPROVED_CORRECTION_CONTRACT
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Completed financial package with52 uncommitted paths and AP/Accounting overlap;34-minute migration validation cost; retain reviewable checkpoint
-  resume_cep_after_blocker_resolution: null
+  boundary_reason: Finding002 requires Human approval of the write-off financial correction and atomic effective-date contract; persistence authority does not define it
+  resume_cep_after_blocker_resolution: CEP-044
   independent_candidates_entry_status: NOT_REVIEWED
   production_authorized: false
   human_signoff_executed: false

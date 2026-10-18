@@ -1,0 +1,9 @@
+{
+  "initial_result": "1 failed,5 passed,10 subtests passed",
+  "scope": "New WriteOffLineageTests immutable-source bulk bypass case",
+  "failure": "Inherited QuerySet.bulk_update enters atomic(savepoint=False) before overridden update raises ValidationError, marking surrounding test transaction for rollback; later read raises TransactionManagementError",
+  "classification": "NEW IMPLEMENTATION GUARD FAILURE; fixed, not baseline debt",
+  "fix": "Explicit early bulk_update guard added before Django internal atomic path",
+  "validated_result": "6 passed,10 subtests passed",
+  "full_original_log_retained": "Initial tool output only; summary retained here; no claim of archived full traceback"
+}

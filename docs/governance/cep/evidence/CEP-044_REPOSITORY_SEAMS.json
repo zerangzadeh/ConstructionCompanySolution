@@ -1,0 +1,576 @@
+{
+  "date": "2026-10-19",
+  "models": {
+    "subledgers.Obligation": {
+      "table": "subledgers_obligation",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "direction": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_kind": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_uuid": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "source_version": {
+          "type": "PositiveIntegerField",
+          "target": null,
+          "null": false
+        },
+        "source_line_key": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_status": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_hash": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_snapshot": {
+          "type": "JSONField",
+          "target": null,
+          "null": false
+        },
+        "party": {
+          "type": "ForeignKey",
+          "target": "parties.BusinessParty",
+          "null": true
+        },
+        "party_name_snapshot": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "party_tax_identifier_snapshot": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "project": {
+          "type": "ForeignKey",
+          "target": "projects.Project",
+          "null": true
+        },
+        "contract": {
+          "type": "ForeignKey",
+          "target": "contracts.Contract",
+          "null": true
+        },
+        "currency": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "original_amount": {
+          "type": "DecimalField",
+          "target": null,
+          "null": false
+        },
+        "recognized_on": {
+          "type": "DateField",
+          "target": null,
+          "null": false
+        },
+        "due_date": {
+          "type": "DateField",
+          "target": null,
+          "null": true
+        },
+        "idempotency_key": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "payload_hash": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "recognized_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        },
+        "recognition_journal": {
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry",
+          "null": true
+        },
+        "control_account": {
+          "type": "ForeignKey",
+          "target": "accounting.Account",
+          "null": true
+        },
+        "control_account_mapping": {
+          "type": "ForeignKey",
+          "target": "accounting.ControlAccountMappingVersion",
+          "null": true
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "direction",
+        "source_kind",
+        "source_uuid",
+        "source_version",
+        "source_line_key",
+        "source_status",
+        "source_hash",
+        "source_snapshot",
+        "party_name_snapshot",
+        "party_tax_identifier_snapshot",
+        "currency",
+        "original_amount",
+        "recognized_on",
+        "due_date",
+        "idempotency_key",
+        "payload_hash",
+        "contract_id",
+        "organization_id",
+        "party_id",
+        "project_id",
+        "recognition_journal_id",
+        "recognized_by_id",
+        "control_account_id",
+        "control_account_mapping_id"
+      ]
+    },
+    "subledgers.WriteOffProposal": {
+      "table": "subledgers_writeoffproposal",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "obligation": {
+          "type": "ForeignKey",
+          "target": "subledgers.Obligation",
+          "null": false
+        },
+        "amount": {
+          "type": "DecimalField",
+          "target": null,
+          "null": false
+        },
+        "effective_date": {
+          "type": "DateField",
+          "target": null,
+          "null": false
+        },
+        "reason": {
+          "type": "TextField",
+          "target": null,
+          "null": false
+        },
+        "idempotency_key": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "payload_hash": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "proposed_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "amount",
+        "effective_date",
+        "reason",
+        "idempotency_key",
+        "payload_hash",
+        "obligation_id",
+        "organization_id",
+        "proposed_by_id"
+      ]
+    },
+    "subledgers.WriteOffDecision": {
+      "table": "subledgers_writeoffdecision",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "proposal": {
+          "type": "OneToOneField",
+          "target": "subledgers.WriteOffProposal",
+          "null": false
+        },
+        "decision": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "reason": {
+          "type": "TextField",
+          "target": null,
+          "null": false
+        },
+        "decided_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        },
+        "journal": {
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry",
+          "null": true
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "decision",
+        "reason",
+        "decided_by_id",
+        "journal_id",
+        "organization_id",
+        "proposal_id"
+      ]
+    },
+    "subledgers.WriteOffReversal": {
+      "table": "subledgers_writeoffreversal",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "decision": {
+          "type": "OneToOneField",
+          "target": "subledgers.WriteOffDecision",
+          "null": false
+        },
+        "effective_date": {
+          "type": "DateField",
+          "target": null,
+          "null": false
+        },
+        "reason": {
+          "type": "TextField",
+          "target": null,
+          "null": false
+        },
+        "reversed_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        },
+        "journal": {
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry",
+          "null": true
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "effective_date",
+        "reason",
+        "decision_id",
+        "journal_id",
+        "organization_id",
+        "reversed_by_id"
+      ]
+    },
+    "accounting.SourceRecognitionDraft": {
+      "table": "accounting_sourcerecognitiondraft",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "source_kind": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_uuid": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "source_event": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_version_reference": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "source_snapshot": {
+          "type": "JSONField",
+          "target": null,
+          "null": false
+        },
+        "source_sha256": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "mapping": {
+          "type": "ForeignKey",
+          "target": "accounting.RecognitionMappingVersion",
+          "null": false
+        },
+        "journal": {
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry",
+          "null": false
+        },
+        "predecessor": {
+          "type": "ForeignKey",
+          "target": "accounting.SourceRecognitionDraft",
+          "null": true
+        },
+        "is_reversal": {
+          "type": "BooleanField",
+          "target": null,
+          "null": false
+        },
+        "created_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        },
+        "target_snapshot": {
+          "type": "JSONField",
+          "target": null,
+          "null": false
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "source_kind",
+        "source_uuid",
+        "source_event",
+        "source_version_reference",
+        "source_snapshot",
+        "source_sha256",
+        "is_reversal",
+        "target_snapshot",
+        "created_by_id",
+        "journal_id",
+        "mapping_id",
+        "organization_id",
+        "predecessor_id"
+      ]
+    },
+    "workflows.WorkflowInstance": {
+      "table": "workflows_workflowinstance",
+      "fields": {
+        "id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "created_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "updated_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": false
+        },
+        "organization": {
+          "type": "ForeignKey",
+          "target": "organizations.Organization",
+          "null": false
+        },
+        "definition": {
+          "type": "ForeignKey",
+          "target": "workflows.WorkflowDefinition",
+          "null": false
+        },
+        "version": {
+          "type": "ForeignKey",
+          "target": "workflows.WorkflowVersion",
+          "null": false
+        },
+        "subject_type": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "subject_id": {
+          "type": "UUIDField",
+          "target": null,
+          "null": false
+        },
+        "subject_context": {
+          "type": "JSONField",
+          "target": null,
+          "null": false
+        },
+        "processed_operations": {
+          "type": "JSONField",
+          "target": null,
+          "null": false
+        },
+        "status": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "idempotency_key": {
+          "type": "CharField",
+          "target": null,
+          "null": false
+        },
+        "started_by": {
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership",
+          "null": false
+        },
+        "completed_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": true
+        },
+        "cancelled_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": true
+        },
+        "suspended_at": {
+          "type": "DateTimeField",
+          "target": null,
+          "null": true
+        },
+        "suspension_reason": {
+          "type": "TextField",
+          "target": null,
+          "null": false
+        },
+        "cancellation_reason": {
+          "type": "TextField",
+          "target": null,
+          "null": false
+        }
+      },
+      "physical_columns": [
+        "id",
+        "created_at",
+        "updated_at",
+        "subject_type",
+        "subject_id",
+        "subject_context",
+        "processed_operations",
+        "status",
+        "idempotency_key",
+        "completed_at",
+        "cancelled_at",
+        "suspended_at",
+        "suspension_reason",
+        "cancellation_reason",
+        "definition_id",
+        "organization_id",
+        "started_by_id",
+        "version_id"
+      ]
+    }
+  },
+  "guards": {
+    "approve_write_off": "Existing policy-absent guard raises ValidationError/P3-S27-Q03; no writes",
+    "reverse_write_off": "Existing policy-absent guard raises ValidationError/P3-S27-Q03; no writes"
+  },
+  "source_file_sha256": {
+    "apps/subledgers/models.py": "4a5081cf653f2574c6197bc600bdc4e93955a1e1bf7443067797bd484ca92511",
+    "apps/subledgers/services.py": "8d91a70cde44dc3149f251b8d354c6a347d154e02358a59dc7df30c68276cc7a",
+    "apps/accounting/recognition_models.py": "625bd6b90f28223cc5aba9986e06483f14ab34a41229135b4f3e5f06fcc7e8ac",
+    "apps/accounting/recognition_services.py": "b4568c71108455ac5a2bf8c1f95c22247e99939f5606444cd0fecb27b4ae7ee1",
+    "apps/accounting/recognition_sources.py": "738e56e3850a605ecbc967c9972f9206a66609e5cc598939bf2d89480f3eef78",
+    "apps/workflows/admin.py": "d027689c6a37320d4f6bb82ae70b23a400507417d7f4871b3a237617a3980c7e",
+    "apps/workflows/models.py": "4d9c13bd9c419a3106fdd72d1eb7cea74e885c41819b8e8955460e41af060b07",
+    "apps/workflows/services.py": "d5a884f447c135160029f3d5ba4912cfe11c1c1809cfb10c8afdae93a82d9efa"
+  },
+  "finding": "WriteOffProposal has no predecessor/supersedes/corrects/replacement source relation or structured correction context. WriteOffReversal links only to old WriteOffDecision. Obligation is immutable and identifies upstream Billing/Procurement/Payroll source, not write-off replacement. SourceRecognitionDraft.predecessor retains downstream Accounting lineage, not AP/AR source correction authority. WorkflowInstance and audit are coordination/evidence; neither is approved write-off business authority.",
+  "minimum_resolution": "Authorize minimum additive AP/AR-owned write-off correction/replacement source-lineage persistence and bounded Development/Non-Production migration, with migration-only canonical prompt amendment and manifest rehash; alternatively provide an approved existing no-migration source-lineage contract. No additional business/recognition/approval defaults inferred.",
+  "catalog_review": "No migration blocker asserted solely from workflow catalog absence: existing SystemCatalogAdmin can provision code-registered types.",
+  "database_mutations": false,
+  "product_mutations": false
+}

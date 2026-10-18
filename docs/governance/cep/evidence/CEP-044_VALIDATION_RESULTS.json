@@ -1,0 +1,40 @@
+{
+  "FOCUSED": {
+    "argv": [
+      "-m",
+      "pytest",
+      "apps/subledgers/test_cep044_lineage.py",
+      "apps/subledgers/test_cep044_writeoffs.py",
+      "apps/subledgers/test_cep044_billing.py",
+      "apps/subledgers/test_cep044_migration.py",
+      "-q",
+      "--reuse-db",
+      "--disable-warnings",
+      "--tb=short"
+    ],
+    "exit_code": 0,
+    "summary": [
+      "29 passed, 10 subtests passed in 143.77s (0:02:23)"
+    ]
+  },
+  "AFFECTED": {
+    "argv": [
+      "-m",
+      "pytest",
+      "apps/accounting/test_cep008_recognition_registry.py",
+      "apps/accounting/test_cep042_recognition.py",
+      "apps/organizations/test_p1_s15_policy_localization.py",
+      "apps/subledgers/tests.py::SubledgerFoundationTests",
+      "apps/subledgers/test_cep033_invoice_handoff.py::SupplierInvoiceAPHandoffTests",
+      "apps/subledgers/test_cep043_payroll_handoff.py::PayrollAPHandoffTests",
+      "-q",
+      "--reuse-db",
+      "--disable-warnings",
+      "--tb=short"
+    ],
+    "exit_code": 0,
+    "summary": [
+      "71 passed, 35 subtests passed in 118.79s (0:01:58)"
+    ]
+  }
+}

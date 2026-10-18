@@ -8,21 +8,32 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
-    PAYROLL_AP_ENROLLMENT_PREPARED = "payroll_ap.enrollment_prepared", "تهیه ثبت بدهی حقوق در AP"
-    PAYROLL_AP_ENROLLMENT_CHANGED = "payroll_ap.enrollment_changed", "فعال‌سازی یا توقف بدهی حقوق در AP"
+    PAYROLL_AP_ENROLLMENT_PREPARED = (
+        "payroll_ap.enrollment_prepared",
+        "تهیه ثبت بدهی حقوق در AP",
+    )
+    PAYROLL_AP_ENROLLMENT_CHANGED = (
+        "payroll_ap.enrollment_changed",
+        "فعال‌سازی یا توقف بدهی حقوق در AP",
+    )
     PAYROLL_AP_OPERATION = "payroll_ap.operation", "پیش‌نویس یا اصلاح بدهی حقوق در AP"
     PAYROLL_AP_FAILED = "payroll_ap.failed", "تلاش ناموفق تحویل بدهی حقوق"
     PAYROLL_AP_RECONCILED = "payroll_ap.reconciled", "تطبیق بدهی حقوق و AP"
 
     SUPPLIER_INVOICE_AP_FAILED = (
-        "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
+        "subledgers.invoice_ap_failed",
+        "انتقال منبع صورتحساب به AP ناموفق بود",
     )
     SUPPLIER_INVOICE_AP_REVERSED = (
-        "subledgers.invoice_ap_reversed", "منبع تعهد صورتحساب AP برگشت شد"
+        "subledgers.invoice_ap_reversed",
+        "منبع تعهد صورتحساب AP برگشت شد",
     )
     TENDER_BID_CREATED = "commercial.tender_bid_created", "فرصت مناقصه ثبت شد"
     TENDER_BID_REVISED = "commercial.tender_bid_revised", "نسخه مناقصه ثبت شد"
-    TENDER_BID_EVIDENCE_LINKED = "commercial.tender_bid_evidence_linked", "شاهد مناقصه پیوند شد"
+    TENDER_BID_EVIDENCE_LINKED = (
+        "commercial.tender_bid_evidence_linked",
+        "شاهد مناقصه پیوند شد",
+    )
     TREASURY_ACCOUNT_CREATED = "treasury.account_created", "حساب خزانه‌داری ایجاد شد"
     TREASURY_ACCOUNT_TRANSITIONED = (
         "treasury.account_transitioned",
@@ -126,6 +137,12 @@ class AuditAction(models.TextChoices):
     SUBLEDGER_WRITEOFF_PROPOSED = (
         "subledger.writeoff_proposed",
         "پیشنهاد سوخت AP/AR ثبت شد",
+    )
+    SUBLEDGER_WRITEOFF_DECIDED = "subledger.writeoff_decided", "تصمیم سوخت AP/AR"
+    SUBLEDGER_WRITEOFF_CORRECTED = "subledger.writeoff_corrected", "اصلاح سوخت AP/AR"
+    SUBLEDGER_WRITEOFF_FAILED = (
+        "subledger.writeoff_failed",
+        "عملیات سوخت AP/AR ناموفق بود",
     )
     SUBLEDGER_AGING_RETAINED = (
         "subledger.aging_retained",
@@ -1617,13 +1634,31 @@ class AuditAction(models.TextChoices):
     PRICE_BOOK_IMPORTED = "estimates.price_book_imported", "نسخه فهرست‌بها وارد شد"
     PRICE_BOOK_ACTIVATED = "estimates.price_book_activated", "منبع فهرست‌بها تأیید شد"
     PRICE_BOOK_MAPPED = "estimates.price_book_mapped", "نگاشت فهرست‌بها ثبت شد"
-    VARIATION_BILLING_ACCEPTED = "billing.variation_accepted", "رخداد اهلیت منبع تغییر ثبت شد"
+    VARIATION_BILLING_ACCEPTED = (
+        "billing.variation_accepted",
+        "رخداد اهلیت منبع تغییر ثبت شد",
+    )
     VARIATION_BILLING_FAILED = "billing.variation_failed", "پذیرش منبع تغییر ناموفق بود"
-    ACCOUNTING_RECOGNITION_MAPPING_PREPARED = "accounting.recognition_mapping_prepared", "نگاشت شناسایی تهیه شد"
-    ACCOUNTING_RECOGNITION_MAPPING_APPROVED = "accounting.recognition_mapping_approved", "نگاشت شناسایی پذیرفته شد"
-    ACCOUNTING_SOURCE_RECOGNIZED = "accounting.source_recognized", "پیش‌نویس شناسایی منبع تهیه شد"
-    ACCOUNTING_SOURCE_RECOGNITION_FAILED = "accounting.source_recognition_failed", "پذیرش منبع شناسایی ناموفق بود"
-    ACCOUNTING_SOURCE_RECONCILED = "accounting.source_reconciled", "منبع شناسایی تطبیق شد"
+    ACCOUNTING_RECOGNITION_MAPPING_PREPARED = (
+        "accounting.recognition_mapping_prepared",
+        "نگاشت شناسایی تهیه شد",
+    )
+    ACCOUNTING_RECOGNITION_MAPPING_APPROVED = (
+        "accounting.recognition_mapping_approved",
+        "نگاشت شناسایی پذیرفته شد",
+    )
+    ACCOUNTING_SOURCE_RECOGNIZED = (
+        "accounting.source_recognized",
+        "پیش‌نویس شناسایی منبع تهیه شد",
+    )
+    ACCOUNTING_SOURCE_RECOGNITION_FAILED = (
+        "accounting.source_recognition_failed",
+        "پذیرش منبع شناسایی ناموفق بود",
+    )
+    ACCOUNTING_SOURCE_RECONCILED = (
+        "accounting.source_reconciled",
+        "منبع شناسایی تطبیق شد",
+    )
 
 
 class AuditEventQuerySet(models.QuerySet):

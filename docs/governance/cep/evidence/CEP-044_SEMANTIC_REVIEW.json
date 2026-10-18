@@ -1,0 +1,93 @@
+{
+  "authority": "HUMAN-CEP044-PERSISTENCE-20261019 item8; migration approval does not define correction financial semantics",
+  "approved_sources": {
+    "docs\\architecture\\P3_S23_S27_IMPLEMENTATION_CONTRACT.md": {
+      "sha256": "31814d8473b086bd1151ce63879f5a3e63ad7c57155e362d4ab1d507aff11f5d",
+      "as_of_and_correction": " and as-of semantics\n\nAging is an exact retained projection, not a mutable balance. `as_of_date`\nincludes obligations recognized on or before that date and subtracts only active\nallocations/write-offs whose effective date is on or before it. Later reversals\nrestore the amount from their effective reversal date; they do not rewrite an\nearlier as-of result. Future-dated facts are excluded.\n\nThe snapshot records Tenant, direction, as-of date, obligation IDs, exact per-item\noriginal/settled/written-off/outstanding amounts, due date, days past due when a\nsource supplied the date, undated status, totals, canonical hash and idempotency\nkey. It does not invent buckets. Any bucketed presentation remains blocked until\nthe Product Owner approves exact boundaries.\n\n## 7. Correction, reversal, and reconciliation\n\nRecognized obligations are not silently edited, voided or deleted. A source\ncorrection requires a separately registered source-correction contract that\ncreates linked adjustment/reversal evidence and, when applicable, a linked\nAccounting reversal. Settlement reversal and write-off reversal require a reason,\nauthorized actor, unique occurrence and an open applicable fiscal boundary if a\njournal is involved. A cash refund is a separate Treasury movement.\n\nAP/AR reconciliation retains exact as-of population, active allocation/write-off\nIDs, source and journal identities, subledger totals, supplied posted GL control\ntotals, differences, exception facts and a canonical hash. It never posts,\nadjusts, signs off or applies a tolerance. Missing mappings/journals are explicit\nexceptions rather than fabricated balances.\n\n"
+    },
+    "docs\\architecture\\P3_S23_S27_ACTIVATION_DECISION_PACKET.md": {
+      "sha256": "c905bec60940044a42655925a6970376cc8c2c94c478cb63335dffa3ebd66327",
+      "Q03": " — Write-off authority, permissions and separation\n\n### Decision closed\n\nThe decision defines who may propose, approve and reverse an AP/AR write-off; which roles receive\nthe existing permissions by default; whether Self-Approval is ever allowed; and\nwhether authorization varies by amount or object scope. No monetary threshold is\ncurrently approved.\n\n### Options\n\n| Option | Complete product choice | Consequences |\n| --- | --- | --- |\n| **A-Revised — Accepted Platform/Tenant policy governs Self-Approval/SoD (accepted)** | Keep `subledgers.writeoffs_propose` in the existing Accountant default set. Give `subledgers.writeoffs_approve` and `subledgers.writeoffs_reverse` **no default-role grant**; assign them explicitly through the existing authorization and object-scope model. The already accepted Platform/Tenant Self-Approval policy governs approval and reversal. Where applicable policy requires independent approval, proposer and approver must be different active authorized memberships. Self-Approval is absolutely prohibited only when the operation is explicitly classified as a Protected Operation under accepted platform policy; this decision does **not** classify write-off or reversal as Protected Operations. Introduce no monetary or cumulative threshold. Missing required authorization or Self-Approval configuration fails closed. | Approval and reversal services must evaluate the effective versioned policy and exact object scope inside the transaction. Every decision remains versioned and auditable and retains exact Accounting/subledger lineage. No role, position or source approval implies write-off authority. No numeric policy field or reversal-request schema is authorized by this decision. |\n| B — Default senior-role approval | Accountant proposes; Owner/Admin receive approval and reversal by default; proposer and approver differ, but reversal is a single authorized action. No amount threshold. | Easier setup, but broad default grants expand financial authority and single-actor reversal provides weaker control. Role membership still cannot bypass object scope. |\n| C — Threshold-based delegated authority | Permit Self-Approval or role-specific approval below an approved amount and require independent approval above it; apply equivalent bands to reversal. | Supports higher-volume operations but cannot be implemented until the Product Owner supplies exact amounts, inclusivity, currency/basis, aggregation window, object scope and fallback behavior. No values may be inferred. |\n\n**Decision:** **Q03 = A-Revised — accepted.** It uses the permissions already\ncatalogued, preserves the accepted policy-owned distinction between Protected and\nother business operations, and closes the product gate without inventing a number\nor silently elevating write-off/reversal classification.\n\n**Still deferred:** every monetary or cumulative threshold; automated/de-minimis\nwrite-off; batch approval; tenant-authored approval formulas; legal/tax treatment;\ncollection or dispute policy; UI; and any default approval/reversal grant beyond\nthe selected option.\n\n"
+    },
+    "docs\\architecture\\WORKFLOW_AND_PERMISSION_MATRIX.md": {
+      "sha256": "022bd5b90b6c8efc929e465e7f1e1c95574344a76c45641c86ee354b0442e8e2"
+    },
+    "BONIRA_WRITE_OFF_POLICY_SPECIFICATION.md": {
+      "sha256": "346d3c738fce4adcd0259480e077e382c74d22ed143599aaab4e7ff774bae8bb",
+      "text": "# BONIRA — AP/AR Write-off Policy Specification\n\nGoverned by `PD-015` and `PD-030`.\n\nV1 SHOULD / NON-BLOCKING.\n\nWrite-off is a first-class auditable occurrence and never deletes the source Obligation/history.\n\nManual proposal requires source Obligation identity/version, proposed effect, reason/comment, audit identity and evidence where governed.\n\nNo automatic threshold/materiality rule is defined. Approval is required and comes from approved workflow assignment/permission, not job title.\n\nAccounting recognition follows the Recognition Owner Matrix. Reversal/correction creates a new governed occurrence and preserves history.\n\n`UNSPECIFIED WRITE-OFF POLICY — MANUAL/HELD, DO NOT INVENT`\n"
+    },
+    "BONIRA_COMPLETE_EXISTING_JOURNEY_REVIEW.csv": {
+      "archive_sha256": "51d9276179bf60065473cb425a161a210c7e46001849e11f36b1792d17cb9503",
+      "member_sha256": "73a4b5c82c6b9c3004604ecb3515123646bf2d2c974e26bd77e097d9fb2b560d",
+      "rows": [
+        {
+          "Journey ID": "E2E-SUB-011",
+          "Domain": "حساب‌های پرداختنی/دریافتنی",
+          "Level": "Exception",
+          "Persona (analytical)": "کارشناس AP/AR",
+          "Existing Audit Status": "DEFERRED-BY-DESIGN",
+          "Existing Findings": "P3-S27-Q03",
+          "Integration Dependencies": "P3-S27-Q03",
+          "UI Discoverability": "Available / service-backed",
+          "Runtime Evidence": "Fresh runtime UAT not executed; post-remediation runtime evidence required",
+          "Product Gap": "Valid target capability intentionally inactive; V1 disposition required",
+          "Production Importance": "HIGH / release-relevant",
+          "Market Importance": "HIGH",
+          "Required Remediation": "No defect remediation; target activation decision",
+          "Product Decision": "PD-015 / SHOULD HAVE V1",
+          "Final Disposition": "DEFERRED-BY-DESIGN"
+        },
+        {
+          "Journey ID": "E2E-SUB-012",
+          "Domain": "حساب‌های پرداختنی/دریافتنی",
+          "Level": "Exception",
+          "Persona (analytical)": "کارشناس AP/AR",
+          "Existing Audit Status": "DEFERRED-BY-DESIGN",
+          "Existing Findings": "P3-S27-Q03",
+          "Integration Dependencies": "P3-S27-Q03",
+          "UI Discoverability": "Available / service-backed",
+          "Runtime Evidence": "Fresh runtime UAT not executed; post-remediation runtime evidence required",
+          "Product Gap": "Valid target capability intentionally inactive; V1 disposition required",
+          "Production Importance": "HIGH / release-relevant",
+          "Market Importance": "HIGH",
+          "Required Remediation": "No defect remediation; target activation decision",
+          "Product Decision": "PD-015 / SHOULD HAVE V1",
+          "Final Disposition": "DEFERRED-BY-DESIGN"
+        },
+        {
+          "Journey ID": "E2E-SUB-013",
+          "Domain": "حساب‌های پرداختنی/دریافتنی",
+          "Level": "Exception",
+          "Persona (analytical)": "کارشناس AP/AR",
+          "Existing Audit Status": "DEFERRED-BY-DESIGN",
+          "Existing Findings": "P3-S27-Q03",
+          "Integration Dependencies": "P3-S27-Q03",
+          "UI Discoverability": "Available / service-backed",
+          "Runtime Evidence": "Fresh runtime UAT not executed; post-remediation runtime evidence required",
+          "Product Gap": "Valid target capability intentionally inactive; V1 disposition required",
+          "Production Importance": "HIGH / release-relevant",
+          "Market Importance": "HIGH",
+          "Required Remediation": "No defect remediation; target activation decision",
+          "Product Decision": "PD-015 / SHOULD HAVE V1",
+          "Final Disposition": "DEFERRED-BY-DESIGN"
+        }
+      ]
+    }
+  },
+  "approved_rules": {
+    "PD015_SPEC024": "Manual auditable write-off; approval from permission/assignment; new governed correction/reversal occurrence; retain original history; no thresholds",
+    "PD030_matrix": "Subledgers owns write-off and reversal/correction recognition; L2 Accounting draft after approval; GL remains Accounting authority",
+    "P3_Q03_A_Revised": "Existing explicit scoped approve/reverse permissions, no default grants, effective Platform/Tenant Self-Approval policy, independent memberships only where policy requires; no implicit Protected classification",
+    "P3_as_of": "Effective dates govern retained as-of results; future-dated facts excluded; later reversal restores amount from its effective date"
+  },
+  "unresolved_material_contract": "No inspected approved source specifies whether correcting an approved write-off is a full reversal plus replacement or an adjustment, or whether original reversal and replacement approval share one atomic effective-date boundary. These choices change outstanding balances and historical/as-of results; persistence authority does not select one.",
+  "proposed_bounded_resolution": {
+    "mechanism": "Full reversal of the prior approved write-off plus a separately approved replacement, never a delta or destructive overwrite",
+    "commit": "At replacement approval, reverse the old decision and approve the replacement atomically; require existing explicit reversal and approval permissions and applicable versioned Self-Approval checks for both actions",
+    "effective_date": "One explicit correction date used by both reversal and replacement, no earlier than prior write-off effective date; do not rewrite earlier as-of results; open applicable Accounting boundary where a GL effect is required",
+    "pending_and_denied": "Original effect remains until successful atomic correction; rejected or unapproved replacement creates no financial effect; no cancellation behavior enabled without governing policy",
+    "lineage": "Replacement retains exact predecessor decision, same tenant/obligation and source/version pins; no inferred historic pairing"
+  },
+  "implemented_before_semantic_stop": "Nullable protected source predecessor relation and structural integrity/immutability only; no financial transition or policy activated",
+  "finding": "CEP-044-FINDING-002 / BLOCKER-SPEC"
+}

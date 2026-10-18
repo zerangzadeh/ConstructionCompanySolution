@@ -1,0 +1,124 @@
+.....F....FF............F....                                  [100%]
+================================== FAILURES ===================================
+_ WriteOffLineageTests.test_source_link_cannot_be_rewritten_deleted_or_bulk_bypassed _
+apps\subledgers\test_cep044_lineage.py:161: in test_source_link_cannot_be_rewritten_deleted_or_bulk_bypassed
+    WriteOffDecision.objects.filter(pk=self.decision.pk).delete()
+apps\subledgers\models.py:843: in delete
+    raise ValidationError("پیشنهاد و پیوند اصلاح سوخت حذف‌پذیر نیست.")
+E   django.core.exceptions.ValidationError: ['پیشنهاد و پیوند اصلاح سوخت حذف\u200cپذیر نیست.']
+---------------------------- Captured stdout call -----------------------------
+uuuuu
+_ WriteOffGovernanceTests.test_consumed_native_ap_target_blocks_source_reversal _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "accounting_journalentry" violates check constraint "journal_submitted_policy_versions_required"
+E   DETAIL:  Failing row contains (00e9bad4-7ec9-47af-b566-5f1ebdae9b08, 2026-10-18 23:19:29.181564+00, 2026-10-18 23:19:29.181564+00, operational, proposed, null, 2026-10-18, 2026-10-18, IRR, Procurement Supplier Invoice Match: 7418a9ba-3a74-4bd8-8d05-9cd0..., L2:ap_invoice:7418a9ba-3a74-4bd8-8d05-9cd009db6d28:payable_recog..., SPEC-002;mapping:6b5b0a51-8562-411b-ac06-39ade2f3c404:v1, 31751144403a7c07a63a5063e3c071aa610e5f43fcb19df9de8c3d97f5ca1dd3, null, null, null, 348d6780-ec27-4ca5-81e5-86d5db22e801, b7e34787-2135-40ba-8d5a-f8cd7e23b2e0, null, null, ca7e1040-e696-4693-9a84-31c3eb529e2c, null, null, recognition_draft, 7418a9ba-3a74-4bd8-8d05-9cd009db6d28, , , null, null, null, recognition.ap_invoice, 7418a9ba-3a74-4bd8-8d05-9cd009db6d28, 1, , null).
+
+The above exception was the direct cause of the following exception:
+apps\subledgers\test_cep044_writeoffs.py:567: in test_consumed_native_ap_target_blocks_source_reversal
+    JournalEntry.objects.filter(pk=effect.journal_id).update(status="proposed")
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "accounting_journalentry" violates check constraint "journal_submitted_policy_versions_required"
+E   DETAIL:  Failing row contains (00e9bad4-7ec9-47af-b566-5f1ebdae9b08, 2026-10-18 23:19:29.181564+00, 2026-10-18 23:19:29.181564+00, operational, proposed, null, 2026-10-18, 2026-10-18, IRR, Procurement Supplier Invoice Match: 7418a9ba-3a74-4bd8-8d05-9cd0..., L2:ap_invoice:7418a9ba-3a74-4bd8-8d05-9cd009db6d28:payable_recog..., SPEC-002;mapping:6b5b0a51-8562-411b-ac06-39ade2f3c404:v1, 31751144403a7c07a63a5063e3c071aa610e5f43fcb19df9de8c3d97f5ca1dd3, null, null, null, 348d6780-ec27-4ca5-81e5-86d5db22e801, b7e34787-2135-40ba-8d5a-f8cd7e23b2e0, null, null, ca7e1040-e696-4693-9a84-31c3eb529e2c, null, null, recognition_draft, 7418a9ba-3a74-4bd8-8d05-9cd009db6d28, , , null, null, null, recognition.ap_invoice, 7418a9ba-3a74-4bd8-8d05-9cd009db6d28, 1, , null).
+_ WriteOffGovernanceTests.test_consumed_target_and_mismatched_date_fail_closed _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.CheckViolation: new row for relation "accounting_journalentry" violates check constraint "journal_submitted_policy_versions_required"
+E   DETAIL:  Failing row contains (8ca7c165-0cd0-416f-9bec-be0b96e695f6, 2026-10-18 23:19:30.910619+00, 2026-10-18 23:19:30.910619+00, operational, proposed, null, 2026-10-18, 2026-10-18, IRR, AP/AR Write-off: 7210a10a-5595-4343-87bf-136e1d04081d, L2:writeoff:7210a10a-5595-4343-87bf-136e1d04081d:payable_written..., SPEC-002;mapping:929dcbd9-e416-489c-ab10-6fd0349b8e29:v1, 24077a2c5e40a7f34f693dec68c3bf7ac1d2b16773cb916b2f9f86b5415703d2, null, null, null, 1524bb25-df17-4233-bfaf-2204d823e967, dece39ad-8c29-4741-8625-40e015fdd704, null, null, fb821756-738b-41c1-b355-433ddde1b419, null, null, recognition_draft, 7210a10a-5595-4343-87bf-136e1d04081d, , , null, null, null, recognition.writeoff, 7210a10a-5595-4343-87bf-136e1d04081d, 1, , null).
+
+The above exception was the direct cause of the following exception:
+apps\subledgers\test_cep044_writeoffs.py:490: in test_consumed_target_and_mismatched_date_fail_closed
+    JournalEntry.objects.filter(pk=effect.journal_id).update(status="proposed")
+.venv\Lib\site-packages\django\db\models\query.py:1263: in update
+    rows = query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: new row for relation "accounting_journalentry" violates check constraint "journal_submitted_policy_versions_required"
+E   DETAIL:  Failing row contains (8ca7c165-0cd0-416f-9bec-be0b96e695f6, 2026-10-18 23:19:30.910619+00, 2026-10-18 23:19:30.910619+00, operational, proposed, null, 2026-10-18, 2026-10-18, IRR, AP/AR Write-off: 7210a10a-5595-4343-87bf-136e1d04081d, L2:writeoff:7210a10a-5595-4343-87bf-136e1d04081d:payable_written..., SPEC-002;mapping:929dcbd9-e416-489c-ab10-6fd0349b8e29:v1, 24077a2c5e40a7f34f693dec68c3bf7ac1d2b16773cb916b2f9f86b5415703d2, null, null, null, 1524bb25-df17-4233-bfaf-2204d823e967, dece39ad-8c29-4741-8625-40e015fdd704, null, null, fb821756-738b-41c1-b355-433ddde1b419, null, null, recognition_draft, 7210a10a-5595-4343-87bf-136e1d04081d, , , null, null, null, recognition.writeoff, 7210a10a-5595-4343-87bf-136e1d04081d, 1, , null).
+_ BillingARRecognitionTests.test_approved_native_claim_and_ar_writeoff_reversal _
+apps\subledgers\test_cep044_billing.py:198: in test_approved_native_claim_and_ar_writeoff_reversal
+    draft = native._claim_for_approval()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:926: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:661: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:649: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:505: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:636: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/subledgers/test_cep044_lineage.py::WriteOffLineageTests::test_source_link_cannot_be_rewritten_deleted_or_bulk_bypassed
+FAILED apps/subledgers/test_cep044_writeoffs.py::WriteOffGovernanceTests::test_consumed_native_ap_target_blocks_source_reversal
+FAILED apps/subledgers/test_cep044_writeoffs.py::WriteOffGovernanceTests::test_consumed_target_and_mismatched_date_fail_closed
+FAILED apps/subledgers/test_cep044_billing.py::BillingARRecognitionTests::test_approved_native_claim_and_ar_writeoff_reversal
+4 failed, 25 passed, 10 subtests passed in 123.61s (0:02:03)

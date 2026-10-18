@@ -170,15 +170,12 @@ def _active_settlement_amount(
     )
 
 
-def _approved_writeoff_amount(*, obligation: Obligation) -> Decimal:
-    return (
-        WriteOffProposal.objects.filter(
-            obligation=obligation,
-            decision__decision=WriteOffDecisionKind.APPROVED,
-            decision__reversal__isnull=True,
-        ).aggregate(total=Sum("amount"))["total"]
-        or ZERO
-    )
+def _approved_writeoff_amount(
+    *, obligation: Obligation, on_or_after: date | None = None
+) -> Decimal:
+    from .writeoffs import max_writeoff_exposure
+
+    return max_writeoff_exposure(obligation, on_or_after=on_or_after)
 
 
 @transaction.atomic
@@ -426,7 +423,7 @@ def allocate_settlement(
     _require_unreversed_source(obligation)
     obligation_used = _active_settlement_amount(
         obligation=obligation
-    ) + _approved_writeoff_amount(obligation=obligation)
+    ) + _approved_writeoff_amount(obligation=obligation, on_or_after=effective_date)
     movement_used = _active_settlement_amount(movement=movement)
     if obligation_used + amount > obligation.original_amount:
         raise ValidationError("مبلغ تخصیص از مانده تعهد بیشتر است.")
@@ -537,6 +534,7 @@ def propose_write_off(
     effective_date: date,
     reason: str,
     idempotency_key: str,
+    corrects=None,
 ) -> WriteOffProposal:
     organization = _lock_organization(organization)
     membership = require_business_permission(
@@ -547,7 +545,17 @@ def propose_write_off(
         project=obligation.project,
     )
     membership = _lock_membership(organization=organization, membership=membership)
-    obligation = Obligation.objects.select_for_update().get(pk=obligation.pk)
+    try:
+        obligation = Obligation.objects.select_for_update().get(
+            pk=obligation.pk, organization=organization
+        )
+    except Obligation.DoesNotExist as exc:
+        raise PermissionDenied(
+            "Write-off source is outside the active tenant."
+        ) from exc
+    from .accounting_sources import require_source_visibility
+
+    require_source_visibility(organization, actor, obligation)
     require_business_permission(
         user=actor,
         organization=organization,
@@ -561,14 +569,25 @@ def propose_write_off(
     idempotency_key = _required_text(
         idempotency_key, message="کلید idempotency پیشنهاد سوخت الزامی است."
     )
-    payload_hash = _canonical_hash(
-        {
-            "obligation": obligation.pk,
-            "amount": amount,
-            "date": effective_date,
-            "reason": reason,
-        }
-    )
+    payload = {
+        "obligation": obligation.pk,
+        "amount": amount,
+        "date": effective_date,
+        "reason": reason,
+    }
+    if corrects is not None:
+        from .models import WriteOffDecision
+
+        try:
+            corrects = (
+                WriteOffDecision.objects.select_for_update(of=("self",))
+                .select_related("proposal")
+                .get(pk=corrects.pk, organization=organization)
+            )
+        except WriteOffDecision.DoesNotExist as exc:
+            raise PermissionDenied("Correction source is outside the tenant.") from exc
+        payload["corrects"] = corrects.pk
+    payload_hash = _canonical_hash(payload)
     existing = WriteOffProposal.objects.filter(
         organization=organization, idempotency_key=idempotency_key
     ).first()
@@ -578,12 +597,22 @@ def propose_write_off(
                 "کلید idempotency سوخت با محتوای متفاوت استفاده شده است."
             )
         return existing
+    if corrects is not None and (
+        corrects.decision != "approved"
+        or corrects.proposal.obligation_id != obligation.pk
+        or hasattr(corrects, "reversal")
+    ):
+        raise ValidationError(
+            "An active approved predecessor on the same obligation is required."
+        )
     _require_unreversed_source(obligation)
     remaining = (
         obligation.original_amount
         - _active_settlement_amount(obligation=obligation)
         - _approved_writeoff_amount(obligation=obligation)
     )
+    if corrects is not None:
+        remaining += corrects.proposal.amount
     if amount > remaining:
         raise ValidationError("مبلغ پیشنهاد سوخت از مانده تعهد بیشتر است.")
     proposal = WriteOffProposal.objects.create(
@@ -595,6 +624,7 @@ def propose_write_off(
         idempotency_key=idempotency_key,
         payload_hash=payload_hash,
         proposed_by=membership,
+        corrects=corrects,
     )
     record_audit_event(
         action=AuditAction.SUBLEDGER_WRITEOFF_PROPOSED,
@@ -607,19 +637,20 @@ def propose_write_off(
     return proposal
 
 
-def approve_write_off(*args: object, **kwargs: object) -> None:
-    del args, kwargs
-    assert _UNRESOLVED_WRITE_OFF_PERMISSIONS
-    raise ValidationError(
-        "اختیار و سیاست سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
-    )
+def approve_write_off(*args: object, **kwargs: object):
+    if not args and not kwargs:
+        raise ValidationError("سیاست و منبع صریح سوخت الزامی است؛ P3-S27-Q03.")
+    from .writeoffs import decide_write_off
+
+    return decide_write_off(*args, approve=True, **kwargs)
 
 
-def reverse_write_off(*args: object, **kwargs: object) -> None:
-    del args, kwargs
-    raise ValidationError(
-        "اختیار و سیاست برگشت سوخت هنوز تصویب نشده است؛ تصمیم P3-S27-Q03 لازم است."
-    )
+def reverse_write_off(*args: object, **kwargs: object):
+    if not args and not kwargs:
+        raise ValidationError("سیاست و منبع صریح برگشت سوخت الزامی است؛ P3-S27-Q03.")
+    from .writeoffs import correct_write_off
+
+    return correct_write_off(*args, **kwargs)
 
 
 def _require_unreversed_source(obligation: Obligation) -> None:

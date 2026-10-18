@@ -178,7 +178,7 @@ def _prior(organization, source):
         return None
     prior = SourceRecognitionDraft.objects.filter(
         organization=organization,
-        source_kind=source.kind,
+        source_kind="writeoff" if source.kind == "writeoff_reversal" else source.kind,
         source_uuid=source.previous_id,
         is_reversal=False,
     ).first()
@@ -317,6 +317,13 @@ def prepare_source_recognition(
         permission=P.ACCOUNTING_RECOGNITION_PREPARE,
     )
     resolution = _policy(organization, source)
+    if source.kind in {"writeoff", "writeoff_reversal"} and accounting_date not in {
+        None,
+        source.occurred_on,
+    }:
+        raise ValidationError(
+            "Write-off Accounting effects must use the explicit source date."
+        )
     snapshot = source.snapshot()
     sha = digest(snapshot)
     existing = (
@@ -368,6 +375,16 @@ def prepare_source_recognition(
         if mapping is None:
             raise ValidationError("نگاشت پذیرفته‌شده و مؤثر حسابداری موجود نیست.")
         rows = _mapped_rows(source, mapping)
+    if source.kind in {
+        "ar_claim",
+        "ap_certificate",
+        "ap_invoice",
+        "writeoff",
+        "writeoff_reversal",
+    }:
+        from apps.subledgers.accounting_sources import validate_control_rows
+
+        validate_control_rows(source, rows)
     if source.currency != organization.settings.currency or source.currency != "IRR":
         raise ValidationError("ارز منبع و حسابداری سازگار نیست.")
     requested_date = accounting_date or source.occurred_on
