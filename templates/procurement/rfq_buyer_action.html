@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ action_title }} | تدارکات{% endblock %}
+{% block content %}
+<nav class="text-sm text-slate-500"><a class="text-blue-700 underline" href="{% url 'procurement:rfq_buyer_workspace' rfq.pk %}">پیشنهاد، مقایسه و انتخاب</a> / {{ action_title }}</nav>
+{% include "components/page_header.html" with page_eyebrow="تدارکات" page_title=action_title page_description=rfq.title only %}
+<p class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">فقط منابع مجاز همین استعلام قابل انتخاب‌اند. خالی بودن فهرست یعنی منبع، دسترسی نسخه یا پیش‌نیاز این مرحله موجود نیست؛ سیاست یا تصمیمی به‌طور خودکار ایجاد نمی‌شود.</p>
+<form method="post" class="erp-surface mt-5 rounded-xl p-5" id="buyer-action-form">{% csrf_token %}
+{% if form.non_field_errors %}<div role="alert" class="mb-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{{ form.non_field_errors }}</div>{% endif %}
+<div class="grid gap-4 md:grid-cols-2">{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</div>
+{% if rows %}<section class="mt-6" aria-labelledby="input-rows"><h2 id="input-rows" class="font-bold">{% if action == 'prepare_award' %}تخصیص‌های صریح انتخاب{% else %}ورودی‌های صریح مقایسه{% endif %}</h2>{% if action == 'prepare_award' %}<p class="mt-2 text-sm text-slate-500">برای «بدون انتخاب» ردیف تخصیص را خالی بگذارید.</p>{% endif %}{{ rows.management_form }}{% if rows.non_form_errors %}<div role="alert" class="mt-3 text-red-700">{{ rows.non_form_errors }}</div>{% endif %}<div id="action-rows" class="mt-3 space-y-4">{% for row in rows %}<fieldset class="grid gap-4 rounded-lg border border-slate-200 p-4 md:grid-cols-2"><legend class="px-2 text-sm font-semibold">ردیف {{ forloop.counter }}</legend>{% for field in row %}{% include "components/form_field.html" with field=field only %}{% endfor %}</fieldset>{% endfor %}</div><button type="button" id="add-action-row" class="erp-btn erp-btn--secondary mt-3">افزودن ردیف دیگر</button><template id="action-row-template"><fieldset class="grid gap-4 rounded-lg border border-slate-200 p-4 md:grid-cols-2"><legend class="px-2 text-sm font-semibold">ردیف جدید</legend>{% for field in rows.empty_form %}{% include "components/form_field.html" with field=field only %}{% endfor %}</fieldset></template></section>{% endif %}
+<div class="mt-6 flex flex-wrap gap-3"><button type="submit" class="erp-btn erp-btn--primary">{{ action_title }}</button><a class="erp-btn erp-btn--secondary" href="{% url 'procurement:rfq_buyer_workspace' rfq.pk %}">بازگشت</a></div>
+</form>
+{% endblock %}
+{% block extra_scripts %}{{ block.super }}{% if rows %}<script>
+document.getElementById('add-action-row').addEventListener('click', function () {
+  const total = document.getElementById('id_rows-TOTAL_FORMS');
+  if (Number(total.value) >= 100) return;
+  const fragment = document.getElementById('action-row-template').innerHTML.replaceAll('__prefix__', total.value);
+  document.getElementById('action-rows').insertAdjacentHTML('beforeend', fragment);
+  total.value = String(Number(total.value) + 1);
+});
+</script>{% endif %}{% endblock %}

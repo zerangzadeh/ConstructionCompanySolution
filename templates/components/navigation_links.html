@@ -21,12 +21,14 @@
     </div></details>
     <details data-nav-id="NAV-017" class="erp-nav-group" open><summary><span>تأمین و تدارکات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
         {% if "purchase_requests.view" in business_permission_codes %}<a data-nav-id="NAV-018" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:request_list' %}">درخواست‌های خرید</a>{% endif %}
+        {% if "rfqs.view" in business_permission_codes %}<a data-nav-id="NAV-019" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:rfq_list' %}">استعلام و انتخاب تأمین‌کننده</a>{% endif %}
         <span data-nav-id="NAV-019" class="erp-nav-link is-unavailable" aria-disabled="true">استعلام و انتخاب تأمین‌کننده</span>
         {% if "purchase_orders.view" in business_permission_codes %}<a data-nav-id="NAV-020" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:order_list' %}">سفارش‌های خرید</a>{% endif %}
         {% if "goods_receipts.view" in business_permission_codes %}<a data-nav-id="NAV-021" class="erp-nav-link{% if current_namespace == 'procurement' %} is-active{% endif %}" href="{% url 'procurement:receipt_list' %}">رسید کالا</a>{% endif %}
         {% if "materials.view" in business_permission_codes %}<a data-nav-id="NAV-022" class="erp-nav-link{% if current_namespace == 'materials' %} is-active{% endif %}" href="{% url 'materials:material_list' %}">مصالح و کالا</a>{% endif %}
         {% if "warehouses.view" in business_permission_codes %}<a data-nav-id="NAV-023" class="erp-nav-link{% if current_namespace == 'inventory' %} is-active{% endif %}" href="{% url 'inventory:warehouse_list' %}">انبار</a>{% endif %}
         {% if "parties.view" in business_permission_codes %}<a data-nav-id="NAV-024" class="erp-nav-link{% if current_namespace == 'parties' and not party_governance_surface %} is-active{% endif %}" href="{% url 'parties:list' %}">طرف‌های تجاری</a>{% endif %}
+        {% if "tender_bids.view" in business_permission_codes %}<a data-nav-id="NAV-013" class="erp-nav-link{% if current_namespace == 'commercial' %} is-active{% endif %}" href="{% url 'commercial:tender_list' %}">تجاری و مناقصه</a>{% endif %}
     </div></details>
     <details data-nav-id="NAV-025" class="erp-nav-group" open><summary><span>مالی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
         {% if "treasury.view" in business_permission_codes %}<a data-nav-id="NAV-026" class="erp-nav-link{% if current_namespace == 'treasury' %} is-active{% endif %}" href="{% url 'treasury:workbench' %}">خزانه‌داری</a>{% endif %}

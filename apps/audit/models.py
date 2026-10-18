@@ -8,6 +8,9 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    TENDER_BID_CREATED = "commercial.tender_bid_created", "فرصت مناقصه ثبت شد"
+    TENDER_BID_REVISED = "commercial.tender_bid_revised", "نسخه مناقصه ثبت شد"
+    TENDER_BID_EVIDENCE_LINKED = "commercial.tender_bid_evidence_linked", "شاهد مناقصه پیوند شد"
     TREASURY_ACCOUNT_CREATED = "treasury.account_created", "حساب خزانه‌داری ایجاد شد"
     TREASURY_ACCOUNT_TRANSITIONED = (
         "treasury.account_transitioned",

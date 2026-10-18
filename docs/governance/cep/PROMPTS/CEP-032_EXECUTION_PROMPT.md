@@ -28,6 +28,7 @@ Current governance applies:
 - `Agents.md`
 - `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`
 - `docs/ROADMAP_EXECUTION_PLAYBOOK.md`
+- `docs/governance/cep/supporting/CEP-032_COMMERCIAL_TENDER_BID_DECISION.md` — Human-approved PD-019/SPEC-019 supplement and bounded migration authority
 - `CEP_EXECUTION_REGISTRY.yaml` for live state only
 - CEP-032 Package Card
 - Canonical IMB records
@@ -140,9 +141,9 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
 If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
 
 ## 16. Data / Migration Requirements
-Migration Impact = `NONE`.
-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
-- If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
+Migration Impact = `BOUNDED DEVELOPMENT SCHEMA MIGRATION` for the minimum Commercial pre-award Tender/Bid persistence needed by IMB-0028. The Human decision recorded in `docs/governance/cep/supporting/CEP-032_COMMERCIAL_TENDER_BID_DECISION.md` supersedes this CEP's prior `NONE` classification only for this purpose.
+- Implement and validate the minimum Commercial Tender/Bid model and development/non-production migration. Record migration evidence and test the new schema boundary.
+- No production migration, cutover, unrelated schema change, or downstream authority transfer is authorized.
 
 ## 17. Integration Requirements
 Preserve approved integration semantics and interaction levels. Financial integrations must not silently escalate authority.
@@ -173,14 +174,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=REQUIRED; TENANT-ISOLATION=REQUIRED; WORKFLOW=REQUIRED; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=REQUIRED; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0022:DOMAIN; SECURITY / PERMISSION; UI; REGRESSION | IMB-0028:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=REQUIRED; TENANT-ISOLATION=REQUIRED; WORKFLOW=REQUIRED; INTEGRATION=NOT APPLICABLE; MIGRATION=REQUIRED FOR BOUNDED DEVELOPMENT SCHEMA; UI / TEMPLATE=REQUIRED; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0022:DOMAIN; SECURITY / PERMISSION; UI; REGRESSION | IMB-0028:UNIT; DOMAIN; REGRESSION; Human-approved bounded development migration
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=REQUIRED; TENANT-ISOLATION TEST=REQUIRED; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=REQUIRED; UI RUNTIME EVIDENCE=CONDITIONAL; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0022:RFQ-to-Award buyer workspace: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof. | IMB-0028:Contractor Tender/Bid register and evidence: implementation diff/evidence; item-specific automated tests; source-authority check; audit/source linkage appropriate to the domain.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED FOR BOUNDED DEVELOPMENT SCHEMA; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=REQUIRED; TENANT-ISOLATION TEST=REQUIRED; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=REQUIRED; UI RUNTIME EVIDENCE=CONDITIONAL; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0022:RFQ-to-Award buyer workspace: UI/functional tests; backend authorization evidence; empty/error/unauthorized-state evidence; Persian/RTL/Jalali check; responsive/browser evidence where required; source deep-link/object-scope proof. | IMB-0028:Contractor Tender/Bid register and evidence: implementation diff/evidence; item-specific automated tests; source-authority check; audit/source linkage appropriate to the domain; Human-approved bounded development migration.
 
 Execution must produce:
 - `CEP-032_EXECUTION_MANIFEST.md`

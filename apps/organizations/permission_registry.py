@@ -1268,6 +1268,13 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         ),
     ),
     PermissionResource(
+        "tender_bids",
+        "فرصت‌ها و پیشنهادهای مناقصه پیمانکار",
+        ("commercial.TenderBid", "commercial.TenderBidRevision", "commercial.TenderBidEvidence"),
+        (P.TENDER_BIDS_VIEW, P.TENDER_BIDS_PREPARE, P.TENDER_BIDS_TRANSITION),
+        ("apps.commercial.services", "apps.commercial.views"),
+    ),
+    PermissionResource(
         "rfq_invitations",
         "دعوت‌نامه‌های استعلام",
         ("procurement.RequestForQuotationInvitation",),

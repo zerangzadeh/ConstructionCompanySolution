@@ -1,0 +1,18 @@
+surface,change,authority
+docs/governance/cep/PROMPTS/CEP-032_EXECUTION_PROMPT.md,Bounded migration contract and evidence/test applicability,Human Decision CEP-032
+docs/governance/cep/CEP_PROMPT_MANIFEST.yaml,Updated canonical prompt SHA-256,Human Decision CEP-032
+docs/governance/cep/supporting/CEP-032_COMMERCIAL_TENDER_BID_DECISION.md,Recorded Commercial owner lifecycle revisions and non-production migration authority,Human Decision CEP-032
+apps/commercial/,New Commercial Tender/Bid identity revisions evidence services views forms templates tests and migrations,IMB-0028
+apps/organizations/,New permission codes catalog default-deny migration and object-scope registration,IMB-0028 security
+apps/audit/models.py,Audited Tender/Bid create revision and evidence actions,IMB-0028 audit
+apps/procurement/rfq_forms.py and rfq_workspace.py,Buyer RFQ workspace forms views and service orchestration,IMB-0022
+apps/procurement/urls.py and templates/procurement/,Buyer workspace routing and templates,IMB-0022
+apps/procurement/test_cep032_workspace.py,Buyer workspace permission tenant and source-link tests,IMB-0022
+config/settings/base.py and config/urls.py and templates/components/navigation_links.html,Register Commercial app and workspace routes/navigation,CEP-032 UI integration
+local development database,Applied organizations.0116 commercial.0001-.0003 plus previously pending projects.0010 expenses.0009 treasury.0009 by full migration command,Development only; no production authorization
+docs/governance/cep/evidence/CEP-032_BROWSER_VERIFICATION.md and CEP-032_SCREENSHOTS/,Authenticated verification evidence and nine screenshots; Finding 003; no product-code change in this resumption,IMB-0022 and IMB-0028 verification
+local development database RFQ CEP032-BROWSER-20261018,One browser-created draft against existing approved request for workspace evidence; no issue or award,Bounded non-production verification
+apps/procurement/rfq_actions.py and rfq_action_forms.py,RFQ-bound forms and thin command orchestration over existing lifecycle services; no domain rule change,IMB-0022 AC-01/02
+templates/procurement/rfq_buyer_workspace.html and rfq_buyer_action.html and rfq_detail.html,Discoverable buyer actions and confidential history plus explicit prerequisites and responsive forms,IMB-0022 UI
+apps/procurement/test_cep032_buyer_actions.py,Isolated current-grant fixtures and real buyer command/security/negative tests; no legacy fixture repair,IMB-0022 validation
+disposable Django test database on localhost:8001,Synthetic browser fixture and normal test-actor login; stopped and cleaned after source reconciliation; development policies unchanged,Non-production validation only

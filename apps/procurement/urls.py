@@ -1,10 +1,28 @@
 from django.urls import path
 
-from apps.procurement import views
+from apps.procurement import rfq_actions, rfq_workspace, views
 
 app_name = "procurement"
 
 urlpatterns = [
+    path("rfqs/", rfq_workspace.rfq_list, name="rfq_list"),
+    path("rfqs/create/", rfq_workspace.rfq_create, name="rfq_create"),
+    path("rfqs/<uuid:rfq_id>/", rfq_workspace.rfq_detail, name="rfq_detail"),
+    path(
+        "rfqs/<uuid:rfq_id>/buyer/",
+        rfq_actions.buyer_workspace,
+        name="rfq_buyer_workspace",
+    ),
+    path(
+        "rfqs/<uuid:rfq_id>/buyer/<slug:action>/",
+        rfq_actions.buyer_action,
+        name="rfq_buyer_action",
+    ),
+    path("rfqs/<uuid:rfq_id>/lines/", rfq_workspace.rfq_line_add, name="rfq_line_add"),
+    path("rfqs/<uuid:rfq_id>/submit/", rfq_workspace.rfq_submit, name="rfq_submit"),
+    path("rfqs/<uuid:rfq_id>/issue/", rfq_workspace.rfq_issue, name="rfq_issue"),
+    path("rfqs/<uuid:rfq_id>/close/", rfq_workspace.rfq_close, name="rfq_close"),
+    path("rfqs/<uuid:rfq_id>/cancel/", rfq_workspace.rfq_cancel, name="rfq_cancel"),
     path("portal/accept/", views.supplier_portal_accept, name="portal_accept"),
     path(
         "portal/grants/<uuid:grant_id>/",

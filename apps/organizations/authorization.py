@@ -83,6 +83,7 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "quality_issues",
         "work_items",
         "rfqs",
+        "tender_bids",
         "supplier_portal",
         "supplier_invoices",
         "invoice_matches",

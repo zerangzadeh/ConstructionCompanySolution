@@ -32,6 +32,7 @@ INSTALLED_APPS: list[str] = [
     "apps.materials",
     "apps.projects",
     "apps.contracts",
+    "apps.commercial",
     "apps.billing",
     "apps.estimates",
     "apps.expenses",
