@@ -35,6 +35,7 @@ Current governance applies:
 - BONIRA Implementation Roadmap
 - BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX
 - BONIRA_CONFIGURATION_PROFILE_MATRIX
+- `docs/governance/cep/supporting/CEP-043_PAYROLL_AP_LIFECYCLE_POLICY.md` — HUMAN-CEP043-LIFECYCLE-20261018, governing Finding002 A/B clarifications
 
 Package-card source traceability:
 - Frozen PDs: `PD-009; PD-030`
@@ -137,9 +138,10 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
 If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
 
 ## 16. Data / Migration Requirements
-Migration Impact = `NONE`.
-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
-- If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
+Migration Impact = `MINIMUM ADDITIVE PAYROLL ENROLLMENT / AP REVERSAL PERSISTENCE — DEVELOPMENT / NON-PRODUCTION ONLY`.
+- Human decision `HUMAN-CEP043-PERSISTENCE-20261018` authorizes only the minimum additive, backward-compatible persistence and bounded Development/Non-Production migrations necessary for existing CEP-043 Scope / AC / scoped DoD; it supersedes the former `NONE` restriction only to that extent.
+- Preserve existing data, history, grants and established domain authority. Retain migration/drift, preservation and relevant concurrency/financial-boundary validation. No production migration, cutover or irreversible production mutation is authorized.
+- This migration permission does not define Payroll enrollment, AP reversal, accounting/posting, lifecycle, transition, ownership or fallback semantics. If any required material rule is not defined by canonical sources, stop and escalate that specific unresolved Human decision before implementing it.
 
 ## 17. Integration Requirements
 Preserve approved integration semantics and interaction levels. Financial integrations must not silently escalate authority.
@@ -169,14 +171,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0061:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=REQUIRED FOR AUTHORIZED ADDITIVE PERSISTENCE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0061:UNIT; DOMAIN; REGRESSION
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0061:Payroll → AP enrolled liability handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED FOR AUTHORIZED ADDITIVE PERSISTENCE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0061:Payroll → AP enrolled liability handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
 
 Execution must produce:
 - `CEP-043_EXECUTION_MANIFEST.md`

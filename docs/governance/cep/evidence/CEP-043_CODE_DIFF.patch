@@ -1,0 +1,2764 @@
+diff --git a/apps/audit/models.py b/apps/audit/models.py
+index bbd2f0d..d616b38 100644
+--- a/apps/audit/models.py
++++ b/apps/audit/models.py
+@@ -8,6 +8,12 @@ from core.models import CreatedAtModel, UUIDModel
+ 
+ 
+ class AuditAction(models.TextChoices):
++    PAYROLL_AP_ENROLLMENT_PREPARED = "payroll_ap.enrollment_prepared", "تهیه ثبت بدهی حقوق در AP"
++    PAYROLL_AP_ENROLLMENT_CHANGED = "payroll_ap.enrollment_changed", "فعال‌سازی یا توقف بدهی حقوق در AP"
++    PAYROLL_AP_OPERATION = "payroll_ap.operation", "پیش‌نویس یا اصلاح بدهی حقوق در AP"
++    PAYROLL_AP_FAILED = "payroll_ap.failed", "تلاش ناموفق تحویل بدهی حقوق"
++    PAYROLL_AP_RECONCILED = "payroll_ap.reconciled", "تطبیق بدهی حقوق و AP"
++
+     SUPPLIER_INVOICE_AP_FAILED = (
+         "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
+     )
+diff --git a/apps/organizations/models.py b/apps/organizations/models.py
+index 4448ff9..9815ada 100644
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -748,6 +748,10 @@ class BusinessPermissionCode(models.TextChoices):
+         "estimate_rate_sources.manage",
+         "مدیریت منبع و نرخ برآورد",
+     )
++    SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE = "subledgers_payroll.enrollments_manage", "تهیه ثبت بدهی حقوق در AP"
++    SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE = "subledgers_payroll.enrollments_approve", "فعال‌سازی و توقف ثبت بدهی حقوق در AP"
++    SUBLEDGERS_PAYROLL_PREPARE = "subledgers_payroll.prepare", "تهیه پیش‌نویس و اصلاح بدهی حقوق در AP"
++    SUBLEDGERS_PAYROLL_VIEW = "subledgers_payroll.view", "مشاهده و تطبیق بدهی حقوق در AP"
+     ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE = "accounting_recognition.mappings_manage", "تهیه نگاشت شناسایی حسابداری"
+     ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE = "accounting_recognition.mappings_approve", "پذیرش مستقل نگاشت شناسایی"
+     ACCOUNTING_RECOGNITION_PREPARE = "accounting_recognition.prepare", "تهیه و تلاش مجدد پیش‌نویس شناسایی"
+diff --git a/apps/organizations/permission_registry.py b/apps/organizations/permission_registry.py
+index 1455c1c..da816e9 100644
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -17,6 +17,12 @@ class PermissionResource:
+ P = BusinessPermissionCode
+ 
+ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
++    PermissionResource(
++        "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
++        ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
++        (P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE, P.SUBLEDGERS_PAYROLL_PREPARE, P.SUBLEDGERS_PAYROLL_VIEW),
++        ("apps.subledgers.payroll_handoffs",),
++    ),
+     PermissionResource(
+         "accounting_recognition", "نگاشت و شواهد شناسایی حسابداری",
+         ("accounting.RecognitionMappingVersion", "accounting.RecognitionMappingApproval", "accounting.SourceRecognitionDraft"),
+diff --git a/apps/organizations/role_defaults.py b/apps/organizations/role_defaults.py
+index c7a973f..3a6675e 100644
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -7,6 +7,10 @@ from apps.organizations.permission_registry import registered_permission_codes
+ 
+ # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
+ ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
++    BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
++    BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
++    BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
++    BusinessPermissionCode.SUBLEDGERS_PAYROLL_VIEW,
+     BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
+     BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,
+     BusinessPermissionCode.ACCOUNTING_RECOGNITION_PREPARE,
+@@ -833,6 +837,16 @@ for _role_code, _permissions in DEFAULT_ROLE_PERMISSIONS.items():
+     }
+ 
+ 
++# CEP043 AP enrollment/consumption are explicit; preserve all existing grants.
++for _permissions in DEFAULT_ROLE_PERMISSIONS.values():
++    _permissions.difference_update({
++        BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
++        BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
++        BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
++        BusinessPermissionCode.SUBLEDGERS_PAYROLL_VIEW,
++    })
++
++
+ DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {
+     MembershipRole.TENANT_OWNER: {
+         "name": "Tenant Owner",
+diff --git a/apps/subledgers/apps.py b/apps/subledgers/apps.py
+index 1db0941..b2b416e 100644
+--- a/apps/subledgers/apps.py
++++ b/apps/subledgers/apps.py
+@@ -9,3 +9,6 @@ class SubledgersConfig(AppConfig):
+         from .supplier_invoice_handoffs import register_supplier_invoice_handoff
+ 
+         register_supplier_invoice_handoff()
++        from .payroll_handoffs import register_payroll_handoff
++
++        register_payroll_handoff()
+diff --git a/apps/subledgers/models.py b/apps/subledgers/models.py
+index 936ec0d..4d427cd 100644
+--- a/apps/subledgers/models.py
++++ b/apps/subledgers/models.py
+@@ -631,9 +631,15 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+         ):
+             raise ValidationError("شواهد نگاشت حساب کنترل با تعهد سازگار نیست.")
+ 
++    @property
++    def source_reversal_evidence(self):
++        if self.source_kind == "payroll.liability.v1":
++            return PayrollAPReversal.objects.filter(obligation=self).first()
++        return self.source_reversals.first()
++
+     @property
+     def outstanding_amount(self):
+-        reversal = self.source_reversals.first()
++        reversal = self.source_reversal_evidence
+         if reversal is not None:
+             from apps.organizations.services import get_organization_settings
+ 
+@@ -659,7 +665,7 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
+ 
+     @property
+     def settlement_status(self) -> str:
+-        if self.source_reversals.exists():
++        if self.source_reversal_evidence is not None:
+             return "reversed"
+         outstanding = self.outstanding_amount
+         if outstanding == self.original_amount:
+@@ -1221,3 +1227,12 @@ class SubledgerReconciliationReview(
+             raise ValidationError({"reason": "دلیل بررسی تطبیق الزامی است."})
+         if self.reviewed_by_id == self.run.created_by_id:
+             raise ValidationError("اجراکننده تطبیق نمی‌تواند همان اجرا را بررسی کند.")
++
++
++from .payroll_models import (  # noqa: F401
++    PayrollAPDraft,
++    PayrollAPEnrollment,
++    PayrollAPEnrollmentEvent,
++    PayrollAPOperation,
++    PayrollAPReversal,
++)
+diff --git a/apps/subledgers/services.py b/apps/subledgers/services.py
+index e7c07a4..6e32df3 100644
+--- a/apps/subledgers/services.py
++++ b/apps/subledgers/services.py
+@@ -210,6 +210,13 @@ def recognize_obligation(
+         raise ValidationError(
+             "منبع تعهد ثبت نشده است؛ تصمیم P3-S27-Q01 برای فعال‌سازی لازم است."
+         )
++    if source_kind == "payroll.liability.v1":
++        require_business_permission(
++            user=actor,
++            organization=organization,
++            permission=BusinessPermissionCode.PAYROLL_RESULTS_VIEW,
++            message="اختیار مشاهده منبع حساس حقوق الزامی است.",
++        )
+     snapshot = resolver(organization, source_uuid, source_version, source_line_key)
+     if (
+         snapshot.source_kind != source_kind
+@@ -616,12 +623,13 @@ def reverse_write_off(*args: object, **kwargs: object) -> None:
+ 
+ 
+ def _require_unreversed_source(obligation: Obligation) -> None:
+-    if obligation.source_reversals.exists():
++    if obligation.source_reversal_evidence is not None:
+         raise ValidationError("منبع تعهد برگشت شده است؛ عملیات جدید مجاز نیست.")
+ 
+ 
+ def _source_reversed_amount_as_of(obligation: Obligation, as_of_date: date) -> Decimal:
+-    if obligation.source_reversals.filter(effective_date__lte=as_of_date).exists():
++    reversal = obligation.source_reversal_evidence
++    if reversal is not None and reversal.effective_date <= as_of_date:
+         return obligation.original_amount
+     return ZERO
+ 
+diff --git a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+index f1440ea..0478e1d 100644
+--- a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
++++ b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+@@ -217,7 +217,7 @@ prompts:
+     path: docs/governance/cep/PROMPTS/CEP-043_EXECUTION_PROMPT.md
+     canonical: true
+     immutable: true
+-    sha256: 2a5089c14f8afb3e4b118bd6f266d1c907fda8d1e6e9639a26d7b734c32eb19c
++    sha256: 2680c725f60d73c9f72140e5af5d0b8c142ccc7cf5bdba9c7760c63531682f00
+   CEP-044:
+     path: docs/governance/cep/PROMPTS/CEP-044_EXECUTION_PROMPT.md
+     canonical: true
+diff --git a/docs/governance/cep/PROMPTS/CEP-043_EXECUTION_PROMPT.md b/docs/governance/cep/PROMPTS/CEP-043_EXECUTION_PROMPT.md
+index f383b97..1742d94 100644
+--- a/docs/governance/cep/PROMPTS/CEP-043_EXECUTION_PROMPT.md
++++ b/docs/governance/cep/PROMPTS/CEP-043_EXECUTION_PROMPT.md
+@@ -35,6 +35,7 @@ Current governance applies:
+ - BONIRA Implementation Roadmap
+ - BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX
+ - BONIRA_CONFIGURATION_PROFILE_MATRIX
++- `docs/governance/cep/supporting/CEP-043_PAYROLL_AP_LIFECYCLE_POLICY.md` — HUMAN-CEP043-LIFECYCLE-20261018, governing Finding002 A/B clarifications
+ 
+ Package-card source traceability:
+ - Frozen PDs: `PD-009; PD-030`
+@@ -137,9 +138,10 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
+ If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
+ 
+ ## 16. Data / Migration Requirements
+-Migration Impact = `NONE`.
+-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
+-- If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
++Migration Impact = `MINIMUM ADDITIVE PAYROLL ENROLLMENT / AP REVERSAL PERSISTENCE — DEVELOPMENT / NON-PRODUCTION ONLY`.
++- Human decision `HUMAN-CEP043-PERSISTENCE-20261018` authorizes only the minimum additive, backward-compatible persistence and bounded Development/Non-Production migrations necessary for existing CEP-043 Scope / AC / scoped DoD; it supersedes the former `NONE` restriction only to that extent.
++- Preserve existing data, history, grants and established domain authority. Retain migration/drift, preservation and relevant concurrency/financial-boundary validation. No production migration, cutover or irreversible production mutation is authorized.
++- This migration permission does not define Payroll enrollment, AP reversal, accounting/posting, lifecycle, transition, ownership or fallback semantics. If any required material rule is not defined by canonical sources, stop and escalate that specific unresolved Human decision before implementing it.
+ 
+ ## 17. Integration Requirements
+ Preserve approved integration semantics and interaction levels. Financial integrations must not silently escalate authority.
+@@ -169,14 +171,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
+ ## 21. Test Plan
+ Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
+ 
+-UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0061:UNIT; DOMAIN; REGRESSION
++UNIT=REQUIRED; MODEL=NOT APPLICABLE; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=REQUIRED; MIGRATION=REQUIRED FOR AUTHORIZED ADDITIVE PERSISTENCE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0061:UNIT; DOMAIN; REGRESSION
+ 
+ UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
+ 
+ ## 22. Evidence Plan
+ Use only package-relevant evidence; no fabricated evidence IDs or results.
+ 
+-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0061:Payroll → AP enrolled liability handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
++CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED FOR AUTHORIZED ADDITIVE PERSISTENCE; DATA RECONCILIATION=REQUIRED; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=REQUIRED; TRANSACTION TRACE=REQUIRED; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=CONDITIONAL; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0061:Payroll → AP enrolled liability handoff: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.
+ 
+ Execution must produce:
+ - `CEP-043_EXECUTION_MANIFEST.md`
+--- /dev/null
++++ b/apps/organizations/migrations/0121_cep043_payroll_ap_permissions.py
+@@ -0,0 +1,30 @@
++"""Explicit AP capabilities only; no existing grants or policy rows changed."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("subledgers_payroll.enrollments_manage", "تهیه ثبت بدهی حقوق در AP"),
++    ("subledgers_payroll.enrollments_approve", "فعال‌سازی و توقف ثبت بدهی حقوق در AP"),
++    ("subledgers_payroll.prepare", "تهیه پیش‌نویس و اصلاح بدهی حقوق در AP"),
++    ("subledgers_payroll.view", "مشاهده و تطبیق بدهی حقوق در AP"),
++)
++
++
++def forward(apps, schema_editor):
++    model = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        model.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    # Preserve catalog/grant history on rollback; only deactivate these new codes.
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0120_cep042_recognition_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]
+--- /dev/null
++++ b/apps/subledgers/migrations/0006_cep043_payroll_ap.py
+@@ -0,0 +1,120 @@
++# Generated by Django 5.2.17 on 2026-10-18 18:33
++
++import django.db.models.deletion
++import uuid
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('organizations', '0121_cep043_payroll_ap_permissions'),
++        ('parties', '0004_p1_s17_party_governance'),
++        ('payroll', '0008_cep054_payroll_inquiry'),
++        ('projects', '0010_projectforecastreview_projectforecasttransition_and_more'),
++        ('subledgers', '0005_supplierinvoiceapreversal'),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='PayrollAPEnrollment',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('category', models.CharField(max_length=40)),
++                ('version', models.PositiveIntegerField()),
++                ('assignments', models.JSONField()),
++                ('evidence_reference', models.CharField(max_length=500)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='PayrollAPDraft',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('source_version', models.CharField(max_length=64)),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('snapshot', models.JSONField()),
++                ('amount', models.DecimalField(decimal_places=2, max_digits=24)),
++                ('currency', models.CharField(max_length=3)),
++                ('recognized_on', models.DateField()),
++                ('due_date', models.DateField()),
++                ('grouping_reference', models.CharField(max_length=120)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('party', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='parties.businessparty')),
++                ('predecessor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='replacements', to='subledgers.payrollapdraft')),
++                ('project', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='projects.project')),
++                ('source_line', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='ap_draft', to='payroll.financialhandoffline')),
++                ('enrollment', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='subledgers.payrollapenrollment')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='PayrollAPEnrollmentEvent',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('kind', models.CharField(choices=[('activate', 'Activate'), ('withdraw', 'Withdraw')], max_length=12)),
++                ('effective_at', models.DateTimeField()),
++                ('reason', models.TextField()),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('enrollment', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='events', to='subledgers.payrollapenrollment')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='PayrollAPOperation',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('source_hash', models.CharField(max_length=64)),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('idempotency_key', models.CharField(max_length=120)),
++                ('result', models.JSONField()),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('reversal_proposal', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='ap_corrections', to='payroll.financialhandoffproposal')),
++                ('source_proposal', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='ap_operation', to='payroll.financialhandoffproposal')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='PayrollAPReversal',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('effective_date', models.DateField()),
++                ('reason', models.TextField()),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organizationmembership')),
++                ('draft', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='source_reversal', to='subledgers.payrollapdraft')),
++                ('obligation', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='payroll_source_reversal', to='subledgers.obligation')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('source_proposal', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='payroll.financialhandoffproposal')),
++            ],
++            options={
++                'abstract': False,
++            },
++        ),
++        migrations.AddConstraint(
++            model_name='payrollapenrollment',
++            constraint=models.UniqueConstraint(fields=('organization', 'category', 'version'), name='payroll_ap_enrollment_version_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='payrollapenrollment',
++            constraint=models.CheckConstraint(condition=models.Q(('version__gte', 1)), name='payroll_ap_enrollment_version_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='payrollapdraft',
++            constraint=models.CheckConstraint(condition=models.Q(('amount__gt', 0)), name='payroll_ap_draft_positive_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='payrollapenrollmentevent',
++            constraint=models.UniqueConstraint(fields=('enrollment', 'kind'), name='payroll_ap_enrollment_event_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='payrollapoperation',
++            constraint=models.UniqueConstraint(fields=('organization', 'idempotency_key'), name='payroll_ap_operation_key_uq'),
++        ),
++    ]
+--- /dev/null
++++ b/apps/subledgers/payroll_handoffs.py
+@@ -0,0 +1,1081 @@
++"""INT-B07 AP-owned L2 drafts; explicit enrollment and retained corrections.
++
++No Payroll write, GL writer, cash effect, implicit mapping or aggregation.
++"""
++
++from __future__ import annotations
++
++from dataclasses import asdict
++from datetime import date, datetime
++from decimal import Decimal
++from uuid import UUID
++
++from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
++from django.db import DatabaseError, transaction
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction
++from apps.audit.services import record_audit_event
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.parties.models import BusinessParty
++from apps.payroll.financial_handoff_services import _digest, _source_snapshot
++from apps.payroll.models import (
++    FinancialHandoffLine,
++    FinancialHandoffProposal,
++    PayrollReversal,
++)
++
++from .models import Obligation, ObligationDirection
++from .payroll_models import (
++    PayrollAPDraft,
++    PayrollAPEnrollment,
++    PayrollAPEnrollmentEvent,
++    PayrollAPOperation,
++    PayrollAPReversal,
++)
++from .services import (
++    ObligationSourceSnapshot,
++    _active_settlement_amount,
++    _approved_writeoff_amount,
++    _canonical_hash,
++    _lock_membership,
++    _lock_organization,
++    recognize_obligation,
++    register_source_resolver,
++    registered_source_kinds,
++)
++
++SOURCE_KIND = "payroll.liability.v1"
++CATEGORIES = frozenset(
++    {"employee_payable", "statutory_employee_payable", "statutory_employer_payable"}
++)
++
++
++def _require(organization, actor, permission):
++    membership = require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        message="Explicit authorized AP/Payroll access required.",
++    )
++    return _lock_membership(organization=organization, membership=membership)
++
++
++def _create(model, **values):
++    obj = model(**values)
++    obj._ap_service = True
++    obj.save()
++    return obj
++
++
++def _audit(organization, actor, action, identity, metadata):
++    entity_type = {
++        AuditAction.PAYROLL_AP_ENROLLMENT_PREPARED: "subledgers.PayrollAPEnrollment",
++        AuditAction.PAYROLL_AP_ENROLLMENT_CHANGED: "subledgers.PayrollAPEnrollmentEvent",
++        AuditAction.PAYROLL_AP_FAILED: "payroll.FinancialHandoffProposal",
++        AuditAction.PAYROLL_AP_RECONCILED: "payroll.FinancialHandoffProposal",
++    }.get(action, "subledgers.PayrollAPOperation")
++    record_audit_event(
++        organization=organization,
++        actor=actor,
++        action=action,
++        entity_type=entity_type,
++        entity_id=identity,
++        metadata=metadata,
++    )
++
++
++def _read(organization, proposal_id, *, historical=False):
++    try:
++        proposal = (
++            FinancialHandoffProposal.objects.select_for_update(of=("self",))
++            .select_related("run__period", "review")
++            .get(pk=proposal_id, organization=organization)
++        )
++        run = (
++            type(proposal.run)
++            .objects.select_for_update()
++            .get(pk=proposal.run_id, organization=organization)
++        )
++        review = proposal.review
++    except ObjectDoesNotExist as exc:
++        raise ValidationError(
++            "Approved tenant Payroll liability source required."
++        ) from exc
++    proposal.run = run
++    states = {"finalized", "reversed"} if historical else {"finalized"}
++    results = list(run.employee_results.select_for_update().select_related("employee"))
++    if (
++        proposal.family != "liability"
++        or proposal.has_exceptions
++        or review.disposition != "accepted"
++        or run.status not in states
++        or not run.finalized_at
++        or not results
++        or proposal.currency != run.currency
++        or proposal.monetary_policy_snapshot != run.monetary_policy_snapshot
++        or any(r.status not in states for r in results)
++        or _digest(_source_snapshot(run, results)) != proposal.source_digest
++    ):
++        raise ValidationError(
++            "Finalized reviewed Payroll evidence is missing or stale."
++        )
++    lines = list(
++        proposal.lines.select_for_update(of=("self",))
++        .select_related("run_employee__project", "statutory_result__calculation")
++        .order_by("pk")
++    )
++    if not lines or sum((x.amount for x in lines), Decimal(0)) != proposal.total_amount:
++        raise ValidationError("Payroll proposal totals do not reconcile.")
++    rows = []
++    for line in lines:
++        if (
++            line.organization_id != organization.pk
++            or line.run_employee.run_id != run.pk
++            or line.employee_id != line.run_employee.employee_id
++            or line.line_kind not in CATEGORIES
++        ):
++            raise ValidationError("Unsupported Payroll liability occurrence.")
++        if line.line_kind == "employee_payable":
++            expected = line.run_employee.net_amount
++        else:
++            statutory = line.statutory_result
++            if (
++                statutory is None
++                or statutory.calculation.run_id != run.pk
++                or statutory.calculation.review.disposition != "accepted"
++            ):
++                raise ValidationError("Accepted statutory source evidence required.")
++            expected = (
++                statutory.employee_amount
++                if line.line_kind == "statutory_employee_payable"
++                else statutory.employer_amount + statutory.other_amount
++            )
++        if line.amount != expected:
++            raise ValidationError(
++                "Liability amount disagrees with authoritative Payroll result."
++            )
++        rows.append(
++            {
++                "id": str(line.pk),
++                "employee": str(line.employee_id),
++                "kind": line.line_kind,
++                "amount": str(line.amount),
++                "digest": line.content_digest,
++                "lineage": line.source_lineage,
++                "component": line.component_reference,
++                "site": str(line.run_employee.site_id)
++                if line.run_employee.site_id
++                else None,
++                "project": str(line.run_employee.project_id)
++                if line.run_employee.project_id
++                else None,
++            }
++        )
++    payload = {
++        "proposal": str(proposal.pk),
++        "run": str(run.pk),
++        "run_version": run.calculation_digest,
++        "proposal_version": proposal.source_digest,
++        "currency": proposal.currency,
++        "review": str(review.pk),
++        "predecessor": str(proposal.predecessor_id)
++        if proposal.predecessor_id
++        else None,
++        "kind": proposal.record_kind,
++        "lines": rows,
++    }
++    return proposal, lines, payload, _canonical_hash(payload)
++
++
++def _cached_source(cache, organization, proposal_id, *, historical=False):
++    key = (organization.pk, proposal_id, historical)
++    if key not in cache:
++        cache[key] = _read(organization, proposal_id, historical=historical)
++    return cache[key]
++
++
++def validate_assignments(enrollment):
++    cache = {}
++    if (
++        enrollment.category not in CATEGORIES
++        or not isinstance(enrollment.assignments, dict)
++        or not enrollment.assignments
++    ):
++        raise ValidationError(
++            "Explicit supported liability classification and occurrence mappings required."
++        )
++    for line_id, terms in enrollment.assignments.items():
++        try:
++            line = FinancialHandoffLine.objects.get(
++                pk=UUID(line_id), organization_id=enrollment.organization_id
++            )
++            party = BusinessParty.objects.get(
++                pk=UUID(terms["party_id"]), organization_id=enrollment.organization_id
++            )
++            date.fromisoformat(terms["recognized_on"])
++            date.fromisoformat(terms["due_date"])
++        except (
++            ObjectDoesNotExist,
++            ValueError,
++            TypeError,
++            KeyError,
++            AttributeError,
++        ) as exc:
++            raise ValidationError(
++                "Explicit same-tenant source/payee/date terms required."
++            ) from exc
++        if (
++            line.line_kind != enrollment.category
++            or not (party.legal_name or party.display_name).strip()
++            or set(terms)
++            != {
++                "party_id",
++                "recognized_on",
++                "due_date",
++                "grouping_reference",
++                "source_hash",
++            }
++            or not isinstance(terms["grouping_reference"], str)
++            or not 0 < len(terms["grouping_reference"].strip()) <= 120
++        ):
++            raise ValidationError("Enrollment classification/terms are invalid.")
++        _, _, _, source_hash = _cached_source(
++            cache, enrollment.organization, line.proposal_id
++        )
++        if source_hash != terms["source_hash"]:
++            raise ValidationError("Enrollment source version is stale.")
++
++
++@transaction.atomic
++def prepare_enrollment(
++    *,
++    organization: Organization,
++    actor: User,
++    category: str,
++    assignments: dict,
++    evidence_reference: str,
++) -> PayrollAPEnrollment:
++    organization = _lock_organization(organization)
++    membership = _require(organization, actor, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE)
++    _require(organization, actor, P.PAYROLL_RESULTS_VIEW)
++    values, cache = {}, {}
++    for line_id, supplied in assignments.items():
++        try:
++            line = FinancialHandoffLine.objects.get(
++                pk=line_id, organization=organization
++            )
++        except ObjectDoesNotExist as exc:
++            raise ValidationError("Tenant liability source required.") from exc
++        _, _, _, h = _cached_source(cache, organization, line.proposal_id)
++        if set(supplied) != {
++            "party_id",
++            "recognized_on",
++            "due_date",
++            "grouping_reference",
++        }:
++            raise ValidationError("Explicit AP occurrence terms required; no defaults.")
++        values[str(line.pk)] = {
++            **supplied,
++            "party_id": str(UUID(supplied["party_id"])),
++            "source_hash": h,
++        }
++    version = (
++        PayrollAPEnrollment.objects.filter(organization=organization, category=category)
++        .order_by("-version")
++        .values_list("version", flat=True)
++        .first()
++        or 0
++    ) + 1
++    result = _create(
++        PayrollAPEnrollment,
++        organization=organization,
++        actor=membership,
++        category=category,
++        version=version,
++        assignments=values,
++        evidence_reference=evidence_reference.strip(),
++    )
++    _audit(
++        organization,
++        actor,
++        AuditAction.PAYROLL_AP_ENROLLMENT_PREPARED,
++        result.pk,
++        {"version": version, "category": category},
++    )
++    return result
++
++
++@transaction.atomic
++def change_enrollment(
++    *,
++    organization: Organization,
++    actor: User,
++    enrollment: PayrollAPEnrollment,
++    kind: str,
++    effective_at: datetime,
++    reason: str,
++) -> PayrollAPEnrollmentEvent:
++    organization = _lock_organization(organization)
++    membership = _require(organization, actor, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE)
++    enrollment = PayrollAPEnrollment.objects.get(
++        pk=enrollment.pk, organization=organization
++    )
++    prior = enrollment.events.filter(kind=kind).first()
++    if prior:
++        if (
++            prior.effective_at == effective_at
++            and prior.reason == reason.strip()
++            and prior.actor_id == membership.pk
++        ):
++            return prior
++        raise ValidationError("Enrollment event identity has conflicting payload.")
++    if (
++        timezone.is_naive(effective_at)
++        or effective_at < timezone.now()
++        or kind not in {"activate", "withdraw"}
++    ):
++        raise ValidationError("Enrollment changes must be explicit and prospective.")
++    active = enrollment.events.filter(kind="activate").first()
++    if kind == "activate":
++        _require(organization, actor, P.PAYROLL_RESULTS_VIEW)
++        validate_assignments(enrollment)
++        previous = PayrollAPEnrollmentEvent.objects.filter(
++            organization=organization,
++            enrollment__category=enrollment.category,
++            kind="activate",
++        )
++        if (
++            previous.filter(enrollment__version__gte=enrollment.version).exists()
++            or previous.filter(effective_at__gte=effective_at).exists()
++        ):
++            raise ValidationError(
++                "Activated versions/effective times must advance prospectively."
++            )
++    elif active is None or effective_at < active.effective_at:
++        raise ValidationError(
++            "Withdrawal requires retained activation and a valid effective time."
++        )
++    result = _create(
++        PayrollAPEnrollmentEvent,
++        organization=organization,
++        actor=membership,
++        enrollment=enrollment,
++        kind=kind,
++        effective_at=effective_at,
++        reason=reason.strip(),
++    )
++    _audit(
++        organization,
++        actor,
++        AuditAction.PAYROLL_AP_ENROLLMENT_CHANGED,
++        result.pk,
++        {
++            "enrollment": str(enrollment.pk),
++            "kind": kind,
++            "effective_at": effective_at.isoformat(),
++        },
++    )
++    return result
++
++
++def _active(organization, category, *, at=None):
++    at = at or timezone.now()
++    event = (
++        PayrollAPEnrollmentEvent.objects.filter(
++            organization=organization,
++            kind="activate",
++            enrollment__category=category,
++            effective_at__lte=at,
++        )
++        .select_related("enrollment")
++        .order_by("-enrollment__version")
++        .first()
++    )
++    if (
++        event is None
++        or event.enrollment.events.filter(
++            kind="withdraw", effective_at__lte=at
++        ).exists()
++    ):
++        return None
++    return event.enrollment
++
++
++def _drafts(
++    organization,
++    actor,
++    membership,
++    proposal,
++    lines,
++    payload,
++    source_hash,
++    predecessors=None,
++    exclusions=None,
++):
++    drafts = []
++    exclusions = exclusions if exclusions is not None else []
++    consumed_at = timezone.now()
++    active = {
++        category: _active(organization, category, at=consumed_at)
++        for category in {line.line_kind for line in lines}
++    }
++    for line in lines:
++        if line.amount <= 0:
++            exclusions.append({"line": str(line.pk), "reason": "NON_POSITIVE_PAYABLE"})
++            continue
++        enrollment = active[line.line_kind]
++        if enrollment is None or str(line.pk) not in enrollment.assignments:
++            exclusions.append(
++                {
++                    "line": str(line.pk),
++                    "reason": "NO_ACTIVE_ENROLLMENT"
++                    if enrollment is None
++                    else "OCCURRENCE_NOT_ENROLLED",
++                    "enrollment": str(enrollment.pk) if enrollment else None,
++                }
++            )
++            continue
++        terms = enrollment.assignments[str(line.pk)]
++        if terms["source_hash"] != source_hash:
++            raise ValidationError("Enrollment pins another Payroll source version.")
++        party = BusinessParty.objects.get(
++            pk=terms["party_id"], organization=organization
++        )
++        snapshot = {
++            "source": payload,
++            "source_hash": source_hash,
++            "enrollment": str(enrollment.pk),
++            "enrollment_version": enrollment.version,
++            "terms": terms,
++            "line": str(line.pk),
++            "party_name": party.legal_name or party.display_name,
++            "party_tax_identifier": party.tax_identifier,
++            "policy_evidence": enrollment.evidence_reference,
++            "consumed_at": consumed_at.isoformat(),
++            "predecessor": str((predecessors or {})[_key(line)].pk)
++            if _key(line) in (predecessors or {})
++            else None,
++        }
++        drafts.append(
++            _create(
++                PayrollAPDraft,
++                organization=organization,
++                actor=membership,
++                source_line=line,
++                enrollment=enrollment,
++                source_version=proposal.source_digest,
++                predecessor=(predecessors or {}).get(_key(line)),
++                snapshot=snapshot,
++                payload_hash=_canonical_hash(snapshot),
++                amount=line.amount,
++                currency=proposal.currency,
++                party=party,
++                project=line.run_employee.project,
++                recognized_on=date.fromisoformat(terms["recognized_on"]),
++                due_date=date.fromisoformat(terms["due_date"]),
++                grouping_reference=terms["grouping_reference"],
++            )
++        )
++    return drafts
++
++
++def _key(line):
++    return (
++        line.employee_id,
++        line.line_kind,
++        line.statutory_result.calculation.kind if line.statutory_result_id else "",
++    )
++
++
++def _target(draft):
++    return Obligation.objects.filter(
++        organization_id=draft.organization_id,
++        source_kind=SOURCE_KIND,
++        source_uuid=draft.pk,
++        source_version=1,
++    ).first()
++
++
++def _validate_draft(draft, *, cache=None):
++    proposal, _, _, current = _cached_source(
++        cache if cache is not None else {},
++        draft.organization,
++        draft.source_line.proposal_id,
++        historical=True,
++    )
++    consumed_at = datetime.fromisoformat(draft.snapshot["consumed_at"])
++    enrollment_at_consumption = _active(
++        draft.organization, draft.enrollment.category, at=consumed_at
++    )
++    if (
++        enrollment_at_consumption is None
++        or enrollment_at_consumption.pk != draft.enrollment_id
++    ):
++        raise ValidationError(
++            "Draft does not pin an enrollment active at source consumption."
++        )
++    if (
++        current != draft.snapshot["source_hash"]
++        or proposal.source_digest != draft.source_version
++        or _canonical_hash(draft.snapshot) != draft.payload_hash
++        or draft.amount != draft.source_line.amount
++        or draft.currency != proposal.currency
++        or draft.enrollment_id != UUID(draft.snapshot["enrollment"])
++        or draft.snapshot["terms"]
++        != draft.enrollment.assignments[str(draft.source_line_id)]
++        or str(draft.party_id) != draft.snapshot["terms"]["party_id"]
++        or draft.recognized_on.isoformat() != draft.snapshot["terms"]["recognized_on"]
++        or draft.due_date.isoformat() != draft.snapshot["terms"]["due_date"]
++        or draft.grouping_reference != draft.snapshot["terms"]["grouping_reference"]
++        or draft.project_id != draft.source_line.run_employee.project_id
++        or draft.snapshot["line"] != str(draft.source_line_id)
++        or draft.snapshot["enrollment_version"] != draft.enrollment.version
++        or draft.snapshot["predecessor"]
++        != (str(draft.predecessor_id) if draft.predecessor_id else None)
++    ):
++        raise ValidationError("Payroll AP draft/source/mapping drift detected.")
++
++
++def _snapshot(draft):
++    return ObligationSourceSnapshot(
++        SOURCE_KIND,
++        draft.pk,
++        1,
++        "",
++        "approved_ap_draft",
++        ObligationDirection.PAYABLE,
++        draft.amount,
++        draft.currency,
++        draft.recognized_on,
++        draft.due_date,
++        draft.party_id,
++        draft.snapshot["party_name"],
++        draft.snapshot["party_tax_identifier"],
++        draft.project_id,
++        None,
++        {
++            "draft": str(draft.pk),
++            "source_version": draft.source_version,
++            **draft.snapshot,
++        },
++    )
++
++
++def _validate_target(draft, target):
++    expected = _snapshot(draft)
++    if (
++        target.payload_hash != _canonical_hash(asdict(expected))
++        or target.source_snapshot != expected.source_snapshot
++        or target.source_hash != _canonical_hash(expected.source_snapshot)
++        or target.original_amount != draft.amount
++        or target.currency != draft.currency
++        or target.party_id != draft.party_id
++        or target.project_id != draft.project_id
++        or target.recognized_on != draft.recognized_on
++        or target.due_date != draft.due_date
++        or target.direction != ObligationDirection.PAYABLE
++        or target.source_version != 1
++        or target.source_line_key
++        or target.contract_id
++        or target.party_name_snapshot != expected.party_name
++        or target.party_tax_identifier_snapshot != expected.party_tax_identifier
++    ):
++        raise ValidationError("AP target/source payload drift detected.")
++
++
++def _operation(
++    *,
++    organization,
++    actor,
++    proposal,
++    idempotency_key,
++    reversal=None,
++    effective_date=None,
++    reason="",
++):
++    idempotency_key = idempotency_key.strip()
++    membership = _require(organization, actor, P.SUBLEDGERS_PAYROLL_PREPARE)
++    _require(organization, actor, P.PAYROLL_RESULTS_VIEW)
++    proposal, lines, payload, h = _read(organization, proposal.pk, historical=True)
++    inverse_hash = _read(organization, reversal.pk)[3] if reversal else None
++    request = {
++        "source": str(proposal.pk),
++        "hash": h,
++        "reversal": str(reversal.pk) if reversal else None,
++        "reversal_hash": inverse_hash,
++        "effective_date": str(effective_date) if effective_date else None,
++        "reason": reason.strip(),
++    }
++    request_hash = _canonical_hash(request)
++    if not idempotency_key.strip() or not reason.strip():
++        raise ValidationError("Explicit request identity and reason required.")
++    prior = PayrollAPOperation.objects.filter(
++        organization=organization, idempotency_key=idempotency_key
++    ).first()
++    source_prior = PayrollAPOperation.objects.filter(
++        organization=organization, source_proposal=proposal
++    ).first()
++    if prior or source_prior:
++        prior = prior or source_prior
++        if (
++            prior.source_proposal_id != proposal.pk
++            or prior.payload_hash != request_hash
++        ):
++            raise ValidationError(
++                "Payroll occurrence/request identity has conflicting payload."
++            )
++        source_cache = {}
++        for pk in prior.result["drafts"]:
++            draft = PayrollAPDraft.objects.get(pk=pk, organization=organization)
++            if draft.source_line.proposal_id != prior.source_proposal_id:
++                raise ValidationError(
++                    "Operation/draft occurrence linkage drift detected."
++                )
++            _validate_draft(draft, cache=source_cache)
++            target = _target(draft)
++            if target:
++                _validate_target(draft, target)
++        for pk in prior.result["reversals"]:
++            effect = PayrollAPReversal.objects.select_related("draft").get(
++                pk=pk, organization=organization
++            )
++            if effect.source_proposal_id != prior.reversal_proposal_id:
++                raise ValidationError("Operation/reversal lineage drift detected.")
++            _validate_draft(effect.draft, cache=source_cache)
++            target = _target(effect.draft)
++            if (target.pk if target else None) != effect.obligation_id:
++                raise ValidationError("Reversal/AP target linkage drift detected.")
++            if target:
++                _validate_target(effect.draft, target)
++        return prior
++    _read(organization, proposal.pk)
++    reversals, predecessors, exclusions, source_cache = [], {}, [], {}
++    if reversal is not None:
++        _require(organization, actor, P.SUBLEDGERS_SOURCES_REVERSE)
++        reversal, inverse_lines, _, inverse_hash = _read(organization, reversal.pk)
++        if not effective_date:
++            raise ValidationError("Explicit AP correction effective date required.")
++        try:
++            chain = PayrollReversal.objects.get(
++                organization=organization, reversal_run_id=reversal.run_id
++            )
++            original = FinancialHandoffProposal.objects.get(
++                organization=organization,
++                run_id=chain.original_run_id,
++                family="liability",
++            )
++        except ObjectDoesNotExist as exc:
++            raise ValidationError(
++                "Retained Payroll reversal/predecessor required."
++            ) from exc
++        if reversal.record_kind != "reversal" or reversal.predecessor_id != original.pk:
++            raise ValidationError("Reversal source lineage does not match.")
++        if proposal.pk != reversal.pk and (
++            proposal.record_kind != "replacement"
++            or proposal.run_id != chain.replacement_run_id
++            or proposal.predecessor_id != original.pk
++        ):
++            raise ValidationError(
++                "Replacement must follow the retained Payroll replacement chain."
++            )
++        _, old_lines, _, _ = _read(organization, original.pk, historical=True)
++        old_map, inverse_map = (
++            {_key(x): x for x in old_lines},
++            {_key(x): x for x in inverse_lines},
++        )
++        if (
++            len(old_map) != len(old_lines)
++            or len(inverse_map) != len(inverse_lines)
++            or set(old_map) != set(inverse_map)
++            or original.currency != reversal.currency
++            or any(old_map[k].amount != -inverse_map[k].amount for k in old_map)
++        ):
++            raise ValidationError(
++                "Payroll reversal must be an exact inverse occurrence set."
++            )
++        old_drafts = list(
++            PayrollAPDraft.objects.select_for_update(of=("self",))
++            .filter(organization=organization, source_line__proposal=original)
++            .select_related("source_line__statutory_result__calculation")
++        )
++        if not old_drafts:
++            raise ValidationError("No retained original AP effect exists to correct.")
++        for draft in old_drafts:
++            _validate_draft(draft, cache=source_cache)
++            target = _target(draft)
++            if target:
++                target = Obligation.objects.select_for_update().get(
++                    pk=target.pk, organization=organization
++                )
++                _validate_target(draft, target)
++            rh = _canonical_hash(
++                {
++                    "draft": str(draft.pk),
++                    "reversal": str(reversal.pk),
++                    "source_hash": inverse_hash,
++                    "effective_date": str(effective_date),
++                    "reason": reason.strip(),
++                }
++            )
++            existing = PayrollAPReversal.objects.filter(draft=draft).first()
++            if existing:
++                if existing.payload_hash != rh:
++                    raise ValidationError(
++                        "Existing Payroll AP reversal has conflicting payload."
++                    )
++                reversals.append(existing)
++            else:
++                if target and (
++                    target.recognition_journal_id
++                    or _active_settlement_amount(obligation=target)
++                    or _approved_writeoff_amount(obligation=target)
++                    or target.settlement_allocations.filter(
++                        reversal__effective_date__gt=effective_date
++                    ).exists()
++                    or target.write_off_proposals.filter(
++                        decision__reversal__effective_date__gt=effective_date
++                    ).exists()
++                ):
++                    raise ValidationError(
++                        "Consumed AP target requires independent downstream unwind first."
++                    )
++                reversals.append(
++                    _create(
++                        PayrollAPReversal,
++                        organization=organization,
++                        actor=membership,
++                        draft=draft,
++                        obligation=target,
++                        source_proposal=reversal,
++                        effective_date=effective_date,
++                        reason=reason.strip(),
++                        payload_hash=rh,
++                    )
++                )
++            predecessors[_key(draft.source_line)] = draft
++        drafts = (
++            []
++            if proposal.pk == reversal.pk
++            else _drafts(
++                organization,
++                actor,
++                membership,
++                proposal,
++                lines,
++                payload,
++                h,
++                predecessors,
++                exclusions=exclusions,
++            )
++        )
++        if any(effective_date > d.recognized_on for d in drafts):
++            raise ValidationError(
++                "Reversal cannot follow replacement recognition date."
++            )
++    else:
++        if proposal.record_kind != "original":
++            raise ValidationError(
++                "Corrections require explicit retained reversal lineage."
++            )
++        drafts = _drafts(
++            organization,
++            actor,
++            membership,
++            proposal,
++            lines,
++            payload,
++            h,
++            exclusions=exclusions,
++        )
++        if not drafts:
++            raise ValidationError(
++                "No active approved occurrence enrollment; AP consumption denied."
++            )
++    result = _create(
++        PayrollAPOperation,
++        organization=organization,
++        actor=membership,
++        source_proposal=proposal,
++        reversal_proposal=reversal,
++        source_hash=h,
++        payload_hash=request_hash,
++        idempotency_key=idempotency_key.strip(),
++        result={
++            "drafts": [str(x.pk) for x in drafts],
++            "reversals": [str(x.pk) for x in reversals],
++            "exclusions": exclusions,
++        },
++    )
++    _audit(
++        organization, actor, AuditAction.PAYROLL_AP_OPERATION, result.pk, result.result
++    )
++    return result
++
++
++def prepare_payroll_ap(
++    *,
++    organization: Organization,
++    actor: User,
++    proposal: FinancialHandoffProposal,
++    idempotency_key: str,
++    reason: str,
++    reversal=None,
++    effective_date: date | None = None,
++) -> PayrollAPOperation:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.SUBLEDGERS_PAYROLL_PREPARE,
++        message="Explicit authorized AP/Payroll access required.",
++    )
++    try:
++        with transaction.atomic():
++            organization = _lock_organization(organization)
++            return _operation(
++                organization=organization,
++                actor=actor,
++                proposal=proposal,
++                idempotency_key=idempotency_key,
++                reason=reason,
++                reversal=reversal,
++                effective_date=effective_date,
++            )
++    except (
++        ValidationError,
++        PermissionDenied,
++        DatabaseError,
++        ObjectDoesNotExist,
++    ) as exc:
++        if FinancialHandoffProposal.objects.filter(
++            organization=organization, pk=proposal.pk
++        ).exists():
++            require_business_permission(
++                user=actor,
++                organization=organization,
++                permission=P.PAYROLL_RESULTS_VIEW,
++                message="Explicit authorized AP/Payroll access required.",
++            )
++            _audit(
++                organization,
++                actor,
++                AuditAction.PAYROLL_AP_FAILED,
++                proposal.pk,
++                {
++                    "request_hash": _canonical_hash(idempotency_key),
++                    "error_type": type(exc).__name__,
++                },
++            )
++        if isinstance(exc, ObjectDoesNotExist):
++            raise ValidationError(
++                "Pinned AP source/mapping evidence is unavailable."
++            ) from exc
++        raise
++
++
++def resolve_payroll_source(organization, source_uuid, source_version, source_line_key):
++    try:
++        draft = (
++            PayrollAPDraft.objects.select_for_update()
++            .select_related("enrollment", "source_line__proposal")
++            .get(pk=source_uuid, organization=organization)
++        )
++    except ObjectDoesNotExist as exc:
++        raise ValidationError("Tenant AP-owned Payroll draft required.") from exc
++    _validate_draft(draft)
++    if (
++        source_version != 1
++        or source_line_key
++        or PayrollAPReversal.objects.filter(draft=draft).exists()
++    ):
++        raise ValidationError("Source version or active AP draft is invalid.")
++    if _target(draft) is None:
++        _read(organization, draft.source_line.proposal_id)
++    target = _target(draft)
++    if target:
++        _validate_target(draft, target)
++    return _snapshot(draft)
++
++
++def accept_payroll_ap_draft(
++    *,
++    organization: Organization,
++    actor: User,
++    draft: PayrollAPDraft,
++    idempotency_key: str,
++) -> Obligation:
++    for permission in (P.SUBLEDGERS_OBLIGATIONS_RECOGNIZE, P.PAYROLL_RESULTS_VIEW):
++        require_business_permission(
++            user=actor,
++            organization=organization,
++            permission=permission,
++            message="Explicit AP and sensitive Payroll authority required.",
++        )
++    try:
++        with transaction.atomic():
++            organization = _lock_organization(organization)
++            _require(organization, actor, P.SUBLEDGERS_OBLIGATIONS_RECOGNIZE)
++            _require(organization, actor, P.PAYROLL_RESULTS_VIEW)
++            return recognize_obligation(
++                organization=organization,
++                actor=actor,
++                source_kind=SOURCE_KIND,
++                source_uuid=draft.pk,
++                source_version=1,
++                idempotency_key=idempotency_key,
++            )
++    except (ValidationError, DatabaseError) as exc:
++        retained = PayrollAPDraft.objects.filter(
++            pk=draft.pk, organization=organization
++        ).first()
++        if retained is not None:
++            _audit(
++                organization,
++                actor,
++                AuditAction.PAYROLL_AP_FAILED,
++                retained.source_line.proposal_id,
++                {
++                    "draft": str(retained.pk),
++                    "request_hash": _canonical_hash(idempotency_key),
++                    "error_type": type(exc).__name__,
++                },
++            )
++        raise
++
++
++def _native_lineage(organization, source):
++    from apps.payroll.models import PayrollRun
++
++    current, seen, lineage = source.run, set(), []
++    while current.status == "reversed":
++        if current.pk in seen:
++            raise ValidationError("Native Payroll correction lineage cycle.")
++        seen.add(current.pk)
++        chain = (
++            PayrollReversal.objects.filter(
++                organization=organization, original_run=current
++            )
++            .select_related("reversal_run")
++            .first()
++        )
++        if chain is None:
++            raise ValidationError(
++                "Reversed Payroll source lacks authoritative reversal lineage."
++            )
++        lineage.append(
++            {
++                "original_run": str(current.pk),
++                "original_version": current.calculation_digest,
++                "reversal_run": str(chain.reversal_run_id),
++                "reversal_version": chain.reversal_run.calculation_digest,
++                "replacement_run": str(chain.replacement_run_id)
++                if chain.replacement_run_id
++                else None,
++            }
++        )
++        if chain.replacement_run_id is None:
++            return None, lineage
++        current = PayrollRun.objects.select_for_update().get(
++            pk=chain.replacement_run_id, organization=organization
++        )
++    return (
++        {"run": str(current.pk), "version": current.calculation_digest}
++        if current.status == "finalized"
++        else None
++    ), lineage
++
++
++@transaction.atomic
++def reconcile_payroll_ap(
++    *, organization: Organization, actor: User, proposal: FinancialHandoffProposal
++) -> dict:
++    organization = _lock_organization(organization)
++    membership = _require(organization, actor, P.SUBLEDGERS_PAYROLL_VIEW)
++    _require(organization, actor, P.PAYROLL_RESULTS_VIEW)
++    source, _, _, source_hash = _read(organization, proposal.pk, historical=True)
++    active_source, native_lineage = _native_lineage(organization, source)
++    pending = list(
++        PayrollAPDraft.objects.filter(
++            organization=organization, source_line__proposal=source
++        )
++    )
++    rows, visited, cache = [], set(), {}
++    for draft in pending:
++        if draft.pk in visited:
++            raise ValidationError("AP replacement lineage cycle/duplicate.")
++        visited.add(draft.pk)
++        _validate_draft(draft, cache=cache)
++        target = _target(draft)
++        rev = (
++            PayrollAPReversal.objects.filter(draft=draft, organization=organization)
++            .select_related("source_proposal")
++            .first()
++        )
++        if target:
++            _validate_target(draft, target)
++        children = list(draft.replacements.filter(organization=organization))
++        pending.extend(children)
++        source_state = draft.source_line.proposal.run.status
++        rows.append(
++            {
++                "source_line": str(draft.source_line_id),
++                "source_version": draft.source_version,
++                "enrollment": str(draft.enrollment_id),
++                "enrollment_version": draft.enrollment.version,
++                "consumed_at": draft.snapshot["consumed_at"],
++                "draft": str(draft.pk),
++                "predecessor": str(draft.predecessor_id)
++                if draft.predecessor_id
++                else None,
++                "amount": str(draft.amount),
++                "obligation": str(target.pk) if target else None,
++                "reversal": str(rev.pk) if rev else None,
++                "reversal_source": str(rev.source_proposal_id) if rev else None,
++                "reversal_source_version": rev.source_proposal.source_digest
++                if rev
++                else None,
++                "replacements": [str(x.pk) for x in children],
++                "issues": ["PENDING_AP_CORRECTION"]
++                if source_state == "reversed" and rev is None
++                else [],
++            }
++        )
++    operations = PayrollAPOperation.objects.filter(
++        organization=organization,
++        source_proposal__run_id__in=[item["original_run"] for item in native_lineage]
++        + ([active_source["run"]] if active_source else [str(source.run_id)]),
++    )
++    result = {
++        "organization": str(organization.pk),
++        "observed_at": timezone.now().isoformat(),
++        "source": str(source.pk),
++        "source_hash": source_hash,
++        "active_native_source": active_source,
++        "native_lineage": native_lineage,
++        "rows": rows,
++        "projection_only": True,
++        "recorded_exclusions": [
++            {
++                "operation": str(op.pk),
++                "source": str(op.source_proposal_id),
++                "exclusions": op.result.get("exclusions", []),
++            }
++            for op in operations
++        ],
++    }
++    _audit(
++        organization,
++        actor,
++        AuditAction.PAYROLL_AP_RECONCILED,
++        source.pk,
++        {"prepared_by": str(membership.pk), "result": result},
++    )
++    return result
++
++
++def register_payroll_handoff():
++    if SOURCE_KIND not in registered_source_kinds():
++        register_source_resolver(SOURCE_KIND, resolve_payroll_source)
+--- /dev/null
++++ b/apps/subledgers/payroll_models.py
+@@ -0,0 +1,212 @@
++"""AP-owned immutable INT-B07 enrollment, drafts and correction lineage."""
++
++# ruff: noqa: RUF012
++
++from django.core.exceptions import ValidationError
++from django.db import models
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class PayrollAPEvidenceQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("Payroll AP evidence is immutable.")
++
++    def delete(self):
++        raise ValidationError("Payroll AP evidence cannot be deleted.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("Use the AP application service.")
++
++
++class PayrollAPEvidence(UUIDModel, CreatedAtModel):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    actor = models.ForeignKey(
++        "organizations.OrganizationMembership", on_delete=models.PROTECT
++    )
++    objects = PayrollAPEvidenceQuerySet.as_manager()
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args, **kwargs):
++        if not getattr(self, "_ap_service", False):
++            raise ValidationError("Use the AP application service.")
++        if not self._state.adding:
++            raise ValidationError("Payroll AP evidence is immutable.")
++        self.full_clean()
++        return super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("Payroll AP evidence cannot be deleted.")
++
++    def clean(self):
++        related = {
++            f.name: getattr(self, f.name)
++            for f in self._meta.fields
++            if f.is_relation and f.name != "organization" and getattr(self, f.attname)
++        }
++        validate_related_organizations(self, **related)
++
++
++class PayrollAPEnrollment(PayrollAPEvidence):
++    category = models.CharField(max_length=40)
++    version = models.PositiveIntegerField()
++    # Exact Payroll liability line UUID -> explicit AP terms plus source hash.
++    assignments = models.JSONField()
++    evidence_reference = models.CharField(max_length=500)
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["organization", "category", "version"],
++                name="payroll_ap_enrollment_version_uq",
++            ),
++            models.CheckConstraint(
++                condition=models.Q(version__gte=1),
++                name="payroll_ap_enrollment_version_ck",
++            ),
++        ]
++
++    def clean(self):
++        super().clean()
++        from .payroll_handoffs import validate_assignments
++
++        validate_assignments(self)
++        if not self.evidence_reference.strip():
++            raise ValidationError("Explicit enrollment policy evidence is required.")
++
++
++class PayrollAPEnrollmentEvent(PayrollAPEvidence):
++    enrollment = models.ForeignKey(
++        PayrollAPEnrollment, on_delete=models.PROTECT, related_name="events"
++    )
++    kind = models.CharField(
++        max_length=12, choices=[("activate", "Activate"), ("withdraw", "Withdraw")]
++    )
++    effective_at = models.DateTimeField()
++    reason = models.TextField()
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["enrollment", "kind"], name="payroll_ap_enrollment_event_uq"
++            )
++        ]
++
++    def clean(self):
++        super().clean()
++        if not self.reason.strip() or self.kind not in {"activate", "withdraw"}:
++            raise ValidationError("Explicit AP enrollment event and reason required.")
++
++
++class PayrollAPDraft(PayrollAPEvidence):
++    source_line = models.OneToOneField(
++        "payroll.FinancialHandoffLine",
++        on_delete=models.PROTECT,
++        related_name="ap_draft",
++    )
++    enrollment = models.ForeignKey(PayrollAPEnrollment, on_delete=models.PROTECT)
++    predecessor = models.ForeignKey(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacements",
++    )
++    source_version = models.CharField(max_length=64)
++    payload_hash = models.CharField(max_length=64)
++    snapshot = models.JSONField()
++    amount = models.DecimalField(max_digits=24, decimal_places=2)
++    currency = models.CharField(max_length=3)
++    party = models.ForeignKey("parties.BusinessParty", on_delete=models.PROTECT)
++    project = models.ForeignKey(
++        "projects.Project", on_delete=models.PROTECT, null=True, blank=True
++    )
++    recognized_on = models.DateField()
++    due_date = models.DateField()
++    grouping_reference = models.CharField(max_length=120)
++
++    class Meta:
++        constraints = [
++            models.CheckConstraint(
++                condition=models.Q(amount__gt=0), name="payroll_ap_draft_positive_ck"
++            )
++        ]
++
++    def clean(self):
++        super().clean()
++        if (
++            self.source_line.proposal.family != "liability"
++            or self.source_line.line_kind != self.enrollment.category
++            or self.currency != "IRR"
++            or self.amount <= 0
++            or not self.grouping_reference.strip()
++        ):
++            raise ValidationError(
++                "Draft must pin an eligible explicit Payroll liability."
++            )
++
++
++class PayrollAPReversal(PayrollAPEvidence):
++    draft = models.OneToOneField(
++        PayrollAPDraft, on_delete=models.PROTECT, related_name="source_reversal"
++    )
++    obligation = models.OneToOneField(
++        "subledgers.Obligation",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="payroll_source_reversal",
++    )
++    source_proposal = models.ForeignKey(
++        "payroll.FinancialHandoffProposal", on_delete=models.PROTECT
++    )
++    effective_date = models.DateField()
++    reason = models.TextField()
++    payload_hash = models.CharField(max_length=64)
++
++    def clean(self):
++        super().clean()
++        if (
++            not self.reason.strip()
++            or self.effective_date < self.draft.recognized_on
++            or (
++                self.obligation_id
++                and (
++                    self.obligation.source_kind != "payroll.liability.v1"
++                    or self.obligation.source_uuid != self.draft_id
++                )
++            )
++        ):
++            raise ValidationError("Payroll AP reversal identity/date is invalid.")
++
++
++class PayrollAPOperation(PayrollAPEvidence):
++    source_proposal = models.OneToOneField(
++        "payroll.FinancialHandoffProposal",
++        on_delete=models.PROTECT,
++        related_name="ap_operation",
++    )
++    reversal_proposal = models.ForeignKey(
++        "payroll.FinancialHandoffProposal",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="ap_corrections",
++    )
++    source_hash = models.CharField(max_length=64)
++    payload_hash = models.CharField(max_length=64)
++    idempotency_key = models.CharField(max_length=120)
++    result = models.JSONField()
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["organization", "idempotency_key"],
++                name="payroll_ap_operation_key_uq",
++            )
++        ]
+--- /dev/null
++++ b/apps/subledgers/test_cep043_migration.py
+@@ -0,0 +1,154 @@
++"""Populated disposable PostgreSQL preservation and additive rollback/reapply."""
++
++import json
++import os
++from datetime import date
++from pathlib import Path
++
++from django.apps import apps
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from apps.accounting.models import FiscalPeriod, FiscalYear, JournalEntry
++from apps.organizations.models import BusinessPermission, OrganizationRole
++
++from . import test_cep043_payroll_handoff as scenarios
++from .models import Obligation
++from .services import _canonical_hash
++
++
++class PayrollAPMigrationTests(scenarios.PayrollAPFixture, TransactionTestCase):
++    def test_populated_legacy_history_grants_and_catalog_survive_additive_reapply(self):
++        # Explicit pre-existing synthetic rows, independent of new AP draft tables.
++        year = FiscalYear.objects.create(
++            organization=self.organization,
++            code="MIG043",
++            name="Retained",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++            created_by=self.owner,
++        )
++        period = FiscalPeriod.objects.create(
++            organization=self.organization,
++            fiscal_year=year,
++            number=1,
++            name="Retained",
++            starts_on=year.starts_on,
++            ends_on=year.ends_on,
++        )
++        JournalEntry.objects.create(
++            organization=self.organization,
++            period=period,
++            kind="manual",
++            document_date=self.day,
++            accounting_date=self.day,
++            description="Synthetic retained draft",
++            source_key="retained043",
++            prepared_by=self.ap_membership,
++        )
++        Obligation.objects.create(
++            organization=self.organization,
++            source_kind="synthetic.retained",
++            source_uuid=self.proposal.pk,
++            source_version=1,
++            source_status="retained",
++            source_hash="retained",
++            source_snapshot={"evidence": "pre-existing fixture"},
++            direction="payable",
++            party_name_snapshot="Retained synthetic party",
++            original_amount=5,
++            recognized_on=self.day,
++            idempotency_key="retained043",
++            payload_hash="retained",
++            recognized_by=self.ap_membership,
++        )
++        labels = (
++            "payroll.PayrollRun",
++            "payroll.PayrollRunEmployee",
++            "payroll.PayrollResultLine",
++            "payroll.FinancialHandoffProposal",
++            "payroll.FinancialHandoffLine",
++            "payroll.FinancialHandoffReview",
++            "subledgers.Obligation",
++            "accounting.Account",
++            "accounting.ControlAccountMappingVersion",
++            "accounting.JournalEntry",
++            "audit.AuditEvent",
++            "organizations.MembershipRoleAssignment",
++            "organizations.MembershipScopeGrant",
++        )
++
++        def snapshot():
++            values = {}
++            for label in labels:
++                rows = list(apps.get_model(label).objects.order_by("pk").values())
++                values[label] = {"count": len(rows), "sha256": _canonical_hash(rows)}
++            rows = list(
++                OrganizationRole.permissions.through.objects.order_by("pk").values()
++            )
++            values["role_grants"] = {
++                "count": len(rows),
++                "sha256": _canonical_hash(rows),
++            }
++            rows = list(
++                BusinessPermission.objects.exclude(
++                    code__startswith="subledgers_payroll."
++                )
++                .order_by("pk")
++                .values()
++            )
++            values["preexisting_catalog"] = {
++                "count": len(rows),
++                "sha256": _canonical_hash(rows),
++            }
++            return values
++
++        before = snapshot()
++        old = [
++            ("subledgers", "0005_supplierinvoiceapreversal"),
++            ("organizations", "0120_cep042_recognition_permissions"),
++        ]
++        new = [
++            ("subledgers", "0006_cep043_payroll_ap"),
++            ("organizations", "0121_cep043_payroll_ap_permissions"),
++        ]
++        try:
++            MigrationExecutor(connection).migrate(old)
++            self.assertEqual(snapshot(), before)
++            self.assertNotIn(
++                "subledgers_payrollapdraft", connection.introspection.table_names()
++            )
++            MigrationExecutor(connection).migrate(new)
++            self.assertEqual(snapshot(), before)
++            for name in (
++                "PayrollAPEnrollment",
++                "PayrollAPEnrollmentEvent",
++                "PayrollAPDraft",
++                "PayrollAPOperation",
++                "PayrollAPReversal",
++            ):
++                self.assertEqual(apps.get_model("subledgers", name).objects.count(), 0)
++            self.assertEqual(
++                BusinessPermission.objects.filter(
++                    code__startswith="subledgers_payroll.", is_active=True
++                ).count(),
++                4,
++            )
++        finally:
++            MigrationExecutor(connection).migrate(new)
++        if os.getenv("BONIRA_CEP043_MIGRATION_TRACE"):
++            Path(os.environ["BONIRA_CEP043_MIGRATION_TRACE"]).write_text(
++                json.dumps(
++                    {
++                        "database": "disposable test PostgreSQL only",
++                        "before": before,
++                        "after": snapshot(),
++                        "preserved": True,
++                        "new_tables_empty": True,
++                        "production": False,
++                    },
++                    indent=2,
++                )
++                + "\n"
++            )
+--- /dev/null
++++ b/apps/subledgers/test_cep043_payroll_handoff.py
+@@ -0,0 +1,856 @@
++"""Synthetic finalized Payroll sources, real AP services and PostgreSQL races."""
++
++import json
++import os
++from concurrent.futures import ThreadPoolExecutor
++from datetime import date, timedelta
++from decimal import Decimal
++from pathlib import Path
++from threading import Barrier
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import DatabaseError, close_old_connections, connection
++from django.test import TestCase, TransactionTestCase
++from django.utils import timezone
++
++from apps.accounting.models import Account, ControlAccountMappingVersion, JournalEntry
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.audit.models import AuditAction, AuditEvent
++from apps.organizations.models import BusinessPermission, OrganizationMembership
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
++from apps.organizations.services import create_organization_with_owner
++from apps.parties.models import BusinessParty
++from apps.payroll import test_p7_s29_s32_financial_handoffs as source_scenarios
++from apps.payroll.financial_handoff_services import (
++    prepare_financial_handoff,
++    review_financial_handoff,
++)
++from apps.payroll.models import PayrollResultLine, PayrollRun, PayrollRunEmployee
++from apps.payroll.services import reverse_run
++from apps.projects.models import ProjectCostFact
++from apps.treasury.models import TreasuryMovement
++
++from . import payroll_handoffs as api
++from .models import Obligation
++from .payroll_models import (
++    PayrollAPDraft,
++    PayrollAPEnrollment,
++    PayrollAPOperation,
++    PayrollAPReversal,
++)
++from .services import (
++    _require_unreversed_source,
++    _source_reversed_amount_as_of,
++)
++
++
++class PayrollAPFixture:
++    _member = source_scenarios.PayrollFinancialHandoffTests._member
++    _monetary_versions = (
++        source_scenarios.PayrollFinancialHandoffTests._monetary_versions
++    )
++    _prepare = source_scenarios.PayrollFinancialHandoffTests._prepare
++
++    def setUp(self):
++        source_scenarios.PayrollFinancialHandoffTests.setUp(self)
++        self.day = date(2026, 10, 18)
++        self.ap_permissions = [
++            P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
++            P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
++            P.SUBLEDGERS_PAYROLL_PREPARE,
++            P.SUBLEDGERS_PAYROLL_VIEW,
++            P.SUBLEDGERS_OBLIGATIONS_RECOGNIZE,
++            P.SUBLEDGERS_SOURCES_REVERSE,
++            P.PAYROLL_ADJUST,
++        ]
++        membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        membership.role_definition.permissions.add(
++            *BusinessPermission.objects.filter(code__in=self.ap_permissions)
++        )
++        explicit_fixture_authority(membership, membership.role_definition)
++        for actor in (self.reviewer, self.denied):
++            m = OrganizationMembership.objects.get(
++                organization=self.organization, user=actor
++            )
++            explicit_fixture_authority(m, m.role_definition)
++        self.ap_membership = membership
++        self.party = BusinessParty.objects.create(
++            organization=self.organization,
++            party_kind="individual",
++            display_name="Synthetic explicitly mapped payee",
++            created_by=self.owner,
++            updated_by=self.owner,
++        )
++        self.account = Account.objects.create(
++            organization=self.organization,
++            code="AP043",
++            name="Explicit synthetic AP control",
++            account_type="liability",
++            is_posting=True,
++            created_by=self.owner,
++        )
++        ControlAccountMappingVersion.objects.create(
++            organization=self.organization,
++            source_kind=api.SOURCE_KIND,
++            direction="payable",
++            version=1,
++            control_account=self.account,
++            effective_from=date(2026, 1, 1),
++            reason="Explicit synthetic AP mapping",
++            created_by=self.ap_membership,
++        )
++        self.proposal = self.source(self.run, "original")
++
++    def source(self, run, key):
++        result = prepare_financial_handoff(
++            organization=self.organization,
++            actor=self.actor,
++            run=run,
++            family="liability",
++            idempotency_key=key,
++            reason="Synthetic finalized source",
++        )
++        review_financial_handoff(
++            organization=self.organization,
++            actor=self.reviewer,
++            proposal=result,
++            disposition="accepted",
++            reason="Source review only",
++        )
++        return result
++
++    def enrollment(self, proposal=None, *, activate=True):
++        proposal = proposal or self.proposal
++        lines = list(proposal.lines.all())
++        line = lines[0]
++        value = api.prepare_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            category=line.line_kind,
++            assignments={
++                str(item.pk): {
++                    "party_id": str(self.party.pk),
++                    "recognized_on": self.day.isoformat(),
++                    "due_date": (self.day + timedelta(days=10)).isoformat(),
++                    "grouping_reference": "explicit-occurrence",
++                }
++                for item in lines
++            },
++            evidence_reference="Approved synthetic EXT0013 contract; no seeded production policy",
++        )
++        if activate:
++            now = max(timezone.now(), getattr(self, "clock", timezone.now()))
++            api.change_enrollment(
++                organization=self.organization,
++                actor=self.actor,
++                enrollment=value,
++                kind="activate",
++                effective_at=now + timedelta(seconds=1),
++                reason="Explicit AP activation",
++            )
++            self.clock = now + timedelta(seconds=2)
++        return value
++
++    def prepare(self, proposal=None, key="request", **kwargs):
++        with patch.object(api.timezone, "now", return_value=self.clock):
++            return api.prepare_payroll_ap(
++                organization=self.organization,
++                actor=self.actor,
++                proposal=proposal or self.proposal,
++                idempotency_key=key,
++                reason="Explicit AP request",
++                **kwargs,
++            )
++
++    def accept(self, draft):
++        with patch.object(api.timezone, "now", return_value=self.clock):
++            return api.accept_payroll_ap_draft(
++                organization=self.organization,
++                actor=self.actor,
++                draft=draft,
++                idempotency_key=f"recognize:{draft.pk}",
++            )
++
++    def correction_sources(self, *, replace=True):
++        chain = reverse_run(
++            organization=self.organization,
++            actor=self.actor,
++            original_run=self.run,
++            reason="Explicit Payroll correction",
++            idempotency_key="native-reversal",
++            create_replacement=replace,
++        )
++        reversal = self.source(chain.reversal_run, "reversal")
++        if not replace:
++            return reversal, None
++        run = chain.replacement_run
++        # Explicit finalized source fixture, not a claim to exercise Payroll calculation.
++        PayrollRun.objects.filter(pk=run.pk).update(
++            status="finalized",
++            calculation_digest="replacement-v1",
++            precision_policy_version=self.run.precision_policy_version,
++            rounding_policy_version=self.run.rounding_policy_version,
++            monetary_policy_snapshot=self.run.monetary_policy_snapshot,
++            finalized_at=timezone.now(),
++            finalized_by=self.actor,
++        )
++        for result in run.employee_results.all():
++            PayrollRunEmployee.objects.filter(pk=result.pk).update(
++                status="finalized",
++                gross_amount=Decimal(1100),
++                deduction_amount=Decimal(100),
++                employer_amount=Decimal(200),
++                net_amount=Decimal(1000),
++            )
++            PayrollResultLine.objects.create(
++                organization=self.organization,
++                run=run,
++                run_employee=result,
++                component=self.component,
++                sequence=10,
++                component_kind="earning",
++                unrounded_amount=1100,
++                amount=1100,
++                explanation={"source": "Synthetic replacement finalized source"},
++            )
++        run.refresh_from_db()
++        return reversal, self.source(run, "replacement")
++
++    def trace(self, proposal=None):
++        result = api.reconcile_payroll_ap(
++            organization=self.organization,
++            actor=self.actor,
++            proposal=proposal or self.proposal,
++        )
++        if os.getenv("BONIRA_CEP043_TRACE"):
++            p = Path(os.environ["BONIRA_CEP043_TRACE"])
++            rows = json.loads(p.read_text()) if p.exists() else []
++            rows.append({**result, "synthetic_data_only": True})
++            p.write_text(json.dumps(rows, indent=2) + "\n")
++        return result
++
++
++class PayrollAPHandoffTests(PayrollAPFixture, TestCase):
++    def test_unenrolled_and_unactivated_fail_closed_without_downstream_effect(self):
++        self.clock = timezone.now()
++        with self.assertRaises(ValidationError):
++            self.prepare()
++        self.enrollment(activate=False)
++        with self.assertRaises(ValidationError):
++            self.prepare()
++        self.assertEqual(PayrollAPDraft.objects.count(), 0)
++        self.assertEqual(Obligation.objects.count(), 0)
++        self.assertEqual(
++            AuditEvent.objects.filter(action=AuditAction.PAYROLL_AP_FAILED).count(), 2
++        )
++
++    def test_explicit_draft_is_not_recognition_and_ap_acceptance_is_idempotent(self):
++        self.enrollment()
++        operation = self.prepare()
++        draft = PayrollAPDraft.objects.get(pk=operation.result["drafts"][0])
++        self.assertFalse(Obligation.objects.exists())
++        self.assertEqual(draft.amount, Decimal(900))
++        self.assertEqual(draft.source_version, self.proposal.source_digest)
++        target = self.accept(draft)
++        self.assertEqual(self.accept(draft).pk, target.pk)
++        self.assertEqual(target.source_uuid, draft.pk)
++        self.assertEqual(target.source_snapshot["enrollment"], str(draft.enrollment_id))
++        self.assertEqual(self.trace()["rows"][0]["obligation"], str(target.pk))
++        self.assertFalse(JournalEntry.objects.exists())
++        self.assertFalse(TreasuryMovement.objects.exists())
++        self.assertFalse(ProjectCostFact.objects.exists())
++
++    def test_exact_occurrence_replay_and_conflicting_payload(self):
++        self.enrollment()
++        result = self.prepare()
++        self.assertEqual(self.prepare(key="another-request").pk, result.pk)
++        with self.assertRaises(ValidationError):
++            api.prepare_payroll_ap(
++                organization=self.organization,
++                actor=self.actor,
++                proposal=self.proposal,
++                idempotency_key="request",
++                reason="Conflicting reason",
++            )
++        self.assertEqual(PayrollAPOperation.objects.count(), 1)
++        self.assertEqual(PayrollAPDraft.objects.count(), 1)
++
++    def test_source_review_does_not_grant_ap_enrollment_or_recognition(self):
++        self.enrollment()
++        draft = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        with self.assertRaises(PermissionDenied):
++            api.accept_payroll_ap_draft(
++                organization=self.organization,
++                actor=self.reviewer,
++                draft=draft,
++                idempotency_key="denied",
++            )
++        with self.assertRaises(PermissionDenied):
++            api.prepare_enrollment(
++                organization=self.organization,
++                actor=self.reviewer,
++                category="employee_payable",
++                assignments={},
++                evidence_reference="Not AP authority",
++            )
++        codes = set(self.ap_permissions[:4])
++        self.assertTrue(
++            all(
++                not codes.intersection(values)
++                for values in DEFAULT_ROLE_PERMISSIONS.values()
++            )
++        )
++
++    def test_withdrawal_prevents_new_consumption_preserves_existing_target_and_pin(
++        self,
++    ):
++        enrollment = self.enrollment()
++        draft = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        target = self.accept(draft)
++        api.change_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            enrollment=enrollment,
++            kind="withdraw",
++            effective_at=self.clock + timedelta(seconds=1),
++            reason="Prospective withdrawal",
++        )
++        self.clock += timedelta(seconds=2)
++        self.assertEqual(self.accept(draft).pk, target.pk)
++        self.assertEqual(self.prepare().result["drafts"], [str(draft.pk)])
++        self.assertEqual(self.trace()["rows"][0]["enrollment"], str(enrollment.pk))
++        self.assertEqual(
++            Obligation.objects.get(pk=target.pk).original_amount, Decimal(900)
++        )
++
++    def test_withdrawal_preserves_already_consumed_draft_for_ap_acceptance(self):
++        enrollment = self.enrollment()
++        draft = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        api.change_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            enrollment=enrollment,
++            kind="withdraw",
++            effective_at=self.clock + timedelta(seconds=1),
++            reason="Stop new AP consumption",
++        )
++        self.clock += timedelta(seconds=2)
++        target = self.accept(draft)
++        self.assertEqual(target.source_uuid, draft.pk)
++        self.assertEqual(draft.enrollment_id, enrollment.pk)
++        self.assertEqual(Obligation.objects.count(), 1)
++
++    def test_withdrawal_blocks_first_consumption_without_prior_draft(self):
++        enrollment = self.enrollment()
++        api.change_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            enrollment=enrollment,
++            kind="withdraw",
++            effective_at=self.clock + timedelta(seconds=1),
++            reason="Stop prospective source consumption",
++        )
++        self.clock += timedelta(seconds=2)
++        with self.assertRaises(ValidationError):
++            self.prepare()
++        self.assertFalse(PayrollAPDraft.objects.exists())
++        self.assertFalse(Obligation.objects.exists())
++
++    def test_enrollment_version_is_prospective_and_immutable(self):
++        first = self.enrollment()
++        draft = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        target = self.accept(draft)
++        second = self.enrollment(activate=False)
++        with self.assertRaises(ValidationError):
++            api.change_enrollment(
++                organization=self.organization,
++                actor=self.actor,
++                enrollment=second,
++                kind="activate",
++                effective_at=timezone.now() - timedelta(seconds=1),
++                reason="Retroactive",
++            )
++        api.change_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            enrollment=second,
++            kind="activate",
++            effective_at=self.clock + timedelta(seconds=1),
++            reason="Future version",
++        )
++        self.clock += timedelta(seconds=2)
++        self.assertEqual(self.accept(draft).pk, target.pk)
++        self.assertEqual(
++            PayrollAPDraft.objects.get(pk=draft.pk).enrollment_id, first.pk
++        )
++        with self.assertRaises(ValidationError):
++            first.save()
++        with self.assertRaises(ValidationError):
++            PayrollAPEnrollment.objects.filter(pk=first.pk).update(version=88)
++
++    def test_mapping_rejects_cross_tenant_payee_unknown_category_and_missing_terms(
++        self,
++    ):
++        other = create_organization_with_owner(
++            owner=self.owner, name="Other synthetic tenant", slug="other043"
++        )
++        party = BusinessParty.objects.create(
++            organization=other,
++            party_kind="individual",
++            display_name="Other",
++            created_by=self.owner,
++            updated_by=self.owner,
++        )
++        terms = {
++            str(self.proposal.lines.get().pk): {
++                "party_id": str(party.pk),
++                "recognized_on": self.day.isoformat(),
++                "due_date": self.day.isoformat(),
++                "grouping_reference": "explicit",
++            }
++        }
++        for category in ("employee_payable", "every_payroll_component"):
++            with self.assertRaises(ValidationError):
++                api.prepare_enrollment(
++                    organization=self.organization,
++                    actor=self.actor,
++                    category=category,
++                    assignments=terms,
++                    evidence_reference="Synthetic",
++                )
++        with self.assertRaises(ValidationError):
++            api.prepare_enrollment(
++                organization=self.organization,
++                actor=self.actor,
++                category="employee_payable",
++                assignments={str(self.proposal.lines.get().pk): {}},
++                evidence_reference="Missing terms",
++            )
++
++    def test_target_failure_rolls_back_drafts_and_preserves_source_and_retry_audit(
++        self,
++    ):
++        self.enrollment()
++        native = self.run.calculation_digest
++        with (
++            patch.object(
++                api,
++                "_audit",
++                side_effect=lambda org, actor, action, identity, metadata: (
++                    (_ for _ in ()).throw(DatabaseError("Synthetic target failure"))
++                    if action == AuditAction.PAYROLL_AP_OPERATION
++                    else None
++                ),
++            ),
++            self.assertRaises(DatabaseError),
++        ):
++            self.prepare()
++        self.assertFalse(PayrollAPDraft.objects.exists())
++        self.assertFalse(PayrollAPOperation.objects.exists())
++        self.run.refresh_from_db()
++        self.assertEqual(self.run.calculation_digest, native)
++        self.assertEqual(self.run.status, "finalized")
++        self.assertEqual(len(self.prepare().result["drafts"]), 1)
++
++    def test_atomic_correction_retains_original_reversal_replacement_and_draft_boundary(
++        self,
++    ):
++        self.enrollment()
++        original = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        target = self.accept(original)
++        reverse, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        operation = self.prepare(
++            replacement, key="correct", reversal=reverse, effective_date=self.day
++        )
++        self.assertEqual(
++            self.prepare(
++                replacement, key="correct", reversal=reverse, effective_date=self.day
++            ).pk,
++            operation.pk,
++        )
++        fresh = PayrollAPDraft.objects.get(pk=operation.result["drafts"][0])
++        self.assertEqual(fresh.predecessor_id, original.pk)
++        self.assertEqual(fresh.amount, Decimal(1000))
++        self.assertEqual(Obligation.objects.count(), 1)
++        self.assertEqual(
++            Obligation.objects.get(pk=target.pk).outstanding_amount, Decimal(0)
++        )
++        self.assertEqual(
++            _source_reversed_amount_as_of(target, self.day - timedelta(days=1)),
++            Decimal(0),
++        )
++        self.assertEqual(_source_reversed_amount_as_of(target, self.day), Decimal(900))
++        with self.assertRaises(ValidationError):
++            _require_unreversed_source(target)
++        with self.assertRaises(ValidationError):
++            self.accept(original)
++        self.accept(fresh)
++        self.assertEqual(Obligation.objects.count(), 2)
++        self.assertEqual(self.trace()["rows"][0]["replacements"], [str(fresh.pk)])
++        self.trace(replacement)
++        self.assertFalse(JournalEntry.objects.exists())
++
++    def test_no_longer_enrolled_replacement_does_not_create_payable(self):
++        enrollment = self.enrollment()
++        self.accept(PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0]))
++        reverse, replacement = self.correction_sources()
++        api.change_enrollment(
++            organization=self.organization,
++            actor=self.actor,
++            enrollment=enrollment,
++            kind="withdraw",
++            effective_at=self.clock + timedelta(seconds=1),
++            reason="Withdraw category",
++        )
++        self.clock += timedelta(seconds=2)
++        result = self.prepare(
++            replacement, key="no-replacement", reversal=reverse, effective_date=self.day
++        )
++        self.assertEqual(result.result["drafts"], [])
++        self.assertEqual(len(result.result["reversals"]), 1)
++        self.assertEqual(Obligation.objects.count(), 1)
++
++    def test_failure_after_reversal_rolls_back_entire_correction_then_retry(self):
++        self.enrollment()
++        self.accept(PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0]))
++        reverse, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        with (
++            patch.object(
++                api,
++                "_drafts",
++                side_effect=DatabaseError("Synthetic replacement failure"),
++            ),
++            self.assertRaises(DatabaseError),
++        ):
++            self.prepare(
++                replacement,
++                key="rollback",
++                reversal=reverse,
++                effective_date=self.day,
++            )
++        self.assertFalse(PayrollAPReversal.objects.exists())
++        self.assertEqual(Obligation.objects.get().outstanding_amount, Decimal(900))
++        self.assertEqual(
++            len(
++                self.prepare(
++                    replacement,
++                    key="rollback",
++                    reversal=reverse,
++                    effective_date=self.day,
++                ).result["drafts"]
++            ),
++            1,
++        )
++
++    def test_consumed_target_fails_closed_without_any_partial_reversal(self):
++        self.enrollment()
++        self.accept(PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0]))
++        reverse, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        with patch.object(api, "_active_settlement_amount", return_value=Decimal(1)):  # noqa: SIM117
++            with self.assertRaises(ValidationError):
++                self.prepare(
++                    replacement, key="held", reversal=reverse, effective_date=self.day
++                )
++        self.assertFalse(PayrollAPReversal.objects.exists())
++        self.assertEqual(Obligation.objects.count(), 1)
++        self.assertEqual(
++            len(
++                self.prepare(
++                    replacement, key="held", reversal=reverse, effective_date=self.day
++                ).result["drafts"]
++            ),
++            1,
++        )
++
++    def test_reconciliation_and_retry_detect_source_and_target_drift(self):
++        self.enrollment()
++        draft = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        target = self.accept(draft)
++        with connection.cursor() as cursor:
++            cursor.execute(
++                "UPDATE subledgers_obligation SET original_amount=1 WHERE id=%s",
++                [target.pk],
++            )
++        with self.assertRaises(ValidationError):
++            self.trace()
++        with self.assertRaises(ValidationError):
++            self.prepare()
++        self.assertEqual(Obligation.objects.count(), 1)
++
++    def test_reversal_only_creates_no_negative_or_replacement_payable(self):
++        self.enrollment()
++        self.accept(PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0]))
++        reverse, _ = self.correction_sources(replace=False)
++        result = self.prepare(
++            reverse, key="reverse-only", reversal=reverse, effective_date=self.day
++        )
++        self.assertEqual(result.result["drafts"], [])
++        self.assertEqual(
++            self.prepare(
++                reverse, key="reverse-only", reversal=reverse, effective_date=self.day
++            ).pk,
++            result.pk,
++        )
++        self.assertEqual(Obligation.objects.get().outstanding_amount, Decimal(0))
++        self.assertEqual(PayrollAPReversal.objects.count(), 1)
++        self.trace()
++
++    def test_real_recognition_link_and_allocation_facts_hold_target_until_unwound(self):
++        from apps.accounting.models import FiscalPeriod, FiscalYear
++
++        from .models import SettlementAllocation, SettlementReversal
++
++        self.enrollment()
++        target = self.accept(
++            PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        )
++        reverse, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        year = FiscalYear.objects.create(
++            organization=self.organization,
++            code="CONSUME",
++            name="Synthetic",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++            created_by=self.owner,
++        )
++        period = FiscalPeriod.objects.create(
++            organization=self.organization,
++            fiscal_year=year,
++            number=1,
++            name="Synthetic",
++            starts_on=year.starts_on,
++            ends_on=year.ends_on,
++        )
++        journal = JournalEntry.objects.create(
++            organization=self.organization,
++            period=period,
++            kind="manual",
++            document_date=self.day,
++            accounting_date=self.day,
++            description="Synthetic independent recognition link",
++            source_key="independent043",
++            prepared_by=self.ap_membership,
++        )
++        Obligation.objects.filter(pk=target.pk).update(recognition_journal=journal)
++        with self.assertRaises(ValidationError):
++            self.prepare(
++                replacement, key="real-held", reversal=reverse, effective_date=self.day
++            )
++        self.assertFalse(PayrollAPReversal.objects.exists())
++        # Synthetic owning-domain fact setup/unwind only, no posting engine claim.
++        Obligation.objects.filter(pk=target.pk).update(recognition_journal=None)
++        movement = TreasuryMovement.objects.create(
++            organization=self.organization,
++            kind="disbursement",
++            movement_date=self.day,
++            amount=10,
++            description="Synthetic retained allocation fixture",
++            idempotency_key="allocation-fixture",
++            payload_hash="synthetic",
++            created_by=self.ap_membership,
++        )
++        allocation = SettlementAllocation.objects.create(
++            organization=self.organization,
++            obligation=target,
++            treasury_movement=movement,
++            amount=1,
++            effective_date=self.day,
++            reason="Synthetic owning-domain allocation fact",
++            idempotency_key="allocation043",
++            payload_hash="synthetic",
++            created_by=self.ap_membership,
++        )
++        with self.assertRaises(ValidationError):
++            self.prepare(
++                replacement, key="real-held", reversal=reverse, effective_date=self.day
++            )
++        SettlementReversal.objects.create(
++            organization=self.organization,
++            allocation=allocation,
++            effective_date=self.day + timedelta(days=1),
++            reason="Synthetic independent allocation unwind",
++            idempotency_key="unwind043",
++            payload_hash="synthetic",
++            reversed_by=self.ap_membership,
++        )
++        with self.assertRaises(ValidationError):
++            self.prepare(
++                replacement, key="real-held", reversal=reverse, effective_date=self.day
++            )
++        # Dates must align; a replacement cannot precede the independent unwind.
++        self.assertEqual(PayrollAPReversal.objects.count(), 0)
++        self.assertEqual(Obligation.objects.count(), 1)
++
++    def test_multi_occurrence_correction_rolls_back_all_reversals_and_replacements(
++        self,
++    ):
++        from apps.workforce.models import Employee
++
++        employee = Employee.objects.create(
++            organization=self.organization,
++            employee_number="PAY-BATCH",
++            first_name="Synthetic",
++            last_name="Second",
++        )
++        run = PayrollRun.objects.create(
++            organization=self.organization,
++            period=self.period,
++            code="BATCH",
++            kind="off_cycle",
++            status="finalized",
++            idempotency_key="batch",
++            calculation_digest="batch-v1",
++            precision_policy_version=self.run.precision_policy_version,
++            rounding_policy_version=self.run.rounding_policy_version,
++            monetary_policy_snapshot=self.run.monetary_policy_snapshot,
++            currency=self.run.currency,
++            created_by=self.owner,
++            finalized_by=self.owner,
++            finalized_at=timezone.now(),
++        )
++        for person in (self.employee, employee):
++            result = PayrollRunEmployee.objects.create(
++                organization=self.organization,
++                run=run,
++                employee=person,
++                status="finalized",
++                gross_amount=1000,
++                deduction_amount=100,
++                employer_amount=200,
++                net_amount=900,
++            )
++            PayrollResultLine.objects.create(
++                organization=self.organization,
++                run=run,
++                run_employee=result,
++                component=self.component,
++                sequence=10,
++                component_kind="earning",
++                unrounded_amount=1000,
++                amount=1000,
++                explanation={"source": "Synthetic batch"},
++            )
++        self.run = run
++        self.proposal = self.source(run, "batch-source")
++        self.enrollment()
++        for pk in self.prepare().result["drafts"]:
++            self.accept(PayrollAPDraft.objects.get(pk=pk))
++        reverse, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        create = api._create
++        counter = []
++
++        def fail_second(model, **values):
++            if model is PayrollAPDraft:
++                counter.append(1)
++                if len(counter) == 2:
++                    raise DatabaseError("Synthetic second replacement failure")
++            return create(model, **values)
++
++        with (
++            patch.object(api, "_create", side_effect=fail_second),
++            self.assertRaises(DatabaseError),
++        ):
++            self.prepare(
++                replacement,
++                key="batch-correction",
++                reversal=reverse,
++                effective_date=self.day,
++            )
++        self.assertEqual(PayrollAPReversal.objects.count(), 0)
++        self.assertEqual(PayrollAPDraft.objects.count(), 2)
++        result = self.prepare(
++            replacement,
++            key="batch-correction",
++            reversal=reverse,
++            effective_date=self.day,
++        )
++        self.assertEqual(len(result.result["reversals"]), 2)
++        self.assertEqual(len(result.result["drafts"]), 2)
++        self.assertEqual(Obligation.objects.count(), 2)
++        self.trace()
++        self.trace(replacement)
++
++
++class PayrollAPConcurrencyTests(PayrollAPFixture, TransactionTestCase):
++    def test_concurrent_corrections_commit_one_reversal_and_replacement_set(self):
++        self.enrollment()
++        original = PayrollAPDraft.objects.get(pk=self.prepare().result["drafts"][0])
++        self.accept(original)
++        reversal, replacement = self.correction_sources()
++        self.enrollment(replacement)
++        barrier = Barrier(2)
++
++        def correct():
++            close_old_connections()
++            try:
++                barrier.wait(timeout=20)
++                operation = api.prepare_payroll_ap(
++                    organization=self.organization,
++                    actor=self.actor,
++                    proposal=replacement,
++                    reversal=reversal,
++                    effective_date=self.day,
++                    idempotency_key="concurrent-correction",
++                    reason="Concurrent correction",
++                )
++                return str(operation.pk), operation.result
++            finally:
++                close_old_connections()
++
++        with patch.object(api.timezone, "now", return_value=self.clock):  # noqa: SIM117
++            with ThreadPoolExecutor(max_workers=2) as pool:
++                results = [
++                    future.result(timeout=45)
++                    for future in [pool.submit(correct), pool.submit(correct)]
++                ]
++        self.assertEqual(results[0], results[1])
++        self.assertEqual(PayrollAPReversal.objects.count(), 1)
++        self.assertEqual(PayrollAPDraft.objects.count(), 2)
++        self.assertEqual(Obligation.objects.count(), 1)
++
++    def test_concurrent_source_replay_creates_one_draft_and_one_ap_target(self):
++        self.enrollment()
++        barrier = Barrier(2)
++
++        def consume():
++            close_old_connections()
++            try:
++                barrier.wait(timeout=20)
++                result = api.prepare_payroll_ap(
++                    organization=self.organization,
++                    actor=self.actor,
++                    proposal=self.proposal,
++                    idempotency_key="concurrent",
++                    reason="Concurrent synthetic request",
++                )
++                draft = PayrollAPDraft.objects.get(pk=result.result["drafts"][0])
++                return str(
++                    api.accept_payroll_ap_draft(
++                        organization=self.organization,
++                        actor=self.actor,
++                        draft=draft,
++                        idempotency_key="concurrent-accept",
++                    ).pk
++                )
++            finally:
++                close_old_connections()
++
++        # Freeze clock once around the threads; per-thread patch contexts would race.
++        with patch.object(api.timezone, "now", return_value=self.clock):  # noqa: SIM117
++            with ThreadPoolExecutor(max_workers=2) as pool:
++                results = [
++                    x.result(timeout=45)
++                    for x in [pool.submit(consume), pool.submit(consume)]
++                ]
++        self.assertEqual(results[0], results[1])
++        self.assertEqual(PayrollAPDraft.objects.count(), 1)
++        self.assertEqual(Obligation.objects.count(), 1)
+--- /dev/null
++++ b/docs/governance/cep/supporting/CEP-043_PAYROLL_AP_LIFECYCLE_POLICY.md
+@@ -0,0 +1,65 @@
++# CEP-043 Payroll → AP lifecycle policy
++
++Status: APPROVED. Authority: Human Product Decision in this chat, 2026-10-18.
++Decision: `HUMAN-CEP043-LIFECYCLE-20261018`. This policy resolves Finding002;
++it supplements the existing frozen PD-009/030 and SPEC-029 without changing their
++recognition ownership, CEP Scope/AC/DoD or dependency graph.
++
++## A. Enrollment
++
++AP/Subledger owns enrollment approval and activation. Payroll review/finalization
++establishes source correctness/eligibility only; it never approves, recognizes or
++finalizes AP obligations. Active enrollment permits AP consumption only of the
++governed eligible finalized Payroll source categories.
++
++Activated configuration is versioned and immutable. Material changes require a
++new prospective version/time. Changes never rewrite finalized Payroll evidence,
++created obligations, prior enrollment/version lineage or reconciliation history.
++Withdrawal/deactivation prevents new consumption from its effective point; it
++does not cancel, reverse, delete or modify existing obligations. Existing targets
++retain exact source and enrollment versions.
++
++Approved proposal A also applies: explicit AP preparation/approval capabilities
++are default-denied in the existing permission system; no additional person-level
++separation beyond existing protected-operation policy. Configuration pins exact
++classification/source scope and explicit party/payee, recognition/due-date and
++grouping evidence. No inferred family, payee, dates or aggregation. No actual
++mapping rows are seeded; actual activation requires EXT-0013 evidence.
++
++## B. Correction, reversal and replacement
++
++Corrected/reversed/replacement finalized Payroll evidence must resolve exact prior
++AP targets through retained source/version lineage. Payroll never directly edits,
++finalizes, settles, pays or deletes AP obligations. AP owns all AP lifecycle effects.
++Finalized AP history is immutable: explicit correction/reversal/replacement only.
++
++Without active downstream consumption that prevents safe correction, AP may
++record its governed correction/reversal and an eligible replacement AP draft.
++Lock/re-read sources and targets; retain predecessor/reversal/replacement pins;
++commit the entire required replacement set or none. Concurrent/replayed execution
++cannot duplicate payable obligations. Replacement remains a draft until normal
++AP-owned recognition/finalization. Ineligible corrected sources produce no
++replacement payable merely to preserve count.
++
++Consumed means an active authoritative downstream dependency, including applicable
++settlement/payment allocation, Treasury consumption, write-off, Accounting
++recognition/posting or another authoritative financial fact. Consumed targets
++fail closed. No deletion/overwrite or automatic downstream unwind is allowed.
++The owning domain must unwind its effect before AP replacement proceeds.
++
++Idempotency uses source/revision/economic identity: exact replay returns existing
++results; conflicting payload for the same identity fails closed. Reconciliation
++retains source/version → enrollment version → AP original → AP correction/reversal
++→ optional replacement. Approved proposal B adds explicit AP source-reverse
++authority, exact inverse amount/currency, explicit effective date/reason, no
++reversal before downstream unwind effective dates and no period of duplicate
++active payables. Missing/unsupported cases fail closed, without negative payable,
++cash reversal, inferred write-off or duplicate GL recognition.
++
++## Boundary
++
++Only missing CEP-043 lifecycle semantics are resolved. No Payroll approval of AP,
++Treasury/cash action, Accounting posting, automatic downstream reversal, pricing,
++statutory, unrelated Scope/AC/DoD/dependency or production authority is granted.
++Existing bounded Development/Non-Production migration authorization applies.
++GATE-05 stays NOT_PASSED. No Git writes.

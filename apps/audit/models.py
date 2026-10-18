@@ -8,6 +8,12 @@ from core.models import CreatedAtModel, UUIDModel
 
 
 class AuditAction(models.TextChoices):
+    PAYROLL_AP_ENROLLMENT_PREPARED = "payroll_ap.enrollment_prepared", "تهیه ثبت بدهی حقوق در AP"
+    PAYROLL_AP_ENROLLMENT_CHANGED = "payroll_ap.enrollment_changed", "فعال‌سازی یا توقف بدهی حقوق در AP"
+    PAYROLL_AP_OPERATION = "payroll_ap.operation", "پیش‌نویس یا اصلاح بدهی حقوق در AP"
+    PAYROLL_AP_FAILED = "payroll_ap.failed", "تلاش ناموفق تحویل بدهی حقوق"
+    PAYROLL_AP_RECONCILED = "payroll_ap.reconciled", "تطبیق بدهی حقوق و AP"
+
     SUPPLIER_INVOICE_AP_FAILED = (
         "subledgers.invoice_ap_failed", "انتقال منبع صورتحساب به AP ناموفق بود"
     )

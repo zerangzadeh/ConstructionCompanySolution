@@ -748,6 +748,10 @@ class BusinessPermissionCode(models.TextChoices):
         "estimate_rate_sources.manage",
         "مدیریت منبع و نرخ برآورد",
     )
+    SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE = "subledgers_payroll.enrollments_manage", "تهیه ثبت بدهی حقوق در AP"
+    SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE = "subledgers_payroll.enrollments_approve", "فعال‌سازی و توقف ثبت بدهی حقوق در AP"
+    SUBLEDGERS_PAYROLL_PREPARE = "subledgers_payroll.prepare", "تهیه پیش‌نویس و اصلاح بدهی حقوق در AP"
+    SUBLEDGERS_PAYROLL_VIEW = "subledgers_payroll.view", "مشاهده و تطبیق بدهی حقوق در AP"
     ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE = "accounting_recognition.mappings_manage", "تهیه نگاشت شناسایی حسابداری"
     ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE = "accounting_recognition.mappings_approve", "پذیرش مستقل نگاشت شناسایی"
     ACCOUNTING_RECOGNITION_PREPARE = "accounting_recognition.prepare", "تهیه و تلاش مجدد پیش‌نویس شناسایی"

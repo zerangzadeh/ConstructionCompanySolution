@@ -7,6 +7,10 @@ from apps.organizations.permission_registry import registered_permission_codes
 
 # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
 ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
+    BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
+    BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
+    BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
+    BusinessPermissionCode.SUBLEDGERS_PAYROLL_VIEW,
     BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
     BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,
     BusinessPermissionCode.ACCOUNTING_RECOGNITION_PREPARE,
@@ -831,6 +835,16 @@ for _role_code, _permissions in DEFAULT_ROLE_PERMISSIONS.items():
     DEFAULT_ROLE_PERMISSIONS[_role_code] = _permissions - {
         BusinessPermissionCode.SUBLEDGERS_SOURCES_REVERSE
     }
+
+
+# CEP043 AP enrollment/consumption are explicit; preserve all existing grants.
+for _permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    _permissions.difference_update({
+        BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
+        BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
+        BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
+        BusinessPermissionCode.SUBLEDGERS_PAYROLL_VIEW,
+    })
 
 
 DEFAULT_ROLE_METADATA: dict[str, dict[str, object]] = {

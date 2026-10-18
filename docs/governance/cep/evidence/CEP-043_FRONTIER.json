@@ -1,0 +1,131 @@
+{
+  "evaluated_at": "2026-10-18",
+  "head": "da01c850b6fbacf41c793548426cb53e9bbc6813",
+  "all_79_prompt_hashes_verified": true,
+  "canonical_dependency_sets_verified": true,
+  "dependency_ready_current_governed": [
+    "CEP-028",
+    "CEP-044",
+    "CEP-045",
+    "CEP-046",
+    "CEP-047",
+    "CEP-048",
+    "CEP-050",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-067",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "readiness_is_not_eligibility": true,
+  "conditional_predecessors_not_assumed_blocking": [
+    {
+      "cep": "CEP-068",
+      "requires_condition_review": [
+        {
+          "prerequisite": "CEP-062",
+          "condition": "For the Mission sub-flow; the Overtime request sub-flow does not require Mission financial routing."
+        }
+      ]
+    },
+    {
+      "cep": "CEP-073",
+      "requires_condition_review": [
+        {
+          "prerequisite": "CEP-028",
+          "condition": "When Legacy Payment reference/data migration to Treasury is included in the PostgreSQL migration verification run."
+        },
+        {
+          "prerequisite": "CEP-057",
+          "condition": "When Leave opening balance migration is included in the PostgreSQL migration verification run."
+        },
+        {
+          "prerequisite": "CEP-058",
+          "condition": "When Historical Payroll/YTD opening-state migration is included in the PostgreSQL migration verification run."
+        }
+      ]
+    },
+    {
+      "cep": "CEP-079",
+      "requires_condition_review": [
+        {
+          "prerequisite": "CEP-045",
+          "condition": "Required when any of UAT scenarios UAT-CASE-011, UAT-CASE-043 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-046",
+          "condition": "Required when UAT scenario UAT-CASE-039 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-060",
+          "condition": "Required when any of UAT scenarios UAT-CASE-019, UAT-CASE-020 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-061",
+          "condition": "Required when UAT scenario UAT-CASE-023 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-064",
+          "condition": "Required when any of UAT scenarios UAT-CASE-003, UAT-CASE-017 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-066",
+          "condition": "Required when UAT scenario UAT-CASE-005 is included in the representative UAT execution set."
+        },
+        {
+          "prerequisite": "CEP-067",
+          "condition": "Required when UAT scenario UAT-CASE-003 is included in the representative UAT execution set."
+        }
+      ]
+    }
+  ],
+  "conditional_scope_review_required": true,
+  "verified_build_eligible_unblocked": [],
+  "unreviewed_dependency_ready_candidates": [
+    "CEP-044",
+    "CEP-045",
+    "CEP-046",
+    "CEP-047",
+    "CEP-048",
+    "CEP-050",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-067",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "excluded_known_partial": [
+    "CEP-028"
+  ],
+  "next_autonomous_cep": null,
+  "next_entry_review_candidate": "CEP-044",
+  "next_candidate_prompt_hash_verified": "15059d1c942991817080cbb8fe8c1791dd34d6228f9a81de8e35d79ad2a7b73c",
+  "next_candidate_entry_checks": "CEP008 complete; no external dependencies; GATE05 exit-only; overlapping AP/Accounting recognition/write-off code, permissions and financial-boundary regression require fresh entry/touch-set review. Full eligibility NOT asserted.",
+  "queue": "CLEAN COMPLETED CEP043 OPERATIONAL BOUNDARY",
+  "boundary_reason": "Completed financial package boundary: additive schema and AP lifecycle changes overlap next CEP044 recognition/write-off surfaces; large uncommitted touch set and 34-minute migration rehearsal justify separate review/checkpoint. Standing authority persists; no new permission required.",
+  "GATE-05": "NOT_PASSED",
+  "EXT-0013": "ACTIVATION ONLY; no real tenant mapping inserted",
+  "counts": {
+    "execution_state_complete": 49,
+    "authorized_not_started": 0,
+    "eligible_under_standing_authority": 0,
+    "in_progress": 0,
+    "blocked_current": 0,
+    "partial_current": 2,
+    "failed_current": 0,
+    "not_started_other_current_governed": 28,
+    "deferred_post_v1": 7
+  },
+  "git_writes": false,
+  "production_authorized": false
+}

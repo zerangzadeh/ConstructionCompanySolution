@@ -632,8 +632,14 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
             raise ValidationError("شواهد نگاشت حساب کنترل با تعهد سازگار نیست.")
 
     @property
+    def source_reversal_evidence(self):
+        if self.source_kind == "payroll.liability.v1":
+            return PayrollAPReversal.objects.filter(obligation=self).first()
+        return self.source_reversals.first()
+
+    @property
     def outstanding_amount(self):
-        reversal = self.source_reversals.first()
+        reversal = self.source_reversal_evidence
         if reversal is not None:
             from apps.organizations.services import get_organization_settings
 
@@ -659,7 +665,7 @@ class Obligation(ImmutableSubledgerEvidence, UUIDModel, CreatedAtModel):
 
     @property
     def settlement_status(self) -> str:
-        if self.source_reversals.exists():
+        if self.source_reversal_evidence is not None:
             return "reversed"
         outstanding = self.outstanding_amount
         if outstanding == self.original_amount:
@@ -1221,3 +1227,12 @@ class SubledgerReconciliationReview(
             raise ValidationError({"reason": "دلیل بررسی تطبیق الزامی است."})
         if self.reviewed_by_id == self.run.created_by_id:
             raise ValidationError("اجراکننده تطبیق نمی‌تواند همان اجرا را بررسی کند.")
+
+
+from .payroll_models import (  # noqa: F401
+    PayrollAPDraft,
+    PayrollAPEnrollment,
+    PayrollAPEnrollmentEvent,
+    PayrollAPOperation,
+    PayrollAPReversal,
+)

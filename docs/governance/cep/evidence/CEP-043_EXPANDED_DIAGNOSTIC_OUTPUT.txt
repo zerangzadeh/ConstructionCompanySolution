@@ -1,0 +1,521 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 3 items
+
+Creating test database for alias 'default' ('test_construction_erp')...
+
+Got an error creating the test database: database "test_construction_erp" already exists
+
+Destroying old test database for alias 'default' ('test_construction_erp')...
+
+apps/subledgers/test_cep043_payroll_handoff.py::PayrollAPHandoffTests::test_multi_occurrence_correction_rolls_back_all_reversals_and_replacements Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0001_initial... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying accounts.0001_initial... OK
+  Applying organizations.0001_initial... OK
+  Applying projects.0001_initial... OK
+  Applying organizations.0002_organizationsettings... OK
+  Applying materials.0001_initial... OK
+  Applying materials.0002_material_master... OK
+  Applying projects.0002_wbs_activity... OK
+  Applying workforce.0001_initial... OK
+  Applying organizations.0003_alter_organization_options_and_more... OK
+  Applying materials.0003_alter_material_options_and_more... OK
+Timeout (0:00:30)!
+Thread 0x0000c120 (most recent call first):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\base.py", line 978 in __new__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\state.py", line 978 in render
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\state.py", line 688 in render_multiple
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\state.py", line 458 in _reload
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\state.py", line 423 in reload_model
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\state.py", line 302 in alter_field
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\operations\fields.py", line 225 in state_forwards
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\migration.py", line 118 in apply
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\executor.py", line 255 in apply_migration
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\executor.py", line 167 in _migrate_all_forwards
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\migrations\executor.py", line 135 in migrate
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\management\commands\migrate.py", line 353 in handle
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\management\base.py", line 111 in wrapper
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\management\base.py", line 464 in execute
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\core\management\__init__.py", line 194 in call_command
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\backends\base\creation.py", line 78 in create_test_db
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\test\utils.py", line 204 in setup_databases
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pytest_django\fixtures.py", line 186 in django_db_setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 998 in call_fixture_func
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 1328 in pytest_fixture_setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 1232 in execute
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 726 in _get_active_fixturedef
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 630 in getfixturevalue
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pytest_django\plugin.py", line 625 in _django_setup_unittest
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 998 in call_fixture_func
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 1328 in pytest_fixture_setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 1232 in execute
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 726 in _get_active_fixturedef
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 630 in getfixturevalue
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\fixtures.py", line 806 in _fillfixtures
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\python.py", line 1710 in setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\unittest.py", line 248 in setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 536 in setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 170 in pytest_runtest_setup
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 250 in <lambda>
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 361 in from_call
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 249 in call_and_report
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 132 in runtestprotocol
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\runner.py", line 118 in pytest_runtest_protocol
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\main.py", line 408 in pytest_runtestloop
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\main.py", line 384 in _main
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\main.py", line 330 in wrap_session
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\main.py", line 377 in pytest_cmdline_main
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_callers.py", line 121 in _multicall
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_manager.py", line 120 in _hookexec
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pluggy\_hooks.py", line 512 in __call__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\config\__init__.py", line 229 in _main
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\_pytest\config\__init__.py", line 253 in _console_main
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\pytest\__main__.py", line 9 in <module>
+  File "<frozen runpy>", line 88 in _run_code
+  File "<frozen runpy>", line 198 in _run_module_as_main
+  Applying projects.0003_alter_activity_options_alter_project_options_and_more... OK
+  Applying workforce.0002_alter_department_options_alter_employee_options_and_more... OK
+  Applying workforce.0003_alter_employeeprojectassignment_status... OK
+  Applying organizations.0004_global_roles_and_permissions... OK
+  Applying organizations.0005_alter_organization_options_and_more... OK
+  Applying organizations.0006_direct_user_provisioning... OK
+  Applying organizations.0007_contract_view_permission... OK
+  Applying organizations.0008_granular_business_permission_catalog... OK
+  Applying organizations.0009_equipment_permissions... OK
+  Applying organizations.0010_safety_permissions... OK
+  Applying organizations.0011_quality_permissions... OK
+  Applying organizations.0012_generalize_document_permission_labels... OK
+  Applying organizations.0013_employee_position_permissions... OK
+  Applying workforce.0004_position_is_single_holder_employeepositionassignment... OK
+  Applying workforce.0005_rename_project_assignment_responsibility_label... OK
+  Applying workforce.0006_employee_profile_image... OK
+  Applying workforce.0007_position_parent_position... OK
+  Applying projects.0004_project_budget_fields... OK
+  Applying organizations.0014_position_change_permission... OK
+  Applying organizations.0015_department_change_permission... OK
+  Applying organizations.0016_organizationaccountconnectionrequest... OK
+  Applying organizations.0017_display_builtin_roles_in_english... OK
+  Applying organizations.0018_organizationaccountconnectionrequest_account_connection_response_state_consistent... OK
+  Applying organizations.0019_rename_organization_role_name_label... OK
+  Applying organizations.0020_add_organization_code_prefixes... OK
+  Applying organizations.0021_employee_profile_image_permission... OK
+  Applying organizations.0022_workflow_foundation_permissions... OK
+  Applying organizations.0023_workflow_runtime_permissions... OK
+  Applying organizations.0024_organization_member_password_reset_permission... OK
+  Applying organizations.0025_baseline_permissions... OK
+  Applying organizations.0026_progress_permissions... OK
+  Applying organizations.0027_claim_permissions... OK
+  Applying organizations.0028_claim_approval_permissions... OK
+  Applying organizations.0029_claim_settlement_permissions... OK
+  Applying organizations.0030_p1_1_authorization_foundation... OK
+  Applying organizations.0031_p1_1_authorization_backfill... OK
+  Applying organizations.0032_p1_1_platform_role_single_superuser... OK
+  Applying organizations.0033_p1_1_platform_admin_protected_operations... OK
+  Applying organizations.0034_p1_1_role_catalog_lifecycle... OK
+  Applying organizations.0035_p1_1_role_catalog_closeout... OK
+  Applying organizations.0036_p1_s14a_configuration_authority... OK
+  Applying organizations.0037_platformpolicy_platformpolicyversion_and_more... OK
+  Applying organizations.0038_p1_s16_party_governance_permissions... OK
+  Applying organizations.0039_p1_s17_party_governance_permission... OK
+  Applying organizations.0040_p1_s19_document_governance_permission... OK
+  Applying contracts.0001_initial... OK
+  Applying payments.0001_initial... OK
+  Applying parties.0001_initial... OK
+  Applying contracts.0002_contract_contract_type_contract_direction_and_more... OK
+  Applying payments.0002_payment_party_paymentallocation... OK
+  Applying parties.0002_alter_businessparty_options_and_more... OK
+  Applying contracts.0003_alter_contract_options_and_more... OK
+  Applying payments.0003_alter_payment_options_and_more... OK
+  Applying expenses.0001_initial... OK
+  Applying expenses.0002_expense_party_expensecategory_and_more... OK
+  Applying expenses.0003_alter_expense_options_alter_expensecategory_options_and_more... OK
+  Applying estimates.0001_initial... OK
+  Applying estimates.0002_estimateitem_unit_of_measure_estimaterevision_and_more... OK
+  Applying estimates.0003_alter_estimate_options_alter_estimateitem_options_and_more... OK
+  Applying documents.0001_initial... OK
+  Applying documents.0002_alter_projectdocument_file... OK
+  Applying documents.0003_alter_projectdocument_options_and_more... OK
+  Applying daily_reports.0001_initial... OK
+  Applying daily_reports.0002_daily_report_evolution... OK
+  Applying daily_reports.0003_alter_dailyactivity_options_and_more... OK
+  Applying documents.0004_document_documentlink_documentversion_and_more... OK
+  Applying documents.0005_p1_s19_document_governance... OK
+  Applying projects.0005_projectdocumentlink... OK
+  Applying organizations.0041_alter_platformroleassignment_role... OK
+  Applying organizations.0042_alter_protectedoperation_code... OK
+  Applying organizations.0043_p1_s22_document_lifecycle_permissions... OK
+  Applying organizations.0044_p1_s23_material_identity_permissions... OK
+  Applying organizations.0045_p1_s24_uom_permissions... OK
+  Applying organizations.0046_p1_s25_material_attribute_permissions... OK
+  Applying organizations.0047_p1_s26_material_technical_permissions... OK
+  Applying organizations.0048_alter_protectedoperation_code... OK
+  Applying organizations.0049_p2_accounting_permissions... OK
+  Applying organizations.0050_alter_protectedoperation_code... OK
+  Applying organizations.0051_p2_accounting_reversal_protection... OK
+  Applying organizations.0052_p2_reconciliation_run_permission... OK
+  Applying organizations.0053_p2_reconciliation_disposition_permission... OK
+  Applying organizations.0054_p2_reconciliation_sign_off... OK
+  Applying organizations.0055_p2_reporting_adjustment_permissions... OK
+  Applying organizations.0056_accounting_policy_foundation... OK
+  Applying organizations.0057_policy_source_reason... OK
+  Applying organizations.0058_deprecate_tenant_policy_approve_permission... OK
+  Applying organizations.0059_p3_treasury_permissions... OK
+  Applying organizations.0060_p3_s12_s17_treasury_permissions... OK
+  Applying organizations.0061_p3_s18_s22_treasury_permissions... OK
+  Applying organizations.0062_p3_s23_s27_subledger_permissions... OK
+  Applying organizations.0063_p3_s30_s31_reconciliation_review_permissions... OK
+  Applying organizations.0064_p4_s01_s06_estimate_depth_permissions... OK
+  Applying organizations.0065_p4_s07_s13_budget_permissions... OK
+  Applying materials.0004_materialalias_materialduplicatecandidate_and_more... OK
+  Applying materials.0005_quantityroundingpolicyversion_unitconversionversion_and_more... OK
+  Applying materials.0006_alter_unitfamily_created_by... OK
+  Applying materials.0007_p1_s24_backfill_unit_families... OK
+  Applying materials.0008_materialattributedefinition_and_more... OK
+  Applying materials.0009_alter_materialattributevalue_normalized_value... OK
+  Applying payments.0004_paymentallocation_reversal_reason... OK
+  Applying payments.0005_backfill_paymentallocation_reversal_reason... OK
+  Applying payments.0006_paymentdocumentlink... OK
+  Applying expenses.0004_expensedocumentlink... OK
+  Applying estimates.0004_estimatedocumentlink... OK
+  Applying daily_reports.0004_dailyreportdocumentlink... OK
+  Applying contracts.0004_contractdocumentlink... OK
+  Applying documents.0006_p1_s20_typed_link_backfill... OK
+  Applying documents.0007_alter_documentversion_file_and_more... OK
+  Applying documents.0008_documentdisposalintent_documentexportmanifest_and_more... OK
+  Applying materials.0010_materialdocumentlink_materialrelationship_and_more... OK
+  Applying equipment.0001_initial... OK
+  Applying estimates.0005_p4_s01_s06_estimate_depth... OK
+  Applying projects.0006_p4_s07_s13_budget_preparation... OK
+  Applying organizations.0066_p4_s14_s20_project_cost_permissions... OK
+  Applying projects.0007_projectcostsourcecontract_projectcostfact_and_more... OK
+  Applying organizations.0067_p4_s21_s25_project_control_permissions... OK
+  Applying projects.0008_p4_s21_s25_schedule_change_controls... OK
+  Applying organizations.0068_p4_s26_s30_expense_permissions... OK
+  Applying organizations.0069_normalize_expense_recurrence_permission... OK
+  Applying organizations.0070_p4_s31_s34_project_controls_permissions... OK
+  Applying organizations.0071_p4_s35_s37_reconciliation_permissions... OK
+  Applying organizations.0072_expense_category_change_permission... OK
+  Applying organizations.0073_p5_s05_rfq_permissions... OK
+  Applying organizations.0074_p5_s06_quote_permissions... OK
+  Applying organizations.0075_p5_s07_close_custody_permission... OK
+  Applying organizations.0076_p5_s08_sealed_custody_permission... OK
+  Applying organizations.0077_p5_s09_opening_control_foundation... OK
+  Applying organizations.0078_p5_s09_reveal_operation_choice... OK
+  Applying organizations.0079_p5_s09_opening_permissions... OK
+  Applying organizations.0080_p5_s10_admissibility_permissions... OK
+  Applying organizations.0081_p5_s11_comparison_award_permissions... OK
+  Applying organizations.0082_p5_s12_s17_permissions... OK
+  Applying organizations.0083_p5_s18_s22_supplier_portal_permission... OK
+  Applying organizations.0084_p6_s01_s06_contract_term_permissions... OK
+  Applying organizations.0085_p6_s14_s20_payable_permissions... OK
+  Applying organizations.0086_p6_s21_s25_commercial_control_permissions... OK
+  Applying organizations.0087_p6_s26_s32_statutory_permissions... OK
+  Applying organizations.0088_p6_s26_s32_national_regulatory_resolution... OK
+  Applying organizations.0089_p6_s33_s38_contractual_record_permissions... OK
+  Applying organizations.0090_p7_s01_s05_workforce_foundation_permissions... OK
+  Applying documents.0009_document_retention_classification_and_more... OK
+  Applying workforce.0008_p7_s01_s05_workforce_foundation... OK
+  Applying timekeeping.0001_initial... OK
+  Applying organizations.0091_p7_s06_s12_timekeeping_permissions... OK
+  Applying payroll.0001_initial... OK
+  Applying organizations.0092_p7_s13_s22_core_payroll_permissions... OK
+  Applying payroll.0002_pinned_monetary_policy... OK
+  Applying payroll.0003_p7_s23_s28_statutory_payroll... OK
+  Applying organizations.0093_p7_s23_s28_statutory_payroll_permissions... OK
+  Applying organizations.0094_p7_s29_s32_payroll_handoff_permissions... OK
+  Applying organizations.0095_p7_role_permission_seed_reconciliation... OK
+  Applying organizations.0096_p8_s05_s11_inventory_custody_permissions... OK
+  Applying organizations.0097_p8_s12_s17_inventory_valuation_permissions... OK
+  Applying organizations.0098_p8_s18_s23_equipment_operations_permissions... OK
+  Applying organizations.0099_p8_s24_s27_cost_asset_permissions... OK
+  Applying organizations.0100_p9_s01_s05_field_operations_permissions... OK
+  Applying organizations.0101_p9_s06_s11_compliance_permissions... OK
+  Applying organizations.0102_p9_s12_s15_partner_permissions... OK
+  Applying organizations.0103_p9_s16_s20_support_permissions... OK
+  Applying organizations.0104_p9_s21_s24_knowledge_permissions... OK
+  Applying organizations.0105_p10_s02_s06_reporting_permissions... OK
+  Applying organizations.0106_p10_s07_s13_reconciliation_permissions... OK
+  Applying organizations.0107_p10_s14_s17_project_closeout_permissions... OK
+  Applying organizations.0108_cep006_control_account_mapping_permission... OK
+  Applying organizations.0109_cep020_forecast_budget_control_permissions... OK
+  Applying organizations.0110_cep027_record_review_permissions... OK
+  Applying organizations.0111_cep054_payroll_inquiry_permissions... OK
+  Applying organizations.0112_cep055_personal_data_permissions... OK
+  Applying organizations.0113_cep056_certificate_permissions... OK
+  Applying organizations.0114_cep036_indexation_permissions... OK
+  Applying organizations.0115_cep022_employment_permissions... OK
+  Applying organizations.0116_cep032_tender_bid_permissions... OK
+  Applying organizations.0117_cep033_ap_source_reversal_permission... OK
+  Applying organizations.0118_cep035_price_book_permissions... OK
+  Applying organizations.0119_cep037_variation_eligibility_permissions... OK
+  Applying organizations.0120_cep042_recognition_permissions... OK
+  Applying audit.0001_initial... OK
+  Applying audit.0002_alter_auditevent_action... OK
+  Applying audit.0003_alter_auditevent_action... OK
+  Applying audit.0004_material_master... OK
+  Applying audit.0005_wbs_activity... OK
+  Applying audit.0006_daily_report_evolution... OK
+  Applying audit.0007_alter_auditevent_action... OK
+  Applying audit.0008_alter_auditevent_action... OK
+  Applying audit.0009_alter_auditevent_action... OK
+  Applying audit.0010_alter_auditevent_action... OK
+  Applying audit.0011_alter_auditevent_action... OK
+  Applying audit.0012_alter_auditevent_options_alter_auditevent_action_and_more... OK
+  Applying audit.0013_alter_auditevent_action... OK
+  Applying audit.0014_role_audit_actions... OK
+  Applying audit.0015_role_deleted_action... OK
+  Applying audit.0016_membership_provisioned_action... OK
+  Applying audit.0017_alter_auditevent_action... OK
+  Applying audit.0018_alter_auditevent_action... OK
+  Applying audit.0019_alter_auditevent_action... OK
+  Applying audit.0020_alter_auditevent_action... OK
+  Applying audit.0021_alter_auditevent_action... OK
+  Applying audit.0022_alter_auditevent_action... OK
+  Applying audit.0023_alter_auditevent_action... OK
+  Applying audit.0024_alter_auditevent_action... OK
+  Applying audit.0025_alter_auditevent_action... OK
+  Applying audit.0026_alter_auditevent_action... OK
+  Applying audit.0027_alter_auditevent_action... OK
+  Applying audit.0028_alter_auditevent_action... OK
+  Applying audit.0029_alter_auditevent_action... OK
+  Applying audit.0030_role_archived_action... OK
+  Applying audit.0031_p1_s16_party_governance_actions... OK
+  Applying audit.0032_p1_s17_party_governance_actions... OK
+  Applying audit.0033_p1_s19_document_governance_action... OK
+  Applying audit.0034_auditevent_changes_auditevent_correlation_id... OK
+  Applying audit.0035_p1_s25_material_attribute_actions... OK
+  Applying audit.0036_p1_s26_material_technical_actions... OK
+  Applying audit.0037_p2_accounting_actions... OK
+  Applying audit.0038_p2_reconciliation_disposition_action... OK
+  Applying audit.0039_p2_reconciliation_sign_off_action... OK
+  Applying audit.0040_p2_statement_adjustment_actions... OK
+  Applying parties.0003_p1_s16_party_identity_and_restrictions... OK
+  Applying parties.0004_p1_s17_party_governance... OK
+  Applying accounting.0001_initial... OK
+  Applying accounting.0002_openingbalanceimport_openingbalanceimportline_and_more... OK
+  Applying accounting.0003_fiscalperiod_fiscal_period_no_year_overlap_and_more... OK
+  Applying accounting.0004_journalline_source_line_uuid... OK
+  Applying accounting.0005_reconciliationrun_reconciliationexceptionsnapshot_and_more... OK
+  Applying accounting.0006_reconciliationtieoutsnapshot... OK
+  Applying accounting.0007_reconciliationexceptiondisposition... OK
+  Applying accounting.0008_reconciliationreview... OK
+  Applying accounting.0009_financial_statements_close_adjustments... OK
+  Applying accounting.0010_submitted_policy_versions_required... OK
+  Applying accounting.0011_remove_journalentry_journal_opening_cutoff_consistent_and_more... OK
+  Applying accounting.0012_controlaccountmappingversion... OK
+  Applying accounting.0013_cep042_recognition_mapping... OK
+  Applying accounts.0002_alter_user_options_alter_user_created_at_and_more... OK
+  Applying accounts.0003_user_blocked_at... OK
+  Applying accounts.0004_user_national_id... OK
+  Applying accounts.0005_loginpagesettings... OK
+  Applying accounts.0006_user_profile_image... OK
+  Applying accounts.0007_login_page_settings_panel_image... OK
+  Applying accounts.0008_optional_login_panel_messages... OK
+  Applying accounts.0009_user_must_change_password... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying audit.0041_p3_treasury_actions... OK
+  Applying audit.0042_p3_s12_s17_treasury_actions... OK
+  Applying audit.0043_p3_s18_s22_treasury_actions... OK
+  Applying audit.0044_p3_s23_s27_subledger_actions... OK
+  Applying audit.0045_p3_s30_s31_reconciliation_review_actions... OK
+  Applying audit.0046_p4_s07_s13_budget_actions... OK
+  Applying audit.0047_p4_s14_s20_project_cost_actions... OK
+  Applying audit.0048_p4_s21_s25_project_control_actions... OK
+  Applying audit.0049_p4_s26_s30_expense_actions... OK
+  Applying audit.0050_p4_s31_s34_project_control_export_action... OK
+  Applying audit.0051_p4_s35_s37_reconciliation_actions... OK
+  Applying audit.0052_expense_master_actions... OK
+  Applying audit.0053_password_recovery_actions... OK
+  Applying audit.0054_cep005_integration_attempt_action... OK
+  Applying documents.0010_photometadata... OK
+  Applying projects.0009_projectsitedocumentlink... OK
+  Applying projects.0010_projectforecastreview_projectforecasttransition_and_more... OK
+  Applying contracts.0005_contracttermversion... OK
+  Applying contracts.0006_p6_s07_s13_payment_due_days... OK
+  Applying contracts.0007_p6_s21_s25_retention_release_terms... OK
+  Applying billing.0001_initial... OK
+  Applying billing.0002_progressrecord... OK
+  Applying billing.0003_progressclaim_claimadjustment_progressclaimitem_and_more... OK
+  Applying billing.0004_f64_claim_approval... OK
+  Applying billing.0005_claimsettlementallocation... OK
+  Applying billing.0006_tenantbillingconfiguration_and_more... OK
+  Applying billing.0007_progressclaim_contract_term_version_and_more... OK
+  Applying billing.0008_p6_s01_s06_seed_reset_and_required_snapshots... OK
+  Applying billing.0009_p6_s07_s13_claim_corrections... OK
+  Applying billing.0010_p6_s07_s13_correction_revision_lineage... OK
+  Applying billing.0011_payablecertificate_payablecertificateadjustment_and_more... OK
+  Applying billing.0012_p6_s21_s25_commercial_controls... OK
+  Applying billing.0013_contractorcomplianceassessment_and_more... OK
+  Applying billing.0014_p6_s26_s32_contractor_submission_snapshot... OK
+  Applying billing.0015_p6_s26_s32_taxpayer_submission_snapshot... OK
+  Applying contracts.0008_contractualrecord_contractualrecordevidence_and_more... OK
+  Applying contracts.0009_p6_s33_s38_immutable_history... OK
+  Applying billing.0016_cep036_indexation... OK
+  Applying billing.0017_cep037_variation_billing_eligibility... OK
+  Applying documents.0011_documentcategory_employee_current_visible_and_more... OK
+  Applying commercial.0001_initial... OK
+  Applying commercial.0002_tenderbidactivation... OK
+  Applying commercial.0003_alter_tenderbidrevision_previous_revision... OK
+  Applying compliance.0001_initial... OK
+  Applying daily_reports.0005_fieldobservation_fielddownstreamproposal_and_more... OK
+  Applying daily_reports.0006_alter_fieldobservationevidencelink_operation_key_and_more... OK
+  Applying procurement.0001_initial... OK
+  Applying inventory.0001_initial... OK
+  Applying inventory.0002_inventorycount_inventoryreservation_and_more... OK
+  Applying inventory.0003_inventoryvaluationevent_downstreamcostsourceenvelope_and_more... OK
+  Applying inventory.0004_inventoryvaluationevent_average_cost_after_and_more... OK
+  Applying inventory.0005_inventoryvaluationexception... OK
+  Applying equipment.0002_equipmentmeter_equipmentusagelog_fuellog_and_more... OK
+  Applying equipment.0003_maintenanceworkorderevidence... OK
+  Applying equipment.0004_maintenancesparepartreference_quantity_snapshot_precision... OK
+  Applying equipment.0005_equipmentcostpolicyversion_equipmentcostrate_and_more... OK
+  Applying equipment.0006_equipment_handoff_source_uniqueness... OK
+  Applying estimates.0006_cep035_price_book_version_mapping... OK
+  Applying workforce.0009_cep010_person_workrelationship... OK
+  Applying workforce.0010_workrelationshipdocumentlink... OK
+  Applying expenses.0005_p4_s26_s30_expense_controls... OK
+  Applying expenses.0006_platformexpensegroup_expensecategory_primary_group... OK
+  Applying expenses.0007_expense_primary_group... OK
+  Applying expenses.0008_protect_expense_primary_group... OK
+  Applying expenses.0009_expense_reimbursement_employee_expense_replaces_and_more... OK
+  Applying fixed_assets.0001_initial... OK
+  Applying fixed_assets.0002_depreciationrun_depreciation_one_final_book_period_uq_and_more... OK
+  Applying fixed_assets.0003_depreciation_reversal_reason... OK
+  Applying fixed_assets.0004_asset_transfer_dimensions... OK
+  Applying fixed_assets.0005_asset_transfer_source_dimensions... OK
+  Applying fixed_assets.0006_fixed_asset_handoff_source_uniqueness... OK
+  Applying inventory.0006_inventory_handoff_source_uniqueness... OK
+  Applying knowledge.0001_initial... OK
+  Applying knowledge.0002_knowledge_lifecycle_completion... OK
+  Applying organizations.0121_cep043_payroll_ap_permissions... OK
+  Applying partner_qualification.0001_p9_s12_s15_partner_qualification... OK
+  Applying workflows.0001_initial... OK
+  Applying workflows.0002_workflowtransitiondefinition_domain_command... OK
+  Applying workflows.0003_workflowtransitiondefinition_required_permission... OK
+  Applying workflows.0004_seed_workflow_catalog... OK
+  Applying workflows.0005_alter_workflowcondition_configuration_and_more... OK
+  Applying workflows.0006_alter_workflowcondition_options_and_more... OK
+  Applying workflows.0007_postgresql_tenant_and_immutability_guards... OK
+  Applying workflows.0008_workflowinstance_workflowstepinstance_workitem_and_more... OK
+  Applying workflows.0009_runtime_tenant_and_immutability_guards... OK
+  Applying procurement.0002_alter_goodsreceipt_options_and_more... OK
+  Applying workflows.0010_procurement_pilot_compatibility... OK
+  Applying workflows.0011_purchase_request_canonical_scope... OK
+  Applying workflows.0012_daily_report_compatibility_catalog... OK
+  Applying safety.0001_initial... OK
+  Applying workflows.0013_safety_compatibility_catalog... OK
+  Applying quality.0001_initial... OK
+  Applying workflows.0014_quality_compatibility_catalog... OK
+  Applying workflows.0015_estimate_contract_amendment_compatibility_catalog... OK
+  Applying workflows.0016_inventory_stock_transaction_compatibility_catalog... OK
+  Applying workflows.0017_equipment_maintenance_compatibility_catalog... OK
+  Applying workflows.0018_project_baseline_compatibility_catalog... OK
+  Applying workflows.0019_progress_verification_compatibility_catalog... OK
+  Applying workflows.0020_progress_claim_approval_compatibility_catalog... OK
+  Applying workflows.0021_p1_1_unresolved_work... OK
+  Applying workflows.0022_p1_1_routing_policy... OK
+  Applying workflows.0023_p1_1_remove_deferred_self_approval... OK
+  Applying workflows.0024_p6_s14_s20_payable_certificate_catalog... OK
+  Applying workflows.0025_p6_s21_s25_commercial_control_catalog... OK
+  Applying workflows.0026_p6_s26_s32_statutory_catalog... OK
+  Applying workflows.0027_p6_s33_s38_contractual_record_catalog... OK
+  Applying timekeeping.0002_attendancecorrectionrequest... OK
+  Applying payroll.0004_p7_s27_statutory_identity_evidence... OK
+  Applying payroll.0005_financialhandoffproposal_financialhandoffline_and_more... OK
+  Applying payroll.0006_cep025_operational_cumulative_ytd... OK
+  Applying payroll.0007_statutorysourcepackage... OK
+  Applying payroll.0008_cep054_payroll_inquiry... OK
+  Applying procurement.0003_p5_s05_rfq_foundation... OK
+  Applying procurement.0004_p5_s06_sealed_quote_capture... OK
+  Applying procurement.0005_p5_s07_rfq_close_manifest... OK
+  Applying procurement.0006_quoterevisionevidence... OK
+  Applying procurement.0007_quoteconfidentialaccessgrant_and_more... OK
+  Applying procurement.0008_p5_s09_package_count_constraint... OK
+  Applying procurement.0009_p5_s10_admissibility... OK
+  Applying procurement.0010_p5_s11_comparison_award... OK
+  Applying procurement.0011_p5_s11_conflict_lineage... OK
+  Applying procurement.0012_p5_s11_comparison_input_lineage... OK
+  Applying procurement.0013_p5_s11_normalization_precision... OK
+  Applying procurement.0014_purchaseorder_source_award_and_more... OK
+  Applying procurement.0015_p5_s18_s22_supplier_portal_foundation... OK
+  Applying quality.0002_qualityissue_review_status_qualityreviewrevision_and_more... OK
+  Applying reporting.0001_initial... OK
+  Applying reporting.0002_seed_approved_metric_catalogue... OK
+  Applying reporting.0003_p10_s07_s13_reconciliation_controls... OK
+  Applying reporting.0004_seed_p10_s07_s13_reconciliation_pairs... OK
+  Applying reporting.0005_projectcloseoutprofiledefinition_and_more... OK
+  Applying reporting.0006_seed_p10_s14_s17_project_closeout_profile... OK
+  Applying safety.0002_safetyincident_review_status_safetyreviewrevision_and_more... OK
+  Applying sessions.0001_initial... OK
+  Applying treasury.0001_initial... OK
+  Applying treasury.0002_chequeinstrument_treasury_cheque_cash_effect_consistent_and_more... OK
+  Applying treasury.0003_account_transition_requester_and_identifier_uniqueness... OK
+  Applying treasury.0004_advancesettlement_advancesettlementreversal_and_more... OK
+  Applying treasury.0005_bankstatementimport_bankreconciliationrun_and_more... OK
+  Applying treasury.0006_bankstatementimport_treasury_stmt_import_positive_bounds_and_more... OK
+  Applying subledgers.0001_initial... OK
+  Applying subledgers.0002_subledgerreconciliationreview... OK
+  Applying subledgers.0003_matchtolerancepolicy_supplierinvoice_and_more... OK
+  Applying subledgers.0004_obligation_control_account_and_more... OK
+  Applying subledgers.0005_supplierinvoiceapreversal... OK
+  Applying subledgers.0006_cep043_payroll_ap... OK
+  Applying support.0001_p9_s16_s20_support... OK
+  Applying support.0002_p9_s16_s20_evidence... OK
+  Applying workforce.0011_cep055_personal_data_change... OK
+  Applying workforce.0012_cep056_certificate_framework... OK
+  Applying timekeeping.0003_cep022_employment_lifecycle... OK
+  Applying treasury.0007_treasuryglreconciliationreview... OK
+  Applying treasury.0008_bankreconciliationruninvalidation_and_more... OK
+  Applying treasury.0009_remove_paymentrequest_treasury_request_beneficiary_consistent_and_more... OK
+  Applying workforce.0013_cep022_employment_lifecycle... OK
+PASSED
+apps/subledgers/test_cep043_payroll_handoff.py::PayrollAPHandoffTests::test_real_recognition_link_and_allocation_facts_hold_target_until_unwound PASSED
+Timeout (0:00:30)!
+Thread 0x0000c120 (most recent call first):
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\apps\registry.py", line 302 in get_swappable_settings_name
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\fields\related.py", line 560 in __init__
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\fields\related.py", line 1039 in __init__
+apps/subledgers/test_cep043_migration.py::PayrollAPMigrationTests::test_populated_legacy_history_grants_and_catalog_survive_additive_reapply PASSED
+
+======================= 3 passed in 2036.18s (0:33:56) ========================

@@ -18,6 +18,12 @@ P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
+        "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
+        ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
+        (P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE, P.SUBLEDGERS_PAYROLL_PREPARE, P.SUBLEDGERS_PAYROLL_VIEW),
+        ("apps.subledgers.payroll_handoffs",),
+    ),
+    PermissionResource(
         "accounting_recognition", "نگاشت و شواهد شناسایی حسابداری",
         ("accounting.RecognitionMappingVersion", "accounting.RecognitionMappingApproval", "accounting.SourceRecognitionDraft"),
         (P.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE, P.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE, P.ACCOUNTING_RECOGNITION_PREPARE, P.ACCOUNTING_RECOGNITION_VIEW),

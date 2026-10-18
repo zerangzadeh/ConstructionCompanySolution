@@ -1,0 +1,17 @@
+{
+  "classification": "CEP043 new test-fixture errors, corrected; not baseline debt",
+  "run_summary": "2 failed,8 passed in19.72s; maxfail2",
+  "failures": {
+    "batch": "Synthetic second regular run conflicted with existing one-regular-run-per-period constraint; use explicit off-cycle synthetic source",
+    "recognition_link": "JournalEntry has prepared_by Membership, not created_by User; fixture corrected"
+  },
+  "product_invariants": "UNCHANGED",
+  "historical_enrollment_validation_run": {
+    "summary": "4 failed,14 passed in32.45s",
+    "attribution": "NEW CEP043 synthetic clock fixture, not baseline debt",
+    "cause": "Second enrollment activation used wall time while earlier consumption advanced a simulated clock two seconds; later version could fall before prior simulated consumption. Fixture now advances monotonically. Product historical checks retained.",
+    "resolution": "Final45 tests/28 subtests PASS; new first-consumption-after-withdrawal test and concurrent correction test PASS."
+  },
+  "interrupted_run": "CEP-043_FINAL_TEST_OUTPUT.txt has no completed pytest summary; interrupted historical migration-state rendering attempt, never counted as PASS. Completed diagnostic migration run later PASS in2036.18s.",
+  "lint_configuration": "Migrations follow repository pyproject.toml extend-exclude; final ruff uses --force-exclude, application/test/script checks PASS."
+}

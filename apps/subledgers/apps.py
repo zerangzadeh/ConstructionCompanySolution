@@ -9,3 +9,6 @@ class SubledgersConfig(AppConfig):
         from .supplier_invoice_handoffs import register_supplier_invoice_handoff
 
         register_supplier_invoice_handoff()
+        from .payroll_handoffs import register_payroll_handoff
+
+        register_payroll_handoff()

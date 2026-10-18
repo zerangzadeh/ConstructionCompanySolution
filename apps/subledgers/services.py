@@ -210,6 +210,13 @@ def recognize_obligation(
         raise ValidationError(
             "منبع تعهد ثبت نشده است؛ تصمیم P3-S27-Q01 برای فعال‌سازی لازم است."
         )
+    if source_kind == "payroll.liability.v1":
+        require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.PAYROLL_RESULTS_VIEW,
+            message="اختیار مشاهده منبع حساس حقوق الزامی است.",
+        )
     snapshot = resolver(organization, source_uuid, source_version, source_line_key)
     if (
         snapshot.source_kind != source_kind
@@ -616,12 +623,13 @@ def reverse_write_off(*args: object, **kwargs: object) -> None:
 
 
 def _require_unreversed_source(obligation: Obligation) -> None:
-    if obligation.source_reversals.exists():
+    if obligation.source_reversal_evidence is not None:
         raise ValidationError("منبع تعهد برگشت شده است؛ عملیات جدید مجاز نیست.")
 
 
 def _source_reversed_amount_as_of(obligation: Obligation, as_of_date: date) -> Decimal:
-    if obligation.source_reversals.filter(effective_date__lte=as_of_date).exists():
+    reversal = obligation.source_reversal_evidence
+    if reversal is not None and reversal.effective_date <= as_of_date:
         return obligation.original_amount
     return ZERO
 

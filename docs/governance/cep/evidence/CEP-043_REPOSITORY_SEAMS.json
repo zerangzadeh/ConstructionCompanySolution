@@ -1,0 +1,1131 @@
+{
+  "settings_module": "config.settings.development",
+  "database_vendor": "postgresql",
+  "local_database": true,
+  "business_rows_read": false,
+  "schema_or_data_mutation": false,
+  "models": {
+    "payroll.FinancialHandoffProposal": {
+      "file": "apps\\payroll\\models.py",
+      "line": 1920,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "family",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "run",
+          "type": "ForeignKey",
+          "target": "payroll.PayrollRun"
+        },
+        {
+          "name": "record_kind",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "predecessor",
+          "type": "ForeignKey",
+          "target": "payroll.FinancialHandoffProposal"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_digest",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "currency",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "precision_policy_version",
+          "type": "ForeignKey",
+          "target": "organizations.PlatformPolicyVersion"
+        },
+        {
+          "name": "rounding_policy_version",
+          "type": "ForeignKey",
+          "target": "organizations.PlatformPolicyVersion"
+        },
+        {
+          "name": "monetary_policy_snapshot",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "proposed_accounting_date",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "mapping_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "total_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "allocated_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "unallocated_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "has_exceptions",
+          "type": "BooleanField",
+          "target": null
+        },
+        {
+          "name": "exception_codes",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "source_snapshot",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "prepared_by",
+          "type": "ForeignKey",
+          "target": "accounts.User"
+        }
+      ]
+    },
+    "payroll.FinancialHandoffLine": {
+      "file": "apps\\payroll\\models.py",
+      "line": 1984,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "proposal",
+          "type": "ForeignKey",
+          "target": "payroll.FinancialHandoffProposal"
+        },
+        {
+          "name": "run_employee",
+          "type": "ForeignKey",
+          "target": "payroll.PayrollRunEmployee"
+        },
+        {
+          "name": "employee",
+          "type": "ForeignKey",
+          "target": "workforce.Employee"
+        },
+        {
+          "name": "result_line",
+          "type": "ForeignKey",
+          "target": "payroll.PayrollResultLine"
+        },
+        {
+          "name": "statutory_result",
+          "type": "ForeignKey",
+          "target": "payroll.StatutoryEmployeeResult"
+        },
+        {
+          "name": "timesheet",
+          "type": "ForeignKey",
+          "target": "timekeeping.Timesheet"
+        },
+        {
+          "name": "timesheet_entry",
+          "type": "ForeignKey",
+          "target": "timekeeping.TimesheetEntry"
+        },
+        {
+          "name": "project",
+          "type": "ForeignKey",
+          "target": "projects.Project"
+        },
+        {
+          "name": "site",
+          "type": "ForeignKey",
+          "target": "projects.ProjectSite"
+        },
+        {
+          "name": "activity",
+          "type": "ForeignKey",
+          "target": "projects.Activity"
+        },
+        {
+          "name": "line_kind",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "payee_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "component_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "allocation_minutes",
+          "type": "PositiveIntegerField",
+          "target": null
+        },
+        {
+          "name": "source_lineage",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "content_digest",
+          "type": "CharField",
+          "target": null
+        }
+      ]
+    },
+    "payroll.FinancialHandoffReview": {
+      "file": "apps\\payroll\\models.py",
+      "line": 2034,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "proposal",
+          "type": "OneToOneField",
+          "target": "payroll.FinancialHandoffProposal"
+        },
+        {
+          "name": "disposition",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "reviewed_by",
+          "type": "ForeignKey",
+          "target": "accounts.User"
+        },
+        {
+          "name": "reviewed_at",
+          "type": "DateTimeField",
+          "target": null
+        }
+      ]
+    },
+    "payroll.FinancialHandoffAcknowledgement": {
+      "file": "apps\\payroll\\models.py",
+      "line": 2048,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "proposal",
+          "type": "ForeignKey",
+          "target": "payroll.FinancialHandoffProposal"
+        },
+        {
+          "name": "downstream_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "downstream_status",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "acknowledged_source_digest",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "acknowledged_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "evidence",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "recorded_by",
+          "type": "ForeignKey",
+          "target": "accounts.User"
+        }
+      ]
+    },
+    "payroll.FinancialHandoffReconciliation": {
+      "file": "apps\\payroll\\models.py",
+      "line": 2067,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "proposal",
+          "type": "ForeignKey",
+          "target": "payroll.FinancialHandoffProposal"
+        },
+        {
+          "name": "acknowledgement",
+          "type": "ForeignKey",
+          "target": "payroll.FinancialHandoffAcknowledgement"
+        },
+        {
+          "name": "status",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "issue_codes",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "expected_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "observed_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "evidence",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "prepared_by",
+          "type": "ForeignKey",
+          "target": "accounts.User"
+        }
+      ]
+    },
+    "subledgers.Obligation": {
+      "file": "apps\\subledgers\\models.py",
+      "line": 519,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "direction",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_kind",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_uuid",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "source_version",
+          "type": "PositiveIntegerField",
+          "target": null
+        },
+        {
+          "name": "source_line_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_status",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_hash",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_snapshot",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "party",
+          "type": "ForeignKey",
+          "target": "parties.BusinessParty"
+        },
+        {
+          "name": "party_name_snapshot",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "party_tax_identifier_snapshot",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "project",
+          "type": "ForeignKey",
+          "target": "projects.Project"
+        },
+        {
+          "name": "contract",
+          "type": "ForeignKey",
+          "target": "contracts.Contract"
+        },
+        {
+          "name": "currency",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "original_amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "recognized_on",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "due_date",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "payload_hash",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "recognized_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        },
+        {
+          "name": "recognition_journal",
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry"
+        },
+        {
+          "name": "control_account",
+          "type": "ForeignKey",
+          "target": "accounting.Account"
+        },
+        {
+          "name": "control_account_mapping",
+          "type": "ForeignKey",
+          "target": "accounting.ControlAccountMappingVersion"
+        }
+      ]
+    },
+    "subledgers.SupplierInvoiceAPReversal": {
+      "file": "apps\\subledgers\\models.py",
+      "line": 683,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "obligation",
+          "type": "ForeignKey",
+          "target": "subledgers.Obligation"
+        },
+        {
+          "name": "replacement_match",
+          "type": "ForeignKey",
+          "target": "subledgers.SupplierInvoiceMatch"
+        },
+        {
+          "name": "effective_date",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "payload_hash",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "reversed_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        }
+      ]
+    },
+    "subledgers.SettlementReversal": {
+      "file": "apps\\subledgers\\models.py",
+      "line": 795,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "allocation",
+          "type": "OneToOneField",
+          "target": "subledgers.SettlementAllocation"
+        },
+        {
+          "name": "effective_date",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "payload_hash",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "reversed_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        },
+        {
+          "name": "reversal_journal",
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry"
+        }
+      ]
+    },
+    "subledgers.WriteOffProposal": {
+      "file": "apps\\subledgers\\models.py",
+      "line": 836,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "obligation",
+          "type": "ForeignKey",
+          "target": "subledgers.Obligation"
+        },
+        {
+          "name": "amount",
+          "type": "DecimalField",
+          "target": null
+        },
+        {
+          "name": "effective_date",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "idempotency_key",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "payload_hash",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "proposed_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        }
+      ]
+    },
+    "accounting.ControlAccountMappingVersion": {
+      "file": "apps\\accounting\\models.py",
+      "line": 171,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "source_kind",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "direction",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "version",
+          "type": "PositiveIntegerField",
+          "target": null
+        },
+        {
+          "name": "control_account",
+          "type": "ForeignKey",
+          "target": "accounting.Account"
+        },
+        {
+          "name": "effective_from",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "effective_to",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "created_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        }
+      ]
+    },
+    "accounting.RecognitionMappingVersion": {
+      "file": "apps\\accounting\\recognition_models.py",
+      "line": 40,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "source_family",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_event",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "version",
+          "type": "PositiveIntegerField",
+          "target": null
+        },
+        {
+          "name": "effective_from",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "account_assignments",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "evidence_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "prepared_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        }
+      ]
+    },
+    "accounting.SourceRecognitionDraft": {
+      "file": "apps\\accounting\\recognition_models.py",
+      "line": 95,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "source_kind",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_uuid",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "source_event",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_version_reference",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "source_snapshot",
+          "type": "JSONField",
+          "target": null
+        },
+        {
+          "name": "source_sha256",
+          "type": "CharField",
+          "target": null
+        },
+        {
+          "name": "mapping",
+          "type": "ForeignKey",
+          "target": "accounting.RecognitionMappingVersion"
+        },
+        {
+          "name": "journal",
+          "type": "OneToOneField",
+          "target": "accounting.JournalEntry"
+        },
+        {
+          "name": "predecessor",
+          "type": "ForeignKey",
+          "target": "accounting.SourceRecognitionDraft"
+        },
+        {
+          "name": "is_reversal",
+          "type": "BooleanField",
+          "target": null
+        },
+        {
+          "name": "created_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        },
+        {
+          "name": "target_snapshot",
+          "type": "JSONField",
+          "target": null
+        }
+      ]
+    },
+    "treasury.TreasuryAccountMappingVersion": {
+      "file": "apps\\treasury\\models.py",
+      "line": 205,
+      "table_exists": true,
+      "fields": [
+        {
+          "name": "id",
+          "type": "UUIDField",
+          "target": null
+        },
+        {
+          "name": "created_at",
+          "type": "DateTimeField",
+          "target": null
+        },
+        {
+          "name": "organization",
+          "type": "ForeignKey",
+          "target": "organizations.Organization"
+        },
+        {
+          "name": "treasury_account",
+          "type": "ForeignKey",
+          "target": "treasury.TreasuryAccount"
+        },
+        {
+          "name": "version",
+          "type": "PositiveIntegerField",
+          "target": null
+        },
+        {
+          "name": "cash_ledger_account",
+          "type": "ForeignKey",
+          "target": "accounting.Account"
+        },
+        {
+          "name": "clearing_ledger_account",
+          "type": "ForeignKey",
+          "target": "accounting.Account"
+        },
+        {
+          "name": "effective_from",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "effective_to",
+          "type": "DateField",
+          "target": null
+        },
+        {
+          "name": "is_active",
+          "type": "BooleanField",
+          "target": null
+        },
+        {
+          "name": "reason",
+          "type": "TextField",
+          "target": null
+        },
+        {
+          "name": "created_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        },
+        {
+          "name": "approval_policy_version",
+          "type": "ForeignKey",
+          "target": "organizations.PlatformPolicyVersion"
+        },
+        {
+          "name": "approved_by",
+          "type": "ForeignKey",
+          "target": "organizations.OrganizationMembership"
+        }
+      ]
+    }
+  },
+  "registered_ap_sources": [
+    "billing.payable_certificate.v1",
+    "billing.progress_claim.v1",
+    "procurement.supplier_invoice_match.v1"
+  ],
+  "platform_policy_codes": [
+    "project-controls-budget-overrun-response",
+    "project-controls-budget-overrun-override-enabled",
+    "accounting-money-precision",
+    "accounting-rounding",
+    "treasury-self-approval",
+    "rfq-admissibility-self-approval",
+    "rfq-comparison-self-finalization",
+    "rfq-commercial-exception-self-approval",
+    "rfq-sourcing-award-self-finalization",
+    "receivable-claim-regulatory",
+    "taxpayer-invoice-regulatory",
+    "contractor-compliance-regulatory",
+    "payroll-tax-regulatory",
+    "employee-insurance-regulatory",
+    "payroll-tax-output-schema",
+    "employee-insurance-output-schema"
+  ],
+  "all_payroll_ap_accounting_model_labels": [
+    "accounting.Account",
+    "accounting.ControlAccountMappingVersion",
+    "accounting.FiscalYear",
+    "accounting.FiscalPeriod",
+    "accounting.JournalEntry",
+    "accounting.JournalLine",
+    "accounting.JournalNumberSequence",
+    "accounting.OpeningBalanceImport",
+    "accounting.OpeningBalanceImportLine",
+    "accounting.ReconciliationRun",
+    "accounting.ReconciliationExceptionSnapshot",
+    "accounting.ReconciliationTieOutSnapshot",
+    "accounting.ReconciliationExceptionDisposition",
+    "accounting.ReconciliationReview",
+    "accounting.FinancialStatementRun",
+    "accounting.FinancialStatementLineSnapshot",
+    "accounting.FiscalPeriodControlEvent",
+    "accounting.RecognitionMappingVersion",
+    "accounting.RecognitionMappingApproval",
+    "accounting.SourceRecognitionDraft",
+    "subledgers.SupplierInvoice",
+    "subledgers.SupplierInvoiceVersion",
+    "subledgers.SupplierInvoiceLine",
+    "subledgers.MatchTolerancePolicy",
+    "subledgers.SupplierInvoiceMatch",
+    "subledgers.SupplierInvoiceMatchLine",
+    "subledgers.MatchDiscrepancy",
+    "subledgers.Obligation",
+    "subledgers.SupplierInvoiceAPReversal",
+    "subledgers.SettlementAllocation",
+    "subledgers.SettlementReversal",
+    "subledgers.WriteOffProposal",
+    "subledgers.WriteOffDecision",
+    "subledgers.WriteOffReversal",
+    "subledgers.AgingRun",
+    "subledgers.SubledgerReconciliationRun",
+    "subledgers.SubledgerReconciliationAccountSlice",
+    "subledgers.SubledgerReconciliationObligationEvidence",
+    "subledgers.SubledgerReconciliationJournalLineEvidence",
+    "subledgers.SubledgerReconciliationSliceInvalidation",
+    "subledgers.SubledgerReconciliationRunProvenance",
+    "subledgers.SubledgerReconciliationReview",
+    "payroll.StatutorySourcePackage",
+    "payroll.EmploymentPayConfiguration",
+    "payroll.PayrollComponent",
+    "payroll.PayrollRule",
+    "payroll.PayrollPeriod",
+    "payroll.PayrollRun",
+    "payroll.PayrollRunEmployee",
+    "payroll.PayrollInput",
+    "payroll.PayrollAdjustment",
+    "payroll.PayrollInputSnapshot",
+    "payroll.PayrollResultLine",
+    "payroll.PayrollYearInterval",
+    "payroll.PayrollCumulativeState",
+    "payroll.PayrollException",
+    "payroll.Payslip",
+    "payroll.PayrollReversal",
+    "payroll.StatutoryCalculation",
+    "payroll.StatutoryEmployeeResult",
+    "payroll.StatutoryCalculationLine",
+    "payroll.StatutoryReviewEvidence",
+    "payroll.StatutoryIdentityEvidence",
+    "payroll.StatutoryOutput",
+    "payroll.StatutoryExportEvidence",
+    "payroll.StatutorySubmissionResolution",
+    "payroll.StatutoryReconciliation",
+    "payroll.FinancialHandoffProposal",
+    "payroll.FinancialHandoffLine",
+    "payroll.FinancialHandoffReview",
+    "payroll.FinancialHandoffAcknowledgement",
+    "payroll.FinancialHandoffReconciliation",
+    "payroll.FinancialHandoffReconciliationReview",
+    "payroll.PayrollInquiryCategory",
+    "payroll.PayrollInquiry",
+    "payroll.PayrollInquiryResponse",
+    "payroll.PayrollInquiryEvidenceLink"
+  ],
+  "pending_relevant_migrations": [],
+  "seam_findings": [
+    "Payroll proposals/reviews retain source-only evidence; liability mapping_reference is discarded by prepare_financial_handoff. payee_reference is employee_number, not an explicit approved AP BusinessParty link. No liability enrollment model/catalog is registered.",
+    "AP Obligation supports immutable identity/version/line key and idempotency, but has no draft/finalization state. recognize_obligation is an AP recognition service, not a source proposal approval.",
+    "The only AP source-reversal evidence is SupplierInvoiceAPReversal; its clean() accepts exclusively procurement.supplier_invoice_match.v1 and replacement_match targets SupplierInvoiceMatch. Outstanding/settlement/aging readers use that relation.",
+    "SettlementReversal reverses Treasury allocation, WriteOffProposal governs write-off; neither is a Payroll source correction. No generic financial correction or repurposed source-specific table is authorized.",
+    "ControlAccountMappingVersion pins Accounting control accounts, not Payroll liability-family enrollment/payee/date/grouping. RecognitionMappingVersion requires debit/credit accounts and builds GL drafts; it cannot serve an AP enrollment contract.",
+    "No approved reusable enrollment and Payroll AP source-reversal retention contract was found. Dedicated additive persistence would exceed canonical Migration Impact NONE; no mutation attempted."
+  ],
+  "preserved_baseline_debt": {
+    "source": "CEP-042_REGRESSION_ATTRIBUTION.json",
+    "classification": "BASELINE TEST DEBT",
+    "legacy_fixture_gap": {
+      "Fixed Assets": "Equipment owner/reviewer memberships are created without explicit role assignment/scope required by current authorization",
+      "Payroll": "Custom role_definition assigned but no MembershipRoleAssignment or MembershipScopeGrant"
+    },
+    "guard_recheck": {
+      "apps/payroll/financial_handoff_services.py::prepare_financial_handoff": {
+        "ast_sha256": "85e2838232b533ad2d34ef97e4c1a58f367e80cf739fbf9484d8d096d4920bc2",
+        "matches_prior": true
+      },
+      "apps/payroll/financial_handoff_services.py::_require": {
+        "ast_sha256": "e83f5003fc0298550ffaae068256f96f1fbbbeb30a26a5ebae9f22698309939d",
+        "matches_prior": true
+      },
+      "apps/organizations/authorization.py::require_business_permission": {
+        "ast_sha256": "c364dfa90d2901aeddf5ef62583ac29bd4915ab987144840037ba726f4cb397f",
+        "matches_prior": true
+      },
+      "apps/organizations/authorization.py::membership_has_permission": {
+        "ast_sha256": "6666382eb0b5b7dba1144a2a3cce7fb55fef1d66527e2e7dc941c6cd97e0affb",
+        "matches_prior": true
+      },
+      "apps/organizations/authorization.py::membership_has_scope": {
+        "ast_sha256": "dba1262030e865e6cf5afaf078c2284158e3e333f2dd2f197449ede7b0616eb0",
+        "matches_prior": true
+      }
+    }
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "date": "2026-10-18",
+  "head": "da01c850b6fbacf41c793548426cb53e9bbc6813",
+  "authority": "HUMAN-CEP043-PERSISTENCE-20261018 item7",
+  "migration_blocker": "RESOLVED; migration-only canonical amendment verified",
+  "required_canonical_sources": {
+    "BONIRA_FINANCIAL_SOURCE_CONTRACT_COMPLETION.md": {
+      "archive": "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "member": "BONIRA_FINANCIAL_SOURCE_CONTRACT_COMPLETION.md",
+      "sha256": "a5456b56a88df3112f1ee788465b7b23efb47d380be7369c500734dd122a668c",
+      "passage": " — Payroll → AP Obligation\nSource: finalized Payroll liability evidence only.\nTarget: AP/employee/payroll liability Obligation only where that liability family is explicitly enrolled.\nLevel: L2.\nIdentity: Payroll run/version + liability occurrence/classification.\nNo generic Payroll→AP for every component.\nAccounting must not repost Payroll occurrence already recognized by Payroll.\n\n`ONE ECONOMIC OCCURRENCE → ONE ACCOUNTING RECOGNITION OWNER`\n"
+    },
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_REGISTER.csv": {
+      "archive": "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "member": "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_REGISTER.csv",
+      "sha256": "c57218339cad589c71ce7d6ff0b1199f82e4896105d02eff1e977ba607b1f4c2",
+      "passage": "SPEC-002,BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX,Accounting,PD-030 mandatory matrix,PD-030; PD-008/009/011/012/014/015,,Financial source journeys,INT-A01/A02/A04/B01/C01,,Assign one recognition owner per occurrence,Financial recognition,YES,YES where production posting applies,YES,Complete,Frozen source families,Frozen PDs + Integration Master Backlog,NO,NO,UNSPECIFIED RECOGNITION POLICY — STOP,BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX.csv,COMPLETE,None for specified rows,Negative-net optional receivable remains held,\nSPEC-029,Payroll → AP Obligation Source Contract,Payroll / AP,INT-B07 source-contract debt,PD-009; PD-030,,,INT-B07,,Define enrolled liability handoff,Payroll/AP,YES where activated,NO,YES,Complete structure,Approved liability-family mapping,Integration backlog,NO,NO,NO GENERIC PAYROLL → AP,BONIRA_FINANCIAL_SOURCE_CONTRACT_COMPLETION.md,CONDITIONALLY READY FOR BACKLOG,Liability-family mapping,Runtime UTV,"
+    },
+    "BONIRA_INTEGRATION_MASTER_BACKLOG_FINAL_EN.md": {
+      "archive": "BONIRA_PRODUCT_REVIEW_CONSOLIDATED_LATEST.zip",
+      "member": "BONIRA_INTEGRATION_MASTER_BACKLOG_FINAL_EN.md",
+      "sha256": "a492a1bc671108e002dea67b31a0d8f783801d33075365f3bc2fca3a8e35278a",
+      "passage": "## `INT-B07 — Payroll → AP Obligation`\n\n- Source: finalized Payroll liability evidence.\n- Target: AP Obligation draft.\n- Automation: `L2`.\n- Target owner: AP.\n- Required policy: liability source classification, party/payee model, due date/payment grouping.\n- Reconciliation: Payroll liability ↔ AP open item ↔ settlement.\n"
+    },
+    "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": {
+      "archive": "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip",
+      "member": "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md",
+      "sha256": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda",
+      "passage": "### `PD-009` — Payroll Downstream Financial Effects\n\n**Domain:** Payroll  \n**Accepted option / disposition:** AMENDED under PD-030  \n**V1 position:** BLOCKS V1  \n**Status:** `FROZEN`\n\n**Decision statement:** Payroll owns calculation/economic evidence; Accounting, AP, Treasury and Project Cost receive distinct downstream effects and may not duplicate the same economic recognition. Employee receivable/carry-forward follows PD-030.\n\n**Production / evidence boundary:** Downstream financial runtime evidence remains separate.\n\n**Source provenance:** `PD-009`  \n**Affected Integration / governing links:** INT-A02; INT-A03; INT-B07; INT-B08  \n**Affected PDM:** DTR-PDM-005  \n**Affected Journeys:** Payroll financial journeys\n\n**Guardrail / fail-closed rule:** No duplicate recognition\n\n\n### `PD-030` — Source-family Accounting Recognition Owner Matrix\n\n**Domain:** Accounting / Cross-domain  \n**Accepted option / disposition:** Promoted from DTR-PD-007 — Option B  \n**V1 position:** BLOCKS V1  \n**Status:** `FROZEN`\n\n**Decision statement:** For every Source Family + Economic Occurrence exactly one domain owns Accounting Recognition. All postings require Source Identity, Source Version and Recognition Type; control-account reconciliation is mandatory; unspecified occurrences fail closed.\n\n**Production / evidence boundary:** Requires BONIRA_ACCOUNTING_RECOGNITION_OWNER_MATRIX before implementation.\n\n**Source provenance:** `DTR-PD-007`  \n**Affected Integration / governing links:** DTR-INT-002; governs PD-008/009/011/012/014  \n**Affected PDM:** —  \n**Affected Journeys:** DTR-JNY-013\n\n**Guardrail / fail-closed rule:** UNSPECIFIED RECOGNITION POLICY — STOP; DO NOT INFER\n"
+    },
+    "docs/architecture/P7_S29_S32_FINANCIAL_HANDOFF_IMPLEMENTATION.md": {
+      "sha256": "8c1f4d665d604a7be0ac111391d2814c3a357383676867ea311b2948f2627ff8",
+      "role": "Accepted historical source-proposal boundary; corroborated by current code, not authority for new downstream semantics",
+      "passages": {
+        "acceptance": "\n\nProduct Owner acceptance covers only the proposal-only financial handoff\nboundary documented here: finalized-Payroll liability, Accounting-source,\nTreasury-payment and Project Cost distribution proposals; immutable source and\nmonetary-policy lineage; correction/reversal/replacement history; idempotency,\nreconciliation and double-counting-risk evidence; separate prepare/review\npermissions; and Persian-first RTL operations. AP/Subledger retains recognized\nobligations/settlements, Accounting retains journals/GL, Treasury retains\npayments/bank/cash/settlement, and Project Controls retains Project Cost actuals.\nNo automatic downstream recognition/execution, cross-domain approval, live filing,\nprovider integration, notifications, schedulers/queues or production activation is\nauthorized.\n\n",
+        "family": "\n\n- Liability proposals contain employee net payables and accepted finalized\n  statutory employee/employer components. Missing statutory payee authority is\n  explicit and prevents acceptance. AP/Subledger alone recognizes obligations.\n- Accounting proposals preserve result-line/component lineage and accept a\n  proposed accounting date or mapping reference only when supplied explicitly.\n  Missing mapping is an exception. No account, debit/credit, period, dimension,\n  journal, posting or reversal is invented.\n- Payment proposals preserve employee/payee reference, amount, currency and\n  Payroll lineage. Until payment authority is configured they remain fail-closed.\n  No bank account, instrument, release, execution or settlement is selected.\n- Project Cost proposals allocate `gross_amount + employer_amount`, both finalized\n  Payroll facts, only across the matching approved timesheet's immutable entries.\n  The run's pinned precision/rounding snapshot governs proportional allocation;\n  the final line absorbs the exact remainder. Missing or inconsistent time remains\n  an explicit unallocated line. Project Controls alone recognizes actual cost.\n\n",
+        "review_and_correction": "\n\nOriginal proposals have no predecessor. Correction, reversal and replacement\nruns must find the same-family proposal for their explicit Payroll predecessor,\nand the new immutable proposal links to it. Prior proposals, acknowledgments and\ndownstream records are never rewritten. Missing predecessor evidence fails\nclosed.\n\n## 5. Review, acknowledgment and reconciliation\n\nReview evidence is immutable and cannot accept a proposal carrying exceptions.\nDownstream acknowledgment is Payroll-held evidence only. Reconciliation creates\nno balance and performs no repair; it reports missing acknowledgment, duplicate\nproposal, stale source, source/result mismatch, lineage mismatch, amount mismatch,\nallocation mismatch and cross-proposal timesheet-entry double-counting risk.\nReconciliation review is separate immutable evidence.\n\n## 6. Permissions and UI\n\nTen new default-denied permissions independently control prepare/review for each\nof the four proposal families and prepare/review for reconciliation. Multiple\npermissions may be granted to one user; this tranche introduces no person-level\nseparation beyond accepted downstream protected operations. The Persian-first RTL\nworkbench exposes proposals, minimum employee reference, exceptions, policy/source\nevidence, correction lineage, allocation coding and reconciliation history.\n\n"
+      }
+    }
+  },
+  "repository_functions": {
+    "apps.payroll.financial_handoff_services.review_financial_handoff": {
+      "path": "apps\\payroll\\financial_handoff_services.py",
+      "line": 462,
+      "source_sha256": "0a4ca18efe6a16bf13451ab269cd0d3882fab9ba76e0b9ecc77f4ddf9e080444"
+    },
+    "apps.payroll.financial_handoff_services._lineage": {
+      "path": "apps\\payroll\\financial_handoff_services.py",
+      "line": 137,
+      "source_sha256": "8e45c44d39a87615180e2bdf601b8b62ae1223d70c6237be1c0874a8b8ca0203"
+    },
+    "apps.payroll.services.reverse_run": {
+      "path": "apps\\payroll\\services.py",
+      "line": 1617,
+      "source_sha256": "b690d5a81ec770b1daec96166912438b8f770c1926e84b918e0e69ce3ab36d96"
+    },
+    "apps.subledgers.supplier_invoice_handoffs._reverse": {
+      "path": "apps\\subledgers\\supplier_invoice_handoffs.py",
+      "line": 222,
+      "source_sha256": "94e757615a5b3afc8be5dc0b593f303f4b7ec20abf5c9b1858e3bd981ebbf2d8"
+    }
+  },
+  "established_contract": [
+    "Finalized source evidence and same-family predecessor lineage",
+    "Approved explicit liability family/mapping before activation",
+    "AP-owned L2 target; separate target approval; no Payroll cross-domain approval",
+    "No duplicate GL/cash/project-cost authority; retained identity/version; idempotency/failure/retry/reconciliation"
+  ],
+  "missing_material_contracts": [
+    "Enrollment preparation/approval authority and prospective effective/supersession/withdrawal transitions",
+    "Payroll-specific AP reversal/correction preconditions, source-reversal relationship, downstream-consumption treatment and effective-date sequencing"
+  ],
+  "not_a_blocker": [
+    "Actual tenant/family/payee/date/grouping mapping values remain activation-only EXT0013",
+    "GATE05 NOT_PASSED is not this build entry gate",
+    "Ordinary safe schema/index/ORM/locking/test choices need no Human decision"
+  ],
+  "human_decision_proposals": "CEP-043_FINDING-002.md sections A and B; proposals only, not enacted",
+  "state": "EXECUTION FAILED / BLOCKED-SPEC before product mutation",
+  "product_files": [],
+  "migrations_written_or_executed": [],
+  "test_claim": "Earlier 10/28 prerequisite PASS retained; new schema/integration/regression/concurrency tests NOT EXECUTED because no implementation",
+  "baseline_debt_and_utv": "UNCHANGED",
+  "GATE-05": "NOT_PASSED",
+  "git_writes": false
+}
