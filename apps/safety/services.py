@@ -17,7 +17,7 @@ from apps.organizations.authorization import (
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.parties.models import BusinessParty
 from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite
-from apps.safety.models import SafetyIncident, SafetyIncidentStatus
+from apps.safety.models import SafetyIncident, SafetyIncidentStatus, SafetyReviewStatus
 from apps.workforce.models import Employee
 
 _STATUS_TRANSITIONS = {
@@ -474,6 +474,8 @@ def _close_safety_incident_domain(
     previous_status = incident.status
     if SafetyIncidentStatus.CLOSED not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط حادثه رفع‌شده قابل بستن است.")
+    if incident.review_status != SafetyReviewStatus.APPROVED:
+        raise ValueError("بستن حادثه مستلزم تأیید جداگانه رکورد است.")
     incident.closure_summary = closure_summary
     incident.closed_at = timezone.now()
     incident.closed_by = actor

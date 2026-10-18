@@ -1,7 +1,7 @@
 acceptance_criterion,status,evidence,notes
-IMB-0094-AC-1,BLOCKED,CEP-027-EV-005,SPEC-026 Safety/Quality record journeys are not mapped to an approved lifecycle/evidence contract.
-IMB-0094-AC-2,BLOCKED,CEP-027-EV-005,Separate SafetyIncident and QualityIssue authorities lack the required transitions.
-IMB-0094-AC-3,BLOCKED,CEP-027-EV-005,Policy-absent paths cannot be implemented without inventing transition semantics.
-IMB-0094-AC-4,BLOCKED,CEP-027-EV-005,Correction/replacement semantics for those record journeys are unspecified.
-IMB-0094-AC-5,BLOCKED,CEP-027-EV-005,Migration Impact NONE prevents inferred persistence changes for missing journeys.
-IMB-0094-AC-6,BLOCKED,CEP-027-EV-005,Excluded behavior remains absent but the entire criterion set cannot close.
+IMB-0094-AC-1,PASS,CEP-027-EV-006|CEP-027-EV-007|CEP-027-EV-009,Approved separate Safety/Quality record-review journeys added; accepted Compliance inspection/NCR/CAPA authority retained.
+IMB-0094-AC-2,PASS,CEP-027-EV-007|CEP-027-EV-008,Valid transitions persist in the owning Safety/Quality sources with version and audit lineage.
+IMB-0094-AC-3,PASS,CEP-027-EV-007,Invalid outcomes missing reasons unauthorized actors cross-tenant evidence and unassessed legacy transitions fail closed.
+IMB-0094-AC-4,PASS,CEP-027-EV-007|CEP-027-EV-008,Returned correction creates linked immutable revision and preserves prior snapshot and source identity.
+IMB-0094-AC-5,PASS,CEP-027-EV-006|CEP-027-EV-007,Only approved record review and evidence references were added; prompt UI impact NONE was respected.
+IMB-0094-AC-6,PASS,CEP-027-EV-010,Diff review finds no new risk scale QA taxonomy checklist KPI regulatory or financial rule.

@@ -1578,20 +1578,30 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "safety_incidents",
         "حوادث ایمنی",
-        ("safety.SafetyIncident",),
+        (
+            "safety.SafetyIncident",
+            "safety.SafetyReviewRevision",
+            "safety.SafetyReviewEvidence",
+        ),
         (
             P.SAFETY_INCIDENTS_VIEW,
             P.SAFETY_INCIDENTS_CREATE,
             P.SAFETY_INCIDENTS_REVIEW,
             P.SAFETY_INCIDENTS_MANAGE,
             P.SAFETY_INCIDENTS_CLOSE,
+            P.SAFETY_INCIDENTS_RECORD_SUBMIT,
+            P.SAFETY_INCIDENTS_RECORD_DECIDE,
         ),
-        ("apps.safety.services", "apps.safety.views"),
+        ("apps.safety.services", "apps.safety.record_review", "apps.safety.views"),
     ),
     PermissionResource(
         "quality_issues",
         "مسائل کیفیت",
-        ("quality.QualityIssue",),
+        (
+            "quality.QualityIssue",
+            "quality.QualityReviewRevision",
+            "quality.QualityReviewEvidence",
+        ),
         (
             P.QUALITY_ISSUES_VIEW,
             P.QUALITY_ISSUES_CREATE,
@@ -1599,8 +1609,10 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.QUALITY_ISSUES_MANAGE,
             P.QUALITY_ISSUES_VERIFY,
             P.QUALITY_ISSUES_CLOSE,
+            P.QUALITY_ISSUES_RECORD_SUBMIT,
+            P.QUALITY_ISSUES_RECORD_DECIDE,
         ),
-        ("apps.quality.services", "apps.quality.views"),
+        ("apps.quality.services", "apps.quality.record_review", "apps.quality.views"),
     ),
     PermissionResource(
         "accounting",

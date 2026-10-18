@@ -36,6 +36,23 @@ class QualityIssueStatus(models.TextChoices):
     CLOSED = "closed", "بسته‌شده"
 
 
+class QualityReviewStatus(models.TextChoices):
+    LEGACY_UNASSESSED = "legacy_unassessed", "میراثی / بررسی‌نشده"
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    APPROVED = "approved", "تأییدشده"
+    REJECTED = "rejected", "ردشده"
+    RETURNED = "returned", "برگشت‌خورده"
+
+
+class QualityReviewHistoryQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("تاریخچه بررسی تغییرپذیر نیست.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("تاریخچه بررسی قابل حذف نیست.")
+
+
 class QualityIssueQuerySet(models.QuerySet):
     """Prevent lifecycle controls and retained history from being bypassed."""
 
@@ -135,6 +152,12 @@ class QualityIssue(UUIDModel, TimeStampedModel):
         max_length=24,
         choices=QualityIssueStatus.choices,
         default=QualityIssueStatus.REPORTED,
+        db_index=True,
+    )
+    review_status = models.CharField(
+        max_length=24,
+        choices=QualityReviewStatus.choices,
+        default=QualityReviewStatus.DRAFT,
         db_index=True,
     )
     reviewed_at = models.DateTimeField("زمان بررسی", null=True, blank=True)
@@ -380,25 +403,176 @@ class QualityIssue(UUIDModel, TimeStampedModel):
             not self.closure_summary or not self.closed_at or not self.closed_by_id
         ):
             raise ValidationError("جمع‌بندی، زمان و عامل بستن مسئله الزامی است.")
+        if (
+            self.status == QualityIssueStatus.CLOSED
+            and self.review_status != QualityReviewStatus.APPROVED
+        ):
+            raise ValidationError("بستن مسئله مستلزم تأیید جداگانه رکورد است.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         if self._state.adding and self.status != QualityIssueStatus.REPORTED:
             raise ValidationError("مسئله جدید باید در وضعیت ثبت‌شده ایجاد شود.")
         if self.pk and not self._state.adding:
-            previous_status = (
+            previous = (
                 type(self)
                 .objects.filter(pk=self.pk)
-                .values_list("status", flat=True)
+                .values(
+                    "status",
+                    "review_status",
+                    "organization_id",
+                    "created_by_id",
+                    "issue_number",
+                    "project_id",
+                    "site_id",
+                    "phase_id",
+                    "activity_id",
+                    "daily_report_id",
+                    "description",
+                    "specification_reference",
+                    "issue_type",
+                    "severity",
+                    "identified_at",
+                )
                 .first()
             )
+            previous_status = previous["status"] if previous else None
             if previous_status == QualityIssueStatus.CLOSED:
                 raise ValidationError("مسئله کیفیت بسته‌شده قابل تغییر نیست.")
             if previous_status != self.status and not getattr(
                 self, "_service_transition", False
             ):
                 raise ValidationError("تغییر وضعیت فقط از طریق سرویس کیفیت مجاز است.")
+            if (
+                previous
+                and previous["review_status"] != self.review_status
+                and not getattr(self, "_review_transition", False)
+            ):
+                raise ValidationError(
+                    "تغییر بررسی رکورد فقط از طریق سرویس کیفیت مجاز است."
+                )
+            if previous and previous["review_status"] != QualityReviewStatus.DRAFT:
+                protected = (
+                    "organization_id",
+                    "created_by_id",
+                    "issue_number",
+                    "project_id",
+                    "site_id",
+                    "phase_id",
+                    "activity_id",
+                    "daily_report_id",
+                    "description",
+                    "specification_reference",
+                    "issue_type",
+                    "severity",
+                    "identified_at",
+                )
+                if any(
+                    previous[name] != getattr(self, name) for name in protected
+                ) and not getattr(self, "_review_correction", False):
+                    raise ValidationError(
+                        "اصلاح رکورد بررسی‌شده فقط از طریق نسخه پیوندی مجاز است."
+                    )
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
         raise ValidationError("سوابق مسائل کیفیت قابل حذف نیستند.")
+
+
+class QualityReviewRevision(UUIDModel, models.Model):
+    """Append-only record review and corrected source snapshot."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    issue = models.ForeignKey(
+        QualityIssue, on_delete=models.PROTECT, related_name="review_revisions"
+    )
+    sequence = models.PositiveIntegerField()
+    previous = models.ForeignKey(
+        "self", on_delete=models.PROTECT, null=True, blank=True
+    )
+    prior_state = models.CharField(max_length=24, choices=QualityReviewStatus.choices)
+    state = models.CharField(max_length=24, choices=QualityReviewStatus.choices)
+    snapshot = models.JSONField()
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+    occurred_at = models.DateTimeField(default=timezone.now)
+
+    objects = QualityReviewHistoryQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["issue", "sequence"], name="quality_review_revision_sequence_uq"
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, issue=self.issue if self.issue_id else None
+        )
+        if not self.reason.strip() or self.sequence < 1:
+            raise ValidationError("دلیل و شماره نسخه بررسی الزامی است.")
+        if (self.sequence == 1) == bool(self.previous_id):
+            raise ValidationError("پیوند نسخه پیشین بررسی الزامی است.")
+        if self.previous_id and (
+            self.previous.issue_id != self.issue_id
+            or self.previous.sequence + 1 != self.sequence
+        ):
+            raise ValidationError("نسخه پیشین بررسی معتبر نیست.")
+        if self.previous_id and self.prior_state != self.previous.state:
+            raise ValidationError("وضعیت پیشین بررسی با نسخه پیوندی سازگار نیست.")
+        if not self.previous_id and self.prior_state != QualityReviewStatus.DRAFT:
+            raise ValidationError("نسخه آغازین بررسی معتبر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("تاریخچه بررسی تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("تاریخچه بررسی قابل حذف نیست.")
+
+
+class QualityReviewEvidence(UUIDModel, models.Model):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    revision = models.ForeignKey(
+        QualityReviewRevision, on_delete=models.PROTECT, related_name="evidence"
+    )
+    document_version = models.ForeignKey(
+        "documents.DocumentVersion", on_delete=models.PROTECT
+    )
+
+    objects = QualityReviewHistoryQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["revision", "document_version"],
+                name="quality_review_evidence_version_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            revision=self.revision if self.revision_id else None,
+            document_version=self.document_version
+            if self.document_version_id
+            else None,
+        )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد بررسی تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("شاهد بررسی قابل حذف نیست.")

@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -127,6 +128,7 @@ class SafetyWorkflowTests(SafetyTestBase):
             incident_id=incident.pk,
             resolution_summary="Guard installed",
         )
+        self.approve_record(incident)
         close_safety_incident(
             organization=self.organization,
             actor=self.owner,
@@ -146,7 +148,7 @@ class SafetyWorkflowTests(SafetyTestBase):
                 entity_type="safety_incident",
                 entity_id=str(incident.pk),
             ).count(),
-            6,
+            8,
         )
         with self.assertRaises(ValidationError):
             incident.save()
@@ -272,6 +274,15 @@ class SafetyWorkflowTests(SafetyTestBase):
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
+        manager_membership.role_assignments.create(
+            organization=self.organization, role=manager_membership.role_definition,
+            reason="Explicit safety test role",
+        )
+        manager_membership.scope_grants.create(
+            organization=self.organization,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit safety test scope",
+        )
         incident = self.create_incident()
         with self.assertRaises(PermissionDenied):
             review_safety_incident(
@@ -352,6 +363,7 @@ class SafetyWorkflowTests(SafetyTestBase):
             incident_id=closed.pk,
             resolution_summary="Resolved",
         )
+        self.approve_record(closed)
         _close_safety_incident_domain(
             organization=self.organization,
             actor=self.owner,
@@ -415,6 +427,15 @@ class SafetyWorkflowTests(SafetyTestBase):
             user=manager,
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
+        )
+        membership.role_assignments.create(
+            organization=self.organization, role=membership.role_definition,
+            reason="Explicit safety test role",
+        )
+        membership.scope_grants.create(
+            organization=self.organization,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit safety test scope",
         )
         self.assertTrue(
             safety_shadow_comparison(organization=self.organization, incident=incident)[
@@ -494,16 +515,26 @@ class SafetyWorkflowConcurrencyTests(TransactionTestCase):
             name="Safety Race", slug="safety-race"
         )
         OrganizationSettings.objects.create(organization=organization)
-        organization.memberships.create(
+        owner_membership = organization.memberships.create(
             user=owner,
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
-        organization.memberships.create(
+        manager_membership = organization.memberships.create(
             user=manager,
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
         )
+        for membership in (owner_membership, manager_membership):
+            membership.role_assignments.create(
+                organization=organization, role=membership.role_definition,
+                reason="Explicit safety test role",
+            )
+            membership.scope_grants.create(
+                organization=organization,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit safety test scope",
+            )
         project = Project.objects.create(
             organization=organization, code="RACE", name="Race"
         )

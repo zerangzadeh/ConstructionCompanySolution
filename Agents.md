@@ -338,7 +338,26 @@ required package semantics cannot be established.
 - Preserve performance, scalability, concurrency safety, maintainability,
   testability, backward compatibility, reversibility, and recoverability.
 
+## 15. Codex communication discipline
+
+- Use strict token discipline in every Codex session.
+- Do not narrate routine reasoning, file reads, searches, commands, or ordinary
+  implementation steps.
+- Intermediate working updates are event-driven, delta-only, and normally no
+  more than 3 lines.
+- Emit an intermediate update only for a material finding, blocker, failed test,
+  scope/dependency issue, governance conflict, Human-required decision, or other
+  material exception.
+- Do not repeat repository context, governance already loaded from canonical
+  sources, prior findings, or completed work.
+- Prefer compact status summaries such as `Focused tests: 12/12 PASS`.
+- Keep required detail in repository evidence and the final compact completion
+  report; token reduction must never weaken required evidence, safety controls,
+  or truthful status reporting.
+
+Principle: silent on routine work; explicit on material exceptions.
+
 Detailed execution mechanics, Git permissions, CEP queues, validation and
 regression attribution, evidence requirements, completion-state semantics,
 blocked-work handling, resource efficiency, build-vs-reuse evaluation, and
-communication rules belong exclusively to the Execution Policy and CEP Playbook.
+detailed communication mechanics belong to the Execution Policy and CEP Playbook.

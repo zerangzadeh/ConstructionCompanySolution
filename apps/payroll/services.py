@@ -4,10 +4,10 @@ import hashlib
 import json
 from collections.abc import Iterable
 from datetime import date
-from decimal import ROUND_HALF_UP, Decimal
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Any
 
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -1294,7 +1294,7 @@ def calculate_run(
         result.informational_amount = _money(
             informational, precision=precision, rounding=rounding
         )
-        result.net_amount = net
+        result.net_amount = max(net, Decimal(0))
         result.status = ResultStatus.CALCULATED
         if net < 0:
             result.status = ResultStatus.EXCEPTION
@@ -1306,7 +1306,13 @@ def calculate_run(
                 code="NEGATIVE_NET_PAY",
                 severity=PayrollExceptionSeverity.ERROR,
                 message="خالص پرداخت منفی است و به اصلاح/تعدیل کنترل‌شده نیاز دارد.",
-                details={"net_amount": format(net, "f")},
+                details={
+                    "calculated_net_amount": format(net, "f"),
+                    "payable_amount": format(result.net_amount, "f"),
+                    "unallocated_negative_amount": format(-net, "f"),
+                    "input_digest": run.input_digest,
+                    "carry_forward_route": None,
+                },
             )
         result.save()
     run.calculation_digest = _digest(
@@ -1342,6 +1348,8 @@ def submit_run_for_review(
         raise ValidationError("فقط اجرای محاسبه‌شده بدون استثنای باز قابل ارسال است.")
     if run.exceptions.filter(is_resolved=False, severity=PayrollExceptionSeverity.ERROR).exists():
         raise ValidationError("استثنای خطای باز مانع ارسال برای بررسی است.")
+    if run.exceptions.filter(code="NEGATIVE_NET_PAY").exists():
+        raise ValidationError("استثنای خالص منفی مانع ارسال عادی است.")
     run.status = PayrollRunStatus.IN_REVIEW
     run.submitted_by = actor
     run.submitted_at = timezone.now()
@@ -1367,6 +1375,8 @@ def approve_run(
         raise ValidationError("فقط اجرای در حال بررسی قابل تأیید است.")
     if run.exceptions.filter(is_resolved=False, severity=PayrollExceptionSeverity.ERROR).exists():
         raise ValidationError("استثنای خطای باز مانع تأیید است.")
+    if run.exceptions.filter(code="NEGATIVE_NET_PAY").exists():
+        raise ValidationError("استثنای خالص منفی مانع تأیید عادی است.")
     run.status = PayrollRunStatus.APPROVED
     run.reviewed_by = actor
     run.reviewed_at = timezone.now()
@@ -1438,12 +1448,17 @@ def finalize_run(
         raise ValidationError("فقط اجرای تأییدشده قابل قطعی‌سازی است.")
     if run.exceptions.filter(is_resolved=False, severity=PayrollExceptionSeverity.ERROR).exists():
         raise ValidationError("استثنای خطای باز مانع قطعی‌سازی است.")
+    if run.exceptions.filter(code="NEGATIVE_NET_PAY").exists():
+        raise ValidationError("استثنای خالص منفی مانع قطعی‌سازی عادی است.")
     results = list(
         PayrollRunEmployee.objects.select_for_update(of=("self",))
         .filter(run=run)
         .select_related("employee", "run__period")
     )
-    if any(result.net_amount < 0 for result in results):
+    if any(
+        result.net_amount < 0 or result.status == ResultStatus.EXCEPTION
+        for result in results
+    ):
         raise ValidationError("خالص منفی از مسیر عادی قابل قطعی‌سازی نیست.")
     now = timezone.now()
     for result in results:
@@ -1483,6 +1498,84 @@ def finalize_run(
         require_approved_year=False,
     )
     return run
+
+
+@transaction.atomic
+def review_negative_net_exception(
+    *, organization: Organization, actor: User, exception: PayrollException, reason: str
+) -> PayrollException:
+    """Record a review while keeping an unrecognized shortfall on hold."""
+    try:
+        exception = (
+            PayrollException.objects.select_for_update(of=("self", "run"))
+            .select_related("run", "run_employee")
+            .get(pk=exception.pk, organization=organization)
+        )
+    except PayrollException.DoesNotExist as exc:
+        raise PermissionDenied("استثنای حقوق متعلق به این شرکت نیست.") from exc
+    _scope(BusinessPermissionCode.PAYROLL_REVIEW, organization=organization, actor=actor)
+    if not reason.strip():
+        raise ValidationError("دلیل بررسی خالص منفی الزامی است.")
+    if (
+        exception.code != "NEGATIVE_NET_PAY"
+        or exception.is_resolved
+        or exception.run.status != PayrollRunStatus.EXCEPTION
+        or exception.run_employee is None
+    ):
+        raise ValidationError("فقط استثنای باز خالص منفی قابل بررسی است.")
+    _audit(
+        action=AuditAction.PAYROLL_NEGATIVE_NET_REVIEWED,
+        organization=organization,
+        actor=actor,
+        entity=exception,
+        metadata={
+            "run_id": str(exception.run_id),
+            "result_id": str(exception.run_employee_id),
+            "input_digest": exception.run.input_digest,
+            "calculation_digest": exception.run.calculation_digest,
+            "unallocated_negative_amount": exception.details.get(
+                "unallocated_negative_amount"
+            ),
+            "reason": reason.strip(),
+            "disposition": "held_no_recognition_route",
+        },
+    )
+    return exception
+
+
+def negative_net_carry_forward_candidate(
+    *, organization: Organization, actor: User, exception: PayrollException
+) -> dict[str, str | bool | None]:
+    """Expose source lineage for a future approved route; never create a carry."""
+    _scope(BusinessPermissionCode.PAYROLL_REVIEW, organization=organization, actor=actor)
+    try:
+        exception = PayrollException.objects.select_related("run", "run_employee").get(
+            pk=exception.pk, organization=organization
+        )
+    except PayrollException.DoesNotExist as exc:
+        raise PermissionDenied("استثنای حقوق متعلق به این شرکت نیست.") from exc
+    if (
+        exception.code != "NEGATIVE_NET_PAY"
+        or exception.run.status != PayrollRunStatus.EXCEPTION
+        or exception.run_employee is None
+        or exception.is_resolved
+    ):
+        raise ValidationError("منبع معتبر خالص منفی برای انتقال وجود ندارد.")
+    try:
+        amount = Decimal(exception.details["unallocated_negative_amount"])
+    except (InvalidOperation, KeyError, TypeError, ValueError) as exc:
+        raise ValidationError("شاهد مبلغ خالص منفی ناقص است.") from exc
+    if amount <= 0 or not amount.is_finite():
+        raise ValidationError("شاهد مبلغ خالص منفی نامعتبر است.")
+    return {
+        "source_run_id": str(exception.run_id),
+        "source_result_id": str(exception.run_employee_id),
+        "source_input_digest": exception.run.input_digest,
+        "source_calculation_digest": exception.run.calculation_digest,
+        "amount": format(amount, "f"),
+        "recognition_route": None,
+        "postable": False,
+    }
 
 
 @transaction.atomic

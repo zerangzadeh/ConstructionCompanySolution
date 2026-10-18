@@ -1627,6 +1627,14 @@ class BusinessPermissionCode(models.TextChoices):
     SAFETY_INCIDENTS_REVIEW = "safety_incidents.review", "بررسی و تخصیص حادثه ایمنی"
     SAFETY_INCIDENTS_MANAGE = "safety_incidents.manage", "مدیریت اقدام اصلاحی ایمنی"
     SAFETY_INCIDENTS_CLOSE = "safety_incidents.close", "بستن حادثه ایمنی"
+    SAFETY_INCIDENTS_RECORD_SUBMIT = (
+        "safety_incidents.record_submit",
+        "ارسال و اصلاح رکورد ایمنی",
+    )
+    SAFETY_INCIDENTS_RECORD_DECIDE = (
+        "safety_incidents.record_decide",
+        "تصمیم بررسی رکورد ایمنی",
+    )
 
     QUALITY_ISSUES_VIEW = "quality_issues.view", "مشاهده مسائل کیفیت"
     QUALITY_ISSUES_CREATE = "quality_issues.create", "ثبت مسئله کیفیت"
@@ -1634,6 +1642,14 @@ class BusinessPermissionCode(models.TextChoices):
     QUALITY_ISSUES_MANAGE = "quality_issues.manage", "مدیریت اقدام اصلاحی کیفیت"
     QUALITY_ISSUES_VERIFY = "quality_issues.verify", "راستی‌آزمایی مسئله کیفیت"
     QUALITY_ISSUES_CLOSE = "quality_issues.close", "بستن مسئله کیفیت"
+    QUALITY_ISSUES_RECORD_SUBMIT = (
+        "quality_issues.record_submit",
+        "ارسال و اصلاح رکورد کیفیت",
+    )
+    QUALITY_ISSUES_RECORD_DECIDE = (
+        "quality_issues.record_decide",
+        "تصمیم بررسی رکورد کیفیت",
+    )
 
     FINANCIALS_VIEW = "financials.view", "مشاهده داشبورد و گزارش‌های مالی"
     REPORTING_METRIC_CATALOG_VIEW = (

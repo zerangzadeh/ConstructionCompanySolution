@@ -13,9 +13,10 @@ from django.utils import timezone
 
 from apps.accounting.models import JournalEntry
 from apps.accounts.models import User
-from apps.audit.models import AuditAction
+from apps.audit.models import AuditAction, AuditEvent
 from apps.audit.services import get_organization_audit_events, record_audit_event
 from apps.organizations.models import (
+    AuthorizationScopeType,
     BusinessPermission,
     BusinessPermissionCode,
     MembershipStatus,
@@ -77,11 +78,13 @@ from .services import (
     export_payslip,
     finalize_run,
     lock_run_inputs,
+    negative_net_carry_forward_candidate,
     record_adjustment,
     record_input,
     retire_employment_configuration,
     retire_rule,
     reverse_run,
+    review_negative_net_exception,
     submit_run_for_review,
     view_payslip,
 )
@@ -159,13 +162,23 @@ class CorePayrollTests(TestCase):
         role.permissions.add(
             *BusinessPermission.objects.filter(code__in=permission_codes)
         )
-        OrganizationMembership.objects.create(
+        membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=user,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
             joined_at=timezone.now(),
             assigned_by=self.owner,
+        )
+        membership.role_assignments.create(
+            organization=self.organization,
+            role=role,
+            reason="Explicit Payroll test authority",
+        )
+        membership.scope_grants.create(
+            organization=self.organization,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit Payroll test scope",
         )
         return user
 
@@ -641,15 +654,95 @@ class CorePayrollTests(TestCase):
         )
         self.assertEqual(run.status, PayrollRunStatus.EXCEPTION)
         result = run.employee_results.get()
-        self.assertEqual(result.net_amount, Decimal(-100))
+        self.assertEqual(result.net_amount, Decimal(0))
         self.assertEqual(result.status, ResultStatus.EXCEPTION)
-        self.assertTrue(
-            run.exceptions.filter(code="NEGATIVE_NET_PAY", is_resolved=False).exists()
+        exception = run.exceptions.get(code="NEGATIVE_NET_PAY", is_resolved=False)
+        self.assertEqual(Decimal(exception.details["calculated_net_amount"]), Decimal(-100))
+        self.assertEqual(Decimal(exception.details["unallocated_negative_amount"]), Decimal(100))
+        self.assertEqual(exception.details["carry_forward_route"], None)
+        self.assertEqual(
+            negative_net_carry_forward_candidate(
+                organization=self.organization, actor=self.actor, exception=exception
+            ),
+            {
+                "source_run_id": str(run.pk),
+                "source_result_id": str(result.pk),
+                "source_input_digest": run.input_digest,
+                "source_calculation_digest": run.calculation_digest,
+                "amount": exception.details["unallocated_negative_amount"],
+                "recognition_route": None,
+                "postable": False,
+            },
         )
+        with self.assertRaises(ValidationError):
+            review_negative_net_exception(
+                organization=self.organization,
+                actor=self.actor,
+                exception=exception,
+                reason=" ",
+            )
+        with self.assertRaises(PermissionDenied):
+            review_negative_net_exception(
+                organization=self.organization,
+                actor=self.denied,
+                exception=exception,
+                reason="Review",
+            )
+        with patch(
+            "apps.payroll.services.record_audit_event",
+            side_effect=RuntimeError("audit unavailable"),
+        ), self.assertRaises(RuntimeError):
+            review_negative_net_exception(
+                organization=self.organization,
+                actor=self.actor,
+                exception=exception,
+                reason="Review must be auditable",
+            )
+        self.assertFalse(
+            AuditEvent.objects.filter(
+                organization=self.organization,
+                action=AuditAction.PAYROLL_NEGATIVE_NET_REVIEWED,
+                entity_id=str(exception.pk),
+            ).exists()
+        )
+        review_negative_net_exception(
+            organization=self.organization,
+            actor=self.actor,
+            exception=exception,
+            reason="Remain held pending an approved recognition route",
+        )
+        self.assertTrue(
+            AuditEvent.objects.filter(
+                organization=self.organization,
+                action=AuditAction.PAYROLL_NEGATIVE_NET_REVIEWED,
+                entity_id=str(exception.pk),
+            ).exists()
+        )
+        exception.refresh_from_db()
+        self.assertFalse(exception.is_resolved)
+        self.assertEqual(JournalEntry.objects.filter(organization=self.organization).count(), 0)
+        self.assertEqual(Obligation.objects.filter(organization=self.organization).count(), 0)
+        self.assertEqual(TreasuryMovement.objects.filter(organization=self.organization).count(), 0)
+        self.assertEqual(ProjectCostFact.objects.filter(organization=self.organization).count(), 0)
         with self.assertRaises(ValidationError):
             submit_run_for_review(
                 organization=self.organization, actor=self.actor, run=run
             )
+        with self.assertRaises(ValidationError):
+            finalize_run(organization=self.organization, actor=self.actor, run=run)
+        replacement = create_run(
+            organization=self.organization,
+            actor=self.actor,
+            period=self.period,
+            code="RUN-NEG-RPL",
+            idempotency_key="negative-replacement",
+            employees=[self.employee],
+            kind=PayrollRunKind.REPLACEMENT,
+            predecessor=run,
+            replaces=run,
+        )
+        self.assertEqual(replacement.employee_results.get().predecessor_result_id, result.pk)
+        self.assertEqual(run.employee_results.get().net_amount, Decimal(0))
 
     def test_off_cycle_adjustment_and_reversal_replacement_keep_lineage_and_idempotency(
         self,
@@ -763,13 +856,23 @@ class CorePayrollTests(TestCase):
             *BusinessPermission.objects.filter(code__in=PAYROLL_PERMISSION_CODES)
         )
         other_actor = User.objects.create_user(username="other-payroll-actor")
-        OrganizationMembership.objects.create(
+        other_membership = OrganizationMembership.objects.create(
             organization=other,
             user=other_actor,
             role_definition=other_role,
             status=MembershipStatus.ACTIVE,
             joined_at=timezone.now(),
             assigned_by=other_owner,
+        )
+        other_membership.role_assignments.create(
+            organization=other,
+            role=other_role,
+            reason="Explicit cross-tenant Payroll test authority",
+        )
+        other_membership.scope_grants.create(
+            organization=other,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit cross-tenant Payroll test scope",
         )
         with self.assertRaises(ValidationError):
             create_employment_configuration(
@@ -992,13 +1095,23 @@ class PayrollConcurrencyTests(TransactionTestCase):
                 code=BusinessPermissionCode.PAYROLL_PREPARE
             )
         )
-        OrganizationMembership.objects.create(
+        membership = OrganizationMembership.objects.create(
             organization=organization,
             user=actor,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
             joined_at=timezone.now(),
             assigned_by=owner,
+        )
+        membership.role_assignments.create(
+            organization=organization,
+            role=role,
+            reason="Explicit Payroll concurrency test authority",
+        )
+        membership.scope_grants.create(
+            organization=organization,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit Payroll concurrency test scope",
         )
         employee = Employee.objects.create(
             organization=organization,

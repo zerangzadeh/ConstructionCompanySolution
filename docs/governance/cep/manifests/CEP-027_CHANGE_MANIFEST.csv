@@ -4,3 +4,12 @@ CEP-027-CH-002,docs/governance/cep/manifests/CEP-027_EXECUTION_MANIFEST.md,Recor
 CEP-027-CH-003,docs/governance/cep/evidence/CEP-027_ACCEPTANCE_MAPPING.csv,Record six blocked criteria,IN SCOPE GOVERNANCE,NONE
 CEP-027-CH-004,docs/governance/cep/evidence/CEP-027_EVIDENCE_MANIFEST.csv,Record canonical recovery evidence,IN SCOPE GOVERNANCE,NONE
 CEP-027-CH-005,docs/governance/cep/reports/CEP-027_COMPLETION_REPORT.md,Record blocked closeout,IN SCOPE GOVERNANCE,NONE
+CEP-027-CH-006,apps/safety/models.py + apps/quality/models.py,Add separate review state and append-only revision/evidence lineage with closure guard,IN SCOPE PRODUCT,CONDITIONAL EXPAND
+CEP-027-CH-007,apps/safety/record_review.py + apps/quality/record_review.py,Add locked permissioned submit decide return correction resubmit and exact DMS-version evidence,IN SCOPE PRODUCT,NONE
+CEP-027-CH-008,apps/safety/services.py + apps/quality/services.py,Require approved record review before existing remediation close,IN SCOPE PRODUCT,NONE
+CEP-027-CH-009,apps/organizations/models.py + apps/organizations/permission_registry.py + apps/audit/models.py,Register four distinct review permissions and two audit actions,IN SCOPE PRODUCT,NONE
+CEP-027-CH-010,apps/organizations/migrations/0110_cep027_record_review_permissions.py,Create permission catalog and map prior create/review role grants,IN SCOPE PRODUCT,CONDITIONAL DATA
+CEP-027-CH-011,apps/safety/migrations/0002_safetyincident_review_status_safetyreviewrevision_and_more.py + apps/quality/migrations/0002_qualityissue_review_status_qualityreviewrevision_and_more.py,Expand review schema and classify existing rows legacy unassessed,IN SCOPE PRODUCT,CONDITIONAL EXPAND+DATA
+CEP-027-CH-012,apps/safety/test_cep027_review.py + apps/quality/test_cep027_review.py + apps/safety/test_cep027_migration.py,Prove lifecycle negative path tenant permission evidence and migration invariants,IN SCOPE TEST,NONE
+CEP-027-CH-013,apps/safety/tests.py + apps/safety/test_workflow.py + apps/quality/tests.py + apps/quality/test_workflow.py,Update affected regression fixtures to explicit authorization and assert approved review before close,IN SCOPE TEST,NONE
+CEP-027-CH-014,docs/governance/cep/evidence/CEP-027_ACCEPTANCE_MAPPING.csv + docs/governance/cep/evidence/CEP-027_EVIDENCE_MANIFEST.csv + docs/governance/cep/manifests/CEP-027_EXECUTION_MANIFEST.md + docs/governance/cep/reports/CEP-027_COMPLETION_REPORT.md + CEP_EXECUTION_REGISTRY.yaml,Record execution evidence and live state,IN SCOPE GOVERNANCE,NONE

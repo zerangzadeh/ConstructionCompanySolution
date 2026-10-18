@@ -13,6 +13,7 @@ from django.utils import timezone
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -124,6 +125,7 @@ class QualityWorkflowTests(QualityTestBase):
             issue_id=issue.pk,
             verification_summary="Inspection accepted",
         )
+        self.approve_record(issue)
         close_quality_issue(
             organization=self.organization,
             actor=self.owner,
@@ -143,7 +145,7 @@ class QualityWorkflowTests(QualityTestBase):
                 entity_type="quality_issue",
                 entity_id=str(issue.pk),
             ).count(),
-            7,
+            9,
         )
 
     def test_field_validation_permission_tenant_scope_and_candidacy_are_rechecked(
@@ -161,6 +163,15 @@ class QualityWorkflowTests(QualityTestBase):
             user=manager,
             role=MembershipRole.COMPANY_MANAGER,
             status=MembershipStatus.ACTIVE,
+        )
+        membership.role_assignments.create(
+            organization=self.organization, role=membership.role_definition,
+            reason="Explicit quality test role",
+        )
+        membership.scope_grants.create(
+            organization=self.organization,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit quality test scope",
         )
         item = WorkflowInstance.objects.get(subject_id=issue.pk).work_items.get()
         item.candidates.filter(membership=membership).update(is_active=False)
@@ -243,6 +254,7 @@ class QualityWorkflowTests(QualityTestBase):
             issue_id=closed.pk,
             verification_summary="Accepted",
         )
+        self.approve_record(closed)
         _close_quality_issue_domain(
             organization=self.organization,
             actor=self.owner,
@@ -330,8 +342,17 @@ class QualityWorkflowConcurrencyTests(TransactionTestCase):
             (owner, MembershipRole.COMPANY_OWNER),
             (manager, MembershipRole.COMPANY_MANAGER),
         ):
-            organization.memberships.create(
+            membership = organization.memberships.create(
                 user=user, role=role, status=MembershipStatus.ACTIVE
+            )
+            membership.role_assignments.create(
+                organization=organization, role=membership.role_definition,
+                reason="Explicit quality test role",
+            )
+            membership.scope_grants.create(
+                organization=organization,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit quality test scope",
             )
         project = Project.objects.create(
             organization=organization, code="RACE", name="Race"

@@ -10,6 +10,7 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.daily_reports.models import DailyReport
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -23,7 +24,9 @@ from apps.quality.models import (
     QualityIssueSeverity,
     QualityIssueStatus,
     QualityIssueType,
+    QualityReviewStatus,
 )
+from apps.quality.record_review import decide_quality_record, submit_quality_record
 from apps.quality.services import (
     assign_quality_issue,
     close_quality_issue,
@@ -68,6 +71,22 @@ class QualityTestBase(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        for organization, user in (
+            (self.organization, self.owner),
+            (self.organization, self.viewer),
+            (self.other_organization, self.other_owner),
+        ):
+            membership = organization.memberships.get(user=user)
+            membership.role_assignments.create(
+                organization=organization,
+                role=membership.role_definition,
+                reason="Explicit quality test role",
+            )
+            membership.scope_grants.create(
+                organization=organization,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit quality test scope",
+            )
         self.project = Project.objects.create(
             organization=self.organization, code="QUAL-P", name="Quality Project"
         )
@@ -138,6 +157,7 @@ class QualityTestBase(TestCase):
         )
 
     def close_issue(self, issue: QualityIssue) -> QualityIssue:
+        self.approve_record(issue)
         review_quality_issue(
             organization=self.organization, actor=self.owner, issue_id=issue.pk
         )
@@ -171,6 +191,21 @@ class QualityTestBase(TestCase):
             actor=self.owner,
             issue_id=issue.pk,
             closure_summary="Consultant acceptance recorded",
+        )
+
+    def approve_record(self, issue: QualityIssue) -> None:
+        submit_quality_record(
+            organization=self.organization,
+            actor=self.owner,
+            issue_id=issue.pk,
+            reason="Record complete",
+        )
+        decide_quality_record(
+            organization=self.organization,
+            actor=self.owner,
+            issue_id=issue.pk,
+            outcome=QualityReviewStatus.APPROVED,
+            reason="Record accepted",
         )
 
 
@@ -235,7 +270,7 @@ class QualityIssueServiceTests(QualityTestBase):
                 entity_type="quality_issue",
                 entity_id=str(issue.pk),
             ).count(),
-            7,
+            9,
         )
         with self.assertRaises(ValueError):
             review_quality_issue(

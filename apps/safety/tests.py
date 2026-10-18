@@ -10,6 +10,7 @@ from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.daily_reports.models import DailyReport
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -23,7 +24,9 @@ from apps.safety.models import (
     SafetyIncidentSeverity,
     SafetyIncidentStatus,
     SafetyIncidentType,
+    SafetyReviewStatus,
 )
+from apps.safety.record_review import decide_safety_record, submit_safety_record
 from apps.safety.services import (
     assign_safety_incident,
     close_safety_incident,
@@ -67,6 +70,22 @@ class SafetyTestBase(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        for organization, user in (
+            (self.organization, self.owner),
+            (self.organization, self.viewer),
+            (self.other_organization, self.other_owner),
+        ):
+            membership = organization.memberships.get(user=user)
+            membership.role_assignments.create(
+                organization=organization,
+                role=membership.role_definition,
+                reason="Explicit safety test role",
+            )
+            membership.scope_grants.create(
+                organization=organization,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit safety test scope",
+            )
         self.project = Project.objects.create(
             organization=self.organization, code="SAFE-P", name="Safety Project"
         )
@@ -136,6 +155,21 @@ class SafetyTestBase(TestCase):
             immediate_action="Area isolated",
         )
 
+    def approve_record(self, incident: SafetyIncident) -> None:
+        submit_safety_record(
+            organization=self.organization,
+            actor=self.owner,
+            incident_id=incident.pk,
+            reason="Record complete",
+        )
+        decide_safety_record(
+            organization=self.organization,
+            actor=self.owner,
+            incident_id=incident.pk,
+            outcome=SafetyReviewStatus.APPROVED,
+            reason="Record accepted",
+        )
+
 
 class SafetyIncidentModelTests(SafetyTestBase):
     def test_structural_relations_reject_cross_tenant_project(self) -> None:
@@ -158,6 +192,7 @@ class SafetyIncidentModelTests(SafetyTestBase):
 
     def test_closed_incident_cannot_be_changed_or_deleted(self) -> None:
         incident = self.create_incident()
+        self.approve_record(incident)
         review_safety_incident(
             organization=self.organization, actor=self.owner, incident_id=incident.pk
         )
@@ -229,6 +264,7 @@ class SafetyIncidentServiceTests(SafetyTestBase):
 
     def test_full_lifecycle_is_ordered_and_audited(self) -> None:
         incident = self.create_incident()
+        self.approve_record(incident)
         review_safety_incident(
             organization=self.organization, actor=self.owner, incident_id=incident.pk
         )
@@ -267,7 +303,7 @@ class SafetyIncidentServiceTests(SafetyTestBase):
                 entity_type="safety_incident",
                 entity_id=str(incident.pk),
             ).count(),
-            6,
+            8,
         )
         with self.assertRaises(ValueError):
             review_safety_incident(

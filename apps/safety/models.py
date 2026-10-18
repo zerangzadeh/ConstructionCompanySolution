@@ -36,6 +36,23 @@ class SafetyIncidentStatus(models.TextChoices):
     CLOSED = "closed", "بسته‌شده"
 
 
+class SafetyReviewStatus(models.TextChoices):
+    LEGACY_UNASSESSED = "legacy_unassessed", "میراثی / بررسی‌نشده"
+    DRAFT = "draft", "پیش‌نویس"
+    SUBMITTED = "submitted", "ارسال‌شده"
+    APPROVED = "approved", "تأییدشده"
+    REJECTED = "rejected", "ردشده"
+    RETURNED = "returned", "برگشت‌خورده"
+
+
+class SafetyReviewHistoryQuerySet(models.QuerySet):
+    def update(self, **kwargs: object) -> int:
+        raise ValidationError("تاریخچه بررسی تغییرپذیر نیست.")
+
+    def delete(self) -> tuple[int, dict[str, int]]:
+        raise ValidationError("تاریخچه بررسی قابل حذف نیست.")
+
+
 class SafetyIncidentQuerySet(models.QuerySet):
     """Prevent lifecycle and immutable history from being bypassed in bulk."""
 
@@ -134,6 +151,12 @@ class SafetyIncident(UUIDModel, TimeStampedModel):
         max_length=24,
         choices=SafetyIncidentStatus.choices,
         default=SafetyIncidentStatus.REPORTED,
+        db_index=True,
+    )
+    review_status = models.CharField(
+        max_length=24,
+        choices=SafetyReviewStatus.choices,
+        default=SafetyReviewStatus.DRAFT,
         db_index=True,
     )
     reviewed_at = models.DateTimeField("زمان بررسی", null=True, blank=True)
@@ -361,25 +384,177 @@ class SafetyIncident(UUIDModel, TimeStampedModel):
             not self.closure_summary or not self.closed_at or not self.closed_by_id
         ):
             raise ValidationError("جمع‌بندی، زمان و عامل بستن حادثه الزامی است.")
+        if (
+            self.status == SafetyIncidentStatus.CLOSED
+            and self.review_status != SafetyReviewStatus.APPROVED
+        ):
+            raise ValidationError("بستن حادثه مستلزم تأیید جداگانه رکورد است.")
 
     def save(self, *args: object, **kwargs: object) -> None:
         if self._state.adding and self.status != SafetyIncidentStatus.REPORTED:
             raise ValidationError("حادثه جدید باید در وضعیت ثبت‌شده ایجاد شود.")
         if self.pk and not self._state.adding:
-            previous_status = (
+            previous = (
                 type(self)
                 .objects.filter(pk=self.pk)
-                .values_list("status", flat=True)
+                .values(
+                    "status",
+                    "review_status",
+                    "organization_id",
+                    "created_by_id",
+                    "incident_number",
+                    "project_id",
+                    "site_id",
+                    "phase_id",
+                    "activity_id",
+                    "daily_report_id",
+                    "description",
+                    "immediate_action",
+                    "incident_type",
+                    "severity",
+                    "occurred_at",
+                )
                 .first()
             )
+            previous_status = previous["status"] if previous else None
             if previous_status == SafetyIncidentStatus.CLOSED:
                 raise ValidationError("حادثه بسته‌شده قابل تغییر نیست.")
             if previous_status != self.status and not getattr(
                 self, "_service_transition", False
             ):
                 raise ValidationError("تغییر وضعیت فقط از طریق سرویس ایمنی مجاز است.")
+            if (
+                previous
+                and previous["review_status"] != self.review_status
+                and not getattr(self, "_review_transition", False)
+            ):
+                raise ValidationError(
+                    "تغییر بررسی رکورد فقط از طریق سرویس ایمنی مجاز است."
+                )
+            if previous and previous["review_status"] != SafetyReviewStatus.DRAFT:
+                protected = (
+                    "organization_id",
+                    "created_by_id",
+                    "incident_number",
+                    "project_id",
+                    "site_id",
+                    "phase_id",
+                    "activity_id",
+                    "daily_report_id",
+                    "description",
+                    "immediate_action",
+                    "incident_type",
+                    "severity",
+                    "occurred_at",
+                )
+                if any(
+                    previous[name] != getattr(self, name) for name in protected
+                ) and not getattr(self, "_review_correction", False):
+                    raise ValidationError(
+                        "اصلاح رکورد بررسی‌شده فقط از طریق نسخه پیوندی مجاز است."
+                    )
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
     def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
         raise ValidationError("سوابق حوادث ایمنی قابل حذف نیستند.")
+
+
+class SafetyReviewRevision(UUIDModel, models.Model):
+    """Append-only record review and corrected source snapshot."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    incident = models.ForeignKey(
+        SafetyIncident, on_delete=models.PROTECT, related_name="review_revisions"
+    )
+    sequence = models.PositiveIntegerField()
+    previous = models.ForeignKey(
+        "self", on_delete=models.PROTECT, null=True, blank=True
+    )
+    prior_state = models.CharField(max_length=24, choices=SafetyReviewStatus.choices)
+    state = models.CharField(max_length=24, choices=SafetyReviewStatus.choices)
+    snapshot = models.JSONField()
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField()
+    occurred_at = models.DateTimeField(default=timezone.now)
+
+    objects = SafetyReviewHistoryQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["incident", "sequence"],
+                name="safety_review_revision_sequence_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self, incident=self.incident if self.incident_id else None
+        )
+        if not self.reason.strip() or self.sequence < 1:
+            raise ValidationError("دلیل و شماره نسخه بررسی الزامی است.")
+        if (self.sequence == 1) == bool(self.previous_id):
+            raise ValidationError("پیوند نسخه پیشین بررسی الزامی است.")
+        if self.previous_id and (
+            self.previous.incident_id != self.incident_id
+            or self.previous.sequence + 1 != self.sequence
+        ):
+            raise ValidationError("نسخه پیشین بررسی معتبر نیست.")
+        if self.previous_id and self.prior_state != self.previous.state:
+            raise ValidationError("وضعیت پیشین بررسی با نسخه پیوندی سازگار نیست.")
+        if not self.previous_id and self.prior_state != SafetyReviewStatus.DRAFT:
+            raise ValidationError("نسخه آغازین بررسی معتبر نیست.")
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("تاریخچه بررسی تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("تاریخچه بررسی قابل حذف نیست.")
+
+
+class SafetyReviewEvidence(UUIDModel, models.Model):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    revision = models.ForeignKey(
+        SafetyReviewRevision, on_delete=models.PROTECT, related_name="evidence"
+    )
+    document_version = models.ForeignKey(
+        "documents.DocumentVersion", on_delete=models.PROTECT
+    )
+
+    objects = SafetyReviewHistoryQuerySet.as_manager()
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["revision", "document_version"],
+                name="safety_review_evidence_version_uq",
+            )
+        ]
+
+    def clean(self) -> None:
+        super().clean()
+        validate_related_organizations(
+            self,
+            revision=self.revision if self.revision_id else None,
+            document_version=self.document_version
+            if self.document_version_id
+            else None,
+        )
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        if not self._state.adding:
+            raise ValidationError("شاهد بررسی تغییرپذیر نیست.")
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: object, **kwargs: object) -> None:
+        raise ValidationError("شاهد بررسی قابل حذف نیست.")

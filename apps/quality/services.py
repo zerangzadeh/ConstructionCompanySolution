@@ -17,7 +17,7 @@ from apps.organizations.authorization import (
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.parties.models import BusinessParty
 from apps.projects.models import Activity, Project, ProjectPhase, ProjectSite
-from apps.quality.models import QualityIssue, QualityIssueStatus
+from apps.quality.models import QualityIssue, QualityIssueStatus, QualityReviewStatus
 from apps.workforce.models import Employee
 
 _STATUS_TRANSITIONS = {
@@ -515,6 +515,8 @@ def _close_quality_issue_domain(
     previous_status = issue.status
     if QualityIssueStatus.CLOSED not in _STATUS_TRANSITIONS[previous_status]:
         raise ValueError("فقط مسئله راستی‌آزمایی‌شده قابل بستن است.")
+    if issue.review_status != QualityReviewStatus.APPROVED:
+        raise ValueError("بستن مسئله مستلزم تأیید جداگانه رکورد است.")
     issue.closure_summary = closure_summary
     issue.closed_at = timezone.now()
     issue.closed_by = actor

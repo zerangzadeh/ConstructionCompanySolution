@@ -1332,6 +1332,10 @@ class AuditAction(models.TextChoices):
     )
     SAFETY_INCIDENT_RESOLVED = "safety_incident.resolved", "حادثه ایمنی رفع شد"
     SAFETY_INCIDENT_CLOSED = "safety_incident.closed", "حادثه ایمنی بسته شد"
+    SAFETY_INCIDENT_RECORD_REVIEWED = (
+        "safety_incident.record_reviewed",
+        "بررسی رکورد ایمنی ثبت شد",
+    )
     QUALITY_ISSUE_CREATED = "quality_issue.created", "مسئله کیفیت ثبت شد"
     QUALITY_ISSUE_REVIEWED = "quality_issue.reviewed", "مسئله کیفیت بررسی شد"
     QUALITY_ISSUE_ASSIGNED = "quality_issue.assigned", "مسئله کیفیت تخصیص یافت"
@@ -1348,6 +1352,10 @@ class AuditAction(models.TextChoices):
         "مسئله کیفیت راستی‌آزمایی شد",
     )
     QUALITY_ISSUE_CLOSED = "quality_issue.closed", "مسئله کیفیت بسته شد"
+    QUALITY_ISSUE_RECORD_REVIEWED = (
+        "quality_issue.record_reviewed",
+        "بررسی رکورد کیفیت ثبت شد",
+    )
     MEMBERSHIP_PROVISIONED = (
         "membership.provisioned",
         "کاربر در انتظار تعیین نقش به شرکت تخصیص یافت",
@@ -1475,6 +1483,10 @@ class AuditAction(models.TextChoices):
         "مانده تجمعی عملیاتی حقوق ثبت شد",
     )
     PAYROLL_EXCEPTION_RESOLVED = "payroll.exception_resolved", "استثنای حقوق رفع شد"
+    PAYROLL_NEGATIVE_NET_REVIEWED = (
+        "payroll.negative_net_reviewed",
+        "خالص منفی حقوق بررسی و در توقف نگه داشته شد",
+    )
     PAYROLL_RUN_REVERSED = "payroll.run_reversed", "اجرای حقوق برگشت و مرتبط شد"
     PAYROLL_STATUTORY_CALCULATED = (
         "payroll.statutory_calculated",

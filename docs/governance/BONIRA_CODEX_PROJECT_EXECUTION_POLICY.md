@@ -582,16 +582,33 @@ alone does not grant Product Owner approval.
 
 ## 27. Execution communication
 
+Use strict token discipline in every Codex session. Communication is
+outcome-oriented, event-driven, and delta-only.
+
 Use concise English unless the user requests otherwise. Lead with outcomes,
 decisions, changed artifacts, validation, blockers, and next action. Do not narrate
-routine reads, searches, edits, or tests.
+routine reasoning, file reads, searches, commands, edits, ordinary implementation
+steps, or successful routine tests.
 
-Send intermediate updates only for a blocker, important decision, significant
-architecture/domain finding, or material change in approach. Never omit a material
-risk, failed validation, approval state, or required Human decision.
+Intermediate working updates are normally no more than 3 lines. Emit one only for
+a material finding, blocker, failed validation, scope/dependency issue, governance
+conflict, Human-required decision, significant architecture/domain finding, or
+material change in approach. Never omit a material risk, failed validation,
+approval state, or required Human decision.
 
-Final reports must state honestly what was and was not validated. Link to artifacts
-instead of copying their contents when a concise reference is sufficient.
+Do not repeat repository context, governance already loaded from canonical sources,
+prior findings, completed actions, or evidence that remains valid. Prefer compact
+status summaries such as `Focused tests: 12/12 PASS` instead of per-step narration.
+
+Keep necessary detail in repository evidence and the final compact Completion
+Report. Link to artifacts instead of copying their contents when a concise
+reference is sufficient. Final reports must state honestly what was and was not
+validated.
+
+Token reduction must never weaken required evidence, safety controls, validation,
+traceability, or truthful status reporting.
+
+Principle: silent on routine work; explicit on material exceptions.
 
 ## 28. Explicit override and stop rule
 
