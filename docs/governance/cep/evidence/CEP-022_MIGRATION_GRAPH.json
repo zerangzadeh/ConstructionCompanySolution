@@ -1,0 +1,24 @@
+{
+  "method": "READ ONLY inspection of isolated test migration recorder and final migration graph; no migrate/SQL mutation in this probe",
+  "reverse_plan": [
+    [
+      "workforce",
+      "0013_cep022_employment_lifecycle",
+      true
+    ],
+    [
+      "timekeeping",
+      "0003_cep022_employment_lifecycle",
+      true
+    ],
+    [
+      "organizations",
+      "0115_cep022_employment_permissions",
+      true
+    ]
+  ],
+  "only_cep022_migrations_reversed": true,
+  "roster_operations_unchanged_by_dependency_narrowing": true,
+  "operations_ast_sha256": "64096c0840c5c320e935e4e472cd13c2eee5194e179b90d66b9468212441a76a",
+  "rollback_reapply_evidence": "Separate existing run PASS on same table operations; final narrowed parent verified by this reverse plan and scoped local development forward application/reconciliation; no duplicate heavy rehearsal needed"
+}

@@ -62,13 +62,13 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 39
+  execution_state_complete: 40
   authorized_not_started: 0
   eligible_under_standing_authority: 1
   in_progress: 0
   blocked_current: 0
   partial_current: 2
-  not_started_other_current_governed: 37
+  not_started_other_current_governed: 36
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-18'
@@ -1026,23 +1026,22 @@ ceps:
     title: Employment lifecycle and roster foundation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: ELIGIBLE
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: BLOCKER_RESOLVED
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
+      passed: 18
       total: 18
-      status: UNRECORDED
-    dod: UNRECORDED
+      status: PASS
+    dod: PASS
     blockers: []
     remaining_utv:
-    - unit_model_service_workflow_ui_template_and_regression_validation
     - browser_accessibility_runtime
     - performance_concurrency_runtime
     completion_report:
@@ -1056,8 +1055,8 @@ ceps:
       remote_main_evidence: UNVERIFIED
     last_execution:
       branch: main
-      sha: 76362e23fbbd18c5f280343ece064e95eeae4881
-    updated_at: '2026-10-17'
+      sha: 7b89fb121878ef68feb44fd44a584896afc37e2c
+    updated_at: '2026-10-18'
     history:
     - date: '2026-10-17'
       status: BLOCKED
@@ -1068,6 +1067,12 @@ ceps:
     - date: '2026-10-17'
       status: BLOCKER_RESOLVED
       reason: Human Decision Authority reaffirmed existing workforce contract and granted bounded non-production persistence migration authority in BONIRA-CONSOLIDATED-20261017.
+    - date: '2026-10-18'
+      status: RESUMED
+      reason: Canonical995a0b49 verified; CEP010 and GATE01/02 proved; SPEC009/010/017/033 and ESS014 recovered; conditional non-production migration authority verified; current main7b89fb1. Actual seam and touch set under entry review before product mutation.
+    - date: '2026-10-18'
+      status: CLOSED_VERIFIED
+      reason: 18/18 AC and all three scoped DoDs PASS; immutable employment/DMS effective history and own read-only UI; clearance follows existing end event via assigned shared Workflow; versioned roster/rotation/overrides preserve Attendance.53 affected tests and separate rollback/reapply PASS; local three-migration source/grant reconciliation and15 fixture captures retained. Seven capabilities, zero default grants; no financial/access mutation or production action.
   CEP-023:
     title: null
     phase: V1_IMPLEMENTATION
@@ -1410,17 +1415,17 @@ ceps:
     updated_at: '2026-10-16'
     history: []
   CEP-030:
-    title: null
+    title: Party operational/governance surfaces
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ELIGIBLE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
+      lifecycle: NOT_STARTED
       advisor_review: PENDING
     acceptance:
       passed: null
@@ -1441,8 +1446,11 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-18'
+    history:
+    - date: '2026-10-18'
+      status: DEPENDENCY_READY
+      reason: No direct CEP prerequisites; per-item Wave foundation semantics verified. Applied Party0004 and tenant-scoped existing source services/read contracts; isolated operational/governance/outsider probe PASS. UIA044 recovered; full030 C0/touch-set verification remains before mutation.028 dataset blocker is not a Party prerequisite.
   CEP-031:
     title: null
     phase: V1_IMPLEMENTATION
@@ -1641,11 +1649,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-036_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 7b89fb121878ef68feb44fd44a584896afc37e2c
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: COMPLETE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 343391c2384fdf302b35d198843196a945b63b27
@@ -1663,6 +1673,9 @@ ceps:
     - date: '2026-10-18'
       status: CLOSED_VERIFIED
       reason: Six AC and scoped build DoD PASS; immutable governed rule/calculation/correction framework, no shipped adapter or policy; explicit operation capabilities with zero defaults. Focused/model/service/migration checks PASS. Contracts/Billing fixture and registry failures attributable to unchanged baseline; evidence comparison retained. Development source/grant reconciliation PASS; EXT0003 activation remains closed.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit and fast-forward push7b89fb1 verified against main/HEAD/origin/main/remote main; clean working tree.
   CEP-037:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3565,9 +3578,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 343391c2384fdf302b35d198843196a945b63b27
-  origin_main: 343391c2384fdf302b35d198843196a945b63b27
-  integration_checkpoint: 343391c2384fdf302b35d198843196a945b63b27
+  last_reconciled_head: 7b89fb121878ef68feb44fd44a584896afc37e2c
+  origin_main: 7b89fb121878ef68feb44fd44a584896afc37e2c
+  integration_checkpoint: 7b89fb121878ef68feb44fd44a584896afc37e2c
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
@@ -3575,8 +3588,8 @@ execution_frontier:
   execution_mode: SERIAL_BY_DEFAULT
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
-  - CEP-022
-  next_autonomous_cep: CEP-022
+  - CEP-030
+  next_autonomous_cep: CEP-030
   current_session_continuation: RESUMED_INDEPENDENT_NON_PRODUCTION_ON_HUMAN_CONTINUE
   current_independent_cep: null
   production_authorized: false

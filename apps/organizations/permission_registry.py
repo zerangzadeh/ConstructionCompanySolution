@@ -17,6 +17,12 @@ class PermissionResource:
 P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+    PermissionResource("employment_records", "سوابق مؤثر استخدام", ("workforce.EmploymentRecord",),
+        (P.EMPLOYMENT_RECORDS_MANAGE, P.EMPLOYMENT_RECORDS_VIEW_OWN), ("apps.workforce.employment_services",)),
+    PermissionResource("offboarding", "بررسی پایان همکاری", ("workforce.OffboardingCase", "workforce.OffboardingReview"),
+        (P.OFFBOARDING_START, P.OFFBOARDING_VIEW, P.OFFBOARDING_REVIEW), ("apps.workforce.employment_services",)),
+    PermissionResource("rosters", "برنامه شیفت", ("timekeeping.RosterVersion", "timekeeping.RosterSlot"),
+        (P.ROSTERS_MANAGE, P.ROSTERS_VIEW), ("apps.timekeeping.roster_services",)),
     PermissionResource(
         "indexation_rules", "قوانین تعدیل حاکم‌شده",
         ("billing.IndexationRuleVersion",),

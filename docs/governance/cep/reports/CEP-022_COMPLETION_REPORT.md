@@ -1,21 +1,23 @@
 # CEP-022 Completion Report
 
-**Execution status: EXECUTION FAILED / BLOCKED BEFORE PRODUCT MUTATION.** `CEP-022-FINDING-001 / BLOCKER-SPEC-REPOSITORY-MIGRATION` prevents implementation because authoritative lifecycle semantics and the necessary persistence contracts are unavailable while the package forbids migration work.
+**EXECUTION COMPLETE.** CLOSED_VERIFIED; IMB-0071/0072/0073;18/18 AC and all three scoped DoDs PASS. [Acceptance](../evidence/CEP-022_ACCEPTANCE_MAPPING.csv), [evidence](../evidence/CEP-022_EVIDENCE_MANIFEST.csv), [actual touch set](../manifests/CEP-022_EXECUTION_MANIFEST.md).
 
-| Checkpoint | Result |
-| --- | --- |
-| CEP / Primary IMBs | CEP-022 / IMB-0071, IMB-0072, IMB-0073 |
-| Repository baseline | `main` at `76362e23fbbd18c5f280343ece064e95eeae4881`; `origin/main` matched |
-| Authority / canonical identity | Standing non-production authority applies; prompt SHA-256 matches the immutable manifest |
-| Dependencies / gates | CEP-010 COMPLETE/CLOSED_VERIFIED; GATE-01 and GATE-02 PASS; no dependency/collision with current blocked CEPs |
-| Product files changed | None |
-| Migrations / data changes | None; Migration Impact = NONE |
-| Acceptance Criteria | 0/18 PASS; 18/18 BLOCKED |
-| Scoped DoD | BLOCKED / NOT MET |
-| Tests / lint / runtime | Product checks not run because the stop occurred before product mutation; required coverage remains UTV |
-| Blocker | Listed authoritative sources provide only repository references; existing models do not contain the required employment document, clearance or roster data/lifecycle contracts |
-| Required resolution | Supply authoritative lifecycle/specification sources and an approved no-migration contract or separately authorize bounded schema/migration work |
-| Human Sign-off / production | NOT EXECUTED / NOT EXECUTED |
-| Git add/commit/push/merge | NOT EXECUTED |
+Resumed baseline main/HEAD/origin/main/remote main7b89fb121878ef68feb44fd44a584896afc37e2c after the authorized036 checkpoint. Current prompt SHA256995a0b498a752bb64369896b946ef5ef59b2277868447a12df807e7cc0f8c230 matches the manifest;79 hashes verified. CEP010 complete; GATE01/02 PASS. Standing authority plus consolidated20261017 Decision04 and current CONDITIONAL migration contract permit bounded non-production persistence. SPEC009/010/017/033, frozen PD025/029 and ESS014 recovered/verified. Earlier20261017 EXECUTION FAILED/BLOCKED before product mutation remains historical: sources and migration authority were subsequently recovered/resolved. Earlier evidence001..004 and Registry/manifest history are retained; current evidence005..011 supplies this result.
 
-No ESS edit, employment-history deletion, automatic financial settlement, clearance state, roster/rotation/override behavior, payroll premium/rate formula, schema migration, production action, or Git write was invented. The Registry removes CEP-022 from the ready frontier and preserves independent candidates for subsequent assessment.
+Workforce owns append-only employment record versions linked to explicit WorkRelationship/revision and exact DMS version/hash/effective dates/supersession. DMS owns files and current/history/category/scan/download authorization. Own read-only history spans authorized same-Person episodes, including rehire, hides confidential source reasons and future/unpermitted records, and uses the existing DMS download selector for availability. View never implies download. GET-only UI and server permission/identity checks prevent ESS source edits.
+
+Clearance attaches to an existing authorized Workforce end revision, preserving the distinct end event/effective date and pending/complete clearance outcome. Published shared Workflow plus actual claimed assignment and current capability govern completion; both required Workforce and access assessments, actor/time/end/source/WorkItem evidence commit atomically. Requester status excludes private assessments/actions/reviewer data. No new department blockers, approval depth, cancellation/rejection/correction policy, automatic relationship/access action, financial settlement, document deletion or parallel work-item engine. Related domains remain informational/owning-domain-only where no approved projection contract exists; an optional access action reference must match an existing same-tenant target-membership authority audit event.
+
+Timekeeping owns stable roster series/versions, explicit rotation/anchor/Shift references, exact source snapshots, date overrides and append-only supersession. Optional Project/Site context requires matching authoritative assignment and an explicit compatibility bridge where needed; native WorkRelationship planning remains available without workforce structures. Planning never rewrites Attendance or introduces Payroll formulae. Existing Attendance and future plan evidence are retained after employment end; owning-domain follow-up remains separate.
+
+Seven distinct capabilities are catalogued with no default grants. Tenant state, membership, source identity, project/site scope and actual Workflow assignment remain server-authoritative. No new roles, legacy identity backfill or source-authority transfer.
+
+Validation:53 PostgreSQL affected tests PASS (35 new employment/clearance/roster plus18 existing DMS/identity tests); separate migration rollback/reapply1/1 PASS. Ruff, new-file formatting, Django check, migration drift and whitespace checks PASS. New permission/resource checks pass; the existing global registry diagnostic violations are identical to HEAD and were not repaired or claimed globally PASS. Previously attributed Workflow fixture debt and036 Contracts/Billing fixture debt remain outside this package. Initial new registration/fixture/format failures were corrected; raw output remains in validation evidence.
+
+Organizations0115, Workforce0013 and Timekeeping0003 are additive/catalogue-only. The generated roster parent was narrowed to already-applied Projects0009 because its existing Project/Site schema suffices; no CEP dependency graph changed. Separate rollback/reapply passed on the same schema operations; the final narrowed graph was verified by read-only reverse-plan/operation equality and scoped development forward application/reconciliation. Configured local PostgreSQL source/DMS/Workforce/Timekeeping and role-grant hashes are unchanged; seven new capabilities have zero grants, with zero new live source records/default offboarding definitions. Earlier pending Projects0010 and Treasury0009 were not executed. No production migration/cutover.
+
+UI evidence:15 synthetic captures across seven states (current/history/empty/unavailable/download unavailable/error/denied), desktop1280x720 and390px iframe, including the scrolled mobile download action. Representative layouts inspected for Persian/RTL/Jalali and readable responsive cards. This is test-response fixture evidence, not native-device emulation or live browser/accessibility certification. Broader browser/accessibility and performance/concurrency remain UTV.
+
+No unresolved in-scope blocker. Registry synchronized to40 COMPLETE. Per-item Wave foundation semantics permit030 entry: existing Party0004 source contracts and isolated operational/governance/outsider probe1 PASS; no direct CEP or external dependency. Next030 requires full entry/touch-set verification after checkpoint.028 remains PARTIAL/BLOCKER-DATA;069 PARTIAL/BLOCKER-EXTERNAL. GATE03 Indexation/certificate activation stays closed; GATE07 NOT_READY (046/063/068 incomplete and no official certificate activation evidence).
+
+Git:036 push/integration metadata reconciled;022 validated attributable work prepared for the Human-authorized main commit/push. Integration SHA is recorded in Registry after successful push. No branch/worktree/merge/rebase/reset/stash/history rewrite. Human Sign-off, Production Certification, production deployment/cutover: NOT GRANTED / NOT EXECUTED.

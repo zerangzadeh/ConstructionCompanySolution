@@ -1,0 +1,363 @@
+CEP-022 execution validation; main baseline7b89fb1. .venv-2 Python / Django / local PostgreSQL.
+Final affected suite: manage.py test apps.workforce.test_cep022 apps.timekeeping.test_cep022_roster apps.documents.test_cep011 apps.workforce.test_cep010_person_workrelationship --keepdb --noinput:53/53 PASS. Separate migration test1 PASS (404.901sec historical graph reconstruction); no runtime performance claim. Source parent narrowed without table-operation change; final reverse graph and scoped configured-development forward/reconciliation proved separately. Next item source foundation probe1 PASS in isolated test DB. Static commands: Ruff changed source/test and manual permission migration; format --check new Python; manage.py check; makemigrations --check --dry-run; git diff --check. Initial failures and final corrected results retained; no global unrelated regression PASS claimed.
+
+ACTUAL CAPTURE: cep022-checks-pass.txt
+All checks passed!
+7 files already formatted
+System check identified no issues (0 silenced).
+No changes detected
+
+
+ACTUAL CAPTURE: cep022-development.txt
+Verified targeted plan: [('organizations', '0115_cep022_employment_permissions'), ('workforce', '0013_cep022_employment_lifecycle'), ('timekeeping', '0003_cep022_employment_lifecycle')]
+Operations to perform:
+  Target specific migration: 0013_cep022_employment_lifecycle, from workforce
+Running migrations:
+  Applying organizations.0115_cep022_employment_permissions... OK
+  Applying workforce.0013_cep022_employment_lifecycle... OK
+Operations to perform:
+  Target specific migration: 0003_cep022_employment_lifecycle, from timekeeping
+Running migrations:
+  Applying timekeeping.0003_cep022_employment_lifecycle... OK
+Reconciliation PASS; existing Workforce/Timekeeping/DMS and role grants unchanged; seven capabilities, zero grants/default workflows/new source rows. No prior pending migrations applied.
+
+
+ACTUAL CAPTURE: cep022-final-all.txt
+Using existing test database for alias 'default'...
+
+.....................................................
+----------------------------------------------------------------------
+Ran 53 tests in 15.060s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 53 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-final-checks.txt
+All checks passed!
+unformatted: File would be reformatted
+  --> apps\workforce\employment_views.py:32:1
+   |
+31 |     return response
+   -
+   -
+   |
+
+1 file would be reformatted, 6 files already formatted
+System check identified no issues (0 silenced).
+No changes detected
+
+
+ACTUAL CAPTURE: cep022-final-source-tests.txt
+Using existing test database for alias 'default'...
+
+........................E...........................
+======================================================================
+ERROR: test_foreign_shift_and_forged_project_instances_are_reloaded_with_tenant (apps.timekeeping.test_cep022_roster.RosterTests.test_foreign_shift_and_forged_project_instances_are_reloaded_with_tenant)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\timekeeping\test_cep022_roster.py", line 261, in test_foreign_shift_and_forged_project_instances_are_reloaded_with_tenant
+    calendar = WorkCalendar.objects.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\timekeeping\models.py", line 255, in save
+    self.full_clean(validate_constraints=False)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'timezone': ['\u062a\u0642\u0648\u06cc\u0645 \u0628\u0627\u06cc\u062f \u0627\u0632 \u0645\u0646\u0637\u0642\u0647 \u0632\u0645\u0627\u0646\u06cc \u062a\u0646\u0638\u06cc\u0645\u0627\u062a \u0634\u0631\u06a9\u062a \u0627\u0633\u062a\u0641\u0627\u062f\u0647 \u06a9\u0646\u062f.']}
+
+----------------------------------------------------------------------
+Ran 52 tests in 22.446s
+
+FAILED (errors=1)
+Preserving test database for alias 'default'...
+
+Found 52 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-final-tests.txt
+Using existing test database for alias 'default'...
+
+..................................................
+----------------------------------------------------------------------
+Ran 50 tests in 18.604s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 50 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-final-validation.txt
+Using existing test database for alias 'default'...
+
+....................................................
+----------------------------------------------------------------------
+Ran 52 tests in 22.351s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 52 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-focused-2.txt
+Using existing test database for alias 'default'...
+
+...EE..E....E..E
+======================================================================
+ERROR: test_document_scan_and_download_policy_are_preserved (apps.workforce.test_cep022.EmploymentTests.test_document_scan_and_download_policy_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 309, in test_document_scan_and_download_policy_are_preserved
+    self._client()
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 101, in _client
+    set_active_organization(
+TypeError: set_active_organization() got an unexpected keyword argument 'user'
+
+======================================================================
+ERROR: test_empty_and_unavailable_document_states (apps.workforce.test_cep022.EmploymentTests.test_empty_and_unavailable_document_states)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 316, in test_empty_and_unavailable_document_states
+    self._client()
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 101, in _client
+    set_active_organization(
+TypeError: set_active_organization() got an unexpected keyword argument 'user'
+
+======================================================================
+ERROR: test_missing_permission_or_dms_policy_fails_closed (apps.workforce.test_cep022.EmploymentTests.test_missing_permission_or_dms_policy_fails_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 254, in test_missing_permission_or_dms_policy_fails_closed
+    self._client()
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 101, in _client
+    set_active_organization(
+TypeError: set_active_organization() got an unexpected keyword argument 'user'
+
+======================================================================
+ERROR: test_replacement_pins_previous_identity_and_exact_dms_versions (apps.workforce.test_cep022.EmploymentTests.test_replacement_pins_previous_identity_and_exact_dms_versions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 242, in test_replacement_pins_previous_identity_and_exact_dms_versions
+    self._client()
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 101, in _client
+    set_active_organization(
+TypeError: set_active_organization() got an unexpected keyword argument 'user'
+
+======================================================================
+ERROR: test_source_history_is_versioned_and_read_only_in_own_ui (apps.workforce.test_cep022.EmploymentTests.test_source_history_is_versioned_and_read_only_in_own_ui)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 216, in test_source_history_is_versioned_and_read_only_in_own_ui
+    self._client()
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep022.py", line 101, in _client
+    set_active_organization(
+TypeError: set_active_organization() got an unexpected keyword argument 'user'
+
+----------------------------------------------------------------------
+Ran 16 tests in 6.175s
+
+FAILED (errors=5)
+Preserving test database for alias 'default'...
+
+Found 16 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-focused-3.txt
+Using existing test database for alias 'default'...
+
+.............................
+----------------------------------------------------------------------
+Ran 29 tests in 14.088s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 29 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-focused.txt
+Using existing test database for alias 'default'...
+
+Found 16 test(s).
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\query.py", line 948, in get_or_create
+    return self.get(**kwargs), False
+           ^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\manage.py", line 18, in <module>
+    main()
+  File "E:\Construction_Company_Solution\manage.py", line 14, in main
+    execute_from_command_line(sys.argv)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 24, in run_from_argv
+    super().run_from_argv(argv)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\test.py", line 63, in handle
+    failures = test_runner.run_tests(test_labels)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 1080, in run_tests
+    old_config = self.setup_databases(
+                 ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\runner.py", line 978, in setup_databases
+    return _setup_databases(
+           ^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\test\utils.py", line 204, in setup_databases
+    connection.creation.create_test_db(
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\backends\base\creation.py", line 78, in create_test_db
+    call_command(
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\__init__.py", line 194, in call_command
+    return command.execute(*args, **defaults)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\base.py", line 111, in wrapper
+    res = handle_func(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\commands\migrate.py", line 380, in handle
+    emit_post_migrate_signal(
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\core\management\sql.py", line 52, in emit_post_migrate_signal
+    models.signals.post_migrate.send(
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\dispatch\dispatcher.py", line 189, in send
+    response = receiver(signal=self, sender=sender, **named)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workflows\catalog_bootstrap.py", line 28, in synchronize_workflow_catalog
+    workflow_type, _ = WorkflowType.objects.using(using).get_or_create(
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\query.py", line 955, in get_or_create
+    return self.create(**params), True
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\query.py", line 665, in create
+    obj.save(force_insert=True, using=self.db)
+  File "E:\Construction_Company_Solution\apps\workflows\models.py", line 100, in save
+    self.full_clean()
+  File "E:\Construction_Company_Solution\.venv-2\Lib\site-packages\django\db\models\base.py", line 1679, in full_clean
+    raise ValidationError(errors)
+django.core.exceptions.ValidationError: {'allowed_scope_fields': ['\u0627\u06cc\u0646 \u0641\u06cc\u0644\u062f \u0646\u0645\u06cc \u062a\u0648\u0627\u0646\u062f \u062e\u0627\u0644\u06cc \u0628\u0627\u0634\u062f.']}
+
+
+ACTUAL CAPTURE: cep022-migration.txt
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_expand_rollback_reapply_preserves_identity_documents_and_grants (apps.workforce.test_cep022_migration.EmploymentMigrationTests.test_expand_rollback_reapply_preserves_identity_documents_and_grants) ... ok
+
+Found 1 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).
+----------------------------------------------------------------------
+Ran 1 test in 404.901s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+
+
+ACTUAL CAPTURE: cep022-next-foundation-probe.txt
+Using existing test database for alias 'default'...
+
+.
+----------------------------------------------------------------------
+Ran 1 test in 0.235s
+
+OK
+Preserving test database for alias 'default'...
+
+
+
+ACTUAL CAPTURE: cep022-regression.txt
+Using existing test database for alias 'default'...
+
+..................................................
+----------------------------------------------------------------------
+Ran 50 tests in 14.373s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 50 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-roster-plan.txt
+Planned operations:
+organizations.0115_cep022_employment_permissions
+    Raw Python operation
+timekeeping.0003_cep022_employment_lifecycle
+    Create model RosterVersion
+    Create model RosterSlot
+    Create constraint roster_series_version_uq on model rosterversion
+    Create constraint roster_version_pos on model rosterversion
+    Create constraint roster_effective_range_ck on model rosterversion
+    Create constraint roster_slot_position_uq on model rosterslot
+    Create constraint roster_override_date_uq on model rosterslot
+    Create constraint roster_slot_days_pos on model rosterslot
+
+
+ACTUAL CAPTURE: cep022-source-policy-final.txt
+Using existing test database for alias 'default'...
+
+.....................................................
+----------------------------------------------------------------------
+Ran 53 tests in 22.198s
+
+OK
+Preserving test database for alias 'default'...
+
+Found 53 test(s).
+System check identified no issues (0 silenced).
+
+
+ACTUAL CAPTURE: cep022-static.txt
+All checks passed!
+System check identified no issues (0 silenced).
+No changes detected
+
+
+ACTUAL CAPTURE: cep022-workforce-plan.txt
+Planned operations:
+organizations.0115_cep022_employment_permissions
+    Raw Python operation
+workforce.0013_cep022_employment_lifecycle
+    Create model OffboardingCase
+    Create model OffboardingReview
+    Create model EmploymentRecord
+
+ACTUAL CAPTURE: cep022-static-closed.txt
+All checks passed!
+7 files already formatted
+System check identified no issues (0 silenced).
+No changes detected

@@ -3,10 +3,12 @@ from django.urls import path
 from apps.workforce import certificate_views as certificates
 from apps.workforce import personal_change_views as personal
 from apps.workforce import views
+from apps.workforce.employment_views import employment_history
 
 app_name = "workforce"
 
 urlpatterns = [
+    path("ess/employment/", employment_history, name="employment_history"),
     path("ess/evidence/",certificates.evidence,name="own_evidence"),
     path("ess/certificates/",certificates.index,name="certificate_index"),
     path("ess/certificates/new/",certificates.create,name="certificate_create"),

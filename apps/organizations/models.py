@@ -570,6 +570,13 @@ class BusinessPermissionCode(models.TextChoices):
     INDEXATION_RULES_MANAGE = "indexation_rules.manage", "تهیه نسخه قانون تعدیل"
     INDEXATION_CALCULATE = "indexation.calculate", "محاسبه تعدیل با سیاست مجاز"
     INDEXATION_CORRECT = "indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"
+    EMPLOYMENT_RECORDS_MANAGE = "employment_records.manage", "ثبت نسخه سابقه استخدام"
+    EMPLOYMENT_RECORDS_VIEW_OWN = "employment_records.view_own", "مشاهده سوابق استخدام شخصی"
+    OFFBOARDING_START = "offboarding.start", "آغاز بررسی تسویه همکاری"
+    OFFBOARDING_VIEW = "offboarding.view", "مشاهده پرونده مجاز پایان همکاری"
+    OFFBOARDING_REVIEW = "offboarding.review", "ثبت بررسی تخصیص‌یافته پایان همکاری"
+    ROSTERS_MANAGE = "rosters.manage", "ثبت نسخه برنامه شیفت"
+    ROSTERS_VIEW = "rosters.view", "مشاهده برنامه شیفت مجاز"
     CONTRACT_TERMS_APPROVE = (
         "contract_terms.approve",
         "تأیید مستقل نسخه شرایط تجاری قرارداد",

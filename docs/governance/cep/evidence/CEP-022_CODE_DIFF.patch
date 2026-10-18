@@ -1,0 +1,2336 @@
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -572,0 +573,7 @@
++    EMPLOYMENT_RECORDS_MANAGE = "employment_records.manage", "ثبت نسخه سابقه استخدام"
++    EMPLOYMENT_RECORDS_VIEW_OWN = "employment_records.view_own", "مشاهده سوابق استخدام شخصی"
++    OFFBOARDING_START = "offboarding.start", "آغاز بررسی تسویه همکاری"
++    OFFBOARDING_VIEW = "offboarding.view", "مشاهده پرونده مجاز پایان همکاری"
++    OFFBOARDING_REVIEW = "offboarding.review", "ثبت بررسی تخصیص‌یافته پایان همکاری"
++    ROSTERS_MANAGE = "rosters.manage", "ثبت نسخه برنامه شیفت"
++    ROSTERS_VIEW = "rosters.view", "مشاهده برنامه شیفت مجاز"
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -19,0 +20,6 @@
++    PermissionResource("employment_records", "سوابق مؤثر استخدام", ("workforce.EmploymentRecord",),
++        (P.EMPLOYMENT_RECORDS_MANAGE, P.EMPLOYMENT_RECORDS_VIEW_OWN), ("apps.workforce.employment_services",)),
++    PermissionResource("offboarding", "بررسی پایان همکاری", ("workforce.OffboardingCase", "workforce.OffboardingReview"),
++        (P.OFFBOARDING_START, P.OFFBOARDING_VIEW, P.OFFBOARDING_REVIEW), ("apps.workforce.employment_services",)),
++    PermissionResource("rosters", "برنامه شیفت", ("timekeeping.RosterVersion", "timekeeping.RosterSlot"),
++        (P.ROSTERS_MANAGE, P.ROSTERS_VIEW), ("apps.timekeeping.roster_services",)),
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -770,0 +771,5 @@
++        BusinessPermissionCode.EMPLOYMENT_RECORDS_MANAGE, BusinessPermissionCode.EMPLOYMENT_RECORDS_VIEW_OWN,
++        BusinessPermissionCode.OFFBOARDING_START, BusinessPermissionCode.OFFBOARDING_VIEW,
++        BusinessPermissionCode.OFFBOARDING_REVIEW, BusinessPermissionCode.ROSTERS_MANAGE, BusinessPermissionCode.ROSTERS_VIEW,
++    ))
++    _default_permissions.difference_update(permission_codes(
+--- a/apps/organizations/migrations/0115_cep022_employment_permissions.py
++++ b/apps/organizations/migrations/0115_cep022_employment_permissions.py
+@@ -0,0 +1,34 @@
++# ruff: noqa: RUF012
++"""Catalogue only; no default or existing tenant-role grants."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("employment_records.manage", "ثبت نسخه سابقه استخدام"),
++    ("employment_records.view_own", "مشاهده سوابق استخدام شخصی"),
++    ("offboarding.start", "آغاز بررسی تسویه همکاری"),
++    ("offboarding.view", "مشاهده پرونده مجاز پایان همکاری"),
++    ("offboarding.review", "ثبت بررسی تخصیص‌یافته پایان همکاری"),
++    ("rosters.manage", "ثبت نسخه برنامه شیفت"),
++    ("rosters.view", "مشاهده برنامه شیفت مجاز"),
++)
++
++
++def forward(apps, schema_editor):
++    for code, name in PERMISSIONS:
++        apps.get_model("organizations", "BusinessPermission").objects.using(
++            schema_editor.connection.alias
++        ).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[c for c, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0114_cep036_indexation_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]
+--- a/apps/timekeeping/models.py
++++ b/apps/timekeeping/models.py
+@@ -2,0 +3 @@
++import uuid
+@@ -39,0 +41,144 @@
++
++
++class RosterHistoryQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("سابقه برنامه شیفت تغییرپذیر نیست.")
++
++    def delete(self):
++        raise ValidationError("سابقه برنامه شیفت حذف‌پذیر نیست.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت گروهی سابقه برنامه شیفت مجاز نیست.")
++
++
++class RosterHistory(AppendOnlyModel):
++    objects = models.Manager.from_queryset(RosterHistoryQuerySet)()
++
++    class Meta:
++        abstract = True
++
++
++class RosterVersion(RosterHistory):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    relationship = models.ForeignKey(
++        "workforce.WorkRelationship", on_delete=models.PROTECT
++    )
++    series_id = models.UUIDField(default=uuid.uuid4)
++    version = models.PositiveIntegerField()
++    effective_from = models.DateField()
++    effective_to = models.DateField()
++    rotation_anchor = models.DateField()
++    project = models.ForeignKey(
++        "projects.Project", on_delete=models.PROTECT, null=True, blank=True
++    )
++    site = models.ForeignKey(
++        "projects.ProjectSite", on_delete=models.PROTECT, null=True, blank=True
++    )
++    supersedes = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement",
++    )
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField(max_length=2000)
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["organization", "series_id", "version"],
++                name="roster_series_version_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(version__gte=1), name="roster_version_pos"
++            ),
++            models.CheckConstraint(
++                condition=Q(effective_to__gte=models.F("effective_from")),
++                name="roster_effective_range_ck",
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            relationship=self.relationship,
++            project=self.project,
++            site=self.site,
++            supersedes=self.supersedes,
++        )
++        if not self.reason.strip() or self.version < 1:
++            raise ValidationError("نسخه و دلیل برنامه لازم است.")
++        if self.site_id and (
++            not self.project_id or self.site.project_id != self.project_id
++        ):
++            raise ValidationError("کارگاه باید متعلق به پروژه برنامه باشد.")
++        if (
++            self.effective_to < self.effective_from
++            or self.rotation_anchor > self.effective_from
++            or self.effective_from < self.relationship.effective_start
++            or (
++                self.relationship.effective_end
++                and self.effective_to > self.relationship.effective_end
++            )
++        ):
++            raise ValidationError("بازه برنامه باید در رابطه کاری معتبر باشد.")
++        if self.supersedes_id:
++            previous = self.supersedes
++            if (
++                previous.pk == self.pk
++                or previous.relationship_id != self.relationship_id
++                or previous.series_id != self.series_id
++                or previous.project_id != self.project_id
++                or previous.site_id != self.site_id
++                or previous.version + 1 != self.version
++            ):
++                raise ValidationError("نسخه جایگزین باید همان تخصیص را حفظ کند.")
++        elif self.version != 1:
++            raise ValidationError("نسخه نخست تخصیص معتبر نیست.")
++
++
++class RosterSlot(RosterHistory):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    roster = models.ForeignKey(
++        RosterVersion, on_delete=models.PROTECT, related_name="slots"
++    )
++    shift = models.ForeignKey("timekeeping.ShiftDefinition", on_delete=models.PROTECT)
++    position = models.PositiveIntegerField()
++    day_count = models.PositiveIntegerField()
++    override_date = models.DateField(null=True, blank=True)
++    shift_snapshot = models.JSONField()
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["roster", "position"], name="roster_slot_position_uq"
++            ),
++            models.UniqueConstraint(
++                fields=["roster", "override_date"],
++                condition=Q(override_date__isnull=False),
++                name="roster_override_date_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(day_count__gte=1), name="roster_slot_days_pos"
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(self, roster=self.roster, shift=self.shift)
++        if self.day_count < 1 or (
++            self.override_date
++            and (
++                self.day_count != 1
++                or not self.roster.effective_from
++                <= self.override_date
++                <= self.roster.effective_to
++            )
++        ):
++            raise ValidationError("مدت یا تاریخ تغییر برنامه معتبر نیست.")
++        if self.shift_snapshot.get("id") != str(self.shift_id):
++            raise ValidationError("تصویر شیفت با منبع سازگار نیست.")
+--- a/apps/timekeeping/roster_services.py
++++ b/apps/timekeeping/roster_services.py
+@@ -0,0 +1,256 @@
++"""Effective planned shift history, independent of actual attendance and Payroll."""
++
++from datetime import date
++from typing import Any
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import models, transaction
++
++from apps.accounts.models import User
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode, Organization
++from apps.projects.models import Project, ProjectSite
++from apps.workforce.models import EmployeeProjectAssignment, WorkRelationship
++
++from .models import RosterSlot, RosterVersion, ShiftDefinition, WorkCalendar
++
++
++def _require(
++    *,
++    actor: User,
++    organization: Organization,
++    code: BusinessPermissionCode,
++    project: Project | None = None,
++    site: ProjectSite | None = None,
++) -> None:
++    organization = Organization.objects.get(pk=organization.pk)
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=code,
++        project=project,
++        site=site,
++        message="برنامه مجاز یافت نشد.",
++    )
++
++
++def _shift(
++    *, shift: ShiftDefinition, organization: Organization, start: date, end: date
++) -> ShiftDefinition:
++    try:
++        item = (
++            ShiftDefinition.objects.select_for_update()
++            .select_related("calendar")
++            .get(pk=shift.pk, organization=organization, is_active=True)
++        )
++    except ShiftDefinition.DoesNotExist as exc:
++        raise PermissionDenied("شیفت مجاز یافت نشد.") from exc
++    item.calendar = WorkCalendar.objects.select_for_update().get(
++        pk=item.calendar_id, organization=organization
++    )
++    if not item.calendar.is_active or item.calendar.archived_at:
++        raise ValidationError("تقویم فعال منبع لازم است.")
++    if (
++        item.effective_from > start
++        or (item.effective_to and item.effective_to < end)
++        or item.calendar.effective_from > start
++        or (item.calendar.effective_to and item.calendar.effective_to < end)
++    ):
++        raise ValidationError("شیفت و تقویم باید در بازه برنامه معتبر باشند.")
++    return item
++
++
++def _snapshot(shift: ShiftDefinition) -> dict[str, Any]:
++    return {
++        "id": str(shift.pk),
++        "code": shift.code,
++        "name": shift.name,
++        "starts_at": shift.starts_at.isoformat(),
++        "ends_at": shift.ends_at.isoformat(),
++        "crosses_midnight": shift.crosses_midnight,
++        "effective_from": shift.effective_from.isoformat(),
++        "effective_to": shift.effective_to.isoformat() if shift.effective_to else None,
++        "source_updated_at": shift.updated_at.isoformat(),
++        "calendar_id": str(shift.calendar_id),
++        "timezone": shift.calendar.timezone,
++        "calendar_updated_at": shift.calendar.updated_at.isoformat(),
++        "working_weekdays": shift.calendar.working_weekdays,
++        "breaks": [
++            {
++                "id": str(b.pk),
++                "starts_at": b.starts_at.isoformat(),
++                "ends_at": b.ends_at.isoformat(),
++                "ends_next_day": b.ends_next_day,
++                "is_paid": b.is_paid,
++            }
++            for b in shift.breaks.order_by("sequence")
++        ],
++    }
++
++
++@transaction.atomic
++def create_roster_version(
++    *,
++    actor: User,
++    organization: Organization,
++    relationship: WorkRelationship,
++    effective_from: date,
++    effective_to: date,
++    rotation_anchor: date,
++    rotation: list[tuple[ShiftDefinition, int]],
++    overrides: list[tuple[date, ShiftDefinition]],
++    reason: str,
++    project: Project | None = None,
++    site: ProjectSite | None = None,
++    supersedes: RosterVersion | None = None,
++) -> RosterVersion:
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    try:
++        if project is not None:
++            project = Project.objects.get(pk=project.pk, organization=organization)
++        if site is not None:
++            site = ProjectSite.objects.get(
++                pk=site.pk, organization=organization, project=project
++            )
++    except (Project.DoesNotExist, ProjectSite.DoesNotExist) as exc:
++        raise PermissionDenied("زمینه پروژه و کارگاه مجاز یافت نشد.") from exc
++    _require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.ROSTERS_MANAGE,
++        project=project,
++        site=site,
++    )
++    try:
++        relationship = WorkRelationship.objects.select_for_update().get(
++            pk=relationship.pk, organization=organization
++        )
++    except WorkRelationship.DoesNotExist as exc:
++        raise PermissionDenied("رابطه کاری مجاز یافت نشد.") from exc
++    if (
++        not rotation
++        or not isinstance(rotation, list)
++        or not isinstance(overrides, list)
++    ):
++        raise ValidationError("ترتیب و تغییرات صریح برنامه لازم است.")
++    if project is not None:
++        assignment = EmployeeProjectAssignment.objects.filter(
++            organization=organization,
++            employee_id=relationship.legacy_employee_id,
++            project=project,
++            site=site,
++            start_date__lte=effective_from,
++        ).filter(models.Q(end_date__isnull=True) | models.Q(end_date__gte=effective_to))
++        if not relationship.legacy_employee_id or not assignment.exists():
++            raise ValidationError("زمینه پروژه باید تخصیص صریح منبع داشته باشد.")
++    previous = None
++    if supersedes:
++        try:
++            previous = RosterVersion.objects.select_for_update().get(
++                pk=supersedes.pk, organization=organization, relationship=relationship
++            )
++        except RosterVersion.DoesNotExist as exc:
++            raise PermissionDenied("نسخه پیشین مجاز یافت نشد.") from exc
++        if RosterVersion.objects.filter(supersedes=previous).exists():
++            raise ValidationError("نسخه پیشین قبلاً جایگزین شده است.")
++    # Serialize allocation on the relationship; prevent competing latest plans.
++    overlaps = RosterVersion.objects.filter(
++        relationship=relationship,
++        replacement__isnull=True,
++        effective_from__lte=effective_to,
++        effective_to__gte=effective_from,
++    )
++    if previous:
++        overlaps = overlaps.exclude(pk=previous.pk)
++    if overlaps.exists():
++        raise ValidationError("برنامه جاری هم‌پوشان باید به‌صراحت جایگزین شود.")
++    values = {
++        "organization": organization,
++        "relationship": relationship,
++        "actor": actor,
++        "effective_from": effective_from,
++        "effective_to": effective_to,
++        "rotation_anchor": rotation_anchor,
++        "project": project,
++        "site": site,
++        "supersedes": previous,
++        "reason": reason,
++        "version": previous.version + 1 if previous else 1,
++    }
++    if previous:
++        values["series_id"] = previous.series_id
++    roster = RosterVersion.objects.create(**values)
++    for position, (shift, days) in enumerate(rotation):
++        if type(days) is not int or days < 1:
++            raise ValidationError("مدت صریح و معتبر برای هر بخش لازم است.")
++        shift = _shift(
++            shift=shift,
++            organization=organization,
++            start=effective_from,
++            end=effective_to,
++        )
++        RosterSlot.objects.create(
++            organization=organization,
++            roster=roster,
++            shift=shift,
++            position=position,
++            day_count=days,
++            shift_snapshot=_snapshot(shift),
++        )
++    dates = set()
++    for offset, (when, shift) in enumerate(overrides, len(rotation)):
++        if when in dates:
++            raise ValidationError("تغییر تکراری در یک روز مجاز نیست.")
++        dates.add(when)
++        shift = _shift(shift=shift, organization=organization, start=when, end=when)
++        RosterSlot.objects.create(
++            organization=organization,
++            roster=roster,
++            shift=shift,
++            position=offset,
++            day_count=1,
++            override_date=when,
++            shift_snapshot=_snapshot(shift),
++        )
++    return roster
++
++
++def get_roster(
++    *, actor: User, organization: Organization, roster_id: object
++) -> RosterVersion:
++    try:
++        item = RosterVersion.objects.select_related("project", "site").get(
++            pk=roster_id, organization=organization
++        )
++    except RosterVersion.DoesNotExist as exc:
++        raise PermissionDenied("برنامه مجاز یافت نشد.") from exc
++    _require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.ROSTERS_VIEW,
++        project=item.project,
++        site=item.site,
++    )
++    return item
++
++
++def planned_shift(
++    *, actor: User, organization: Organization, roster_id: object, on_date: date
++) -> dict[str, Any]:
++    item = get_roster(actor=actor, organization=organization, roster_id=roster_id)
++    if not item.effective_from <= on_date <= item.effective_to:
++        raise ValidationError("تاریخ خارج از بازه نسخه برنامه است.")
++    rows = list(item.slots.order_by("position"))
++    for row in rows:
++        if row.override_date == on_date:
++            return row.shift_snapshot
++    rotation = [r for r in rows if r.override_date is None]
++    total = sum(r.day_count for r in rotation)
++    if total == 0:
++        raise ValidationError("ترتیب صریح برنامه موجود نیست.")
++    offset = (on_date - item.rotation_anchor).days % total
++    for row in rotation:
++        if offset < row.day_count:
++            return row.shift_snapshot
++        offset -= row.day_count
++    raise ValidationError("برنامه معتبر در دسترس نیست.")
+--- a/apps/timekeeping/migrations/0003_cep022_employment_lifecycle.py
++++ b/apps/timekeeping/migrations/0003_cep022_employment_lifecycle.py
+@@ -0,0 +1,77 @@
++# Generated by Django 5.2.17 on 2026-10-18 07:42
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('organizations', '0115_cep022_employment_permissions'),
++        ('projects', '0009_projectsitedocumentlink'),
++        ('timekeeping', '0002_attendancecorrectionrequest'),
++        ('workforce', '0012_cep056_certificate_framework'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='RosterVersion',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('series_id', models.UUIDField(default=uuid.uuid4)),
++                ('version', models.PositiveIntegerField()),
++                ('effective_from', models.DateField()),
++                ('effective_to', models.DateField()),
++                ('rotation_anchor', models.DateField()),
++                ('reason', models.TextField(max_length=2000)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('project', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='projects.project')),
++                ('relationship', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='workforce.workrelationship')),
++                ('site', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='projects.projectsite')),
++                ('supersedes', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='replacement', to='timekeeping.rosterversion')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='RosterSlot',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('position', models.PositiveIntegerField()),
++                ('day_count', models.PositiveIntegerField()),
++                ('override_date', models.DateField(blank=True, null=True)),
++                ('shift_snapshot', models.JSONField()),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('shift', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='timekeeping.shiftdefinition')),
++                ('roster', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='slots', to='timekeeping.rosterversion')),
++            ],
++        ),
++        migrations.AddConstraint(
++            model_name='rosterversion',
++            constraint=models.UniqueConstraint(fields=('organization', 'series_id', 'version'), name='roster_series_version_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='rosterversion',
++            constraint=models.CheckConstraint(condition=models.Q(('version__gte', 1)), name='roster_version_pos'),
++        ),
++        migrations.AddConstraint(
++            model_name='rosterversion',
++            constraint=models.CheckConstraint(condition=models.Q(('effective_to__gte', models.F('effective_from'))), name='roster_effective_range_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='rosterslot',
++            constraint=models.UniqueConstraint(fields=('roster', 'position'), name='roster_slot_position_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='rosterslot',
++            constraint=models.UniqueConstraint(condition=models.Q(('override_date__isnull', False)), fields=('roster', 'override_date'), name='roster_override_date_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='rosterslot',
++            constraint=models.CheckConstraint(condition=models.Q(('day_count__gte', 1)), name='roster_slot_days_pos'),
++        ),
++    ]
+--- a/apps/timekeeping/test_cep022_roster.py
++++ b/apps/timekeeping/test_cep022_roster.py
+@@ -0,0 +1,324 @@
++from copy import deepcopy
++from datetime import time, timedelta
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++from django.utils import timezone
++
++from apps.documents import test_cep011 as baseline
++from apps.organizations.models import (
++    BusinessPermission,
++    Organization,
++    OrganizationMembership,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.projects.services import create_project
++from apps.workforce.models import Employee
++from apps.workforce.person_services import end_work_relationship
++
++from . import roster_services as service
++from .models import AttendanceRecord, RosterSlot, RosterVersion, ShiftDefinition
++from .services import create_shift, create_work_calendar
++
++
++class RosterTests(TestCase):
++    _relationship = baseline.EmployeeDocumentAccessTests._relationship
++
++    def setUp(self):
++        baseline.EmployeeDocumentAccessTests.setUp(self)
++        self.member = OrganizationMembership.objects.get(
++            user=self.owner, organization=self.organization
++        )
++        self.member.role_definition.permissions.add(
++            *BusinessPermission.objects.filter(
++                code__in=[P.ROSTERS_MANAGE, P.ROSTERS_VIEW, P.TIME_CALENDARS_MANAGE]
++            )
++        )
++        self.calendar = create_work_calendar(
++            actor=self.owner,
++            organization=self.organization,
++            code="R22",
++            name="تقویم برنامه",
++            effective_from=self.today - timedelta(days=60),
++            working_weekdays=[1, 2, 3, 4, 5],
++        )
++        self.day = create_shift(
++            actor=self.owner,
++            organization=self.organization,
++            calendar=self.calendar,
++            code="DAY",
++            name="روز",
++            starts_at=time(8),
++            ends_at=time(16),
++            crosses_midnight=False,
++            effective_from=self.today - timedelta(days=60),
++            breaks=[],
++        )
++        self.night = create_shift(
++            actor=self.owner,
++            organization=self.organization,
++            calendar=self.calendar,
++            code="NIGHT",
++            name="شب",
++            starts_at=time(20),
++            ends_at=time(4),
++            crosses_midnight=True,
++            effective_from=self.today - timedelta(days=60),
++            breaks=[],
++        )
++
++    def _create(self, **changes):
++        data = {
++            "actor": self.owner,
++            "organization": self.organization,
++            "relationship": self.relationship,
++            "effective_from": self.today,
++            "effective_to": self.today + timedelta(days=14),
++            "rotation_anchor": self.today,
++            "rotation": [(self.day, 2), (self.night, 1)],
++            "overrides": [],
++            "reason": "برنامه صریح منبع",
++        }
++        return service.create_roster_version(**(data | changes))
++
++    def _planned(self, roster, days=0):
++        return service.planned_shift(
++            actor=self.owner,
++            organization=self.organization,
++            roster_id=roster.pk,
++            on_date=self.today + timedelta(days=days),
++        )
++
++    def test_explicit_rotation_is_planned_separately_from_attendance(self):
++        before = AttendanceRecord.objects.count()
++        roster = self._create()
++        self.assertEqual(
++            [self._planned(roster, d)["id"] for d in range(4)],
++            [str(self.day.pk), str(self.day.pk), str(self.night.pk), str(self.day.pk)],
++        )
++        self.assertEqual(AttendanceRecord.objects.count(), before)
++        self.assertEqual(roster.relationship_id, self.relationship.pk)
++        self.assertEqual(roster.version, 1)
++
++    def test_override_and_source_snapshot_are_explicit_and_immutable(self):
++        roster = self._create(overrides=[(self.today, self.night)])
++        before = deepcopy(self._planned(roster))
++        self.night.starts_at = time(21)
++        self.night.save()
++        self.assertEqual(self._planned(roster), before)
++        self.assertEqual(before["starts_at"], "20:00:00")
++        self.assertTrue(before["crosses_midnight"])
++        self.assertEqual(
++            RosterSlot.objects.filter(roster=roster, override_date=self.today).count(),
++            1,
++        )
++
++    def test_version_replacement_preserves_series_source_history_and_prior_plan(self):
++        first = self._create()
++        prior = list(first.slots.values())
++        second = self._create(
++            supersedes=first, rotation=[(self.night, 1)], reason="اصلاح صریح"
++        )
++        self.assertEqual(second.series_id, first.series_id)
++        self.assertEqual(second.version, 2)
++        self.assertEqual(second.supersedes_id, first.pk)
++        self.assertEqual(list(first.slots.values()), prior)
++        self.assertEqual(self._planned(first)["id"], str(self.day.pk))
++        self.assertEqual(self._planned(second)["id"], str(self.night.pk))
++        with self.assertRaises(ValidationError):
++            self._create(supersedes=first)
++
++    def test_overlap_requires_explicit_supersession(self):
++        self._create()
++        with self.assertRaises(ValidationError):
++            self._create()
++        self.assertEqual(RosterVersion.objects.count(), 1)
++
++    def test_invalid_period_duration_or_missing_rotation_rolls_back(self):
++        cases = [
++            {"rotation": []},
++            {"rotation": [(self.day, 0)]},
++            {"rotation": [(self.day, True)]},
++            {"effective_to": self.today - timedelta(days=1)},
++            {"rotation_anchor": self.today + timedelta(days=1)},
++            {"overrides": [(self.today - timedelta(days=1), self.day)]},
++        ]
++        for changes in cases:
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                self._create(**changes)
++        self.assertEqual(RosterVersion.objects.count(), 0)
++        self.assertEqual(RosterSlot.objects.count(), 0)
++
++    def test_duplicate_override_date_rolls_back(self):
++        with self.assertRaises(ValidationError):
++            self._create(overrides=[(self.today, self.day), (self.today, self.night)])
++        self.assertFalse(RosterVersion.objects.exists())
++
++    def test_cross_tenant_source_context_and_view_fail_closed(self):
++        other = Organization.objects.create(name="Other", slug="roster-other")
++        with self.assertRaises(PermissionDenied):
++            self._create(organization=other)
++        roster = self._create()
++        with self.assertRaises(PermissionDenied):
++            service.get_roster(
++                actor=self.owner, organization=other, roster_id=roster.pk
++            )
++
++    def test_project_context_requires_explicit_source_assignment(self):
++        project = create_project(
++            actor=self.owner, organization=self.organization, code="R22P", name="پروژه"
++        )
++        with self.assertRaises(ValidationError):
++            self._create(project=project)
++        self.assertFalse(RosterVersion.objects.exists())
++
++    def test_explicit_episode_assignment_supports_project_and_site_scope(self):
++        from apps.projects.models import ProjectSite
++        from apps.workforce.models import EmployeeProjectAssignment, Person
++
++        project = create_project(
++            actor=self.owner,
++            organization=self.organization,
++            code="R22POS",
++            name="پروژه مجاز",
++        )
++        site = ProjectSite.objects.create(
++            organization=self.organization, project=project, code="SITE", name="کارگاه"
++        )
++        employee = Employee.objects.create(
++            organization=self.organization,
++            employee_number="R22POS",
++            first_name="Fixture",
++            last_name="Worker",
++        )
++        person = Person.objects.create(
++            organization=self.organization, first_name="Fixture", last_name="Worker"
++        )
++        relationship = self._relationship(person, "R22POS", legacy=employee)
++        EmployeeProjectAssignment.objects.create(
++            organization=self.organization,
++            employee=employee,
++            project=project,
++            site=site,
++            start_date=relationship.effective_start,
++            created_by=self.owner,
++        )
++        roster = self._create(relationship=relationship, project=project, site=site)
++        self.assertEqual(roster.project_id, project.pk)
++        self.assertEqual(roster.site_id, site.pk)
++        self.assertEqual(self._planned(roster)["id"], str(self.day.pk))
++
++    def test_inactive_or_out_of_period_shift_and_calendar_are_rejected(self):
++        self.day.effective_to = self.today - timedelta(days=1)
++        self.day.save()
++        with self.assertRaises(ValidationError):
++            self._create()
++        self.day.effective_to = None
++        self.day.save()
++        self.calendar.is_active = False
++        self.calendar.archived_at = timezone.now()
++        self.calendar.save()
++        with self.assertRaises(ValidationError):
++            self._create()
++        self.assertFalse(RosterVersion.objects.exists())
++
++    def test_capability_and_object_scope_are_rechecked(self):
++        permission = BusinessPermission.objects.get(code=P.ROSTERS_MANAGE)
++        self.member.role_definition.permissions.remove(permission)
++        with self.assertRaises(PermissionDenied):
++            self._create()
++        self.member.role_definition.permissions.add(permission)
++        self.member.scope_grants.all().delete()
++        with self.assertRaises(PermissionDenied):
++            self._create()
++
++    def test_history_cannot_be_mutated_or_deleted(self):
++        roster = self._create()
++        slot = roster.slots.first()
++        for item in (roster, slot):
++            with self.assertRaises(ValidationError):
++                item.save()
++            with self.assertRaises(ValidationError):
++                item.delete()
++            with self.assertRaises(ValidationError):
++                type(item).objects.filter(pk=item.pk).delete()
++        self.assertEqual(RosterVersion.objects.count(), 1)
++
++    def test_planned_date_outside_source_version_fails(self):
++        roster = self._create()
++        with self.assertRaises(ValidationError):
++            self._planned(roster, 15)
++
++    def test_shift_row_remains_protected_by_history(self):
++        from django.db.models.deletion import ProtectedError
++
++        self._create()
++        with self.assertRaises(ProtectedError):
++            ShiftDefinition.objects.get(pk=self.day.pk).delete()
++
++    def test_existing_attendance_and_future_plan_are_preserved_when_employment_ends(
++        self,
++    ):
++        employee = Employee.objects.create(
++            organization=self.organization,
++            employee_number="ATT22",
++            first_name="Fixture",
++            last_name="Worker",
++        )
++        AttendanceRecord.objects.create(
++            organization=self.organization,
++            employee=employee,
++            calendar=self.calendar,
++            shift=self.day,
++            work_date=self.today,
++            check_in_at=timezone.now(),
++            source="manual",
++            captured_by=self.owner,
++        )
++        before = list(AttendanceRecord.objects.values())
++        roster = self._create()
++        plan = list(RosterSlot.objects.filter(roster=roster).values())
++        end_work_relationship(
++            actor=self.owner,
++            organization=self.organization,
++            relationship=self.relationship,
++            effective_end=self.today,
++        )
++        self.assertEqual(list(AttendanceRecord.objects.values()), before)
++        self.assertEqual(list(RosterSlot.objects.filter(roster=roster).values()), plan)
++        self.assertEqual(self._planned(roster, 2)["id"], str(self.night.pk))
++
++    def test_foreign_shift_and_forged_project_instances_are_reloaded_with_tenant(self):
++        from apps.projects.models import Project
++
++        from .models import WorkCalendar
++
++        other = Organization.objects.create(name="Other", slug="roster-foreign")
++        calendar = WorkCalendar.objects.create(
++            organization=other,
++            code="OTHER",
++            name="Other",
++            timezone=other.timezone,
++            effective_from=self.today - timedelta(days=1),
++            working_weekdays=[1],
++            created_by=self.owner,
++        )
++        shift = ShiftDefinition.objects.create(
++            organization=other,
++            calendar=calendar,
++            code="OTHER",
++            name="Other",
++            starts_at=time(8),
++            ends_at=time(16),
++            effective_from=self.today,
++            created_by=self.owner,
++        )
++        with self.assertRaises(PermissionDenied):
++            self._create(rotation=[(shift, 1)])
++        project = Project.objects.create(
++            organization=other, code="OTHER", name="Other", created_by=self.owner
++        )
++        project.organization_id = self.organization.pk
++        with self.assertRaises(PermissionDenied):
++            self._create(project=project)
++        self.assertFalse(RosterVersion.objects.exists())
+--- a/apps/workforce/models.py
++++ b/apps/workforce/models.py
+@@ -1719,0 +1720,167 @@
++
++
++class EmploymentHistoryQuerySet(PersonalDataHistoryQuerySet):
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("ثبت گروهی سابقه استخدام مجاز نیست.")
++
++
++class EmploymentHistory(PersonalDataRecord):
++    objects = models.Manager.from_queryset(EmploymentHistoryQuerySet)()
++
++    class Meta:
++        abstract = True
++
++
++class EmploymentRecord(EmploymentHistory):
++    """Workforce effective metadata; authoritative file bytes remain in DMS."""
++
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    relationship = models.ForeignKey(WorkRelationship, on_delete=models.PROTECT)
++    relationship_revision = models.ForeignKey(
++        WorkRelationshipRevision, on_delete=models.PROTECT
++    )
++    record_key = models.CharField(max_length=100)
++    kind = models.CharField(
++        max_length=20,
++        choices=[("contract", "قرارداد استخدام"), ("personnel_order", "حکم پرسنلی")],
++    )
++    version = models.PositiveIntegerField()
++    effective_from = models.DateField()
++    effective_to = models.DateField(null=True, blank=True)
++    document_version = models.ForeignKey(
++        "documents.DocumentVersion", on_delete=models.PROTECT
++    )
++    document_sha256 = models.CharField(max_length=64)
++    supersedes = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement",
++    )
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField(max_length=2000)
++
++    class Meta:
++        constraints = [  # noqa: RUF012
++            models.UniqueConstraint(
++                fields=["organization", "relationship", "record_key", "version"],
++                name="employment_record_version_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(version__gte=1), name="employment_record_version_pos"
++            ),
++            models.CheckConstraint(
++                condition=Q(effective_to__isnull=True)
++                | Q(effective_to__gte=models.F("effective_from")),
++                name="employment_record_dates_ck",
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            relationship=self.relationship,
++            relationship_revision=self.relationship_revision,
++            document_version=self.document_version,
++            supersedes=self.supersedes,
++        )
++        if self.relationship_revision.relationship_id != self.relationship_id:
++            raise ValidationError("نسخه منبع متعلق به این رابطه کاری نیست.")
++        if not self.record_key.strip() or not self.reason.strip() or self.version < 1:
++            raise ValidationError("شناسه، نسخه و دلیل معتبر لازم است.")
++        if self.effective_from < self.relationship.effective_start or (
++            self.effective_to and self.effective_to < self.effective_from
++        ):
++            raise ValidationError("بازه اثر سابقه معتبر نیست.")
++        if (
++            self.document_sha256 != self.document_version.sha256
++            or not WorkRelationshipDocumentLink.objects.filter(
++                organization_id=self.organization_id,
++                work_relationship_id=self.relationship_id,
++                document_id=self.document_version.document_id,
++            ).exists()
++        ):
++            raise ValidationError("نسخه سند باید به همین رابطه کاری متصل باشد.")
++        if self.supersedes_id:
++            if (
++                self.supersedes.relationship_id != self.relationship_id
++                or self.supersedes.record_key != self.record_key
++                or self.supersedes.kind != self.kind
++                or self.version != self.supersedes.version + 1
++                or self.supersedes_id == self.pk
++            ):
++                raise ValidationError("زنجیره نسخه سابقه سازگار نیست.")
++        elif self.version != 1:
++            raise ValidationError("نسخه نخست باید صریح باشد.")
++
++
++class OffboardingCase(EmploymentHistory):
++    """Clearance coordinates an existing Workforce end event; it never ends it."""
++
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    end_revision = models.OneToOneField(
++        WorkRelationshipRevision, on_delete=models.PROTECT
++    )
++    workflow_version = models.ForeignKey(
++        "workflows.WorkflowVersion", on_delete=models.PROTECT
++    )
++    initiated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField(max_length=2000)
++    source_snapshot = models.JSONField()
++
++    @property
++    def status(self):
++        return (
++            "complete"
++            if OffboardingReview.objects.filter(case=self).exists()
++            else "pending"
++        )
++
++    def clean(self):
++        validate_related_organizations(
++            self, end_revision=self.end_revision, workflow_version=self.workflow_version
++        )
++        if not self.end_revision.effective_end or not self.reason.strip():
++            raise ValidationError("رویداد پایان و دلیل معتبر لازم است.")
++        if (
++            self.workflow_version.definition.workflow_type.code
++            != "workforce.offboarding"
++        ):
++            raise ValidationError("مسیر بررسی پایان همکاری معتبر نیست.")
++
++
++class OffboardingReview(EmploymentHistory):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    case = models.OneToOneField(
++        OffboardingCase, on_delete=models.PROTECT, related_name="review"
++    )
++    work_item = models.OneToOneField("workflows.WorkItem", on_delete=models.PROTECT)
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    workforce_evidence = models.TextField(max_length=2000)
++    access_assessment = models.TextField(max_length=2000)
++    access_action_audit = models.ForeignKey(
++        "audit.AuditEvent", on_delete=models.PROTECT, null=True, blank=True
++    )
++    source_snapshot = models.JSONField()
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            case=self.case,
++            work_item=self.work_item,
++            access_action_audit=self.access_action_audit,
++        )
++        if not self.workforce_evidence.strip() or not self.access_assessment.strip():
++            raise ValidationError("هر دو بررسی ضروری باید نتیجه ثبت‌شده داشته باشند.")
++        if (
++            self.work_item.instance.subject_id != self.case_id
++            or self.work_item.instance.subject_type != "workforce.offboarding"
++        ):
++            raise ValidationError("کار بررسی متعلق به همین پرونده نیست.")
+--- a/apps/workforce/employment_services.py
++++ b/apps/workforce/employment_services.py
+@@ -0,0 +1,467 @@
++"""Effective source history and bounded clearance; no financial/access mutation."""
++
++from dataclasses import dataclass
++from datetime import date
++from typing import Any
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.db.models import Q
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.audit.models import AuditAction, AuditEvent
++from apps.documents.employee_access import (
++    get_employee_documents,
++    get_employee_version_for_download,
++)
++from apps.documents.models import DocumentVersion
++from apps.documents.services import get_organization_document
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode, Organization
++from apps.workflows.models import WorkflowVersion, WorkItem, WorkItemStatus
++from apps.workflows.runtime import start_workflow
++
++from .ess_services import resolve_ess_subject
++from .models import (
++    EmploymentRecord,
++    OffboardingCase,
++    OffboardingReview,
++    WorkRelationship,
++    WorkRelationshipRevision,
++)
++
++SUBJECT = "workforce.offboarding"
++DENIED = "اطلاعات مجاز در این شرکت یافت نشد."
++
++
++def require(*, actor: User, organization: Organization, code: BusinessPermissionCode):
++    organization = Organization.objects.get(pk=organization.pk)
++    return require_business_permission(
++        user=actor, organization=organization, permission=code, message=DENIED
++    )
++
++
++@transaction.atomic
++def record_employment_version(
++    *,
++    actor: User,
++    organization: Organization,
++    relationship: WorkRelationship,
++    record_key: str,
++    kind: str,
++    effective_from: date,
++    effective_to: date | None,
++    document_version: DocumentVersion,
++    reason: str,
++    supersedes: EmploymentRecord | None = None,
++) -> EmploymentRecord:
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.EMPLOYMENT_RECORDS_MANAGE,
++    )
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.EMPLOYEES_VIEW,
++    )
++    try:
++        relationship = WorkRelationship.objects.select_for_update().get(
++            pk=relationship.pk, organization=organization
++        )
++        version = (
++            DocumentVersion.objects.select_for_update()
++            .select_related("document")
++            .get(pk=document_version.pk, organization=organization)
++        )
++    except (WorkRelationship.DoesNotExist, DocumentVersion.DoesNotExist) as exc:
++        raise PermissionDenied(DENIED) from exc
++    get_organization_document(
++        user=actor, organization=organization, document_id=version.document_id
++    )
++    revision = (
++        WorkRelationshipRevision.objects.filter(
++            relationship=relationship, organization=organization
++        )
++        .order_by("-version")
++        .first()
++    )
++    if revision is None or not version.is_available:
++        raise ValidationError("نسخه منبع و سند ایمن لازم است.")
++    previous = None
++    existing = EmploymentRecord.objects.filter(
++        organization=organization, relationship=relationship, record_key=record_key
++    )
++    if supersedes:
++        try:
++            previous = existing.select_for_update().get(pk=supersedes.pk)
++        except EmploymentRecord.DoesNotExist as exc:
++            raise PermissionDenied(DENIED) from exc
++        if EmploymentRecord.objects.filter(supersedes=previous).exists():
++            raise ValidationError("سابقه پیشین قبلاً جایگزین شده است.")
++    elif existing.exists():
++        raise ValidationError("جایگزینی سابقه باید صریح باشد.")
++    return EmploymentRecord.objects.create(
++        organization=organization,
++        relationship=relationship,
++        relationship_revision=revision,
++        record_key=record_key,
++        kind=kind,
++        version=previous.version + 1 if previous else 1,
++        effective_from=effective_from,
++        effective_to=effective_to,
++        document_version=version,
++        document_sha256=version.sha256,
++        actor=actor,
++        reason=reason,
++        supersedes=previous,
++    )
++
++
++@dataclass(frozen=True)
++class OwnEmploymentRow:
++    kind_label: str
++    version: int
++    effective_from: date
++    effective_to: date | None
++    status_label: str
++    document_id: object
++    document_version_id: object
++    can_download: bool
++
++
++@dataclass(frozen=True)
++class OwnEmploymentHistory:
++    rows: tuple[OwnEmploymentRow, ...]
++    document_state: str
++
++
++def own_employment_history(
++    *, actor: User, organization: Organization
++) -> OwnEmploymentHistory:
++    organization = Organization.objects.get(pk=organization.pk)
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.EMPLOYMENT_RECORDS_VIEW_OWN,
++    )
++    subject = resolve_ess_subject(user=actor, organization=organization)
++    try:
++        access = {
++            a.document.pk: a
++            for a in get_employee_documents(user=actor, organization=organization)
++        }
++    except PermissionDenied:
++        return OwnEmploymentHistory((), "unavailable")
++    today = timezone.localdate(timezone=ZoneInfo(organization.settings.timezone))
++    rows = []
++    records = (
++        EmploymentRecord.objects.filter(
++            organization=organization,
++            relationship__person=subject.person,
++            effective_from__lte=today,
++        )
++        .select_related("document_version", "relationship")
++        .order_by("-effective_from", "-version")
++    )
++    for record in records:
++        permitted = access.get(record.document_version.document_id)
++        if permitted is None or record.document_version_id not in {
++            v.pk for v in permitted.versions
++        }:
++            continue
++        historical = (
++            EmploymentRecord.objects.filter(supersedes=record).exists()
++            or (record.effective_to and record.effective_to < today)
++            or record.relationship_id != subject.current_relationship.pk
++        )
++        if historical and not permitted.document.category.employee_history_visible:
++            continue
++        can_download = False
++        try:
++            get_employee_version_for_download(
++                user=actor,
++                organization=organization,
++                document_id=str(permitted.document.pk),
++                version_id=str(record.document_version_id),
++            )
++        except PermissionDenied:
++            pass
++        else:
++            can_download = True
++        rows.append(
++            OwnEmploymentRow(
++                record.get_kind_display(),
++                record.version,
++                record.effective_from,
++                record.effective_to,
++                "تاریخی" if historical else "مؤثر",
++                permitted.document.pk,
++                record.document_version_id,
++                can_download,
++            )
++        )
++    return OwnEmploymentHistory(tuple(rows), "ready" if rows else "empty")
++
++
++def _source_snapshot(
++    relationship: WorkRelationship, revision: WorkRelationshipRevision
++) -> dict[str, Any]:
++    # Only same-tenant, explicit links. Other tenant responsibilities are not inferred.
++    person = relationship.person
++    membership = (
++        relationship.organization.memberships.filter(user_id=person.user_id).first()
++        if person.user_id
++        else None
++    )
++    return {
++        "person_id": str(person.pk),
++        "relationship_id": str(relationship.pk),
++        "revision_id": str(revision.pk),
++        "revision": revision.version,
++        "effective_end": revision.effective_end.isoformat(),
++        "end_actor_id": str(revision.recorded_by_id),
++        "membership_id": str(membership.pk) if membership else None,
++        "membership_status": membership.status if membership else None,
++        "other_same_tenant_episodes": [
++            str(i)
++            for i in WorkRelationship.objects.filter(
++                organization=relationship.organization, person=person
++            )
++            .exclude(pk=relationship.pk)
++            .values_list("pk", flat=True)
++        ],
++        "other_tenant_responsibilities": "NOT_ASSESSED_NO_GLOBAL_ACCESS_ACTION",
++        "informational_sources": {
++            "payroll": "OWNING_DOMAIN_ONLY",
++            "treasury": "OWNING_DOMAIN_ONLY",
++            "equipment": "OWNING_DOMAIN_ONLY",
++            "projects": "OWNING_DOMAIN_ONLY",
++            "dms": "RETAINED_NO_DELETION",
++            "workflow": "OWNING_WORKFLOW_ONLY",
++        },
++    }
++
++
++@transaction.atomic
++def start_offboarding(
++    *,
++    actor: User,
++    organization: Organization,
++    end_revision: WorkRelationshipRevision,
++    workflow_version: WorkflowVersion,
++    reason: str,
++) -> OffboardingCase:
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.OFFBOARDING_START,
++    )
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.OFFBOARDING_VIEW,
++    )
++    require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.EMPLOYEES_VIEW,
++    )
++    try:
++        revision = (
++            WorkRelationshipRevision.objects.select_for_update()
++            .select_related("relationship__person", "relationship__organization")
++            .get(pk=end_revision.pk, organization=organization)
++        )
++        workflow_version = WorkflowVersion.objects.get(
++            pk=workflow_version.pk, organization=organization, status="published"
++        )
++    except (WorkRelationshipRevision.DoesNotExist, WorkflowVersion.DoesNotExist) as exc:
++        raise PermissionDenied(DENIED) from exc
++    if workflow_version.definition.scope:
++        raise ValidationError("پرونده پایان همکاری در محدوده رابطه کاری شرکت است.")
++    relationship = (
++        WorkRelationship.objects.select_for_update()
++        .select_related("person", "organization")
++        .get(pk=revision.relationship_id, organization=organization)
++    )
++    if (
++        not revision.effective_end
++        or revision.effective_end != relationship.effective_end
++        or revision.version
++        != relationship.revisions.order_by("-version")
++        .values_list("version", flat=True)
++        .first()
++    ):
++        raise ValidationError("رویداد پایان مؤثر منبع لازم است؛ تسویه مجوز پایان نیست.")
++    old = OffboardingCase.objects.filter(end_revision=revision).first()
++    if old:
++        if old.workflow_version_id != workflow_version.pk or old.reason != reason:
++            raise ValidationError("پرونده موجود با ورودی متفاوت سازگار نیست.")
++        return get_case(actor=actor, organization=organization, case_id=old.pk)
++    case = OffboardingCase.objects.create(
++        organization=organization,
++        end_revision=revision,
++        workflow_version=workflow_version,
++        initiated_by=actor,
++        reason=reason,
++        source_snapshot=_source_snapshot(relationship, revision),
++    )
++    instance = start_workflow(
++        actor=actor,
++        organization=organization,
++        version_id=workflow_version.pk,
++        subject_id=case.pk,
++        idempotency_key=f"offboarding:{case.pk}",
++    )
++    usable = False
++    for item in instance.work_items.filter(
++        status__in=[WorkItemStatus.OPEN, WorkItemStatus.CLAIMED]
++    ):
++        for candidate in item.candidates.filter(is_active=True).select_related(
++            "membership__user"
++        ):
++            try:
++                for code in (
++                    BusinessPermissionCode.OFFBOARDING_VIEW,
++                    BusinessPermissionCode.OFFBOARDING_REVIEW,
++                    BusinessPermissionCode.WORK_ITEMS_VIEW,
++                    BusinessPermissionCode.WORK_ITEMS_CLAIM,
++                    BusinessPermissionCode.WORK_ITEMS_ACT,
++                ):
++                    require(
++                        actor=candidate.membership.user,
++                        organization=organization,
++                        code=code,
++                    )
++            except PermissionDenied:
++                continue
++            usable = True
++    if instance.status != "active" or not usable:
++        raise ValidationError("مسیر بررسی تخصیص‌یافته مجاز موجود نیست.")
++    return case
++
++
++def get_case(
++    *, actor: User, organization: Organization, case_id: object
++) -> OffboardingCase:
++    member = require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.OFFBOARDING_VIEW,
++    )
++    try:
++        case = OffboardingCase.objects.select_related(
++            "end_revision__relationship__person"
++        ).get(pk=case_id, organization=organization)
++    except OffboardingCase.DoesNotExist as exc:
++        raise PermissionDenied(DENIED) from exc
++    if (
++        case.initiated_by_id != actor.pk
++        and not WorkItem.objects.filter(
++            organization=organization,
++            instance__subject_type=SUBJECT,
++            instance__subject_id=case.pk,
++        )
++        .filter(
++            Q(current_assignee=member)
++            | Q(candidates__membership=member, candidates__is_active=True)
++        )
++        .exists()
++    ):
++        raise PermissionDenied(DENIED)
++    return case
++
++
++def requester_status(
++    *, actor: User, organization: Organization, case_id: object
++) -> dict[str, str]:
++    case = get_case(actor=actor, organization=organization, case_id=case_id)
++    # Private review notes, access assessment/actions and reviewer identity never escape.
++    return {
++        "case_id": str(case.pk),
++        "status": case.status,
++        "employment_end": case.end_revision.effective_end.isoformat(),
++    }
++
++
++@transaction.atomic
++def complete_clearance(
++    *,
++    subject: OffboardingCase,
++    actor: User,
++    organization: Organization,
++    work_item: WorkItem,
++    context: dict[str, Any],
++    **kwargs: Any,
++) -> None:
++    del kwargs
++    member = require(
++        actor=actor,
++        organization=organization,
++        code=BusinessPermissionCode.OFFBOARDING_REVIEW,
++    )
++    work_item = (
++        WorkItem.objects.select_for_update()
++        .select_related("instance")
++        .get(pk=work_item.pk, organization=organization)
++    )
++    case = (
++        OffboardingCase.objects.select_for_update()
++        .select_related(
++            "end_revision__relationship__person",
++            "end_revision__relationship__organization",
++        )
++        .get(pk=subject.pk, organization=organization)
++    )
++    if (
++        work_item.organization_id != organization.pk
++        or work_item.status != WorkItemStatus.CLAIMED
++        or work_item.current_assignee_id != member.pk
++        or work_item.instance.subject_id != case.pk
++        or work_item.instance.subject_type != SUBJECT
++    ):
++        raise PermissionDenied(DENIED)
++    if OffboardingReview.objects.filter(case=case).exists():
++        raise ValidationError("بررسی قبلاً ثبت شده است.")
++    allowed = {"workforce_evidence", "access_assessment", "access_action_audit_id"}
++    if set(context) - allowed or any(
++        not isinstance(context.get(k), str) or not context[k].strip()
++        for k in ("workforce_evidence", "access_assessment")
++    ):
++        raise ValidationError(
++            "هر دو نتیجه ضروری صریح لازم است؛ بررسی اطلاعاتی مانع نیست."
++        )
++    action = None
++    relationship = case.end_revision.relationship
++    snapshot = _source_snapshot(relationship, case.end_revision)
++    if context.get("access_action_audit_id"):
++        try:
++            action = AuditEvent.objects.get(
++                pk=context["access_action_audit_id"],
++                organization=organization,
++                entity_id=snapshot["membership_id"],
++                action__in=[
++                    AuditAction.MEMBERSHIP_STATUS_CHANGED,
++                    AuditAction.MEMBERSHIP_ROLE_REVOKED,
++                    AuditAction.MEMBERSHIP_SCOPE_REVOKED,
++                ],
++            )
++        except (AuditEvent.DoesNotExist, ValueError) as exc:
++            raise ValidationError(
++                "مرجع اقدام دسترسی باید از اختیار همان منبع باشد."
++            ) from exc
++    OffboardingReview.objects.create(
++        organization=organization,
++        case=case,
++        work_item=work_item,
++        actor=actor,
++        workforce_evidence=context["workforce_evidence"].strip(),
++        access_assessment=context["access_assessment"].strip(),
++        access_action_audit=action,
++        source_snapshot=snapshot,
++    )
+--- a/apps/workforce/employment_workflow.py
++++ b/apps/workforce/employment_workflow.py
+@@ -0,0 +1,38 @@
++from apps.organizations.models import OrganizationMembership
++from apps.workflows.registry import SubjectSnapshot, registry
++
++
++def load_offboarding(*, organization, subject_id, actor, for_update):
++    from .employment_services import get_case
++    from .models import OffboardingCase
++
++    visible = get_case(actor=actor, organization=organization, case_id=subject_id)
++    query = (
++        OffboardingCase.objects.select_for_update()
++        if for_update
++        else OffboardingCase.objects
++    )
++    case = query.get(pk=visible.pk, organization=organization)
++    member = OrganizationMembership.objects.get(
++        user_id=case.initiated_by_id, organization=organization
++    )
++    return SubjectSnapshot(
++        subject=case,
++        subject_id=str(case.pk),
++        organization_id=str(organization.pk),
++        attributes={
++            "created_by_id": str(case.initiated_by_id),
++            "project_id": None,
++            "site_id": None,
++        },
++        creator_membership_id=str(member.pk),
++        submitter_membership_id=str(member.pk),
++        display="بررسی پایان همکاری",
++    )
++
++
++def register_employment_workflow():
++    from .employment_services import complete_clearance
++
++    registry.bind_subject_loader("workforce.offboarding", load_offboarding)
++    registry.bind_domain_command("workforce.offboarding.complete", complete_clearance)
+--- a/apps/workforce/employment_views.py
++++ b/apps/workforce/employment_views.py
+@@ -0,0 +1,31 @@
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.shortcuts import render
++from django.views.decorators.http import require_GET
++
++from apps.organizations.decorators import active_organization_required
++
++from .employment_services import own_employment_history
++
++
++@active_organization_required
++@require_GET
++def employment_history(request):
++    try:
++        history = own_employment_history(
++            actor=request.user, organization=request.organization
++        )
++        response = render(
++            request, "workforce/employment_history.html", {"history": history}
++        )
++    except PermissionDenied:
++        response = render(request, "workforce/ess_unavailable.html", status=403)
++    except ValidationError:
++        response = render(
++            request,
++            "workforce/employment_history.html",
++            {"history_error": True},
++            status=400,
++        )
++    response["Cache-Control"] = "private, no-store"
++    response["Vary"] = "Cookie"
++    return response
+--- a/apps/workforce/apps.py
++++ b/apps/workforce/apps.py
+@@ -9,0 +10,2 @@
++        from .employment_workflow import register_employment_workflow
++        register_employment_workflow()
+--- a/apps/workforce/urls.py
++++ b/apps/workforce/urls.py
+@@ -5,0 +6 @@
++from apps.workforce.employment_views import employment_history
+@@ -9,0 +11 @@
++    path("ess/employment/", employment_history, name="employment_history"),
+--- a/apps/workforce/migrations/0013_cep022_employment_lifecycle.py
++++ b/apps/workforce/migrations/0013_cep022_employment_lifecycle.py
+@@ -0,0 +1,78 @@
++# Generated by Django 5.2.17 on 2026-10-18 07:42
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('audit', '0054_cep005_integration_attempt_action'),
++        ('documents', '0011_documentcategory_employee_current_visible_and_more'),
++        ('organizations', '0115_cep022_employment_permissions'),
++        ('workflows', '0027_p6_s33_s38_contractual_record_catalog'),
++        ('workforce', '0012_cep056_certificate_framework'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='OffboardingCase',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('reason', models.TextField(max_length=2000)),
++                ('source_snapshot', models.JSONField()),
++                ('end_revision', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='workforce.workrelationshiprevision')),
++                ('initiated_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('workflow_version', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='workflows.workflowversion')),
++            ],
++            options={
++                'abstract': False,
++            },
++        ),
++        migrations.CreateModel(
++            name='OffboardingReview',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('workforce_evidence', models.TextField(max_length=2000)),
++                ('access_assessment', models.TextField(max_length=2000)),
++                ('source_snapshot', models.JSONField()),
++                ('access_action_audit', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='audit.auditevent')),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('case', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='review', to='workforce.offboardingcase')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('work_item', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, to='workflows.workitem')),
++            ],
++            options={
++                'abstract': False,
++            },
++        ),
++        migrations.CreateModel(
++            name='EmploymentRecord',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('record_key', models.CharField(max_length=100)),
++                ('kind', models.CharField(choices=[('contract', 'قرارداد استخدام'), ('personnel_order', 'حکم پرسنلی')], max_length=20)),
++                ('version', models.PositiveIntegerField()),
++                ('effective_from', models.DateField()),
++                ('effective_to', models.DateField(blank=True, null=True)),
++                ('document_sha256', models.CharField(max_length=64)),
++                ('reason', models.TextField(max_length=2000)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('document_version', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='documents.documentversion')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('relationship', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='workforce.workrelationship')),
++                ('relationship_revision', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='workforce.workrelationshiprevision')),
++                ('supersedes', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='replacement', to='workforce.employmentrecord')),
++            ],
++            options={
++                'constraints': [models.UniqueConstraint(fields=('organization', 'relationship', 'record_key', 'version'), name='employment_record_version_uq'), models.CheckConstraint(condition=models.Q(('version__gte', 1)), name='employment_record_version_pos'), models.CheckConstraint(condition=models.Q(('effective_to__isnull', True), ('effective_to__gte', models.F('effective_from')), _connector='OR'), name='employment_record_dates_ck')],
++            },
++        ),
++    ]
+--- a/apps/workforce/test_cep022.py
++++ b/apps/workforce/test_cep022.py
+@@ -0,0 +1,480 @@
++"""Employment history, source privacy and assigned shared clearance tests."""
++
++import os
++from datetime import timedelta
++from pathlib import Path
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++from django.urls import reverse
++
++from apps.documents import test_cep011 as baseline
++from apps.documents.services import add_document_version
++from apps.organizations.models import (
++    BusinessPermission,
++    Organization,
++    OrganizationMembership,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.services import set_active_organization
++from apps.workflows.models import WorkflowInstance, WorkItem
++from apps.workflows.runtime import claim_work_item, complete_work_item
++from apps.workflows.services import (
++    create_workflow_draft,
++    edit_workflow_draft,
++    publish_workflow_version,
++)
++
++from . import employment_services as service
++from .models import (
++    EmploymentRecord,
++    OffboardingCase,
++    OffboardingReview,
++    WorkRelationshipRevision,
++)
++from .person_services import end_work_relationship
++
++
++class EmploymentTests(TestCase):
++    _relationship = baseline.EmployeeDocumentAccessTests._relationship
++    _upload = staticmethod(baseline.EmployeeDocumentAccessTests._upload)
++    _document = baseline.EmployeeDocumentAccessTests._document
++    _allow = baseline.EmployeeDocumentAccessTests._allow
++    _scan_clean = baseline.EmployeeDocumentAccessTests._scan_clean
++
++    def setUp(self):
++        baseline.EmployeeDocumentAccessTests.setUp(self)
++        self.operator = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.owner
++        )
++        self.operator.role_definition.permissions.add(
++            *BusinessPermission.objects.filter(
++                code__in=[
++                    P.EMPLOYMENT_RECORDS_MANAGE,
++                    P.EMPLOYMENT_RECORDS_VIEW_OWN,
++                    P.OFFBOARDING_START,
++                    P.OFFBOARDING_VIEW,
++                    P.OFFBOARDING_REVIEW,
++                    P.WORKFLOWS_CREATE,
++                    P.WORKFLOWS_CHANGE_DRAFT,
++                    P.WORKFLOWS_PUBLISH,
++                    P.WORK_ITEMS_VIEW,
++                    P.WORK_ITEMS_CLAIM,
++                    P.WORK_ITEMS_ACT,
++                ]
++            )
++        )
++        self.role.permissions.add(
++            BusinessPermission.objects.get(code=P.EMPLOYMENT_RECORDS_VIEW_OWN)
++        )
++        self._allow(current=True, history=True, download=True)
++        self.document = self._document()
++        self._scan_clean(self.document.current_version)
++
++    def _record(self, **changes):
++        data = {
++            "actor": self.owner,
++            "organization": self.organization,
++            "relationship": self.relationship,
++            "record_key": "contract-1",
++            "kind": "contract",
++            "effective_from": self.relationship.effective_start,
++            "effective_to": None,
++            "document_version": self.document.current_version,
++            "reason": "PRIVATE-SOURCE-REASON",
++        }
++        return service.record_employment_version(**(data | changes))
++
++    def _own(self, **changes):
++        return service.own_employment_history(
++            **(
++                {"actor": self.employee_user, "organization": self.organization}
++                | changes
++            )
++        )
++
++    def _client(self, user=None):
++        user = user or self.employee_user
++        self.client.force_login(user)
++        session = self.client.session
++        set_active_organization(session=session, organization=self.organization)
++        session.save()
++
++    def _capture(self, name, response):
++        directory = os.environ.get("CEP022_CAPTURE_DIR")
++        if directory:
++            Path(directory).mkdir(parents=True, exist_ok=True)
++            (Path(directory) / (name + ".html")).write_bytes(response.content)
++
++    def _workflow(self):
++        draft = create_workflow_draft(
++            actor=self.owner,
++            organization=self.organization,
++            workflow_type_code=service.SUBJECT,
++            code="offboarding-test",
++            name="بررسی پایان همکاری",
++            scope={},
++        )
++        config = {
++            "steps": [
++                {"key": "start", "step_type": "start", "is_start": True},
++                {
++                    "key": "review",
++                    "step_type": "approval",
++                    "required_permission": P.OFFBOARDING_REVIEW,
++                    "configuration": {"decision_policy": "any"},
++                    "routing": [
++                        {
++                            "resolver_type": "business_permission",
++                            "configuration": {"permission": P.OFFBOARDING_REVIEW},
++                        }
++                    ],
++                },
++                {"key": "end", "step_type": "end", "is_terminal": True},
++            ],
++            "transitions": [
++                {
++                    "source": "start",
++                    "target": "review",
++                    "outcome": "submitted",
++                    "is_default": True,
++                },
++                {
++                    "source": "review",
++                    "target": "end",
++                    "outcome": "complete",
++                    "domain_command": service.SUBJECT + ".complete",
++                    "required_permission": P.OFFBOARDING_REVIEW,
++                },
++            ],
++        }
++        edit_workflow_draft(
++            actor=self.owner,
++            organization=self.organization,
++            version_id=draft.pk,
++            configuration=config,
++        )
++        return publish_workflow_version(
++            actor=self.owner, organization=self.organization, version_id=draft.pk
++        )
++
++    def _end(self):
++        end_work_relationship(
++            actor=self.owner,
++            organization=self.organization,
++            relationship=self.relationship,
++            effective_end=self.today - timedelta(days=1),
++        )
++        return WorkRelationshipRevision.objects.filter(
++            relationship=self.relationship
++        ).latest("version")
++
++    def _case(self):
++        return service.start_offboarding(
++            actor=self.owner,
++            organization=self.organization,
++            end_revision=self._end(),
++            workflow_version=self._workflow(),
++            reason="PRIVATE-CASE-REASON",
++        )
++
++    def _claim(self, case):
++        task = WorkItem.objects.get(instance__subject_id=case.pk)
++        claim_work_item(
++            actor=self.owner,
++            organization=self.organization,
++            work_item_id=task.pk,
++            idempotency_key="claim",
++        )
++        task.refresh_from_db()
++        return task
++
++    def _complete(self, task, **changes):
++        values = {
++            "actor": self.owner,
++            "organization": self.organization,
++            "work_item_id": task.pk,
++            "outcome": "complete",
++            "idempotency_key": "complete",
++            "command_context": {
++                "workforce_evidence": "PRIVATE-WORKFORCE-CHECK",
++                "access_assessment": "PRIVATE-ACCESS-ASSESSMENT no automatic action",
++            },
++        }
++        return complete_work_item(**(values | changes))
++
++    def test_source_history_is_versioned_and_read_only_in_own_ui(self):
++        record = self._record()
++        rows = self._own().rows
++        self.assertEqual(len(rows), 1)
++        self.assertEqual(rows[0].document_version_id, record.document_version_id)
++        self.assertEqual(record.document_sha256, self.document.current_version.sha256)
++        self.assertEqual(record.relationship_revision.version, 1)
++        self._client()
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "قرارداد و احکام استخدام من")
++        self.assertContains(response, "دریافت نسخه مجاز سند")
++        self.assertNotContains(response, "PRIVATE-SOURCE-REASON")
++        self.assertNotContains(response, 'name="record_key"')
++        self.assertIn("no-store", response["Cache-Control"])
++        self.assertEqual(
++            self.client.post(reverse("workforce:employment_history")).status_code, 405
++        )
++        self._capture("current", response)
++
++    def test_replacement_pins_previous_identity_and_exact_dms_versions(self):
++        first = self._record()
++        second_version = add_document_version(
++            document=self.document, actor=self.owner, upload=self._upload("second.pdf")
++        )
++        self._scan_clean(second_version)
++        second = self._record(
++            document_version=second_version, supersedes=first, reason="Replacement"
++        )
++        self.assertEqual(second.version, 2)
++        self.assertEqual(second.supersedes_id, first.pk)
++        self.assertEqual(len(self._own().rows), 2)
++        first.refresh_from_db()
++        self.assertNotEqual(first.document_version_id, second.document_version_id)
++        self._client()
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "تاریخی")
++        self._capture("history", response)
++
++    def test_missing_permission_or_dms_policy_fails_closed(self):
++        self._record()
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.EMPLOYMENT_RECORDS_VIEW_OWN)
++        )
++        with self.assertRaises(PermissionDenied):
++            self._own()
++        self._client()
++        denied = self.client.get(reverse("workforce:employment_history"))
++        self.assertEqual(denied.status_code, 403)
++        self._capture("denied", denied)
++        self.role.permissions.add(
++            BusinessPermission.objects.get(code=P.EMPLOYMENT_RECORDS_VIEW_OWN)
++        )
++        self._allow(current=False, history=False, download=False)
++        self.assertEqual(self._own().rows, ())
++
++    def test_cross_person_records_and_unlinked_documents_never_appear(self):
++        other = self._document(self.other_relationship)
++        self._scan_clean(other.current_version)
++        with self.assertRaises(ValidationError):
++            self._record(document_version=other.current_version)
++        self._record(
++            relationship=self.other_relationship, document_version=other.current_version
++        )
++        self.assertEqual(self._own().rows, ())
++
++    def test_cross_tenant_inputs_fail_closed(self):
++        other = Organization.objects.create(name="Other", slug="other-022")
++        with self.assertRaises(PermissionDenied):
++            self._record(organization=other)
++        self.assertEqual(EmploymentRecord.objects.count(), 0)
++
++    def test_future_source_is_not_exposed(self):
++        self._record(effective_from=self.today + timedelta(days=1))
++        self.assertEqual(self._own().rows, ())
++
++    def test_model_and_services_reject_rewrites_duplicate_and_invalid_sources(self):
++        first = self._record()
++        for action in (
++            first.save,
++            first.delete,
++            lambda: EmploymentRecord.objects.filter(pk=first.pk).update(
++                reason="rewrite"
++            ),
++        ):
++            with self.assertRaises(ValidationError):
++                action()
++        with self.assertRaises(ValidationError):
++            self._record()
++        with self.assertRaises(ValidationError):
++            self._record(
++                supersedes=first, effective_to=first.effective_from - timedelta(days=1)
++            )
++        self.assertEqual(EmploymentRecord.objects.count(), 1)
++
++    def test_document_scan_and_download_policy_are_preserved(self):
++        unscanned = self._document()
++        with self.assertRaises(ValidationError):
++            self._record(document_version=unscanned.current_version)
++        self._record()
++        self._allow(current=True, history=True, download=False)
++        self._client()
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "دریافت این نسخه سند در دسترس نیست.")
++        self.assertNotContains(response, "دریافت نسخه مجاز سند")
++        self._capture("download_unavailable", response)
++        self._allow(current=True, history=True, download=True)
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.DOCUMENTS_DOWNLOAD)
++        )
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertNotContains(response, "دریافت نسخه مجاز سند")
++        self.assertEqual(len(self._own().rows), 1)
++
++    def test_empty_and_unavailable_document_states(self):
++        self._client()
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "سابقه استخدام مجازی برای نمایش موجود نیست.")
++        self._capture("empty", response)
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.DOCUMENTS_VIEW)
++        )
++        response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "منبع اسناد برای حساب شما در دسترس نیست.")
++        self._capture("unavailable", response)
++
++    def test_offboarding_requires_existing_end_event_and_assigned_published_workflow(
++        self,
++    ):
++        version = self._workflow()
++        initial = self.relationship.revisions.get(version=1)
++        with self.assertRaises(ValidationError):
++            service.start_offboarding(
++                actor=self.owner,
++                organization=self.organization,
++                end_revision=initial,
++                workflow_version=version,
++                reason="Invalid",
++            )
++        self.assertEqual(OffboardingCase.objects.count(), 0)
++        self.relationship.refresh_from_db()
++        self.assertIsNone(self.relationship.effective_end)
++
++    def test_end_is_preserved_before_and_after_clearance(self):
++        case = self._case()
++        self.assertEqual(case.status, "pending")
++        self.relationship.refresh_from_db()
++        end = self.relationship.effective_end
++        task = self._claim(case)
++        self._complete(task)
++        self.assertEqual(case.status, "complete")
++        self.relationship.refresh_from_db()
++        self.assertEqual(self.relationship.effective_end, end)
++        self.assertTrue(
++            self.person.__class__.objects.filter(pk=self.person.pk).exists()
++        )
++        self.employee_user.refresh_from_db()
++        self.assertTrue(self.employee_user.is_active)
++        review = OffboardingReview.objects.get(case=case)
++        self.assertEqual(review.actor_id, self.owner.pk)
++        self.assertEqual(review.work_item_id, task.pk)
++        self.assertEqual(
++            review.source_snapshot["revision_id"], str(case.end_revision_id)
++        )
++
++    def test_required_outcomes_cannot_be_skipped_and_invalid_action_rolls_back(self):
++        case = self._case()
++        task = self._claim(case)
++        for context in (
++            {},
++            {"workforce_evidence": "checked"},
++            {
++                "workforce_evidence": "checked",
++                "access_assessment": "checked",
++                "blocking_payroll": True,
++            },
++        ):
++            with self.subTest(context=context), self.assertRaises(ValidationError):
++                self._complete(task, command_context=context)
++        self.assertFalse(OffboardingReview.objects.exists())
++        task.refresh_from_db()
++        self.assertEqual(task.status, "claimed")
++        self.assertEqual(case.status, "pending")
++        for outcome in ("reject", "cancel", "correct"):
++            with self.subTest(outcome=outcome), self.assertRaises(ValidationError):
++                self._complete(task, outcome=outcome)
++        self.assertFalse(OffboardingReview.objects.exists())
++
++    def test_permission_and_actual_assignment_required_for_clearance(self):
++        case = self._case()
++        task = WorkItem.objects.get(instance__subject_id=case.pk)
++        with self.assertRaises((PermissionDenied, ValidationError)):
++            self._complete(task)
++        task = self._claim(case)
++        with self.assertRaises(PermissionDenied):
++            self._complete(task, actor=self.employee_user)
++        self.assertFalse(OffboardingReview.objects.exists())
++
++    def test_requester_status_omits_confidential_review_and_access_details(self):
++        case = self._case()
++        self._complete(self._claim(case))
++        status = service.requester_status(
++            actor=self.owner, organization=self.organization, case_id=case.pk
++        )
++        self.assertEqual(set(status), {"case_id", "status", "employment_end"})
++        self.assertNotIn("PRIVATE", str(status))
++        with self.assertRaises(PermissionDenied):
++            service.requester_status(
++                actor=self.other_user, organization=self.organization, case_id=case.pk
++            )
++
++    def test_clearance_and_shared_completion_rollback_together(self):
++        case = self._case()
++        task = self._claim(case)
++        original = OffboardingReview.save
++
++        def fail(record, *args, **kwargs):
++            original(record, *args, **kwargs)
++            raise ValidationError("Synthetic post-insert failure")
++
++        with (
++            patch.object(OffboardingReview, "save", fail),
++            self.assertRaises(ValidationError),
++        ):
++            self._complete(task)
++        self.assertFalse(OffboardingReview.objects.exists())
++        task.refresh_from_db()
++        self.assertEqual(task.status, "claimed")
++        self.assertEqual(
++            WorkflowInstance.objects.get(subject_id=case.pk).status, "active"
++        )
++
++    def test_no_new_default_grants(self):
++        from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
++
++        new = {
++            P.EMPLOYMENT_RECORDS_MANAGE,
++            P.EMPLOYMENT_RECORDS_VIEW_OWN,
++            P.OFFBOARDING_START,
++            P.OFFBOARDING_VIEW,
++            P.OFFBOARDING_REVIEW,
++            P.ROSTERS_MANAGE,
++            P.ROSTERS_VIEW,
++        }
++        for codes in DEFAULT_ROLE_PERMISSIONS.values():
++            self.assertFalse(new & set(codes))
++
++    def test_rehire_keeps_prior_episode_employment_evidence(self):
++        record = self._record()
++        self._end()
++        new = self._relationship(self.person, "REHIRE022", start=self.today)
++        history = self._own()
++        self.assertEqual(len(history.rows), 1)
++        self.assertEqual(history.rows[0].status_label, "تاریخی")
++        record.refresh_from_db()
++        self.assertNotEqual(record.relationship_id, new.pk)
++        self.assertEqual(record.relationship_revision.version, 1)
++
++    def test_category_history_policy_hides_superseded_metadata_even_current_file(self):
++        first = self._record()
++        self._record(supersedes=first, reason="Metadata correction")
++        self._allow(current=True, history=False, download=True)
++        self.assertEqual([r.version for r in self._own().rows], [2])
++
++    def test_error_ui_is_private_and_contains_no_source_details(self):
++        self._client()
++        with patch(
++            "apps.workforce.employment_views.own_employment_history",
++            side_effect=ValidationError("PRIVATE-INTERNAL-DETAIL"),
++        ):
++            response = self.client.get(reverse("workforce:employment_history"))
++        self.assertContains(response, "دریافت سوابق استخدام ممکن نشد", status_code=400)
++        self.assertNotContains(response, "PRIVATE-INTERNAL-DETAIL", status_code=400)
++        self.assertIn("no-store", response["Cache-Control"])
++        self._capture("error", response)
+--- a/apps/workforce/test_cep022_migration.py
++++ b/apps/workforce/test_cep022_migration.py
+@@ -0,0 +1,102 @@
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from apps.organizations.models import BusinessPermission, OrganizationRole
++from apps.timekeeping.models import RosterSlot, RosterVersion
++
++from . import test_cep022 as fixtures
++from .models import (
++    EmploymentRecord,
++    OffboardingCase,
++    OffboardingReview,
++    Person,
++    WorkRelationship,
++)
++
++
++class EmploymentMigrationTests(TransactionTestCase):
++    serialized_rollback = True
++
++    def test_expand_rollback_reapply_preserves_identity_documents_and_grants(self):
++        fixture = fixtures.EmploymentTests()
++        fixture.setUp()
++        self.addCleanup(fixture.doCleanups)
++        sources = [
++            Person,
++            WorkRelationship,
++            fixture.document.__class__,
++            fixture.document.current_version.__class__,
++        ]
++        before = {
++            m._meta.label: list(m.objects.order_by("pk").values()) for m in sources
++        }
++        codes = [
++            "employment_records.manage",
++            "employment_records.view_own",
++            "offboarding.start",
++            "offboarding.view",
++            "offboarding.review",
++            "rosters.manage",
++            "rosters.view",
++        ]
++        OrganizationRole.permissions.through.objects.filter(
++            businesspermission__code__in=codes
++        ).delete()
++        grants_before = list(
++            OrganizationRole.permissions.through.objects.order_by("pk").values()
++        )
++        previous = [
++            ("workforce", "0012_cep056_certificate_framework"),
++            ("timekeeping", "0002_attendancecorrectionrequest"),
++            ("organizations", "0114_cep036_indexation_permissions"),
++        ]
++        current = [
++            ("workforce", "0013_cep022_employment_lifecycle"),
++            ("timekeeping", "0003_cep022_employment_lifecycle"),
++            ("organizations", "0115_cep022_employment_permissions"),
++        ]
++        try:
++            MigrationExecutor(connection).migrate(previous)
++            self.assertFalse(
++                BusinessPermission.objects.filter(
++                    code__in=codes, is_active=True
++                ).exists()
++            )
++            self.assertEqual(
++                {
++                    m._meta.label: list(m.objects.order_by("pk").values())
++                    for m in sources
++                },
++                before,
++            )
++            MigrationExecutor(connection).migrate(current)
++            self.assertEqual(
++                {
++                    m._meta.label: list(m.objects.order_by("pk").values())
++                    for m in sources
++                },
++                before,
++            )
++            self.assertEqual(
++                list(
++                    OrganizationRole.permissions.through.objects.order_by("pk").values()
++                ),
++                grants_before,
++            )
++            self.assertEqual(
++                BusinessPermission.objects.filter(
++                    code__in=codes, is_active=True
++                ).count(),
++                len(codes),
++            )
++            for model in (
++                EmploymentRecord,
++                OffboardingCase,
++                OffboardingReview,
++                RosterVersion,
++                RosterSlot,
++            ):
++                self.assertEqual(model.objects.count(), 0)
++        finally:
++            MigrationExecutor(connection).migrate(current)
+--- a/apps/workflows/registry.py
++++ b/apps/workflows/registry.py
+@@ -183,0 +184,15 @@
++        key="workforce.offboarding", subject_type="workforce.offboarding",
++        exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),
++        start_permission="offboarding.start", view_permission="offboarding.view",
++    )
++)
++registry.register_workflow_type(
++    WorkflowTypeSpec(code="workforce.offboarding", subject_type="workforce.offboarding",
++        subject_adapter="workforce.offboarding", allowed_scope_fields=frozenset({"project_id", "site_id"}),
++        domain_commands=frozenset({"workforce.offboarding.complete"}))
++)
++registry.register_domain_command(
++    DomainCommandSpec(key="workforce.offboarding.complete", workflow_type="workforce.offboarding", include_work_item=True)
++)
++registry.register_subject_adapter(
++    SubjectAdapterSpec(
+--- a/templates/workforce/employment_history.html
++++ b/templates/workforce/employment_history.html
+@@ -0,0 +1,37 @@
++{% extends "base.html" %}
++{% load erp_format %}
++{% block title %}سوابق استخدام من | بنیرا{% endblock %}
++{% block content %}
++<section class="mx-auto max-w-4xl" dir="rtl">
++  {% include "workforce/_ess_navigation.html" %}
++  <header class="erp-surface rounded-2xl p-5 sm:p-6">
++    <p class="text-xs font-bold text-blue-700">خدمات کارکنان</p>
++    <h1 class="mt-2 text-2xl font-black text-slate-950">قرارداد و احکام استخدام من</h1>
++    <p class="mt-3 text-sm text-slate-600">سوابق مؤثر و تاریخی فقط از رابطه کاری و نسخه‌های مجاز اسناد خوانده می‌شوند.</p>
++  </header>
++  {% if history_error %}
++    <p class="erp-surface mt-5 rounded-2xl p-5" role="alert">دریافت سوابق استخدام ممکن نشد. دوباره تلاش کنید.</p>
++  {% elif history.document_state == "unavailable" %}
++    <p class="erp-surface mt-5 rounded-2xl p-5" role="status">منبع اسناد برای حساب شما در دسترس نیست.</p>
++  {% else %}
++    <div class="mt-5 grid gap-4">
++      {% for row in history.rows %}
++      <article class="erp-surface rounded-2xl p-5 sm:p-6">
++        <div class="flex flex-wrap items-center justify-between gap-3">
++          <h2 class="text-lg font-bold">{{ row.kind_label }}</h2>
++          <span class="rounded-full bg-slate-100 px-3 py-1 text-sm">{{ row.status_label }}</span>
++        </div>
++        <dl class="mt-4 grid gap-4 sm:grid-cols-3">
++          <div><dt class="text-xs text-slate-500">نسخه منبع</dt><dd class="mt-1 font-bold">{{ row.version|erp_number }}</dd></div>
++          <div><dt class="text-xs text-slate-500">شروع اثر</dt><dd class="mt-1 font-bold">{{ row.effective_from|jalali_date }}</dd></div>
++          <div><dt class="text-xs text-slate-500">پایان اثر ثبت‌شده</dt><dd class="mt-1 font-bold">{{ row.effective_to|jalali_date|default:"ثبت نشده" }}</dd></div>
++        </dl>
++        {% if row.can_download %}
++          <a class="mt-5 inline-flex rounded-xl bg-blue-700 px-4 py-2 font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" href="{% url 'documents:employee-version-download' row.document_id row.document_version_id %}">دریافت نسخه مجاز سند</a>
++        {% else %}<p class="mt-4 text-sm text-slate-600" role="status">دریافت این نسخه سند در دسترس نیست.</p>{% endif %}
++      </article>
++      {% empty %}<p class="erp-surface rounded-2xl p-5" role="status">سابقه استخدام مجازی برای نمایش موجود نیست.</p>{% endfor %}
++    </div>
++  {% endif %}
++</section>
++{% endblock %}
+--- a/templates/workforce/_ess_navigation.html
++++ b/templates/workforce/_ess_navigation.html
+@@ -3,0 +4 @@
++  {% if "employment_records.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:employment_history' %}"{% if request.resolver_match.url_name == 'employment_history' %} aria-current="page"{% endif %}>قرارداد و احکام من</a>{% endif %}

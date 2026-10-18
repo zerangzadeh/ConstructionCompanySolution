@@ -1,19 +1,19 @@
 acceptance_criterion,status,evidence,notes
-IMB-0071-AC-1,BLOCKED,CEP-022-EV-003,Employment evidence and authorized employee visibility policy are absent.
-IMB-0071-AC-2,BLOCKED,CEP-022-EV-003,Authoritative contract/personnel-order persistence is not defined.
-IMB-0071-AC-3,BLOCKED,CEP-022-EV-003,Valid versus policy-absent employment document inputs are not defined.
-IMB-0071-AC-4,BLOCKED,CEP-022-EV-003,Required correction/replacement source identity/version semantics are unavailable.
-IMB-0071-AC-5,BLOCKED,CEP-022-EV-003,Effective relationship/document historical-read model requires unavailable contract semantics.
-IMB-0071-AC-6,BLOCKED,CEP-022-EV-003,No ESS employment-fact edit was introduced because product mutation stopped.
-IMB-0072-AC-1,BLOCKED,CEP-022-EV-003,E2E-WORK-020 effective-end versus clearance-complete semantics are unavailable.
-IMB-0072-AC-2,BLOCKED,CEP-022-EV-003,Offboarding source preconditions and initiation authority are not defined.
-IMB-0072-AC-3,BLOCKED,CEP-022-EV-003,Required workflow/assignment path is not defined.
-IMB-0072-AC-4,BLOCKED,CEP-022-EV-003,Accepted-action audit linkage cannot be modeled before actions and states are defined.
-IMB-0072-AC-5,BLOCKED,CEP-022-EV-003,Permitted rejection/cancellation/correction paths are unavailable.
-IMB-0072-AC-6,BLOCKED,CEP-022-EV-003,Requester-visible confidential-metadata rules are unavailable.
-IMB-0073-AC-1,BLOCKED,CEP-022-EV-003,PDM-009 roster identity/version/effective-history semantics are unavailable.
-IMB-0073-AC-2,BLOCKED,CEP-022-EV-003,Authoritative roster persistence surface is absent.
-IMB-0073-AC-3,BLOCKED,CEP-022-EV-003,Valid versus policy-absent roster inputs are not defined.
-IMB-0073-AC-4,BLOCKED,CEP-022-EV-003,Roster replacement and version-preservation rules are unavailable.
-IMB-0073-AC-5,BLOCKED,CEP-022-EV-003,Rotation override and optional project/site semantics are unavailable.
-IMB-0073-AC-6,BLOCKED,CEP-022-EV-003,No payroll premium/rate formula was introduced because product mutation stopped.
+IMB-0071-AC-1,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Own current/historical effective record UI; exact authorized DMS versions; rehire preserves prior episode
+IMB-0071-AC-2,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Workforce record/revision and DMS version/hash persisted without file-authority transfer
+IMB-0071-AC-3,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Unlinked unsafe foreign invalid duplicate or policy-absent sources fail closed
+IMB-0071-AC-4,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Append-only source versions and supersedes/DMS lineage protect history
+IMB-0071-AC-5,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Only approved effective relationship/document history scope
+IMB-0071-AC-6,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008;CEP-022-EV-009,Own UI GET only; no employment edit inputs; POST405 and backend permissions
+IMB-0072-AC-1,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Existing governed end revision remains distinct from pending/complete clearance
+IMB-0072-AC-2,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Existing end event plus published assigned Workflow required; no invented blockers
+IMB-0072-AC-3,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,"Actual claimed WorkItem, current membership and distinct permission enforced"
+IMB-0072-AC-4,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Actor/time/end revision/source snapshots/WorkItem audit linkage retained
+IMB-0072-AC-5,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Only configured complete action; reject/cancel/correct absent without policy; history immutable
+IMB-0072-AC-6,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Requester DTO excludes private assessment reviewer/action details
+IMB-0073-AC-1,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Explicit rotation/anchor/effective versions and overrides own planned history
+IMB-0073-AC-2,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Timekeeping authoritative source persists separately from Attendance
+IMB-0073-AC-3,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Invalid periods/durations/sources/context/capability rejected transactionally
+IMB-0073-AC-4,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Stable series and one-to-one supersession preserve prior exact Shift snapshots
+IMB-0073-AC-5,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,Optional project/site requires explicit episode bridge/source assignment and scope
+IMB-0073-AC-6,PASS,CEP-022-EV-006;CEP-022-EV-007;CEP-022-EV-008,No Payroll formula or Attendance rewrite; existing Attendance and future plan preserved after end

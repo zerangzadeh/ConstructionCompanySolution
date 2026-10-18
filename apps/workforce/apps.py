@@ -7,6 +7,8 @@ class WorkforceConfig(AppConfig):
     verbose_name = "منابع انسانی"
 
     def ready(self):
+        from .employment_workflow import register_employment_workflow
+        register_employment_workflow()
         from .personal_change_workflow import register_personal_change
         register_personal_change()
         from .certificate_workflow import register_certificate_workflow

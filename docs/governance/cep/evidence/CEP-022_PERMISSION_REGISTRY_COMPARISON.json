@@ -1,0 +1,414 @@
+{
+  "baseline_revision": "7b89fb121878ef68feb44fd44a584896afc37e2c",
+  "method": "HEAD enum/registry execution in memory; cached AST inspection; baseline model set excludes five new models; no global repair or weakened controls",
+  "identical_violations": true,
+  "baseline": {
+    "missing_permissions": [
+      "support.access_platform_approve",
+      "support.access_request",
+      "support.access_revoke",
+      "support.access_tenant_confirm",
+      "support.access_use",
+      "support.audit_reconcile",
+      "support.calendar_view",
+      "support.case_assign",
+      "support.case_create",
+      "support.case_reopen",
+      "support.case_resolve",
+      "support.case_update",
+      "support.case_view",
+      "support.evidence_link",
+      "support.evidence_sensitive_view",
+      "support.notifications_acknowledge",
+      "support.notifications_view"
+    ],
+    "duplicate_models": [
+      "payroll.FinancialHandoffLine",
+      "payroll.FinancialHandoffProposal",
+      "payroll.FinancialHandoffReview",
+      "payroll.Payslip"
+    ],
+    "unregistered_models": [
+      "contracts.ContractDocumentLink",
+      "daily_reports.DailyReportDocumentLink",
+      "documents.PhotoMetadata",
+      "equipment.DowntimeEvent",
+      "equipment.EquipmentUsageLog",
+      "equipment.FuelLog",
+      "equipment.MaintenancePlan",
+      "equipment.MaintenanceSparePartReference",
+      "equipment.MaintenanceWorkOrderEvidence",
+      "equipment.MeterReading",
+      "equipment.OperatorEquipmentQualification",
+      "estimates.EstimateDocumentLink",
+      "expenses.ExpenseDocumentLink",
+      "expenses.PlatformExpenseGroup",
+      "inventory.InventoryValuationException",
+      "inventory.InventoryValuationPool",
+      "materials.MaterialAlias",
+      "materials.MaterialAttributeImportRow",
+      "materials.MaterialDocumentLink",
+      "materials.MaterialDuplicateCandidate",
+      "materials.MaterialRelationship",
+      "materials.MaterialSupersession",
+      "materials.MaterialTechnicalApproval",
+      "materials.QuantityConversionSnapshot",
+      "materials.QuantityRoundingPolicyVersion",
+      "materials.UnitConversionVersion",
+      "materials.UnitFamily",
+      "organizations.PlatformPolicyVersionSource",
+      "payments.PaymentDocumentLink",
+      "payroll.StatutorySourcePackage",
+      "projects.ProjectDocumentLink",
+      "projects.ProjectSiteDocumentLink",
+      "workforce.Person",
+      "workforce.WorkRelationship",
+      "workforce.WorkRelationshipDocumentLink",
+      "workforce.WorkRelationshipRevision"
+    ],
+    "namespace_mismatches": [
+      "compliance.audit_reconcile",
+      "compliance.capa_assign",
+      "compliance.capa_execute",
+      "compliance.close",
+      "compliance.effectiveness_review",
+      "compliance.evidence_link",
+      "compliance.export",
+      "compliance.findings_classify",
+      "compliance.findings_create",
+      "compliance.findings_manage",
+      "compliance.inspections_create",
+      "compliance.inspections_execute",
+      "compliance.inspections_review",
+      "compliance.inspections_submit",
+      "compliance.ncr_manage",
+      "compliance.permits_control",
+      "compliance.permits_issue",
+      "compliance.permits_prepare",
+      "compliance.reopen",
+      "compliance.sensitive_evidence_view",
+      "compliance.templates_manage",
+      "compliance.templates_publish",
+      "compliance.tests_execute",
+      "compliance.tests_request",
+      "compliance.tests_review",
+      "compliance.verify",
+      "compliance.view",
+      "equipment_downtime.manage",
+      "equipment_fuel.record",
+      "equipment_maintenance_plans.manage",
+      "equipment_meters.correct",
+      "equipment_meters.record",
+      "equipment_qualifications.manage",
+      "equipment_spare_links.manage",
+      "equipment_spare_links.reconcile",
+      "equipment_usage.record",
+      "equipment_work_orders.complete",
+      "equipment_work_orders.manage",
+      "equipment_work_orders.reopen",
+      "estimate_assumptions.manage",
+      "estimate_composition.manage",
+      "estimate_imports.preview",
+      "estimate_rate_sources.manage",
+      "field_proposals.prepare",
+      "field_proposals.review",
+      "material_documents.link",
+      "material_prices.observations_record",
+      "material_relationships.manage",
+      "material_technical.approve",
+      "material_technical.review",
+      "material_technical.submit",
+      "partner.audit_reconcile",
+      "partner.category_decide",
+      "partner.evaluations_appeal",
+      "partner.evaluations_prepare",
+      "partner.evaluations_publish",
+      "partner.evaluations_submit",
+      "partner.evidence_link",
+      "partner.export",
+      "partner.profile_manage",
+      "partner.proposals_create",
+      "partner.qualifications_control",
+      "partner.qualifications_prepare",
+      "partner.qualifications_review",
+      "partner.qualifications_submit",
+      "partner.requirements_manage",
+      "partner.sensitive_evidence_view",
+      "partner.view",
+      "party_governance.manage",
+      "party_restrictions.manage",
+      "payroll_statutory_configuration.view"
+    ],
+    "missing_enforcement": {
+      "hr_certificates": [
+        "HR_CERTIFICATES_CANCEL",
+        "HR_CERTIFICATES_CONFIGURE",
+        "HR_CERTIFICATES_GENERATE",
+        "HR_CERTIFICATES_REQUEST",
+        "HR_CERTIFICATES_REVIEW",
+        "HR_CERTIFICATES_VIEW"
+      ],
+      "personal_data": [
+        "PERSONAL_DATA_CONFIGURE",
+        "PERSONAL_DATA_REQUEST",
+        "PERSONAL_DATA_REVIEW",
+        "PERSONAL_DATA_VIEW"
+      ],
+      "material_attributes": [
+        "MATERIAL_DOCUMENTS_LINK"
+      ],
+      "compliance_controls": [
+        "COMPLIANCE_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "partner_qualification": [
+        "PARTNER_AUDIT_RECONCILE",
+        "PARTNER_EXPORT",
+        "PARTNER_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "knowledge": [
+        "KNOWLEDGE_AUDIT_RECONCILE",
+        "KNOWLEDGE_EXPORT",
+        "KNOWLEDGE_TAXONOMY_MANAGE"
+      ],
+      "time_calendars": [
+        "TIME_CALENDARS_VIEW"
+      ],
+      "attendance": [
+        "ATTENDANCE_VIEW"
+      ],
+      "leave_mission": [
+        "LEAVE_MISSION_VIEW"
+      ],
+      "overtime": [
+        "OVERTIME_VIEW"
+      ],
+      "timesheets": [
+        "TIMESHEETS_VIEW"
+      ],
+      "payroll_inquiries": [
+        "PAYROLL_INQUIRIES_REQUEST",
+        "PAYROLL_INQUIRIES_RESPOND"
+      ],
+      "payroll_ess": [
+        "PAYROLL_ESS_EXPORT",
+        "PAYROLL_ESS_VIEW"
+      ],
+      "inventory_traceability": [
+        "INVENTORY_TRACEABILITY_VIEW"
+      ],
+      "inventory_valuation": [
+        "INVENTORY_VALUATION_VIEW"
+      ],
+      "equipment_operations": [
+        "EQUIPMENT_OPERATIONS_VIEW",
+        "EQUIPMENT_SPARE_LINKS_RECONCILE",
+        "EQUIPMENT_WORK_ORDERS_REOPEN"
+      ]
+    }
+  },
+  "current": {
+    "missing_permissions": [
+      "support.access_platform_approve",
+      "support.access_request",
+      "support.access_revoke",
+      "support.access_tenant_confirm",
+      "support.access_use",
+      "support.audit_reconcile",
+      "support.calendar_view",
+      "support.case_assign",
+      "support.case_create",
+      "support.case_reopen",
+      "support.case_resolve",
+      "support.case_update",
+      "support.case_view",
+      "support.evidence_link",
+      "support.evidence_sensitive_view",
+      "support.notifications_acknowledge",
+      "support.notifications_view"
+    ],
+    "duplicate_models": [
+      "payroll.FinancialHandoffLine",
+      "payroll.FinancialHandoffProposal",
+      "payroll.FinancialHandoffReview",
+      "payroll.Payslip"
+    ],
+    "unregistered_models": [
+      "contracts.ContractDocumentLink",
+      "daily_reports.DailyReportDocumentLink",
+      "documents.PhotoMetadata",
+      "equipment.DowntimeEvent",
+      "equipment.EquipmentUsageLog",
+      "equipment.FuelLog",
+      "equipment.MaintenancePlan",
+      "equipment.MaintenanceSparePartReference",
+      "equipment.MaintenanceWorkOrderEvidence",
+      "equipment.MeterReading",
+      "equipment.OperatorEquipmentQualification",
+      "estimates.EstimateDocumentLink",
+      "expenses.ExpenseDocumentLink",
+      "expenses.PlatformExpenseGroup",
+      "inventory.InventoryValuationException",
+      "inventory.InventoryValuationPool",
+      "materials.MaterialAlias",
+      "materials.MaterialAttributeImportRow",
+      "materials.MaterialDocumentLink",
+      "materials.MaterialDuplicateCandidate",
+      "materials.MaterialRelationship",
+      "materials.MaterialSupersession",
+      "materials.MaterialTechnicalApproval",
+      "materials.QuantityConversionSnapshot",
+      "materials.QuantityRoundingPolicyVersion",
+      "materials.UnitConversionVersion",
+      "materials.UnitFamily",
+      "organizations.PlatformPolicyVersionSource",
+      "payments.PaymentDocumentLink",
+      "payroll.StatutorySourcePackage",
+      "projects.ProjectDocumentLink",
+      "projects.ProjectSiteDocumentLink",
+      "workforce.Person",
+      "workforce.WorkRelationship",
+      "workforce.WorkRelationshipDocumentLink",
+      "workforce.WorkRelationshipRevision"
+    ],
+    "namespace_mismatches": [
+      "compliance.audit_reconcile",
+      "compliance.capa_assign",
+      "compliance.capa_execute",
+      "compliance.close",
+      "compliance.effectiveness_review",
+      "compliance.evidence_link",
+      "compliance.export",
+      "compliance.findings_classify",
+      "compliance.findings_create",
+      "compliance.findings_manage",
+      "compliance.inspections_create",
+      "compliance.inspections_execute",
+      "compliance.inspections_review",
+      "compliance.inspections_submit",
+      "compliance.ncr_manage",
+      "compliance.permits_control",
+      "compliance.permits_issue",
+      "compliance.permits_prepare",
+      "compliance.reopen",
+      "compliance.sensitive_evidence_view",
+      "compliance.templates_manage",
+      "compliance.templates_publish",
+      "compliance.tests_execute",
+      "compliance.tests_request",
+      "compliance.tests_review",
+      "compliance.verify",
+      "compliance.view",
+      "equipment_downtime.manage",
+      "equipment_fuel.record",
+      "equipment_maintenance_plans.manage",
+      "equipment_meters.correct",
+      "equipment_meters.record",
+      "equipment_qualifications.manage",
+      "equipment_spare_links.manage",
+      "equipment_spare_links.reconcile",
+      "equipment_usage.record",
+      "equipment_work_orders.complete",
+      "equipment_work_orders.manage",
+      "equipment_work_orders.reopen",
+      "estimate_assumptions.manage",
+      "estimate_composition.manage",
+      "estimate_imports.preview",
+      "estimate_rate_sources.manage",
+      "field_proposals.prepare",
+      "field_proposals.review",
+      "material_documents.link",
+      "material_prices.observations_record",
+      "material_relationships.manage",
+      "material_technical.approve",
+      "material_technical.review",
+      "material_technical.submit",
+      "partner.audit_reconcile",
+      "partner.category_decide",
+      "partner.evaluations_appeal",
+      "partner.evaluations_prepare",
+      "partner.evaluations_publish",
+      "partner.evaluations_submit",
+      "partner.evidence_link",
+      "partner.export",
+      "partner.profile_manage",
+      "partner.proposals_create",
+      "partner.qualifications_control",
+      "partner.qualifications_prepare",
+      "partner.qualifications_review",
+      "partner.qualifications_submit",
+      "partner.requirements_manage",
+      "partner.sensitive_evidence_view",
+      "partner.view",
+      "party_governance.manage",
+      "party_restrictions.manage",
+      "payroll_statutory_configuration.view"
+    ],
+    "missing_enforcement": {
+      "hr_certificates": [
+        "HR_CERTIFICATES_CANCEL",
+        "HR_CERTIFICATES_CONFIGURE",
+        "HR_CERTIFICATES_GENERATE",
+        "HR_CERTIFICATES_REQUEST",
+        "HR_CERTIFICATES_REVIEW",
+        "HR_CERTIFICATES_VIEW"
+      ],
+      "personal_data": [
+        "PERSONAL_DATA_CONFIGURE",
+        "PERSONAL_DATA_REQUEST",
+        "PERSONAL_DATA_REVIEW",
+        "PERSONAL_DATA_VIEW"
+      ],
+      "material_attributes": [
+        "MATERIAL_DOCUMENTS_LINK"
+      ],
+      "compliance_controls": [
+        "COMPLIANCE_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "partner_qualification": [
+        "PARTNER_AUDIT_RECONCILE",
+        "PARTNER_EXPORT",
+        "PARTNER_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "knowledge": [
+        "KNOWLEDGE_AUDIT_RECONCILE",
+        "KNOWLEDGE_EXPORT",
+        "KNOWLEDGE_TAXONOMY_MANAGE"
+      ],
+      "time_calendars": [
+        "TIME_CALENDARS_VIEW"
+      ],
+      "attendance": [
+        "ATTENDANCE_VIEW"
+      ],
+      "leave_mission": [
+        "LEAVE_MISSION_VIEW"
+      ],
+      "overtime": [
+        "OVERTIME_VIEW"
+      ],
+      "timesheets": [
+        "TIMESHEETS_VIEW"
+      ],
+      "payroll_inquiries": [
+        "PAYROLL_INQUIRIES_REQUEST",
+        "PAYROLL_INQUIRIES_RESPOND"
+      ],
+      "payroll_ess": [
+        "PAYROLL_ESS_EXPORT",
+        "PAYROLL_ESS_VIEW"
+      ],
+      "inventory_traceability": [
+        "INVENTORY_TRACEABILITY_VIEW"
+      ],
+      "inventory_valuation": [
+        "INVENTORY_VALUATION_VIEW"
+      ],
+      "equipment_operations": [
+        "EQUIPMENT_OPERATIONS_VIEW",
+        "EQUIPMENT_SPARE_LINKS_RECONCILE",
+        "EQUIPMENT_WORK_ORDERS_REOPEN"
+      ]
+    }
+  },
+  "new_resources": "PASS; seven capabilities; five models; exact namespaces and literal service enforcement"
+}

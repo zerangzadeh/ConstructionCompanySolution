@@ -181,6 +181,21 @@ class WorkflowRegistry:
 registry = WorkflowRegistry()
 registry.register_subject_adapter(
     SubjectAdapterSpec(
+        key="workforce.offboarding", subject_type="workforce.offboarding",
+        exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),
+        start_permission="offboarding.start", view_permission="offboarding.view",
+    )
+)
+registry.register_workflow_type(
+    WorkflowTypeSpec(code="workforce.offboarding", subject_type="workforce.offboarding",
+        subject_adapter="workforce.offboarding", allowed_scope_fields=frozenset({"project_id", "site_id"}),
+        domain_commands=frozenset({"workforce.offboarding.complete"}))
+)
+registry.register_domain_command(
+    DomainCommandSpec(key="workforce.offboarding.complete", workflow_type="workforce.offboarding", include_work_item=True)
+)
+registry.register_subject_adapter(
+    SubjectAdapterSpec(
         key="workforce.hr_certificate_review",
         subject_type="workforce.hr_certificate_review",
         exposed_attributes=frozenset({"created_by_id", "project_id", "site_id"}),

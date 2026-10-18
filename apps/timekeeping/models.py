@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import uuid
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
@@ -37,6 +38,150 @@ class AppendOnlyModel(UUIDModel, CreatedAtModel):
 
     def delete(self, *args: object, **kwargs: object):
         raise ValidationError("سابقه قطعی قابل حذف نیست.")
+
+
+class RosterHistoryQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError("سابقه برنامه شیفت تغییرپذیر نیست.")
+
+    def delete(self):
+        raise ValidationError("سابقه برنامه شیفت حذف‌پذیر نیست.")
+
+    def bulk_create(self, *args, **kwargs):
+        raise ValidationError("ثبت گروهی سابقه برنامه شیفت مجاز نیست.")
+
+
+class RosterHistory(AppendOnlyModel):
+    objects = models.Manager.from_queryset(RosterHistoryQuerySet)()
+
+    class Meta:
+        abstract = True
+
+
+class RosterVersion(RosterHistory):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    relationship = models.ForeignKey(
+        "workforce.WorkRelationship", on_delete=models.PROTECT
+    )
+    series_id = models.UUIDField(default=uuid.uuid4)
+    version = models.PositiveIntegerField()
+    effective_from = models.DateField()
+    effective_to = models.DateField()
+    rotation_anchor = models.DateField()
+    project = models.ForeignKey(
+        "projects.Project", on_delete=models.PROTECT, null=True, blank=True
+    )
+    site = models.ForeignKey(
+        "projects.ProjectSite", on_delete=models.PROTECT, null=True, blank=True
+    )
+    supersedes = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="replacement",
+    )
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["organization", "series_id", "version"],
+                name="roster_series_version_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(version__gte=1), name="roster_version_pos"
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_to__gte=models.F("effective_from")),
+                name="roster_effective_range_ck",
+            ),
+        ]
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            relationship=self.relationship,
+            project=self.project,
+            site=self.site,
+            supersedes=self.supersedes,
+        )
+        if not self.reason.strip() or self.version < 1:
+            raise ValidationError("نسخه و دلیل برنامه لازم است.")
+        if self.site_id and (
+            not self.project_id or self.site.project_id != self.project_id
+        ):
+            raise ValidationError("کارگاه باید متعلق به پروژه برنامه باشد.")
+        if (
+            self.effective_to < self.effective_from
+            or self.rotation_anchor > self.effective_from
+            or self.effective_from < self.relationship.effective_start
+            or (
+                self.relationship.effective_end
+                and self.effective_to > self.relationship.effective_end
+            )
+        ):
+            raise ValidationError("بازه برنامه باید در رابطه کاری معتبر باشد.")
+        if self.supersedes_id:
+            previous = self.supersedes
+            if (
+                previous.pk == self.pk
+                or previous.relationship_id != self.relationship_id
+                or previous.series_id != self.series_id
+                or previous.project_id != self.project_id
+                or previous.site_id != self.site_id
+                or previous.version + 1 != self.version
+            ):
+                raise ValidationError("نسخه جایگزین باید همان تخصیص را حفظ کند.")
+        elif self.version != 1:
+            raise ValidationError("نسخه نخست تخصیص معتبر نیست.")
+
+
+class RosterSlot(RosterHistory):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    roster = models.ForeignKey(
+        RosterVersion, on_delete=models.PROTECT, related_name="slots"
+    )
+    shift = models.ForeignKey("timekeeping.ShiftDefinition", on_delete=models.PROTECT)
+    position = models.PositiveIntegerField()
+    day_count = models.PositiveIntegerField()
+    override_date = models.DateField(null=True, blank=True)
+    shift_snapshot = models.JSONField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["roster", "position"], name="roster_slot_position_uq"
+            ),
+            models.UniqueConstraint(
+                fields=["roster", "override_date"],
+                condition=Q(override_date__isnull=False),
+                name="roster_override_date_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(day_count__gte=1), name="roster_slot_days_pos"
+            ),
+        ]
+
+    def clean(self):
+        validate_related_organizations(self, roster=self.roster, shift=self.shift)
+        if self.day_count < 1 or (
+            self.override_date
+            and (
+                self.day_count != 1
+                or not self.roster.effective_from
+                <= self.override_date
+                <= self.roster.effective_to
+            )
+        ):
+            raise ValidationError("مدت یا تاریخ تغییر برنامه معتبر نیست.")
+        if self.shift_snapshot.get("id") != str(self.shift_id):
+            raise ValidationError("تصویر شیفت با منبع سازگار نیست.")
 
 
 class WorkCalendar(UUIDModel, TimeStampedModel):

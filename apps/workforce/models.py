@@ -1717,3 +1717,170 @@ class HRCertificateCancellation(PersonalDataRecord):
         validate_related_organizations(self, request=self.request)
         if not self.reason.strip():
             raise ValidationError("دلیل لغو لازم است.")
+
+
+class EmploymentHistoryQuerySet(PersonalDataHistoryQuerySet):
+    def bulk_create(self, *args, **kwargs):
+        raise ValidationError("ثبت گروهی سابقه استخدام مجاز نیست.")
+
+
+class EmploymentHistory(PersonalDataRecord):
+    objects = models.Manager.from_queryset(EmploymentHistoryQuerySet)()
+
+    class Meta:
+        abstract = True
+
+
+class EmploymentRecord(EmploymentHistory):
+    """Workforce effective metadata; authoritative file bytes remain in DMS."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    relationship = models.ForeignKey(WorkRelationship, on_delete=models.PROTECT)
+    relationship_revision = models.ForeignKey(
+        WorkRelationshipRevision, on_delete=models.PROTECT
+    )
+    record_key = models.CharField(max_length=100)
+    kind = models.CharField(
+        max_length=20,
+        choices=[("contract", "قرارداد استخدام"), ("personnel_order", "حکم پرسنلی")],
+    )
+    version = models.PositiveIntegerField()
+    effective_from = models.DateField()
+    effective_to = models.DateField(null=True, blank=True)
+    document_version = models.ForeignKey(
+        "documents.DocumentVersion", on_delete=models.PROTECT
+    )
+    document_sha256 = models.CharField(max_length=64)
+    supersedes = models.OneToOneField(
+        "self",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="replacement",
+    )
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+
+    class Meta:
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["organization", "relationship", "record_key", "version"],
+                name="employment_record_version_uq",
+            ),
+            models.CheckConstraint(
+                condition=Q(version__gte=1), name="employment_record_version_pos"
+            ),
+            models.CheckConstraint(
+                condition=Q(effective_to__isnull=True)
+                | Q(effective_to__gte=models.F("effective_from")),
+                name="employment_record_dates_ck",
+            ),
+        ]
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            relationship=self.relationship,
+            relationship_revision=self.relationship_revision,
+            document_version=self.document_version,
+            supersedes=self.supersedes,
+        )
+        if self.relationship_revision.relationship_id != self.relationship_id:
+            raise ValidationError("نسخه منبع متعلق به این رابطه کاری نیست.")
+        if not self.record_key.strip() or not self.reason.strip() or self.version < 1:
+            raise ValidationError("شناسه، نسخه و دلیل معتبر لازم است.")
+        if self.effective_from < self.relationship.effective_start or (
+            self.effective_to and self.effective_to < self.effective_from
+        ):
+            raise ValidationError("بازه اثر سابقه معتبر نیست.")
+        if (
+            self.document_sha256 != self.document_version.sha256
+            or not WorkRelationshipDocumentLink.objects.filter(
+                organization_id=self.organization_id,
+                work_relationship_id=self.relationship_id,
+                document_id=self.document_version.document_id,
+            ).exists()
+        ):
+            raise ValidationError("نسخه سند باید به همین رابطه کاری متصل باشد.")
+        if self.supersedes_id:
+            if (
+                self.supersedes.relationship_id != self.relationship_id
+                or self.supersedes.record_key != self.record_key
+                or self.supersedes.kind != self.kind
+                or self.version != self.supersedes.version + 1
+                or self.supersedes_id == self.pk
+            ):
+                raise ValidationError("زنجیره نسخه سابقه سازگار نیست.")
+        elif self.version != 1:
+            raise ValidationError("نسخه نخست باید صریح باشد.")
+
+
+class OffboardingCase(EmploymentHistory):
+    """Clearance coordinates an existing Workforce end event; it never ends it."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    end_revision = models.OneToOneField(
+        WorkRelationshipRevision, on_delete=models.PROTECT
+    )
+    workflow_version = models.ForeignKey(
+        "workflows.WorkflowVersion", on_delete=models.PROTECT
+    )
+    initiated_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    reason = models.TextField(max_length=2000)
+    source_snapshot = models.JSONField()
+
+    @property
+    def status(self):
+        return (
+            "complete"
+            if OffboardingReview.objects.filter(case=self).exists()
+            else "pending"
+        )
+
+    def clean(self):
+        validate_related_organizations(
+            self, end_revision=self.end_revision, workflow_version=self.workflow_version
+        )
+        if not self.end_revision.effective_end or not self.reason.strip():
+            raise ValidationError("رویداد پایان و دلیل معتبر لازم است.")
+        if (
+            self.workflow_version.definition.workflow_type.code
+            != "workforce.offboarding"
+        ):
+            raise ValidationError("مسیر بررسی پایان همکاری معتبر نیست.")
+
+
+class OffboardingReview(EmploymentHistory):
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    case = models.OneToOneField(
+        OffboardingCase, on_delete=models.PROTECT, related_name="review"
+    )
+    work_item = models.OneToOneField("workflows.WorkItem", on_delete=models.PROTECT)
+    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    workforce_evidence = models.TextField(max_length=2000)
+    access_assessment = models.TextField(max_length=2000)
+    access_action_audit = models.ForeignKey(
+        "audit.AuditEvent", on_delete=models.PROTECT, null=True, blank=True
+    )
+    source_snapshot = models.JSONField()
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            case=self.case,
+            work_item=self.work_item,
+            access_action_audit=self.access_action_audit,
+        )
+        if not self.workforce_evidence.strip() or not self.access_assessment.strip():
+            raise ValidationError("هر دو بررسی ضروری باید نتیجه ثبت‌شده داشته باشند.")
+        if (
+            self.work_item.instance.subject_id != self.case_id
+            or self.work_item.instance.subject_type != "workforce.offboarding"
+        ):
+            raise ValidationError("کار بررسی متعلق به همین پرونده نیست.")
