@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}خدمات من در دسترس نیست | بنیرا{% endblock %}
+{% block content %}
+<section class="erp-surface rounded-2xl p-5 sm:p-6" aria-labelledby="unavailable-heading">
+  <h1 id="unavailable-heading" class="text-xl font-black text-slate-950">خدمات من در دسترس نیست</h1>
+  <p class="mt-3 text-sm text-slate-600">برای این حساب امکان نمایش خدمات شخصی در این شرکت فراهم نیست.</p>
+  <a class="mt-5 inline-flex font-bold text-blue-700" href="{% url 'home' %}">بازگشت به خانه</a>
+</section>
+{% endblock %}

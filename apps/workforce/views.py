@@ -8,6 +8,7 @@ from django.http import (
     HttpResponseNotFound,
 )
 from django.shortcuts import redirect, render
+from django.template.loader import render_to_string
 from django.views.decorators.http import require_GET, require_POST
 
 from apps.documents.models import DocumentConfidentiality
@@ -19,6 +20,7 @@ from apps.organizations.decorators import (
 )
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import ProjectSite
+from apps.workforce.ess_dashboard import build_ess_dashboard
 from apps.workforce.ess_services import get_own_profile
 from apps.workforce.forms import (
     AssignmentStatusTransitionForm,
@@ -115,14 +117,27 @@ _IMAGE_CONTENT_TYPES = {
 
 @active_organization_required
 @require_GET
+def ess_dashboard(request: HttpRequest) -> HttpResponse:
+    try:
+        dashboard = build_ess_dashboard(user=request.user, organization=request.organization)
+    except PermissionDenied:
+        return HttpResponse(render_to_string("workforce/ess_unavailable.html"), status=403)
+    return render(request, "workforce/ess_dashboard.html", {"dashboard": dashboard})
+
+
+@active_organization_required
+@require_GET
 def ess_profile(
     request: HttpRequest, relationship_id: str | None = None
 ) -> HttpResponse:
-    profile = get_own_profile(
-        user=request.user,
-        organization=request.organization,
-        relationship_id=relationship_id,
-    )
+    try:
+        profile = get_own_profile(
+            user=request.user,
+            organization=request.organization,
+            relationship_id=relationship_id,
+        )
+    except PermissionDenied:
+        return HttpResponse(render_to_string("workforce/ess_unavailable.html"), status=403)
     return render(request, "workforce/ess_profile.html", {"profile": profile})
 
 

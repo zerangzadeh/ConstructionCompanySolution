@@ -181,11 +181,11 @@ class ESSOwnDataPrivacyTests(TestCase):
         )
         response = self.client.get(reverse("home"))
         self.assertTrue(response.context["ess_subject_available"])
-        self.assertContains(response, reverse("workforce:ess_profile"))
+        self.assertContains(response, reverse("workforce:ess_dashboard"))
 
         self._login(self.unlinked_user)
         response = self.client.get(reverse("home"))
-        self.assertNotContains(response, reverse("workforce:ess_profile"))
+        self.assertNotContains(response, reverse("workforce:ess_dashboard"))
         self.assertContains(response, "خدمات من")
         self.assertEqual(
             self.client.get(reverse("workforce:ess_profile")).status_code, 403

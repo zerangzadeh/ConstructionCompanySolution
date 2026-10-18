@@ -6,6 +6,7 @@ app_name = "workforce"
 
 urlpatterns = [
     path("", views.employee_list, name="employee_list"),
+    path("ess/", views.ess_dashboard, name="ess_dashboard"),
     path("ess/profile/", views.ess_profile, name="ess_profile"),
     path(
         "ess/profile/<uuid:relationship_id>/",

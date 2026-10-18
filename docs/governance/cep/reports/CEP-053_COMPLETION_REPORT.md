@@ -1,0 +1,15 @@
+# CEP-053 Completion Report
+
+**EXECUTION COMPLETE.** Lifecycle CLOSED_VERIFIED. IMB-0084; 6/6 AC and scoped DoD PASS. [Acceptance](../evidence/CEP-053_ACCEPTANCE_MAPPING.csv), [evidence](../evidence/CEP-053_EVIDENCE_MANIFEST.csv), [actual touch set](../manifests/CEP-053_EXECUTION_MANIFEST.md).
+
+Baseline: clean `main` / `origin/main` / remote `a383df06cc90860fe0c778a705617b94dd356c33`. Canonical SHA-256 `6e2eb63215509c29bbd5c221ad82dbf244e6ab5b9294152c8d0704aa99890bc5`; CEP-017/026 COMPLETE; GATE-02 PASS; standing bounded non-production authority.
+
+NAV-006 now enters the ESS dashboard. The shell links the existing read-only profile and permitted My Requests surface. Composition reuses source request/status/link authority and additionally restricts legacy source rows to the actor's current explicitly resolved Person/WorkRelationship bridge. No inferred identities, management views, scores, balances, statutory values, direct edits or new permission semantics. Missing source capability, authorized empty source and source validation errors are distinct; the independent profile stays available. Missing/unauthorized ESS objects return the same Persian 403 without request-context tokens or object disclosure. Manager handling and My Tasks remain in their existing workspaces. Unsupported domain adapters are omitted and remain with downstream CEPs.
+
+Validation: 19 PostgreSQL unit/service/permission/tenant/workflow/UI/regression tests PASS (7 new, 6 existing personal workspace, 6 existing ESS privacy). Baseline 12 PASS. Initial overly broad no-form test was corrected to reject profile-edit fields while preserving shared search/logout forms. The first localized denial rendering included changing CSRF fields; rendering its public shell without request context restored the existing identical-response invariant. No failed required test remains. Ruff check, scoped formatting, Django check, migration drift and whitespace PASS. No schema/data migration.
+
+Five synthetic fixture screenshots inspected: desktop ready/empty/error/denied plus true 390x900 mobile emulation. Mobile viewport/document/main widths all 390, retained in browser evidence. The first CLI mobile screenshot used Chrome's minimum window width and was replaced. Persian/RTL/Jalali and captured responsive states verified; full live-browser, accessibility conformance and performance/concurrency runtime remain UTV.
+
+Registry: 35 COMPLETE; remaining verified non-production implementation frontier CEP-022/036/054/055/056. CEP-028 stays PARTIAL/BLOCKER-DATA. Newly dependency-ready CEP-069 is a narrow evidence/certification packet requiring its own entry assessment after CEP-052; its official-currentness and Human production boundaries are not implied by engine completion. Further serial work follows the recomputed frontier and canonical entry checks.
+
+Git at execution closeout: authorized add/commit/push checkpoint pending; no branch/worktree/merge. Integration is recorded separately from this baseline. Human Sign-off / Production Certification / Production Cutover: NOT EXECUTED.

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}داشبورد خدمات من | بنیرا{% endblock %}
+{% block content %}
+{% include "workforce/_ess_navigation.html" %}
+<header class="erp-surface rounded-2xl p-5 sm:p-6">
+  <p class="text-xs font-bold text-blue-700">خدمات کارکنان</p>
+  <h1 class="mt-2 text-2xl font-black text-slate-950">داشبورد خدمات من</h1>
+  <p class="mt-2 text-sm text-slate-600">اطلاعات شخصی و وضعیت درخواست‌ها از منابع مجاز شما نمایش داده می‌شود.</p>
+  <p class="mt-2 text-xs text-slate-500">زمان مشاهده: {{ dashboard.observed_at|jalali_datetime }}</p>
+</header>
+<div class="mt-5 grid gap-5 lg:grid-cols-2">
+  <section class="erp-surface rounded-2xl p-5 sm:p-6" aria-labelledby="profile-heading">
+    <h2 id="profile-heading" class="text-lg font-black text-slate-950">پروفایل و رابطه کاری من</h2>
+    <dl class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><dt class="text-xs text-slate-500">نام و نام خانوادگی</dt><dd class="mt-1 font-bold">{{ dashboard.profile.person.first_name }} {{ dashboard.profile.person.last_name }}</dd></div>
+      <div><dt class="text-xs text-slate-500">شماره پرسنلی</dt><dd class="mt-1 font-bold"><bdi>{{ dashboard.profile.relationship.employee_number }}</bdi></dd></div>
+      <div><dt class="text-xs text-slate-500">شروع رابطه کاری</dt><dd class="mt-1 font-bold">{{ dashboard.profile.relationship.effective_start|jalali_date }}</dd></div>
+    </dl>
+    <a class="mt-5 inline-flex font-bold text-blue-700" href="{% url 'workforce:ess_profile' %}">مشاهده پروفایل فقط‌خواندنی</a>
+  </section>
+  <section class="erp-surface rounded-2xl p-5 sm:p-6" aria-labelledby="requests-heading">
+    <h2 id="requests-heading" class="text-lg font-black text-slate-950">وضعیت درخواست‌های من</h2>
+    {% if dashboard.requests_state == "ready" %}
+      <ul class="mt-3 divide-y divide-slate-100">
+        {% for row in dashboard.requests %}
+          <li class="py-3 text-sm" data-source-id="{{ row.source_id }}">
+            <p class="font-bold">{{ row.source_label }}</p>
+            <p class="mt-1 text-slate-600">وضعیت منبع: {{ row.status_label }} · <bdi>{{ row.status }}</bdi></p>
+            <p class="mt-1 text-xs text-slate-500">آخرین تغییر منبع: {{ row.occurred_at|jalali_datetime }}</p>
+            {% if row.source_url %}<a class="mt-2 inline-flex font-bold text-blue-700" href="{{ row.source_url }}">مشاهده در منبع</a>{% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+      <a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workflows:my_requests' %}">همه درخواست‌های من</a>
+    {% elif dashboard.requests_state == "empty" %}
+      <p class="mt-4 text-sm text-slate-600" role="status">درخواست مجازی برای نمایش ثبت نشده است.</p>
+      <a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workflows:my_requests' %}">ورود به درخواست‌های من</a>
+    {% elif dashboard.requests_state == "error" %}
+      <p class="mt-4 text-sm text-slate-600" role="status">دریافت وضعیت درخواست‌ها ممکن نشد. دوباره تلاش کنید.</p>
+    {% else %}
+      <p class="mt-4 text-sm text-slate-600" role="status">این منبع برای حساب شما در دسترس نیست.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
