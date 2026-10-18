@@ -1555,11 +1555,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-032_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 3aabf35ab35242444c9daa45ea1491ee4dfb3dac
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: VERIFIED_3AABF35_REMOTE_MAIN
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 1a9e8c334d24b22be9688058a79378972b89377b
@@ -1607,6 +1609,9 @@ ceps:
     - date: '2026-10-18'
       status: COMPLETE
       reason: 12/12 AC and both scoped IMB DoD PASS; 20 screenshots and actual browser source reconciliation prove zero downstream objects. Temporary synthetic browser server and fixture-only disposable test DB cleaned. No remaining in-scope blocker; activation gates unchanged and full cross-browser/formal accessibility and performance/concurrency UTV retained. Authorized bounded Git checkpoint and CEP-033 canonical entry review follow.
+    - date: '2026-10-18'
+      status: GIT_INTEGRATED
+      reason: Authorized bounded direct main checkpoint 3aabf35ab35242444c9daa45ea1491ee4dfb3dac committed and pushed as a fast-forward from 1a9e8c3. HEAD/origin/main/live remote main verified equal and working tree clean before integration-evidence update. No branch/worktree or merge; execution baseline remains distinct.
   CEP-033:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3666,9 +3671,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 1a9e8c334d24b22be9688058a79378972b89377b
-  origin_main: 1a9e8c334d24b22be9688058a79378972b89377b
-  integration_checkpoint: e35847fec5691006899d84719a6a146d0039a5b3
+  last_reconciled_head: 3aabf35ab35242444c9daa45ea1491ee4dfb3dac
+  origin_main: 3aabf35ab35242444c9daa45ea1491ee4dfb3dac
+  integration_checkpoint: 3aabf35ab35242444c9daa45ea1491ee4dfb3dac
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-18'
 execution_frontier:
