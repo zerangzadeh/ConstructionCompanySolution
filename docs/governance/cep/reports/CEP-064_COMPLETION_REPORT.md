@@ -146,7 +146,9 @@ is inferred. GATE-04/GATE-06 remain unchanged. Registry records PARTIAL and stop
 automatic continuation. The historical Payment population decision is resolved;
 no historical financial dataset is requested.
 
-Git checkpoint is separately authorized; exact committed/pushed implementation
-facts are recorded in the Registry after verification. No source data deletion,
+Implementation checkpoint `33e3da4098f49454d276298edeb9784744cc835f` was committed directly on existing
+`main`, pushed to `origin/main`, and verified with a clean tree (CEP-064-EV-009).
+A separate governance-only follow-up records those facts; tested product code
+is unchanged by that follow-up. No source data deletion,
 Legacy Payment model/table/app removal, Production migration/deployment/cutover,
 CEP-069..079 execution, Human Sign-off or Production Certification occurred.
