@@ -96,8 +96,8 @@ def apply_profile_suggestion(
     ):
         raise PermissionDenied("نقش داخلی لازم برای اعمال سیاست را ندارید.")
     if suggestion.policy_code is None:
-        # The current repository has no approved Leave Policy version authority.
-        # A profile cannot create or infer one.
+        # A profile cannot select, create or infer a Workforce Leave Policy.
+        # Explicit effective source configuration is still required.
         raise ValidationError("نسخه تأییدشده سیاست مرخصی برای این کلید موجود نیست.")
 
     Organization.objects.select_for_update().get(pk=organization.pk)

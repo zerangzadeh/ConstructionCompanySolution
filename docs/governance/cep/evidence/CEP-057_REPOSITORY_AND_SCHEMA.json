@@ -1,0 +1,148 @@
+{
+  "head": "ad167f58714577620666a0efb7f5518895cac4a0",
+  "registered_implementation": {
+    "configured_environment": "config.settings.development; no connection details recorded",
+    "registered_leave_models": [
+      {
+        "label": "timekeeping.LeaveMissionRequest",
+        "fields": [
+          "id",
+          "created_at",
+          "updated_at",
+          "organization",
+          "employee",
+          "project",
+          "site",
+          "kind",
+          "category_code",
+          "starts_at",
+          "ends_at",
+          "reason",
+          "policy_reference",
+          "state",
+          "requested_by",
+          "reviewed_by",
+          "reviewed_at",
+          "review_reason"
+        ]
+      }
+    ],
+    "leave_named_tables": [
+      "timekeeping_leavemissionrequest"
+    ],
+    "applied_timekeeping_workforce_migrations": [
+      [
+        "timekeeping",
+        "0001_initial"
+      ],
+      [
+        "timekeeping",
+        "0002_attendancecorrectionrequest"
+      ],
+      [
+        "timekeeping",
+        "0003_cep022_employment_lifecycle"
+      ],
+      [
+        "workforce",
+        "0001_initial"
+      ],
+      [
+        "workforce",
+        "0002_alter_department_options_alter_employee_options_and_more"
+      ],
+      [
+        "workforce",
+        "0003_alter_employeeprojectassignment_status"
+      ],
+      [
+        "workforce",
+        "0004_position_is_single_holder_employeepositionassignment"
+      ],
+      [
+        "workforce",
+        "0005_rename_project_assignment_responsibility_label"
+      ],
+      [
+        "workforce",
+        "0006_employee_profile_image"
+      ],
+      [
+        "workforce",
+        "0007_position_parent_position"
+      ],
+      [
+        "workforce",
+        "0008_p7_s01_s05_workforce_foundation"
+      ],
+      [
+        "workforce",
+        "0009_cep010_person_workrelationship"
+      ],
+      [
+        "workforce",
+        "0010_workrelationshipdocumentlink"
+      ],
+      [
+        "workforce",
+        "0011_cep055_personal_data_change"
+      ],
+      [
+        "workforce",
+        "0012_cep056_certificate_framework"
+      ],
+      [
+        "workforce",
+        "0013_cep022_employment_lifecycle"
+      ]
+    ],
+    "read_only": true,
+    "business_records_read": false,
+    "migration_actions": []
+  },
+  "searches": [
+    {
+      "command": [
+        "rg",
+        "-n",
+        "-i",
+        "leave.?((opening|entitlement|accrual|balance|policy))|(opening|entitlement|accrual|balance|policy).{0,24}leave",
+        "apps",
+        "--glob",
+        "*.py"
+      ],
+      "exit_code": 0,
+      "output": "apps\\timekeeping\\test_p7_s06_s12_timekeeping.py:320:        leave.policy_reference = \"PO-POLICY-001\"\napps\\timekeeping\\test_p7_s06_s12_timekeeping.py:322:            policy_reference=leave.policy_reference\napps\\organizations\\configuration_profiles.py:64:    ProfileSuggestion(\"leave.accrual_preset\", \"POLICY_DEFINED\", None, None),\napps\\organizations\\configuration_profiles.py:99:        # The current repository has no approved Leave Policy version authority.\napps\\organizations\\test_cep015_configuration_profiles.py:114:                    (\"leave.accrual_preset\", \"POLICY_DEFINED\"),\napps\\organizations\\test_cep015_configuration_profiles.py:124:            \"leave.accrual_preset\",\n"
+    },
+    {
+      "command": [
+        "git",
+        "log",
+        "--all",
+        "--oneline",
+        "--regexp-ignore-case",
+        "--grep=CEP-023\\|leave entitlement\\|leave balance\\|CEP-029",
+        "-12"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "rg",
+        "--files",
+        "apps/workforce",
+        "apps/timekeeping"
+      ],
+      "exit_code": 0,
+      "output": "apps/timekeeping\\__init__.py\napps/timekeeping\\views.py\napps/timekeeping\\urls.py\napps/timekeeping\\test_p7_s06_s12_timekeeping.py\napps/timekeeping\\test_cep050_reconciliation.py\napps/timekeeping\\test_cep024_scope.py\napps/timekeeping\\test_cep022_roster.py\napps/timekeeping\\services.py\napps/timekeeping\\roster_services.py\napps/timekeeping\\reconciliation.py\napps/timekeeping\\models.py\napps/workforce\\certificate_forms.py\napps/workforce\\apps.py\napps/workforce\\admin.py\napps/workforce\\certificate_views.py\napps/workforce\\certificate_services.py\napps/workforce\\employment_services.py\napps/workforce\\certificate_workflow.py\napps/workforce\\employment_views.py\napps/timekeeping\\apps.py\napps/timekeeping\\forms.py\napps/timekeeping\\migrations\\__init__.py\napps/timekeeping\\migrations\\0003_cep022_employment_lifecycle.py\napps/timekeeping\\migrations\\0002_attendancecorrectionrequest.py\napps/timekeeping\\migrations\\0001_initial.py\napps/workforce\\management\\__init__.py\napps/workforce\\__init__.py\napps/workforce\\views.py\napps/workforce\\urls.py\napps/workforce\\test_p7_s01_s05_workforce_foundation.py\napps/workforce\\test_cep056_migration.py\napps/workforce\\test_cep056.py\napps/workforce\\test_cep055_migration.py\napps/workforce\\test_cep055.py\napps/workforce\\test_cep053.py\napps/workforce\\test_cep026_ess_privacy.py\napps/workforce\\test_cep022_migration.py\napps/workforce\\test_cep022.py\napps/workforce\\test_cep010_person_workrelationship.py\napps/workforce\\tests.py\napps/workforce\\management\\commands\\__init__.py\napps/workforce\\management\\commands\\seed_workforce.py\napps/workforce\\management\\commands\\populate_employee_profile_images.py\napps/workforce\\forms.py\napps/workforce\\ess_services.py\napps/workforce\\ess_dashboard.py\napps/workforce\\employment_workflow.py\napps/workforce\\personal_change_services.py\napps/workforce\\personal_change_forms.py\napps/workforce\\own_evidence.py\napps/workforce\\models.py\napps/workforce\\migrations\\__init__.py\napps/workforce\\migrations\\0013_cep022_employment_lifecycle.py\napps/workforce\\migrations\\0012_cep056_certificate_framework.py\napps/workforce\\migrations\\0011_cep055_personal_data_change.py\napps/workforce\\migrations\\0010_workrelationshipdocumentlink.py\napps/workforce\\migrations\\0009_cep010_person_workrelationship.py\napps/workforce\\migrations\\0008_p7_s01_s05_workforce_foundation.py\napps/workforce\\migrations\\0007_position_parent_position.py\napps/workforce\\migrations\\0006_employee_profile_image.py\napps/workforce\\migrations\\0005_rename_project_assignment_responsibility_label.py\napps/workforce\\migrations\\0004_position_is_single_holder_employeepositionassignment.py\napps/workforce\\migrations\\0003_alter_employeeprojectassignment_status.py\napps/workforce\\migrations\\0002_alter_department_options_alter_employee_options_and_more.py\napps/workforce\\migrations\\0001_initial.py\napps/workforce\\person_services.py\napps/workforce\\personal_change_workflow.py\napps/workforce\\personal_change_views.py\napps/workforce\\services.py\napps/workforce\\static\\workforce\\js\\position_chart.js\napps/workforce\\static\\workforce\\js\\organization_chart.js\napps/workforce\\static\\workforce\\css\\organization_chart.css\n"
+    }
+  ],
+  "direct_evidence": {
+    "apps/organizations/configuration_profiles.py:99": "Current repository has no approved Leave Policy version authority; profile application raises ValidationError",
+    "apps/timekeeping/models.py:579": "LeaveMissionRequest retains policy_reference text only; no entitlement/opening/accrual/balance target",
+    "apps/workforce/person_services.py:166": "resolve_legacy_employee retains existing Employee and optional explicit relationship without fabricating target episodes",
+    "apps/workforce/migrations/0009_cep010_person_workrelationship.py": "Structural model migration only; no source dataset/backfill proof for CEP029"
+  },
+  "limits": "Inspected current main, installed Django models/schema, repository sources/history and approved canonical recovery materials. This does not assert that approved implementation/evidence or datasets cannot exist elsewhere."
+}

@@ -1,0 +1,169 @@
+Continue BONIRA CEP execution from current repository reality.
+
+Ground current `main` and read governing sources in authority order:
+
+1. `docs/governance/CEP_PROGRAM_AUTHORITY.md`
+2. `Agents.md`
+3. `docs/governance/BONIRA_CODEX_PROJECT_EXECUTION_POLICY.md`
+4. `docs/ROADMAP_EXECUTION_PLAYBOOK.md`
+5. `CEP_EXECUTION_REGISTRY.yaml`
+6. applicable canonical CEP prompts
+7. `docs/governance/cep/CEP_PROMPT_MANIFEST.yaml`
+
+Load additional Product Decisions/specifications only when materially required.
+
+Latest verified program state:
+
+- CEP-047 checkpointed.
+- CEP-048 COMPLETE and pushed.
+- CEP-050 COMPLETE and pushed.
+- `main`, `origin/main`, and remote were aligned at `ad167f5` before the latest CEP-057 adjudication evidence.
+- GATE-05 remains `NOT_PASSED`.
+- CEP-047/048 activation remains fail-closed.
+
+CEP-057 entry review exposed invalid historical prerequisite completion claims.
+
+Adjudicated prerequisite state:
+
+A. CEP-023
+- Classification: `A3 — HISTORICAL COMPLETION INVALID`
+- Canonical owner: `IMB-0074 — Authoritative leave entitlement/balance engine`
+- Required authority/persistence was absent when COMPLETE was imported.
+- No qualifying acceptance evidence or later repository removal was found.
+- Historical provenance must be preserved.
+
+B. CEP-029
+- Classification: `B4 — IMPLEMENTATION / MIGRATION GAP`
+- CEP-010 created only the Person / WorkRelationship identity foundation.
+- CEP-029 still owns Employee → WorkRelationship conversion, mappings, rehire/history reconstruction, migration evidence and reconciliation.
+- No verified conversion/backfill outcome exists.
+
+CEP-057 therefore remains BLOCKED and must not absorb either prerequisite's remediation.
+
+The Human has authorized the following remediation:
+
+==================================================
+CEP-023 remediation
+==================================================
+
+Reopen CEP-023 only for its existing canonical IMB-0074 scope.
+
+Authorize the minimum additive Development / Non-Production persistence/schema
+required for the authoritative Leave Policy and leave entitlement/balance engine.
+
+For CEP-023 only, supersede `Migration Impact = NONE` to the minimum extent necessary.
+
+Authorize a migration-only canonical prompt amendment and SHA re-verification.
+
+Preserve original Scope, AC, DoD, dependencies, PD-026/SPEC-011 semantics and ownership.
+
+Do not invent:
+- entitlement amounts
+- accrual rules/rates
+- carry-forward limits
+- expiry periods
+- negative-balance values
+- statutory/default leave policies
+
+Missing effective Leave Policy configuration must fail closed.
+
+CEP-023 must establish authoritative persistence/history only.
+Do NOT perform CEP-057 opening-balance backfill inside CEP-023.
+
+CEP-023 may return to COMPLETE only when its original canonical AC and scoped DoD are truly satisfied with executable evidence.
+
+==================================================
+CEP-029 remediation
+==================================================
+
+After CEP-023 completes, reopen CEP-029 only for its existing canonical IMB-0070 scope.
+
+CEP-029 already has canonical DATA-MIGRATION authority.
+
+Implement and verify the minimum Development / Non-Production
+Employee → Person / WorkRelationship migration and rehire/history reconstruction.
+
+Preserve:
+- legacy Employee identity
+- tenant ownership
+- assignment history
+- source IDs and lineage
+- existing Person / WorkRelationship facts
+
+Do not fabricate historical employment episodes when source evidence is insufficient.
+Record explicit exceptions instead.
+
+Required evidence includes:
+- before/after counts
+- source→target mapping
+- unmapped/exception list
+- migration execution evidence
+- reconciliation
+- repeatability/idempotency where applicable
+- rollback/reapply or equivalent migration validation
+- historical traceability
+- required permission/tenant-boundary validation
+
+Do not treat CEP-010 foundation as CEP-029 completion.
+
+==================================================
+Execution order
+==================================================
+
+Execute serially:
+
+CEP-023 remediation
+→ full validation
+→ COMPLETE only if proven
+→ safe Git checkpoint when appropriate
+
+then
+
+CEP-029 remediation
+→ full validation
+→ COMPLETE only if proven
+→ safe Git checkpoint when appropriate
+
+then
+
+recompute frontier
+→ repeat full CEP-057 entry review
+
+CEP-057 remains BLOCKED until both prerequisites are actually proven complete.
+
+Do not infer EXT-0015 satisfaction or GATE-06 PASS from prerequisite completion.
+
+Standing bounded Git authorization remains active for safe attributable completed work:
+- `git add`
+- `git commit`
+- `git push origin main`
+
+Do not perform:
+- merge
+- rebase
+- cherry-pick
+- reset
+- clean
+- stash
+- force push
+- history rewrite
+- destructive checkout
+
+No Production action.
+No Human Sign-off.
+No Production Certification.
+
+Before any mutation:
+- verify current branch/HEAD/origin/remote/working tree;
+- reconcile Registry against actual repository state;
+- verify relevant canonical prompt hashes;
+- record Actual Execution Touch Set.
+
+Apply strict token discipline:
+- no routine narration;
+- intermediate updates only for material exceptions;
+- delta-only;
+- normally <=3 lines.
+
+Stop only for a new material blocker, Human-only decision, governance conflict,
+unsafe repository/Git state, or environment limitation that cannot be resolved safely.

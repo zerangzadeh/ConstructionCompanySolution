@@ -306,9 +306,11 @@ class P7TimekeepingTests(TestCase):
             ends_at=datetime(2026, 3, 1, 12, tzinfo=self.zone),
             reason="Request",
         )
-        submit_time_request(
-            organization=self.organization, actor=self.owner, request=leave
-        )
+        # CEP-023 supersedes free-text-only leave approval with source allocation.
+        with self.assertRaises(ValidationError):
+            submit_time_request(
+                organization=self.organization, actor=self.owner, request=leave
+            )
         with self.assertRaises(ValidationError):
             review_time_request(
                 organization=self.organization,
@@ -322,13 +324,10 @@ class P7TimekeepingTests(TestCase):
             policy_reference=leave.policy_reference
         )
         leave.refresh_from_db()
-        review_time_request(
-            organization=self.organization,
-            actor=self.reviewer,
-            request=leave,
-            approve=True,
-            reason="Within explicitly approved policy",
-        )
+        with self.assertRaises(ValidationError):
+            submit_time_request(
+                organization=self.organization, actor=self.owner, request=leave
+            )
         overtime = create_overtime_request(
             organization=self.organization,
             actor=self.owner,

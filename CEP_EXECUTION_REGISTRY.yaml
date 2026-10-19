@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 55
+  execution_state_complete: 54
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
-  blocked_current: 0
+  blocked_current: 2
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 22
+  not_started_other_current_governed: 21
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -196,6 +196,15 @@ human_decisions:
     scope: Finding001 exact INT-B04/B05/B06 mappings and PD010 guardrails; no contract, scope, dependency or production authority amendment
     provenance: docs/governance/cep/evidence/CEP-047_MAPPING_RESOLUTION_PROVENANCE.json
     unresolved_material_semantics_must_stop: true
+    production_authorized: false
+  HUMAN-CEP023-029-REMEDIATION-20261019:
+    source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED_BOUNDED_SERIAL
+    scope: Reopen023 existing IMB0074 with minimum additive Development/non-production schema and migration-only prompt amendment; after proven023 completion reopen029 existing IMB0070 data conversion/history; then repeat057 entry review
+    no_invented_policy_values_or_employment_episodes: true
+    no_057_opening_backfill_in_023: true
+    git_writes_authorized: SAFE_ATTRIBUTABLE_COMPLETED_WORK_ONLY
     production_authorized: false
   HUMAN-SERIAL-CEP-GIT-CHECKPOINTS-20261019:
     source: Current Human instruction to proceed autonomously from completed047 boundary
@@ -1154,39 +1163,56 @@ ceps:
       status: GIT_INTEGRATED
       reason: Authorized direct commit and fast-forward push1533f7f verified main/HEAD/origin/main/remote main; clean working tree.
   CEP-023:
-    title: null
+    title: Leave entitlement and balance authority
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: SATISFIED
     authorization:
-      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-CEP023-029-REMEDIATION-20261019
+      source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
     execution:
       status: COMPLETE
       lifecycle: CLOSED_VERIFIED
-      advisor_review: ACCEPTED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: VERIFIED
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Performance/concurrency and browser/accessibility runtime remain UTV per canonical contract; no production or statutory activation
+    - EXT0014 explicit effective tenant Leave Policy remains required; configured Development has zero policies and balances
+    - Three legacy Timekeeping fixtures require documented test-only explicit scope overlay; HEAD baseline reproduces same failures
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-023_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_NEW_REMEDIATION_EVIDENCE_HISTORICAL_PROVENANCE_RETAINED
     git:
       committed: null
       commit_sha: null
       pushed: null
       merged_to_main: null
-      remote_main_evidence: REPORT_NOT_FOUND
+      remote_main_evidence: NOT_YET_CHECKPOINTED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: '2026-10-16'
-    history: []
+      branch: main
+      sha: ad167f58714577620666a0efb7f5518895cac4a0
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: PREREQUISITE_ADJUDICATION
+      reason: A3_HISTORICAL_COMPLETION_INVALID established under explicit adjudication-only Human instruction. Original imported COMPLETE/CLOSED_VERIFIED stamp in2f16cc05 had no AC/DoD/report/commit history; raw prior record preserved in CEP-057_ADJUDICATION_SOURCES.json. Current canonical outcome not started/verified; no product or migration remediation performed.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Explicit Human authorization reopens existing IMB0074 only; minimum additive non-production schema and migration-only prompt amendment authorized. Historical A3 finding retained; no completion or activation inferred. Actual touch set recorded before product edits.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: Explicit bounded IMB0074 remediation proved 6/6 original AC and scoped DoD. Final49 tests plus12 subtests and bounded migration preservation test PASS; actual isolated forward/reverse/reapply and configured Development additive apply/recheck retained. Package-induced four system read grants removed; exact correction retained. No existing worker conversion or057 opening backfill; no default values or activation inferred. Prior imported invalid completion remains in adjudication source evidence.
+    adjudication:
+      classification: A3_HISTORICAL_COMPLETION_INVALID
+      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
+      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
+      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
   CEP-024:
     title: Timekeeping object-scope enforcement
     phase: V1_IMPLEMENTATION
@@ -1461,28 +1487,29 @@ ceps:
       status: PARTIAL
       reason: Human Decision Authority granted bounded non-production migration preparation and rehearsal authority in BONIRA-CONSOLIDATED-20261017 but expressly withheld dataset-dependent backfill pending named tenant, exclusive cutoff, authoritative source/opening dataset and accountable reviewers. BLOCKER-DATA remains.
   CEP-029:
-    title: null
+    title: Employee to WorkRelationship migration
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: SATISFIED
+    eligibility_status: BLOCKED_CANONICAL_REMEDIATION_REQUIRED
     authorization:
       status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
       authorization_id: null
       source: null
     execution:
-      status: COMPLETE
-      lifecycle: CLOSED_VERIFIED
-      advisor_review: ACCEPTED
+      status: NOT_STARTED
+      lifecycle: BLOCKED_BEFORE_MUTATION
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
+      passed: 0
+      total: 7
+      status: NOT_VERIFIED
+    dod: NOT_MET
+    blockers:
+    - CEP-029-FINDING-001 / B4_IMPLEMENTATION_MIGRATION_GAP / Canonical outcome absent; remediation owned by this CEP, not057; see CEP057 prerequisite adjudication
     remaining_utv: []
     completion_report:
       path: null
-      evidence_presence: UNVERIFIED
+      evidence_presence: NO_QUALIFYING_COMPLETION_EVIDENCE_RECOVERED
     git:
       committed: null
       commit_sha: null
@@ -1492,8 +1519,16 @@ ceps:
     last_execution:
       branch: null
       sha: null
-    updated_at: '2026-10-16'
-    history: []
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: PREREQUISITE_ADJUDICATION
+      reason: B4_IMPLEMENTATION_MIGRATION_GAP established under explicit adjudication-only Human instruction. Original imported COMPLETE/CLOSED_VERIFIED stamp in2f16cc05 had no AC/DoD/report/commit history; raw prior record preserved in CEP-057_ADJUDICATION_SOURCES.json. Current canonical outcome not started/verified; no product or migration remediation performed.
+    adjudication:
+      classification: B4_IMPLEMENTATION_MIGRATION_GAP
+      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
+      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
+      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
   CEP-030:
     title: Party operational/governance surfaces
     phase: V1_IMPLEMENTATION
@@ -2956,28 +2991,32 @@ ceps:
       status: GIT_INTEGRATED
       reason: Authorized direct commit/push343391c verified main/origin and clean tree; no production action.
   CEP-057:
-    title: null
+    title: Leave opening-balance migration
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: UNSATISFIED_CONFIRMED_A3_B4
+    eligibility_status: BLOCKED_BEFORE_MUTATION
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
-      source: null
+      source: Standing bounded non-production authority exists; entry blocked by mandatory-prerequisite implementation conflict
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      lifecycle: BLOCKED_BEFORE_MUTATION
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 0
+      total: 7
+      status: BLOCKED_NOT_VERIFIED
+    dod: NOT_MET_BLOCKED
+    blockers:
+    - CEP-057-FINDING-001 / BLOCKER-REGISTRY-CONFLICT / CEP023 marked COMPLETE but authoritative leave policy/balance target absent from current models/schema; CEP029 migrated mapping evidence unproved; stop before057 product mutation
+    remaining_utv:
+    - All CEP057 service, isolation, integration, migration, reconciliation and rollback execution NOT_EXECUTED
+    - EXT0015 approved dataset, explicit identity mapping, as-of/cutover and totals not verified; required before migration execution
+    - Performance/concurrency and browser/accessibility remain UTV
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-057_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_ENTRY_ONLY_NO_EXECUTION_PASS
     git:
       committed: null
       commit_sha: null
@@ -2985,10 +3024,16 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: ad167f58714577620666a0efb7f5518895cac4a0
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: ENTRY_BLOCKED_BEFORE_MUTATION
+      reason: Canonical prompt SHA, PD026, SPEC011 and dependency/external phase records verified. Registry COMPLETE prerequisite claims conflict with current registered models/schema and explicit configuration guard. No057 implementation, tests, backfill, cutover, source balance synthesis or prerequisite scope absorption. Recover/reconcile prerequisite implementation/evidence before repeat entry review.
+    - date: '2026-10-19'
+      status: BLOCKER_CAUSES_ADJUDICATED
+      reason: A3 for023 and B4 for029 separately established; required authority and migrated-identity outcome absent, not a stale report-link problem. Initial057 finding and entry evidence retained; both mandatory prerequisites unsatisfied. No057 product/migration repair or checkpoint; scoped remediation remains023/029, with Human resolution required before any necessary023 schema under its NONE contract.
   CEP-058:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4021,9 +4066,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 46baa4765628d5a8cee036c021b521ed800548d2
-  origin_main: 46baa4765628d5a8cee036c021b521ed800548d2
-  integration_checkpoint: 46baa4765628d5a8cee036c021b521ed800548d2
+  last_reconciled_head: ad167f58714577620666a0efb7f5518895cac4a0
+  origin_main: ad167f58714577620666a0efb7f5518895cac4a0
+  integration_checkpoint: ad167f58714577620666a0efb7f5518895cac4a0
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4032,8 +4077,7 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-028
-  - CEP-057
-  - CEP-058
+  - CEP-029
   - CEP-063
   - CEP-065
   - CEP-067
@@ -4046,17 +4090,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP050_CHECKPOINT_VERIFIED_SERIAL_ENTRY_REVIEW
+  current_session_continuation: CEP023_COMPLETE_CHECKPOINT_THEN_CEP029_ENTRY
   current_independent_cep: null
-  next_entry_review_candidate: CEP-057
-  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED
+  next_entry_review_candidate: CEP-029
+  next_candidate_full_entry_eligibility: CEP029_REQUIRES_FULL_ENTRY_REVIEW
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Completed050 comparison/history contract verified; authorized normal checkpoint precedes057 full entry review. Dependency readiness is not eligibility; no producer activation or global Gate PASS inferred.
-  resume_cep_after_blocker_resolution: null
-  independent_candidates_entry_status: SERIAL_ENTRY_REVIEW_PENDING
+  boundary_reason: Newly evidenced023 remediation COMPLETE; Human-authorized serial029 entry follows safe checkpoint. Historical A3/B4 provenance retained. CEP057 remains blocked until029 is proven; no EXT0015 or GATE06 inference. GATE05 NOT_PASSED and047/048 activation remains fail-closed.
+  resume_cep_after_blocker_resolution: CEP-057
+  independent_candidates_entry_status: NOT_REVIEWED_QUEUE_STOPPED_ON_MATERIAL_CONFLICT
   production_authorized: false
   human_signoff_executed: false

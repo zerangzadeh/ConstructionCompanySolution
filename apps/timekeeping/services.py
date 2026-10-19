@@ -812,6 +812,8 @@ def submit_time_request(
     actor: User,
     request: LeaveMissionRequest | OvertimeRequest,
 ) -> Any:
+    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
+        organization = Organization.objects.select_for_update().get(pk=organization.pk)
     request = (
         type(request)
         .objects.select_for_update()
@@ -831,6 +833,10 @@ def submit_time_request(
     )
     if request.requested_by_id != actor.pk or request.state != RequestState.DRAFT:
         raise PermissionDenied("فقط سازنده می‌تواند پیش‌نویس را ارسال کند.")
+    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
+        from apps.workforce.leave_services import _require_reservation
+
+        _require_reservation(organization=organization, request=request)
     type(request).objects.filter(pk=request.pk).update(state=RequestState.SUBMITTED)
     request.refresh_from_db()
     _audit(
@@ -852,6 +858,8 @@ def review_time_request(
     approve: bool,
     reason: str,
 ) -> Any:
+    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
+        organization = Organization.objects.select_for_update().get(pk=organization.pk)
     request = (
         type(request)
         .objects.select_for_update()
@@ -875,6 +883,18 @@ def review_time_request(
         raise ValidationError("فقط درخواست ارسال‌شده با دلیل قابل بررسی است.")
     if approve and not request.policy_reference.strip():
         raise ValidationError("تأیید بدون مرجع سیاست مصوب مجاز نیست.")
+    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
+        from apps.workforce.leave_services import (
+            _release_rejected_request,
+            _require_reservation,
+        )
+
+        if approve:
+            _require_reservation(organization=organization, request=request)
+        else:
+            _release_rejected_request(
+                organization=organization, actor=actor, request=request, reason=reason
+            )
     state = RequestState.APPROVED if approve else RequestState.REJECTED
     type(request).objects.filter(pk=request.pk).update(
         state=state, reviewed_by=actor, reviewed_at=timezone.now(), review_reason=reason

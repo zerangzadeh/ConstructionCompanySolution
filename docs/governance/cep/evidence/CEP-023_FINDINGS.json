@@ -1,0 +1,36 @@
+[
+  {
+    "id": "CEP-023-FINDING-001",
+    "status": "RESOLVED_BY_NEW_CANONICAL_REMEDIATION",
+    "classification": "A3 historical completion invalid",
+    "source": "CEP-057_PREREQUISITE_ADJUDICATION.json",
+    "resolution": "New implementation and evidence under original IMB0074; original provenance retained."
+  },
+  {
+    "id": "CEP-023-FINDING-002",
+    "status": "RESOLVED",
+    "classification": "CEP_REGRESSION",
+    "evidence": [
+      "CEP-023_DEVELOPMENT_MIGRATION_OUTPUT.txt",
+      "CEP-023_NEW_GRANT_CORRECTION.json",
+      "CEP-023_DEVELOPMENT_MIGRATION.json"
+    ],
+    "details": "Suffix-derived READ_ONLY_PERMISSIONS reintroduced new leave_balances.view defaults. Exclusion now applies to every default role. Removed exactly four new system read grants only. No other grants modified by that correction. Original failing run did not persist its per-model before snapshot; no retroactive first-run hash PASS claimed. Final no-op configured migration recheck persisted matching source/grant before/after hashes."
+  },
+  {
+    "id": "CEP-023-FINDING-003",
+    "status": "ATTRIBUTED_BASELINE_TEST_DEBT",
+    "evidence": [
+      "CEP-023_FOCUSED_REGRESSION_OUTPUT.txt",
+      "CEP-023_HEAD_BASELINE_RETRY_OUTPUT.txt",
+      "CEP-023_TEST_HARNESS.py"
+    ],
+    "details": "Three legacy P7 Timekeeping fixtures lack explicit object-scope grants. HEAD services plus HEAD tests reproduce same three permission failures. Test-only scope overlay adds intended reviewer organization scope, retaining dedicated site restriction tests and product authorization."
+  },
+  {
+    "id": "CEP-023-FINDING-004",
+    "status": "RESOLVED_BY_EQUIVALENT_BOUNDED_VALIDATION",
+    "classification": "TEST_INFRASTRUCTURE",
+    "details": "Full historical MigrationExecutor test stopped after >10 CPU minutes. Actual isolated management migrate reverse/reapply completed earlier. Bounded schema-editor preservation test uses actual migration reverse guard, preserves source records and grants, rejects populated-history rollback. Initial bounded retry encountered previous interrupted fixture rows; TransactionTestCase cleanup cleared them; subsequent test passed. No full-program migration verification claimed."
+  }
+]

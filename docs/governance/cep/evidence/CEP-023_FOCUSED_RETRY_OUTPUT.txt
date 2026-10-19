@@ -1,0 +1,19 @@
+.......F.............                                          [100%]
+================================== FAILURES ===================================
+_ LeaveAuthorityTests.test_future_occurrence_and_terminated_episode_are_rejected _
+apps\workforce\test_cep023.py:624: in test_future_occurrence_and_terminated_episode_are_rejected
+    service.consume_approved_occurrence(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workforce\leave_services.py:578: in consume_approved_occurrence
+    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workforce\leave_services.py:30: in _access
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: Explicit leave authority is required.
+=========================== short test summary info ===========================
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_future_occurrence_and_terminated_episode_are_rejected
+1 failed, 20 passed, 10 subtests passed in 33.55s

@@ -1,0 +1,58 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ LeaveMigrationTests.test_additive_reverse_reapply_preserves_legacy_and_existing_authority _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UniqueViolation: duplicate key value violates unique constraint "accounts_user_username_key"
+E   DETAIL:  Key (username)=(cep023-owner) already exists.
+
+The above exception was the direct cause of the following exception:
+apps\workforce\test_cep023_migration.py:33: in test_additive_reverse_reapply_preserves_legacy_and_existing_authority
+    fixture.setUp()
+apps\workforce\test_cep023.py:41: in setUp
+    self.actor = User.objects.create_user(username="cep023-owner")
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\accounts\models.py:155: in create_user
+    user.save(using=self._db)
+apps\accounts\models.py:240: in save
+    super().save(*args, **kwargs)
+.venv\Lib\site-packages\django\contrib\auth\base_user.py:65: in save
+    super().save(*args, **kwargs)
+.venv\Lib\site-packages\django\db\models\base.py:902: in save
+    self.save_base(
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1169: in _save_table
+    results = self._do_insert(
+.venv\Lib\site-packages\django\db\models\base.py:1210: in _do_insert
+    return manager._insert(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1873: in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1882: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.IntegrityError: duplicate key value violates unique constraint "accounts_user_username_key"
+E   DETAIL:  Key (username)=(cep023-owner) already exists.
+=========================== short test summary info ===========================
+FAILED apps/workforce/test_cep023_migration.py::LeaveMigrationTests::test_additive_reverse_reapply_preserves_legacy_and_existing_authority
+1 failed in 12.26s

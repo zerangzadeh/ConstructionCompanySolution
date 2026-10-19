@@ -1,0 +1,86 @@
+.FF....F......F.FF                                             [100%]
+================================== FAILURES ===================================
+__ LeaveAuthorityTests.test_cancel_unconsumed_approved_request_releases_only __
+apps\workforce\test_cep023.py:414: in test_cancel_unconsumed_approved_request_releases_only
+    request = self.approved()
+              ^^^^^^^^^^^^^^^
+apps\workforce\test_cep023.py:189: in approved
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+_ LeaveAuthorityTests.test_consumption_requires_approved_completed_occurrence_and_evidence _
+apps\workforce\test_cep023.py:456: in test_consumption_requires_approved_completed_occurrence_and_evidence
+    service.consume_approved_occurrence(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workforce\leave_services.py:539: in consume_approved_occurrence
+    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workforce\leave_services.py:30: in _access
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: Explicit leave authority is required.
+_ LeaveAuthorityTests.test_native_submission_and_approval_cannot_bypass_reservation _
+apps\workforce\test_cep023.py:345: in test_native_submission_and_approval_cannot_bypass_reservation
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+____ LeaveAuthorityTests.test_rejected_request_releases_without_consuming _____
+apps\workforce\test_cep023.py:401: in test_rejected_request_releases_without_consuming
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+_ LeaveAuthorityTests.test_reservation_consumption_cancellation_and_retry_are_atomic _
+apps\workforce\test_cep023.py:355: in test_reservation_consumption_cancellation_and_retry_are_atomic
+    request = self.approved()
+              ^^^^^^^^^^^^^^^
+apps\workforce\test_cep023.py:189: in approved
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+_ LeaveAuthorityTests.test_tenant_permission_membership_and_suspension_fail_closed _
+apps\workforce\test_cep023.py:510: in test_tenant_permission_membership_and_suspension_fail_closed
+    with self.assertRaises(PermissionDenied):
+E   AssertionError: PermissionDenied not raised
+=========================== short test summary info ===========================
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_cancel_unconsumed_approved_request_releases_only
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_consumption_requires_approved_completed_occurrence_and_evidence
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_native_submission_and_approval_cannot_bypass_reservation
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_rejected_request_releases_without_consuming
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_reservation_consumption_cancellation_and_retry_are_atomic
+FAILED apps/workforce/test_cep023.py::LeaveAuthorityTests::test_tenant_permission_membership_and_suspension_fail_closed
+6 failed, 12 passed, 10 subtests passed in 28.50s

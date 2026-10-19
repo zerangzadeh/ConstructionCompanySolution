@@ -124,8 +124,10 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
 If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
 
 ## 16. Data / Migration Requirements
-Migration Impact = `NONE`.
-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
+Migration Impact = `ADDITIVE SCHEMA — DEVELOPMENT / NON-PRODUCTION ONLY`.
+
+Human amendment 2026-10-19: minimum additive persistence/schema and Development / Non-Production migration execution solely for existing IMB-0074 Leave Policy and entitlement/balance authority. Original Scope, AC, DoD, dependencies, PD-024/PD-026 and SPEC-011 remain unchanged. No CEP-057 opening-balance backfill, production migration, cutover or activation without effective explicit policy. Source: `docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt`.
+- Verify additive schema forward/reverse/reapply in an isolated non-production database; retain migration output and preservation evidence. No existing leave balances may be synthesized or backfilled.
 - If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
 
 ## 17. Integration Requirements
@@ -151,14 +153,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
 ## 21. Test Plan
 Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
 
-UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
+UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=REQUIRED (bounded additive schema); UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
 
 UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
 
 ## 22. Evidence Plan
 Use only package-relevant evidence; no fabricated evidence IDs or results.
 
-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED (bounded additive schema); DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
 
 Future authorized execution must produce:
 - `CEP-023_EXECUTION_MANIFEST.md`

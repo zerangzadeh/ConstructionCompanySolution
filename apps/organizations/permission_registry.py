@@ -18,6 +18,12 @@ P = BusinessPermissionCode
 
 PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
+        "leave_authority", "سیاست و مانده مرخصی",
+        ("workforce.LeavePolicyVersion", "workforce.LeaveBalanceEntry"),
+        (P.LEAVE_POLICIES_MANAGE, P.LEAVE_BALANCES_MANAGE, P.LEAVE_BALANCES_VIEW),
+        ("apps.workforce.leave_services",),
+    ),
+    PermissionResource(
         "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
         ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
         (P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE, P.SUBLEDGERS_PAYROLL_PREPARE, P.SUBLEDGERS_PAYROLL_VIEW),

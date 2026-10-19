@@ -1,0 +1,46 @@
+....................................FF.F.........            [100%]
+================================== FAILURES ===================================
+_ P7TimekeepingTests.test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history _
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:189: in test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history
+    record = finalize_attendance(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:368: in finalize_attendance
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+____ P7TimekeepingTests.test_s08_s09_requests_overlap_sod_and_policy_gate _____
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:315: in test_s08_s09_requests_overlap_sod_and_policy_gate
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+_ P7TimekeepingTests.test_s11_s12_conservation_immutability_review_and_non_posting_preview _
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:450: in test_s11_s12_conservation_immutability_review_and_non_posting_preview
+    review_timesheet(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:1063: in review_timesheet
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+=========================== short test summary info ===========================
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s08_s09_requests_overlap_sod_and_policy_gate
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s11_s12_conservation_immutability_review_and_non_posting_preview
+3 failed, 46 passed, 12 subtests passed in 66.22s (0:01:06)

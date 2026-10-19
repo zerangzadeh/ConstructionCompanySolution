@@ -14,6 +14,9 @@ from core.identifiers import canonicalize_upper_identifier
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
+# These records are owned by Workforce; imported here for Django model discovery.
+from .leave_models import LeaveBalanceEntry, LeavePolicyVersion  # noqa: F401
+
 
 def employee_profile_image_upload_path(instance: "Employee", filename: str) -> str:
     """Store employee images under opaque tenant-scoped names."""

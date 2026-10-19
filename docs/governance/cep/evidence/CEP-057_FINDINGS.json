@@ -1,0 +1,28 @@
+[
+  {
+    "finding_id": "CEP-057-FINDING-001",
+    "status": "OPEN",
+    "classification": "BLOCKER-REGISTRY-CONFLICT / BLOCKER-DEPENDENCY",
+    "affected_imb": "IMB-0075",
+    "affected_ac": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "claim": "Registry CEP023 and029 COMPLETE, but completion reports/evidence unverified/report-not-found",
+    "actual": "Registered runtime/schema has only LeaveMissionRequest; no PDM010 leave policy/entitlement/balance/opening target or source service. Existing config explicitly records missing leave policy authority. Optional explicit legacy identity resolution does not prove CEP029 migrated mapping/backfill.",
+    "evidence": [
+      "CEP-057_ENTRY.json",
+      "CEP-057_REPOSITORY_AND_SCHEMA.json",
+      "CEP_EXECUTION_REGISTRY.yaml CEP023 and029 records"
+    ],
+    "scope_impact": "Implementing the missing authoritative engine would reopen/absorb CEP023 outside CEP057 BACKFILL scope. Must not invent it or replace with request history, generic JSON or Accounting balance authority.",
+    "phase": "Blocks entry/framework against an unproved mandatory target prerequisite; distinct from EXT0015 activation-only dataset condition",
+    "resolution": "Recover/reconcile approved prerequisite implementation and valid completion evidence; retain historical claims unchanged pending correction; then repeat full entry review. Approved EXT0015 dataset remains required before migration execution.",
+    "safe_action": "STOP serial queue before057 product mutation; preserve completed checkpoints and record entry evidence only."
+  }
+]

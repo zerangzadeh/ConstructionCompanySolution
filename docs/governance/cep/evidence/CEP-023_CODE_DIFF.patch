@@ -1,0 +1,2356 @@
+diff --git a/CEP_EXECUTION_REGISTRY.yaml b/CEP_EXECUTION_REGISTRY.yaml
+index 567627b..10426fa 100644
+--- a/CEP_EXECUTION_REGISTRY.yaml
++++ b/CEP_EXECUTION_REGISTRY.yaml
+@@ -62,14 +62,14 @@ inventory:
+   verification_uat: CEP-073..CEP-079
+   post_v1_range: CEP-080..CEP-086
+ summary:
+-  execution_state_complete: 55
++  execution_state_complete: 54
+   authorized_not_started: 0
+   eligible_under_standing_authority: 0
+   in_progress: 0
+-  blocked_current: 0
++  blocked_current: 2
+   partial_current: 2
+   failed_current: 0
+-  not_started_other_current_governed: 22
++  not_started_other_current_governed: 21
+   deferred_post_v1: 7
+   remote_main_verified_complete_from_last_audit: null
+   last_updated: '2026-10-19'
+@@ -197,6 +197,15 @@ human_decisions:
+     provenance: docs/governance/cep/evidence/CEP-047_MAPPING_RESOLUTION_PROVENANCE.json
+     unresolved_material_semantics_must_stop: true
+     production_authorized: false
++  HUMAN-CEP023-029-REMEDIATION-20261019:
++    source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
++    authority: HUMAN_DECISION_AUTHORITY / Product Owner
++    status: APPROVED_BOUNDED_SERIAL
++    scope: Reopen023 existing IMB0074 with minimum additive Development/non-production schema and migration-only prompt amendment; after proven023 completion reopen029 existing IMB0070 data conversion/history; then repeat057 entry review
++    no_invented_policy_values_or_employment_episodes: true
++    no_057_opening_backfill_in_023: true
++    git_writes_authorized: SAFE_ATTRIBUTABLE_COMPLETED_WORK_ONLY
++    production_authorized: false
+   HUMAN-SERIAL-CEP-GIT-CHECKPOINTS-20261019:
+     source: Current Human instruction to proceed autonomously from completed047 boundary
+     authority: HUMAN_DECISION_AUTHORITY / Product Owner
+@@ -1154,39 +1163,56 @@ ceps:
+       status: GIT_INTEGRATED
+       reason: Authorized direct commit and fast-forward push1533f7f verified main/HEAD/origin/main/remote main; clean working tree.
+   CEP-023:
+-    title: null
++    title: Leave entitlement and balance authority
+     phase: V1_IMPLEMENTATION
+     dependency_status: SATISFIED
+     eligibility_status: SATISFIED
+     authorization:
+-      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+-      authorization_id: null
+-      source: null
++      status: AUTHORIZED
++      authorization_id: HUMAN-CEP023-029-REMEDIATION-20261019
++      source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
+     execution:
+       status: COMPLETE
+       lifecycle: CLOSED_VERIFIED
+-      advisor_review: ACCEPTED
++      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
+     acceptance:
+-      passed: null
+-      total: null
+-      status: UNRECORDED
+-    dod: UNRECORDED
++      passed: 6
++      total: 6
++      status: VERIFIED
++    dod: MET
+     blockers: []
+-    remaining_utv: []
++    remaining_utv:
++    - Performance/concurrency and browser/accessibility runtime remain UTV per canonical contract; no production or statutory activation
++    - EXT0014 explicit effective tenant Leave Policy remains required; configured Development has zero policies and balances
++    - Three legacy Timekeeping fixtures require documented test-only explicit scope overlay; HEAD baseline reproduces same failures
+     completion_report:
+-      path: null
+-      evidence_presence: UNVERIFIED
++      path: docs/governance/cep/reports/CEP-023_COMPLETION_REPORT.md
++      evidence_presence: VERIFIED_NEW_REMEDIATION_EVIDENCE_HISTORICAL_PROVENANCE_RETAINED
+     git:
+       committed: null
+       commit_sha: null
+       pushed: null
+       merged_to_main: null
+-      remote_main_evidence: REPORT_NOT_FOUND
++      remote_main_evidence: NOT_YET_CHECKPOINTED
+     last_execution:
+-      branch: null
+-      sha: null
+-    updated_at: '2026-10-16'
+-    history: []
++      branch: main
++      sha: ad167f58714577620666a0efb7f5518895cac4a0
++    updated_at: '2026-10-19'
++    history:
++    - date: '2026-10-19'
++      status: PREREQUISITE_ADJUDICATION
++      reason: A3_HISTORICAL_COMPLETION_INVALID established under explicit adjudication-only Human instruction. Original imported COMPLETE/CLOSED_VERIFIED stamp in2f16cc05 had no AC/DoD/report/commit history; raw prior record preserved in CEP-057_ADJUDICATION_SOURCES.json. Current canonical outcome not started/verified; no product or migration remediation performed.
++    - date: '2026-10-19'
++      status: RESUMED
++      reason: Explicit Human authorization reopens existing IMB0074 only; minimum additive non-production schema and migration-only prompt amendment authorized. Historical A3 finding retained; no completion or activation inferred. Actual touch set recorded before product edits.
++    - date: '2026-10-19'
++      status: COMPLETE
++      reason: Explicit bounded IMB0074 remediation proved 6/6 original AC and scoped DoD. Final49 tests plus12 subtests and bounded migration preservation test PASS; actual isolated forward/reverse/reapply and configured Development additive apply/recheck retained. Package-induced four system read grants removed; exact correction retained. No existing worker conversion or057 opening backfill; no default values or activation inferred. Prior imported invalid completion remains in adjudication source evidence.
++    adjudication:
++      classification: A3_HISTORICAL_COMPLETION_INVALID
++      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
++      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
++      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
+   CEP-024:
+     title: Timekeeping object-scope enforcement
+     phase: V1_IMPLEMENTATION
+@@ -1461,28 +1487,29 @@ ceps:
+       status: PARTIAL
+       reason: Human Decision Authority granted bounded non-production migration preparation and rehearsal authority in BONIRA-CONSOLIDATED-20261017 but expressly withheld dataset-dependent backfill pending named tenant, exclusive cutoff, authoritative source/opening dataset and accountable reviewers. BLOCKER-DATA remains.
+   CEP-029:
+-    title: null
++    title: Employee to WorkRelationship migration
+     phase: V1_IMPLEMENTATION
+     dependency_status: SATISFIED
+-    eligibility_status: SATISFIED
++    eligibility_status: BLOCKED_CANONICAL_REMEDIATION_REQUIRED
+     authorization:
+       status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+       authorization_id: null
+       source: null
+     execution:
+-      status: COMPLETE
+-      lifecycle: CLOSED_VERIFIED
+-      advisor_review: ACCEPTED
++      status: NOT_STARTED
++      lifecycle: BLOCKED_BEFORE_MUTATION
++      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
+     acceptance:
+-      passed: null
+-      total: null
+-      status: UNRECORDED
+-    dod: UNRECORDED
+-    blockers: []
++      passed: 0
++      total: 7
++      status: NOT_VERIFIED
++    dod: NOT_MET
++    blockers:
++    - CEP-029-FINDING-001 / B4_IMPLEMENTATION_MIGRATION_GAP / Canonical outcome absent; remediation owned by this CEP, not057; see CEP057 prerequisite adjudication
+     remaining_utv: []
+     completion_report:
+       path: null
+-      evidence_presence: UNVERIFIED
++      evidence_presence: NO_QUALIFYING_COMPLETION_EVIDENCE_RECOVERED
+     git:
+       committed: null
+       commit_sha: null
+@@ -1492,8 +1519,16 @@ ceps:
+     last_execution:
+       branch: null
+       sha: null
+-    updated_at: '2026-10-16'
+-    history: []
++    updated_at: '2026-10-19'
++    history:
++    - date: '2026-10-19'
++      status: PREREQUISITE_ADJUDICATION
++      reason: B4_IMPLEMENTATION_MIGRATION_GAP established under explicit adjudication-only Human instruction. Original imported COMPLETE/CLOSED_VERIFIED stamp in2f16cc05 had no AC/DoD/report/commit history; raw prior record preserved in CEP-057_ADJUDICATION_SOURCES.json. Current canonical outcome not started/verified; no product or migration remediation performed.
++    adjudication:
++      classification: B4_IMPLEMENTATION_MIGRATION_GAP
++      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
++      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
++      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
+   CEP-030:
+     title: Party operational/governance surfaces
+     phase: V1_IMPLEMENTATION
+@@ -2956,28 +2991,32 @@ ceps:
+       status: GIT_INTEGRATED
+       reason: Authorized direct commit/push343391c verified main/origin and clean tree; no production action.
+   CEP-057:
+-    title: null
++    title: Leave opening-balance migration
+     phase: V1_IMPLEMENTATION
+-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
+-    eligibility_status: NOT_ELIGIBLE
++    dependency_status: UNSATISFIED_CONFIRMED_A3_B4
++    eligibility_status: BLOCKED_BEFORE_MUTATION
+     authorization:
+       status: NOT_AUTHORIZED
+       authorization_id: null
+-      source: null
++      source: Standing bounded non-production authority exists; entry blocked by mandatory-prerequisite implementation conflict
+     execution:
+       status: NOT_STARTED
+-      lifecycle: NOT_ELIGIBLE
+-      advisor_review: PENDING
++      lifecycle: BLOCKED_BEFORE_MUTATION
++      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
+     acceptance:
+-      passed: null
+-      total: null
+-      status: UNRECORDED
+-    dod: UNRECORDED
+-    blockers: []
+-    remaining_utv: []
++      passed: 0
++      total: 7
++      status: BLOCKED_NOT_VERIFIED
++    dod: NOT_MET_BLOCKED
++    blockers:
++    - CEP-057-FINDING-001 / BLOCKER-REGISTRY-CONFLICT / CEP023 marked COMPLETE but authoritative leave policy/balance target absent from current models/schema; CEP029 migrated mapping evidence unproved; stop before057 product mutation
++    remaining_utv:
++    - All CEP057 service, isolation, integration, migration, reconciliation and rollback execution NOT_EXECUTED
++    - EXT0015 approved dataset, explicit identity mapping, as-of/cutover and totals not verified; required before migration execution
++    - Performance/concurrency and browser/accessibility remain UTV
+     completion_report:
+-      path: null
+-      evidence_presence: UNVERIFIED
++      path: docs/governance/cep/reports/CEP-057_COMPLETION_REPORT.md
++      evidence_presence: VERIFIED_ENTRY_ONLY_NO_EXECUTION_PASS
+     git:
+       committed: null
+       commit_sha: null
+@@ -2985,10 +3024,16 @@ ceps:
+       merged_to_main: null
+       remote_main_evidence: UNVERIFIED
+     last_execution:
+-      branch: null
+-      sha: null
+-    updated_at: null
+-    history: []
++      branch: main
++      sha: ad167f58714577620666a0efb7f5518895cac4a0
++    updated_at: '2026-10-19'
++    history:
++    - date: '2026-10-19'
++      status: ENTRY_BLOCKED_BEFORE_MUTATION
++      reason: Canonical prompt SHA, PD026, SPEC011 and dependency/external phase records verified. Registry COMPLETE prerequisite claims conflict with current registered models/schema and explicit configuration guard. No057 implementation, tests, backfill, cutover, source balance synthesis or prerequisite scope absorption. Recover/reconcile prerequisite implementation/evidence before repeat entry review.
++    - date: '2026-10-19'
++      status: BLOCKER_CAUSES_ADJUDICATED
++      reason: A3 for023 and B4 for029 separately established; required authority and migrated-identity outcome absent, not a stale report-link problem. Initial057 finding and entry evidence retained; both mandatory prerequisites unsatisfied. No057 product/migration repair or checkpoint; scoped remediation remains023/029, with Human resolution required before any necessary023 schema under its NONE contract.
+   CEP-058:
+     title: null
+     phase: V1_IMPLEMENTATION
+@@ -4021,9 +4066,9 @@ authority_scope:
+   - Production Certification
+ repository_state:
+   branch: main
+-  last_reconciled_head: 46baa4765628d5a8cee036c021b521ed800548d2
+-  origin_main: 46baa4765628d5a8cee036c021b521ed800548d2
+-  integration_checkpoint: 46baa4765628d5a8cee036c021b521ed800548d2
++  last_reconciled_head: ad167f58714577620666a0efb7f5518895cac4a0
++  origin_main: ad167f58714577620666a0efb7f5518895cac4a0
++  integration_checkpoint: ad167f58714577620666a0efb7f5518895cac4a0
+   integration_method: DIRECT_COMMIT_TO_MAIN
+   last_reconciled_at: '2026-10-19'
+ execution_frontier:
+@@ -4032,8 +4077,7 @@ execution_frontier:
+   fixed_cep_count_per_session: NONE
+   dependency_ready_current_governed:
+   - CEP-028
+-  - CEP-057
+-  - CEP-058
++  - CEP-029
+   - CEP-063
+   - CEP-065
+   - CEP-067
+@@ -4046,17 +4090,17 @@ execution_frontier:
+   dependency_ready_is_not_entry_gate_or_execution_authority: true
+   verified_build_eligible_unblocked: []
+   next_autonomous_cep: null
+-  current_session_continuation: CEP050_CHECKPOINT_VERIFIED_SERIAL_ENTRY_REVIEW
++  current_session_continuation: CEP023_COMPLETE_CHECKPOINT_THEN_CEP029_ENTRY
+   current_independent_cep: null
+-  next_entry_review_candidate: CEP-057
+-  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED
++  next_entry_review_candidate: CEP-029
++  next_candidate_full_entry_eligibility: CEP029_REQUIRES_FULL_ENTRY_REVIEW
+   conditional_dependency_entry_review_candidates:
+   - CEP-068
+   - CEP-073
+   - CEP-079
+   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
+-  boundary_reason: Completed050 comparison/history contract verified; authorized normal checkpoint precedes057 full entry review. Dependency readiness is not eligibility; no producer activation or global Gate PASS inferred.
+-  resume_cep_after_blocker_resolution: null
+-  independent_candidates_entry_status: SERIAL_ENTRY_REVIEW_PENDING
++  boundary_reason: Newly evidenced023 remediation COMPLETE; Human-authorized serial029 entry follows safe checkpoint. Historical A3/B4 provenance retained. CEP057 remains blocked until029 is proven; no EXT0015 or GATE06 inference. GATE05 NOT_PASSED and047/048 activation remains fail-closed.
++  resume_cep_after_blocker_resolution: CEP-057
++  independent_candidates_entry_status: NOT_REVIEWED_QUEUE_STOPPED_ON_MATERIAL_CONFLICT
+   production_authorized: false
+   human_signoff_executed: false
+diff --git a/apps/organizations/configuration_profiles.py b/apps/organizations/configuration_profiles.py
+index dd3ee27..334cae1 100644
+--- a/apps/organizations/configuration_profiles.py
++++ b/apps/organizations/configuration_profiles.py
+@@ -96,8 +96,8 @@ def apply_profile_suggestion(
+     ):
+         raise PermissionDenied("نقش داخلی لازم برای اعمال سیاست را ندارید.")
+     if suggestion.policy_code is None:
+-        # The current repository has no approved Leave Policy version authority.
+-        # A profile cannot create or infer one.
++        # A profile cannot select, create or infer a Workforce Leave Policy.
++        # Explicit effective source configuration is still required.
+         raise ValidationError("نسخه تأییدشده سیاست مرخصی برای این کلید موجود نیست.")
+ 
+     Organization.objects.select_for_update().get(pk=organization.pk)
+diff --git a/apps/organizations/models.py b/apps/organizations/models.py
+index 9815ada..b48cf9d 100644
+--- a/apps/organizations/models.py
++++ b/apps/organizations/models.py
+@@ -573,6 +573,9 @@ class BusinessPermissionCode(models.TextChoices):
+     INDEXATION_RULES_MANAGE = "indexation_rules.manage", "تهیه نسخه قانون تعدیل"
+     INDEXATION_CALCULATE = "indexation.calculate", "محاسبه تعدیل با سیاست مجاز"
+     INDEXATION_CORRECT = "indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"
++    LEAVE_POLICIES_MANAGE = "leave_policies.manage", "ثبت نسخه سیاست مرخصی"
++    LEAVE_BALANCES_MANAGE = "leave_balances.manage", "ثبت منبع مانده مرخصی"
++    LEAVE_BALANCES_VIEW = "leave_balances.view", "مشاهده مانده مجاز مرخصی"
+     EMPLOYMENT_RECORDS_MANAGE = "employment_records.manage", "ثبت نسخه سابقه استخدام"
+     EMPLOYMENT_RECORDS_VIEW_OWN = "employment_records.view_own", "مشاهده سوابق استخدام شخصی"
+     OFFBOARDING_START = "offboarding.start", "آغاز بررسی تسویه همکاری"
+diff --git a/apps/organizations/permission_registry.py b/apps/organizations/permission_registry.py
+index da816e9..e61c547 100644
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -17,6 +17,12 @@ class PermissionResource:
+ P = BusinessPermissionCode
+ 
+ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
++    PermissionResource(
++        "leave_authority", "سیاست و مانده مرخصی",
++        ("workforce.LeavePolicyVersion", "workforce.LeaveBalanceEntry"),
++        (P.LEAVE_POLICIES_MANAGE, P.LEAVE_BALANCES_MANAGE, P.LEAVE_BALANCES_VIEW),
++        ("apps.workforce.leave_services",),
++    ),
+     PermissionResource(
+         "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
+         ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
+diff --git a/apps/organizations/role_defaults.py b/apps/organizations/role_defaults.py
+index 3a6675e..4749d6d 100644
+--- a/apps/organizations/role_defaults.py
++++ b/apps/organizations/role_defaults.py
+@@ -7,6 +7,9 @@ from apps.organizations.permission_registry import registered_permission_codes
+ 
+ # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
+ ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
++    BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
++    BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
++    BusinessPermissionCode.LEAVE_BALANCES_VIEW,
+     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
+     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
+     BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
+@@ -782,6 +785,12 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
+ # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
+ # nor reversal to any default role until authority and SoD policy are accepted.
+ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
++    # CEP-023: suffix-derived read permissions must also remain explicit.
++    _default_permissions.difference_update(permission_codes(
++        BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
++        BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
++        BusinessPermissionCode.LEAVE_BALANCES_VIEW,
++    ))
+     _default_permissions.difference_update(permission_codes(
+         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
+         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,
+diff --git a/apps/timekeeping/services.py b/apps/timekeeping/services.py
+index 51838d6..5daf717 100644
+--- a/apps/timekeeping/services.py
++++ b/apps/timekeeping/services.py
+@@ -812,6 +812,8 @@ def submit_time_request(
+     actor: User,
+     request: LeaveMissionRequest | OvertimeRequest,
+ ) -> Any:
++    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
++        organization = Organization.objects.select_for_update().get(pk=organization.pk)
+     request = (
+         type(request)
+         .objects.select_for_update()
+@@ -831,6 +833,10 @@ def submit_time_request(
+     )
+     if request.requested_by_id != actor.pk or request.state != RequestState.DRAFT:
+         raise PermissionDenied("فقط سازنده می‌تواند پیش‌نویس را ارسال کند.")
++    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
++        from apps.workforce.leave_services import _require_reservation
++
++        _require_reservation(organization=organization, request=request)
+     type(request).objects.filter(pk=request.pk).update(state=RequestState.SUBMITTED)
+     request.refresh_from_db()
+     _audit(
+@@ -852,6 +858,8 @@ def review_time_request(
+     approve: bool,
+     reason: str,
+ ) -> Any:
++    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
++        organization = Organization.objects.select_for_update().get(pk=organization.pk)
+     request = (
+         type(request)
+         .objects.select_for_update()
+@@ -875,6 +883,18 @@ def review_time_request(
+         raise ValidationError("فقط درخواست ارسال‌شده با دلیل قابل بررسی است.")
+     if approve and not request.policy_reference.strip():
+         raise ValidationError("تأیید بدون مرجع سیاست مصوب مجاز نیست.")
++    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
++        from apps.workforce.leave_services import (
++            _release_rejected_request,
++            _require_reservation,
++        )
++
++        if approve:
++            _require_reservation(organization=organization, request=request)
++        else:
++            _release_rejected_request(
++                organization=organization, actor=actor, request=request, reason=reason
++            )
+     state = RequestState.APPROVED if approve else RequestState.REJECTED
+     type(request).objects.filter(pk=request.pk).update(
+         state=state, reviewed_by=actor, reviewed_at=timezone.now(), review_reason=reason
+diff --git a/apps/timekeeping/test_p7_s06_s12_timekeeping.py b/apps/timekeeping/test_p7_s06_s12_timekeeping.py
+index b44e5bf..afb0054 100644
+--- a/apps/timekeeping/test_p7_s06_s12_timekeeping.py
++++ b/apps/timekeeping/test_p7_s06_s12_timekeeping.py
+@@ -306,9 +306,11 @@ class P7TimekeepingTests(TestCase):
+             ends_at=datetime(2026, 3, 1, 12, tzinfo=self.zone),
+             reason="Request",
+         )
+-        submit_time_request(
+-            organization=self.organization, actor=self.owner, request=leave
+-        )
++        # CEP-023 supersedes free-text-only leave approval with source allocation.
++        with self.assertRaises(ValidationError):
++            submit_time_request(
++                organization=self.organization, actor=self.owner, request=leave
++            )
+         with self.assertRaises(ValidationError):
+             review_time_request(
+                 organization=self.organization,
+@@ -322,13 +324,10 @@ class P7TimekeepingTests(TestCase):
+             policy_reference=leave.policy_reference
+         )
+         leave.refresh_from_db()
+-        review_time_request(
+-            organization=self.organization,
+-            actor=self.reviewer,
+-            request=leave,
+-            approve=True,
+-            reason="Within explicitly approved policy",
+-        )
++        with self.assertRaises(ValidationError):
++            submit_time_request(
++                organization=self.organization, actor=self.owner, request=leave
++            )
+         overtime = create_overtime_request(
+             organization=self.organization,
+             actor=self.owner,
+diff --git a/apps/workforce/models.py b/apps/workforce/models.py
+index 74e66e7..83889c3 100644
+--- a/apps/workforce/models.py
++++ b/apps/workforce/models.py
+@@ -14,6 +14,9 @@ from core.identifiers import canonicalize_upper_identifier
+ from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
+ from core.tenant_validation import validate_related_organizations
+ 
++# These records are owned by Workforce; imported here for Django model discovery.
++from .leave_models import LeaveBalanceEntry, LeavePolicyVersion  # noqa: F401
++
+ 
+ def employee_profile_image_upload_path(instance: "Employee", filename: str) -> str:
+     """Store employee images under opaque tenant-scoped names."""
+diff --git a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+index f2a38a4..46b4191 100644
+--- a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
++++ b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+@@ -117,7 +117,7 @@ prompts:
+     path: docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
+     canonical: true
+     immutable: true
+-    sha256: b0b06c4b7f2395485749de134f28fe11ae62650b29347e3352a6ab2b7acfd7c8
++    sha256: d5e4f4391d546d94a151206c299fbc7e061cdc6dcb9ac24d63358b5e6ebb42d3
+   CEP-024:
+     path: docs/governance/cep/PROMPTS/CEP-024_EXECUTION_PROMPT.md
+     canonical: true
+diff --git a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
+index 130c977..0ffb7ba 100644
+--- a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
++++ b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
+@@ -124,8 +124,10 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
+ If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
+ 
+ ## 16. Data / Migration Requirements
+-Migration Impact = `NONE`.
+-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
++Migration Impact = `ADDITIVE SCHEMA — DEVELOPMENT / NON-PRODUCTION ONLY`.
++
++Human amendment 2026-10-19: minimum additive persistence/schema and Development / Non-Production migration execution solely for existing IMB-0074 Leave Policy and entitlement/balance authority. Original Scope, AC, DoD, dependencies, PD-024/PD-026 and SPEC-011 remain unchanged. No CEP-057 opening-balance backfill, production migration, cutover or activation without effective explicit policy. Source: `docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt`.
++- Verify additive schema forward/reverse/reapply in an isolated non-production database; retain migration output and preservation evidence. No existing leave balances may be synthesized or backfilled.
+ - If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
+ 
+ ## 17. Integration Requirements
+@@ -151,14 +153,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
+ ## 21. Test Plan
+ Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
+ 
+-UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
++UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=REQUIRED (bounded additive schema); UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
+ 
+ UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
+ 
+ ## 22. Evidence Plan
+ Use only package-relevant evidence; no fabricated evidence IDs or results.
+ 
+-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
++CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED (bounded additive schema); DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
+ 
+ Future authorized execution must produce:
+ - `CEP-023_EXECUTION_MANIFEST.md`
+diff --git a/apps/workforce/leave_models.py b/apps/workforce/leave_models.py
+new file mode 100644
+index 0000000..9097ca9
+--- /dev/null
++++ b/apps/workforce/leave_models.py
+@@ -0,0 +1,236 @@
++"""CEP-023 authoritative leave records; no statutory or profile defaults."""
++
++# Django model Meta declarations are class-level collections.
++# ruff: noqa: RUF012
++
++from django.conf import settings
++from django.core.exceptions import ValidationError
++from django.db import models
++from django.db.models import Q
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class LeaveHistoryQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("Leave history requires an appended correction.")
++
++    def delete(self):
++        raise ValidationError("Leave history cannot be deleted.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("Leave history requires validated individual records.")
++
++
++class LeaveHistory(UUIDModel, CreatedAtModel):
++    objects = models.Manager.from_queryset(LeaveHistoryQuerySet)()
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField(max_length=2000)
++    evidence_reference = models.CharField(max_length=255)
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding:
++            raise ValidationError("Leave history is immutable.")
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("Leave history cannot be deleted.")
++
++
++class LeavePolicyVersion(LeaveHistory):
++    category_code = models.CharField(max_length=50)
++    version = models.PositiveIntegerField()
++    effective_from = models.DateField()
++    effective_to = models.DateField()
++    unit = models.CharField(
++        max_length=20, choices=[("minutes", "Minutes"), ("days", "Days")]
++    )
++    accrual_preset = models.CharField(
++        max_length=20,
++        choices=[(v, v) for v in ("FULL_CREDIT", "ZERO_ACCRUAL", "POLICY_DEFINED")],
++    )
++    # A reference is evidence, never executable tenant code or an inferred rate.
++    entitlement_rule_reference = models.CharField(max_length=255)
++    accrual_rule_reference = models.CharField(max_length=255, blank=True)
++    negative_balance_threshold = models.DecimalField(max_digits=14, decimal_places=4)
++    carry_forward_limit = models.DecimalField(
++        max_digits=14, decimal_places=4, null=True, blank=True
++    )
++    expiry_rule_reference = models.CharField(max_length=255, blank=True)
++    supersedes = models.OneToOneField(
++        "self",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="replacement",
++    )
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["organization", "category_code", "version"],
++                name="leave_policy_version_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(effective_to__gt=models.F("effective_from")),
++                name="leave_policy_dates_ck",
++            ),
++            models.CheckConstraint(
++                condition=Q(negative_balance_threshold__lte=0),
++                name="leave_policy_floor_ck",
++            ),
++            models.CheckConstraint(
++                condition=Q(carry_forward_limit__isnull=True)
++                | Q(carry_forward_limit__gte=0),
++                name="leave_policy_carry_ck",
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self, supersedes=self.supersedes if self.supersedes_id else None
++        )
++        if (
++            self.accrual_preset == "POLICY_DEFINED"
++            and not self.accrual_rule_reference.strip()
++        ):
++            raise ValidationError("An explicit approved accrual rule is required.")
++        if self.supersedes_id and (
++            self.supersedes.category_code != self.category_code
++            or self.version != self.supersedes.version + 1
++            or self.unit != self.supersedes.unit
++        ):
++            raise ValidationError(
++                "A replacement must retain its policy identity and unit."
++            )
++
++
++class LeaveEntryKind(models.TextChoices):
++    OPENING = "opening", "Controlled opening evidence (CEP-057 producer)"
++    ENTITLEMENT = "entitlement", "Entitlement"
++    ACCRUAL = "accrual", "Accrual"
++    CARRY_FORWARD = "carry_forward", "Carry forward"
++    EXPIRY = "expiry", "Expiry"
++    ADJUSTMENT = "adjustment", "Adjustment"
++    REVERSAL = "reversal", "Reversal"
++    RESERVATION = "reservation", "Reservation"
++    RELEASE = "release", "Reservation release"
++    CONSUMPTION = "consumption", "Approved occurrence consumption"
++    REINSTATEMENT = "reinstatement", "Cancellation reinstatement"
++
++
++class LeaveBalanceEntry(LeaveHistory):
++    relationship = models.ForeignKey(
++        "workforce.WorkRelationship",
++        on_delete=models.PROTECT,
++        related_name="leave_entries",
++    )
++    policy = models.ForeignKey(LeavePolicyVersion, on_delete=models.PROTECT)
++    effective_on = models.DateField()
++    kind = models.CharField(max_length=24, choices=LeaveEntryKind.choices)
++    quantity = models.DecimalField(max_digits=14, decimal_places=4)
++    reserved_quantity = models.DecimalField(max_digits=14, decimal_places=4)
++    source_key = models.CharField(max_length=200)
++    request_snapshot = models.JSONField(default=dict, blank=True)
++    request = models.ForeignKey(
++        "timekeeping.LeaveMissionRequest",
++        on_delete=models.PROTECT,
++        null=True,
++        blank=True,
++        related_name="balance_entries",
++    )
++    reverses = models.OneToOneField(
++        "self", on_delete=models.PROTECT, null=True, blank=True, related_name="reversal"
++    )
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["organization", "source_key"], name="leave_entry_source_uq"
++            ),
++            models.CheckConstraint(
++                condition=~(Q(quantity=0) & Q(reserved_quantity=0)),
++                name="leave_entry_nonzero_ck",
++            ),
++            models.UniqueConstraint(
++                fields=["request", "kind"],
++                condition=Q(request__isnull=False),
++                name="leave_request_kind_uq",
++            ),
++        ]
++        indexes = [
++            models.Index(
++                fields=["organization", "relationship", "effective_on"],
++                name="leave_balance_asof_idx",
++            )
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            relationship=self.relationship if self.relationship_id else None,
++            policy=self.policy if self.policy_id else None,
++            request=self.request if self.request_id else None,
++            reverses=self.reverses if self.reverses_id else None,
++        )
++        if (
++            self.request_id
++            and self.relationship.legacy_employee_id != self.request.employee_id
++        ):
++            raise ValidationError(
++                "The request requires an explicit legacy identity link."
++            )
++        if self.reverses_id and (
++            self.reverses.relationship_id != self.relationship_id
++            or self.reverses.policy_id != self.policy_id
++            or self.quantity != -self.reverses.quantity
++            or self.reserved_quantity != -self.reverses.reserved_quantity
++        ):
++            raise ValidationError(
++                "Reversal must exactly retain and reverse its source."
++            )
++        request_kinds = {
++            LeaveEntryKind.RESERVATION,
++            LeaveEntryKind.RELEASE,
++            LeaveEntryKind.CONSUMPTION,
++            LeaveEntryKind.REINSTATEMENT,
++        }
++        if (self.kind in request_kinds) != bool(self.request_id):
++            raise ValidationError(
++                "Request movements require an explicit native source."
++            )
++        if self.kind == LeaveEntryKind.RESERVATION and (
++            self.quantity != 0 or self.reserved_quantity <= 0 or self.reverses_id
++        ):
++            raise ValidationError("A reservation only increases reserved quantity.")
++        if self.kind == LeaveEntryKind.RELEASE and (
++            self.quantity != 0
++            or self.reserved_quantity >= 0
++            or not self.reverses_id
++            or self.reverses.kind != LeaveEntryKind.RESERVATION
++        ):
++            raise ValidationError("A release must reverse its exact reservation.")
++        if self.kind == LeaveEntryKind.CONSUMPTION and (
++            self.quantity >= 0
++            or self.reserved_quantity != 0
++            or self.reverses_id
++            or self.request.state != "approved"
++        ):
++            raise ValidationError("Consumption requires an approved native occurrence.")
++        if self.kind == LeaveEntryKind.REINSTATEMENT and (
++            self.quantity <= 0
++            or self.reserved_quantity != 0
++            or not self.reverses_id
++            or self.reverses.kind != LeaveEntryKind.CONSUMPTION
++        ):
++            raise ValidationError("Reinstatement must reverse its exact consumption.")
++        if self.kind not in request_kinds and self.reserved_quantity != 0:
++            raise ValidationError("Non-request sources cannot change reservations.")
+diff --git a/apps/workforce/leave_services.py b/apps/workforce/leave_services.py
+new file mode 100644
+index 0000000..462d20f
+--- /dev/null
++++ b/apps/workforce/leave_services.py
+@@ -0,0 +1,699 @@
++"""Explicit leave source history and as-of projection. No inferred policy values.
++
++Approved policy rule references and quantities are required source inputs. This
++module does not interpret unregistered formulas, execute tenant code, calculate
++statutory rates, convert days to minutes, or infer credits from request history.
++"""
++
++from dataclasses import dataclass
++from datetime import date, datetime
++from decimal import Decimal, InvalidOperation
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.timekeeping.models import LeaveMissionRequest, RequestKind, RequestState
++
++from .leave_models import LeaveBalanceEntry, LeavePolicyVersion
++from .leave_models import LeaveEntryKind as K
++from .models import WorkRelationship
++
++
++def _access(organization: Organization, actor: User, permission: P) -> Organization:
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        message="Explicit leave authority is required.",
++    )
++    return organization
++
++
++def _quantity(value: Decimal) -> Decimal:
++    if not isinstance(value, Decimal) or not value.is_finite():
++        raise ValidationError("An explicit finite Decimal quantity is required.")
++    try:
++        rounded = value.quantize(Decimal("0.0001"))
++    except InvalidOperation as exc:
++        raise ValidationError("Invalid leave quantity.") from exc
++    if value != rounded:
++        raise ValidationError("Quantity precision exceeds the authoritative unit.")
++    return value
++
++
++def _relationship(organization, relationship):
++    try:
++        return WorkRelationship.objects.select_for_update().get(
++            pk=relationship.pk, organization=organization
++        )
++    except WorkRelationship.DoesNotExist as exc:
++        raise PermissionDenied(
++            "Workforce subject is outside the active tenant."
++        ) from exc
++
++
++def _policy(organization, category_code, on, recorded_before=None):
++    candidates = LeavePolicyVersion.objects.filter(
++        organization=organization,
++        category_code=category_code,
++        effective_from__lte=on,
++        effective_to__gt=on,
++    )
++    if recorded_before is not None:
++        candidates = candidates.filter(created_at__lte=recorded_before)
++    policy = candidates.order_by("-version").first()
++    if policy is None:
++        raise ValidationError("UNSPECIFIED LEAVE POLICY — DO NOT INVENT")
++    return policy
++
++
++@transaction.atomic
++def record_policy(
++    *,
++    organization: Organization,
++    actor: User,
++    category_code: str,
++    effective_from: date,
++    effective_to: date,
++    unit: str,
++    accrual_preset: str,
++    entitlement_rule_reference: str,
++    accrual_rule_reference: str,
++    negative_balance_threshold: Decimal,
++    carry_forward_limit: Decimal | None,
++    expiry_rule_reference: str,
++    evidence_reference: str,
++    reason: str,
++    supersedes: LeavePolicyVersion | None = None,
++) -> LeavePolicyVersion:
++    organization = _access(organization, actor, P.LEAVE_POLICIES_MANAGE)
++    _quantity(negative_balance_threshold)
++    if carry_forward_limit is not None:
++        _quantity(carry_forward_limit)
++    versions = LeavePolicyVersion.objects.filter(
++        organization=organization, category_code=category_code
++    )
++    previous = None
++    if supersedes is not None:
++        previous = versions.filter(pk=supersedes.pk).first()
++        if previous is None:
++            raise PermissionDenied("Policy replacement is outside its source family.")
++        if versions.filter(supersedes=previous).exists():
++            raise ValidationError("Policy has already been replaced.")
++        if (effective_from, effective_to) != (
++            previous.effective_from,
++            previous.effective_to,
++        ):
++            raise ValidationError(
++                "Correction must retain the original effective interval."
++            )
++    overlapping = versions.filter(
++        effective_from__lt=effective_to, effective_to__gt=effective_from
++    )
++    if previous:
++        # Only the correction chain of this exact interval may overlap.
++        overlapping = overlapping.exclude(
++            effective_from=previous.effective_from, effective_to=previous.effective_to
++        )
++    if overlapping.exists():
++        raise ValidationError("Independent policy intervals may not overlap.")
++    latest = versions.order_by("-version").first()
++    version = latest.version + 1 if latest else 1
++    if previous and previous.version != version - 1:
++        raise ValidationError("Only the latest policy version may be corrected.")
++    policy = LeavePolicyVersion.objects.create(
++        organization=organization,
++        actor=actor,
++        category_code=category_code,
++        version=version,
++        effective_from=effective_from,
++        effective_to=effective_to,
++        unit=unit,
++        accrual_preset=accrual_preset,
++        entitlement_rule_reference=entitlement_rule_reference,
++        accrual_rule_reference=accrual_rule_reference,
++        negative_balance_threshold=negative_balance_threshold,
++        carry_forward_limit=carry_forward_limit,
++        expiry_rule_reference=expiry_rule_reference,
++        evidence_reference=evidence_reference,
++        reason=reason,
++        supersedes=previous,
++    )
++    for relationship in WorkRelationship.objects.filter(
++        organization=organization, leave_entries__policy__category_code=category_code
++    ).distinct():
++        _validate_history(organization, relationship, policy)
++    return policy
++
++
++@dataclass(frozen=True)
++class LeaveBalance:
++    relationship_id: object
++    policy_id: object
++    unit: str
++    as_of: date
++    quantity: Decimal
++    reserved: Decimal
++    available: Decimal
++    source_ids: tuple
++
++
++def _entries(organization, relationship, category_code, recorded_before=None):
++    entries = LeaveBalanceEntry.objects.filter(
++        organization=organization,
++        relationship=relationship,
++        policy__category_code=category_code,
++    )
++    if recorded_before is not None:
++        entries = entries.filter(created_at__lte=recorded_before)
++    return entries.order_by("effective_on", "created_at", "pk")
++
++
++@transaction.atomic
++def balance_as_of(
++    *,
++    organization: Organization,
++    actor: User,
++    relationship: WorkRelationship,
++    category_code: str,
++    as_of: date,
++    recorded_before: datetime | None = None,
++) -> LeaveBalance:
++    organization = _access(organization, actor, P.LEAVE_BALANCES_VIEW)
++    relationship = _relationship(organization, relationship)
++    policy = _policy(organization, category_code, as_of, recorded_before)
++    entries = list(
++        _entries(organization, relationship, category_code, recorded_before).filter(
++            effective_on__lte=as_of
++        )
++    )
++    if not entries:
++        raise ValidationError(
++            "No evidenced source balance exists for this subject/cutoff."
++        )
++    if any(e.policy.unit != policy.unit for e in entries):
++        raise ValidationError("Leave units require an explicitly governed conversion.")
++    quantity = sum((e.quantity for e in entries), Decimal(0))
++    reserved = sum((e.reserved_quantity for e in entries), Decimal(0))
++    if reserved < 0 or quantity - reserved < policy.negative_balance_threshold:
++        raise ValidationError("As-of balance breaches its explicit effective policy.")
++    return LeaveBalance(
++        relationship.pk,
++        policy.pk,
++        policy.unit,
++        as_of,
++        quantity,
++        reserved,
++        quantity - reserved,
++        tuple(e.pk for e in entries),
++    )
++
++
++def _append(
++    *,
++    organization,
++    actor,
++    relationship,
++    policy,
++    effective_on,
++    kind,
++    quantity,
++    reserved_quantity,
++    source_key,
++    evidence_reference,
++    reason,
++    request=None,
++    reverses=None,
++):
++    _quantity(quantity)
++    _quantity(reserved_quantity)
++    data = {
++        "organization": organization,
++        "actor": actor,
++        "relationship": relationship,
++        "policy": policy,
++        "effective_on": effective_on,
++        "kind": kind,
++        "quantity": quantity,
++        "reserved_quantity": reserved_quantity,
++        "source_key": source_key,
++        "evidence_reference": evidence_reference,
++        "reason": reason,
++        "request": request,
++        "reverses": reverses,
++        "request_snapshot": _request_snapshot(request) if request else {},
++    }
++    existing = LeaveBalanceEntry.objects.filter(
++        organization=organization, source_key=source_key
++    ).first()
++    if existing:
++        if any(getattr(existing, k) != v for k, v in data.items()):
++            raise ValidationError(
++                "Idempotency key was used with different source facts."
++            )
++        return existing
++    if effective_on < relationship.effective_start or (
++        relationship.effective_end is not None
++        and effective_on > relationship.effective_end
++    ):
++        raise ValidationError(
++            "Leave source falls outside its evidenced employment episode."
++        )
++    entry = LeaveBalanceEntry.objects.create(**data)
++    _validate_history(organization, relationship, policy)
++    return entry
++
++
++def _validate_history(organization, relationship, policy):
++    total = reserved = Decimal(0)
++    # Recheck every chronological prefix, including future reservations, so a
++    # backdated correction cannot silently invalidate a later accepted balance.
++    for row in _entries(
++        organization, relationship, policy.category_code
++    ).select_related("policy"):
++        if row.policy.unit != policy.unit:
++            raise ValidationError("Leave unit conversion has no governed contract.")
++        total += row.quantity
++        reserved += row.reserved_quantity
++        floor = _policy(
++            organization, policy.category_code, row.effective_on
++        ).negative_balance_threshold
++        if reserved < 0 or total - reserved < floor:
++            raise ValidationError(
++                "Leave source would breach explicit balance/reservation policy."
++            )
++    for start in (
++        LeavePolicyVersion.objects.filter(
++            organization=organization, category_code=policy.category_code
++        )
++        .values_list("effective_from", flat=True)
++        .distinct()
++    ):
++        prior = list(
++            _entries(organization, relationship, policy.category_code).filter(
++                effective_on__lte=start
++            )
++        )
++        if prior:
++            available = sum(
++                (e.quantity - e.reserved_quantity for e in prior), Decimal(0)
++            )
++            if (
++                available
++                < _policy(
++                    organization, policy.category_code, start
++                ).negative_balance_threshold
++            ):
++                raise ValidationError(
++                    "Policy interval would invalidate an existing source balance."
++                )
++
++
++@transaction.atomic
++def record_credit(
++    *,
++    organization: Organization,
++    actor: User,
++    relationship: WorkRelationship,
++    category_code: str,
++    effective_on: date,
++    kind: str,
++    quantity: Decimal,
++    rule_reference: str,
++    source_key: str,
++    evidence_reference: str,
++    reason: str,
++) -> LeaveBalanceEntry:
++    """Record an explicitly evidenced rule outcome, never calculate an absent rate.
++
++    Opening-balance production is deliberately unavailable here (CEP-057).
++    Repeated periodic inputs require their own stable source evidence/key.
++    """
++    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    relationship = _relationship(organization, relationship)
++    policy = _policy(organization, category_code, effective_on)
++    _quantity(quantity)
++    if kind not in {K.ENTITLEMENT, K.ACCRUAL, K.CARRY_FORWARD, K.EXPIRY, K.ADJUSTMENT}:
++        raise ValidationError(
++            "Unsupported leave source; opening import belongs to CEP-057."
++        )
++    expected_rule = policy.entitlement_rule_reference
++    if kind == K.ACCRUAL:
++        if policy.accrual_preset != "POLICY_DEFINED":
++            raise ValidationError(
++                "This explicit preset does not permit periodic accrual."
++            )
++        expected_rule = policy.accrual_rule_reference
++    if kind == K.CARRY_FORWARD and (
++        policy.carry_forward_limit is None or quantity > policy.carry_forward_limit
++    ):
++        raise ValidationError(
++            "Carry forward requires an explicit limit and eligible source evidence."
++        )
++    if kind == K.EXPIRY:
++        expected_rule = policy.expiry_rule_reference
++    if not expected_rule.strip() or rule_reference != expected_rule:
++        raise ValidationError("The approved effective rule reference is required.")
++    if (kind in {K.ENTITLEMENT, K.ACCRUAL, K.CARRY_FORWARD} and quantity <= 0) or (
++        kind == K.EXPIRY and quantity >= 0
++    ):
++        raise ValidationError("Leave credit/expiry direction is invalid.")
++    return _append(
++        organization=organization,
++        actor=actor,
++        relationship=relationship,
++        policy=policy,
++        effective_on=effective_on,
++        kind=kind,
++        quantity=quantity,
++        reserved_quantity=Decimal(0),
++        source_key=source_key,
++        evidence_reference=evidence_reference,
++        reason=reason,
++    )
++
++
++@transaction.atomic
++def reverse_credit(
++    *,
++    organization: Organization,
++    actor: User,
++    source: LeaveBalanceEntry,
++    effective_on: date,
++    source_key: str,
++    evidence_reference: str,
++    reason: str,
++) -> LeaveBalanceEntry:
++    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    try:
++        source = LeaveBalanceEntry.objects.select_for_update().get(
++            pk=source.pk, organization=organization
++        )
++    except LeaveBalanceEntry.DoesNotExist as exc:
++        raise PermissionDenied("Leave source is outside the active tenant.") from exc
++    if (
++        source.kind
++        not in {K.ENTITLEMENT, K.ACCRUAL, K.CARRY_FORWARD, K.EXPIRY, K.ADJUSTMENT}
++        or effective_on < source.effective_on
++    ):
++        raise ValidationError(
++            "Only original source credits may be corrected, at/after source date."
++        )
++    relationship = _relationship(organization, source.relationship)
++    return _append(
++        organization=organization,
++        actor=actor,
++        relationship=relationship,
++        policy=source.policy,
++        effective_on=effective_on,
++        kind=K.REVERSAL,
++        quantity=-source.quantity,
++        reserved_quantity=Decimal(0),
++        source_key=source_key,
++        evidence_reference=evidence_reference,
++        reason=reason,
++        reverses=source,
++    )
++
++
++def _request(organization, actor, request, permission):
++    try:
++        request = LeaveMissionRequest.objects.select_for_update().get(
++            pk=request.pk, organization=organization
++        )
++    except LeaveMissionRequest.DoesNotExist as exc:
++        raise PermissionDenied("Leave request is outside the active tenant.") from exc
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=request.project,
++        site=request.site,
++        message="Leave request permission/object scope is required.",
++    )
++    if request.kind != RequestKind.LEAVE:
++        raise ValidationError(
++            "Only a native leave request may use the leave authority."
++        )
++    return request
++
++
++def _local_date(organization, moment):
++    return moment.astimezone(ZoneInfo(organization.settings.timezone)).date()
++
++
++def _request_snapshot(request):
++    return {
++        "employee_id": str(request.employee_id),
++        "category_code": request.category_code,
++        "kind": request.kind,
++        "starts_at": request.starts_at.isoformat(),
++        "ends_at": request.ends_at.isoformat(),
++        "project_id": str(request.project_id) if request.project_id else None,
++        "site_id": str(request.site_id) if request.site_id else None,
++        "policy_reference": request.policy_reference,
++    }
++
++
++@transaction.atomic
++def reserve_request(
++    *,
++    organization: Organization,
++    actor: User,
++    relationship: WorkRelationship,
++    request: LeaveMissionRequest,
++    quantity: Decimal,
++    effective_on: date,
++    source_key: str,
++    evidence_reference: str,
++    reason: str,
++) -> LeaveBalanceEntry:
++    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    relationship = _relationship(organization, relationship)
++    request = _request(organization, actor, request, P.LEAVE_MISSION_REQUEST)
++    if request.state != RequestState.DRAFT or request.requested_by_id != actor.pk:
++        raise PermissionDenied("Only the author may reserve a draft leave request.")
++    _quantity(quantity)
++    if quantity <= 0 or effective_on > _local_date(organization, request.starts_at):
++        raise ValidationError("Reservation quantity/date is invalid.")
++    _validate_request_episode(organization, relationship, request)
++    policy = _policy(organization, request.category_code, effective_on)
++    end_policy = _policy(
++        organization, request.category_code, _local_date(organization, request.ends_at)
++    )
++    if policy.pk != end_policy.pk:
++        raise ValidationError(
++            "Cross-policy requests require explicit separate source allocation."
++        )
++    if (
++        not _entries(organization, relationship, request.category_code)
++        .filter(effective_on__lte=effective_on)
++        .exists()
++    ):
++        raise ValidationError(
++            "An evidenced initial entitlement/opening source is required."
++        )
++    return _append(
++        organization=organization,
++        actor=actor,
++        relationship=relationship,
++        policy=policy,
++        effective_on=effective_on,
++        kind=K.RESERVATION,
++        quantity=Decimal(0),
++        reserved_quantity=quantity,
++        source_key=source_key,
++        evidence_reference=evidence_reference,
++        reason=reason,
++        request=request,
++    )
++
++
++def _require_reservation(*, organization, request):
++    """Internal guard, called only after native service authorization/locking."""
++    reserve = (
++        LeaveBalanceEntry.objects.filter(
++            organization=organization,
++            request=request,
++            kind=K.RESERVATION,
++        )
++        .select_related("policy", "relationship")
++        .first()
++    )
++    if (
++        reserve is None
++        or LeaveBalanceEntry.objects.filter(request=request, kind=K.RELEASE).exists()
++    ):
++        raise ValidationError("An active authoritative leave reservation is required.")
++    current = _policy(organization, request.category_code, reserve.effective_on)
++    if reserve.request_snapshot != _request_snapshot(request):
++        raise ValidationError("Request facts changed after authoritative allocation.")
++    _validate_request_episode(organization, reserve.relationship, request)
++    if current.pk != reserve.policy_id:
++        raise ValidationError(
++            "Policy changed; the source allocation requires governed review."
++        )
++    return reserve
++
++
++def _validate_request_episode(organization, relationship, request):
++    start = _local_date(organization, request.starts_at)
++    end = _local_date(organization, request.ends_at)
++    if relationship.legacy_employee_id != request.employee_id or (
++        start < relationship.effective_start
++        or (relationship.effective_end is not None and end > relationship.effective_end)
++    ):
++        raise ValidationError(
++            "Request must retain its explicit employed identity/episode."
++        )
++
++
++def _release(
++    organization, actor, request, reserve, effective_on, evidence_reference, reason
++):
++    return _append(
++        organization=organization,
++        actor=actor,
++        relationship=reserve.relationship,
++        policy=reserve.policy,
++        effective_on=effective_on,
++        kind=K.RELEASE,
++        quantity=Decimal(0),
++        reserved_quantity=-reserve.reserved_quantity,
++        source_key=f"request:{request.pk}:release",
++        evidence_reference=evidence_reference,
++        reason=reason,
++        request=request,
++        reverses=reserve,
++    )
++
++
++def _release_rejected_request(*, organization, actor, request, reason):
++    """Internal native review seam; transaction/authorization owned by caller."""
++    reserve = LeaveBalanceEntry.objects.filter(
++        organization=organization, request=request, kind=K.RESERVATION
++    ).first()
++    if reserve is not None:
++        _release(
++            organization,
++            actor,
++            request,
++            reserve,
++            reserve.effective_on,
++            f"native-rejection:{request.pk}",
++            reason,
++        )
++
++
++@transaction.atomic
++def consume_approved_occurrence(
++    *,
++    organization: Organization,
++    actor: User,
++    request: LeaveMissionRequest,
++    occurred_on: date,
++    evidence_reference: str,
++    reason: str,
++) -> LeaveBalanceEntry:
++    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    request = _request(organization, actor, request, P.LEAVE_MISSION_REVIEW)
++    if request.state != RequestState.APPROVED:
++        raise ValidationError("Consumption requires an approved leave occurrence.")
++    if request.requested_by_id == actor.pk:
++        raise PermissionDenied("Self consumption approval is forbidden.")
++    if request.ends_at > timezone.now() or occurred_on != _local_date(
++        organization, request.ends_at
++    ):
++        raise ValidationError(
++            "Occurrence evidence must match completed approved leave."
++        )
++    existing = LeaveBalanceEntry.objects.filter(
++        organization=organization, request=request, kind=K.CONSUMPTION
++    ).first()
++    if existing:
++        if (
++            existing.evidence_reference != evidence_reference
++            or existing.reason != reason
++        ):
++            raise ValidationError("Occurrence retry changed its evidence.")
++        return existing
++    reserve = _require_reservation(organization=organization, request=request)
++    _release(
++        organization, actor, request, reserve, occurred_on, evidence_reference, reason
++    )
++    return _append(
++        organization=organization,
++        actor=actor,
++        relationship=reserve.relationship,
++        policy=reserve.policy,
++        effective_on=occurred_on,
++        kind=K.CONSUMPTION,
++        quantity=-reserve.reserved_quantity,
++        reserved_quantity=Decimal(0),
++        source_key=f"request:{request.pk}:consumption",
++        evidence_reference=evidence_reference,
++        reason=reason,
++        request=request,
++    )
++
++
++@transaction.atomic
++def cancel_request(
++    *,
++    organization: Organization,
++    actor: User,
++    request: LeaveMissionRequest,
++    effective_on: date,
++    evidence_reference: str,
++    reason: str,
++) -> LeaveBalanceEntry:
++    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    request = _request(organization, actor, request, P.LEAVE_MISSION_REVIEW)
++    if actor.pk == request.requested_by_id:
++        raise PermissionDenied(
++            "Cancellation requires an independent authorized reviewer."
++        )
++    source = LeaveBalanceEntry.objects.filter(
++        organization=organization, request=request, kind=K.CONSUMPTION
++    ).first()
++    if source:
++        kind = K.REINSTATEMENT
++    else:
++        source = LeaveBalanceEntry.objects.filter(
++            organization=organization, request=request, kind=K.RESERVATION
++        ).first()
++        kind = K.RELEASE
++    if source is None or effective_on < source.effective_on:
++        raise ValidationError("Cancellation requires dated source allocation evidence.")
++    if request.state not in {
++        RequestState.SUBMITTED,
++        RequestState.APPROVED,
++        RequestState.CANCELLED,
++    }:
++        raise ValidationError("Request is not eligible for cancellation.")
++    result = _append(
++        organization=organization,
++        actor=actor,
++        relationship=source.relationship,
++        policy=source.policy,
++        effective_on=effective_on,
++        kind=kind,
++        quantity=-source.quantity,
++        reserved_quantity=-source.reserved_quantity,
++        source_key=f"request:{request.pk}:cancellation",
++        evidence_reference=evidence_reference,
++        reason=reason,
++        request=request,
++        reverses=source,
++    )
++    LeaveMissionRequest.objects.filter(pk=request.pk).update(
++        state=RequestState.CANCELLED
++    )
++    return result
+diff --git a/apps/workforce/migrations/0014_cep023_leave_authority.py b/apps/workforce/migrations/0014_cep023_leave_authority.py
+new file mode 100644
+index 0000000..22df409
+--- /dev/null
++++ b/apps/workforce/migrations/0014_cep023_leave_authority.py
+@@ -0,0 +1,105 @@
++# Generated by Django 5.2.17 on 2026-10-19 11:39
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++def preserve_leave_history(apps, schema_editor):
++    """Schema rollback is allowed only before any authoritative history exists."""
++    for name in ("LeavePolicyVersion", "LeaveBalanceEntry"):
++        if apps.get_model("workforce", name).objects.using(
++            schema_editor.connection.alias
++        ).exists():
++            raise RuntimeError("Leave history exists; destructive schema rollback is forbidden.")
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('organizations', '0122_cep023_leave_permissions'),
++        ('timekeeping', '0003_cep022_employment_lifecycle'),
++        ('workforce', '0013_cep022_employment_lifecycle'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='LeavePolicyVersion',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('reason', models.TextField(max_length=2000)),
++                ('evidence_reference', models.CharField(max_length=255)),
++                ('category_code', models.CharField(max_length=50)),
++                ('version', models.PositiveIntegerField()),
++                ('effective_from', models.DateField()),
++                ('effective_to', models.DateField()),
++                ('unit', models.CharField(choices=[('minutes', 'Minutes'), ('days', 'Days')], max_length=20)),
++                ('accrual_preset', models.CharField(choices=[('FULL_CREDIT', 'FULL_CREDIT'), ('ZERO_ACCRUAL', 'ZERO_ACCRUAL'), ('POLICY_DEFINED', 'POLICY_DEFINED')], max_length=20)),
++                ('entitlement_rule_reference', models.CharField(max_length=255)),
++                ('accrual_rule_reference', models.CharField(blank=True, max_length=255)),
++                ('negative_balance_threshold', models.DecimalField(decimal_places=4, max_digits=14)),
++                ('carry_forward_limit', models.DecimalField(blank=True, decimal_places=4, max_digits=14, null=True)),
++                ('expiry_rule_reference', models.CharField(blank=True, max_length=255)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('supersedes', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='replacement', to='workforce.leavepolicyversion')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='LeaveBalanceEntry',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('reason', models.TextField(max_length=2000)),
++                ('evidence_reference', models.CharField(max_length=255)),
++                ('effective_on', models.DateField()),
++                ('kind', models.CharField(choices=[('opening', 'Controlled opening evidence (CEP-057 producer)'), ('entitlement', 'Entitlement'), ('accrual', 'Accrual'), ('carry_forward', 'Carry forward'), ('expiry', 'Expiry'), ('adjustment', 'Adjustment'), ('reversal', 'Reversal'), ('reservation', 'Reservation'), ('release', 'Reservation release'), ('consumption', 'Approved occurrence consumption'), ('reinstatement', 'Cancellation reinstatement')], max_length=24)),
++                ('quantity', models.DecimalField(decimal_places=4, max_digits=14)),
++                ('reserved_quantity', models.DecimalField(decimal_places=4, max_digits=14)),
++                ('source_key', models.CharField(max_length=200)),
++                ('request_snapshot', models.JSONField(blank=True, default=dict)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('relationship', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='leave_entries', to='workforce.workrelationship')),
++                ('request', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='balance_entries', to='timekeeping.leavemissionrequest')),
++                ('reverses', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='reversal', to='workforce.leavebalanceentry')),
++                ('policy', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='workforce.leavepolicyversion')),
++            ],
++        ),
++        migrations.AddConstraint(
++            model_name='leavepolicyversion',
++            constraint=models.UniqueConstraint(fields=('organization', 'category_code', 'version'), name='leave_policy_version_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavepolicyversion',
++            constraint=models.CheckConstraint(condition=models.Q(('effective_to__gt', models.F('effective_from'))), name='leave_policy_dates_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavepolicyversion',
++            constraint=models.CheckConstraint(condition=models.Q(('negative_balance_threshold__lte', 0)), name='leave_policy_floor_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavepolicyversion',
++            constraint=models.CheckConstraint(condition=models.Q(('carry_forward_limit__isnull', True), ('carry_forward_limit__gte', 0), _connector='OR'), name='leave_policy_carry_ck'),
++        ),
++        migrations.AddIndex(
++            model_name='leavebalanceentry',
++            index=models.Index(fields=['organization', 'relationship', 'effective_on'], name='leave_balance_asof_idx'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavebalanceentry',
++            constraint=models.UniqueConstraint(fields=('organization', 'source_key'), name='leave_entry_source_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavebalanceentry',
++            constraint=models.CheckConstraint(condition=models.Q(('quantity', 0), ('reserved_quantity', 0), _negated=True), name='leave_entry_nonzero_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='leavebalanceentry',
++            constraint=models.UniqueConstraint(condition=models.Q(('request__isnull', False)), fields=('request', 'kind'), name='leave_request_kind_uq'),
++        ),
++        migrations.RunPython(migrations.RunPython.noop, preserve_leave_history),
++    ]
+diff --git a/apps/workforce/test_cep023.py b/apps/workforce/test_cep023.py
+new file mode 100644
+index 0000000..256bf9a
+--- /dev/null
++++ b/apps/workforce/test_cep023.py
+@@ -0,0 +1,643 @@
++"""Executable leave authority evidence with explicit synthetic policy inputs."""
++
++from datetime import date, datetime, timedelta
++from decimal import Decimal as D
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    MembershipStatus,
++    Organization,
++    OrganizationMembership,
++    OrganizationRole,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.organizations.services import create_organization_with_owner
++from apps.timekeeping.models import LeaveMissionRequest, RequestState
++from apps.timekeeping.services import (
++    create_leave_mission_request,
++    review_time_request,
++    submit_time_request,
++)
++
++from . import leave_services as service
++from .leave_models import LeaveBalanceEntry, LeavePolicyVersion
++from .leave_models import LeaveEntryKind as K
++from .models import Employee
++from .person_services import create_person, create_work_relationship
++
++
++class LeaveAuthorityTests(TestCase):
++    def setUp(self):
++        self.actor = User.objects.create_user(username="cep023-owner")
++        self.organization = create_organization_with_owner(
++            owner=self.actor, name="CEP023", slug="cep023"
++        )
++        self.codes = [
++            P.LEAVE_POLICIES_MANAGE,
++            P.LEAVE_BALANCES_MANAGE,
++            P.LEAVE_BALANCES_VIEW,
++            P.LEAVE_MISSION_REQUEST,
++            P.LEAVE_MISSION_REVIEW,
++        ]
++        membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        membership.role_definition.permissions.add(
++            *BusinessPermission.objects.filter(code__in=self.codes)
++        )
++        self.reviewer = User.objects.create_user(username="cep023-reviewer")
++        role = OrganizationRole.objects.create(
++            organization=self.organization,
++            code="leave-reviewer",
++            name="Reviewer",
++            created_by=self.actor,
++        )
++        role.permissions.add(*BusinessPermission.objects.filter(code__in=self.codes))
++        reviewer_membership = OrganizationMembership.objects.create(
++            organization=self.organization,
++            user=self.reviewer,
++            role_definition=role,
++            status=MembershipStatus.ACTIVE,
++            assigned_by=self.actor,
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=reviewer_membership,
++            scope_type=AuthorizationScopeType.ORGANIZATION,
++            reason="Explicit synthetic reviewer scope",
++        )
++        self.employee = Employee.objects.create(
++            organization=self.organization,
++            employee_number="L1",
++            first_name="Synthetic",
++            last_name="Worker",
++        )
++        person = create_person(
++            organization=self.organization,
++            actor=self.actor,
++            first_name="Synthetic",
++            last_name="Worker",
++        )
++        self.relationship = create_work_relationship(
++            organization=self.organization,
++            actor=self.actor,
++            person=person,
++            employee_number="L1",
++            effective_start=date(2025, 1, 1),
++            legacy_employee=self.employee,
++        )
++        self.other_actor = User.objects.create_user(username="cep023-other")
++        self.other = create_organization_with_owner(
++            owner=self.other_actor, name="Other", slug="cep023-other"
++        )
++        for assigned in membership.role_assignments.select_related("role"):
++            assigned.role.permissions.add(
++                *BusinessPermission.objects.filter(code__in=self.codes)
++            )
++
++    def policy(self, **changes):
++        args = {
++            "organization": self.organization,
++            "actor": self.actor,
++            "category_code": "EXPLICIT",
++            "effective_from": date(2026, 1, 1),
++            "effective_to": date(2027, 1, 1),
++            "unit": "minutes",
++            "accrual_preset": "ZERO_ACCRUAL",
++            "entitlement_rule_reference": "approved-test-entitlement-rule",
++            "accrual_rule_reference": "",
++            "negative_balance_threshold": D(0),
++            "carry_forward_limit": None,
++            "expiry_rule_reference": "",
++            "evidence_reference": "synthetic-policy-approval",
++            "reason": "Explicit synthetic policy",
++        }
++        return service.record_policy(**(args | changes))
++
++    def credit(self, **changes):
++        args = {
++            "organization": self.organization,
++            "actor": self.actor,
++            "relationship": self.relationship,
++            "category_code": "EXPLICIT",
++            "effective_on": date(2026, 1, 1),
++            "kind": K.ENTITLEMENT,
++            "quantity": D(1000),
++            "rule_reference": "approved-test-entitlement-rule",
++            "source_key": "test-entitlement-source",
++            "evidence_reference": "synthetic-rule-outcome",
++            "reason": "Explicit synthetic source quantity",
++        }
++        return service.record_credit(**(args | changes))
++
++    def balance(self, **changes):
++        return service.balance_as_of(
++            **(
++                {
++                    "organization": self.organization,
++                    "actor": self.actor,
++                    "relationship": self.relationship,
++                    "category_code": "EXPLICIT",
++                    "as_of": date(2026, 3, 1),
++                }
++                | changes
++            )
++        )
++
++    def request(self, **changes):
++        zone = ZoneInfo("Asia/Tehran")
++        return create_leave_mission_request(
++            **(
++                {
++                    "organization": self.organization,
++                    "actor": self.actor,
++                    "employee": self.employee,
++                    "kind": "leave",
++                    "category_code": "EXPLICIT",
++                    "starts_at": datetime(2026, 2, 1, 8, tzinfo=zone),
++                    "ends_at": datetime(2026, 2, 1, 12, tzinfo=zone),
++                    "reason": "Synthetic request",
++                    "policy_reference": "synthetic-policy-approval",
++                }
++                | changes
++            )
++        )
++
++    def reserve(self, request, **changes):
++        return service.reserve_request(
++            **(
++                {
++                    "organization": self.organization,
++                    "actor": self.actor,
++                    "relationship": self.relationship,
++                    "request": request,
++                    "quantity": D(240),
++                    "effective_on": date(2026, 1, 31),
++                    "source_key": "reservation-source",
++                    "evidence_reference": "explicit-quantity-evidence",
++                    "reason": "Approved quantity in policy unit",
++                }
++                | changes
++            )
++        )
++
++    def approved(self):
++        self.policy()
++        self.credit()
++        request = self.request()
++        self.reserve(request)
++        submit_time_request(
++            organization=self.organization, actor=self.actor, request=request
++        )
++        review_time_request(
++            organization=self.organization,
++            actor=self.reviewer,
++            request=request,
++            approve=True,
++            reason="Independent native approval",
++        )
++        return request
++
++    def test_policy_and_initial_balance_absence_fail_closed(self):
++        with self.assertRaises(ValidationError):
++            self.balance()
++        with self.assertRaises(ValidationError):
++            self.credit()
++        self.policy()
++        with self.assertRaises(ValidationError):
++            self.balance()
++        with self.assertRaises(ValidationError):
++            self.reserve(self.request())
++        self.assertEqual(LeaveBalanceEntry.objects.count(), 0)
++
++    def test_authoritative_asof_projection_source_ids_and_recorded_cutoff(self):
++        policy = self.policy()
++        first = self.credit()
++        self.credit(
++            kind=K.ADJUSTMENT,
++            effective_on=date(2026, 4, 1),
++            quantity=D(-100),
++            source_key="future-correction",
++        )
++        result = self.balance(recorded_before=first.created_at)
++        self.assertEqual(
++            (
++                result.quantity,
++                result.available,
++                result.unit,
++                result.policy_id,
++                result.source_ids,
++            ),
++            (D(1000), D(1000), "minutes", policy.pk, (first.pk,)),
++        )
++        self.assertEqual(self.balance(as_of=date(2026, 4, 1)).quantity, D(900))
++
++    def test_policy_versions_preserve_prior_identity_and_knowledge_cutoff(self):
++        first = self.policy()
++        self.credit()
++        second = self.policy(
++            supersedes=first,
++            reason="Correct explicit threshold",
++            negative_balance_threshold=D(-10),
++        )
++        self.assertEqual(second.supersedes_id, first.pk)
++        self.assertEqual(self.balance().policy_id, second.pk)
++        self.assertEqual(
++            service._policy(
++                self.organization, "EXPLICIT", date(2026, 3, 1), first.created_at
++            ).pk,
++            first.pk,
++        )
++        first.refresh_from_db()
++        self.assertEqual(first.negative_balance_threshold, D(0))
++        with self.assertRaises(ValidationError):
++            self.policy(supersedes=first)
++        with self.assertRaises(ValidationError):
++            self.policy()
++
++    def test_record_and_queryset_history_are_immutable(self):
++        policy = self.policy()
++        entry = self.credit()
++        for record in (policy, entry):
++            with self.assertRaises(ValidationError):
++                record.save()
++            with self.assertRaises(ValidationError):
++                record.delete()
++            with self.assertRaises(ValidationError):
++                type(record).objects.filter(pk=record.pk).update(reason="overwrite")
++            with self.assertRaises(ValidationError):
++                type(record).objects.filter(pk=record.pk).delete()
++
++    def test_credit_retry_is_idempotent_and_mismatch_rejected(self):
++        self.policy()
++        first = self.credit()
++        self.assertEqual(self.credit().pk, first.pk)
++        with self.assertRaises(ValidationError):
++            self.credit(quantity=D(1001))
++        self.assertEqual(LeaveBalanceEntry.objects.count(), 1)
++
++    def test_explicit_correction_reverses_and_preserves_source(self):
++        self.policy()
++        source = self.credit()
++        args = {
++            "organization": self.organization,
++            "actor": self.actor,
++            "source": source,
++            "effective_on": date(2026, 2, 1),
++            "source_key": "correct-source",
++            "evidence_reference": "approved-correction",
++            "reason": "Retain original",
++        }
++        correction = service.reverse_credit(**args)
++        self.assertEqual(service.reverse_credit(**args).pk, correction.pk)
++        self.assertEqual(correction.reverses_id, source.pk)
++        self.assertEqual(self.balance().quantity, D(0))
++        source.refresh_from_db()
++        self.assertEqual(source.quantity, D(1000))
++
++    def test_no_accrual_default_carry_limit_expiry_or_opening_import(self):
++        self.policy()
++        for changes in [
++            {"kind": K.ACCRUAL},
++            {"kind": K.CARRY_FORWARD},
++            {"kind": K.EXPIRY, "quantity": D(-1)},
++            {"kind": K.OPENING},
++            {"quantity": 1000.0},
++            {"quantity": D("NaN")},
++            {"quantity": D("0.00001")},
++        ]:
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                self.credit(**changes)
++        self.assertEqual(LeaveBalanceEntry.objects.count(), 0)
++
++    def test_explicit_policy_defined_rule_outcomes_and_limits(self):
++        self.policy(
++            accrual_preset="POLICY_DEFINED",
++            accrual_rule_reference="approved-test-accrual",
++            carry_forward_limit=D(20),
++            expiry_rule_reference="approved-test-expiry",
++        )
++        self.credit()
++        self.credit(
++            kind=K.ACCRUAL,
++            quantity=D(10),
++            rule_reference="approved-test-accrual",
++            source_key="accrual-evidence",
++        )
++        self.credit(kind=K.CARRY_FORWARD, quantity=D(20), source_key="carry-evidence")
++        self.credit(
++            kind=K.EXPIRY,
++            quantity=D(-5),
++            rule_reference="approved-test-expiry",
++            source_key="expiry-evidence",
++        )
++        self.assertEqual(self.balance().quantity, D(1025))
++        with self.assertRaises(ValidationError):
++            self.credit(kind=K.CARRY_FORWARD, quantity=D(21), source_key="excess-carry")
++
++    def test_native_submission_and_approval_cannot_bypass_reservation(self):
++        request = self.request()
++        with self.assertRaises(ValidationError):
++            submit_time_request(
++                organization=self.organization, actor=self.actor, request=request
++            )
++        LeaveMissionRequest.objects.filter(pk=request.pk).update(
++            state=RequestState.SUBMITTED
++        )
++        with self.assertRaises(ValidationError):
++            review_time_request(
++                organization=self.organization,
++                actor=self.reviewer,
++                request=request,
++                approve=True,
++                reason="Text alone is insufficient",
++            )
++        self.assertEqual(LeaveBalanceEntry.objects.count(), 0)
++
++    def test_reservation_consumption_cancellation_and_retry_are_atomic(self):
++        request = self.approved()
++        balance = self.balance()
++        self.assertEqual(
++            (balance.quantity, balance.reserved, balance.available),
++            (D(1000), D(240), D(760)),
++        )
++        args = {
++            "organization": self.organization,
++            "actor": self.reviewer,
++            "request": request,
++            "occurred_on": date(2026, 2, 1),
++            "evidence_reference": "approved-occurrence",
++            "reason": "Evidenced completed occurrence",
++        }
++        consumption = service.consume_approved_occurrence(**args)
++        self.assertEqual(service.consume_approved_occurrence(**args).pk, consumption.pk)
++        self.assertEqual(
++            (self.balance().quantity, self.balance().reserved), (D(760), D(0))
++        )
++        cancel = {
++            "organization": self.organization,
++            "actor": self.reviewer,
++            "request": request,
++            "effective_on": date(2026, 2, 2),
++            "evidence_reference": "approved-cancellation",
++            "reason": "Governed cancellation",
++        }
++        reinstatement = service.cancel_request(**cancel)
++        self.assertEqual(service.cancel_request(**cancel).pk, reinstatement.pk)
++        self.assertEqual(reinstatement.reverses_id, consumption.pk)
++        self.assertEqual(
++            (self.balance().quantity, self.balance().reserved), (D(1000), D(0))
++        )
++        request.refresh_from_db()
++        self.assertEqual(request.state, RequestState.CANCELLED)
++        with self.assertRaises(ValidationError):
++            service.consume_approved_occurrence(**args)
++
++    def test_rejected_request_releases_without_consuming(self):
++        self.policy()
++        self.credit()
++        request = self.request()
++        self.reserve(request)
++        submit_time_request(
++            organization=self.organization, actor=self.actor, request=request
++        )
++        review_time_request(
++            organization=self.organization,
++            actor=self.reviewer,
++            request=request,
++            approve=False,
++            reason="Rejected by assigned authority",
++        )
++        self.assertEqual(
++            (self.balance().quantity, self.balance().reserved), (D(1000), D(0))
++        )
++        self.assertFalse(LeaveBalanceEntry.objects.filter(kind=K.CONSUMPTION).exists())
++
++    def test_cancel_unconsumed_approved_request_releases_only(self):
++        request = self.approved()
++        service.cancel_request(
++            organization=self.organization,
++            actor=self.reviewer,
++            request=request,
++            effective_on=date(2026, 2, 1),
++            evidence_reference="approved-cancel",
++            reason="Cancel before consumption",
++        )
++        self.assertEqual(
++            (self.balance().quantity, self.balance().reserved), (D(1000), D(0))
++        )
++        self.assertFalse(
++            LeaveBalanceEntry.objects.filter(kind=K.REINSTATEMENT).exists()
++        )
++
++    def test_overspend_and_backdated_correction_rollback_all_source_writes(self):
++        self.policy()
++        source = self.credit()
++        request = self.request()
++        with self.assertRaises(ValidationError):
++            self.reserve(request, quantity=D(1001))
++        self.reserve(request)
++        before = LeaveBalanceEntry.objects.count()
++        with self.assertRaises(ValidationError):
++            service.reverse_credit(
++                organization=self.organization,
++                actor=self.actor,
++                source=source,
++                effective_on=date(2026, 1, 2),
++                source_key="unsafe-reversal",
++                evidence_reference="correction",
++                reason="Would invalidate later reservation",
++            )
++        self.assertEqual(LeaveBalanceEntry.objects.count(), before)
++
++    def test_consumption_requires_approved_completed_occurrence_and_evidence(self):
++        self.policy()
++        self.credit()
++        request = self.request()
++        self.reserve(request)
++        with self.assertRaises(ValidationError):
++            service.consume_approved_occurrence(
++                organization=self.organization,
++                actor=self.reviewer,
++                request=request,
++                occurred_on=date(2026, 2, 1),
++                evidence_reference="event",
++                reason="Not approved",
++            )
++        submit_time_request(
++            organization=self.organization, actor=self.actor, request=request
++        )
++        review_time_request(
++            organization=self.organization,
++            actor=self.reviewer,
++            request=request,
++            approve=True,
++            reason="Approve",
++        )
++        before = LeaveBalanceEntry.objects.count()
++        with self.assertRaises(ValidationError):
++            service.consume_approved_occurrence(
++                organization=self.organization,
++                actor=self.reviewer,
++                request=request,
++                occurred_on=date(2026, 2, 1),
++                evidence_reference="",
++                reason="No evidence",
++            )
++        self.assertEqual(LeaveBalanceEntry.objects.count(), before)
++        with self.assertRaises(PermissionDenied):
++            service.cancel_request(
++                organization=self.organization,
++                actor=self.actor,
++                request=request,
++                effective_on=date(2026, 2, 2),
++                evidence_reference="self",
++                reason="Self cancel",
++            )
++
++    def test_tenant_permission_membership_and_suspension_fail_closed(self):
++        self.policy()
++        self.credit()
++        for kwargs in [
++            {"actor": self.other_actor},
++            {"organization": self.other, "actor": self.other_actor},
++        ]:
++            with self.assertRaises(PermissionDenied):
++                self.balance(**kwargs)
++        membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        OrganizationRole.permissions.through.objects.filter(
++            organizationrole__in=[
++                membership.role_definition_id,
++                *membership.role_assignments.values_list("role_id", flat=True),
++            ],
++            businesspermission__code=P.LEAVE_BALANCES_VIEW,
++        ).delete()
++        with self.assertRaises(PermissionDenied):
++            self.balance()
++        membership.role_definition.permissions.add(
++            BusinessPermission.objects.get(code=P.LEAVE_BALANCES_VIEW)
++        )
++        Organization.objects.filter(pk=self.organization.pk).update(status="suspended")
++        with self.assertRaises(PermissionDenied):
++            self.credit(source_key="suspended-write")
++
++    def test_request_identity_is_explicit_and_foreign_policy_replacement_denied(self):
++        policy = self.policy()
++        self.credit()
++        foreign_employee = Employee.objects.create(
++            organization=self.other,
++            employee_number="OTHER",
++            first_name="Other",
++            last_name="Worker",
++        )
++        request = self.request()
++        self.relationship.legacy_employee = None
++        from .models import WorkRelationship
++
++        WorkRelationship.objects.filter(pk=self.relationship.pk).update(
++            legacy_employee=None
++        )
++        with self.assertRaises(ValidationError):
++            self.reserve(request)
++        with self.assertRaises(PermissionDenied):
++            self.policy(
++                organization=self.other, actor=self.other_actor, supersedes=policy
++            )
++        self.assertIsNotNone(foreign_employee.pk)
++
++    def test_no_future_occurrence_or_unconfigured_policy_interval(self):
++        self.policy()
++        self.credit()
++        with self.assertRaises(ValidationError):
++            self.balance(as_of=date(2027, 1, 1))
++        with self.assertRaises(ValidationError):
++            self.policy(
++                accrual_preset="POLICY_DEFINED",
++                supersedes=LeavePolicyVersion.objects.get(),
++            )
++
++    def test_foreign_request_and_invalid_reservation_sources_fail_closed(self):
++        self.policy()
++        self.credit()
++        request = self.request()
++        with self.assertRaises(PermissionDenied):
++            service.reserve_request(
++                organization=self.other,
++                actor=self.other_actor,
++                relationship=self.relationship,
++                request=request,
++                quantity=D(1),
++                effective_on=date(2026, 1, 31),
++                source_key="foreign",
++                evidence_reference="x",
++                reason="x",
++            )
++        for changes in [
++            {"quantity": D(-1)},
++            {"effective_on": date(2026, 2, 2)},
++            {"evidence_reference": ""},
++        ]:
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                self.reserve(request, **changes)
++        self.assertEqual(LeaveBalanceEntry.objects.count(), 1)
++
++    def test_policy_correction_cannot_invalidate_recorded_balances(self):
++        policy = self.policy(negative_balance_threshold=D(-10))
++        self.credit(quantity=D(5))
++        self.credit(kind=K.ADJUSTMENT, quantity=D(-10), source_key="approved-negative")
++        with self.assertRaises(ValidationError):
++            self.policy(supersedes=policy, negative_balance_threshold=D(0))
++        self.assertEqual(LeavePolicyVersion.objects.count(), 1)
++        self.assertEqual(self.balance().available, D(-5))
++
++    def test_request_fact_changes_cannot_reuse_a_stale_reservation(self):
++        self.policy()
++        self.credit()
++        request = self.request()
++        self.reserve(request)
++        request.ends_at += timedelta(hours=1)
++        request.save()
++        with self.assertRaises(ValidationError):
++            submit_time_request(
++                organization=self.organization, actor=self.actor, request=request
++            )
++        request.refresh_from_db()
++        self.assertEqual(request.state, RequestState.DRAFT)
++
++    def test_future_occurrence_and_terminated_episode_are_rejected(self):
++        request = self.approved()
++        original_end = request.ends_at
++        LeaveMissionRequest.objects.filter(pk=request.pk).update(
++            ends_at=timezone.now() + timedelta(days=1)
++        )
++        with self.assertRaises(ValidationError):
++            service.consume_approved_occurrence(
++                organization=self.organization,
++                actor=self.reviewer,
++                request=request,
++                occurred_on=date(2026, 2, 1),
++                evidence_reference="future",
++                reason="Cannot consume future leave",
++            )
++        LeaveMissionRequest.objects.filter(pk=request.pk).update(ends_at=original_end)
++        with self.assertRaises(ValidationError):
++            service.consume_approved_occurrence(
++                organization=self.organization,
++                actor=self.reviewer,
++                request=request,
++                occurred_on=date(2026, 2, 2),
++                evidence_reference="wrong-date",
++                reason="Date mismatches approved occurrence",
++            )
+diff --git a/apps/workforce/test_cep023_migration.py b/apps/workforce/test_cep023_migration.py
+new file mode 100644
+index 0000000..047516b
+--- /dev/null
++++ b/apps/workforce/test_cep023_migration.py
+@@ -0,0 +1,99 @@
++"""Bounded additive rollback/reapply; finalized leave history cannot be dropped."""
++
++from importlib import import_module
++
++from django.apps import apps
++from django.db import connection
++from django.test import TransactionTestCase
++
++from apps.organizations.models import OrganizationRole
++from apps.timekeeping.models import LeaveMissionRequest
++
++from . import test_cep023 as fixtures
++from .leave_models import LeaveBalanceEntry, LeavePolicyVersion
++from .models import Employee, Person, WorkRelationship, WorkRelationshipRevision
++
++
++class LeaveMigrationTests(TransactionTestCase):
++    serialized_rollback = True
++
++    def test_additive_reverse_reapply_preserves_legacy_and_existing_authority(self):
++        from apps.organizations.role_defaults import DEFAULT_ROLE_PERMISSIONS
++
++        for permissions in DEFAULT_ROLE_PERMISSIONS.values():
++            self.assertFalse(
++                set(permissions)
++                & {
++                    "leave_policies.manage",
++                    "leave_balances.manage",
++                    "leave_balances.view",
++                }
++            )
++        fixture = fixtures.LeaveAuthorityTests()
++        fixture.setUp()
++        fixture.request()
++        sources = [
++            Employee,
++            Person,
++            WorkRelationship,
++            WorkRelationshipRevision,
++            LeaveMissionRequest,
++            OrganizationRole.permissions.through,
++        ]
++        before = {
++            model._meta.label: list(model.objects.order_by("pk").values())
++            for model in sources
++        }
++        guard = import_module(
++            "apps.workforce.migrations.0014_cep023_leave_authority"
++        ).preserve_leave_history
++        try:
++            # Actual migration apply/reverse/reapply is separately retained in
++            # command output. Exercise the same bounded schema operations here
++            # without replaying all unrelated historical ProjectState graphs.
++            with connection.schema_editor() as editor:
++                guard(apps, editor)
++                editor.delete_model(LeaveBalanceEntry)
++                editor.delete_model(LeavePolicyVersion)
++            self.assertNotIn(
++                "workforce_leavebalanceentry", connection.introspection.table_names()
++            )
++            self.assertEqual(
++                before,
++                {
++                    model._meta.label: list(model.objects.order_by("pk").values())
++                    for model in sources
++                },
++            )
++            with connection.schema_editor() as editor:
++                editor.create_model(LeavePolicyVersion)
++                editor.create_model(LeaveBalanceEntry)
++            self.assertEqual(
++                before,
++                {
++                    model._meta.label: list(model.objects.order_by("pk").values())
++                    for model in sources
++                },
++            )
++            policy = fixture.policy()
++            source = fixture.credit()
++            with (
++                connection.schema_editor() as editor,
++                self.assertRaisesMessage(
++                    RuntimeError, "destructive schema rollback is forbidden"
++                ),
++            ):
++                guard(apps, editor)
++            policy.refresh_from_db()
++            source.refresh_from_db()
++            self.assertEqual(source.policy_id, policy.pk)
++            print(
++                "CEP023 additive rollback/reapply: preserved Employee/Person/WorkRelationship/revisions/native requests/role grants; populated history rollback refused"
++            )
++        finally:
++            tables = connection.introspection.table_names()
++            with connection.schema_editor() as editor:
++                if LeavePolicyVersion._meta.db_table not in tables:
++                    editor.create_model(LeavePolicyVersion)
++                if LeaveBalanceEntry._meta.db_table not in tables:
++                    editor.create_model(LeaveBalanceEntry)
+diff --git a/apps/organizations/migrations/0122_cep023_leave_permissions.py b/apps/organizations/migrations/0122_cep023_leave_permissions.py
+new file mode 100644
+index 0000000..de75156
+--- /dev/null
++++ b/apps/organizations/migrations/0122_cep023_leave_permissions.py
+@@ -0,0 +1,28 @@
++"""CEP-023 catalog only; no existing or default role grants."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("leave_policies.manage", "ثبت نسخه سیاست مرخصی"),
++    ("leave_balances.manage", "ثبت منبع مانده مرخصی"),
++    ("leave_balances.view", "مشاهده مانده مجاز مرخصی"),
++)
++
++
++def forward(apps, schema_editor):
++    permission = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        permission.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0121_cep043_payroll_ap_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]

@@ -1,0 +1,184 @@
+{
+  "date": "2026-10-19",
+  "baseline": "ad167f58714577620666a0efb7f5518895cac4a0",
+  "complete_current_governed": 53,
+  "dependency_ready": [
+    "CEP-023",
+    "CEP-028",
+    "CEP-029",
+    "CEP-065",
+    "CEP-067",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "conditional_entry_review": [
+    {
+      "cep": "CEP-068",
+      "requires_condition_review": [
+        {
+          "Dependency ID": "CEP-DEP-102",
+          "Prerequisite CEP": "CEP-062",
+          "Dependent CEP": "CEP-068",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0083:IMB-0078→IMB-0091",
+          "Strength": "CONDITIONAL",
+          "Condition": "For the Mission sub-flow; the Overtime request sub-flow does not require Mission financial routing.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "ESS Mission request entry must hand approved monetary effects to exactly one governed Mission financial route.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        }
+      ]
+    },
+    {
+      "cep": "CEP-073",
+      "requires_condition_review": [
+        {
+          "Dependency ID": "CEP-DEP-074",
+          "Prerequisite CEP": "CEP-028",
+          "Dependent CEP": "CEP-073",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0044:IMB-0050→IMB-0103",
+          "Strength": "CONDITIONAL",
+          "Condition": "When Legacy Payment reference/data migration to Treasury is included in the PostgreSQL migration verification run.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "PostgreSQL migration/runtime verification of Legacy Payment reference/data migration to Treasury requires that migration implementation to exist before the scenario can be executed.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-077",
+          "Prerequisite CEP": "CEP-029",
+          "Dependent CEP": "CEP-073",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0076:IMB-0070→IMB-0103",
+          "Strength": "CONDITIONAL",
+          "Condition": "When Employee → WorkRelationship migration and rehire history is included in the PostgreSQL migration verification run.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "PostgreSQL migration/runtime verification of Employee → WorkRelationship migration and rehire history requires that migration implementation to exist before the scenario can be executed.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-097",
+          "Prerequisite CEP": "CEP-057",
+          "Dependent CEP": "CEP-073",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0079:IMB-0075→IMB-0103",
+          "Strength": "CONDITIONAL",
+          "Condition": "When Leave opening balance migration is included in the PostgreSQL migration verification run.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "PostgreSQL migration/runtime verification of Leave opening balance migration requires that migration implementation to exist before the scenario can be executed.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-098",
+          "Prerequisite CEP": "CEP-058",
+          "Dependent CEP": "CEP-073",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0089:IMB-0080→IMB-0103",
+          "Strength": "CONDITIONAL",
+          "Condition": "When Historical Payroll/YTD opening-state migration is included in the PostgreSQL migration verification run.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "PostgreSQL migration/runtime verification of Historical Payroll/YTD opening-state migration requires that migration implementation to exist before the scenario can be executed.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        }
+      ]
+    },
+    {
+      "cep": "CEP-079",
+      "requires_condition_review": [
+        {
+          "Dependency ID": "CEP-DEP-099",
+          "Prerequisite CEP": "CEP-060",
+          "Dependent CEP": "CEP-079",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0137:IMB-0053→IMB-0110",
+          "Strength": "CONDITIONAL",
+          "Condition": "Required when any of UAT scenarios UAT-CASE-019, UAT-CASE-020 is included in the representative UAT execution set.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Full Representative UAT Execution requires Native Treasury operational workspace because approved UAT scenario(s) UAT-CASE-019, UAT-CASE-020 cannot be executed meaningfully against the target state without that implementation outcome.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-101",
+          "Prerequisite CEP": "CEP-061",
+          "Dependent CEP": "CEP-079",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0138:IMB-0054→IMB-0110",
+          "Strength": "CONDITIONAL",
+          "Condition": "Required when UAT scenario UAT-CASE-023 is included in the representative UAT execution set.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Full Representative UAT Execution requires Billing/AR settlement → Treasury integration because approved UAT scenario(s) UAT-CASE-023 cannot be executed meaningfully against the target state without that implementation outcome.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-107",
+          "Prerequisite CEP": "CEP-064",
+          "Dependent CEP": "CEP-079",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0135:IMB-0051→IMB-0110",
+          "Strength": "CONDITIONAL",
+          "Condition": "Required when any of UAT scenarios UAT-CASE-003, UAT-CASE-017 is included in the representative UAT execution set.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Full Representative UAT Execution requires Legacy financial read-model convergence because approved UAT scenario(s) UAT-CASE-003, UAT-CASE-017 cannot be executed meaningfully against the target state without that implementation outcome.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-108",
+          "Prerequisite CEP": "CEP-066",
+          "Dependent CEP": "CEP-079",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0133:IMB-0046→IMB-0110",
+          "Strength": "CONDITIONAL",
+          "Condition": "Required when UAT scenario UAT-CASE-005 is included in the representative UAT execution set.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Full Representative UAT Execution requires Governed financial/project closeout gates because approved UAT scenario(s) UAT-CASE-005 cannot be executed meaningfully against the target state without that implementation outcome.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        },
+        {
+          "Dependency ID": "CEP-DEP-109",
+          "Prerequisite CEP": "CEP-067",
+          "Dependent CEP": "CEP-079",
+          "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+          "Source IMB Edge IDs / IMB Pair": "DEP-0134:IMB-0047→IMB-0110",
+          "Strength": "CONDITIONAL",
+          "Condition": "Required when UAT scenario UAT-CASE-003 is included in the representative UAT execution set.",
+          "Roadmap Compatibility": "PASS",
+          "Justification": "Full Representative UAT Execution requires Management and executive reporting read models because approved UAT scenario(s) UAT-CASE-003 cannot be executed meaningfully against the target state without that implementation outcome.",
+          "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+        }
+      ]
+    }
+  ],
+  "excluded_actual_blocked": [
+    "CEP-023",
+    "CEP-028",
+    "CEP-029",
+    "CEP-057",
+    "CEP-069"
+  ],
+  "CEP057": {
+    "eligibility": "BLOCKED_BEFORE_PRODUCT_OR_MIGRATION_MUTATION",
+    "canonical_prerequisites": [
+      "CEP-023",
+      "CEP-029"
+    ],
+    "actual_results": {
+      "CEP-023": "A3 / UNSATISFIED",
+      "CEP-029": "B4 / UNSATISFIED"
+    },
+    "specific_historical_run_log_required_by_dependency": false,
+    "verified_migrated_identity_outcome_required": true
+  },
+  "next_autonomous_cep": null,
+  "automatic_continuation": "STOPPED_AFTER_AUTHORIZED_ADJUDICATION_ONLY",
+  "remediation_ownership": [
+    "CEP-023",
+    "CEP-029"
+  ],
+  "gate05": "NOT_PASSED",
+  "activation047_048": "FAIL_CLOSED",
+  "production": false
+}

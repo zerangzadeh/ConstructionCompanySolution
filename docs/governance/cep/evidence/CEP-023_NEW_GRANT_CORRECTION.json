@@ -1,0 +1,32 @@
+{
+  "cause": "suffix-based READ_ONLY_PERMISSIONS independently reintroduced leave_balances.view despite ALL_PERMISSIONS exclusion",
+  "introduced_grants_removed": [
+    {
+      "pk": 5884,
+      "organizationrole__code": "accountant",
+      "organizationrole__organization_id": null,
+      "businesspermission__code": "leave_balances.view"
+    },
+    {
+      "pk": 5885,
+      "organizationrole__code": "supervisor",
+      "organizationrole__organization_id": null,
+      "businesspermission__code": "leave_balances.view"
+    },
+    {
+      "pk": 5886,
+      "organizationrole__code": "member",
+      "organizationrole__organization_id": null,
+      "businesspermission__code": "leave_balances.view"
+    },
+    {
+      "pk": 5887,
+      "organizationrole__code": "viewer",
+      "organizationrole__organization_id": null,
+      "businesspermission__code": "leave_balances.view"
+    }
+  ],
+  "other_grants_preserved": true,
+  "new_capability_grants_remaining": 0,
+  "production": false
+}

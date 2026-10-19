@@ -7,6 +7,9 @@ from apps.organizations.permission_registry import registered_permission_codes
 
 # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
 ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
+    BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
+    BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
+    BusinessPermissionCode.LEAVE_BALANCES_VIEW,
     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
     BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
@@ -782,6 +785,12 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
 # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
 # nor reversal to any default role until authority and SoD policy are accepted.
 for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+    # CEP-023: suffix-derived read permissions must also remain explicit.
+    _default_permissions.difference_update(permission_codes(
+        BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
+        BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
+        BusinessPermissionCode.LEAVE_BALANCES_VIEW,
+    ))
     _default_permissions.difference_update(permission_codes(
         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,

@@ -1,0 +1,46 @@
+...FF.F                                                                  [100%]
+================================== FAILURES ===================================
+_ P7TimekeepingTests.test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history _
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\test_baseline_timekeeping.py:189: in test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history
+    record = finalize_attendance(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:368: in finalize_attendance
+    _scope(
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+____ P7TimekeepingTests.test_s08_s09_requests_overlap_sod_and_policy_gate _____
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\test_baseline_timekeeping.py:313: in test_s08_s09_requests_overlap_sod_and_policy_gate
+    review_time_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:865: in review_time_request
+    _scope(
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+_ P7TimekeepingTests.test_s11_s12_conservation_immutability_review_and_non_posting_preview _
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\test_baseline_timekeeping.py:451: in test_s11_s12_conservation_immutability_review_and_non_posting_preview
+    review_timesheet(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:1043: in review_timesheet
+    _scope(
+C:\Users\azera\AppData\Local\Temp\bonira_cep023_20261019\baseline_services.py:74: in _scope
+    require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+=========================== short test summary info ===========================
+FAILED ::P7TimekeepingTests::test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history
+FAILED ::P7TimekeepingTests::test_s08_s09_requests_overlap_sod_and_policy_gate
+FAILED ::P7TimekeepingTests::test_s11_s12_conservation_immutability_review_and_non_posting_preview
+3 failed, 4 passed in 19.13s
