@@ -1,0 +1,207 @@
+.FFFFFFF                                                                 [100%]
+================================== FAILURES ===================================
+_ PayrollAffectedRegression.test_concurrent_idempotent_preparation_creates_one_proposal _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_finalized_only_idempotent_pinned_and_non_posting _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_handoff_views_expose_only_explicitly_authorized_family _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_persian_rtl_ui_and_minimum_sensitive_detail __
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_project_cost_conservation_allocation_lineage_and_no_actual _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_replacement_requires_and_preserves_explicit_predecessor_lineage _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+_ PayrollAffectedRegression.test_unallocated_reconciliation_permissions_tenant_and_audit_rollback _
+apps\payroll\test_p7_s29_s32_financial_handoffs.py:85: in setUp
+    self.organization = create_organization_with_owner(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:80: in inner
+    with self._recreate_cm():
+.venv\Lib\site-packages\django\db\transaction.py:307: in __exit__
+    connection.set_autocommit(True)
+.venv\Lib\site-packages\django\db\backends\base\base.py:491: in set_autocommit
+    self.run_and_clear_commit_hooks()
+.venv\Lib\site-packages\django\db\backends\base\base.py:769: in run_and_clear_commit_hooks
+    func()
+apps\organizations\services.py:752: in <lambda>
+    lambda: ensure_purchase_request_compatibility_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:348: in ensure_purchase_request_compatibility_workflow
+    workflow_type, template = _ensure_purchase_request_platform_catalog()
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\procurement\workflow.py:322: in _ensure_purchase_request_platform_catalog
+    workflow_type = WorkflowType.objects.get(code=WORKFLOW_TYPE_CODE, is_active=True)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowType.DoesNotExist: WorkflowType matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_concurrent_idempotent_preparation_creates_one_proposal
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_finalized_only_idempotent_pinned_and_non_posting
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_handoff_views_expose_only_explicitly_authorized_family
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_persian_rtl_ui_and_minimum_sensitive_detail
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_project_cost_conservation_allocation_lineage_and_no_actual
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_replacement_requires_and_preserves_explicit_predecessor_lineage
+FAILED apps/accounting/test_cep042_regression.py::PayrollAffectedRegression::test_unallocated_reconciliation_permissions_tenant_and_audit_rollback
+7 failed, 1 passed in 44.90s

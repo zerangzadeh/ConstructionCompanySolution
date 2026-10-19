@@ -1,0 +1,161 @@
+{
+  "date": "2026-10-19",
+  "cep": "CEP-048",
+  "primary_imb": "IMB-0037",
+  "branch": "main",
+  "head": "9771f1e4d3af0bd663bd6af2466662063e90ab5d",
+  "origin_main": "9771f1e4d3af0bd663bd6af2466662063e90ab5d",
+  "remote_main": "9771f1e4d3af0bd663bd6af2466662063e90ab5d",
+  "dirty_entry": "Only attributable completed047 post-checkpoint governance metadata; no unrelated or overlapping product changes",
+  "prompt_sha256": "7d4ac74ce888d0fda0413cccd5838ad3c9fbe687f0887763e2e30b71aba19cc1",
+  "canonical_sources": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "packages/CEP-048.md": "a5759dc5de96b5a75dd5215d135baf026e6213fdf5122990384fed1b1bb06dec",
+        "BONIRA_CEP_DEPENDENCY_REGISTER.csv": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip",
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    },
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_PROJECT_COST_PRODUCER_CONTRACT_SPECIFICATION.md": "fd461c762a1dab5a6e5b2dd1e847927dee179d0a62360e749c065d23d9dc4610",
+        "BONIRA_INTEGRATION_REGISTRY.csv": "6d2944e120e3ff836c330177e3d0ecc2f1056407959f693542034da13f060944",
+        "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip",
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    }
+  },
+  "canonical_extracts": {
+    "packages/CEP-048.md": "# CEP-048 — Payroll Project Cost labor producer\n\n## Identity\n- CEP ID: `CEP-048`\n- Lifecycle Status: `DRAFT`\n- Authorization Status: `NOT AUTHORIZED`\n- Primary Package Type: `INTEGRATION`\n- Primary Roadmap Stage: `STG-02 CORE BUILD`\n- Primary Roadmap Wave: `RW-04`\n- Primary Track: `TRACK-04`\n- Delivery Classification: `V1`\n- Risk: `CRITICAL`\n- Package Size Flag: `NONE`\n- Package Prompt Readiness: `YES`\n\n## Objective\nDeliver the canonical outcomes owned by the listed IMBs as one bounded package without expanding authority, scope, roadmap placement or business semantics.\n\n## Primary IMBs\n- `IMB-0037` — Payroll → Project Cost labor actual producer\n\n## Authoritative Sources\n- Frozen PDs: `PD-009; PD-010`\n- Specifications: `SPEC-008`\n- Integration IDs: `INT-B08`\n- UI Architecture IDs: `NONE`\n- ESS Capability IDs: `NONE`\n- Canonical sources: Final Implementation Master Backlog, Dependency Graph, Implementation Roadmap, Codex Implementation Playbook v1.0.\n- Repository design baseline: `main @ d75a9334d8e27683159c5f756725c0540651ec43` (read-only inspection).\n\n## Scope\n- Labor-cost producer, idempotency, correction/replacement, reconciliation.\n\n## Out of Scope\n- No cash payment→cost inference; no duplicate Payroll recognition.\n- Any untraced cleanup/refactor/enhancement outside approved IMB outcomes.\n- Any actual deployment, migration execution, runtime verification or Human Sign-off unless a later authorized execution package explicitly permits it.\n\n## Prerequisites\n- Prerequisite CEPs: `NONE`\n- Prerequisite IMBs from other CEPs: `NONE`\n- External dependencies: `EXT-0009`\n- Entry Gate: `Relevant authority/contract prerequisites`\n- Exit Gate: `GATE-05`\n\n## Internal Execution Sequence\n- None.\n\n## Expected Code Surfaces\n- apps/payroll (CONFIRMED directory; exact files UNKNOWN); apps/projects (CONFIRMED directory; exact files UNKNOWN)\n- Confidence: repository directories are confirmed; exact files/models/services remain `LIKELY/UNKNOWN` until package execution repository inspection.\n\n## Implementation Concerns\n- Package Size Rationale: Single canonical IMB is itself a substantial bounded outcome; keeping it isolated minimizes review blast radius and preserves independent verification.\n- Financial Impact: YES — Payroll, Project Cost\n- Configuration Profile Impact: NONE — no profile-specific semantics may be inferred\n- Feature Flag Potential: NO CURRENT NEED IDENTIFIED — feature flag must not be invented\n- Regulatory Impact: NONE\n\n## Security\n- Security Impact: `NONE`\n- Applicability detail: NONE\n- Permission Test: `NOT APPLICABLE`\n- Tenant-Isolation Test: `NOT APPLICABLE`\n## Migration / Cutover\n- Migration Impact: `NONE`\n- Canonical components: NONE\n- Migration Test: `NOT APPLICABLE`\n- Migration Evidence: `NOT APPLICABLE`\n- Migration/cutover execution remains NOT AUTHORIZED.\n## UI\n- UI Impact: `NONE`\n- UI scope detail: NONE\n- UI / Template Test: `NOT APPLICABLE`\n- Screenshot Evidence: `NOT APPLICABLE`\n- UI Runtime Evidence: `NOT APPLICABLE`\n- Global BONIRA UI standards govern if UI is touched, but do not themselves create CEP UI impact.\n## Test Plan\n\n- `UNIT`: **REQUIRED**\n- `MODEL`: **NOT APPLICABLE**\n- `SERVICE`: **REQUIRED**\n- `PERMISSION`: **NOT APPLICABLE**\n- `TENANT-ISOLATION`: **NOT APPLICABLE**\n- `WORKFLOW`: **NOT APPLICABLE**\n- `INTEGRATION`: **REQUIRED**\n- `MIGRATION`: **NOT APPLICABLE**\n- `UI / TEMPLATE`: **NOT APPLICABLE**\n- `END-TO-END`: **NOT APPLICABLE**\n- `REGRESSION`: **REQUIRED**\n- `RUNTIME VERIFICATION`: **NOT APPLICABLE**\n- `UAT`: **NOT APPLICABLE**\n- `PRODUCTION-CERTIFICATION`: **NOT APPLICABLE**\n\n**Canonical Test Basis**\n- `IMB-0037`: UNIT; DOMAIN; REGRESSION\n## Evidence Plan\n\n- `CODE DIFF`: **REQUIRED**\n- `TEST OUTPUT`: **REQUIRED**\n- `LINT OUTPUT`: **REQUIRED**\n- `MIGRATION OUTPUT`: **NOT APPLICABLE**\n- `DATA RECONCILIATION`: **NOT APPLICABLE**\n- `PERMISSION TEST`: **NOT APPLICABLE**\n- `TENANT-ISOLATION TEST`: **NOT APPLICABLE**\n- `INTEGRATION TRACE`: **REQUIRED**\n- `TRANSACTION TRACE`: **REQUIRED**\n- `SCREENSHOT`: **NOT APPLICABLE**\n- `UI RUNTIME EVIDENCE`: **NOT APPLICABLE**\n- `LOG / DIAGNOSTIC EVIDENCE`: **CONDITIONAL**\n- `UAT SCENARIO RESULT`: **NOT APPLICABLE**\n- `RESTORE / RECOVERY EVIDENCE`: **NOT APPLICABLE**\n- `PERFORMANCE RESULT`: **NOT APPLICABLE**\n- `ACCESSIBILITY / BROWSER RESULT`: **NOT APPLICABLE**\n- `PRODUCTION-CERTIFICATION EVIDENCE`: **NOT APPLICABLE**\n\n**Canonical Evidence Basis**\n- `IMB-0037`: Payroll → Project Cost labor actual producer: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.\n\n- No evidence result is claimed during package design.\n## Acceptance Coverage\n- `IMB-0037`: 6 acceptance criteria mapped in `BONIRA_CEP_ACCEPTANCE_COVERAGE_REGISTER.csv`.\n\n## Definition of Done Coverage\n- `IMB-0037` DoD: - Target outcome implemented for `Payroll → Project Cost labor actual producer` exactly within approved scope. - Source/target contract and lineage implemented. - Idempotency, retry/failure and duplicate prevention implemented. - Reconciliation and audit/source linkage implemented. - Integration/domain/security tests added. - Authority boundary verified.\n\n## Entry Criteria\n- Explicit implementation authorization exists.\n- All prerequisite CEP/IMB outcomes required by canonical dependencies are available.\n- Required gates and external conditions are satisfied for the relevant execution phase.\n- No unresolved Frozen-PD/specification conflict.\n- Repository branch/base, SHA, migration state and focused test baseline are known.\n- Build vs activation distinction is honored for conditional-readiness IMBs.\n\n## Exit Criteria\n- All scoped IMB outcomes implemented without scope invention.\n- All mapped acceptance criteria verified.\n- All required DoD obligations satisfied.\n- Applicable tests/security/migration/integration checks passed.\n- Evidence Manifest complete and inspectable.\n- No unresolved critical blocker.\n- Downstream interface/contract evidence recorded where applicable.\n- Remaining UTV stays UTV until runtime evidence exists.\n\n## Known Blockers / Conditional Readiness\n- `EXT-0009`: ACTIVATION condition; build blocking = NO; fail-closed: Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION\n\n## Execution-Prompt Readiness\n`YES` — package scope, dependencies, roadmap context, guardrails, tests and evidence expectations are defined. Future execution prompt must remain self-contained and fail closed on unresolved external/runtime conditions.\n\n## Authorization\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n\n`HUMAN SIGN-OFF: NOT EXECUTED`\n",
+    "BONIRA_CEP_DEPENDENCY_REGISTER.csv": [],
+    "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": [
+      {
+        "External Dependency ID": "EXT-0009",
+        "CEP ID": "CEP-048",
+        "Dependency Phase": "ACTIVATION",
+        "Blocks Build?": "NO",
+        "Blocks Activation?": "YES",
+        "Blocks Verification?": "NO",
+        "Blocks Production?": "NO",
+        "Required Gate": "GATE-05",
+        "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR ACTIVATION",
+        "Notes": "Payroll labor-cost→ProjectCost allocation mapping — Finalized Payroll source mapping to project/cost dimensions, effective version and correction rule"
+      }
+    ],
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": [
+      {
+        "Backlog ID": "IMB-0037",
+        "Title": "Payroll → Project Cost labor actual producer",
+        "Persian Title": "تولید Actual نیروی انسانی پروژه از حقوق",
+        "Primary Type": "INTEGRATION",
+        "Secondary Tags": "INTEGRATION, IDEMPOTENCY, RECONCILIATION, FINANCIAL, PROJECT-SCOPE, SENSITIVE-DATA",
+        "Domain": "Payroll / Project Controls",
+        "Subdomain": "Payroll / Project Controls",
+        "Business Outcome": "Finalized allocated Payroll labor evidence creates ProjectCostFact Actual exactly once.",
+        "Current State": "NOT IMPLEMENTED",
+        "Target State": "INT-B08 uses approved project/labor mapping and Payroll source version.",
+        "Implementation Scope": "Labor-cost producer, idempotency, correction/replacement, reconciliation.",
+        "Explicit Exclusions": "No cash payment→cost inference; no duplicate Payroll recognition.",
+        "V1 / Post-V1": "V1",
+        "Priority Class": "V1-ESSENTIAL",
+        "Implementation Eligibility": "CONDITIONALLY READY",
+        "Readiness Condition": "An approved Payroll labor-cost→ProjectCost allocation mapping from finalized Payroll results to project/cost dimensions must exist.",
+        "Governing Frozen PD": "PD-009; PD-010",
+        "Canonical PDM": "",
+        "Canonical Journey IDs": "E2E-PAYR-029",
+        "Integration IDs": "INT-B08",
+        "UI Architecture IDs": "",
+        "ESS Capability IDs": "",
+        "Specification Dependencies": "SPEC-008",
+        "RMB IDs": "",
+        "DTR Gap IDs": "DTR-GAP-042",
+        "UGR / Product Review IDs": "UGR-0078; UGR-0165; UGR-0166; UGR-0167; UGR-0168; UGR-0169; UGR-0171; UGR-0172; UGR-0173; UGR-0174; UGR-0175; UGR-0219; UGR-0236; UGR-0294; UGR-0296",
+        "Audit Provenance": "",
+        "Source of Truth": "Owning domain remains authoritative.",
+        "Authority Boundary": "No authority transfer beyond approved source.",
+        "Required Permission / Object Scope": "Payroll handler: authorized employee Payroll objects in permitted tenant scope. Employee-facing exposure: own finalized Payroll results only. No cross-employee UI/API/direct-URL access.",
+        "Data Model Impact": "As required by approved target; no unrelated model redesign.",
+        "Data Migration Impact": "None unless explicitly stated.",
+        "Cutover Impact": "None unless explicitly stated.",
+        "UI Impact": "NONE — no operator-surface change required by this outcome.",
+        "Integration Impact": "DIRECT — INT-B08: Payroll → Project Cost labor actual producer. Implement source identity/version, idempotency, retry/failure and reconciliation while preserving separate source/target authorities.",
+        "Security / Privacy Impact": "Backend object-scope enforcement; UI hiding is not access control.",
+        "Localization / Jalali / RTL Impact": "Persian-first / RTL / Jalali where applicable.",
+        "Testing Requirements": "UNIT; DOMAIN; REGRESSION",
+        "Runtime Verification Requirement": "Required before claiming runtime PASS.",
+        "UTV Dependency": "Preserve existing UTV until executed.",
+        "Acceptance Criteria": "1) `Payroll → Project Cost labor actual producer` produces the approved target outcome: INT-B08 uses approved project/labor mapping and Payroll source version. 2) Only the approved source occurrence under INT-B08 can create/update the target effect; source identity/version is retained. 3) Reprocessing the same source identity/version is idempotent and creates no duplicate target occurrence. 4) A failed target mutation leaves source authority intact and retains retry/error evidence; retry cannot bypass validation. 5) Authority boundary is preserved: No authority transfer beyond approved source. 6) Source/target reconciliation identifies the active source version and corresponding target correction/reversal.",
+        "Definition of Done": "- Target outcome implemented for `Payroll → Project Cost labor actual producer` exactly within approved scope. - Source/target contract and lineage implemented. - Idempotency, retry/failure and duplicate prevention implemented. - Reconciliation and audit/source linkage implemented. - Integration/domain/security tests added. - Authority boundary verified.",
+        "Known Direct Dependency IDs": "IMB-0039",
+        "Related Backlog IDs": "",
+        "Production Certification Dependency": "INDIRECT — production activation of INT-B08 requires source/target, idempotency, failure and reconciliation verification.",
+        "Human Sign-off Required?": "NO",
+        "Evidence Required": "Payroll → Project Cost labor actual producer: automated integration tests; source identity/version evidence; idempotency/retry test; source→target reconciliation; failure-path evidence; audit/source linkage.",
+        "Risk Class": "CRITICAL",
+        "Status": "BACKLOG READY",
+        "Technical Enabler Parent ID": "N/A",
+        "Notes / No-Inference Guardrail": "NO APPROVED SOURCE → NO NEW BUSINESS BEHAVIOR."
+      }
+    ],
+    "BONIRA_PROJECT_COST_PRODUCER_CONTRACT_SPECIFICATION.md": "# BONIRA — Project Cost Producer Contract Specification\n\nGoverned by `PD-010`.\n\n`NO APPROVED PRODUCER CONTRACT → NO PROJECT COST FACT`\n\nCommon idempotency key:\n`ProducerContractID + SourceType + SourceID + SourceVersion + RecognitionType`\n\n## PCP-PO-COMMITMENT\n- Source: approved/issued Purchase Order version.\n- Trigger: eligible approved/issued version becomes effective.\n- Project/CBS/cost classification: explicit validated mapping only.\n- Amount/currency/effective date: from source-approved version; no invented valuation.\n- Revision: adjusts/supersedes open commitment.\n- Cancellation: releases remaining commitment.\n- Target: `ProjectCostFact: COMMITMENT`.\n- Level: `L2`.\n- Integration: `INT-B11`.\n\n## PCP-SUBCONTRACT-COMMITMENT\nSame invariants:\n- Source: approved Subcontract version.\n- Amendment adjusts/supersedes.\n- Cancellation/termination releases remaining commitment.\n- Target: `ProjectCostFact: COMMITMENT`.\n- Level: `L2`.\n- Integration: `INT-B11`.\n\n## Accrual / Relief\n`PCP-GR-ACCRUAL` and `PCP-SERVICE-ACCRUAL` may create Accrual/relieve Commitment only where explicit source-specific valuation/mapping exists.\n\n`NO APPROVED ACCRUAL MAPPING → NO ACCRUAL FACT / NO COMMITMENT RELIEF`\n\n## Actual Producer Contracts\n- `PCP-FIN-ACTUAL` — Treasury/Accounting eligible occurrence only where explicit mapping exists.\n- `PCP-INV-ACTUAL` — eligible Inventory financial-effect event.\n- `PCP-EQP-ACTUAL` — eligible Equipment cost evidence.\n- `PCP-FA-ACTUAL` — eligible Fixed Asset/Depreciation cost evidence.\n- `PCP-PAYR-ACTUAL` — finalized Payroll labor-cost evidence.\n\nAll are L2 unless explicit policy says otherwise. Source correction/reversal creates new reversing/superseding fact; historical facts are not deleted.\n\n`IMPLEMENTATION AUTHORIZATION: NOT YET GRANTED`\n",
+    "BONIRA_INTEGRATION_REGISTRY.csv": [
+      {
+        "Official Integration ID": "INT-B08",
+        "Title": "Payroll → Project Cost Actual",
+        "Series": "B",
+        "Registry Role": "ROOT",
+        "Canonical Root ID": "INT-B08",
+        "Integration Level": "L2",
+        "Status": "Deferred target",
+        "Governing PD / Policy": "PD-010; PD-009",
+        "Source": "Payroll",
+        "Target": "ProjectCostFact ACTUAL",
+        "Provenance / Alias": "",
+        "Notes": "Producer contract required"
+      }
+    ],
+    "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": {
+      "PD-009": "### `PD-009` — Payroll Downstream Financial Effects\n\n**Domain:** Payroll  \n**Accepted option / disposition:** AMENDED under PD-030  \n**V1 position:** BLOCKS V1  \n**Status:** `FROZEN`\n\n**Decision statement:** Payroll owns calculation/economic evidence; Accounting, AP, Treasury and Project Cost receive distinct downstream effects and may not duplicate the same economic recognition. Employee receivable/carry-forward follows PD-030.\n\n**Production / evidence boundary:** Downstream financial runtime evidence remains separate.\n\n**Source provenance:** `PD-009`  \n**Affected Integration / governing links:** INT-A02; INT-A03; INT-B07; INT-B08  \n**Affected PDM:** DTR-PDM-005  \n**Affected Journeys:** Payroll financial journeys\n\n**Guardrail / fail-closed rule:** No duplicate recognition\n\n",
+      "PD-010": "### `PD-010` — Project Cost Producer & Commitment/Accrual Policy\n\n**Domain:** Project Controls  \n**Accepted option / disposition:** AMENDED with DTR-PD-006  \n**V1 position:** BLOCKS V1  \n**Status:** `FROZEN`\n\n**Decision statement:** ProjectCostFact is Project Cost authority. Source domains may produce facts only via approved Producer Contracts; PO/Subcontract commitment, revisions, cancellations, receipt/service accrual-relief and Actual producers follow explicit source-specific contracts/mappings/cutoffs.\n\n**Production / evidence boundary:** DTR-PD-006 merged; DTR-INT-001 governed.\n\n**Source provenance:** `PD-010 + DTR-PD-006`  \n**Affected Integration / governing links:** DTR-INT-001; INT-B03..B08  \n**Affected PDM:** —  \n**Affected Journeys:** DTR-JNY-012\n\n**Guardrail / fail-closed rule:** NO APPROVED PRODUCER CONTRACT → NO PROJECT COST FACT\n\n"
+    }
+  },
+  "repository_seam_hashes": {
+    "apps/payroll/models.py": "fdad2cfd317cd8738172b6c4cb2b559af1b8260411f5a2b0db4418cc6a9cf954",
+    "apps/payroll/financial_handoff_services.py": "2be816e21a09b9f5cd22e53fd6755899368e8f19f5e2ad61412f811e0bd1aa9e",
+    "apps/payroll/services.py": "4eb0bc400c6dfcf3950ff8a944939af453090ca846749054610c4a02776d19f3",
+    "apps/projects/actual_integration.py": "a7325db179395d7e8ed6e86d8454d041a68b3192ae0ca5dca0f0d5b987694e56",
+    "apps/projects/actual_sources.py": "8670c516a8ee9297ae85004ef8534136a5d65c935287b33fa70b63d0994112cd",
+    "apps/projects/test_cep047_actual.py": "acaaab3114621b41446235a8b9092966b1c27978c2677ec17436dc821a4fb555",
+    "docs/architecture/P7_S29_S32_FINANCIAL_HANDOFF_IMPLEMENTATION.md": "8c1f4d665d604a7be0ac111391d2814c3a357383676867ea311b2948f2627ff8"
+  },
+  "standing_authority": "Bounded non-production build; current explicit Human serial instruction and safe completed-work checkpoints",
+  "dependencies": [],
+  "activation_external": "EXT0009 ACTIVATION only; actual approved project/labor/classification/cutoff/effective version binding required; unconfigured must fail closed",
+  "entry_gate": "Relevant authority/contract foundations: existing approved Payroll source proposal boundary and ProjectCostSourceContract/Fact plus current canonical mapping requirements",
+  "gate05": "NOT_PASSED; exit/convergence/activation boundary retained; no global build block inferred",
+  "migration_impact": "NONE",
+  "UI": "NONE",
+  "source_seam": "Finalized Payroll PROJECT_COST FinancialHandoffProposal with accepted immutable review, allocated labor lines and source/run/cost-line/timesheet lineage; distinct cash/payment family denied",
+  "target_seam": "Existing explicit L2 Actual candidate/target transaction framework; ProjectCostFact authority retained; no auto-recognition",
+  "correction_boundary": "Use explicit native Payroll full reversal and replacement lineage; replacement after already-recognized source reversal cannot reverse the original twice. Unsupported adjustment economics remain fail-closed pending explicit approved mapping, not inferred",
+  "material_human_decision_required_for_bounded_build": false,
+  "build_eligibility": "SATISFIED_FOR_CONDITIONAL_BUILD_ONLY",
+  "production_authorized": false
+}

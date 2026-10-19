@@ -1,0 +1,828 @@
+diff --git a/apps/projects/actual_integration.py b/apps/projects/actual_integration.py
+index 466967e..eecfc95 100644
+--- a/apps/projects/actual_integration.py
++++ b/apps/projects/actual_integration.py
+@@ -150,13 +150,15 @@ def _payload(source, mapping, contract):
+-    return _stable_payload_hash(
+-        {
+-            "source_version": source.source_version,
+-            "operation": source.operation,
+-            "predecessor": source.predecessor_id,
+-            "effects": effects,
+-            "contract_payload_hash": contract.payload_hash,
+-            "cutoff": mapping.cutoff_reference,
+-            "date_rule": mapping.effective_date_rule_reference,
+-            "basis": mapping.unit_value_rate_book_reference,
+-            "attribution_version": mapping.project_attribution_version,
+-        }
+-    )
++    payload = {
++        "source_version": source.source_version,
++        "operation": source.operation,
++        "predecessor": source.predecessor_id,
++        "effects": effects,
++        "contract_payload_hash": contract.payload_hash,
++        "cutoff": mapping.cutoff_reference,
++        "date_rule": mapping.effective_date_rule_reference,
++        "basis": mapping.unit_value_rate_book_reference,
++        "attribution_version": mapping.project_attribution_version,
++    }
++    # Existing three-family payloads retain their original exact hash contract.
++    if source.required_reversal_source_id:
++        payload["required_reversal_source_id"] = source.required_reversal_source_id
++    return _stable_payload_hash(payload)
+@@ -197,0 +200,2 @@ def _build(*, organization, actor, contract_id, source_id, permission):
++    if source.operation not in {"recognize", "reverse", "replace", "replace_reversed"}:
++        raise ActualRejected("approved_correction_operation_required")
+@@ -425,3 +429,3 @@ def consume_actual_candidate(
+-                if set(original_by_line) != {
+-                    e.line_reference for e in fresh.mapping.effects
+-                }:
++                if fresh.source.operation != "replace_reversed" and set(
++                    original_by_line
++                ) != {e.line_reference for e in fresh.mapping.effects}:
+@@ -428,0 +433,37 @@ def consume_actual_candidate(
++            if fresh.source.operation == "replace_reversed":
++                # Payroll publishes the full source inverse separately. Its
++                # replacement must not create a second target inverse.
++                for original in original_by_line.values():
++                    _require_budget_access(
++                        organization=organization,
++                        actor=actor,
++                        project=original.project,
++                        permission=P.PROJECT_COST_FACTS_RECORD,
++                    )
++                prerequisite = (
++                    _successful(organization)
++                    .filter(
++                        metadata__producer_key=fresh.producer_key,
++                        metadata__source_id=fresh.source.required_reversal_source_id,
++                        metadata__predecessor_id=fresh.source.predecessor_id,
++                        metadata__operation="reverse",
++                        metadata__contract_id=fresh.contract_id,
++                    )
++                    .first()
++                )
++                reversals = ProjectCostFact.objects.filter(
++                    organization=organization,
++                    contract=contract,
++                    source_id=fresh.source.required_reversal_source_id,
++                    kind="actual_reversal",
++                    reverses_id__in=[fact.pk for fact in original_by_line.values()],
++                )
++                inverse_ids = {str(pk) for pk in reversals.values_list("pk", flat=True)}
++                if (
++                    not original_by_line
++                    or not fresh.source.required_reversal_source_id
++                    or prerequisite is None
++                    or inverse_ids != set(prerequisite.metadata["fact_ids"])
++                    or len(inverse_ids) != len(original_by_line)
++                ):
++                    raise ActualRejected("recognized_native_reversal_required")
+@@ -453 +494 @@ def consume_actual_candidate(
+-                if old:
++                if old and fresh.source.operation != "replace_reversed":
+@@ -490,0 +532 @@ def consume_actual_candidate(
++                "required_reversal_source_id": fresh.source.required_reversal_source_id,
+diff --git a/apps/projects/actual_sources.py b/apps/projects/actual_sources.py
+index d047575..901372d 100644
+--- a/apps/projects/actual_sources.py
++++ b/apps/projects/actual_sources.py
+@@ -1 +1 @@
+-"""Closed native source readers for INT-B04/B05/B06; never mutate sources.
++"""Closed native source readers for INT-B04/B05/B06/B08; never mutate sources.
+@@ -25,0 +26 @@ SOURCE_MODELS = {
++    "pcp-payr-actual": "payroll.financialhandoffproposal",
+@@ -30,0 +32 @@ INTEGRATIONS = {
++    "pcp-payr-actual": "INT-B08",
+@@ -51,0 +54 @@ class NativeActualSource:
++    required_reversal_source_id: str = ""
+@@ -343,0 +347,2 @@ def read_native_actual(
++    from .payroll_actual_source import read_payroll_actual
++
+@@ -347,0 +353 @@ def read_native_actual(
++        "pcp-payr-actual": read_payroll_actual,
+@@ -408,0 +415,11 @@ def native_lineage(source: NativeActualSource) -> dict:
++        "payroll": (
++            "run_id",
++            "calculation_digest",
++            "period_id",
++            "source_digest",
++            "precision_policy_version_id",
++            "rounding_policy_version_id",
++            "allocation_line_ids",
++            "predecessor_id",
++            "required_reversal_source_id",
++        ),
+diff --git a/apps/projects/payroll_actual_source.py b/apps/projects/payroll_actual_source.py
+new file mode 100644
+index 0000000..194b783
+--- /dev/null
++++ b/apps/projects/payroll_actual_source.py
+@@ -0,0 +1,222 @@
++"""INT-B08 finalized allocated Payroll evidence; no calculation or target write."""
++
++from decimal import Decimal
++
++from django.core.exceptions import PermissionDenied
++
++from apps.organizations.authorization import has_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.payroll.financial_handoff_services import _digest, _source_snapshot
++from apps.payroll.models import FinancialHandoffProposal, PayrollRun
++from apps.timekeeping.models import Timesheet, TimesheetEntry
++
++from .actual_sources import (
++    SOURCE_MODELS,
++    ActualRejected,
++    NativeActualSource,
++    _read_permission,
++    _row,
++    _same_tenant,
++)
++from .services import _stable_payload_hash
++
++KEY = "pcp-payr-actual"
++
++
++def read_payroll_actual(*, organization, actor, source_id) -> NativeActualSource:
++    """Called inside read_native_actual's atomic snapshot/target transaction.
++
++    A finalized/reversed historical proposal is read evidence, never authority
++    to infer a date, cost class, employee mapping, partial adjustment or payment.
++    """
++    _read_permission(actor, organization, P.PAYROLL_RESULTS_VIEW)
++    if not any(
++        has_business_permission(user=actor, organization=organization, permission=code)
++        for code in (
++            P.PAYROLL_PROJECT_COST_HANDOFF_PREPARE,
++            P.PAYROLL_PROJECT_COST_HANDOFF_REVIEW,
++            P.PAYROLL_HANDOFF_RECONCILIATION_PREPARE,
++            P.PAYROLL_HANDOFF_RECONCILIATION_REVIEW,
++        )
++    ):
++        raise PermissionDenied("Payroll source-family access is required.")
++    proposal = FinancialHandoffProposal.objects.select_for_update().get(
++        organization=organization, pk=source_id, family="project_cost"
++    )
++    run = PayrollRun.objects.select_for_update().get(
++        organization=organization, pk=proposal.run_id
++    )
++    review = proposal.review
++    _same_tenant(organization, proposal, run, review, run.period)
++    if (
++        review.disposition != "accepted"
++        or proposal.has_exceptions
++        or proposal.exception_codes
++    ):
++        raise ActualRejected("approved_allocated_payroll_proposal_required")
++    if (
++        run.status not in {"finalized", "reversed"}
++        or not run.finalized_at
++        or not run.calculation_digest
++    ):
++        raise ActualRejected("finalized_payroll_source_required")
++    results = list(run.employee_results.select_for_update().select_related("employee"))
++    _same_tenant(organization, *results, *(item.employee for item in results))
++    if not results or any(
++        item.status not in {"finalized", "reversed"} for item in results
++    ):
++        raise ActualRejected("finalized_payroll_results_required")
++    if (
++        _digest(_source_snapshot(run, results)) != proposal.source_digest
++        or proposal.currency != run.currency
++        or proposal.monetary_policy_snapshot != run.monetary_policy_snapshot
++        or proposal.precision_policy_version_id != run.precision_policy_version_id
++        or proposal.rounding_policy_version_id != run.rounding_policy_version_id
++    ):
++        raise ActualRejected("payroll_source_version_or_policy_mismatch")
++    lines = list(
++        proposal.lines.select_for_update(of=("self",))
++        .select_related(
++            "run_employee__employee",
++            "project",
++            "site",
++            "activity",
++        )
++        .order_by("pk")
++    )
++    if (
++        not lines
++        or proposal.unallocated_amount != 0
++        or proposal.allocated_amount != proposal.total_amount
++        or sum((line.amount for line in lines), Decimal(0)) != proposal.total_amount
++    ):
++        raise ActualRejected("conserved_payroll_allocation_required")
++    sheets = {
++        sheet.pk: sheet
++        for sheet in Timesheet.objects.select_for_update()
++        .filter(organization=organization, pk__in={line.timesheet_id for line in lines})
++        .order_by("pk")
++    }
++    entries = {
++        entry.pk: entry
++        for entry in TimesheetEntry.objects.select_for_update()
++        .filter(
++            organization=organization,
++            pk__in={line.timesheet_entry_id for line in lines},
++        )
++        .order_by("pk")
++    }
++    for line in lines:
++        _same_tenant(organization, line, line.run_employee, line.run_employee.employee)
++        _same_tenant(
++            organization, *(item for item in (line.site, line.activity) if item)
++        )
++        if (
++            line.line_kind != "project_cost_allocation"
++            or line.run_employee.run_id != run.pk
++            or line.employee_id != line.run_employee.employee_id
++            or not line.project_id
++            or not line.timesheet_id
++            or not line.timesheet_entry_id
++        ):
++            raise ActualRejected("explicit_payroll_cost_line_required")
++        sheet, entry = (
++            sheets.get(line.timesheet_id),
++            entries.get(line.timesheet_entry_id),
++        )
++        if sheet is None or entry is None:
++            raise ActualRejected("payroll_approved_time_dimension_mismatch")
++        _same_tenant(organization, sheet, entry, line.project)
++        _read_permission(actor, organization, P.PAYROLL_RESULTS_VIEW, line.project)
++        if (
++            sheet.state != "approved"
++            or sheet.employee_id != line.employee_id
++            or sheet.period_start != run.period.starts_on
++            or sheet.period_end != run.period.ends_on
++            or entry.timesheet_id != sheet.pk
++            or entry.project_id != line.project_id
++            or entry.site_id != line.site_id
++            or entry.activity_id != line.activity_id
++            or (line.site_id and line.site.project_id != line.project_id)
++            or (line.activity_id and line.activity.project_id != line.project_id)
++            or entry.minutes != line.allocation_minutes
++            or line.source_lineage.get("timesheet_revision") != sheet.revision
++            or line.source_lineage.get("entry_id") != str(entry.pk)
++        ):
++            raise ActualRejected("payroll_approved_time_dimension_mismatch")
++    operation, predecessor, prerequisite = "recognize", "", ""
++    if proposal.record_kind == "reversal":
++        if run.kind != "reversal" or not run.reversal_of_id:
++            raise ActualRejected("explicit_payroll_inverse_required")
++        predecessor = proposal.predecessor
++        if predecessor is None or predecessor.run_id != run.reversal_of_id:
++            raise ActualRejected("payroll_inverse_predecessor_mismatch")
++        _same_tenant(organization, predecessor, predecessor.run)
++        if proposal.total_amount != -predecessor.total_amount:
++            raise ActualRejected("exact_payroll_inverse_required")
++        operation = "reverse"
++    elif proposal.record_kind == "replacement":
++        predecessor = proposal.predecessor
++        if (
++            run.kind != "replacement"
++            or predecessor is None
++            or predecessor.run_id != run.replaces_id
++        ):
++            raise ActualRejected("explicit_payroll_replacement_required")
++        _same_tenant(organization, predecessor, predecessor.run)
++        inverse_run = PayrollRun.objects.get(
++            organization=organization,
++            pk=run.predecessor_id,
++            kind="reversal",
++            reversal_of_id=run.replaces_id,
++            status="finalized",
++        )
++        prerequisite = FinancialHandoffProposal.objects.get(
++            organization=organization,
++            run=inverse_run,
++            family="project_cost",
++            record_kind="reversal",
++            predecessor=predecessor,
++            review__disposition="accepted",
++            has_exceptions=False,
++        ).pk
++        operation = "replace_reversed"
++    elif (
++        proposal.record_kind != "original"
++        or run.kind not in {"regular", "off_cycle"}
++        or proposal.predecessor_id
++    ):
++        # No implicit treatment of signed adjustment economics as a full replacement.
++        raise ActualRejected("approved_payroll_adjustment_mapping_required")
++    predecessor_id = str(predecessor.pk) if predecessor else ""
++    evidence = {
++        "proposal": _row(proposal),
++        "run": _row(run),
++        "review": _row(review),
++        "allocations": [_row(line) for line in lines],
++        "payroll": {
++            "run_id": str(run.pk),
++            "calculation_digest": run.calculation_digest,
++            "period_id": str(run.period_id),
++            "source_digest": proposal.source_digest,
++            "precision_policy_version_id": str(run.precision_policy_version_id),
++            "rounding_policy_version_id": str(run.rounding_policy_version_id),
++            "allocation_line_ids": [str(line.pk) for line in lines],
++            "predecessor_id": predecessor_id,
++            "required_reversal_source_id": str(prerequisite),
++        },
++    }
++    return NativeActualSource(
++        KEY,
++        SOURCE_MODELS[KEY],
++        str(proposal.pk),
++        _stable_payload_hash(evidence),
++        evidence,
++        proposal.total_amount,
++        proposal.currency,
++        "",
++        run.status == "finalized",
++        operation,
++        predecessor_id,
++        str(prerequisite),
++    )
+diff --git a/apps/projects/test_cep047_actual.py b/apps/projects/test_cep047_actual.py
+index 259a3da..eebc43d 100644
+--- a/apps/projects/test_cep047_actual.py
++++ b/apps/projects/test_cep047_actual.py
+@@ -21 +21,3 @@ from apps.projects.actual_sources import (
+-    SOURCE_MODELS,
++    SOURCE_MODELS as REGISTERED_SOURCE_MODELS,
++)
++from apps.projects.actual_sources import (
+@@ -32,0 +35,6 @@ from apps.projects.test_cep005_commitment_integration import _authorized_project
++# This retained regression continues to own exactly the CEP047 source families.
++SOURCE_MODELS = {
++    key: REGISTERED_SOURCE_MODELS[key]
++    for key in ("pcp-inv-actual", "pcp-eqp-actual", "pcp-fa-actual")
++}
++
+diff --git a/apps/projects/test_cep048_payroll_actual.py b/apps/projects/test_cep048_payroll_actual.py
+new file mode 100644
+index 0000000..de7d059
+--- /dev/null
++++ b/apps/projects/test_cep048_payroll_actual.py
+@@ -0,0 +1,462 @@
++"""INT-B08 native proposal/target transactions with synthetic approved bindings."""
++
++import json
++from datetime import date
++from decimal import Decimal
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied
++from django.test import SimpleTestCase, TransactionTestCase
++from django.utils import timezone
++
++from apps.accounting import test_cep042_regression as retained
++from apps.accounting.models import JournalEntry
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.audit.models import AuditEvent
++from apps.organizations.catalog_bootstrap import synchronize_authorization_catalog
++from apps.organizations.models import (
++    BusinessPermission,
++    OrganizationMembership,
++    OrganizationRole,
++)
++from apps.payroll import test_p7_s29_s32_financial_handoffs as payroll_fixtures
++from apps.payroll.financial_handoff_services import (
++    prepare_financial_handoff,
++    review_financial_handoff,
++)
++from apps.payroll.models import PayrollPeriod, PayrollRun, PayrollRunEmployee
++from apps.payroll.services import _monetary_policy_snapshot, reverse_run
++from apps.projects import actual_integration as integration
++from apps.projects import test_cep047_actual as actual_fixtures
++from apps.projects.actual_sources import (
++    ActualRejected,
++    NativeActualSource,
++    native_lineage,
++)
++from apps.projects.models import ProjectCostFact
++from apps.projects.services import (
++    approve_project_cost_source_contract,
++    create_project_cost_source_contract,
++)
++from apps.subledgers.models import Obligation
++from apps.timekeeping.models import Timesheet, TimesheetEntry
++from apps.treasury.models import TreasuryMovement
++from apps.workflows.catalog_bootstrap import synchronize_workflow_catalog
++from apps.workforce.models import Employee
++
++KEY = "pcp-payr-actual"
++
++
++class PayrollLineageUnitTests(SimpleTestCase):
++    def test_audit_lineage_retains_source_line_ids_without_employee_or_payee_detail(
++        self,
++    ):
++        source = NativeActualSource(
++            KEY,
++            "payroll.financialhandoffproposal",
++            "proposal",
++            "version",
++            {
++                "payroll": {
++                    "run_id": "run",
++                    "allocation_line_ids": ["line"],
++                    "employee_number": "private",
++                    "employee_name": "private",
++                }
++            },
++            Decimal(100),
++            "IRR",
++            "",
++            True,
++            "recognize",
++        )
++        self.assertEqual(
++            native_lineage(source),
++            {"payroll": {"run_id": "run", "allocation_line_ids": ["line"]}},
++        )
++
++
++class PayrollActualTests(TransactionTestCase):
++    _draft = actual_fixtures.ActualTargetTests._draft
++    _classify_and_submit = actual_fixtures.ActualTargetTests._classify_and_submit
++    read_source = actual_fixtures.ActualTargetTests.read_source
++    consume = actual_fixtures.ActualTargetTests.consume
++    _monetary_versions = (
++        payroll_fixtures.PayrollFinancialHandoffTests._monetary_versions
++    )
++
++    def setUp(self):
++        synchronize_workflow_catalog(using="default")
++        actual_fixtures.ActualTargetTests.setUp(self)
++        self.native_patch.stop()
++        self.owner = self.preparer
++        self.owner_membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.owner
++        )
++        role = OrganizationRole.objects.create(
++            organization=self.organization,
++            code="cep048-synthetic-source-authority",
++            name="Explicit synthetic Payroll source authority",
++            created_by=self.owner,
++        )
++        role.permissions.add(
++            *BusinessPermission.objects.exclude(
++                code__startswith="accounting_recognition."
++            )
++        )
++        for actor in (self.preparer, self.approver):
++            explicit_fixture_authority(
++                OrganizationMembership.objects.get(
++                    organization=self.organization, user=actor
++                ),
++                role,
++            )
++        precision_version, rounding_version = self._monetary_versions()
++        from apps.accounting.policy_calculations import (
++            accounting_rounding_policy_from_version,
++            money_precision_policy_from_version,
++        )
++
++        self.money = {
++            "precision_policy_version": precision_version,
++            "rounding_policy_version": rounding_version,
++            "monetary_policy_snapshot": _monetary_policy_snapshot(
++                currency="IRR",
++                precision=money_precision_policy_from_version(
++                    precision_version, consumer="payroll.run.lock"
++                ),
++                rounding=accounting_rounding_policy_from_version(
++                    rounding_version, consumer="payroll.run.lock"
++                ),
++            ),
++        }
++        self.employee = Employee.objects.create(
++            organization=self.organization,
++            employee_number="CEP048-EMP",
++            first_name="Synthetic",
++            last_name="Payroll",
++            phone_number="09120000000",
++        )
++        self.period = PayrollPeriod.objects.create(
++            organization=self.organization,
++            code="CEP048-PERIOD",
++            name="Synthetic period",
++            starts_on=date(2026, 9, 23),
++            ends_on=date(2026, 10, 22),
++            cutoff_at=timezone.now(),
++            status="finalized",
++            locked_at=timezone.now(),
++            finalized_at=timezone.now(),
++            created_by=self.owner,
++        )
++        sheet = Timesheet.objects.create(
++            organization=self.organization,
++            employee=self.employee,
++            period_start=self.period.starts_on,
++            period_end=self.period.ends_on,
++            revision=1,
++            declared_minutes=600,
++            prepared_by=self.owner,
++        )
++        for day, minutes in [(1, 400), (2, 200)]:
++            TimesheetEntry.objects.create(
++                organization=self.organization,
++                timesheet=sheet,
++                work_date=date(2026, 10, day),
++                project=self.project,
++                minutes=minutes,
++            )
++        Timesheet.objects.filter(pk=sheet.pk).update(state="approved")
++        self.run = self.make_run("ORIGINAL")
++        self.proposal = self.propose(self.run)
++        contract = create_project_cost_source_contract(
++            organization=self.organization,
++            actor=self.owner,
++            producer_key=KEY,
++            version=1,
++            measure="actual",
++            source_model="payroll.financialhandoffproposal",
++            event_schema=f"{KEY}.v1",
++            classification_policy_reference="TEST-CLASSIFICATION-1",
++            recognition_policy_reference="TEST-EXPLICIT-DATE-1",
++            reconciliation_policy_reference="TEST-RECONCILIATION-1",
++            requires_financial_evidence=True,
++        )
++        self.contracts[KEY] = approve_project_cost_source_contract(
++            contract=contract, actor=self.approver
++        )
++        self.policies[
++            KEY,
++            "TEST-CLASSIFICATION-1",
++            "TEST-EXPLICIT-DATE-1",
++            "TEST-RECONCILIATION-1",
++        ] = integration.ActualPolicyBinding(self.map_source)
++
++    def make_run(
++        self, code, *, kind="regular", gross="1000.00", employer="200.00", **kwargs
++    ):
++        run = PayrollRun.objects.create(
++            organization=self.organization,
++            period=self.period,
++            code=f"CEP048-{code}",
++            kind=kind,
++            status="finalized",
++            idempotency_key=f"CEP048-{code}",
++            input_digest=f"test-input-{code}",
++            calculation_digest=f"test-version-{code}",
++            currency="IRR",
++            created_by=self.owner,
++            finalized_by=self.approver,
++            finalized_at=timezone.now(),
++            **self.money,
++            **kwargs,
++        )
++        PayrollRunEmployee.objects.create(
++            organization=self.organization,
++            run=run,
++            employee=self.employee,
++            status="finalized",
++            gross_amount=Decimal(gross),
++            employer_amount=Decimal(employer),
++            net_amount=Decimal(gross),
++        )
++        return run
++
++    def propose(self, run, *, family="project_cost", review=True):
++        proposal = prepare_financial_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            run=run,
++            family=family,
++            idempotency_key=f"CEP048-{family}-{run.pk}",
++            reason="Synthetic source evidence",
++        )
++        if review:
++            review_financial_handoff(
++                organization=self.organization,
++                actor=self.approver,
++                proposal=proposal,
++                disposition="accepted",
++                reason="Synthetic independent source review",
++            )
++        return proposal
++
++    def map_source(self, *, source, **kwargs):
++        effects = tuple(
++            integration.ActualEffect(
++                ("replacement:" if source.operation == "replace_reversed" else "")
++                + row["timesheet_entry_id"],
++                self.project,
++                self.cbs,
++                self.wbs,
++                self.cost_center,
++                Decimal(row["amount"]),
++                source.currency,
++                date(2026, 10, 14),
++                "TEST-PAYROLL-PINNED-VALUE",
++                "TEST-PAYROLL-FINANCIAL-EVIDENCE",
++            )
++            for row in source.evidence["allocations"]
++        )
++        return integration.ActualMapping(
++            effects,
++            "TEST-CUTOFF-1",
++            "TEST-EXPLICIT-DATE-1",
++            "TEST-PAYROLL-NATIVE-POLICY-VERSION",
++            "TEST-PROJECT-LABOR-MAPPING-V1",
++        )
++
++    def candidate(self, proposal=None, **kwargs):
++        return integration.prepare_actual_candidate(
++            organization=self.organization,
++            actor=kwargs.get("actor", self.owner),
++            contract_id=self.contracts[KEY].pk,
++            source_id=(proposal or self.proposal).pk,
++        )
++
++    def reconcile(self, proposal=None):
++        return integration.reconcile_actual_candidate(
++            organization=self.organization,
++            actor=self.owner,
++            contract_id=self.contracts[KEY].pk,
++            source_id=(proposal or self.proposal).pk,
++        )
++
++    def test_native_l2_allocation_source_line_version_idempotency_and_authority(self):
++        other_authorities = (
++            JournalEntry.objects.count(),
++            Obligation.objects.count(),
++            TreasuryMovement.objects.count(),
++        )
++        candidate = self.candidate()
++        self.assertFalse(ProjectCostFact.objects.exists())
++        result = self.consume(candidate)
++        self.assertEqual(self.consume(candidate).fact_ids, result.fact_ids)
++        self.assertEqual(len(result.fact_ids), 2)
++        self.assertEqual(
++            sum(ProjectCostFact.objects.values_list("amount", flat=True)),
++            Decimal("1200.00"),
++        )
++        self.assertEqual(
++            set(ProjectCostFact.objects.values_list("source_version", flat=True)),
++            {candidate.source_version},
++        )
++        self.assertEqual(
++            other_authorities,
++            (
++                JournalEntry.objects.count(),
++                Obligation.objects.count(),
++                TreasuryMovement.objects.count(),
++            ),
++        )
++        report = self.reconcile()
++        self.assertTrue(report["target_payload_matches"])
++        self.assertEqual(Decimal(report["mapped_target_difference"]), 0)
++        print("CEP048 RECON " + json.dumps(report, sort_keys=True))
++        event = AuditEvent.objects.get(
++            entity_type=integration.ENTITY, metadata__stage="succeeded"
++        )
++        self.assertEqual(
++            len(event.metadata["native_lineage"]["payroll"]["allocation_line_ids"]), 2
++        )
++        print("CEP048 TRACE " + json.dumps(event.metadata, sort_keys=True))
++
++    def test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed(self):
++        with self.assertRaisesMessage(
++            ActualRejected, "approved_actual_contract_required"
++        ):
++            integration.prepare_actual_candidate(
++                organization=self.organization,
++                actor=self.owner,
++                contract_id=uuid4(),
++                source_id=self.proposal.pk,
++            )
++        with (
++            patch.object(integration, "POLICIES", {}),
++            self.assertRaisesMessage(
++                ActualRejected, "approved_mapping_cutoff_classification_required"
++            ),
++        ):
++            self.candidate()
++        unreviewed = self.propose(
++            self.make_run("UNREVIEWED", kind="off_cycle"), review=False
++        )
++        with self.assertRaises(ActualRejected):
++            self.candidate(unreviewed)
++        payment = self.propose(self.run, family="payment", review=False)
++        with self.assertRaises(ActualRejected):
++            self.candidate(payment)
++        adjustment = self.propose(
++            self.make_run("ADJUSTMENT", kind="adjustment", predecessor=self.run)
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "approved_payroll_adjustment_mapping_required"
++        ):
++            self.candidate(adjustment)
++        self.assertFalse(ProjectCostFact.objects.exists())
++
++    def test_target_rollback_durable_failure_retry_and_revalidation(self):
++        candidate = self.candidate()
++        original = integration.record_project_cost_fact
++
++        def fail_after_insert(**kwargs):
++            original(**kwargs)
++            raise RuntimeError("synthetic target failure")
++
++        with (
++            patch.object(
++                integration, "record_project_cost_fact", side_effect=fail_after_insert
++            ),
++            self.assertRaises(RuntimeError),
++        ):
++            self.consume(candidate)
++        self.assertFalse(ProjectCostFact.objects.exists())
++        failure = AuditEvent.objects.get(
++            entity_type=integration.ENTITY, metadata__stage="failed"
++        )
++        self.assertEqual(failure.metadata["error_code"], "target_failure")
++        with (
++            patch.object(integration, "POLICIES", {}),
++            self.assertRaises(ActualRejected),
++        ):
++            self.consume(candidate, retry_of=failure.entity_id)
++        result = self.consume(candidate, retry_of=failure.entity_id)
++        self.assertEqual(self.consume(candidate).outcome, "replayed")
++        self.assertEqual(len(result.fact_ids), 2)
++        print(
++            "CEP048 TRANSACTION rollback0 -> durable failure -> denied unmapped retry -> revalidated2 -> replay2"
++        )
++
++    def test_current_source_version_and_tenant_authority_are_rechecked(self):
++        with self.assertRaises(PermissionDenied):
++            self.candidate(actor=self.outsider)
++        candidate = self.candidate()
++        PayrollRun.objects.filter(pk=self.run.pk).update(
++            calculation_digest="changed-source"
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "payroll_source_version_or_policy_mismatch"
++        ):
++            self.consume(candidate)
++        self.assertFalse(ProjectCostFact.objects.exists())
++
++    def test_explicit_native_inverse_then_replacement_does_not_reverse_twice(self):
++        candidate = self.candidate()
++        original = self.consume(candidate)
++        reversal = reverse_run(
++            organization=self.organization,
++            actor=self.approver,
++            original_run=self.run,
++            reason="Synthetic governed correction",
++            idempotency_key="CEP048-REVERSE",
++            create_replacement=False,
++        )
++        inverse_proposal = self.propose(reversal.reversal_run)
++        replacement = self.make_run(
++            "REPLACEMENT",
++            kind="replacement",
++            gross="1100.00",
++            employer="220.00",
++            replaces=self.run,
++            predecessor=reversal.reversal_run,
++        )
++        replacement_proposal = self.propose(replacement)
++        fresh = self.candidate(replacement_proposal)
++        with self.assertRaisesMessage(
++            ActualRejected, "recognized_native_reversal_required"
++        ):
++            self.consume(fresh)
++        self.assertEqual(ProjectCostFact.objects.count(), 2)
++        inverse = self.consume(self.candidate(inverse_proposal))
++        self.assertEqual(len(inverse.fact_ids), 2)
++        successor = self.consume(fresh)
++        self.assertEqual(len(successor.fact_ids), 2)
++        self.assertEqual(self.consume(fresh).fact_ids, successor.fact_ids)
++        self.assertEqual(self.consume(candidate).fact_ids, original.fact_ids)
++        self.assertEqual(ProjectCostFact.objects.count(), 6)
++        self.assertEqual(
++            ProjectCostFact.objects.filter(kind="actual_reversal").count(), 2
++        )
++        self.assertEqual(
++            sum(ProjectCostFact.objects.values_list("amount", flat=True)),
++            Decimal("1320.00"),
++        )
++        report = self.reconcile()
++        self.assertFalse(report["source_active"])
++        self.assertEqual(Decimal(report["lineage_net_amount"]), Decimal("1320.00"))
++        self.assertEqual(set(report["target_reversals"]), set(inverse.fact_ids))
++        print("CEP048 CORRECTION_RECON " + json.dumps(report, sort_keys=True))
++        for event in AuditEvent.objects.filter(
++            entity_type=integration.ENTITY, metadata__stage="succeeded"
++        ).order_by("created_at"):
++            print(
++                "CEP048 CORRECTION_TRACE " + json.dumps(event.metadata, sort_keys=True)
++            )
++
++
++class RetainedPayrollHandoffRegression(retained.PayrollAffectedRegression):
++    def setUp(self):
++        synchronize_authorization_catalog(using="default")
++        synchronize_workflow_catalog(using="default")
++        super().setUp()

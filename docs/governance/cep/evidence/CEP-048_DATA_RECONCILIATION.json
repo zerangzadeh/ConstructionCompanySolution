@@ -1,0 +1,119 @@
+{
+  "source": "CEP-048_FOCUSED_FINAL_OUTPUT.txt",
+  "read_only": true,
+  "reports": [
+    {
+      "active_source_version": null,
+      "active_source_versions": [
+        {
+          "source_id": "1bddba2c-0d64-43e7-baa0-c526a4c4b1fe",
+          "source_version": "54bf4939b3824cc333caff80902a87fb9f446a2484b707956f1dff43704aef92"
+        },
+        {
+          "source_id": "c1e5c9d7-8a5b-4f5f-9794-735208b7a0cf",
+          "source_version": "7169dca3840bf9a29544a16d61df328bb661504784457bbfa7afd891939771ac"
+        }
+      ],
+      "approved_cutoff": "TEST-CUTOFF-1",
+      "corresponding_successors": [
+        {
+          "fact_ids": [
+            "2cf4b103-66e2-47e9-909c-595ccde82fff",
+            "49a3925b-2af0-427d-bd1d-e8228a893522"
+          ],
+          "operation": "replace_reversed",
+          "recorded_source_version": "54bf4939b3824cc333caff80902a87fb9f446a2484b707956f1dff43704aef92",
+          "recorded_version_matches": true,
+          "source_active": true,
+          "source_id": "1bddba2c-0d64-43e7-baa0-c526a4c4b1fe",
+          "source_version": "54bf4939b3824cc333caff80902a87fb9f446a2484b707956f1dff43704aef92"
+        },
+        {
+          "fact_ids": [
+            "cc8054fb-b4d6-43d8-9280-24eae52ff0d8",
+            "28870030-b18c-48a8-91ab-28150430a90a"
+          ],
+          "operation": "reverse",
+          "recorded_source_version": "7169dca3840bf9a29544a16d61df328bb661504784457bbfa7afd891939771ac",
+          "recorded_version_matches": true,
+          "source_active": true,
+          "source_id": "c1e5c9d7-8a5b-4f5f-9794-735208b7a0cf",
+          "source_version": "7169dca3840bf9a29544a16d61df328bb661504784457bbfa7afd891939771ac"
+        }
+      ],
+      "duplicate_results": false,
+      "lineage_cycle": false,
+      "lineage_net_amount": "1320.00",
+      "mapped_amount": "1200.00",
+      "mapped_target_difference": "0.00",
+      "missing_target": false,
+      "native_amount": "1200.00",
+      "operation": "recognize",
+      "other_recorded_source_versions": [],
+      "predecessor_id": "",
+      "project_attribution_version": "TEST-PROJECT-LABOR-MAPPING-V1",
+      "source_active": false,
+      "source_id": "a9b574cf-afdc-40c0-84a8-f408faac6af7",
+      "source_version": "28340b062816ec7c1a83eee049346bf98f12704e62c5151a58c3b9554601509a",
+      "target_fact_ids": [
+        "3f9c9104-3fdd-4486-8fc9-15201adeebb3",
+        "2623710f-96ea-4850-8e7b-c2c1dbc50b47"
+      ],
+      "target_lineage_missing": false,
+      "target_payload_matches": true,
+      "target_recognized_amount": "1200.00",
+      "target_reversal_amount": "0",
+      "target_reversals": [
+        "cc8054fb-b4d6-43d8-9280-24eae52ff0d8",
+        "28870030-b18c-48a8-91ab-28150430a90a"
+      ],
+      "unit_value_rate_book_reference": "TEST-PAYROLL-NATIVE-POLICY-VERSION",
+      "unlinked_target_fact_ids": [],
+      "unlinked_version_or_contract_drift": false
+    },
+    {
+      "active_source_version": "45933f8de56e0003227c7db4370863bbdc4fa8286009042408a6b59da75b8dff",
+      "active_source_versions": [
+        {
+          "source_id": "c60c57bc-3e13-4355-9b21-bb9052a9c11f",
+          "source_version": "45933f8de56e0003227c7db4370863bbdc4fa8286009042408a6b59da75b8dff"
+        }
+      ],
+      "approved_cutoff": "TEST-CUTOFF-1",
+      "corresponding_successors": [],
+      "duplicate_results": false,
+      "lineage_cycle": false,
+      "lineage_net_amount": "1200.00",
+      "mapped_amount": "1200.00",
+      "mapped_target_difference": "0.00",
+      "missing_target": false,
+      "native_amount": "1200.00",
+      "operation": "recognize",
+      "other_recorded_source_versions": [],
+      "predecessor_id": "",
+      "project_attribution_version": "TEST-PROJECT-LABOR-MAPPING-V1",
+      "source_active": true,
+      "source_id": "c60c57bc-3e13-4355-9b21-bb9052a9c11f",
+      "source_version": "45933f8de56e0003227c7db4370863bbdc4fa8286009042408a6b59da75b8dff",
+      "target_fact_ids": [
+        "bb37964a-6bbd-40e3-be42-7f4188cf8eb7",
+        "c4e013de-d4e4-421b-820d-1e6c5bdcf100"
+      ],
+      "target_lineage_missing": false,
+      "target_payload_matches": true,
+      "target_recognized_amount": "1200.00",
+      "target_reversal_amount": "0",
+      "target_reversals": [],
+      "unit_value_rate_book_reference": "TEST-PAYROLL-NATIVE-POLICY-VERSION",
+      "unlinked_target_fact_ids": [],
+      "unlinked_version_or_contract_drift": false
+    }
+  ],
+  "assertions": [
+    "Original source allocated1200 equals two recognized facts",
+    "Full native reversal offsets exact originals",
+    "Replacement source1320 creates only two new facts after reversal; six facts total, two inverse facts, net1320",
+    "Changed approved replacement line identities accepted without second inverse",
+    "Inactive original replay returns prior facts without reactivation"
+  ]
+}

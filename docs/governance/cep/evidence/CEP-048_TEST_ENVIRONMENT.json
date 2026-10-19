@@ -1,0 +1,30 @@
+{
+  "engine": "PostgreSQL18.6",
+  "databases": [
+    "test_bonira_cep047_focused_v2_20261019",
+    "test_bonira_cep047_regression_v2_20261019"
+  ],
+  "schema_source": "Existing isolated current Development schema-only copies established for047; no business data copied",
+  "previous_schema_evidence": "CEP-047_RESUME_TEST_ENVIRONMENT.json",
+  "pytest_args": [
+    "--reuse-db",
+    "--no-migrations",
+    "-o",
+    "faulthandler_timeout=0",
+    "-vv",
+    "-s",
+    "--tb=short"
+  ],
+  "focused_targets": [
+    "apps/projects/test_cep048_payroll_actual.py::PayrollActualTests",
+    "apps/projects/test_cep048_payroll_actual.py::PayrollLineageUnitTests"
+  ],
+  "regression_targets": [
+    "apps/projects/test_cep048_payroll_actual.py::RetainedPayrollHandoffRegression",
+    "apps/projects/test_cep047_actual.py"
+  ],
+  "test_only_catalogue_bootstrap": "Existing synchronize_authorization_catalog and synchronize_workflow_catalog; no shared historical fixtures or production defaults changed",
+  "source_fixture_boundary": "Synthetic finalized Payroll run/results and approved timesheets as in retained P7 fixture; real proposal prepare/review, native Payroll reversal and target services exercised. No end-to-end Payroll calculation, statutory or production runtime claim",
+  "migration_impact": "NONE; no migration creation/execution/verification; bypass only redundant historical setup against complete current affected schema",
+  "production_action": false
+}

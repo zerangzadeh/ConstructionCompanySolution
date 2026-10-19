@@ -1,4 +1,4 @@
-"""Closed native source readers for INT-B04/B05/B06; never mutate sources.
+"""Closed native source readers for INT-B04/B05/B06/B08; never mutate sources.
 
 These readers prove source identity and evidence. Eligibility, classification,
 allocation and effective-date policy still require an approved registered binding.
@@ -23,11 +23,13 @@ SOURCE_MODELS = {
     "pcp-inv-actual": "inventory.inventoryvaluationevent",
     "pcp-eqp-actual": "equipment.equipmentcostallocation",
     "pcp-fa-actual": "fixed_assets.fixedassetsourceenvelope",
+    "pcp-payr-actual": "payroll.financialhandoffproposal",
 }
 INTEGRATIONS = {
     "pcp-inv-actual": "INT-B04",
     "pcp-eqp-actual": "INT-B05",
     "pcp-fa-actual": "INT-B06",
+    "pcp-payr-actual": "INT-B08",
 }
 REVIEWED = {"reviewed", "acknowledged", "reconciled"}
 
@@ -49,6 +51,7 @@ class NativeActualSource:
     active: bool
     operation: str
     predecessor_id: str = ""
+    required_reversal_source_id: str = ""
 
 
 def _row(record) -> dict[str, str]:
@@ -341,10 +344,13 @@ def _assets(*, organization, actor, source_id):
 def read_native_actual(
     *, organization, actor, producer_key: str, source_id
 ) -> NativeActualSource:
+    from .payroll_actual_source import read_payroll_actual
+
     reader = {
         "pcp-inv-actual": _inventory,
         "pcp-eqp-actual": _equipment,
         "pcp-fa-actual": _assets,
+        "pcp-payr-actual": read_payroll_actual,
     }.get(producer_key)
     if reader is None:
         raise ActualRejected("unregistered_actual_source_family")
@@ -405,6 +411,17 @@ def native_lineage(source: NativeActualSource) -> dict:
             "effective_from",
             "method",
             "convention",
+        ),
+        "payroll": (
+            "run_id",
+            "calculation_digest",
+            "period_id",
+            "source_digest",
+            "precision_policy_version_id",
+            "rounding_policy_version_id",
+            "allocation_line_ids",
+            "predecessor_id",
+            "required_reversal_source_id",
         ),
     }
     return {

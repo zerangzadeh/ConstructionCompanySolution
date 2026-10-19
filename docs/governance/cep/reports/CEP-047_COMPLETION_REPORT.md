@@ -1,6 +1,8 @@
 # CEP-047 Completion Report — resumed closeout, 2026-10-19
 
 **EXECUTION COMPLETE — 18/18 AC PASS; scoped IMB-0034/0035/0036 DoD MET.**
+Post-closeout normal Git checkpoint `9771f1e4d3af0bd663bd6af2466662063e90ab5d` was verified on main/origin/remote under the subsequent explicit Human instruction. [Git evidence](../evidence/CEP-047_GIT_CHECKPOINT.json) and the Registry record integration separately from the original execution baseline. Current serial authority supersedes the earlier one-CEP stop prospectively; activation remains fail-closed and GATE-05 NOT_PASSED.
+
 Lifecycle: CLOSED_VERIFIED. Finding001 is RESOLVED by the retained approved
 INT-B04/B05/B06 mappings, reconfirmed by the current Human handoff. No additional
 material contract is required for this conditional, fail-closed build.

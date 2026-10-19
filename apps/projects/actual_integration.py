@@ -147,19 +147,21 @@ def _payload(source, mapping, contract):
                 "financial_evidence": effect.financial_evidence_reference,
             }
         )
-    return _stable_payload_hash(
-        {
-            "source_version": source.source_version,
-            "operation": source.operation,
-            "predecessor": source.predecessor_id,
-            "effects": effects,
-            "contract_payload_hash": contract.payload_hash,
-            "cutoff": mapping.cutoff_reference,
-            "date_rule": mapping.effective_date_rule_reference,
-            "basis": mapping.unit_value_rate_book_reference,
-            "attribution_version": mapping.project_attribution_version,
-        }
-    )
+    payload = {
+        "source_version": source.source_version,
+        "operation": source.operation,
+        "predecessor": source.predecessor_id,
+        "effects": effects,
+        "contract_payload_hash": contract.payload_hash,
+        "cutoff": mapping.cutoff_reference,
+        "date_rule": mapping.effective_date_rule_reference,
+        "basis": mapping.unit_value_rate_book_reference,
+        "attribution_version": mapping.project_attribution_version,
+    }
+    # Existing three-family payloads retain their original exact hash contract.
+    if source.required_reversal_source_id:
+        payload["required_reversal_source_id"] = source.required_reversal_source_id
+    return _stable_payload_hash(payload)
 
 
 def _build(*, organization, actor, contract_id, source_id, permission):
@@ -195,6 +197,8 @@ def _build(*, organization, actor, contract_id, source_id, permission):
         producer_key=contract.producer_key,
         source_id=source_id,
     )
+    if source.operation not in {"recognize", "reverse", "replace", "replace_reversed"}:
+        raise ActualRejected("approved_correction_operation_required")
     mapping = binding.map_source(
         organization=organization, actor=actor, contract=contract, source=source
     )
@@ -422,10 +426,47 @@ def consume_actual_candidate(
                             kind="actual_recognized",
                         )
                     )
-                if set(original_by_line) != {
-                    e.line_reference for e in fresh.mapping.effects
-                }:
+                if fresh.source.operation != "replace_reversed" and set(
+                    original_by_line
+                ) != {e.line_reference for e in fresh.mapping.effects}:
                     raise ActualRejected("predecessor_mapping_lines_mismatch")
+            if fresh.source.operation == "replace_reversed":
+                # Payroll publishes the full source inverse separately. Its
+                # replacement must not create a second target inverse.
+                for original in original_by_line.values():
+                    _require_budget_access(
+                        organization=organization,
+                        actor=actor,
+                        project=original.project,
+                        permission=P.PROJECT_COST_FACTS_RECORD,
+                    )
+                prerequisite = (
+                    _successful(organization)
+                    .filter(
+                        metadata__producer_key=fresh.producer_key,
+                        metadata__source_id=fresh.source.required_reversal_source_id,
+                        metadata__predecessor_id=fresh.source.predecessor_id,
+                        metadata__operation="reverse",
+                        metadata__contract_id=fresh.contract_id,
+                    )
+                    .first()
+                )
+                reversals = ProjectCostFact.objects.filter(
+                    organization=organization,
+                    contract=contract,
+                    source_id=fresh.source.required_reversal_source_id,
+                    kind="actual_reversal",
+                    reverses_id__in=[fact.pk for fact in original_by_line.values()],
+                )
+                inverse_ids = {str(pk) for pk in reversals.values_list("pk", flat=True)}
+                if (
+                    not original_by_line
+                    or not fresh.source.required_reversal_source_id
+                    or prerequisite is None
+                    or inverse_ids != set(prerequisite.metadata["fact_ids"])
+                    or len(inverse_ids) != len(original_by_line)
+                ):
+                    raise ActualRejected("recognized_native_reversal_required")
             facts, recognition_lines = [], {}
             for effect in fresh.mapping.effects:
                 old = original_by_line.get(effect.line_reference)
@@ -450,7 +491,7 @@ def consume_actual_candidate(
                 line_key = _stable_payload_hash(
                     {"candidate": fresh.identity, "line": effect.line_reference}
                 )
-                if old:
+                if old and fresh.source.operation != "replace_reversed":
                     amount = (
                         effect.amount
                         if fresh.source.operation == "reverse"
@@ -488,6 +529,7 @@ def consume_actual_candidate(
                 "recognition_lines": recognition_lines,
                 "operation": fresh.source.operation,
                 "predecessor_id": fresh.source.predecessor_id,
+                "required_reversal_source_id": fresh.source.required_reversal_source_id,
                 "cutoff": fresh.mapping.cutoff_reference,
                 "effective_date_rule": fresh.mapping.effective_date_rule_reference,
                 "basis": fresh.mapping.unit_value_rate_book_reference,

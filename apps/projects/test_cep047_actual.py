@@ -18,7 +18,9 @@ from apps.organizations.catalog_bootstrap import synchronize_authorization_catal
 from apps.projects import actual_integration as integration
 from apps.projects import test_p4_budget_preparation as helpers
 from apps.projects.actual_sources import (
-    SOURCE_MODELS,
+    SOURCE_MODELS as REGISTERED_SOURCE_MODELS,
+)
+from apps.projects.actual_sources import (
     ActualRejected,
     NativeActualSource,
 )
@@ -29,6 +31,12 @@ from apps.projects.services import (
     create_project_cost_source_contract,
 )
 from apps.projects.test_cep005_commitment_integration import _authorized_project
+
+# This retained regression continues to own exactly the CEP047 source families.
+SOURCE_MODELS = {
+    key: REGISTERED_SOURCE_MODELS[key]
+    for key in ("pcp-inv-actual", "pcp-eqp-actual", "pcp-fa-actual")
+}
 
 
 class ActualIdentityUnitTests(SimpleTestCase):

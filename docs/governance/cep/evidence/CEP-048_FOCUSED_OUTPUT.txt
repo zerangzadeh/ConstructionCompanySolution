@@ -1,0 +1,559 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 6 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_focused_v2_20261019')...
+
+apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_current_source_version_and_tenant_authority_are_rechecked FAILED
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:393: in test_current_source_version_and_tenant_authority_are_rechecked
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_explicit_native_inverse_then_replacement_does_not_reverse_twice FAILED
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:404: in test_explicit_native_inverse_then_replacement_does_not_reverse_twice
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed FAILED
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:355: in test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed
+    self.candidate(adjustment)
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_native_l2_allocation_source_line_version_idempotency_and_authority FAILED
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:291: in test_native_l2_allocation_source_line_version_idempotency_and_authority
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_target_rollback_durable_failure_retry_and_revalidation FAILED
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:359: in test_target_rollback_durable_failure_retry_and_revalidation
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+apps/projects/test_cep048_payroll_actual.py::PayrollLineageUnitTests::test_audit_lineage_retains_source_line_ids_without_employee_or_payee_detail PASSED
+
+================================== FAILURES ===================================
+_ PayrollActualTests.test_current_source_version_and_tenant_authority_are_rechecked _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:393: in test_current_source_version_and_tenant_authority_are_rechecked
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+_ PayrollActualTests.test_explicit_native_inverse_then_replacement_does_not_reverse_twice _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:404: in test_explicit_native_inverse_then_replacement_does_not_reverse_twice
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+_ PayrollActualTests.test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:355: in test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed
+    self.candidate(adjustment)
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+_ PayrollActualTests.test_native_l2_allocation_source_line_version_idempotency_and_authority _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:291: in test_native_l2_allocation_source_line_version_idempotency_and_authority
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+_ PayrollActualTests.test_target_rollback_durable_failure_retry_and_revalidation _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.FeatureNotSupported: FOR UPDATE cannot be applied to the nullable side of an outer join
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep048_payroll_actual.py:359: in test_target_rollback_durable_failure_retry_and_revalidation
+    candidate = self.candidate()
+                ^^^^^^^^^^^^^^^^
+apps\projects\test_cep048_payroll_actual.py:270: in candidate
+    return integration.prepare_actual_candidate(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_integration.py:278: in prepare_actual_candidate
+    candidate, _ = _build(
+apps\projects\actual_integration.py:194: in _build
+    source = read_native_actual(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\actual_sources.py:358: in read_native_actual
+    return reader(organization=organization, actor=actor, source_id=source_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\payroll_actual_source.py:75: in read_payroll_actual
+    lines = list(
+.venv\Lib\site-packages\django\db\models\query.py:386: in __iter__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_current_source_version_and_tenant_authority_are_rechecked - django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+FAILED apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_explicit_native_inverse_then_replacement_does_not_reverse_twice - django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+FAILED apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_missing_contract_mapping_unreviewed_and_cash_sources_fail_closed - django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+FAILED apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_native_l2_allocation_source_line_version_idempotency_and_authority - django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+FAILED apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_target_rollback_durable_failure_retry_and_revalidation - django.db.utils.NotSupportedError: FOR UPDATE cannot be applied to the nullable side of an outer join
+======================== 5 failed, 1 passed in 48.63s =========================

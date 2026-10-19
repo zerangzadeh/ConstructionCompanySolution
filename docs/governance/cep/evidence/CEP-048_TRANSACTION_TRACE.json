@@ -1,0 +1,32 @@
+{
+  "source": "CEP-048_FOCUSED_FINAL_OUTPUT.txt",
+  "rollback_retry": [
+    "apps/projects/test_cep048_payroll_actual.py::PayrollActualTests::test_target_rollback_durable_failure_retry_and_revalidation CEP048 TRANSACTION rollback0 -> durable failure -> denied unmapped retry -> revalidated2 -> replay2"
+  ],
+  "native_correction_operations": [
+    {
+      "source_id": "c1e5c9d7-8a5b-4f5f-9794-735208b7a0cf",
+      "operation": "reverse",
+      "fact_ids": [
+        "cc8054fb-b4d6-43d8-9280-24eae52ff0d8",
+        "28870030-b18c-48a8-91ab-28150430a90a"
+      ],
+      "required_reversal_source_id": ""
+    },
+    {
+      "source_id": "1bddba2c-0d64-43e7-baa0-c526a4c4b1fe",
+      "operation": "replace_reversed",
+      "fact_ids": [
+        "2cf4b103-66e2-47e9-909c-595ccde82fff",
+        "49a3925b-2af0-427d-bd1d-e8228a893522"
+      ],
+      "required_reversal_source_id": "c1e5c9d7-8a5b-4f5f-9794-735208b7a0cf"
+    }
+  ],
+  "assertions": [
+    "Target insert rolled back with success audit; separate failure audit retained",
+    "Retry with withdrawn binding denied, restored approved binding revalidated",
+    "Replacement denied until exact source inverse is already recognized",
+    "Native original/reversal/replacement and target audit commit atomically within each owning operation"
+  ]
+}
