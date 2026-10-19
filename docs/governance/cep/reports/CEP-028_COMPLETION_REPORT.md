@@ -1,5 +1,46 @@
 # CEP-028 Completion Report
 
+Current execution: **EXECUTION COMPLETE** — IMB-0050, authorized zero historical
+population disposition. Baseline clean main/45a06ad; local and remote matched.
+Human authority: [retirement authorization](../supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md).
+Original prompt hash verified, bounded zero-population amendment and manifest hash
+updated. Canonical dependencies: none; relevant source/Treasury schemas exist.
+GATE-06 is an exit gate and remains NOT_PASSED; no program gate inferred.
+
+All 80 Development Payment rows explicitly excluded as demo/test; authoritative
+historical population 0, mapped/opening targets 0, exceptions 0. No financial data
+migration or fabricated history. Stable UUID/fingerprint/dependent identities are
+retained in the ignored private inventory, checksum in
+[zero-population evidence](../evidence/CEP-028_ZERO_POPULATION.json). Existing
+references remain physically intact for CEP-064 replacement; no source deletion.
+The versioned read-only exclusion process reruns identically. Rollback at this
+step is code-only; database has no mutation. Future destructive retirement still
+requires the exact all12 gate and verified Development database recovery.
+
+AC **7/7 PASS**, scoped DoD MET under the explicit zero-population amendment.
+Migration code/preparation: versioned exclusion/reconciliation; data execution:
+no-op, 80 excluded / 0 eligible; physical retirement/cutover: NOT_EXECUTED.
+Focused and tenant inventory integration regression: **6 passed, 2 subtests**
+(`pytest apps/treasury/test_legacy_payment_migration.py --reuse-db -q`).
+Ruff check/format and Django system check PASS; configured migration plan empty;
+migration drift and diff checks recorded at checkpoint.
+
+Legacy Payment regression baseline: 13 failed / 1 passed; every failure enters
+unchanged `create_project` authorization before Payment behavior because the old
+fixture assigns only the obsolete legacy role field. This is BASELINE TEST DEBT,
+not changed exclusion behavior. Transition coverage replacement belongs to the
+explicitly authorized CEP-064 remediation; gate condition11 cannot pass with
+unresolved required validation. No broad regression PASS claimed here.
+
+Remaining UTV: performance/concurrency runtime; no production, UAT or browser
+certification. CEP-064 may now enter after its CEP-007 prerequisite verification.
+Git checkpoint is separately authorized; exact commit/push facts follow Git.
+Human Sign-off / Production Certification / Production Cutover: NOT EXECUTED.
+
+## Historical reports (superseded by the current Human population decision)
+
+# CEP-028 Completion Report
+
 **Execution status: EXECUTION FAILED / BLOCKED BEFORE PRODUCT MUTATION.** `CEP-028-FINDING-001 / BLOCKER-GATE-SPEC` prevents migration preparation because the required schema/authority entry prerequisite, GATE-06 evidence and approved INT-R01 source-target mapping are unavailable.
 
 | Checkpoint | Result |

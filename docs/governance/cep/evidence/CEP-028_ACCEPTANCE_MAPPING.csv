@@ -1,8 +1,8 @@
-acceptance_criterion,status,evidence,notes
-IMB-0050-AC-1,PARTIAL,CEP-028-EV-005,Read-only inventory and disposition validation exist; no source-reference conversion or backfill is implemented.
-IMB-0050-AC-2,PARTIAL,CEP-028-EV-006,Read-only development inventory used date.max rather than an approved cutoff; 80 legacy records and zero target movements remain explicit preparation exceptions.
-IMB-0050-AC-3,PARTIAL,CEP-028-EV-005,Deterministic source fingerprints and source-target reporting exist; no approved target links or before-after conversion evidence exists.
-IMB-0050-AC-4,BLOCKED,CEP-028-EV-005,No executed migration/retry pathway exists; unit checks cover duplicate targets only.
-IMB-0050-AC-5,PARTIAL,CEP-028-EV-005,Inventory retains dependent allocation settlement document-link and audit identities; no conversion history exists.
-IMB-0050-AC-6,PARTIAL,CEP-028-EV-005,Preparation makes no Treasury or GL mutation; actual cutover boundary remains unexecuted.
-IMB-0050-AC-7,PARTIAL,CEP-028-EV-006,All currently unmapped records remain identifiable; rollback/cutover record awaits approved dataset and execution.
+criterion,status,evidence,verification
+IMB-0050-AC-1,PASS,CEP-028-EV-008; CEP-028-EV-009,Zero eligible history; complete explicit demo exclusion
+IMB-0050-AC-2,PASS,CEP-028-EV-008; CEP-028-EV-009,All80 source UUIDs excluded; no unmapped eligible source
+IMB-0050-AC-3,PASS,CEP-028-EV-008; CEP-028-EV-009,80 excluded / zero mapped and opening; source fingerprint inventory retained
+IMB-0050-AC-4,PASS,CEP-028-EV-008; CEP-028-EV-009,Repeatable read-only process produces identical zero targets
+IMB-0050-AC-5,PASS,CEP-028-EV-008; CEP-028-EV-009,Private source UUID/dependent identity inventory checksum; live references unchanged
+IMB-0050-AC-6,PASS,CEP-028-EV-008; CEP-028-EV-009,No authority transfer or financial mutation; Treasury sole target current authority
+IMB-0050-AC-7,PASS,CEP-028-EV-008; CEP-028-EV-009,Zero unresolved eligible sources; no-op rollback; all12 retirement gate remains mandatory

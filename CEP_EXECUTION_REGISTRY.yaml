@@ -62,12 +62,12 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 57
+  execution_state_complete: 58
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 2
-  partial_current: 7
+  partial_current: 6
   failed_current: 0
   not_started_other_current_governed: 13
   deferred_post_v1: 7
@@ -222,6 +222,15 @@ human_decisions:
     scope: Normal git add, commit and push origin main for exclusively attributable authorized completed CEP work when repository safety is proved; serial eligible non-production CEP execution may continue
     excludes: Branch or worktree creation, destructive Git operations, history rewrite, production action, activation inference, scope or dependency changes and Human Sign-off
     git_writes_authorized: true
+    production_authorized: false
+  HUMAN-LEGACY-PAYMENT-RETIREMENT-20261019:
+    source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED_BOUNDED_CONDITIONAL_RETIREMENT
+    authoritative_historical_payment_population: 0
+    scope: Development remediation and conditional retirement of Legacy Payment; Treasury sole current cash authority; no fabricated history
+    destructive_retirement_requires: ALL_12_READINESS_PASS_AND_VERIFIED_DEVELOPMENT_DB_CHECKPOINT
+    git_writes_authorized: SAFE_ADD_COMMIT_PUSH_ORIGIN_MAIN
     production_authorized: false
 registry_update_rules:
   on_start:
@@ -1466,32 +1475,31 @@ ceps:
   CEP-028:
     closure_triage:
       category: B
-      disposition: AWAIT_HUMAN_INPUT_NO_REVISIT_THIS_SESSION
+      disposition: RESOLVED_ZERO_POPULATION_DISPOSITION_COMPLETE
       root_human_input_cep: CEP-028
-      minimum_resolution: "Supply approved pilot tenant identity, exclusive cutoff, authoritative source/opening dataset, opening-versus-replay coverage and accountable reviewers; expressly withheld authoritative backfill cannot proceed without these facts."
+      minimum_resolution: Human zero historical population supplied; reconcile excluded demo/test evidence without financial targets.
       evidence: docs/governance/cep/evidence/V1_CLOSURE_TRIAGE_20261019.json
       assessed_at: '2026-10-19'
     title: Legacy Payment migration preparation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-20261019
+      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md
     execution:
-      status: PARTIAL
-      lifecycle: EXECUTION_PARTIAL
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 0
+      passed: 7
       total: 7
-      status: PARTIAL
-    dod: PARTIAL
-    blockers:
-    - CEP-028-FINDING-002 / BLOCKER-DATA / No approved Tenant cutoff, opening-versus-replay dataset or exact source-to-target evidence; development inventory has 80 legacy Payments and zero Treasury movements; migration/backfill and GATE-06 remain incomplete
+      status: VERIFIED
+    dod: MET
+    blockers: []
     remaining_utv:
-    - migration_reconciliation_retry_and_regression_validation
+    - Legacy operational transition regression replacement pending in bounded CEP064; all12 readiness remains required
     - performance_concurrency_runtime
     completion_report:
       path: docs/governance/cep/reports/CEP-028_COMPLETION_REPORT.md
@@ -1519,6 +1527,12 @@ ceps:
     - date: '2026-10-17'
       status: PARTIAL
       reason: Human Decision Authority granted bounded non-production migration preparation and rehearsal authority in BONIRA-CONSOLIDATED-20261017 but expressly withheld dataset-dependent backfill pending named tenant, exclusive cutoff, authoritative source/opening dataset and accountable reviewers. BLOCKER-DATA remains.
+    - date: '2026-10-19'
+      status: BLOCKER_RESOLVED_AND_RESUMED
+      reason: Human establishes zero authoritative historical Payment population; all existing rows demo/test. Supersedes dataset blocker only; excluded inventory/retry/reference evidence still required.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: Human zero historical population disposition verified; all80 demo sources excluded and zero financial targets;6 tests plus2 subtests pass;7/7 scoped AC. No destructive retirement or Gate06 inference.
   CEP-029:
     title: Employee to WorkRelationship migration
     phase: V1_IMPLEMENTATION
@@ -4331,7 +4345,6 @@ v1_closure_triage:
   evidence: docs/governance/cep/evidence/V1_CLOSURE_TRIAGE_20261019.json
   category_a_closable_now: []
   category_b_human_resolution_required:
-  - CEP-028
   - CEP-057
   - CEP-058
   - CEP-059
@@ -4343,16 +4356,16 @@ v1_closure_triage:
   - CEP-066
   - CEP-068
   category_c_external_parked: []
-  v1_complete: 57
-  v1_partial: 4
+  v1_complete: 58
+  v1_partial: 3
   v1_not_started: 7
   v1_entry_blocked_not_started: 1
   implementation_closable_now: false
   next_action: ESTABLISH_RECORDED_HUMAN_INPUTS_THEN_REPEAT_ENTRY_CHECKS
 repository_state:
   branch: main
-  last_reconciled_head: 65af113be88f32d321290a36458bfccc6e31a859
-  origin_main: 65af113be88f32d321290a36458bfccc6e31a859
+  last_reconciled_head: 45a06ad5531fd7069df8b5f74aa6eb06db2988fb
+  origin_main: 45a06ad5531fd7069df8b5f74aa6eb06db2988fb
   integration_checkpoint: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
@@ -4361,7 +4374,6 @@ execution_frontier:
   execution_mode: SERIAL_BY_DEFAULT
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
-  - CEP-028
   - CEP-057
   - CEP-058
   - CEP-065
@@ -4372,10 +4384,11 @@ execution_frontier:
   - CEP-077
   - CEP-078
   dependency_ready_is_not_entry_gate_or_execution_authority: true
-  verified_build_eligible_unblocked: []
+  verified_build_eligible_unblocked:
+  - CEP-064
   verified_verification_eligible_unblocked: []
-  next_autonomous_cep: null
-  current_session_continuation: V1_CLOSURE_TRIAGE_FINISHED_NO_CATEGORY_A
+  next_autonomous_cep: CEP-064
+  current_session_continuation: HUMAN_BOUNDED_PAYMENT_RETIREMENT_CEP028_COMPLETE_CEP064_NEXT
   current_independent_cep: null
   next_entry_review_candidate: null
   next_candidate_full_entry_eligibility: NO_UNBLOCKED_CANDIDATE_WITHIN_HUMAN_V1_ONLY_SESSION_SCOPE

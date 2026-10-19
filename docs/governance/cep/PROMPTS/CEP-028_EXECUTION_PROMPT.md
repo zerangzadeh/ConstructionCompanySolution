@@ -59,7 +59,7 @@ Deliver the canonical outcomes owned by the listed IMBs as one bounded package w
 Only these Primary IMBs define implementation ownership. Secondary/reference IMBs are prerequisites, coordination references or verification targets only.
 
 ## 6. Scope
-- Data mapping/backfill/reference conversion for evidence-supported legacy Payment use.
+- Evidence-supported Legacy Payment disposition/reference conversion, including the Human-approved zero historical population and explicit demo/test exclusion.
 
 ## 7. Explicit Out of Scope
 - No fabricated Treasury movement for unsupported history.
@@ -115,7 +115,7 @@ Treat exact files as repository-grounding results, not assumptions. Do not fabri
 Under the current applicable execution authority, implement only the canonical scope below. Use minimum necessary refactoring only when required to safely deliver the approved IMB outcome, and record it in the Change Manifest.
 
 Canonical package scope:
-- Data mapping/backfill/reference conversion for evidence-supported legacy Payment use.
+- Evidence-supported Legacy Payment disposition/reference conversion, including the Human-approved zero historical population and explicit demo/test exclusion.
 
 Required internal IMB sequence:
 NONE
@@ -142,8 +142,13 @@ Canonical Migration Impact: `MULTIPLE`.
 - Migration Test: `REQUIRED`
 - Migration Evidence: `REQUIRED`
 - The recorded consolidated Human authority permits bounded **non-production** migration preparation, focused tests and development rehearsal for CEP-028.
-- Dataset-dependent authoritative backfill remains **NOT AUTHORIZED** until the required pilot tenant, exclusive cutoff, authoritative source/opening dataset, opening-vs-replay coverage and accountable reviewers are supplied through authoritative Human evidence.
-- Until then, preserve fail-closed unresolved exceptions and create no speculative Treasury/GL facts or source-reference backfill.
+- Human authorization `supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md`
+  establishes authoritative historical Payment population = ZERO. Existing rows
+  are excluded seed/demo/test evidence, not a historical migration dataset.
+- Reconcile the complete excluded inventory, stable identifiers and dependent
+  references; retain source evidence and prove repeatability with zero Treasury,
+  GL or opening targets. A pilot/cutoff/opening dataset is not required for this
+  zero-population disposition. Never fabricate financial history.
 - Distinguish Migration Code / Preparation / Execution / Verification / Cutover.
 - Production migration, irreversible production mutation and Production Cutover remain Human-only.
 

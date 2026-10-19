@@ -23,6 +23,9 @@ from apps.payments.models import Payment, PaymentAllocation, PaymentDocumentLink
 from apps.treasury.models import TreasuryMovement, TreasuryMovementStatus
 
 PLAN_VERSION = "legacy-payment-disposition-v1"
+ZERO_POPULATION_AUTHORITY = (
+    "docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -78,6 +81,33 @@ class Reconciliation:
     mapped_amount: Decimal
     exceptions: tuple[tuple[str, str], ...]
     source_to_target: tuple[tuple[str, str], ...]
+
+
+def reconcile_demo_population(
+    *, sources: Iterable[SourceRow], authority_reference: str
+) -> Reconciliation:
+    """Disposition approved demo/test sources without creating financial history.
+
+    This exact authority applies only to the existing non-production population;
+    it is not an alternative migration path for authoritative historical data.
+    """
+    if authority_reference != ZERO_POPULATION_AUTHORITY:
+        raise ValueError("Exact Human zero-population authority is required")
+    rows = tuple(sources)
+    if len({row.payment_id for row in rows}) != len(rows):
+        raise ValueError("Duplicate source Payment identity")
+    return Reconciliation(
+        plan_version="legacy-payment-zero-population-v2",
+        source_count=len(rows),
+        mapped_count=0,
+        opening_count=0,
+        excluded_count=len(rows),
+        exception_count=0,
+        source_amount=sum((row.amount for row in rows), Decimal(0)),
+        mapped_amount=Decimal(0),
+        exceptions=(),
+        source_to_target=(),
+    )
 
 
 def _digest(value: dict[str, Any]) -> str:
@@ -207,15 +237,23 @@ def reconcile_dispositions(
         if not plan.reviewer_id or not plan.evidence_reference.strip():
             exceptions.append((str(row.payment_id), "missing_review_or_evidence"))
             continue
-        if plan.kind == "opening" and plan.evidence_reference not in accepted_opening_evidence:
+        if (
+            plan.kind == "opening"
+            and plan.evidence_reference not in accepted_opening_evidence
+        ):
             exceptions.append((str(row.payment_id), "unaccepted_opening_evidence"))
             continue
-        if plan.kind == "excluded" and plan.evidence_reference not in accepted_exclusion_evidence:
+        if (
+            plan.kind == "excluded"
+            and plan.evidence_reference not in accepted_exclusion_evidence
+        ):
             exceptions.append((str(row.payment_id), "unaccepted_exclusion_evidence"))
             continue
         if plan.kind == "mapped":
             if plan.evidence_reference not in accepted_exact_match_evidence:
-                exceptions.append((str(row.payment_id), "unaccepted_exact_match_evidence"))
+                exceptions.append(
+                    (str(row.payment_id), "unaccepted_exact_match_evidence")
+                )
                 continue
             proof = plan.exact_match_proof
             if (

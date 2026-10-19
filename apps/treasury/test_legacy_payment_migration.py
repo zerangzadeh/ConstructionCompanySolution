@@ -5,14 +5,59 @@ from decimal import Decimal
 from types import SimpleNamespace
 from uuid import uuid4
 
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, TestCase
 
 from apps.treasury.legacy_payment_migration import (
+    ZERO_POPULATION_AUTHORITY,
     Disposition,
     ExactMatchProof,
     SourceRow,
+    inventory_legacy_payments,
+    reconcile_demo_population,
     reconcile_dispositions,
 )
+
+
+class LegacyPopulationInventoryTests(TestCase):
+    def test_inventory_is_tenant_scoped_and_retains_stable_source_evidence(self):
+        from apps.accounts.models import User
+        from apps.organizations.services import create_organization_with_owner
+        from apps.payments.models import Payment
+        from apps.projects.services import create_project
+
+        owner = User.objects.create_user(username="retirement-inventory")
+        sources = []
+        for number in (1, 2):
+            org = create_organization_with_owner(
+                owner=owner, name=f"Inventory {number}", slug=f"inventory-{number}"
+            )
+            project = create_project(
+                organization=org, actor=owner, code="INV", name="Inventory"
+            )
+            # Deliberate demo source fixture, never a current operation.
+            payment = Payment.objects.create(
+                organization=org,
+                project=project,
+                payment_number="DEMO",
+                direction="receipt",
+                amount=Decimal(10),
+                paid_on=date(2026, 1, 1),
+                counterparty_name="Demo",
+                created_by=owner,
+            )
+            sources.append((org, payment))
+        for org, payment in sources:
+            rows = inventory_legacy_payments(organization_id=org.pk, cutoff=date.max)
+            self.assertEqual(tuple(row.payment_id for row in rows), (payment.pk,))
+            self.assertEqual(
+                rows, inventory_legacy_payments(organization_id=org.pk, cutoff=date.max)
+            )
+            self.assertEqual(len(rows[0].fingerprint), 64)
+            result = reconcile_demo_population(
+                sources=rows, authority_reference=ZERO_POPULATION_AUTHORITY
+            )
+            self.assertEqual(result.excluded_count, 1)
+            self.assertEqual(result.source_to_target, ())
 
 
 class LegacyPaymentMigrationPlanTests(SimpleTestCase):
@@ -43,10 +88,39 @@ class LegacyPaymentMigrationPlanTests(SimpleTestCase):
         stale = reconcile_dispositions(
             sources=[self.row],
             dispositions=[
-                Disposition(self.payment_id, "mapped", "wrong-hash", uuid4(), "evidence")
+                Disposition(
+                    self.payment_id, "mapped", "wrong-hash", uuid4(), "evidence"
+                )
             ],
         )
         self.assertEqual(stale.exceptions[0][1], "stale_source_fingerprint")
+
+    def test_zero_history_disposition_is_repeatable_and_has_no_financial_targets(self):
+        for rows in ((), (self.row,)):
+            first = reconcile_demo_population(
+                sources=rows, authority_reference=ZERO_POPULATION_AUTHORITY
+            )
+            self.assertEqual(
+                first,
+                reconcile_demo_population(
+                    sources=rows, authority_reference=ZERO_POPULATION_AUTHORITY
+                ),
+            )
+            self.assertEqual(first.excluded_count, len(rows))
+            self.assertEqual(first.mapped_count + first.opening_count, 0)
+            self.assertEqual(first.source_to_target, ())
+            self.assertEqual(first.exception_count, 0)
+
+    def test_zero_history_disposition_rejects_unapproved_or_duplicate_sources(self):
+        with self.assertRaises(ValueError):
+            reconcile_demo_population(
+                sources=[self.row], authority_reference="unapproved"
+            )
+        with self.assertRaises(ValueError):
+            reconcile_demo_population(
+                sources=[self.row, self.row],
+                authority_reference=ZERO_POPULATION_AUTHORITY,
+            )
 
     def test_opening_and_exclusion_require_accepted_evidence(self) -> None:
         for kind in ("opening", "excluded"):
@@ -110,4 +184,6 @@ class LegacyPaymentMigrationPlanTests(SimpleTestCase):
         )
         self.assertEqual(matched.mapped_count, 1)
         self.assertEqual(matched.exception_count, 0)
-        self.assertEqual(matched.source_to_target, ((str(self.payment_id), str(target_id)),))
+        self.assertEqual(
+            matched.source_to_target, ((str(self.payment_id), str(target_id)),)
+        )

@@ -23,3 +23,28 @@ Implemented only `apps/treasury/legacy_payment_migration.py` and focused pure te
 The planned mapping-register migration was **not created**. The configured development database has 80 legacy Payments and no Treasury movements; a read-only `date.max` inventory yielded 80 missing-disposition exceptions. No approved tenant cutoff, opening/replay coverage, exact-match dataset or migration execution authorization exists. Full backfill/reference conversion, migration tests/output, before/after target counts, retry and rollback evidence, AC/DoD, and GATE-06 therefore remain incomplete. No production, Git, Treasury cash or Accounting mutation occurred. The CEP is `EXECUTION PARTIAL`; no next CEP may be started merely because the read-only tests pass.
 
 The existing Payment database regression was interrupted during full-schema setup after no test result for this run. Migration-drift check reported no changes; targeted Ruff, Django system check, new pure tests and diff hygiene passed. Database regression remains UTV.
+
+## 2026-10-19 authorized zero-population disposition
+
+Baseline main/45a06ad, clean tree, local origin/main and remote main identical.
+Intervening commits since Registry 65af113 inspected: bounded governance/closure
+triage; no implementation conflict. Canonical CEP-028/064 original hashes verified
+before the Human-authorized minimal amendment. Development system check PASS;
+configured PostgreSQL migration plan empty.
+
+Touch set before implementation: apps/treasury/legacy_payment_migration.py and
+its focused tests; explicit Human authority, CEP-028/064 canonical prompts and
+manifest hashes; Registry and CEP-028 execution/change/evidence/acceptance/report
+artifacts. No schema/data mutation in this step. Inventory is organization-scoped,
+all source UUID/fingerprint/dependent identities retained privately; excluded
+demo/test count reconciles with zero authoritative migration targets.
+
+Subsequent CEP-064 touch set (only after CEP-028 closeout): apps/payments runtime
+services/views/forms/urls/admin, config/urls.py; apps/financials/services.py and
+tests/templates; apps/billing services/forms/views/templates and tests;
+apps/documents forms/services/link_registry plus Treasury typed evidence link;
+apps/accounts/management/commands/seed_demo_data.py and affected tests; shared
+permission/navigation catalogs; minimum additive preparation migrations and
+conditional retirement migrations after all12 PASS; private DB backup and restore
+rehearsal tooling; directly affected evidence and package closeout artifacts.
+Legacy schema/models remain until readiness PASS. No CEP-069..079 execution.

@@ -62,6 +62,12 @@ Only these Primary IMBs define implementation ownership. Secondary/reference IMB
 ## 6. Scope
 - Authority boundary, compatibility-only mode, write prohibition, reference conversion contract, cutover controls.
 - Read model/query adapter migration and deprecation labeling.
+- Under `supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md`,
+  converge current operations on existing Treasury/Subledger services; replace
+  Billing/DMS/seed consumers, retire obsolete operational UI/permissions, and
+  prepare Development-only retirement migrations. Destructive retirement requires
+  all twelve readiness conditions PASS and a verified Development DB checkpoint.
+  Preserve audit/document interpretation; retain Treasury PaymentRequest.
 
 ## 7. Explicit Out of Scope
 - No dual-authoritative write.
@@ -121,6 +127,12 @@ Under the current applicable execution authority, implement only the canonical s
 Canonical package scope:
 - Authority boundary, compatibility-only mode, write prohibition, reference conversion contract, cutover controls.
 - Read model/query adapter migration and deprecation labeling.
+- Under `supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md`,
+  converge current operations on existing Treasury/Subledger services; replace
+  Billing/DMS/seed consumers, retire obsolete operational UI/permissions, and
+  prepare Development-only retirement migrations. Destructive retirement requires
+  all twelve readiness conditions PASS and a verified Development DB checkpoint.
+  Preserve audit/document interpretation; retain Treasury PaymentRequest.
 
 Required internal IMB sequence:
 - `IMB-0049 → IMB-0051` via `DEP-0038`. Sequence: IMB-0049 → stabilize required contract/outcome → IMB-0051. Stability point: Legacy financial read-model convergence requires the target Treasury authority boundary to be active so compatibility reads cannot imply legacy cash authority.
@@ -168,8 +180,8 @@ Canonical Financial Impact: YES — Treasury
 - No temporary dual authority unless the canonical migration/cutover model explicitly authorizes it.
 
 ## 19. UI Requirements
-UI Impact = `NONE`.
-- Do not invent UI work.
+UI Impact = `BOUNDED LEGACY PAYMENT CONSUMER REPLACEMENT`.
+- Only directly affected Billing/DMS/Payment navigation and forms are authorized.
 - If implementation unexpectedly touches UI, record a finding; BONIRA Persian-first/RTL/Jalali/accessibility/design-token standards remain governing.
 
 ## 20. Regulatory / Configuration Requirements
