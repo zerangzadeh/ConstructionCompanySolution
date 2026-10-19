@@ -453,9 +453,9 @@ ceps:
     updated_at: '2026-10-16'
     history: []
     reconciliation:
-      status: DIVERGENT_REMOTE_MAIN
+      status: A3_HISTORICAL_COMPLETION_INVALID_IMB0066
       note: Current execution state treats CEP-006 as COMPLETE, while the last audited remote main report still showed PARTIAL/BLOCKED.
-        Preserve both facts until repository reconciliation.
+        Blocker adjudication found no implementation or evidence that ever satisfied IMB-0066 AC12-16; the target GL/Audit paths are byte-identical at the CEP-006 implementation commit and current HEAD. Preserve the historical COMPLETE lifecycle and program counts; require bounded CEP-006 IMB-0066 remediation and proof before CEP-073 entry. Evidence docs/governance/cep/evidence/CEP-006_TO_CEP-073_BLOCKER_ADJUDICATION.json
   CEP-007:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4208,9 +4208,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 7e1386c91de377f9798bc703a8280e07ba5287a8
-  origin_main: 7e1386c91de377f9798bc703a8280e07ba5287a8
-  integration_checkpoint: 7e1386c91de377f9798bc703a8280e07ba5287a8
+  last_reconciled_head: c884bad18786c19b5f3f02ac898963a2c886fd13
+  origin_main: c884bad18786c19b5f3f02ac898963a2c886fd13
+  integration_checkpoint: c884bad18786c19b5f3f02ac898963a2c886fd13
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4232,16 +4232,16 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_MATERIAL_REGISTRY_IMPLEMENTATION_CONFLICT_BEFORE_CEP073_ENTRY
+  current_session_continuation: STOP_AFTER_CEP006_TO_CEP073_BLOCKER_ADJUDICATION_NO_PRODUCT_MUTATION
   current_independent_cep: null
   next_entry_review_candidate: CEP-073
-  next_candidate_full_entry_eligibility: BLOCKED_REQUIRED_CEP006_IMB0066_READINESS_CONFLICT
+  next_candidate_full_entry_eligibility: BLOCKED_PENDING_CEP006_IMB0066_REMEDIATION_AND_PROOF
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Regrounded clean7e1386c on local/origin/remote main;remaining prompt identities, relevant prerequisites and canonical dependency frontier verified.006 is COMPLETE but mandatory073 IMB0066 bounding is absent in GL/Audit source paths. BLOCKER-REGISTRY-CONFLICT;stop before product mutation/new CEP execution. Preserve57 COMPLETE,6 PARTIAL,all lifecycle/blockers,gates05/06/08 NOT_PASSED,no production. Evidence docs/governance/cep/evidence/FRONTIER_7e1386c_ENTRY_REVIEW.json
+  boundary_reason: CEP006-to-CEP073 blocker adjudicated A3 HISTORICAL COMPLETION INVALID for IMB0066. No artifact originally satisfied GL/Audit list bounding; target path blobs are unchanged since implementation commit89ca8f28. Preserve historical CEP006 COMPLETE and57 COMPLETE/6 PARTIAL counts, but CEP073 entry remains blocked pending bounded CEP006 IMB0066 product remediation and proof. No product/runtime mutation, Gate PASS or production authority. Evidence docs/governance/cep/evidence/CEP-006_TO_CEP-073_BLOCKER_ADJUDICATION.json
   resume_cep_after_blocker_resolution: CEP-057
   independent_candidates_entry_status: NO_FULL_ENTRY_GRANTED_AFTER_MATERIAL_REGISTRY_CONFLICT
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED

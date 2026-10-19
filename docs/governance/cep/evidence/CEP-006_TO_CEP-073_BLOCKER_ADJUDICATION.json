@@ -1,0 +1,101 @@
+{
+  "schema": "bonira.cep.blocker-adjudication.v1",
+  "adjudicated_at": "2026-10-19",
+  "repository": {
+    "branch": "main",
+    "baseline_head": "c884bad18786c19b5f3f02ac898963a2c886fd13",
+    "origin_main": "c884bad18786c19b5f3f02ac898963a2c886fd13",
+    "remote_main": "c884bad18786c19b5f3f02ac898963a2c886fd13",
+    "working_tree_before_adjudication": "CLEAN"
+  },
+  "scope": {
+    "blocker": "BLOCKER-REGISTRY-CONFLICT",
+    "edge": "CEP-006 -> CEP-073",
+    "product_mutation": "NONE",
+    "cep_073_runtime_verification": "NOT_STARTED"
+  },
+  "canonical_contract": {
+    "cep_006_prompt_sha256": "dfe2b61a485320d0347ebc40cb45a30569936481a52f11f033a3ed2970e0ea2a",
+    "imb_0066": {
+      "title": "High-volume GL/Audit list bounding",
+      "required_outcome": "Audited list hotspots are paginated/bounded with query evidence.",
+      "acceptance_criteria": [12, 13, 14, 15, 16],
+      "required_evidence": "implementation diff/evidence; item-specific automated tests; source-authority check; audit/source linkage appropriate to the domain",
+      "migration_impact": "NONE"
+    },
+    "cep_073_edge": {
+      "strength": "MANDATORY",
+      "condition": "ALWAYS",
+      "source": "DEP-0036:IMB-0048->IMB-0109; DEP-0060:IMB-0066->IMB-0109"
+    }
+  },
+  "historical_completion_record": {
+    "implementation_commit": "89ca8f28da8828a6ac4226baceb18d27c5d98f09",
+    "registry_completion_commit": "2f16cc05fabe404da32aa51bc5328b069567f350",
+    "completion_report_sha256": "2ddf02c1a878929a8d3700704bc2217c2b4770520711e6a90df4e28d9548cbc6",
+    "execution_manifest_sha256": "6d76b7eabd1eff71a30b608275b22a715147cc1d79d1a964e84bef7f6e8775ed",
+    "claims": [
+      "The completion report says the final focused suite passed 54 tests.",
+      "The completion report then asserts all 16 unchanged Acceptance Criteria were satisfied.",
+      "The execution manifest says the 54-test suite covered Subledgers, Treasury and Reporting reconciliation behavior and completes the authorized CEP-006 scope."
+    ],
+    "missing_required_artifacts": [
+      "CEP-006_ACCEPTANCE_MAPPING.csv",
+      "CEP-006_EVIDENCE_MANIFEST.csv",
+      "CEP-006_CHANGE_MANIFEST.csv"
+    ]
+  },
+  "artifact_trace": {
+    "question": "Which repository artifacts/evidence originally satisfied IMB-0066?",
+    "answer": "NONE IDENTIFIED",
+    "basis": [
+      "Commit 89ca8f28 added no change to the Accounting journal-list or Audit log implementation paths.",
+      "The CEP-006 focused runner selects only apps/subledgers/tests.py, apps/treasury/tests.py and apps/reporting/test_p10_s07_s13.py.",
+      "The retained 54-test JUnit result contains no Accounting journal-list, Audit log, pagination or list-bounding test.",
+      "No CEP-006 acceptance mapping, evidence manifest or change manifest exists in current history to map AC 12-16 to implementation or proof.",
+      "The completion report's aggregate all-16 assertion does not identify an IMB-0066 diff, test, query result or source-authority trace."
+    ],
+    "focused_runner_sha256": "c6c1ef32ff43d29661fe70eda383961987f848d21f1fd77912b719bd9cf1b420",
+    "focused_junit_sha256": "9eb07de72142a9cedc480ab38a452ae3e183b70fa84d9303b94c316cf3baf67b"
+  },
+  "current_and_historical_implementation": {
+    "accounting_journal_list": "JournalEntry tenant queryset uses select_related/prefetch_related and is passed unsliced to a template that iterates all journals; no Paginator, page boundary or fixed result bound.",
+    "audit_log": "get_organization_audit_events returns an ordered tenant queryset without a limit; audit_log passes it directly to a template that iterates all events.",
+    "lineage": {
+      "apps/accounting/views.py": "blob 459be557ef43105880d34fa4ee3e4b3ce14c4664 at both 89ca8f28 and current HEAD",
+      "apps/accounting/templates/accounting/journal_list.html": "blob 858435fc066ad22b4a8ca43188ec6e03b1edf4df at both 89ca8f28 and current HEAD",
+      "apps/audit/services.py": "blob 84ea80a2347f5ed52899b5eb08ce627f482b8b9e at both 89ca8f28 and current HEAD",
+      "apps/audit/views.py": "blob a7f671c0581504ec52bb71ebc2af3fd111eacd0e at both 89ca8f28 and current HEAD",
+      "templates/audit/log.html": "blob 37b179d36c67cbf7ae8051f381eb1ecb40eda643 at both 89ca8f28 and current HEAD"
+    },
+    "conclusion": "The missing behavior was already absent when the CEP-006 completion implementation was committed and was not later removed from these paths."
+  },
+  "classification": {
+    "code": "A3",
+    "label": "HISTORICAL COMPLETION INVALID",
+    "reason": "CEP-006 was marked complete through an aggregate validation assertion without implementation or evidence satisfying IMB-0066 AC 12-16. A1 is disproved by current source; A2 is disproved by identical target-path blobs at completion and current HEAD; A4 is disproved because both CEP-006 and the CEP-073 dependency contract explicitly name IMB-0066."
+  },
+  "minimum_remediation": {
+    "owner": "CEP-006 / IMB-0066",
+    "product_changes_required": true,
+    "schema_or_migration_required": false,
+    "bounded_surface": [
+      "Add deterministic tenant-scoped pagination or an approved fixed bound to the Accounting journal list.",
+      "Add deterministic tenant-scoped pagination or an approved fixed bound to the Audit event list.",
+      "Update the corresponding templates for bounded navigation/result handling.",
+      "Add focused tests proving bounds, deterministic ordering, tenant/object authority preservation and query behavior for both hotspots.",
+      "Produce the missing IMB-0066 acceptance, evidence and change mappings and rerun proportionate regression/static checks."
+    ],
+    "canonical_authority_assessment": "The current CEP-006 prompt expressly owns this outcome and requires its implementation and item-specific tests; no scope or DAG change is needed. The remediation was not started because this task authorizes adjudication only and expressly forbids CEP-006 product mutation.",
+    "prohibited_inferences": "No page size, UX convention, performance threshold or database migration is selected by this adjudication."
+  },
+  "disposition": {
+    "cep_006_registry_lifecycle_changed": false,
+    "preserved_counts": "57 COMPLETE; 6 PARTIAL",
+    "cep_073_entry": "BLOCKED_PENDING_CEP006_IMB0066_REMEDIATION_AND_PROOF",
+    "gate_05": "NOT_PASSED",
+    "gate_06": "NOT_PASSED",
+    "production_authority": "NONE",
+    "next_action": "Execute a separately initiated bounded CEP-006 IMB-0066 remediation under its canonical non-production authority, then reconcile evidence and repeat CEP-073 entry review."
+  }
+}
