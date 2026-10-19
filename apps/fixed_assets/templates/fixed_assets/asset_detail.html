@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}{{ asset.name }} | دارایی‌های ثابت مالی{% endblock %}
+{% block content %}
+<div data-workspace-id="WS-15B">
+{% include "components/page_header.html" with page_eyebrow="دارایی‌های ثابت مالی" page_title=asset.name page_description=asset.asset_number only %}
+<p class="mt-3 text-sm text-slate-600">مرجع دارایی و استهلاک: دارایی‌های ثابت · مرجع ثبت دفتر کل: حسابداری</p>
+<p class="mt-1 text-xs text-slate-500">زمان مشاهده: {{ workspace_observed_at|jalali_datetime }}</p>
+<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'fixed_assets:workbench' %}">همهٔ دارایی‌های ثابت</a>
+<div class="mt-5 grid gap-5 lg:grid-cols-2">
+  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">مشخصات مالی دارایی</h2>
+    <dl class="mt-3 space-y-3 text-sm">
+      <div><dt class="text-slate-500">وضعیت</dt><dd>{{ asset.get_status_display }}</dd></div>
+      <div><dt class="text-slate-500">طبقه و نسخه</dt><dd>{{ asset.asset_class.code }} · {{ asset.asset_class.version }}</dd></div>
+      <div><dt class="text-slate-500">کتاب و نسخه</dt><dd>{{ asset.book_policy.code }} · {{ asset.book_policy.version }}</dd></div>
+      <div><dt class="text-slate-500">آماده‌به‌کار</dt><dd>{{ asset.ready_for_use_date|jalali_date }}</dd></div>
+      <div><dt class="text-slate-500">پروژه</dt><dd>{{ asset.project.name|default:"—" }}</dd></div>
+    </dl>
+  </section>
+  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">پیوندهای ثبت‌شده با تجهیزات عملیاتی</h2>
+    {% for link in operational_links %}<div class="mt-3 border-t pt-3 text-sm"><a class="erp-btn erp-btn--secondary" href="{% url 'equipment:detail' link.equipment_id %}">{{ link.equipment.name }}</a><p class="mt-2 text-xs text-slate-500">از {{ link.effective_from|jalali_date }}{% if link.effective_to %} تا {{ link.effective_to|jalali_date }}{% endif %}</p></div>
+    {% empty %}<p class="mt-3 text-sm text-slate-500">پیوند قابل‌نمایشی در دسترس نیست.</p>{% endfor %}
+  </section>
+  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">منابع ثبت‌شدهٔ دارایی</h2>
+    {% for source in sources %}<div class="mt-3 border-t pt-3 text-sm"><p>{{ source.source_public_id }} · نسخه {{ source.source_version }}</p><p class="mt-1 text-xs text-slate-500">{{ source.source_date|jalali_date }} · {{ source.amount|rial }}</p></div>
+    {% empty %}<p class="mt-3 text-sm text-slate-500">منبعی ثبت نشده است.</p>{% endfor %}
+  </section>
+  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">اسناد مرتبط در مرجع حسابداری</h2>
+    {% for target in accounting_targets %}<div class="mt-3 border-t pt-3 text-sm"><a class="erp-btn erp-btn--secondary" href="{% url 'accounting:journal_detail' target.journal_id %}">مشاهدهٔ سند حسابداری</a><p class="mt-2 break-all text-xs text-slate-500">نسخهٔ منبع: {{ target.source_version_reference }}</p><p class="mt-1 text-xs text-slate-500">تاریخ حسابداری: {{ target.journal.accounting_date|jalali_date }} · {{ target.journal.get_status_display }} · نسخهٔ نگاشت {{ target.mapping.version }}</p></div>
+    {% empty %}<p class="mt-3 text-sm text-slate-500">سند مرتبط قابل‌نمایشی در دسترس نیست.</p>{% endfor %}
+  </section>
+</div>
+</div>
+{% endblock %}

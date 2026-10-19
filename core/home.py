@@ -10,6 +10,7 @@ from apps.organizations.authorization import (
     permission_supports_object_scope,
 )
 from apps.organizations.models import Organization
+from core.financial_navigation import FINANCIAL_AUTHORITIES
 
 
 @dataclass(frozen=True)
@@ -24,7 +25,14 @@ WORKSPACE_LINKS = (
     HomeLink("اسناد", "documents:list", "documents.view"),
     HomeLink("قراردادها", "contracts:list", "contracts.view"),
     HomeLink("تدارکات", "procurement:request_list", "purchase_requests.view"),
-    HomeLink("فضای مالی قدیمی", "financials:dashboard", "financials.view"),
+    HomeLink(
+        "تجهیزات عملیاتی", "equipment:operations_workbench", "equipment_operations.view"
+    ),
+    HomeLink("فهرست تجهیزات", "equipment:list", "equipment.view"),
+    *(
+        HomeLink(link.label, link.route, link.permission)
+        for link in FINANCIAL_AUTHORITIES
+    ),
 )
 ASSIGNED_WORK = HomeLink("کارهای ارجاع‌شده", "workflows:workbench", "work_items.view")
 ALERTS = HomeLink("اعلان‌ها", "support:notifications", "support.notifications_view")
@@ -45,7 +53,13 @@ def authorized_home_links(
         )
     }
     workspaces = tuple(
-        link for link in WORKSPACE_LINKS if link.permission in effective_codes
+        link
+        for link in WORKSPACE_LINKS
+        if link.permission in effective_codes
+        and not (
+            link.route == "equipment:list"
+            and "equipment_operations.view" in effective_codes
+        )
     )
     assigned_work = (
         ASSIGNED_WORK if ASSIGNED_WORK.permission in effective_codes else None

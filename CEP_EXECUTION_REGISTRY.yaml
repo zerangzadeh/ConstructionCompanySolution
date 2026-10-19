@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 50
+  execution_state_complete: 51
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 0
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 27
+  not_started_other_current_governed: 26
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -2326,28 +2326,29 @@ ceps:
       status: GIT_CHECKPOINT_VERIFIED
       reason: Completed CEP044 implementation/evidence checkpoint 51c220207f15d23116542db861cbd84fc5bfcd8e directly committed and normally pushed to main under explicit session authority. HEAD/origin/remote matched and tree was clean after push; no merge/rebase/history rewrite. Execution baseline remains f0034b5. Separate integration-metadata followup records this verified result.
   CEP-045:
-    title: null
+    title: Equipment/fixed-asset workspace authority separation
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: STANDING_NON_PRODUCTION_EXECUTION_AUTHORITY
+      source: Existing Registry standing Human authority effective2026-10-17; no new Human authorization issued
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 12
+      total: 12
+      status: PASS
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Performance/concurrency runtime and browser/assistive-technology coverage beyond isolated Chrome screenshots remain UTV; no production or UAT certification
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-045_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED
     git:
       committed: null
       commit_sha: null
@@ -2355,10 +2356,16 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 38be3392346935f1e5fdff5efb5719968fc3ff63
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: IN_PROGRESS
+      reason: Verified next eligible entry after completed/pushed044; canonical identity and recovered source/PD/UIA/schema foundations checked, no blocking prerequisite or external gate. Scope limited to existing workspace separation and financial source/authority navigation. No model/migration/new financial semantics or default grants. Existing blocked028 excluded; GATE05 remains NOT_PASSED.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: EXECUTION COMPLETE;12/12 AC and scoped IMB0020/0021 DoD verified. Separate Equipment/Fixed Assets identity, exact retained relationship and native Accounting drilldown, backend tenant/permission/scope checks, compatibility Financials owner/source/observation labels and canonical Home de-emphasis. Focused/browser23 PASS; affected29 PASS plus one identical NAV019 pre-mutation baseline assertion retained. Lint/format/system/source-preservation checks PASS;8 synthetic screenshots. No model/migration/grant/financial-source/metric/recognition change. UTV retained. GATE05 NOT_PASSED; Git checkpoint pending separately.
   CEP-046:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3946,8 +3953,6 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-028
-  - CEP-044
-  - CEP-045
   - CEP-046
   - CEP-047
   - CEP-048
@@ -3965,17 +3970,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: RESUMED_CEP044_CORRECTION_CONTRACT
+  current_session_continuation: CEP045_COMPLETE_CHECKPOINT_THEN_ENTRY_REVIEW
   current_independent_cep: null
-  next_entry_review_candidate: null
-  next_candidate_full_entry_eligibility: RESUMED_APPROVED_CORRECTION_CONTRACT
+  next_entry_review_candidate: CEP-046
+  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Finding002 requires Human approval of the write-off financial correction and atomic effective-date contract; persistence authority does not define it
-  resume_cep_after_blocker_resolution: CEP-044
-  independent_candidates_entry_status: NOT_REVIEWED
+  boundary_reason: Completed045; bounded Git checkpoint and clean grounding precede046 full canonical entry review. Existing blocked028/069 excluded. No fixed package-count stop.
+  resume_cep_after_blocker_resolution: null
+  independent_candidates_entry_status: ENTRY_REVIEW_PENDING
   production_authorized: false
   human_signoff_executed: false

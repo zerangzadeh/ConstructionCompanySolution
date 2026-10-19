@@ -1,0 +1,1198 @@
+diff --git a/apps/equipment/views.py b/apps/equipment/views.py
+index ddc3779..731580d 100644
+--- a/apps/equipment/views.py
++++ b/apps/equipment/views.py
+@@ -85,6 +85,7 @@ from apps.equipment.services import (
+     transition_equipment_status,
+     transition_maintenance_status,
+ )
++from apps.fixed_assets.workspace import equipment_financial_links
+ from apps.organizations.decorators import (
+     active_organization_required,
+     organization_permission_required,
+@@ -678,6 +679,11 @@ def equipment_detail(request: HttpRequest, equipment_id: str) -> HttpResponse:
+             "assignments": assignments,
+             "maintenance_records": maintenance_records,
+             "status_form": EquipmentStatusForm(),
++            "financial_asset_links": equipment_financial_links(
++                organization=request.organization,
++                actor=request.user,
++                equipment=equipment,
++            ),
+         },
+     )
+ 
+diff --git a/apps/financials/views.py b/apps/financials/views.py
+index b119b07..d18ab65 100644
+--- a/apps/financials/views.py
++++ b/apps/financials/views.py
+@@ -1,5 +1,6 @@
+ from django.http import HttpRequest, HttpResponse
+ from django.shortcuts import render
++from django.utils import timezone
+ 
+ from apps.financials.services import (
+     get_organization_dashboard,
+@@ -10,6 +11,7 @@ from apps.organizations.decorators import (
+     organization_permission_required,
+ )
+ from apps.organizations.models import BusinessPermissionCode
++from core.financial_navigation import authorized_financial_authorities
+ 
+ 
+ def _sort_financial_reports(request: HttpRequest, reports):
+@@ -40,7 +42,17 @@ def financial_report(request: HttpRequest) -> HttpResponse:
+         organization=request.organization,
+     )
+     reports = _sort_financial_reports(request, reports)
+-    return render(request, "financials/report.html", {"reports": reports})
++    return render(
++        request,
++        "financials/report.html",
++        {
++            "reports": reports,
++            "financial_authorities": authorized_financial_authorities(
++                user=request.user, organization=request.organization
++            ),
++            "workspace_observed_at": timezone.now(),
++        },
++    )
+ 
+ 
+ @active_organization_required
+@@ -50,4 +62,14 @@ def dashboard(request: HttpRequest) -> HttpResponse:
+         user=request.user,
+         organization=request.organization,
+     )
+-    return render(request, "financials/dashboard.html", {"summary": summary})
++    return render(
++        request,
++        "financials/dashboard.html",
++        {
++            "summary": summary,
++            "financial_authorities": authorized_financial_authorities(
++                user=request.user, organization=request.organization
++            ),
++            "workspace_observed_at": timezone.now(),
++        },
++    )
+--- /dev/null
++++ b/apps/fixed_assets/templates/fixed_assets/asset_detail.html
+@@ -0,0 +1,33 @@
++{% extends "base.html" %}{% load erp_format %}
++{% block title %}{{ asset.name }} | دارایی‌های ثابت مالی{% endblock %}
++{% block content %}
++<div data-workspace-id="WS-15B">
++{% include "components/page_header.html" with page_eyebrow="دارایی‌های ثابت مالی" page_title=asset.name page_description=asset.asset_number only %}
++<p class="mt-3 text-sm text-slate-600">مرجع دارایی و استهلاک: دارایی‌های ثابت · مرجع ثبت دفتر کل: حسابداری</p>
++<p class="mt-1 text-xs text-slate-500">زمان مشاهده: {{ workspace_observed_at|jalali_datetime }}</p>
++<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'fixed_assets:workbench' %}">همهٔ دارایی‌های ثابت</a>
++<div class="mt-5 grid gap-5 lg:grid-cols-2">
++  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">مشخصات مالی دارایی</h2>
++    <dl class="mt-3 space-y-3 text-sm">
++      <div><dt class="text-slate-500">وضعیت</dt><dd>{{ asset.get_status_display }}</dd></div>
++      <div><dt class="text-slate-500">طبقه و نسخه</dt><dd>{{ asset.asset_class.code }} · {{ asset.asset_class.version }}</dd></div>
++      <div><dt class="text-slate-500">کتاب و نسخه</dt><dd>{{ asset.book_policy.code }} · {{ asset.book_policy.version }}</dd></div>
++      <div><dt class="text-slate-500">آماده‌به‌کار</dt><dd>{{ asset.ready_for_use_date|jalali_date }}</dd></div>
++      <div><dt class="text-slate-500">پروژه</dt><dd>{{ asset.project.name|default:"—" }}</dd></div>
++    </dl>
++  </section>
++  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">پیوندهای ثبت‌شده با تجهیزات عملیاتی</h2>
++    {% for link in operational_links %}<div class="mt-3 border-t pt-3 text-sm"><a class="erp-btn erp-btn--secondary" href="{% url 'equipment:detail' link.equipment_id %}">{{ link.equipment.name }}</a><p class="mt-2 text-xs text-slate-500">از {{ link.effective_from|jalali_date }}{% if link.effective_to %} تا {{ link.effective_to|jalali_date }}{% endif %}</p></div>
++    {% empty %}<p class="mt-3 text-sm text-slate-500">پیوند قابل‌نمایشی در دسترس نیست.</p>{% endfor %}
++  </section>
++  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">منابع ثبت‌شدهٔ دارایی</h2>
++    {% for source in sources %}<div class="mt-3 border-t pt-3 text-sm"><p>{{ source.source_public_id }} · نسخه {{ source.source_version }}</p><p class="mt-1 text-xs text-slate-500">{{ source.source_date|jalali_date }} · {{ source.amount|rial }}</p></div>
++    {% empty %}<p class="mt-3 text-sm text-slate-500">منبعی ثبت نشده است.</p>{% endfor %}
++  </section>
++  <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">اسناد مرتبط در مرجع حسابداری</h2>
++    {% for target in accounting_targets %}<div class="mt-3 border-t pt-3 text-sm"><a class="erp-btn erp-btn--secondary" href="{% url 'accounting:journal_detail' target.journal_id %}">مشاهدهٔ سند حسابداری</a><p class="mt-2 break-all text-xs text-slate-500">نسخهٔ منبع: {{ target.source_version_reference }}</p><p class="mt-1 text-xs text-slate-500">تاریخ حسابداری: {{ target.journal.accounting_date|jalali_date }} · {{ target.journal.get_status_display }} · نسخهٔ نگاشت {{ target.mapping.version }}</p></div>
++    {% empty %}<p class="mt-3 text-sm text-slate-500">سند مرتبط قابل‌نمایشی در دسترس نیست.</p>{% endfor %}
++  </section>
++</div>
++</div>
++{% endblock %}
+diff --git a/apps/fixed_assets/templates/fixed_assets/workbench.html b/apps/fixed_assets/templates/fixed_assets/workbench.html
+index d3a932e..4c272bf 100644
+--- a/apps/fixed_assets/templates/fixed_assets/workbench.html
++++ b/apps/fixed_assets/templates/fixed_assets/workbench.html
+@@ -1,11 +1,14 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load erp_format %}
+ {% block title %}دارایی‌های ثابت{% endblock %}
+ {% block content %}
+-{% include "components/page_header.html" with page_eyebrow="P8 · غیرتولیدی" page_title="کاربرگ دارایی‌های ثابت" page_description="دفتر فرعی شواهدی؛ بدون سند دفترکل، هزینه واقعی پروژه، بدهی یا حرکت نقد" only %}
+-<div class="mt-4 flex flex-wrap gap-2"><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:class_create' %}">طبقه دارایی</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:book_create' %}">سیاست کتاب</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:asset_create' %}">نامزد دارایی</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:transaction_create' %}">رویداد دارایی</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:depreciation_preview' %}">پیش‌نمایش استهلاک</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:handoff_create' %}">پیشنهاد تحویل</a><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:audit_evidence' %}">شواهد ممیزی</a></div>
+-<div class="mt-6 grid gap-5 xl:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-bold">سیاست‌ها</h2>{% for item in classes %}<div class="mt-3 border-t pt-3 text-sm">{{ item.code }} / {{ item.version }} · {{ item.get_status_display }}<form method="post" class="mt-2 inline" action="{% url 'fixed_assets:policy_transition' item.id 'class' 'review' %}">{% csrf_token %}<button class="text-blue-700">بررسی</button></form> · <form method="post" class="inline" action="{% url 'fixed_assets:policy_transition' item.id 'class' 'publish' %}">{% csrf_token %}<button class="text-blue-700">انتشار</button></form></div>{% endfor %}{% for item in books %}<div class="mt-3 border-t pt-3 text-sm">{{ item.code }} / {{ item.version }} · {{ item.get_status_display }}<form method="post" class="mt-2 inline" action="{% url 'fixed_assets:policy_transition' item.id 'book' 'review' %}">{% csrf_token %}<button class="text-blue-700">بررسی</button></form> · <form method="post" class="inline" action="{% url 'fixed_assets:policy_transition' item.id 'book' 'publish' %}">{% csrf_token %}<button class="text-blue-700">انتشار</button></form></div>{% endfor %}</section>
+-<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">دارایی‌ها</h2>{% for asset in assets %}<div class="mt-3 border-t pt-3 text-sm"><strong>{{ asset.asset_number }}</strong> · {{ asset.name }} · {{ asset.get_status_display }}<div class="mt-2 flex gap-3"><a class="text-blue-700" href="{% url 'fixed_assets:source_create' asset.id %}">منبع</a><a class="text-blue-700" href="{% url 'fixed_assets:asset_capitalize' asset.id %}">سرمایه‌ای‌کردن</a></div>{% for source in asset.source_references.all %}<div class="mt-1 text-xs">{{ source.source_family }} · {{ source.amount }} IRR {% if not source.reviewed %}<form method="post" class="inline" action="{% url 'fixed_assets:source_review' source.id %}">{% csrf_token %}<button class="text-blue-700">بررسی منبع</button></form>{% endif %}</div>{% endfor %}</div>{% empty %}<p class="mt-3 text-sm text-slate-500">دارایی ثبت نشده است.</p>{% endfor %}</section></div>
+-<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-bold">اجرای استهلاک</h2>{% for run in runs %}<div class="mt-3 flex items-center justify-between border-t pt-3 text-sm"><span>{{ run.fiscal_period.name }} · {{ run.get_status_display }} · {{ run.lines.count }} خط</span><span>{% if run.status == 'preview' %}<form method="post" class="inline" action="{% url 'fixed_assets:depreciation_finalize' run.id %}">{% csrf_token %}<button class="text-blue-700">نهایی‌سازی مستقل</button></form>{% elif run.status == 'finalized' and not run.reversal_of_id %}<a class="text-blue-700" href="{% url 'fixed_assets:depreciation_reverse' run.id %}">برگشت</a>{% endif %}</span></div>{% empty %}<p class="mt-3 text-sm text-slate-500">اجرایی ثبت نشده است.</p>{% endfor %}</section>
+-<div class="mt-5 grid gap-5 xl:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-bold">رویدادهای دارایی</h2>{% for item in transactions %}<div class="mt-3 border-t pt-3 text-sm"><strong>{{ item.asset.asset_number }}</strong> · {{ item.get_transaction_type_display }} · {{ item.amount }} IRR · {{ item.get_status_display }}<div class="mt-2">{% if item.status == 'prepared' %}<form method="post" class="inline" action="{% url 'fixed_assets:transaction_finalize' item.id %}">{% csrf_token %}<button class="text-blue-700">بررسی و نهایی‌سازی</button></form>{% elif item.status == 'finalized' and not item.reversal_of_id %}<a class="text-blue-700" href="{% url 'fixed_assets:transaction_reverse' item.id %}">برگشت صریح</a>{% endif %}</div></div>{% empty %}<p class="mt-3 text-sm text-slate-500">رویدادی ثبت نشده است.</p>{% endfor %}</section>
++<div data-workspace-id="WS-15B">
++{% include "components/page_header.html" with page_eyebrow="امور مالی" page_title="دارایی‌های ثابت مالی" page_description="مرجع دارایی و استهلاک؛ ثبت دفتر کل در حوزهٔ حسابداری انجام می‌شود." only %}
++<p class="mt-2 text-xs text-slate-500">زمان مشاهده: {{ workspace_observed_at|jalali_datetime }}</p>
++<div class="mt-4 flex flex-wrap gap-2">{% if "fixed_assets.class_policy_manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:class_create' %}">طبقه دارایی</a>{% endif %}{% if "fixed_assets.class_policy_manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:book_create' %}">سیاست کتاب</a>{% endif %}{% if "fixed_assets.candidate_prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:asset_create' %}">نامزد دارایی</a>{% endif %}{% if "fixed_assets.transaction_prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:transaction_create' %}">رویداد دارایی</a>{% endif %}{% if "fixed_assets.depreciation_preview" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:depreciation_preview' %}">پیش‌نمایش استهلاک</a>{% endif %}{% if "fixed_assets.handoff_prepare" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:handoff_create' %}">پیشنهاد تحویل</a>{% endif %}{% if "fixed_assets.audit_view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:audit_evidence' %}">شواهد ممیزی</a>{% endif %}</div>
++<div class="mt-6 grid gap-5 xl:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-bold">سیاست‌ها</h2>{% for item in classes %}<div class="mt-3 border-t pt-3 text-sm">{{ item.code }} / {{ item.version }} · {{ item.get_status_display }}{% if "fixed_assets.class_policy_publish" in business_permission_codes %}<form method="post" class="mt-2 inline" action="{% url 'fixed_assets:policy_transition' item.id 'class' 'review' %}">{% csrf_token %}<button class="text-blue-700">بررسی</button></form>{% endif %} · {% if "fixed_assets.class_policy_publish" in business_permission_codes %}<form method="post" class="inline" action="{% url 'fixed_assets:policy_transition' item.id 'class' 'publish' %}">{% csrf_token %}<button class="text-blue-700">انتشار</button></form>{% endif %}</div>{% endfor %}{% for item in books %}<div class="mt-3 border-t pt-3 text-sm">{{ item.code }} / {{ item.version }} · {{ item.get_status_display }}{% if "fixed_assets.class_policy_publish" in business_permission_codes %}<form method="post" class="mt-2 inline" action="{% url 'fixed_assets:policy_transition' item.id 'book' 'review' %}">{% csrf_token %}<button class="text-blue-700">بررسی</button></form>{% endif %} · {% if "fixed_assets.class_policy_publish" in business_permission_codes %}<form method="post" class="inline" action="{% url 'fixed_assets:policy_transition' item.id 'book' 'publish' %}">{% csrf_token %}<button class="text-blue-700">انتشار</button></form>{% endif %}</div>{% endfor %}</section>
++<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">دارایی‌ها</h2>{% for asset in assets %}<div class="mt-3 border-t pt-3 text-sm"><a class="font-bold text-blue-700" href="{% url 'fixed_assets:asset_detail' asset.id %}">{{ asset.asset_number }}</a> · {{ asset.name }} · {{ asset.get_status_display }}<div class="mt-2 flex gap-3">{% if "fixed_assets.candidate_prepare" in business_permission_codes %}<a class="text-blue-700" href="{% url 'fixed_assets:source_create' asset.id %}">منبع</a>{% endif %}{% if "fixed_assets.capitalize" in business_permission_codes %}<a class="text-blue-700" href="{% url 'fixed_assets:asset_capitalize' asset.id %}">سرمایه‌ای‌کردن</a>{% endif %}</div>{% for source in asset.source_references.all %}<div class="mt-1 text-xs">{{ source.source_family }} · {{ source.amount }} IRR {% if not source.reviewed %}{% if "fixed_assets.candidate_review" in business_permission_codes %}<form method="post" class="inline" action="{% url 'fixed_assets:source_review' source.id %}">{% csrf_token %}<button class="text-blue-700">بررسی منبع</button></form>{% endif %}{% endif %}</div>{% endfor %}</div>{% empty %}<p class="mt-3 text-sm text-slate-500">دارایی ثبت نشده است.</p>{% endfor %}</section></div>
++<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-bold">اجرای استهلاک</h2>{% for run in runs %}<div class="mt-3 flex items-center justify-between border-t pt-3 text-sm"><span>{{ run.fiscal_period.name }} · {{ run.get_status_display }} · {{ run.lines.count }} خط</span><span>{% if run.status == 'preview' %}{% if "fixed_assets.depreciation_finalize" in business_permission_codes %}<form method="post" class="inline" action="{% url 'fixed_assets:depreciation_finalize' run.id %}">{% csrf_token %}<button class="text-blue-700">نهایی‌سازی مستقل</button></form>{% endif %}{% elif run.status == 'finalized' and not run.reversal_of_id %}{% if "fixed_assets.depreciation_reverse" in business_permission_codes %}<a class="text-blue-700" href="{% url 'fixed_assets:depreciation_reverse' run.id %}">برگشت</a>{% endif %}{% endif %}</span></div>{% empty %}<p class="mt-3 text-sm text-slate-500">اجرایی ثبت نشده است.</p>{% endfor %}</section>
++<div class="mt-5 grid gap-5 xl:grid-cols-2"><section class="erp-surface rounded-xl p-5"><h2 class="font-bold">رویدادهای دارایی</h2>{% for item in transactions %}<div class="mt-3 border-t pt-3 text-sm"><strong>{{ item.asset.asset_number }}</strong> · {{ item.get_transaction_type_display }} · {{ item.amount }} IRR · {{ item.get_status_display }}<div class="mt-2">{% if item.status == 'prepared' %}{% if "fixed_assets.transaction_review" in business_permission_codes %}<form method="post" class="inline" action="{% url 'fixed_assets:transaction_finalize' item.id %}">{% csrf_token %}<button class="text-blue-700">بررسی و نهایی‌سازی</button></form>{% endif %}{% elif item.status == 'finalized' and not item.reversal_of_id %}{% if "fixed_assets.transaction_reverse" in business_permission_codes %}<a class="text-blue-700" href="{% url 'fixed_assets:transaction_reverse' item.id %}">برگشت صریح</a>{% endif %}{% endif %}</div></div>{% empty %}<p class="mt-3 text-sm text-slate-500">رویدادی ثبت نشده است.</p>{% endfor %}</section>
+ <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">پیشنهاد و تطبیق مصرف‌کننده</h2><p class="mt-2 text-xs text-amber-700">این موارد فقط پیشنهاد هستند و سند دفترکل یا هزینه واقعی پروژه ایجاد نمی‌کنند.</p>{% for item in envelopes %}<div class="mt-3 border-t pt-3 text-sm">{{ item.get_consumer_display|default:item.consumer }} · {{ item.amount }} IRR · {{ item.get_status_display }}<div class="mt-2">{% if item.status == 'prepared' %}<form method="post" class="inline" action="{% url 'fixed_assets:handoff_review' item.id %}">{% csrf_token %}<button class="text-blue-700">بررسی مستقل</button></form>{% elif item.status == 'reviewed' or item.status == 'acknowledged' or item.status == 'rejected' %}<a class="text-blue-700" href="{% url 'fixed_assets:handoff_reconcile' item.id %}">ثبت تطبیق</a>{% endif %}</div></div>{% empty %}<p class="mt-3 text-sm text-slate-500">پیشنهادی ثبت نشده است.</p>{% endfor %}</section></div>
++</div>
+ {% endblock %}
+--- /dev/null
++++ b/apps/fixed_assets/test_cep045_regression.py
+@@ -0,0 +1,45 @@
++"""Existing read/workspace scenarios with explicit current test authority."""
++
++from unittest.mock import patch
++
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.equipment import tests as equipment_scenarios
++from apps.expenses.models import LegacyExpenseCategory, PlatformExpenseGroup
++from apps.financials import tests as financial_scenarios
++from apps.organizations.models import OrganizationMembership
++
++
++class ExplicitLegacyFixture:
++    def setUp(self):
++        original_save = OrganizationMembership.save
++
++        def assigned_save(membership, *args, **kwargs):
++            result = original_save(membership, *args, **kwargs)
++            explicit_fixture_authority(membership, membership.role_definition)
++            return result
++
++        with patch.object(OrganizationMembership, "save", assigned_save):
++            super().setUp()
++
++
++class EquipmentServiceRegression(
++    ExplicitLegacyFixture, equipment_scenarios.EquipmentServiceTests
++):
++    pass
++
++
++class EquipmentPanelRegression(
++    ExplicitLegacyFixture, equipment_scenarios.EquipmentPanelTests
++):
++    pass
++
++
++class FinancialReadRegression(
++    ExplicitLegacyFixture, financial_scenarios.FinancialReportTests
++):
++    def setUp(self):
++        super().setUp()
++        PlatformExpenseGroup.objects.get_or_create(
++            code=LegacyExpenseCategory.OTHER,
++            defaults={"name": "Synthetic regression expense group", "is_active": True},
++        )
+--- /dev/null
++++ b/apps/fixed_assets/test_cep045_workspace.py
+@@ -0,0 +1,372 @@
++"""Read-only workspace boundaries using explicit current authorization fixtures."""
++
++from datetime import date
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied
++from django.test import TestCase
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.accounting import test_cep042_recognition as recognition
++from apps.accounting.models import JournalEntry
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.accounts.models import User
++from apps.equipment.models import Equipment
++from apps.organizations.models import (
++    BusinessPermission,
++    MembershipScopeGrant,
++    OrganizationRole,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.organizations.services import (
++    ACTIVE_ORGANIZATION_SESSION_KEY,
++    create_organization_with_owner,
++)
++from apps.projects.models import Project, ProjectSite
++from apps.treasury.models import TreasuryMovement
++from core.home import authorized_home_links
++
++from .models import (
++    AssetBookPolicyVersion,
++    FixedAsset,
++    FixedAssetClassVersion,
++    FixedAssetEquipmentLink,
++)
++from .workspace import visible_assets
++
++READ_CODES = (
++    P.FIXED_ASSETS_VIEW,
++    P.EQUIPMENT_VIEW,
++    P.EQUIPMENT_ASSIGNMENTS_VIEW,
++    P.MAINTENANCE_RECORDS_VIEW,
++    P.EQUIPMENT_OPERATIONS_VIEW,
++    P.FINANCIALS_VIEW,
++    P.ACCOUNTING_VIEW,
++    P.TREASURY_VIEW,
++    P.SUBLEDGERS_VIEW,
++    P.EXPENSES_VIEW,
++    P.ACCOUNTING_RECOGNITION_VIEW,
++)
++
++
++def explicit_reader(organization, username, codes=READ_CODES):
++    actor = User.objects.create_user(username=username, password="synthetic-cep045")
++    role = OrganizationRole.objects.create(
++        organization=organization, code=username, name="Explicit test reader"
++    )
++    role.permissions.set(BusinessPermission.objects.filter(code__in=codes))
++    membership = organization.memberships.create(
++        user=actor, role="member", role_definition=role, status="active"
++    )
++    explicit_fixture_authority(membership, role)
++    return actor, membership, role
++
++
++class WorkspaceFixture:
++    def setUp(self):
++        super().setUp()
++        self.owner = User.objects.create_user(username="cep045-owner")
++        self.organization = create_organization_with_owner(
++            owner=self.owner, name="شرکت آزمایشی تفکیک حوزه‌ها", slug="cep045"
++        )
++        self.actor, self.membership, self.role = explicit_reader(
++            self.organization, "cep045-reader"
++        )
++        self.equipment = Equipment.objects.create(
++            organization=self.organization,
++            code="SAME045",
++            name="تجهیز عملیاتی آزمایشی",
++            category="سازه",
++        )
++        self.asset = self.make_asset(self.organization, self.owner)
++        self.client.force_login(self.actor)
++        session = self.client.session
++        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(self.organization.pk)
++        session.save()
++
++    def make_asset(self, organization, owner):
++        cls = FixedAssetClassVersion.objects.create(
++            organization=organization,
++            code="CLASS045",
++            name="طبقهٔ آزمایشی",
++            version=1,
++            status="published",
++            effective_from=date(2026, 1, 1),
++            account_mapping_reference="Synthetic retained map",
++            capitalization_policy_reference="Synthetic retained policy",
++            prepared_by=owner,
++        )
++        book = AssetBookPolicyVersion.objects.create(
++            organization=organization,
++            code="BOOK045",
++            version=1,
++            status="published",
++            effective_from=date(2026, 1, 1),
++            monetary_policy_code="accounting-money-precision",
++            monetary_policy_version="1",
++            convention="full_month",
++            prepared_by=owner,
++        )
++        return FixedAsset.objects.create(
++            organization=organization,
++            asset_number="SAME045",
++            name="دارایی مالی آزمایشی",
++            asset_class=cls,
++            book_policy=book,
++            ready_for_use_date=date(2026, 1, 5),
++            useful_life_months=12,
++            residual_value=0,
++            capitalization_basis=60,
++            evidence_reference="Synthetic retained financial record",
++            prepared_by=owner,
++        )
++
++    def link(self):
++        return FixedAssetEquipmentLink.objects.create(
++            organization=self.organization,
++            asset=self.asset,
++            equipment=self.equipment,
++            effective_from=date(2026, 1, 5),
++            reason="Explicit retained relationship; no identity inference",
++            linked_by=self.owner,
++        )
++
++    def counts(self):
++        return tuple(
++            cls.objects.count()
++            for cls in (
++                Equipment,
++                FixedAsset,
++                FixedAssetEquipmentLink,
++                TreasuryMovement,
++                JournalEntry,
++                SourceRecognitionDraft,
++            )
++        )
++
++
++class WorkspaceSeparationTests(WorkspaceFixture, TestCase):
++    def test_home_and_navigation_use_real_owning_capabilities_not_legacy_financials(
++        self,
++    ):
++        links, _, _ = authorized_home_links(
++            user=self.actor, organization=self.organization
++        )
++        routes = {item.route for item in links}
++        self.assertNotIn("financials:dashboard", routes)
++        self.assertIn("accounting:dashboard", routes)
++        self.assertIn("treasury:workbench", routes)
++        self.assertIn("fixed_assets:workbench", routes)
++        self.assertIn("equipment:operations_workbench", routes)
++        self.assertNotIn("equipment:list", routes)
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.EQUIPMENT_OPERATIONS_VIEW)
++        )
++        links, _, _ = authorized_home_links(
++            user=self.actor, organization=self.organization
++        )
++        self.assertIn("equipment:list", {item.route for item in links})
++        response = self.client.get(reverse("equipment:list"))
++        self.assertContains(response, 'data-workspace-id="WS-15A"')
++        self.assertContains(response, f'href="{reverse("equipment:list")}"')
++        self.assertEqual(
++            self.client.get(reverse("equipment:operations_workbench")).status_code, 403
++        )
++
++    def test_separate_surfaces_and_read_requests_create_no_financial_or_identity_facts(
++        self,
++    ):
++        before = self.counts()
++        for route, identity in (
++            ("equipment:operations_workbench", "WS-15A"),
++            ("fixed_assets:workbench", "WS-15B"),
++        ):
++            response = self.client.get(reverse(route))
++            self.assertContains(response, f'data-workspace-id="{identity}"')
++            self.assertContains(response, '<html lang="fa" dir="rtl">')
++        self.assertEqual(before, self.counts())
++        response = self.client.get(reverse("fixed_assets:workbench"))
++        self.assertNotContains(response, reverse("fixed_assets:asset_create"))
++        self.assertContains(
++            response, reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++        )
++
++    def test_only_explicit_relationship_enables_cross_domain_drilldown(self):
++        equipment_url = reverse("equipment:detail", args=[self.equipment.pk])
++        asset_url = reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++        self.assertNotContains(self.client.get(equipment_url), asset_url)
++        self.link()
++        before = self.counts()
++        self.assertContains(self.client.get(equipment_url), asset_url)
++        response = self.client.get(asset_url)
++        self.assertContains(response, equipment_url)
++        self.assertContains(response, "1404/10/15")
++        self.assertNotContains(response, "2026-01-05")
++        self.assertEqual(before, self.counts())
++        required = BusinessPermission.objects.get(code=P.EQUIPMENT_ASSIGNMENTS_VIEW)
++        self.role.permissions.remove(required)
++        self.assertNotContains(self.client.get(asset_url), equipment_url)
++        self.role.permissions.add(required)
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.EQUIPMENT_VIEW)
++        )
++        response = self.client.get(asset_url)
++        self.assertNotContains(response, equipment_url)
++        self.assertNotContains(response, self.equipment.name)
++
++    def test_financial_permission_is_independent_of_equipment_and_job_title(self):
++        self.link()
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.FIXED_ASSETS_VIEW)
++        )
++        response = self.client.get(
++            reverse("equipment:detail", args=[self.equipment.pk])
++        )
++        self.assertNotContains(response, self.asset.name)
++        self.assertNotContains(
++            response, reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++        )
++        self.assertEqual(
++            self.client.get(
++                reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++            ).status_code,
++            403,
++        )
++        self.assertEqual(
++            self.client.get(
++                reverse("fixed_assets:asset_detail", args=[uuid4()])
++            ).status_code,
++            403,
++        )
++
++    def test_foreign_tenant_and_invalid_context_do_not_reveal_objects(self):
++        other_owner = User.objects.create_user(username="cep045-other")
++        other = create_organization_with_owner(
++            owner=other_owner, name="Private other organization", slug="other045"
++        )
++        foreign = self.make_asset(other, other_owner)
++        for identity in (foreign.pk, uuid4()):
++            response = self.client.get(
++                reverse("fixed_assets:asset_detail", args=[identity]),
++                {"organization_id": str(other.pk)},
++            )
++            self.assertEqual(response.status_code, 404)
++            self.assertNotContains(response, foreign.name, status_code=404)
++        self.assertEqual(
++            self.client.get("/fixed-assets/assets/not-a-uuid/").status_code, 404
++        )
++        session = self.client.session
++        session[ACTIVE_ORGANIZATION_SESSION_KEY] = str(other.pk)
++        session.save()
++        self.assertEqual(
++            self.client.get(reverse("fixed_assets:workbench")).status_code, 403
++        )
++
++    def test_project_site_context_cannot_expand_existing_organization_only_permission(
++        self,
++    ):
++        project = Project.objects.create(
++            organization=self.organization, code="P045", name="Project"
++        )
++        site = ProjectSite.objects.create(
++            organization=self.organization, project=project, code="S045", name="Site"
++        )
++        MembershipScopeGrant.objects.filter(membership=self.membership).update(
++            revoked_at=timezone.now()
++        )
++        for scope, context in (
++            ("project", {"project": project}),
++            ("site", {"project": project, "site": site}),
++        ):
++            grant = MembershipScopeGrant.objects.create(
++                organization=self.organization,
++                membership=self.membership,
++                scope_type=scope,
++                reason="Explicit scoped fixture",
++                **context,
++            )
++            with self.assertRaises(PermissionDenied):
++                visible_assets(organization=self.organization, actor=self.actor)
++            response = self.client.get(
++                reverse("fixed_assets:workbench"),
++                {"project_id": str(project.pk), "site_id": str(site.pk)},
++            )
++            self.assertEqual(response.status_code, 403)
++            MembershipScopeGrant.objects.filter(pk=grant.pk).update(
++                revoked_at=timezone.now()
++            )
++
++    def test_compatibility_projection_labels_sources_observation_and_authority_links(
++        self,
++    ):
++        before = self.counts()
++        for route in ("financials:dashboard", "financials:report"):
++            response = self.client.get(reverse(route))
++            self.assertContains(response, "نمای سازگاری مالی")
++            self.assertContains(response, "اسناد قدیمی دریافت و پرداخت")
++            self.assertContains(response, "زمان مشاهده")
++            self.assertContains(response, reverse("treasury:workbench"))
++            self.assertContains(response, reverse("accounting:dashboard"))
++        self.assertEqual(before, self.counts())
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.TREASURY_VIEW)
++        )
++        response = self.client.get(reverse("financials:dashboard"))
++        self.assertNotContains(response, f'href="{reverse("treasury:workbench")}"')
++
++    def test_empty_and_read_only_detail_states_are_explicit(self):
++        response = self.client.get(
++            reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++        )
++        self.assertContains(response, "پیوند قابل‌نمایشی در دسترس نیست")
++        self.assertContains(response, "منبعی ثبت نشده است")
++        self.assertContains(response, "سند مرتبط قابل‌نمایشی در دسترس نیست")
++        self.assertEqual(
++            self.client.post(
++                reverse("fixed_assets:asset_detail", args=[self.asset.pk])
++            ).status_code,
++            405,
++        )
++
++
++class AccountingDrilldownTests(recognition.RecognitionFixture, TestCase):
++    def test_existing_native_recognition_is_linked_with_exact_source_version_and_no_new_writer(
++        self,
++    ):
++        asset, transaction = self.asset()
++        self.mapping("Fixed Assets", "capitalization")
++        effect = self.recognize("asset", transaction)
++        self.client.force_login(self.maker)
++        before = (
++            SourceRecognitionDraft.objects.count(),
++            JournalEntry.objects.count(),
++            TreasuryMovement.objects.count(),
++        )
++        response = self.client.get(
++            reverse("fixed_assets:asset_detail", args=[asset.pk])
++        )
++        self.assertContains(
++            response, reverse("accounting:journal_detail", args=[effect.journal_id])
++        )
++        self.assertContains(response, effect.source_version_reference)
++        self.assertEqual(
++            before,
++            (
++                SourceRecognitionDraft.objects.count(),
++                JournalEntry.objects.count(),
++                TreasuryMovement.objects.count(),
++            ),
++        )
++        viewer, _, _ = explicit_reader(
++            self.organization, "asset-only045", [P.FIXED_ASSETS_VIEW]
++        )
++        self.client.force_login(viewer)
++        response = self.client.get(
++            reverse("fixed_assets:asset_detail", args=[asset.pk])
++        )
++        self.assertNotContains(response, str(effect.journal_id))
++        self.assertNotContains(response, effect.source_version_reference)
+diff --git a/apps/fixed_assets/test_p8_s24_s27.py b/apps/fixed_assets/test_p8_s24_s27.py
+index 681ec9e..32b6ad3 100644
+--- a/apps/fixed_assets/test_p8_s24_s27.py
++++ b/apps/fixed_assets/test_p8_s24_s27.py
+@@ -713,4 +713,4 @@ class P8CostAndFixedAssetTests(EquipmentTestBase, TestCase):
+         session.save()
+         response = self.client.get("/fixed-assets/")
+         self.assertEqual(response.status_code, 200)
+-        self.assertContains(response, "بدون سند دفترکل")
++        self.assertContains(response, "ثبت دفتر کل در حوزهٔ حسابداری")
+diff --git a/apps/fixed_assets/urls.py b/apps/fixed_assets/urls.py
+index 799e6fe..83ad6df 100644
+--- a/apps/fixed_assets/urls.py
++++ b/apps/fixed_assets/urls.py
+@@ -8,6 +8,7 @@ urlpatterns = [
+     path("", views.workbench, name="workbench"),
+     path("audit/", views.audit_evidence, name="audit_evidence"),
+     path("assets/create/", views.asset_create, name="asset_create"),
++    path("assets/<uuid:asset_id>/", views.asset_detail, name="asset_detail"),
+     path("classes/create/", views.class_create, name="class_create"),
+     path("books/create/", views.book_create, name="book_create"),
+     path(
+diff --git a/apps/fixed_assets/views.py b/apps/fixed_assets/views.py
+index 3290fe4..76869f2 100644
+--- a/apps/fixed_assets/views.py
++++ b/apps/fixed_assets/views.py
+@@ -2,7 +2,8 @@ from django.contrib import messages
+ from django.core.exceptions import PermissionDenied, ValidationError
+ from django.http import Http404, HttpRequest, HttpResponse
+ from django.shortcuts import get_object_or_404, redirect, render
+-from django.views.decorators.http import require_POST
++from django.utils import timezone
++from django.views.decorators.http import require_GET, require_POST
+ 
+ from apps.audit.models import AuditEvent
+ from apps.fixed_assets.forms import (
+@@ -45,6 +46,11 @@ from apps.fixed_assets.services import (
+     review_handoff,
+     review_policy,
+ )
++from apps.fixed_assets.workspace import (
++    asset_accounting_targets,
++    asset_operational_links,
++    visible_assets,
++)
+ from apps.organizations.decorators import (
+     active_organization_required,
+     organization_permission_required,
+@@ -60,9 +66,10 @@ def workbench(request: HttpRequest) -> HttpResponse:
+         request,
+         "fixed_assets/workbench.html",
+         {
+-            "assets": FixedAsset.objects.filter(
+-                organization=organization
++            "assets": visible_assets(
++                organization=organization, actor=request.user
+             ).select_related("asset_class", "book_policy", "project")[:100],
++            "workspace_observed_at": timezone.now(),
+             "classes": FixedAssetClassVersion.objects.filter(organization=organization)[
+                 :50
+             ],
+@@ -86,6 +93,35 @@ def workbench(request: HttpRequest) -> HttpResponse:
+     )
+ 
+ 
++@active_organization_required
++@organization_permission_required(BusinessPermissionCode.FIXED_ASSETS_VIEW)
++@require_GET
++def asset_detail(request: HttpRequest, asset_id) -> HttpResponse:
++    asset = get_object_or_404(
++        visible_assets(
++            organization=request.organization, actor=request.user
++        ).select_related("asset_class", "book_policy", "project", "site"),
++        pk=asset_id,
++    )
++    return render(
++        request,
++        "fixed_assets/asset_detail.html",
++        {
++            "asset": asset,
++            "operational_links": asset_operational_links(
++                organization=request.organization, actor=request.user, asset=asset
++            ),
++            "accounting_targets": asset_accounting_targets(
++                organization=request.organization, actor=request.user, asset=asset
++            ),
++            "sources": asset.source_references.filter(
++                organization=request.organization
++            ),
++            "workspace_observed_at": timezone.now(),
++        },
++    )
++
++
+ @active_organization_required
+ @organization_permission_required(BusinessPermissionCode.FIXED_ASSET_AUDIT_VIEW)
+ def audit_evidence(request: HttpRequest) -> HttpResponse:
+--- /dev/null
++++ b/apps/fixed_assets/workspace.py
+@@ -0,0 +1,90 @@
++"""Read-only workspace selectors over retained financial/operational relationships."""
++
++from django.core.exceptions import PermissionDenied
++from django.db.models import Q
++
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.equipment.services import get_organization_equipment
++from apps.organizations.authorization import (
++    has_business_permission,
++    require_business_permission,
++    scope_queryset,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++
++from .models import FixedAsset, FixedAssetEquipmentLink
++
++
++def visible_assets(*, organization, actor):
++    # Preserve the current Fixed Assets UI's explicit organization scope. This
++    # selector does not add scope types or grant project/site access implicitly.
++    membership = require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.FIXED_ASSETS_VIEW,
++        message="اجازه مشاهدهٔ دارایی‌های ثابت این شرکت را ندارید.",
++    )
++    return scope_queryset(
++        FixedAsset.objects.filter(organization=organization),
++        membership=membership,
++        project_lookup="project_id",
++        site_lookup="site_id",
++    )
++
++
++def equipment_financial_links(*, organization, actor, equipment):
++    if equipment.organization_id != organization.pk:
++        raise PermissionDenied("Equipment is outside the active organization.")
++    try:
++        assets = visible_assets(organization=organization, actor=actor)
++    except PermissionDenied:
++        return FixedAssetEquipmentLink.objects.none()
++    # Retained links are evidence, including historical links; no current-active
++    # or identity-equivalence rule is inferred from dates, numbers or names.
++    return FixedAssetEquipmentLink.objects.filter(
++        organization=organization, equipment=equipment, asset__in=assets
++    ).select_related("asset")
++
++
++def asset_operational_links(*, organization, actor, asset):
++    visible_assets(organization=organization, actor=actor).get(pk=asset.pk)
++    if not all(
++        has_business_permission(
++            user=actor, organization=organization, permission=permission
++        )
++        for permission in (P.EQUIPMENT_ASSIGNMENTS_VIEW, P.MAINTENANCE_RECORDS_VIEW)
++    ):
++        return FixedAssetEquipmentLink.objects.none()
++    try:
++        equipment = get_organization_equipment(user=actor, organization=organization)
++    except PermissionDenied:
++        return FixedAssetEquipmentLink.objects.none()
++    return FixedAssetEquipmentLink.objects.filter(
++        organization=organization, asset=asset, equipment__in=equipment
++    ).select_related("equipment")
++
++
++def asset_accounting_targets(*, organization, actor, asset):
++    visible_assets(organization=organization, actor=actor).get(pk=asset.pk)
++    if not all(
++        has_business_permission(
++            user=actor, organization=organization, permission=permission
++        )
++        for permission in (P.ACCOUNTING_VIEW, P.ACCOUNTING_RECOGNITION_VIEW)
++    ):
++        return SourceRecognitionDraft.objects.none()
++    transactions = asset.transactions.filter(organization=organization).values("pk")
++    runs = asset.depreciation_lines.filter(organization=organization).values("run_id")
++    return (
++        SourceRecognitionDraft.objects.filter(
++            organization=organization,
++            journal__organization=organization,
++            mapping__organization=organization,
++        )
++        .filter(
++            Q(source_kind="asset", source_uuid__in=transactions)
++            | Q(source_kind="depreciation", source_uuid__in=runs)
++        )
++        .select_related("journal", "mapping")
++        .order_by("created_at")
++    )
+--- /dev/null
++++ b/core/financial_navigation.py
+@@ -0,0 +1,67 @@
++"""Owning-domain shortcuts; visibility grants no business or source authority."""
++
++from dataclasses import dataclass
++
++from apps.organizations.authorization import (
++    get_active_membership,
++    membership_has_scope,
++    membership_permission_codes,
++    permission_supports_object_scope,
++)
++
++
++@dataclass(frozen=True)
++class FinancialAuthorityLink:
++    label: str
++    route: str
++    permission: str
++    source_label: str
++
++
++FINANCIAL_AUTHORITIES = (
++    FinancialAuthorityLink(
++        "حسابداری",
++        "accounting:dashboard",
++        "accounting.view",
++        "دفتر کل و اسناد حسابداری",
++    ),
++    FinancialAuthorityLink(
++        "خزانه‌داری",
++        "treasury:workbench",
++        "treasury.view",
++        "دریافت، پرداخت و موجودی نقد",
++    ),
++    FinancialAuthorityLink(
++        "دریافتنی‌ها و پرداختنی‌ها",
++        "subledgers:workbench",
++        "subledgers.view",
++        "تعهدات دریافتنی و پرداختنی",
++    ),
++    FinancialAuthorityLink(
++        "دارایی‌های ثابت مالی",
++        "fixed_assets:workbench",
++        "fixed_assets.view",
++        "دارایی ثابت و استهلاک",
++    ),
++    FinancialAuthorityLink("هزینه‌ها", "expenses:list", "expenses.view", "اسناد هزینه"),
++    FinancialAuthorityLink(
++        "گزارش‌ها",
++        "reporting:dashboard",
++        "reporting.metric_result.view",
++        "نمایش خواندنی منابع حوزه‌ها",
++    ),
++)
++
++
++def authorized_financial_authorities(*, user, organization):
++    membership = get_active_membership(user=user, organization=organization)
++    codes = membership_permission_codes(membership)
++    return tuple(
++        link
++        for link in FINANCIAL_AUTHORITIES
++        if link.permission in codes
++        and membership_has_scope(
++            membership,
++            allow_any_scope=permission_supports_object_scope(link.permission),
++        )
++    )
+diff --git a/core/home.py b/core/home.py
+index 76cf17f..5e33431 100644
+--- a/core/home.py
++++ b/core/home.py
+@@ -10,6 +10,7 @@ from apps.organizations.authorization import (
+     permission_supports_object_scope,
+ )
+ from apps.organizations.models import Organization
++from core.financial_navigation import FINANCIAL_AUTHORITIES
+ 
+ 
+ @dataclass(frozen=True)
+@@ -24,7 +25,14 @@ WORKSPACE_LINKS = (
+     HomeLink("اسناد", "documents:list", "documents.view"),
+     HomeLink("قراردادها", "contracts:list", "contracts.view"),
+     HomeLink("تدارکات", "procurement:request_list", "purchase_requests.view"),
+-    HomeLink("فضای مالی قدیمی", "financials:dashboard", "financials.view"),
++    HomeLink(
++        "تجهیزات عملیاتی", "equipment:operations_workbench", "equipment_operations.view"
++    ),
++    HomeLink("فهرست تجهیزات", "equipment:list", "equipment.view"),
++    *(
++        HomeLink(link.label, link.route, link.permission)
++        for link in FINANCIAL_AUTHORITIES
++    ),
+ )
+ ASSIGNED_WORK = HomeLink("کارهای ارجاع‌شده", "workflows:workbench", "work_items.view")
+ ALERTS = HomeLink("اعلان‌ها", "support:notifications", "support.notifications_view")
+@@ -45,7 +53,13 @@ def authorized_home_links(
+         )
+     }
+     workspaces = tuple(
+-        link for link in WORKSPACE_LINKS if link.permission in effective_codes
++        link
++        for link in WORKSPACE_LINKS
++        if link.permission in effective_codes
++        and not (
++            link.route == "equipment:list"
++            and "equipment_operations.view" in effective_codes
++        )
+     )
+     assigned_work = (
+         ASSIGNED_WORK if ASSIGNED_WORK.permission in effective_codes else None
+--- /dev/null
++++ b/core/test_cep045_browser.py
+@@ -0,0 +1,114 @@
++"""Bounded synthetic screenshots, distinct from production/runtime certification."""
++
++import json
++import os
++import subprocess
++from pathlib import Path
++from unittest import skipUnless
++
++from django.contrib.staticfiles.testing import StaticLiveServerTestCase
++from django.urls import reverse
++
++from apps.fixed_assets.test_cep045_workspace import WorkspaceFixture, explicit_reader
++from apps.organizations.models import BusinessPermissionCode as P
++
++
++@skipUnless(
++    os.getenv("BONIRA_CEP045_SCREENSHOTS"), "Explicit local screenshot run only"
++)
++class WorkspaceBrowserTests(WorkspaceFixture, StaticLiveServerTestCase):
++    def probe(self, cases):
++        root = Path(__file__).resolve().parents[1]
++        output = root / "docs/governance/cep/evidence/CEP-045_SCREENSHOTS"
++        result = subprocess.run(
++            [
++                "node",
++                str(root / "docs/governance/cep/evidence/CEP-045_BROWSER_PROBE.mjs"),
++                self.live_server_url,
++                json.dumps(cases),
++                str(output),
++            ],
++            env={
++                **os.environ,
++                "CEP045_TEST_SESSION": self.client.cookies["sessionid"].value,
++            },
++            capture_output=True,
++            text=True,
++            encoding="utf-8",
++            timeout=90,
++            check=False,
++        )
++        self.assertEqual(result.returncode, 0, result.stderr[-2500:])
++        return json.loads(result.stdout)
++
++    def test_desktop_mobile_empty_linked_compatibility_and_denied_screens(self):
++        self.link()
++        cases = [
++            {"name": "home-canonical", "path": "/", "status": 200, "home": True},
++            {
++                "name": "equipment-desktop",
++                "path": reverse("equipment:operations_workbench"),
++                "workspace": "WS-15A",
++                "status": 200,
++            },
++            {
++                "name": "equipment-mobile",
++                "path": reverse("equipment:operations_workbench"),
++                "workspace": "WS-15A",
++                "status": 200,
++                "mobile": True,
++            },
++            {
++                "name": "equipment-link",
++                "path": reverse("equipment:detail", args=[self.equipment.pk]),
++                "workspace": "WS-15A",
++                "status": 200,
++            },
++            {
++                "name": "fixed-assets-desktop",
++                "path": reverse("fixed_assets:workbench"),
++                "workspace": "WS-15B",
++                "status": 200,
++            },
++            {
++                "name": "asset-source-detail",
++                "path": reverse("fixed_assets:asset_detail", args=[self.asset.pk]),
++                "workspace": "WS-15B",
++                "status": 200,
++            },
++            {
++                "name": "compatibility-financials",
++                "path": reverse("financials:dashboard"),
++                "status": 200,
++                "authorities": True,
++            },
++        ]
++        observations = self.probe(cases)
++        denied, _, _ = explicit_reader(
++            self.organization, "cep045-denied", [P.EQUIPMENT_VIEW]
++        )
++        self.client.force_login(denied)
++        observations += self.probe(
++            [
++                {
++                    "name": "unauthorized-fixed-asset",
++                    "path": reverse("fixed_assets:asset_detail", args=[self.asset.pk]),
++                    "status": 403,
++                }
++            ]
++        )
++        root = Path(__file__).resolve().parents[1]
++        (
++            root / "docs/governance/cep/evidence/CEP-045_BROWSER_OBSERVATIONS.json"
++        ).write_text(
++            json.dumps(
++                {
++                    "environment": "Isolated synthetic StaticLiveServer / local Chrome; no production data",
++                    "observations": observations,
++                    "production_or_runtime_certification": False,
++                },
++                indent=2,
++            )
++            + "\n",
++            "utf-8",
++        )
+diff --git a/core/test_home_browser.py b/core/test_home_browser.py
+index 505e55c..6f476b3 100644
+--- a/core/test_home_browser.py
++++ b/core/test_home_browser.py
+@@ -53,7 +53,9 @@ class HomeBrowserTests(StaticLiveServerTestCase):
+                 self.assertTrue(size["mobileNavOpens"])
+             if state == "normal":
+                 self.assertGreater(size["homeLinks"], 0)
+-                self.assertTrue(size["financialLink"])
++                self.assertFalse(
++                    size["financialLink"]
++                )  # Legacy Financials is no longer a canonical Home link.
+             if state in {"empty", "no_context", "unauthorized"}:
+                 self.assertFalse(size["testOrgVisible"])
+ 
+--- /dev/null
++++ b/templates/403.html
+@@ -0,0 +1,6 @@
++{% extends "base.html" %}
++{% block title %}دسترسی مجاز نیست | بنیرا{% endblock %}
++{% block content %}
++{% include "components/page_header.html" with page_eyebrow="دسترسی" page_title="امکان نمایش این بخش وجود ندارد" page_description="برای ادامه، یکی از فضاهای کاری مجاز را انتخاب کنید." only %}
++<a class="erp-btn erp-btn--secondary mt-5" href="{% url 'home' %}">بازگشت به خانه</a>
++{% endblock %}
+--- /dev/null
++++ b/templates/404.html
+@@ -0,0 +1,6 @@
++{% extends "base.html" %}
++{% block title %}مورد قابل‌نمایشی یافت نشد | بنیرا{% endblock %}
++{% block content %}
++{% include "components/page_header.html" with page_eyebrow="یافت نشد" page_title="مورد قابل‌نمایشی در دسترس نیست" page_description="برای ادامه، از مسیرهای مجاز فضای کاری استفاده کنید." only %}
++<a class="erp-btn erp-btn--secondary mt-5" href="{% url 'home' %}">بازگشت به خانه</a>
++{% endblock %}
+--- /dev/null
++++ b/templates/components/financial_authority_links.html
+@@ -0,0 +1,11 @@
++{% load erp_format %}
++<section class="erp-surface mb-5 rounded-xl p-5" data-financial-authorities aria-label="مرجع داده‌های مالی">
++  <h2 class="text-sm font-bold">مرجع داده‌های مالی</h2>
++  <p class="mt-2 text-sm text-slate-600">جمع‌های این نمای سازگاری از برآوردهای تأییدشده، هزینه‌های ثبت‌شده و اسناد قدیمی دریافت و پرداخت خوانده می‌شوند. مرجع هر حوزه از مسیرهای زیر در دسترس است.</p>
++  <p class="mt-1 text-xs text-slate-500">زمان مشاهدهٔ مجموعهٔ فعلی اسناد: {{ workspace_observed_at|jalali_datetime }}</p>
++  <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
++    {% for link in financial_authorities %}
++    <li><a class="erp-btn erp-btn--secondary" href="{% url link.route %}">{{ link.label }}</a><p class="mt-1 text-xs text-slate-500">{{ link.source_label }}</p></li>
++    {% empty %}<li class="text-sm text-slate-500">مسیر مالی مجاز دیگری برای این عضویت در دسترس نیست.</li>{% endfor %}
++  </ul>
++</section>
+diff --git a/templates/components/navigation_links.html b/templates/components/navigation_links.html
+index 9d3997f..30313d0 100644
+--- a/templates/components/navigation_links.html
++++ b/templates/components/navigation_links.html
+@@ -35,14 +35,14 @@
+         {% if "accounting.view" in business_permission_codes %}<a data-nav-id="NAV-027" class="erp-nav-link{% if current_namespace == 'accounting' %} is-active{% endif %}" href="{% url 'accounting:dashboard' %}">حسابداری</a>{% endif %}
+         {% if "subledgers.view" in business_permission_codes %}<a data-nav-id="NAV-028" class="erp-nav-link{% if current_namespace == 'subledgers' %} is-active{% endif %}" href="{% url 'subledgers:workbench' %}">پرداختنی و دریافتنی</a>{% endif %}
+         {% if "expenses.view" in business_permission_codes %}<a data-nav-id="NAV-029" class="erp-nav-link{% if current_namespace == 'expenses' %} is-active{% endif %}" href="{% url 'expenses:list' %}">هزینه‌ها</a>{% endif %}
+-        {% if "fixed_assets.view" in business_permission_codes %}<a data-nav-id="NAV-030" class="erp-nav-link{% if current_namespace == 'fixed_assets' %} is-active{% endif %}" href="{% url 'fixed_assets:workbench' %}">دارایی ثابت</a>{% endif %}
++        {% if "fixed_assets.view" in business_permission_codes %}<a data-nav-id="NAV-030" data-workspace-id="WS-15B" class="erp-nav-link{% if current_namespace == 'fixed_assets' %} is-active{% endif %}" href="{% url 'fixed_assets:workbench' %}">دارایی‌های ثابت مالی</a>{% endif %}
+     </div></details>
+     <details data-nav-id="NAV-031" class="erp-nav-group" open><summary><span>منابع انسانی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+         {% if "employees.view" in business_permission_codes %}<a data-nav-id="NAV-032" class="erp-nav-link{% if current_namespace == 'workforce' %} is-active{% endif %}" href="{% url 'workforce:employee_list' %}">کارکنان و ساختار سازمانی</a>{% endif %}
+         {% if "attendance.view" in business_permission_codes %}<a data-nav-id="NAV-033" class="erp-nav-link{% if current_namespace == 'timekeeping' %} is-active{% endif %}" href="{% url 'timekeeping:workbench' %}">حضور و زمان</a>{% endif %}
+         {% if "payroll_results.view" in business_permission_codes %}<a data-nav-id="NAV-034" class="erp-nav-link{% if current_namespace == 'payroll' %} is-active{% endif %}" href="{% url 'payroll:workbench' %}">حقوق و دستمزد</a>{% endif %}
+     </div></details>
+-    <details data-nav-id="NAV-035" class="erp-nav-group" open><summary><span>تجهیزات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">{% if "equipment.view" in business_permission_codes %}<a data-nav-id="NAV-036" class="erp-nav-link{% if current_namespace == 'equipment' %} is-active{% endif %}" href="{% url 'equipment:operations_workbench' %}">ماشین‌آلات و تجهیزات</a>{% endif %}</div></details>
++    <details data-nav-id="NAV-035" class="erp-nav-group" open><summary><span>تجهیزات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">{% if "equipment_operations.view" in business_permission_codes or "equipment.view" in business_permission_codes %}<a data-nav-id="NAV-036" data-workspace-id="WS-15A" class="erp-nav-link{% if current_namespace == 'equipment' %} is-active{% endif %}" href="{% if 'equipment_operations.view' in business_permission_codes %}{% url 'equipment:operations_workbench' %}{% else %}{% url 'equipment:list' %}{% endif %}">تجهیزات عملیاتی</a>{% endif %}</div></details>
+     {% if "reporting.metric_result.view" in business_permission_codes %}<a data-nav-id="NAV-037" class="erp-nav-link{% if current_namespace == 'reporting' %} is-active{% endif %}" href="{% url 'reporting:dashboard' %}">گزارش‌ها</a>{% endif %}
+     <details data-nav-id="NAV-038" class="erp-nav-group" open><summary><span>مدیریت سامانه</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+         <span data-nav-id="NAV-039" class="erp-nav-link is-unavailable" aria-disabled="true">گردش‌کارها</span>
+diff --git a/templates/equipment/detail.html b/templates/equipment/detail.html
+index cf95c5c..a9c65ec 100644
+--- a/templates/equipment/detail.html
++++ b/templates/equipment/detail.html
+@@ -1,6 +1,7 @@
+-{% extends "base.html" %}
++{% extends "base.html" %}{% load erp_format %}
+ {% block title %}{{ equipment.name }} | تجهیزات{% endblock %}
+ {% block content %}
++<div data-workspace-id="WS-15A">
+ <nav class="text-xs text-slate-400"><a class="hover:text-blue-700" href="{% url 'equipment:list' %}">تجهیزات</a><span class="mx-2">/</span>{{ equipment.name }}</nav>
+ <div class="mt-4 flex flex-wrap items-end justify-between gap-3"><div><p class="text-xs font-semibold text-blue-600">تجهیزات</p><h1 class="mt-1 text-2xl font-bold text-slate-950">{{ equipment.name }}</h1><p class="mt-1 text-sm text-slate-500">{{ equipment.category }} · <span dir="ltr">{{ equipment.code }}</span></p></div>{% include "components/status_badge.html" with status=equipment.status label=equipment.get_status_display only %}</div>
+ <div class="mt-6 grid gap-5 xl:grid-cols-[.8fr_1.2fr]">
+@@ -13,4 +14,7 @@
+     <section class="erp-surface rounded-xl"><div class="erp-panel-header flex items-center justify-between"><h2 class="text-sm font-bold text-slate-900">سوابق سرویس و تعمیر</h2>{% if "maintenance_records.create" in business_permission_codes %}<a class="text-xs font-semibold text-blue-700" href="{% url 'equipment:maintenance_create' %}">سابقه جدید</a>{% endif %}</div>{% if maintenance_records %}<div class="divide-y divide-slate-100">{% for item in maintenance_records %}<div class="flex items-center justify-between gap-3 px-5 py-3"><div><p class="text-sm font-semibold">{{ item.summary }}</p><p class="text-[11px] text-slate-500" dir="ltr">{{ item.record_number }} · {{ item.scheduled_date }}</p></div><div class="flex items-center gap-3">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}{% if "maintenance_records.transition" in business_permission_codes %}{% if item.status == "scheduled" or item.status == "in_progress" %}<a class="text-xs font-semibold text-blue-700" href="{% url 'equipment:maintenance_status_change' item.id %}">تغییر</a>{% endif %}{% endif %}</div></div>{% endfor %}</div>{% else %}<p class="p-5 text-sm text-slate-500">سابقه‌ای ثبت نشده است.</p>{% endif %}</section>
+   </section>
+ </div>
++
++{% if financial_asset_links %}<section class="erp-surface mt-5 rounded-xl p-5" aria-label="پیوندهای مالی ثبت‌شده"><h2 class="font-bold">پیوندهای ثبت‌شده با دارایی‌های ثابت مالی</h2>{% for link in financial_asset_links %}<div class="mt-3 border-t pt-3"><a class="erp-btn erp-btn--secondary" href="{% url 'fixed_assets:asset_detail' link.asset_id %}">{{ link.asset.name }}</a><p class="mt-2 text-xs text-slate-500">از {{ link.effective_from|jalali_date }}{% if link.effective_to %} تا {{ link.effective_to|jalali_date }}{% endif %}</p></div>{% endfor %}</section>{% endif %}
++</div>
+ {% endblock %}
+diff --git a/templates/equipment/list.html b/templates/equipment/list.html
+index 120e661..a14b5c1 100644
+--- a/templates/equipment/list.html
++++ b/templates/equipment/list.html
+@@ -1,6 +1,8 @@
+ {% extends "base.html" %}{% load table_filters %}
+ {% block title %}تجهیزات | سامانه مدیریت ساخت{% endblock %}
+ {% block content %}
++<div data-workspace-id="WS-15A">
+ {% table_filters filters "equipment-filters" %}
+ {% if "equipment.create" in business_permission_codes %}{% url "equipment:create" as create_url %}{% endif %}{% include "components/page_header.html" with page_eyebrow="تجهیزات" page_title="تجهیزات" page_description=request.organization.name page_action_url=create_url page_action_label="تجهیز جدید" only %}<div class="mt-5 flex flex-wrap gap-2"><a class="erp-btn erp-btn--secondary" href="{% url 'equipment:assignment_list' %}">تخصیص‌ها</a><a class="erp-btn erp-btn--secondary" href="{% url 'equipment:maintenance_list' %}">سرویس و تعمیرات</a>{% if "equipment_operations.view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:operations_workbench' %}">عملیات تجهیز</a>{% endif %}</div><section class="erp-surface mt-4 overflow-hidden rounded-xl">{% if equipment %}<div class="erp-table-wrap"><table class="w-full min-w-[850px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">کد و نام</th><th class="border-b border-slate-200 px-4 py-3">دسته</th><th class="border-b border-slate-200 px-4 py-3">مالکیت</th><th class="border-b border-slate-200 px-4 py-3">وضعیت</th></tr></thead><tbody class="divide-y divide-slate-100">{% for item in equipment %}<tr><td class="px-4 py-3.5"><a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'equipment:detail' item.id %}">{{ item.name }}</a><p class="text-[11px] text-slate-500" dir="ltr">{{ item.code }}</p></td><td class="px-4 py-3.5">{{ item.category }}</td><td class="px-4 py-3.5">{{ item.get_ownership_type_display }}</td><td class="px-4 py-3.5">{% include "components/status_badge.html" with status=item.status label=item.get_status_display only %}</td></tr>{% endfor %}</tbody></table></div>{% else %}{% include "components/empty_state.html" with empty_title="هنوز تجهیزی ثبت نشده است" empty_description="ماشین‌آلات و ابزارهای شرکت را ثبت کنید." empty_action_url=create_url empty_action_label="تجهیز جدید" only %}{% endif %}</section>
++</div>
+ {% endblock %}
+diff --git a/templates/equipment/operations_workbench.html b/templates/equipment/operations_workbench.html
+index bf217ec..ca05d68 100644
+--- a/templates/equipment/operations_workbench.html
++++ b/templates/equipment/operations_workbench.html
+@@ -1,7 +1,8 @@
+ {% extends "base.html" %}
+ {% block title %}عملیات تجهیز{% endblock %}
+ {% block content %}
+-{% include "components/page_header.html" with page_eyebrow="تجهیزات" page_title="عملیات تجهیز" page_description="شواهد عملیاتی غیرمالی و پیوندهای مرجع انبار" only %}
++<div data-workspace-id="WS-15A">
++{% include "components/page_header.html" with page_eyebrow="تجهیزات" page_title="تجهیزات عملیاتی" page_description="شواهد عملیاتی غیرمالی و پیوندهای مرجع انبار" only %}
+ <div class="mt-4 flex flex-wrap gap-2">{% if "equipment_meters.record" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:meter_reading_create' %}">قرائت کنتور</a>{% endif %}{% if "equipment_usage.record" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:usage_create' %}">ثبت کارکرد</a>{% endif %}{% if "equipment_fuel.record" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:fuel_create' %}">ثبت سوخت</a>{% endif %}{% if "equipment_qualifications.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:operator_qualification_create' %}">ثبت صلاحیت اپراتور</a>{% endif %}{% if "equipment_downtime.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:downtime_create' %}">ثبت توقف تجهیز</a>{% endif %}{% if "equipment_maintenance_plans.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:maintenance_plan_create' %}">برنامه نگهداری</a>{% endif %}{% if "equipment_work_orders.manage" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:work_order_create' %}">دستورکار نگهداری</a>{% endif %}{% if "equipment_cost_allocation.view" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'equipment:cost_workbench' %}">هزینه پیشنهادی</a>{% endif %}</div>
+ <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+ {% for label, rows in sections %}{% endfor %}
+@@ -11,4 +12,5 @@
+ <section class="erp-surface rounded-xl p-5"><h2 class="font-bold">برنامه و دستورکار</h2><p class="mt-2 text-sm text-slate-500">{{ plans|length }} برنامه · {{ work_orders|length }} دستورکار</p></section>
+ </div>
+ <section class="erp-surface mt-5 overflow-hidden rounded-xl"><div class="erp-panel-header"><h2 class="font-bold">پیوندهای قطعات یدکی و شواهد دستورکار</h2></div><div class="divide-y divide-slate-100">{% for order in work_orders %}<div class="flex items-center justify-between gap-3 p-4 text-sm"><span>{{ order.number }} · {{ order.spare_part_references.count }} پیوند مرجع انبار · {{ order.evidence_references.count }} شاهد</span><span class="flex gap-2"><a class="text-xs font-semibold text-blue-700" href="{% url 'equipment:work_order_evidence_create' order.id %}">افزودن شاهد</a><a class="text-xs font-semibold text-blue-700" href="{% url 'equipment:spare_link_create' order.id %}">پیوند قطعه</a><a class="text-xs font-semibold text-blue-700" href="{% url 'equipment:work_order_transition' order.id %}">تغییر وضعیت</a></span></div>{% empty %}<p class="p-5 text-sm text-slate-500">دستورکار یا پیوند قطعه یدکی ثبت نشده است.</p>{% endfor %}</div></section>
++</div>
+ {% endblock %}
+diff --git a/templates/financials/dashboard.html b/templates/financials/dashboard.html
+index 75913fc..571fd12 100644
+--- a/templates/financials/dashboard.html
++++ b/templates/financials/dashboard.html
+@@ -1,12 +1,13 @@
+-{% extends "base.html" %}{% load erp_format %} {% block title %}داشبورد | بنیرا{% endblock %} {% block content %}
+-<div class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900" dir="rtl">این داشبورد نمای قدیمی سازگاری است و مرجع شاخص‌های P10، بودجه، هزینه واقعی یا نقدینگی خزانه‌داری نیست.</div>
++{% extends "base.html" %}{% load erp_format %} {% block title %}نمای سازگاری مالی | بنیرا{% endblock %} {% block content %}
++<p class="mb-4 text-sm text-slate-600" data-legacy-financial-surface>نمای سازگاری مالی برای مرور سوابق قدیمی پروژه‌ها</p>
++{% include "components/financial_authority_links.html" %}
+ <span class="sr-only">داشبورد شرکت</span>
+ <section class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 px-5 py-6 text-white sm:px-7" aria-labelledby="dashboard-title">
+ <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+     <div>
+-        <p class="text-xs font-semibold text-blue-300">نمای مدیریتی شرکت</p>
+-        <h1 id="dashboard-title" class="mt-1 text-2xl font-bold tracking-tight text-white">داشبورد عملیاتی</h1>
+-        <p class="mt-1 text-sm text-slate-300">نمای یکپارچهٔ وضعیت پروژه‌ها و عملکرد مالی {{ request.organization.name }}</p>
++        <p class="text-xs font-semibold text-blue-300">سوابق قدیمی شرکت</p>
++        <h1 id="dashboard-title" class="mt-1 text-2xl font-bold tracking-tight text-white">نمای سازگاری مالی</h1>
++        <p class="mt-1 text-sm text-slate-300">مرور سوابق پروژه‌ها و اسناد مالی قدیمی {{ request.organization.name }}</p>
+     </div>
+     <div class="flex items-center gap-2 text-xs text-slate-300">
+         <span class="grid h-8 w-8 place-items-center rounded-lg border border-slate-700 bg-slate-800 text-blue-300"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg></span>
+@@ -43,10 +44,10 @@
+     {% if "payments.view" in business_permission_codes %}<a class="erp-surface group rounded-xl border-t-2 border-t-amber-500 p-4 transition hover:border-blue-200" href="{% url 'payments:list' %}">
+         <div class="flex items-start justify-between">
+             <div>
+-                <p class="text-xs font-medium text-slate-500">پرداخت‌های قطعی</p>
++                <p class="text-xs font-medium text-slate-500">اسناد قطعی قدیمی دریافت و پرداخت</p>
+                 <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.posted_payment_count }}</p>
+             </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span></div>
+-        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">پرداخت‌های ثبت نهایی</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
++        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">اسناد قدیمی ثبت نهایی</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+     </a>{% endif %}
+ </section>
+ 
+@@ -54,8 +55,8 @@
+     <section class="erp-surface overflow-hidden rounded-xl" aria-labelledby="financial-position-title">
+         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+             <div>
+-                <h2 id="financial-position-title" class="font-bold text-slate-900">تصویر مالی شرکت</h2>
+-                <p class="mt-1 text-xs text-slate-500">مقایسه مبالغ مصوب، هزینه و جریان نقدی</p>
++                <h2 id="financial-position-title" class="font-bold text-slate-900">خلاصهٔ منابع نمای قدیمی</h2>
++                <p class="mt-1 text-xs text-slate-500">برآوردهای مصوب، هزینه‌های ثبت‌شده و اسناد قدیمی دریافت و پرداخت</p>
+             </div>
+             <a class="text-xs font-semibold text-blue-600 hover:text-blue-700" href="{% url 'financials:report' %}">گزارش کامل ←</a>
+         </div>
+@@ -69,20 +70,20 @@
+                 <p class="mt-2 text-lg font-bold tabular-nums text-slate-950" dir="ltr">{{ summary.recorded_expense_total|rial }}</p>
+             </div>
+             <div class="bg-white px-5 py-5">
+-                <p class="text-xs text-slate-500">مانده برآورد</p>
++                <p class="text-xs text-slate-500">تفاضل برآورد و هزینهٔ ثبت‌شده</p>
+                 <p class="mt-2 text-lg font-bold tabular-nums {% if summary.variance < 0 %}text-red-600{% else %}text-emerald-600{% endif %}" dir="ltr">{{ summary.variance|rial }}</p>
+             </div>
+         </div>
+         <div class="border-t border-slate-100 bg-slate-50/60 p-5">
+             <div class="mb-4 flex items-center justify-between">
+-                <p class="text-xs font-semibold text-slate-700">گردش وجوه نقد</p><span class="erp-badge text-[11px] {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|rial }}</span></div>
++                <p class="text-xs font-semibold text-slate-700">خالص اسناد قدیمی دریافت و پرداخت</p><span class="erp-badge text-[11px] {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|rial }}</span></div>
+             <div class="grid gap-3 sm:grid-cols-2">
+                 <div class="rounded-lg border border-emerald-100 bg-white p-3">
+-                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">دریافت‌ها</span><span class="h-2 w-2 rounded-full bg-emerald-500"></span></div>
++                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">اسناد قدیمی دریافت</span><span class="h-2 w-2 rounded-full bg-emerald-500"></span></div>
+                     <p class="mt-2 text-sm font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.receipt_total|rial }}</p>
+                 </div>
+                 <div class="rounded-lg border border-rose-100 bg-white p-3">
+-                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">پرداخت‌ها</span><span class="h-2 w-2 rounded-full bg-rose-500"></span></div>
++                    <div class="flex items-center justify-between"><span class="text-xs text-slate-500">اسناد قدیمی پرداخت</span><span class="h-2 w-2 rounded-full bg-rose-500"></span></div>
+                     <p class="mt-2 text-sm font-semibold tabular-nums text-slate-800" dir="ltr">{{ summary.disbursement_total|rial }}</p>
+                 </div>
+             </div>
+diff --git a/templates/financials/report.html b/templates/financials/report.html
+index 069ba8f..798fdf8 100644
+--- a/templates/financials/report.html
++++ b/templates/financials/report.html
+@@ -1,12 +1,13 @@
+ {% extends "base.html" %}{% load erp_format table_filters %}
+ {% block title %}گزارش مالی | سامانه مدیریت ساخت{% endblock %}
+ {% block content %}
+-<div class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900" dir="rtl">این گزارش صرفاً سازگاری سامانه قبلی است؛ مقدار «انحراف» آن به شاخص مصوب بودجه/هزینه واقعی P10 تبدیل نشده است.</div>
++<p class="mb-4 text-sm text-slate-600" data-legacy-financial-surface>نمای سازگاری مالی برای مرور سوابق قدیمی پروژه‌ها</p>
++{% include "components/financial_authority_links.html" %}
+ {% include "components/page_header.html" with page_eyebrow="امور مالی" page_title="گزارش مالی پروژه‌ها" page_description=request.organization.name only %}
+ <section class="erp-surface mt-6 overflow-hidden rounded-xl" aria-label="گزارش مالی پروژه‌ها">
+ {% if reports %}
+-<div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">وضعیت مالی پروژه‌ها</h2><p class="mt-0.5 text-[11px] text-slate-500">مقایسهٔ برآورد، هزینه و جریان نقدی</p></div><span class="text-[11px] text-slate-500">واحد: {{ request.organization.currency }}</span></div>
+-<div class="erp-table-wrap"><table class="w-full min-w-[1050px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "project" "پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "approved_estimate_total" "برآورد مصوب" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "recorded_expense_total" "هزینه واقعی" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "variance" "انحراف" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "receipt_total" "دریافت" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "disbursement_total" "پرداخت" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "net_cash_flow" "خالص جریان نقدی" %}</th></tr></thead><tbody class="divide-y divide-slate-100">{% for report in reports %}<tr><td class="px-4 py-3.5">{% if "projects.view" in business_permission_codes %}<a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'projects:detail' report.project.id %}">{{ report.project.name }}</a>{% else %}<span class="font-semibold text-slate-900">{{ report.project.name }}</span>{% endif %}<p class="mt-0.5 text-[11px] text-slate-500"><span dir="ltr">{{ report.project.code }}</span> · {{ report.approved_estimate_count }} برآورد · {{ report.recorded_expense_count }} هزینه · {{ report.posted_payment_count }} پرداخت</p></td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.approved_estimate_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.recorded_expense_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums {% if report.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.variance|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.receipt_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.disbursement_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums {% if report.net_cash_flow < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.net_cash_flow|erp_number }}</td></tr>{% endfor %}</tbody></table></div>
++<div class="erp-panel-header"><div><h2 class="text-sm font-semibold text-slate-900">وضعیت مالی پروژه‌ها</h2><p class="mt-0.5 text-[11px] text-slate-500">برآورد، هزینه و اسناد قدیمی دریافت و پرداخت</p></div><span class="text-[11px] text-slate-500">واحد: {{ request.organization.currency }}</span></div>
++<div class="erp-table-wrap"><table class="w-full min-w-[1050px] text-right"><thead><tr><th class="border-b border-slate-200 px-4 py-3">{% table_sort_header "project" "پروژه" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "approved_estimate_total" "برآورد مصوب" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "recorded_expense_total" "هزینه واقعی" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "variance" "تفاضل نمای قدیمی" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "receipt_total" "دریافت قدیمی" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "disbursement_total" "پرداخت قدیمی" %}</th><th class="border-b border-slate-200 px-4 py-3 text-left">{% table_sort_header "net_cash_flow" "خالص اسناد قدیمی دریافت و پرداخت" %}</th></tr></thead><tbody class="divide-y divide-slate-100">{% for report in reports %}<tr><td class="px-4 py-3.5">{% if "projects.view" in business_permission_codes %}<a class="font-semibold text-slate-900 hover:text-blue-700" href="{% url 'projects:detail' report.project.id %}">{{ report.project.name }}</a>{% else %}<span class="font-semibold text-slate-900">{{ report.project.name }}</span>{% endif %}<p class="mt-0.5 text-[11px] text-slate-500"><span dir="ltr">{{ report.project.code }}</span> · {{ report.approved_estimate_count }} برآورد · {{ report.recorded_expense_count }} هزینه · {{ report.posted_payment_count }} پرداخت</p></td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.approved_estimate_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.recorded_expense_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums {% if report.variance < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.variance|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.receipt_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left tabular-nums" dir="ltr">{{ report.disbursement_total|erp_number }}</td><td class="whitespace-nowrap px-4 py-3.5 text-left font-semibold tabular-nums {% if report.net_cash_flow < 0 %}text-red-700{% else %}text-emerald-700{% endif %}" dir="ltr">{{ report.net_cash_flow|erp_number }}</td></tr>{% endfor %}</tbody></table></div>
+ <div class="border-t border-slate-200 bg-slate-50 px-4 py-3 text-[11px] text-slate-500">نمایش {{ reports|length }} پروژه</div>
+ {% else %}{% include "components/empty_state.html" with empty_title="پروژه فعالی برای گزارش وجود ندارد" empty_description="پس از ثبت پروژه، اطلاعات مالی آن در این بخش نمایش داده می‌شود." only %}{% endif %}
+ </section>

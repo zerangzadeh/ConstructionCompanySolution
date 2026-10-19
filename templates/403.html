@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}دسترسی مجاز نیست | بنیرا{% endblock %}
+{% block content %}
+{% include "components/page_header.html" with page_eyebrow="دسترسی" page_title="امکان نمایش این بخش وجود ندارد" page_description="برای ادامه، یکی از فضاهای کاری مجاز را انتخاب کنید." only %}
+<a class="erp-btn erp-btn--secondary mt-5" href="{% url 'home' %}">بازگشت به خانه</a>
+{% endblock %}

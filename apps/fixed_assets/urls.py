@@ -8,6 +8,7 @@ urlpatterns = [
     path("", views.workbench, name="workbench"),
     path("audit/", views.audit_evidence, name="audit_evidence"),
     path("assets/create/", views.asset_create, name="asset_create"),
+    path("assets/<uuid:asset_id>/", views.asset_detail, name="asset_detail"),
     path("classes/create/", views.class_create, name="class_create"),
     path("books/create/", views.book_create, name="book_create"),
     path(

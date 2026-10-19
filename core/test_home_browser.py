@@ -53,7 +53,9 @@ class HomeBrowserTests(StaticLiveServerTestCase):
                 self.assertTrue(size["mobileNavOpens"])
             if state == "normal":
                 self.assertGreater(size["homeLinks"], 0)
-                self.assertTrue(size["financialLink"])
+                self.assertFalse(
+                    size["financialLink"]
+                )  # Legacy Financials is no longer a canonical Home link.
             if state in {"empty", "no_context", "unauthorized"}:
                 self.assertFalse(size["testOrgVisible"])
 

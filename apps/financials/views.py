@@ -1,5 +1,6 @@
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.utils import timezone
 
 from apps.financials.services import (
     get_organization_dashboard,
@@ -10,6 +11,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.financial_navigation import authorized_financial_authorities
 
 
 def _sort_financial_reports(request: HttpRequest, reports):
@@ -40,7 +42,17 @@ def financial_report(request: HttpRequest) -> HttpResponse:
         organization=request.organization,
     )
     reports = _sort_financial_reports(request, reports)
-    return render(request, "financials/report.html", {"reports": reports})
+    return render(
+        request,
+        "financials/report.html",
+        {
+            "reports": reports,
+            "financial_authorities": authorized_financial_authorities(
+                user=request.user, organization=request.organization
+            ),
+            "workspace_observed_at": timezone.now(),
+        },
+    )
 
 
 @active_organization_required
@@ -50,4 +62,14 @@ def dashboard(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "financials/dashboard.html", {"summary": summary})
+    return render(
+        request,
+        "financials/dashboard.html",
+        {
+            "summary": summary,
+            "financial_authorities": authorized_financial_authorities(
+                user=request.user, organization=request.organization
+            ),
+            "workspace_observed_at": timezone.now(),
+        },
+    )

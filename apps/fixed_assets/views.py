@@ -2,7 +2,8 @@ from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_POST
+from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 
 from apps.audit.models import AuditEvent
 from apps.fixed_assets.forms import (
@@ -45,6 +46,11 @@ from apps.fixed_assets.services import (
     review_handoff,
     review_policy,
 )
+from apps.fixed_assets.workspace import (
+    asset_accounting_targets,
+    asset_operational_links,
+    visible_assets,
+)
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -60,9 +66,10 @@ def workbench(request: HttpRequest) -> HttpResponse:
         request,
         "fixed_assets/workbench.html",
         {
-            "assets": FixedAsset.objects.filter(
-                organization=organization
+            "assets": visible_assets(
+                organization=organization, actor=request.user
             ).select_related("asset_class", "book_policy", "project")[:100],
+            "workspace_observed_at": timezone.now(),
             "classes": FixedAssetClassVersion.objects.filter(organization=organization)[
                 :50
             ],
@@ -82,6 +89,35 @@ def workbench(request: HttpRequest) -> HttpResponse:
                 "depreciation_line__asset",
                 "depreciation_line__run__fiscal_period",
             )[:100],
+        },
+    )
+
+
+@active_organization_required
+@organization_permission_required(BusinessPermissionCode.FIXED_ASSETS_VIEW)
+@require_GET
+def asset_detail(request: HttpRequest, asset_id) -> HttpResponse:
+    asset = get_object_or_404(
+        visible_assets(
+            organization=request.organization, actor=request.user
+        ).select_related("asset_class", "book_policy", "project", "site"),
+        pk=asset_id,
+    )
+    return render(
+        request,
+        "fixed_assets/asset_detail.html",
+        {
+            "asset": asset,
+            "operational_links": asset_operational_links(
+                organization=request.organization, actor=request.user, asset=asset
+            ),
+            "accounting_targets": asset_accounting_targets(
+                organization=request.organization, actor=request.user, asset=asset
+            ),
+            "sources": asset.source_references.filter(
+                organization=request.organization
+            ),
+            "workspace_observed_at": timezone.now(),
         },
     )
 

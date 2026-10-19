@@ -713,4 +713,4 @@ class P8CostAndFixedAssetTests(EquipmentTestBase, TestCase):
         session.save()
         response = self.client.get("/fixed-assets/")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "بدون سند دفترکل")
+        self.assertContains(response, "ثبت دفتر کل در حوزهٔ حسابداری")

@@ -1,0 +1,52 @@
+{
+  "baseline": {
+    "result": "14 passed,1 failed before product mutation",
+    "classification": "BASELINE TEST DEBT",
+    "failure": "CEP017 unimplemented-target assertion locates first NAV019, now an implemented RFQ link from prior CEP030; old placeholder span remains too",
+    "scope": "RFQ source markup unchanged by045; no silent repair"
+  },
+  "initial_focused": {
+    "result": "7 failed,14 passed",
+    "classification": "NEW IMPLEMENTATION / FIXTURE ERRORS",
+    "failures": [
+      "New visible-assets helper omitted required denial message; fixed",
+      "Equipment detail requires separate assignment and maintenance read capabilities; explicit fixture and cross-link target gate now preserve all existing requirements"
+    ]
+  },
+  "second_focused": {
+    "result": "3 failed,18 passed",
+    "classification": "NEW TEMPLATE ERROR",
+    "failure": "Used nonexistent money filter; replaced with existing rial formatter"
+  },
+  "no_failed_required_test_converted_to_pass": true,
+  "third_run": {
+    "result": "20 passed,2 failed",
+    "failures": [
+      {
+        "classification": "TEST EXPECTATION ERROR",
+        "failure": "Test assumed Unicode Persian numerals; existing Jalali formatter emits1404/10/15 and font localization applies visually; assert the known Jalali date instead of changing calendar behavior"
+      },
+      {
+        "classification": "REQUIRED UI STATE GAP",
+        "failure": "Synthetic browser403 returned status403 and hid confidential name, but default page lang=en and noRTL",
+        "resolution": "Add shared403/404 Persian RTL templates preserving backend statuses/authorization"
+      }
+    ]
+  },
+  "affected_initial": {
+    "result": "14 failed,21 passed,3 subtests",
+    "classification": "One introduced outdated heading assertion; twelve legacy test-fixture failures before changed behavior; one proven NAV019 baseline failure",
+    "resolution": "Updated affected heading assertion. Test-only wrapper explicitly assigns existing role definitions/scopes; Financials fixture supplies required active other expense group. No production permission, role catalog, expense semantics or payment services changed."
+  },
+  "affected_refinement": {
+    "result": "2 failed,25 passed before supplying required test expense group",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "failure": "Both Financials legacy scenarios omitted required active PlatformExpenseGroup; fail at unchanged expenses.services.create_expense before changed UI",
+    "resolution": "Explicit test-only PlatformExpenseGroup fixture; both scenarios now pass with unchanged service validations"
+  },
+  "final": {
+    "focused_browser": "23 passed",
+    "affected": "29 passed,1 failed",
+    "remaining_failure": "Exact NAV019 baseline assertion retained; same failure at clean pre-mutation baseline. Changed NAV030/036 lines do not affect NAV019. All required CEP045 and affected behavior checks pass; no full suite PASS claim."
+  }
+}

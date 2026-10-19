@@ -85,6 +85,7 @@ from apps.equipment.services import (
     transition_equipment_status,
     transition_maintenance_status,
 )
+from apps.fixed_assets.workspace import equipment_financial_links
 from apps.organizations.decorators import (
     active_organization_required,
     organization_permission_required,
@@ -678,6 +679,11 @@ def equipment_detail(request: HttpRequest, equipment_id: str) -> HttpResponse:
             "assignments": assignments,
             "maintenance_records": maintenance_records,
             "status_form": EquipmentStatusForm(),
+            "financial_asset_links": equipment_financial_links(
+                organization=request.organization,
+                actor=request.user,
+                equipment=equipment,
+            ),
         },
     )
 

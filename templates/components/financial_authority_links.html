@@ -1,0 +1,11 @@
+{% load erp_format %}
+<section class="erp-surface mb-5 rounded-xl p-5" data-financial-authorities aria-label="مرجع داده‌های مالی">
+  <h2 class="text-sm font-bold">مرجع داده‌های مالی</h2>
+  <p class="mt-2 text-sm text-slate-600">جمع‌های این نمای سازگاری از برآوردهای تأییدشده، هزینه‌های ثبت‌شده و اسناد قدیمی دریافت و پرداخت خوانده می‌شوند. مرجع هر حوزه از مسیرهای زیر در دسترس است.</p>
+  <p class="mt-1 text-xs text-slate-500">زمان مشاهدهٔ مجموعهٔ فعلی اسناد: {{ workspace_observed_at|jalali_datetime }}</p>
+  <ul class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {% for link in financial_authorities %}
+    <li><a class="erp-btn erp-btn--secondary" href="{% url link.route %}">{{ link.label }}</a><p class="mt-1 text-xs text-slate-500">{{ link.source_label }}</p></li>
+    {% empty %}<li class="text-sm text-slate-500">مسیر مالی مجاز دیگری برای این عضویت در دسترس نیست.</li>{% endfor %}
+  </ul>
+</section>

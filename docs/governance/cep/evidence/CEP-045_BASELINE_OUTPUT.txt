@@ -1,0 +1,9 @@
+..............F                                                          [100%]
+================================== FAILURES ===================================
+_ Cep017NavigationTemplateTests.test_unimplemented_targets_are_not_links_or_new_actions _
+core\test_cep017_navigation.py:51: in test_unimplemented_targets_are_not_links_or_new_actions
+    self.assertIn('aria-disabled="true"', fragment)
+E   AssertionError: 'aria-disabled="true"' not found in 'data-nav-id="NAV-019" class="erp-nav-link{% if current_namespace == \'procurement\' %} is-active{% endif %}" href="{% url \'procurement:rfq_list\' %}">استعلام و انتخاب تأمین\u200cکننده</a>{% endif %}\n        <span data-nav-id="NA'
+=========================== short test summary info ===========================
+FAILED core/test_cep017_navigation.py::Cep017NavigationTemplateTests::test_unimplemented_targets_are_not_links_or_new_actions
+1 failed, 14 passed in 12.06s
