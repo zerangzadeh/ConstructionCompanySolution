@@ -11,8 +11,8 @@
     {
       "number": 2,
       "condition": "Zero active business/reporting readers from Legacy Payment",
-      "status": "PASS",
-      "evidence": "Financial projections read posted Treasury movements; Billing reads exact Subledger AR allocations. Forensics classified separately."
+      "status": "FAIL",
+      "evidence": "CEP-064_REHEARSAL_PREFLIGHT.json: registered Reporting claim_settlement adapter queries billing.ClaimSettlementAllocation, with FK to payments.PaymentAllocation. Earlier zero-reader finding was incomplete; runtime dependency remains even with zero active allocation rows."
     },
     {
       "number": 3,
@@ -42,7 +42,7 @@
       "number": 7,
       "condition": "Current-operation seed/demo fixtures use Treasury-approved flows",
       "status": "PASS",
-      "evidence": "Pending Treasury request generator is idempotent and creates no Payment/cash/GL history. Full seed has a separate unresolved Safety regression under condition11."
+      "evidence": "Financial seeds use pending Treasury requests, no Legacy Payment/cash/GL history. Full seed now fails a separate unchanged Quality record-review prerequisite under condition11; Safety flow fixed and verified."
     },
     {
       "number": 8,
@@ -60,19 +60,19 @@
       "number": 10,
       "condition": "Full migration graph builds from empty database with retirement changes",
       "status": "UNVERIFIED",
-      "evidence": "Preparation graph428/428 from zero PASS,523 tables. Full destructive contract candidate is not installed/rehearsed; see contract plan."
+      "evidence": "Full destructive candidate graph remains UNVERIFIED. Rehearsal preflight exposed an active required legacy Reporting reader; full seed remains FAIL. Stop under exact Human gate; preparation graph428/428 remains separate evidence."
     },
     {
       "number": 11,
       "condition": "System/migration/focused/affected regression all PASS, none FAIL or UNVERIFIED",
       "status": "FAIL",
-      "evidence": "System and drift PASS;65 focused/affected tests and28 subtests PASS. Four baseline registry failures and latest full-seed Safety approval failure remain required FAIL results."
+      "evidence": "System/drift PASS. Safety6/6 PASS. Registry2 PASS/6 reproduced baseline failures validly attributed under latest Human instruction; zero attributable registry failure. Required full seed FAIL at unchanged Quality separate-record approval prerequisite. See blocker closure evidence."
     },
     {
       "number": 12,
       "condition": "Verified Development database rollback/recovery checkpoint before destructive mutation",
       "status": "PASS",
-      "evidence": "Custom dump restored to separate local DB; all520 source tables counts/digests matched, source stable during capture; private dump and manifest retained."
+      "evidence": "Fresh custom Development dump restored to separate local DB; all523 source tables counts/digests match; source stable during capture. CEP-064_DEVELOPMENT_RECOVERY.json; native recovery procedure executed."
     }
   ],
   "LEGACY_PAYMENT_RETIREMENT_READINESS": "FAIL",
@@ -81,5 +81,16 @@
   "destructive_removal_executed": false,
   "post_removal_checks": "NOT_EXECUTED; no retirement completion claim",
   "production_action": false,
-  "cep_069_079_executed": false
+  "cep_069_079_executed": false,
+  "followup_authority": "supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md",
+  "tally": {
+    "PASS": 9,
+    "FAIL": 2,
+    "UNVERIFIED": 1
+  },
+  "remaining_blockers": [
+    "CEP-064-FINDING-004: full seed Quality record approval prerequisite",
+    "CEP-064-FINDING-005: active legacy Reporting settlement reader",
+    "CEP-064-FINDING-003: full destructive contract graph from zero UNVERIFIED; rehearsal preflight blocked"
+  ]
 }

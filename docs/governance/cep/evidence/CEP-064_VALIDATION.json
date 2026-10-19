@@ -16,15 +16,16 @@
   "full_seed_latest": {
     "status": "FAIL",
     "command": "pytest tests/test_seed_demo_data.py --reuse-db -q --tb=short",
-    "failure": "Safety incident closure requires separate record approval",
-    "source_services_unchanged_at_baseline": true,
-    "seed_safety_call_unchanged": true,
-    "artifact": "private seed-final-validation.xml"
+    "failure": "Quality closure requires separate record approval; Safety closure now passes through existing separate review API.",
+    "quality_seed_method_unchanged": true,
+    "artifact": "private seed-approved-validation.xml"
   },
   "registry_regression": {
     "passed": 2,
-    "failed": 4,
-    "baseline_same_four_failures": true,
+    "baseline_failed": 6,
+    "original_four_architecture_failure_sets_identical": true,
+    "two_additional_same_support_catalog_defect": true,
+    "attributable_failures": 0,
     "evidence": "CEP-064_REGRESSION_ATTRIBUTION.json"
   },
   "resolved_introduced_failure": "Missing mandatory message argument on three new Billing permission checks; corrected and all eight new Billing transition tests PASS.",
@@ -70,5 +71,13 @@
     "failed": 0,
     "private_artifact": "cash-precision-validation.xml",
     "behavior": "Cash projections preserve already-approved source Decimal precision; no separate rounding policy."
-  }
+  },
+  "demo_safety_followup": {
+    "passed": 6,
+    "failed": 0,
+    "existing_safety_review_tests": 5,
+    "new_seed_review_and_idempotency_test": 1,
+    "human_approval_recorded": true
+  },
+  "followup": "CEP-064_BLOCKER_CLOSURE_20261020.json"
 }

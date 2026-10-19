@@ -232,6 +232,17 @@ human_decisions:
     destructive_retirement_requires: ALL_12_READINESS_PASS_AND_VERIFIED_DEVELOPMENT_DB_CHECKPOINT
     git_writes_authorized: SAFE_ADD_COMMIT_PUSH_ORIGIN_MAIN
     production_authorized: false
+  HUMAN-LEGACY-PAYMENT-RETIREMENT-20261020:
+    source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: APPROVED_BOUNDED_BLOCKER_CLOSURE
+    authoritative_historical_payment_population: 0
+    scope: Close only named registry attribution, Demo Safety approval and Development retirement rehearsal blockers; preserve audit and document evidence
+    registry_baseline_attribution: VALID_NON_CEP_ATTRIBUTION_ALLOWED_NO_WEAKENING
+    demo_safety_approval: GRANTED
+    destructive_retirement_requires: ALL_12_READINESS_PASS_AND_VERIFIED_DEVELOPMENT_DB_CHECKPOINT
+    git_writes_authorized: SAFE_ATTRIBUTABLE_CHECKPOINTS
+    production_authorized: false
 registry_update_rules:
   on_start:
   - Read registry before product mutation
@@ -3398,18 +3409,18 @@ ceps:
     closure_triage:
       category: B
       disposition: BLOCKED_REQUIRED_VALIDATION_AND_CONTRACT_REHEARSAL
-      root_human_input_cep: CEP-028
-      minimum_resolution: "Zero historical population is resolved. Fix required registry and Safety seed regressions under their approved authority, rehearse the complete retirement contract graph, then re-evaluate the exact Human all12 gate. No historical Payment dataset is required."
-      evidence: docs/governance/cep/evidence/V1_CLOSURE_TRIAGE_20261019.json
-      assessed_at: '2026-10-19'
+      root_human_input_cep: CEP-064
+      minimum_resolution: "Registry baseline attribution and Human-approved Demo Safety closure verified. Full seed now fails unchanged Quality record review; rehearsal preflight found an active Reporting legacy-settlement reader. Resolve these within bounded authority before full graph rehearsal and exact12 re-evaluation. No historical Payment dataset is required."
+      evidence: docs/governance/cep/evidence/CEP-064_BLOCKER_CLOSURE_20261020.json
+      assessed_at: '2026-10-20'
     title: Treasury authority cutover and read-model convergence
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED
-      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-20261019
-      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md
+      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-20261020
+      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md
     execution:
       status: PARTIAL
       lifecycle: BLOCKED_REQUIRED_VALIDATION
@@ -3420,9 +3431,9 @@ ceps:
       status: PARTIAL_BLOCKED_REQUIRED_VALIDATION
     dod: NOT_MET_BLOCKED
     blockers:
-    - CEP-064-FINDING-001 / BLOCKER-TEST four baseline registry architecture failures remain required FAIL
-    - CEP-064-FINDING-002 / BLOCKER-TEST full demo Safety closure lacks separate record approval
-    - CEP-064-FINDING-003 / BLOCKER-MIGRATION complete destructive contract graph from zero UNVERIFIED
+    - CEP-064-FINDING-004 / BLOCKER-TEST required full demo seed now fails unchanged Quality separate record approval prerequisite
+    - CEP-064-FINDING-005 / BLOCKER-RUNTIME-REFERENCE registered Reporting claim_settlement adapter still reads legacy Billing settlement model
+    - CEP-064-FINDING-003 / BLOCKER-MIGRATION complete destructive contract graph from zero UNVERIFIED; required reader found at rehearsal preflight
     remaining_utv:
     - Complete candidate retirement graph from zero
     - Gated destructive Development contract and all required post-removal validation
@@ -3449,6 +3460,9 @@ ceps:
     - date: '2026-10-20'
       status: GIT_INTEGRATED
       reason: Implementation/preparation checkpoint 33e3da4098f49454d276298edeb9784744cc835f committed directly on main, pushed and independently verified equal to remote main with clean tree. Governance-only follow-up records Git facts. Execution remains PARTIAL; exact12 readiness FAIL; destructive retirement and serial continuation remain blocked.
+    - date: '2026-10-20'
+      status: PARTIAL_BOUNDED_BLOCKER_FOLLOWUP
+      reason: Clean main4a29233 entry; latest Human demo disposition and Demo Safety approval recorded. Findings001/002 closed with complete baseline attribution and6 Safety tests PASS. Required registry suite2 PASS/6 reproduced baseline failures; no attributable failure or permission/test weakening. Fresh523-table native restore matches all counts/digests;80 sources and32 typed/32 generic/160 audit identities reverified. Required full seed now fails unchanged Quality record review; active Reporting legacy settlement reader found at rehearsal preflight. Exact12 gate9 PASS/2 FAIL/1 UNVERIFIED. Full destructive graph remains unverified; stop under Human rule, no destructive retirement, unrelated CEP or Production action.
   CEP-065:
     closure_triage:
       category: B
@@ -4378,9 +4392,9 @@ v1_closure_triage:
   next_action: ESTABLISH_RECORDED_HUMAN_INPUTS_THEN_REPEAT_ENTRY_CHECKS
 repository_state:
   branch: main
-  last_reconciled_head: 33e3da4098f49454d276298edeb9784744cc835f
-  origin_main: 33e3da4098f49454d276298edeb9784744cc835f
-  integration_checkpoint: 33e3da4098f49454d276298edeb9784744cc835f
+  last_reconciled_head: 4a292332809431b89c060f4ac778d76377fb436a
+  origin_main: 4a292332809431b89c060f4ac778d76377fb436a
+  integration_checkpoint: 4a292332809431b89c060f4ac778d76377fb436a
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
 execution_frontier:
@@ -4411,7 +4425,7 @@ execution_frontier:
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Human-bounded Payment retirement stopped at PARTIAL. Exact12 readiness10 PASS/1 FAIL/1 UNVERIFIED; required registry and Safety seed regressions remain FAIL and final contract graph unverified. CEP028 zero historical population decision resolved; no new historical dataset, production action or069..079 execution authorized.
+  boundary_reason: Human-bounded retirement stopped at PARTIAL. Named registry and Demo Safety blockers closed with valid baseline attribution and6 Safety tests PASS. Exact12 readiness9 PASS/2 FAIL/1 UNVERIFIED; active Reporting legacy settlement reader and full seed Quality review failure remain; full contract graph unverified after failed preflight. Recovery523 tables PASS. No destructive retirement, unrelated CEP, historical dataset reopening or Production action.
   resume_cep_after_blocker_resolution: CEP-064
   independent_candidates_entry_status: CEP071_072_REQUIRE_FULL_NONPRODUCTION_ENTRY_REVIEW; CEP078_EXT0024_CURRENT_READINESS_UNVERIFIED
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED

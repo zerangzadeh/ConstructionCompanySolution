@@ -153,7 +153,9 @@ from apps.safety.models import (
     SafetyIncident,
     SafetyIncidentSeverity,
     SafetyIncidentType,
+    SafetyReviewStatus,
 )
+from apps.safety.record_review import decide_safety_record, submit_safety_record
 from apps.safety.services import (
     assign_safety_incident,
     close_safety_incident,
@@ -1840,6 +1842,21 @@ class Command(BaseCommand):
             actor=manager,
             incident_id=str(incident.pk),
             resolution_summary="اقدامات اصلاحی اجرا و اثربخشی آن در بازدید مشترک کارگاه تأیید شد.",
+        )
+        # Human-approved demo closure uses the source-owned record review API.
+        # Keep the normal permission checks, revisions and closure prerequisite.
+        submit_safety_record(
+            organization=organization,
+            actor=manager,
+            incident_id=str(incident.pk),
+            reason="Demo record submitted for separate Safety approval.",
+        )
+        decide_safety_record(
+            organization=organization,
+            actor=owner,
+            incident_id=str(incident.pk),
+            outcome=SafetyReviewStatus.APPROVED,
+            reason="Demo Safety closure authorized by Human decision 2026-10-20.",
         )
         close_safety_incident(
             organization=organization,

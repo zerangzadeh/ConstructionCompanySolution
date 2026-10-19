@@ -1,10 +1,12 @@
 evidence_id,kind,source_or_command,result,status
 CEP-064-EV-001,Authority and canonical identity,CEP-064_CONTRACT_IDENTITY.json; ../supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md,Both applicable prompt hashes match manifest; exact Human all12 gate governs,PASS
-CEP-064-EV-002,Development recovery,CEP-064_DEVELOPMENT_RECOVERY.json,Separate DB restore matches all520 source table counts/digests,PASS
+CEP-064-EV-002,Development recovery,CEP-064_DEVELOPMENT_RECOVERY.json,Separate local restore matches all523 current source tables; source stable,PASS
 CEP-064-EV-003,Reference retention and retry,CEP-064_REFERENCE_RETENTION.json; CEP-064_REFERENCE_RETRY.json,80 source snapshots;32 typed/generic document identities;160 audit IDs; two replays without duplicates,PASS
 CEP-064-EV-004,Empty preparation graph,CEP-064_EMPTY_DATABASE_PREPARATION.json,428/428 migrations from zero;523 tables; final destructive candidate remains unverified,PREPARATION_PASS_CONTRACT_UNVERIFIED
-CEP-064-EV-005,Focused and affected validation,CEP-064_VALIDATION.json,65 tests and28 subtests PASS;16 new transition cases PASS; UI/DMS targeted reruns PASS; full seed Safety regression FAIL; final precision/current-cash rerun2 PASS,REQUIRED_REGRESSION_FAIL
-CEP-064-EV-006,Baseline attribution,CEP-064_REGRESSION_ATTRIBUTION.json,Four architecture failures reproduced at784a5e6; Safety service/workflow and seed method unchanged,FAIL_BASELINE_AND_LATENT_SOURCE_FINDINGS
-CEP-064-EV-007,Runtime reference classification,CEP-064_RUNTIME_REFERENCE_INVENTORY.json,No active business Legacy Payment reader/writer; explicit transitional retained surfaces,PASS
-CEP-064-EV-008,Exact readiness evaluation,CEP-064_RETIREMENT_READINESS.json; ../supporting/CEP-064_RETIREMENT_CONTRACT_PLAN.md,10 PASS;1 FAIL;1 UNVERIFIED; no destructive execution or retirement completion,FAIL
+CEP-064-EV-005,Focused and affected validation,CEP-064_VALIDATION.json,Prior65 tests/28 subtests PASS; latest Safety6 PASS; required full seed Quality closure FAIL,REQUIRED_FULL_SEED_FAIL
+CEP-064-EV-006,Baseline attribution,CEP-064_REGRESSION_ATTRIBUTION.json,Original4 architecture and2 Support-catalog failures reproduce baseline; current registry2 PASS/6 baseline FAIL; no attributable regression,VALID_NON_CEP_BASELINE_ATTRIBUTION
+CEP-064-EV-007,Runtime reference classification,CEP-064_RUNTIME_REFERENCE_INVENTORY.json,Corrected:1 active Reporting legacy-settlement reader; facades remain denied,FAIL_ACTIVE_READER
+CEP-064-EV-008,Exact readiness evaluation,CEP-064_RETIREMENT_READINESS.json; ../supporting/CEP-064_RETIREMENT_CONTRACT_PLAN.md,9 PASS/2 FAIL/1 UNVERIFIED; reader and required Quality seed failure; graph unverified,FAIL
 CEP-064-EV-009,Git integration,CEP-064_GIT_CHECKPOINT.json,Implementation checkpoint committed/pushed and verified on existing main; partial blocked status retained,PASS_IMPLEMENTATION_CHECKPOINT
+CEP-064-EV-010,Human decision and bounded blocker closure,../supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md; CEP-064_BLOCKER_CLOSURE_20261020.json; CEP-064_DEMO_DISPOSITION.json,Registry valid baseline attribution and Demo Safety closure verified; all80 sources corroborated demo; no deletion,BOUNDED_CLOSURE_VERIFIED
+CEP-064-EV-011,Rehearsal preflight,CEP-064_REHEARSAL_PREFLIGHT.json,Active registered Reporting reader of legacy Billing settlement; full graph remains unverified; no destructive mutation,FAIL_ACTIVE_REQUIRED_CONSUMER

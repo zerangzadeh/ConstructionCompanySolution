@@ -30,3 +30,15 @@ Development restore checkpoint. Complete destructive contract not installed.
 Required registry/Safety seed regressions and contract rehearsal remain blockers;
 exact12 readiness FAIL. See Completion Report and evidence manifests. No serial
 continuation beyond this Human-bounded retirement task.
+
+Bounded follow-up2026-10-20 at clean main4a29233: latest Human disposition and
+Demo Safety approval recorded; Safety seed now uses existing submit/approve/close
+services (6 focused/affected tests PASS). Four original registry architecture
+failures and two database/flush manifestations have reproduced non-CEP baseline
+attribution. No permissions/tests weakened. Fresh523-table restore verified;
+80 source snapshots and32 typed/32 generic/160 audit identities reverified.
+Required full seed now fails unchanged Quality record approval. Rehearsal preflight
+found a registered active Reporting legacy-settlement reader; original zero-reader
+inventory corrected. Exact gate9 PASS/2 FAIL/1 UNVERIFIED; stop, no destructive
+execution, unrelated CEP or Production action. Findings001/002 closed;003 remains,
+004 Quality and005 reader recorded. See current Completion Report.

@@ -4,19 +4,19 @@
     "failures": [
       {
         "test": "test_every_managed_business_model_is_registered_exactly_once",
-        "detail": "Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']"
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 92, in test_every_managed_business_model_is_registered_exactly_once\n    self.assertEqual(duplicates, [])\nAssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']\n"
       },
       {
         "test": "test_every_permission_code_is_registered_exactly_once",
-        "detail": "Items in the second set but not the first:\n'support.case_create'\n'support.case_assign'\n'support.access_request'\n'support.access_use'\n'support.notifications_view'\n'support.evidence_link'\n'support.calendar_view'\n'support.evidence_sensitive_view'\n'support.access_platform_approve'\n'support.case_view'\n'support.notifications_acknowledge'\n'support.case_resolve'\n'support.access_revoke'\n'support.case_update'\n'support.audit_reconcile'\n'support.case_reopen'\n'support.access_tenant_confirm'"
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 60, in test_every_permission_code_is_registered_exactly_once\n    self.assertEqual(set(registered), set(BusinessPermissionCode.values))\nAssertionError: Items in the second set but not the first:\n'support.case_reopen'\n'support.access_tenant_confirm'\n'support.access_revoke'\n'support.case_create'\n'support.access_use'\n'support.notifications_view'\n'support.case_update'\n'support.calendar_view'\n'support.evidence_link'\n'support.notifications_acknowledge'\n'support.access_platform_approve'\n'support.access_request'\n'support.evidence_sensitive_view'\n'support.case_assign'\n'support.audit_reconcile'\n'support.case_view'\n'support.case_resolve'\n"
       },
       {
         "test": "test_every_registered_permission_is_referenced_by_its_enforcement_module",
-        "detail": "{'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\nDiff is 2521 characters long. Set self.maxDiff to None to see it."
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 109, in test_every_registered_permission_is_referenced_by_its_enforcement_module\n    self.assertEqual(missing, {})\nAssertionError: {'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\n+ {}\n- {'accounting_recognition': ['ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE',\n-                             'ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE',\n-                             'ACCOUNTING_RECOGNITION_PREPARE',\n-                             'ACCOUNTING_RECOGNITION_VIEW'],\n-  'attendance': ['ATTENDANCE_VIEW'],\n-  'compliance_controls': ['COMPLIANCE_SENSITIVE_EVIDENCE_VIEW'],\n-  'equipment_operations': ['EQUIPMENT_OPERATIONS_VIEW',\n-                           'EQUIPMENT_SPARE_LINKS_RECONCILE',\n-                           'EQUIPMENT_WORK_ORDERS_REOPEN'],\n-  'hr_certificates': ['HR_CERTIFICATES_CANCEL',\n-                      'HR_CERTIFICATES_CONFIGURE',\n-                      'HR_CERTIFICATES_GENERATE',\n-                      'HR_CERTIFICATES_REQUEST',\n-                      'HR_CERTIFICATES_REVIEW',\n-                      'HR_CERTIFICATES_VIEW'],\n-  'inventory_traceability': ['INVENTORY_TRACEABILITY_VIEW'],\n-  'inventory_valuation': ['INVENTORY_VALUATION_VIEW'],\n-  'knowledge': ['KNOWLEDGE_AUDIT_RECONCILE',\n-                'KNOWLEDGE_EXPORT',\n-                'KNOWLEDGE_TAXONOMY_MANAGE'],\n-  'leave_authority': ['LEAVE_BALANCES_MANAGE',\n-                      'LEAVE_BALANCES_VIEW',\n-                      'LEAVE_POLICIES_MANAGE'],\n-  'leave_mission': ['LEAVE_MISSION_VIEW'],\n-  'material_attributes': ['MATERIAL_DOCUMENTS_LINK'],\n-  'overtime': ['OVERTIME_VIEW'],\n-  'partner_qualification': ['PARTNER_AUDIT_RECONCILE',\n-                            'PARTNER_EXPORT',\n-                            'PARTNER_SENSITIVE_EVIDENCE_VIEW'],\n-  'payroll_ess': ['PAYROLL_ESS_EXPORT', 'PAYROLL_ESS_VIEW'],\n-  'payroll_inquiries': ['PAYROLL_INQUIRIES_REQUEST',\n-                        'PAYROLL_INQUIRIES_RESPOND'],\n-  'personal_data': ['PERSONAL_DATA_CONFIGURE',\n-                    'PERSONAL_DATA_REQUEST',\n-                    'PERSONAL_DATA_REVIEW',\n-                    'PERSONAL_DATA_VIEW'],\n-  'price_books': ['PRICE_BOOKS_ACTIVATE',\n-                  'PRICE_BOOKS_MANAGE',\n-                  'PRICE_BOOK_MAPPINGS_MANAGE'],\n-  'subledgers_payroll': ['SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE',\n-                         'SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE',\n-                         'SUBLEDGERS_PAYROLL_PREPARE',\n-                         'SUBLEDGERS_PAYROLL_VIEW'],\n-  'time_calendars': ['TIME_CALENDARS_VIEW'],\n-  'timesheets': ['TIMESHEETS_VIEW'],\n-  'variation_billing_eligibility': ['BILLING_VARIATION_ELIGIBILITY_RETRY',\n-                                    'BILLING_VARIATION_ELIGIBILITY_VIEW']}\n"
       },
       {
         "test": "test_resource_keys_are_unique_and_match_permission_namespaces",
-        "detail": "Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\nDiff is 2506 characters long. Set self.maxDiff to None to see it."
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 75, in test_resource_keys_are_unique_and_match_permission_namespaces\n    self.assertEqual(namespace_mismatches, [])\nAssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\n+ []\n- ['billing_variation_eligibility.retry',\n-  'billing_variation_eligibility.view',\n-  'compliance.audit_reconcile',\n-  'compliance.capa_assign',\n-  'compliance.capa_execute',\n-  'compliance.close',\n-  'compliance.effectiveness_review',\n-  'compliance.evidence_link',\n-  'compliance.export',\n-  'compliance.findings_classify',\n-  'compliance.findings_create',\n-  'compliance.findings_manage',\n-  'compliance.inspections_create',\n-  'compliance.inspections_execute',\n-  'compliance.inspections_review',\n-  'compliance.inspections_submit',\n-  'compliance.ncr_manage',\n-  'compliance.permits_control',\n-  'compliance.permits_issue',\n-  'compliance.permits_prepare',\n-  'compliance.reopen',\n-  'compliance.sensitive_evidence_view',\n-  'compliance.templates_manage',\n-  'compliance.templates_publish',\n-  'compliance.tests_execute',\n-  'compliance.tests_request',\n-  'compliance.tests_review',\n-  'compliance.verify',\n-  'compliance.view',\n-  'equipment_downtime.manage',\n-  'equipment_fuel.record',\n-  'equipment_maintenance_plans.manage',\n-  'equipment_meters.correct',\n-  'equipment_meters.record',\n-  'equipment_qualifications.manage',\n-  'equipment_spare_links.manage',\n-  'equipment_spare_links.reconcile',\n-  'equipment_usage.record',\n-  'equipment_work_orders.complete',\n-  'equipment_work_orders.manage',\n-  'equipment_work_orders.reopen',\n-  'estimate_assumptions.manage',\n-  'estimate_composition.manage',\n-  'estimate_imports.preview',\n-  'estimate_rate_sources.manage',\n-  'field_proposals.prepare',\n-  'field_proposals.review',\n-  'leave_balances.manage',\n-  'leave_balances.view',\n-  'leave_policies.manage',\n-  'material_documents.link',\n-  'material_prices.observations_record',\n-  'material_relationships.manage',\n-  'material_technical.approve',\n-  'material_technical.review',\n-  'material_technical.submit',\n-  'partner.audit_reconcile',\n-  'partner.category_decide',\n-  'partner.evaluations_appeal',\n-  'partner.evaluations_prepare',\n-  'partner.evaluations_publish',\n-  'partner.evaluations_submit',\n-  'partner.evidence_link',\n-  'partner.export',\n-  'partner.profile_manage',\n-  'partner.proposals_create',\n-  'partner.qualifications_control',\n-  'partner.qualifications_prepare',\n-  'partner.qualifications_review',\n-  'partner.qualifications_submit',\n-  'partner.requirements_manage',\n-  'partner.sensitive_evidence_view',\n-  'partner.view',\n-  'party_governance.manage',\n-  'party_restrictions.manage',\n-  'payroll_statutory_configuration.view',\n-  'price_book_mappings.manage']\n"
       }
     ],
     "errors": 0
@@ -26,22 +26,259 @@
     "failures": [
       {
         "test": "test_every_managed_business_model_is_registered_exactly_once",
-        "detail": "Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']"
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 92, in test_every_managed_business_model_is_registered_exactly_once\n    self.assertEqual(duplicates, [])\nAssertionError: Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']\n"
       },
       {
         "test": "test_every_permission_code_is_registered_exactly_once",
-        "detail": "Items in the second set but not the first:\n'support.case_create'\n'support.case_assign'\n'support.access_request'\n'support.access_use'\n'support.notifications_view'\n'support.evidence_link'\n'support.calendar_view'\n'support.evidence_sensitive_view'\n'support.access_platform_approve'\n'support.case_view'\n'support.notifications_acknowledge'\n'support.case_resolve'\n'support.access_revoke'\n'support.case_update'\n'support.audit_reconcile'\n'support.case_reopen'\n'support.access_tenant_confirm'"
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 60, in test_every_permission_code_is_registered_exactly_once\n    self.assertEqual(set(registered), set(BusinessPermissionCode.values))\nAssertionError: Items in the second set but not the first:\n'support.case_reopen'\n'support.access_tenant_confirm'\n'support.access_revoke'\n'support.case_create'\n'support.access_use'\n'support.notifications_view'\n'support.case_update'\n'support.calendar_view'\n'support.evidence_link'\n'support.notifications_acknowledge'\n'support.access_platform_approve'\n'support.access_request'\n'support.evidence_sensitive_view'\n'support.case_assign'\n'support.audit_reconcile'\n'support.case_view'\n'support.case_resolve'\n"
       },
       {
         "test": "test_every_registered_permission_is_referenced_by_its_enforcement_module",
-        "detail": "{'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\nDiff is 2521 characters long. Set self.maxDiff to None to see it."
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 109, in test_every_registered_permission_is_referenced_by_its_enforcement_module\n    self.assertEqual(missing, {})\nAssertionError: {'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\n+ {}\n- {'accounting_recognition': ['ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE',\n-                             'ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE',\n-                             'ACCOUNTING_RECOGNITION_PREPARE',\n-                             'ACCOUNTING_RECOGNITION_VIEW'],\n-  'attendance': ['ATTENDANCE_VIEW'],\n-  'compliance_controls': ['COMPLIANCE_SENSITIVE_EVIDENCE_VIEW'],\n-  'equipment_operations': ['EQUIPMENT_OPERATIONS_VIEW',\n-                           'EQUIPMENT_SPARE_LINKS_RECONCILE',\n-                           'EQUIPMENT_WORK_ORDERS_REOPEN'],\n-  'hr_certificates': ['HR_CERTIFICATES_CANCEL',\n-                      'HR_CERTIFICATES_CONFIGURE',\n-                      'HR_CERTIFICATES_GENERATE',\n-                      'HR_CERTIFICATES_REQUEST',\n-                      'HR_CERTIFICATES_REVIEW',\n-                      'HR_CERTIFICATES_VIEW'],\n-  'inventory_traceability': ['INVENTORY_TRACEABILITY_VIEW'],\n-  'inventory_valuation': ['INVENTORY_VALUATION_VIEW'],\n-  'knowledge': ['KNOWLEDGE_AUDIT_RECONCILE',\n-                'KNOWLEDGE_EXPORT',\n-                'KNOWLEDGE_TAXONOMY_MANAGE'],\n-  'leave_authority': ['LEAVE_BALANCES_MANAGE',\n-                      'LEAVE_BALANCES_VIEW',\n-                      'LEAVE_POLICIES_MANAGE'],\n-  'leave_mission': ['LEAVE_MISSION_VIEW'],\n-  'material_attributes': ['MATERIAL_DOCUMENTS_LINK'],\n-  'overtime': ['OVERTIME_VIEW'],\n-  'partner_qualification': ['PARTNER_AUDIT_RECONCILE',\n-                            'PARTNER_EXPORT',\n-                            'PARTNER_SENSITIVE_EVIDENCE_VIEW'],\n-  'payroll_ess': ['PAYROLL_ESS_EXPORT', 'PAYROLL_ESS_VIEW'],\n-  'payroll_inquiries': ['PAYROLL_INQUIRIES_REQUEST',\n-                        'PAYROLL_INQUIRIES_RESPOND'],\n-  'personal_data': ['PERSONAL_DATA_CONFIGURE',\n-                    'PERSONAL_DATA_REQUEST',\n-                    'PERSONAL_DATA_REVIEW',\n-                    'PERSONAL_DATA_VIEW'],\n-  'price_books': ['PRICE_BOOKS_ACTIVATE',\n-                  'PRICE_BOOKS_MANAGE',\n-                  'PRICE_BOOK_MAPPINGS_MANAGE'],\n-  'subledgers_payroll': ['SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE',\n-                         'SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE',\n-                         'SUBLEDGERS_PAYROLL_PREPARE',\n-                         'SUBLEDGERS_PAYROLL_VIEW'],\n-  'time_calendars': ['TIME_CALENDARS_VIEW'],\n-  'timesheets': ['TIMESHEETS_VIEW'],\n-  'variation_billing_eligibility': ['BILLING_VARIATION_ELIGIBILITY_RETRY',\n-                                    'BILLING_VARIATION_ELIGIBILITY_VIEW']}\n"
       },
       {
         "test": "test_resource_keys_are_unique_and_match_permission_namespaces",
-        "detail": "Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\nDiff is 2506 characters long. Set self.maxDiff to None to see it."
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 75, in test_resource_keys_are_unique_and_match_permission_namespaces\n    self.assertEqual(namespace_mismatches, [])\nAssertionError: Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\n+ []\n- ['billing_variation_eligibility.retry',\n-  'billing_variation_eligibility.view',\n-  'compliance.audit_reconcile',\n-  'compliance.capa_assign',\n-  'compliance.capa_execute',\n-  'compliance.close',\n-  'compliance.effectiveness_review',\n-  'compliance.evidence_link',\n-  'compliance.export',\n-  'compliance.findings_classify',\n-  'compliance.findings_create',\n-  'compliance.findings_manage',\n-  'compliance.inspections_create',\n-  'compliance.inspections_execute',\n-  'compliance.inspections_review',\n-  'compliance.inspections_submit',\n-  'compliance.ncr_manage',\n-  'compliance.permits_control',\n-  'compliance.permits_issue',\n-  'compliance.permits_prepare',\n-  'compliance.reopen',\n-  'compliance.sensitive_evidence_view',\n-  'compliance.templates_manage',\n-  'compliance.templates_publish',\n-  'compliance.tests_execute',\n-  'compliance.tests_request',\n-  'compliance.tests_review',\n-  'compliance.verify',\n-  'compliance.view',\n-  'equipment_downtime.manage',\n-  'equipment_fuel.record',\n-  'equipment_maintenance_plans.manage',\n-  'equipment_meters.correct',\n-  'equipment_meters.record',\n-  'equipment_qualifications.manage',\n-  'equipment_spare_links.manage',\n-  'equipment_spare_links.reconcile',\n-  'equipment_usage.record',\n-  'equipment_work_orders.complete',\n-  'equipment_work_orders.manage',\n-  'equipment_work_orders.reopen',\n-  'estimate_assumptions.manage',\n-  'estimate_composition.manage',\n-  'estimate_imports.preview',\n-  'estimate_rate_sources.manage',\n-  'field_proposals.prepare',\n-  'field_proposals.review',\n-  'leave_balances.manage',\n-  'leave_balances.view',\n-  'leave_policies.manage',\n-  'material_documents.link',\n-  'material_prices.observations_record',\n-  'material_relationships.manage',\n-  'material_technical.approve',\n-  'material_technical.review',\n-  'material_technical.submit',\n-  'partner.audit_reconcile',\n-  'partner.category_decide',\n-  'partner.evaluations_appeal',\n-  'partner.evaluations_prepare',\n-  'partner.evaluations_publish',\n-  'partner.evaluations_submit',\n-  'partner.evidence_link',\n-  'partner.export',\n-  'partner.profile_manage',\n-  'partner.proposals_create',\n-  'partner.qualifications_control',\n-  'partner.qualifications_prepare',\n-  'partner.qualifications_review',\n-  'partner.qualifications_submit',\n-  'partner.requirements_manage',\n-  'partner.sensitive_evidence_view',\n-  'partner.view',\n-  'party_governance.manage',\n-  'party_restrictions.manage',\n-  'payroll_statutory_configuration.view',\n-  'price_book_mappings.manage']\n"
       }
     ],
     "errors": 0
   },
-  "interpretation": "Four architecture regression failures also occur at baseline; no risk waiver or retirement PASS is inferred."
+  "classification": "BASELINE TEST DEBT",
+  "identical_complete_defect_sets": true,
+  "defect_sets": {
+    "duplicate_models": [
+      "payroll.FinancialHandoffLine",
+      "payroll.FinancialHandoffProposal",
+      "payroll.FinancialHandoffReview",
+      "payroll.Payslip"
+    ],
+    "missing_permissions": [
+      "support.access_platform_approve",
+      "support.access_request",
+      "support.access_revoke",
+      "support.access_tenant_confirm",
+      "support.access_use",
+      "support.audit_reconcile",
+      "support.calendar_view",
+      "support.case_assign",
+      "support.case_create",
+      "support.case_reopen",
+      "support.case_resolve",
+      "support.case_update",
+      "support.case_view",
+      "support.evidence_link",
+      "support.evidence_sensitive_view",
+      "support.notifications_acknowledge",
+      "support.notifications_view"
+    ],
+    "unreferenced_enforcement": {
+      "leave_authority": [
+        "LEAVE_BALANCES_MANAGE",
+        "LEAVE_BALANCES_VIEW",
+        "LEAVE_POLICIES_MANAGE"
+      ],
+      "subledgers_payroll": [
+        "SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE",
+        "SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE",
+        "SUBLEDGERS_PAYROLL_PREPARE",
+        "SUBLEDGERS_PAYROLL_VIEW"
+      ],
+      "accounting_recognition": [
+        "ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE",
+        "ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE",
+        "ACCOUNTING_RECOGNITION_PREPARE",
+        "ACCOUNTING_RECOGNITION_VIEW"
+      ],
+      "hr_certificates": [
+        "HR_CERTIFICATES_CANCEL",
+        "HR_CERTIFICATES_CONFIGURE",
+        "HR_CERTIFICATES_GENERATE",
+        "HR_CERTIFICATES_REQUEST",
+        "HR_CERTIFICATES_REVIEW",
+        "HR_CERTIFICATES_VIEW"
+      ],
+      "personal_data": [
+        "PERSONAL_DATA_CONFIGURE",
+        "PERSONAL_DATA_REQUEST",
+        "PERSONAL_DATA_REVIEW",
+        "PERSONAL_DATA_VIEW"
+      ],
+      "material_attributes": [
+        "MATERIAL_DOCUMENTS_LINK"
+      ],
+      "variation_billing_eligibility": [
+        "BILLING_VARIATION_ELIGIBILITY_RETRY",
+        "BILLING_VARIATION_ELIGIBILITY_VIEW"
+      ],
+      "price_books": [
+        "PRICE_BOOKS_ACTIVATE",
+        "PRICE_BOOKS_MANAGE",
+        "PRICE_BOOK_MAPPINGS_MANAGE"
+      ],
+      "compliance_controls": [
+        "COMPLIANCE_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "partner_qualification": [
+        "PARTNER_AUDIT_RECONCILE",
+        "PARTNER_EXPORT",
+        "PARTNER_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "knowledge": [
+        "KNOWLEDGE_AUDIT_RECONCILE",
+        "KNOWLEDGE_EXPORT",
+        "KNOWLEDGE_TAXONOMY_MANAGE"
+      ],
+      "time_calendars": [
+        "TIME_CALENDARS_VIEW"
+      ],
+      "attendance": [
+        "ATTENDANCE_VIEW"
+      ],
+      "leave_mission": [
+        "LEAVE_MISSION_VIEW"
+      ],
+      "overtime": [
+        "OVERTIME_VIEW"
+      ],
+      "timesheets": [
+        "TIMESHEETS_VIEW"
+      ],
+      "payroll_inquiries": [
+        "PAYROLL_INQUIRIES_REQUEST",
+        "PAYROLL_INQUIRIES_RESPOND"
+      ],
+      "payroll_ess": [
+        "PAYROLL_ESS_EXPORT",
+        "PAYROLL_ESS_VIEW"
+      ],
+      "inventory_traceability": [
+        "INVENTORY_TRACEABILITY_VIEW"
+      ],
+      "inventory_valuation": [
+        "INVENTORY_VALUATION_VIEW"
+      ],
+      "equipment_operations": [
+        "EQUIPMENT_OPERATIONS_VIEW",
+        "EQUIPMENT_SPARE_LINKS_RECONCILE",
+        "EQUIPMENT_WORK_ORDERS_REOPEN"
+      ]
+    },
+    "namespace_mismatches": [
+      "billing_variation_eligibility.retry",
+      "billing_variation_eligibility.view",
+      "compliance.audit_reconcile",
+      "compliance.capa_assign",
+      "compliance.capa_execute",
+      "compliance.close",
+      "compliance.effectiveness_review",
+      "compliance.evidence_link",
+      "compliance.export",
+      "compliance.findings_classify",
+      "compliance.findings_create",
+      "compliance.findings_manage",
+      "compliance.inspections_create",
+      "compliance.inspections_execute",
+      "compliance.inspections_review",
+      "compliance.inspections_submit",
+      "compliance.ncr_manage",
+      "compliance.permits_control",
+      "compliance.permits_issue",
+      "compliance.permits_prepare",
+      "compliance.reopen",
+      "compliance.sensitive_evidence_view",
+      "compliance.templates_manage",
+      "compliance.templates_publish",
+      "compliance.tests_execute",
+      "compliance.tests_request",
+      "compliance.tests_review",
+      "compliance.verify",
+      "compliance.view",
+      "equipment_downtime.manage",
+      "equipment_fuel.record",
+      "equipment_maintenance_plans.manage",
+      "equipment_meters.correct",
+      "equipment_meters.record",
+      "equipment_qualifications.manage",
+      "equipment_spare_links.manage",
+      "equipment_spare_links.reconcile",
+      "equipment_usage.record",
+      "equipment_work_orders.complete",
+      "equipment_work_orders.manage",
+      "equipment_work_orders.reopen",
+      "estimate_assumptions.manage",
+      "estimate_composition.manage",
+      "estimate_imports.preview",
+      "estimate_rate_sources.manage",
+      "field_proposals.prepare",
+      "field_proposals.review",
+      "leave_balances.manage",
+      "leave_balances.view",
+      "leave_policies.manage",
+      "material_documents.link",
+      "material_prices.observations_record",
+      "material_relationships.manage",
+      "material_technical.approve",
+      "material_technical.review",
+      "material_technical.submit",
+      "partner.audit_reconcile",
+      "partner.category_decide",
+      "partner.evaluations_appeal",
+      "partner.evaluations_prepare",
+      "partner.evaluations_publish",
+      "partner.evaluations_submit",
+      "partner.evidence_link",
+      "partner.export",
+      "partner.profile_manage",
+      "partner.proposals_create",
+      "partner.qualifications_control",
+      "partner.qualifications_prepare",
+      "partner.qualifications_review",
+      "partner.qualifications_submit",
+      "partner.requirements_manage",
+      "partner.sensitive_evidence_view",
+      "partner.view",
+      "party_governance.manage",
+      "party_restrictions.manage",
+      "payroll_statutory_configuration.view",
+      "price_book_mappings.manage"
+    ]
+  },
+  "attribution": "All four exact defect sets reproduce at pre-retirement 784a5e6. No introduced defect in the current registry; test and permissions unchanged. Full architecture regression remains 2 PASS / 4 baseline FAIL.",
+  "human_disposition": "LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md allows valid non-CEP attribution; Execution Policy section16 requires preserving unrelated debt.",
+  "retirement_namespaces": {
+    "claim_settlements": "PASS: no duplicate model, missing code, namespace or enforcement defect",
+    "payments": "PASS: no duplicate model, missing code, namespace or enforcement defect",
+    "documents": "PASS: no duplicate model, missing code, namespace or enforcement defect",
+    "treasury": "PASS: no duplicate model, missing code, namespace or enforcement defect",
+    "financials": "PASS: no duplicate model, missing code, namespace or enforcement defect"
+  },
+  "production_permission_change": false,
+  "additional_required_catalog_tests": {
+    "classification": "BASELINE TEST DEBT",
+    "tests": 2,
+    "baseline_failures": 2,
+    "current_failures": 2,
+    "exact_registry_code_sets_equal": true,
+    "failure_cause": "The same 17 Support enum/catalog codes absent from baseline and current registry. This is the existing Support registration defect, reached independently by both database and post-flush assertions.",
+    "baseline_failure_details": [
+      {
+        "test": "test_database_catalog_matches_registry",
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 142, in test_database_catalog_matches_registry\n    self.assertEqual(\nAssertionError: Items in the second set but not the first:\n'timesheets.view'\n'compliance_evidence.approve'\n'knowledge.candidates_create'\n'timesheets.prepare'\n'safety_incidents.view'\n'compliance.permits_issue'\n'fixed_assets.handoff_prepare'\n'party_governance.manage'\n'treasury.payment_requests_release'\n'employees.view'\n'taxpayer_invoices.submit'\n'compliance.tests_execute'\n'rfqs.create'\n'inventory_valuation.view'\n'reporting.export.sensitive'\n'offboarding.view'\n'rfq_quotes.approve_open'\n'price_books.manage'\n'subledgers.writeoffs_reverse'\n'inventory_counts.prepare'\n'equipment_spare_links.reconcile'\n'claim_settlements.allocate'\n'taxpayer_invoices.approve'\n'stock_balances.view'\n'rfqs.submit'\n'parties.create'\n'payslips.view'\n'rfq_quotes.view_confidential'\n'field_observations.review'\n'subledgers_payroll.enrollments_manage'\n'work_teams.create'\n'rfq_quotes.submit'\n'accounting.journals_approve'\n'projects.archive'\n'workflows.delegate'\n'partner.evaluations_publish'\n'rfq_quotes.prepare_admissibility'\n'accounting.adjustments_prepare'\n'rfq_quotes.view_metadata'\n'subledgers.reconciliations_run'\n'employee_positions.assign'\n'material_attributes.apply'\n'estimate_assumptions.manage'\n'payslips.export'\n'payroll_payment_handoff.review'\n'hr_certificates.view'\n'knowledge.publications_view'\n'workforce_labor_rates.view'\n'payroll_inquiries.view'\n'treasury.payment_requests_create'\n'reporting.reconciliation_definition.publish'\n'supplier_invoices.approve'\n'stock_transactions.create'\n'contractor_compliance.prepare'\n'warehouses.archive'\n'payable_certificates.view'\n'payments.void'\n'workforce_qualifications.view'\n'partner.export'\n'timesheets.review'\n'employment_records.manage'\n'subledgers_payroll.view'\n'positions.change'\n'contractor_compliance.submit'\n'compliance.effectiveness_review'\n'reporting.project_closeout_profile.prepare'\n'treasury.movements_submit'\n'wbs_nodes.create'\n'units.create'\n'compliance.inspections_submit'\n'project_control_registers.manage'\n'attendance.correct'\n'treasury.view'\n'quality_issues.record_submit'\n'employees.change_status'\n'goods_receipts.void'\n'daily_reports.create'\n'treasury.advances_manage'\n'inventory_traceability.manage'\n'reporting.reconciliation_exception.close'\n'retention_releases.create'\n'payroll_ess.view_own'\n'workforce_labor_rates.manage'\n'documents.download'\n'hr_certificates.configure'\n'claims.approve'\n'reporting.reconciliation_exception.reopen'\n'project_cost.facts_record'\n'project_cost.budget_overrides_approve'\n'workforce_skills.manage'\n'fixed_assets.dispose'\n'leave_mission.request'\n'fixed_assets.impair'\n'contracts.view'\n'budgets.accept'\n'positions.create'\n'activities.create'\n'contract_terms.manage'\n'contractor_compliance.approve'\n'partner.evaluations_appeal'\n'equipment_work_orders.reopen'\n'material_categories.view'\n'rfq_quotes.manage_confidential_access'\n'equipment_cost_allocation.review'\n'knowledge.reuse_record'\n'reporting.project_closeout_sensitive.view'\n'reporting.project_closeout_profile.view'\n'activities.transition'\n'estimate_composition.manage'\n'reporting.project_closeout_case.prepare'\n'partner.view'\n'departments.archive'\n'treasury.payment_requests_approve'\n'indexation.correct'\n'contractor_compliance.view'\n'inventory_reservations.release'\n'reporting.reconciliation_catalog.view'\n'project_controls.view'\n'tender_bids.transition'\n'membership.view'\n'rfqs.cancel'\n'equipment_assignments.transition'\n'project_controls.exceptions_view'\n'treasury.cheques_clear'\n'compliance.capa_assign'\n'expense_categories.archive'\n'contracts.change'\n'equipment_cost_handoff.prepare'\n'compliance.permits_control'\n'equipment_cost_policy.manage'\n'material_attributes.definitions_manage'\n'compliance.sensitive_evidence_view'\n'offboarding.start'\n'projects.create'\n'equipment_cost_allocation.view'\n'authorization_grants.create'\n'payroll_handoff_reconciliation.review'\n'rfq_quotes.finalize_comparison'\n'subledgers_payroll.enrollments_approve'\n'partner.qualifications_submit'\n'project_sites.create'\n'wbs_nodes.change'\n'reporting.audit.view'\n'rfq_quotes.prepare_sourcing_award'\n'compliance_evidence.submit'\n'knowledge.history_view'\n'knowledge.publications_approve'\n'company.settings.change'\n'rfqs.custody_sealed_evidence'\n'rfqs.addendum'\n'company.settings.view'\n'purchase_requests.reject'\n'reporting.metric_refresh.review'\n'field_observations.submit'\n'knowledge.audit_reconcile'\n'reporting.project_closeout_export.create'\n'project_rebaselines.accept'\n'reporting.metric_definition.publish'\n'payroll_statutory_outputs.generate'\n'documents.retention_approve'\n'daily_reports.add_delay'\n'supplier_invoices.prepare'\n'payroll_audit.view'\n'estimates.compare'\n'reporting.saved_view.manage_shared'\n'reporting.reconciliation_exception.assign'\n'tenant_policies.view'\n'guarantees.submit'\n'compliance.reopen'\n'purchase_request_items.add'\n'equipment_usage.record'\n'reporting.source_drillthrough.view'\n'units.view'\n'reporting.reconciliation_audit.view'\n'reporting.metric_definition.prepare'\n'compliance.close'\n'equipment_assignments.create'\n'baselines.manage'\n'equipment.change_status'\n'treasury.advances_reverse'\n'personal_data.configure'\n'project_schedules.prepare'\n'fixed_assets.depreciation_finalize'\n'equipment_fuel.record'\n'accounting_recognition.prepare'\n'accounting_recognition.mappings_manage'\n'time_calendars.view'\n'project_assignments.create'\n'employees.create'\n'daily_reports.add_material'\n'safety_incidents.close'\n'fixed_assets.class_policy_publish'\n'fixed_assets.candidate_prepare'\n'retention_releases.submit'\n'offboarding.review'\n'retention_releases.view'\n'departments.view'\n'purchase_order_changes.request'\n'quality_issues.close'\n'fixed_assets.capitalize'\n'reporting.project_closeout_case.reopen'\n'maintenance_records.create'\n'claims.view'\n'leave_mission.view'\n'reporting.reconciliation_run.review'\n'parties.change'\n'accounting.reports_view'\n'treasury.reconciliations_review'\n'inventory_valuation.prepare'\n'goods_receipts.post'\n'inventory_counts.approve'\n'workflows.view'\n'materials.merge'\n'units.rounding_manage'\n'rfq_quotes.evaluate_comparison'\n'guarantees.view'\n'material_prices.observations_record'\n'partner.evaluations_prepare'\n'guarantees.approve'\n'payable_measurements.view'\n'project_assignments.change_status'\n'payroll_statutory.review'\n'accounting.statements_run'\n'equipment_cost_policy.publish'\n'treasury.movements_reverse'\n'employees.link_account'\n'compliance.templates_publish'\n'treasury.mappings_manage'\n'accounting.journals_prepare'\n'inventory_transfers.prepare'\n'reporting.project_closeout_case.review'\n'field_observations.capture'\n'units.convert'\n'price_book_mappings.manage'\n'partner.audit_reconcile'\n'payroll.adjust'\n'rfq_quotes.finalize_sourcing_award'\n'materials.archive'\n'daily_reports.submit'\n'project_cost.sources_manage'\n'compliance.inspections_create'\n'attendance.capture'\n'statutory_submissions.execute'\n'rfq_quotes.capture'\n'equipment_work_orders.manage'\n'compliance.evidence_link'\n'rosters.view'\n'progress.verify'\n'payroll_payment_handoff.prepare'\n'tender_bids.prepare'\n'equipment_maintenance_plans.manage'\n'partner.sensitive_evidence_view'\n'progress.record'\n'daily_reports.add_equipment'\n'activities.archive'\n'material_documents.link'\n'leave_policies.manage'\n'knowledge.export'\n'tender_bids.view'\n'treasury.bank_reconciliations_run'\n'accounting.control_account_mappings_manage'\n'rosters.manage'\n'units.archive'\n'payments.view'\n'treasury.statement_matches_manage'\n'payroll.finalize'\n'project_cost.forecasts_prepare'\n'employment_records.view_own'\n'invoice_match_policies.approve'\n'materials.create'\n'project_phases.transition'\n'reporting.metric_catalog.view'\n'authorization_roles.assign'\n'project_cost.reconciliations_view'\n'expense_categories.create'\n'partner.evidence_link'\n'fixed_assets.class_policy_manage'\n'claims.submit'\n'accounting.periods_reopen'\n'documents.retention_manage'\n'price_books.activate'\n'reporting.project_closeout_evidence.link'\n'rfq_quotes.withdraw'\n'party_roles.assign'\n'safety_incidents.record_submit'\n'reporting.reconciliation_exception.view'\n'maintenance_records.view'\n'project_schedules.accept'\n'fixed_assets.view'\n'accounting.view'\n'expenses.create'\n'billing_variation_eligibility.retry'\n'payroll_configuration.view'\n'fixed_assets.depreciation_preview'\n'quality_issues.record_decide'\n'treasury.movements_post'\n'workflows.retire'\n'payroll.prepare'\n'authorization_unresolved.recover'\n'knowledge.candidates_submit'\n'inventory_transfers.accept'\n'estimates.create'\n'knowledge.publications_withdraw'\n'contract_amendments.approve'\n'employees.archive'\n'attendance.import'\n'material_categories.create'\n'documents.export'\n'rfqs.view'\n'budgets.submit'\n'contractual_records.approve'\n'fixed_assets.handoff_reconcile'\n'purchase_requests.approve'\n'payroll_ess.export_own'\n'purchase_orders.cancel'\n'reporting.reconciliation_definition.prepare'\n'membership.change_role'\n'baselines.view'\n'inventory_transfers.view'\n'employees.change_profile_image'\n'payable_measurements.verify'\n'work_items.view'\n'rfq_quotes.approve_admissibility'\n'warehouses.view'\n'accounting_recognition.view'\n'purchase_requests.create'\n'compliance.capa_execute'\n'tenant_policies.apply'\n'inventory_traceability.view'\n'project_controls.export'\n'documents.disposals_request'\n'service_acceptances.view'\n'project_control_registers.view'\n'field_observations.location_view'\n'indexation_rules.manage'\n'guarantees.manage'\n'workflows.publish'\n'knowledge.sensitive_provenance_view'\n'indexation.calculate'\n'subledgers.settlements_reverse'\n'project_assignments.view'\n'expenses.void'\n'service_acceptances.accept'\n'payable_certificates.approve'\n'accounting.journals_post'\n'equipment_meters.record'\n'equipment_spare_links.manage'\n'reporting.metric_refresh.run'\n'fixed_assets.transaction_review'\n'workforce_qualifications.manage'\n'supplier_portal.invitations_manage'\n'accounting.journals_submit'\n'compliance_evidence.view'\n'expenses.submit'\n'knowledge.recurrence_record'\n'estimates.revise'\n'parties.merge'\n'reporting.metric_result.view'\n'leave_balances.view'\n'payable_certificates.create'\n'reporting.export.download'\n'estimate_rate_sources.manage'\n'accounting_recognition.mappings_approve'\n'compliance.inspections_execute'\n'payroll_inquiries.request'\n'reporting.reconciliation_rebuild.execute'\n'material_relationships.manage'\n'workflows.create'\n'party_restrictions.manage'\n'overtime.request'\n'document_categories.manage'\n'partner.qualifications_control'\n'billing_variation_eligibility.view'\n'reporting.reconciliation_run.view'\n'compliance_evidence.manage'\n'treasury.statement_matches_clear'\n'project_changes.propose'\n'contracts.create'\n'documents.holds_place'\n'goods_receipt_items.add'\n'expense_categories.change'\n'project_phases.create'\n'rfqs.issue'\n'workflows.migrate_instances'\n'employee_positions.end'\n'purchase_requests.cancel'\n'project_cost.reconciliations_export'\n'rfq_quotes.approve_exception'\n'treasury.statements_import'\n'overtime.review'\n'quality_issues.manage'\n'safety_incidents.review'\n'reporting.project_closeout_case.view'\n'positions.view'\n'payroll_statutory_configuration.view'\n'compliance.audit_reconcile'\n'purchase_orders.create'\n'purchase_requests.view'\n'personal_data.review'\n'contractual_records.view'\n'documents.disposals_approve'\n'accounts.create'\n'documents.upload'\n'rfqs.close_custody'\n'documents.holds_release'\n'compliance.verify'\n'leave_mission.review'\n'hr_certificates.generate'\n'positions.archive'\n'goods_receipts.create'\n'treasury.payment_requests_submit'\n'compliance.templates_manage'\n'purchase_requests.submit'\n'authorization_grants.view'\n'parties.archive'\n'project_rebaselines.propose'\n'partner.evaluations_submit'\n'fixed_assets.transaction_prepare'\n'personal_data.view'\n'equipment.create'\n'quality_issues.verify'\n'materials.view'\n'claims.create'\n'claim_settlements.view'\n'payroll_statutory.prepare'\n'project_cost.view'\n'inventory_valuation.supply'\n'treasury.advances_settle'\n'rfq_quotes.prepare_comparison'\n'warehouses.create'\n'stock_transactions.post'\n'payroll_results.view'\n'equipment_qualifications.manage'\n'expenses.approve'\n'service_acceptances.void'\n'work_items.act'\n'membership.change_status'\n'attendance.review'\n'quality_issues.create'\n'accounting.reconciliations_dispose'\n'purchase_order_items.add'\n'subledgers.reconciliations_review'\n'partner.category_decide'\n'progress.view'\n'contract_terms.approve'\n'claim_settlements.reverse'\n'compliance.findings_classify'\n'daily_reports.view'\n'hr_certificates.cancel'\n'material_categories.change'\n'compliance.inspections_review'\n'statutory_submissions.resolve'\n'attendance.view'\n'materials.steward'\n'field_proposals.prepare'\n'knowledge.publications_supersede'\n'project_schedules.view'\n'field_observations.view'\n'personal_data.request'\n'treasury.movements_approve'\n'reporting.project_closeout_export.download'\n'payroll_statutory.correct'\n'safety_incidents.manage'\n'payroll_accounting_handoff.review'\n'reporting.reconciliation_rebuild.review'\n'knowledge.taxonomy_manage'\n'expense_categories.view'\n'daily_reports.approve'\n'fixed_assets.manage'\n'subledgers.writeoffs_approve'\n'accounts.reset_password'\n'project_cost.sources_approve'\n'treasury.sensitive_view'\n'activities.view'\n'leave_balances.manage'\n'stock_transactions.view'\n'rfq_quotes.dispose_conflict'\n'equipment_meters.correct'\n'timesheets.preview'\n'equipment_cost_policy.view'\n'equipment_cost_allocation.reverse'\n'equipment_cost_handoff.reconcile'\n'budgets.view'\n'accounting.reconciliations_run'\n'payroll.review'\n'payroll_configuration.manage'\n'knowledge.candidates_review'\n'knowledge.publications_publish'\n'estimate_imports.preview'\n'reporting.reconciliation_exception.disposition'\n'departments.change'\n'projects.view'\n'payroll_handoff_reconciliation.prepare'\n'subledgers.sources_reverse'\n'taxpayer_invoices.view'\n'reporting.portfolio.view'\n'documents.view'\n'inventory_reconciliations.view'\n'compliance.ncr_manage'\n'safety_incidents.create'\n'payroll_liability_handoff.review'\n'reporting.reconciliation_evidence.link'\n'rfq_invitations.manage'\n'materials.change'\n'inventory_valuation.reverse'\n'treasury.reconciliations_run'\n'reporting.project_closeout_case.coordinate'\n'purchase_orders.view'\n'equipment_cost_allocation.prepare'\n'purchase_orders.issue'\n'party_contacts.add'\n'accounting.reconciliations_sign_off'\n'project_sites.view'\n'daily_reports.add_labor'\n'compliance.findings_create'\n'project_phases.view'\n'inventory_reservations.manage'\n'reporting.metric_result.view_sensitive'\n'treasury.cheques_manage'\n'equipment.view'\n'authorization_grants.revoke'\n'quality_issues.view'\n'material_technical.submit'\n'equipment_work_orders.complete'\n'parties.view'\n'invoice_matches.view'\n'quality_issues.review'\n'expenses.allocate'\n'reporting.export.create'\n'reporting.saved_view.manage_own'\n'payments.allocate'\n'expenses.recurrences_manage'\n'equipment_cost_handoff.review'\n'project_rebaselines.view'\n'partner.proposals_create'\n'stock_transactions.reverse'\n'material_technical.approve'\n'invoice_matches.run'\n'fixed_assets.transaction_reverse'\n'reporting.project_closeout_profile.publish'\n'equipment_operations.view'\n'inventory_traceability.dispose'\n'time_calendars.manage'\n'compliance.tests_request'\n'fixed_assets.transfer'\n'contracts.transition'\n'cost_structures.manage'\n'rfq_quotes.open'\n'project_changes.approve'\n'payroll_inquiries.respond'\n'payable_certificates.revise'\n'payroll_project_cost_handoff.review'\n'treasury.movements_create'\n'material_categories.archive'\n'taxpayer_invoices.prepare'\n'equipment_downtime.manage'\n'accounting.accounts_manage'\n'contract_items.add'\n'estimate_items.add'\n'workflows.reassign'\n'documents.archive'\n'project_cost.forecasts_review'\n'treasury.statements_accept'\n'financials.view'\n'project_controls.compare'\n'partner.requirements_manage'\n'units.conversions_manage'\n'fixed_assets.handoff_review'\n'purchase_order_changes.approve'\n'equipment_assignments.view'\n'hr_certificates.request'\n'budgets.prepare'\n'compliance.tests_review'\n'payroll_accounting_handoff.prepare'\n'invoice_match_policies.manage'\n'payroll_project_cost_handoff.prepare'\n'knowledge.unpublished_view'\n'overtime.view'\n'payroll_statutory_audit.view'\n'estimates.view'\n'work_teams.view'\n'inventory_counts.post'\n'partner.qualifications_review'\n'hr_certificates.review'\n'work_items.claim'\n'project_changes.view'\n'ess_evidence.view_own'\n'service_acceptances.create'\n'maintenance_records.transition'\n'subledgers.writeoffs_propose'\n'reporting.metric_definition.review'\n'claims.revise'\n'baselines.approve'\n'compliance.view'\n'workflows.change_draft'\n'fixed_assets.audit_view'\n'wbs_nodes.view'\n'treasury.accounts_manage'\n'reporting.project_closeout_audit.view'\n'payroll_statutory_outputs.export'\n'workforce_skills.view'\n'estimates.approve'\n'inventory_transfers.dispatch'\n'compliance.findings_manage'\n'partner.qualifications_prepare'\n'rfqs.change'\n'inventory_valuation.reconcile'\n'reporting.reconciliation_run.execute'\n'payable_measurements.record'\n'subledgers.aging_run'\n'inventory_reservations.view'\n'partner.profile_manage'\n'reporting.project_closeout_case.accept'\n'subledgers_payroll.prepare'\n'compliance.export'\n'authorization_roles.revoke'\n'fixed_assets.depreciation_reverse'\n'safety_incidents.record_decide'\n'compliance.permits_prepare'\n'contractual_records.prepare'\n'expenses.view'\n'goods_receipts.view'\n'daily_reports.add_activity'\n'payroll_liability_handoff.prepare'\n'subledgers.obligations_recognize'\n'field_proposals.review'\n'work_teams.archive'\n'workforce_performance.manage'\n'supplier_invoices.view'\n'audit.view'\n'fixed_assets.candidate_review'\n'accounting.periods_close'\n'subledgers.view'\n'authorization_roles.view'\n'payable_certificates.submit'\n'workforce_performance.view'\n'inventory_counts.view'\n'material_technical.review'\n'expenses.return'\n'material_attributes.import'\n'retention_releases.approve'\n'inventory_transfers.resolve'\n'equipment.archive'\n'subledgers.settlements_allocate'\n'accounting.periods_manage'\n'departments.create'\n'wbs_nodes.archive'\n'contractual_records.submit'\n'payments.create'\n'workforce_qualifications.revoke'\n"
+      },
+      {
+        "test": "test_flush_recreates_code_owned_authorization_catalog",
+        "detail": "Traceback (most recent call last):\n  File \"E:\\Construction_Company_Solution\\apps\\organizations\\test_permission_registry.py\", line 168, in test_flush_recreates_code_owned_authorization_catalog\n    self.assertEqual(\nAssertionError: Items in the first set but not the second:\n'support.access_use'\n'support.evidence_sensitive_view'\n'support.evidence_link'\n'support.case_create'\n'support.audit_reconcile'\n'support.case_reopen'\n'support.notifications_view'\n'support.case_resolve'\n'support.notifications_acknowledge'\n'support.access_revoke'\n'support.case_update'\n'support.calendar_view'\n'support.case_assign'\n'support.access_platform_approve'\n'support.access_tenant_confirm'\n'support.case_view'\n'support.access_request'\n"
+      }
+    ],
+    "baseline_catalog_bootstrap_bytes_unchanged": true
+  },
+  "full_required_registry_run": {
+    "tests": 8,
+    "passed": 2,
+    "baseline_failed": 6,
+    "subtests_passed": 11,
+    "cep_attributable_failures": 0,
+    "test_and_permissions_weakened": false,
+    "disposition": "All six failures have reproduced baseline attribution; the original four architecture failures plus two manifestations of the same Support registry defect. No global registry PASS is claimed."
+  }
 }

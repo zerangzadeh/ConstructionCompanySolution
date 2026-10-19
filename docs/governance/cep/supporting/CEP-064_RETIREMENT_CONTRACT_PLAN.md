@@ -11,8 +11,8 @@ decision is final: zero authoritative history, all existing rows excluded demo/t
    `documents.0012_legacy_payment_reference_preparation`; current DMS references
    resolve to Documents-owned retained evidence using the original UUIDs.
 3. Require the readiness evidence to contain twelve PASS results bound to the
-   actual candidate code/migration digest. A pre-existing test failure is not a
-   waiver. Validate source/snapshot equality again immediately before contract.
+   actual candidate code/migration digest. Latest Human authority permits valid non-CEP registry attribution;
+   required attributable failures still block. Validate source/snapshot equality again immediately before contract.
 4. Prepare the Billing contract migration after `billing.0017` and `documents.0012`:
    delete only the obsolete `ClaimSettlementAllocation` model/table. Its source
    values must already be included in the retained snapshots. Current allocations
@@ -40,3 +40,9 @@ Current boundaries: preparation/reference migrations only; no old table/model/ap
 removal, no source-row deletion, no Production action, no CEP-069..079 execution.
 The final destructive candidate graph has not been rehearsed and remains
 UNVERIFIED. The prepared reference graph is a separate validation result.
+
+Follow-up2026-10-20: refreshed523-table recovery PASS. Preflight found an active
+Reporting dependency on billing.ClaimSettlementAllocation and full seed Quality
+record-review failure after Safety was fixed. Full destructive graph remains
+UNVERIFIED and is not executed under the exact Human STOP rule. See
+CEP-064_REHEARSAL_PREFLIGHT.json. No new source contract is installed.

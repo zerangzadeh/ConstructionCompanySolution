@@ -1,0 +1,36 @@
+{
+  "status": "FAIL",
+  "readiness_condition": 2,
+  "finding_id": "CEP-064-FINDING-005",
+  "reader": "apps/reporting/reconciliation.py:_claim_settlement",
+  "reader_registered_in": "ADAPTERS[claim_settlement]",
+  "runtime_entrypoints": [
+    "execute_reconciliation (ADAPTERS dispatch)",
+    "replay_reconciliation (ADAPTERS dispatch)"
+  ],
+  "legacy_model": "billing.ClaimSettlementAllocation",
+  "legacy_fk": "payment_allocation -> payments.PaymentAllocation -> payments.Payment",
+  "source_sha256": "ccb04ceb1de43e152df4fcde222fafcef940605dba557d57ca33b0b408ee87a1",
+  "runtime_observations": [
+    {
+      "source_model": "billing.ClaimSettlementAllocation",
+      "legacy_row_count": 0
+    },
+    {
+      "source_model": "billing.ClaimSettlementAllocation",
+      "legacy_row_count": 0
+    },
+    {
+      "source_model": "billing.ClaimSettlementAllocation",
+      "legacy_row_count": 0
+    },
+    {
+      "source_model": "billing.ClaimSettlementAllocation",
+      "legacy_row_count": 0
+    }
+  ],
+  "impact": "An active reconciliation adapter retains the legacy settlement model/table dependency; removing that table would break this runtime path. Prior zero-reader inventory was incomplete.",
+  "product_mutated": false,
+  "boundary": "New implementation dependency found during bounded rehearsal preflight. No architecture or historical-data decision reopened.",
+  "full_destructive_rehearsal": "NOT_EXECUTED: active required legacy reader discovered at preflight; required full seed also remains FAIL. Human exact gate mandates STOP on FAIL/UNVERIFIED."
+}

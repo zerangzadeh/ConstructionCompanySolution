@@ -1,6 +1,6 @@
 {
   "active_runtime_writers": 0,
-  "active_business_reporting_readers": 0,
+  "active_business_reporting_readers": 1,
   "current_sources": [
     "apps.treasury.services",
     "apps.subledgers.services"
@@ -35,7 +35,17 @@
       "purpose": "Excluded demo interpretation, negative compatibility, tenant-model validation and double-counting witnesses; current-operation seeds use Treasury requests."
     }
   ],
-  "required_legacy_business_consumer": false,
+  "required_legacy_business_consumer": true,
   "retained_audit_action_labels": "Interpretive evidence only; AuditEvent stores entity_type/entity_id strings, not a live Payment generic FK.",
-  "active_app_model_table_removal": false
+  "active_app_model_table_removal": false,
+  "inventory_status": "FAIL_CORRECTED_BY_REHEARSAL_PREFLIGHT",
+  "active_reader_evidence": "CEP-064_REHEARSAL_PREFLIGHT.json",
+  "active_readers": [
+    {
+      "surface": "apps/reporting/reconciliation.py:_claim_settlement",
+      "consumer": "ADAPTERS[claim_settlement] used by execute_reconciliation and replay_reconciliation",
+      "source": "billing.ClaimSettlementAllocation -> payments.PaymentAllocation -> payments.Payment",
+      "disposition": "UNRESOLVED; no active rows does not eliminate schema dependency"
+    }
+  ]
 }

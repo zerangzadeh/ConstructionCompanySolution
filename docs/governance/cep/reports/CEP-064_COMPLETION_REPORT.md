@@ -41,114 +41,88 @@ Billing demo claims are omitted when approved commercial terms do not exist;
 measurements remain. Other claim prerequisites continue through normal Billing
 services. Treasury `PaymentRequest` remains a product model.
 
-## Schema, recovery and validation
+## Current bounded follow-up — 2026-10-20
 
-Applied **only** `documents.0012_legacy_payment_reference_preparation` and
-`treasury.0010_legacy_payment_reference_preparation` to configured Development.
-They add retained evidence/current Treasury document links and repoint DMS
-references. Original source rows, old Billing settlement rows, old tables/models
-and the legacy app remain. The source-retention migration rejects execution
-outside Development. No destructive contract migration is installed.
+Entry: clean existing main `4a292332809431b89c060f4ac778d76377fb436a`.
+The [latest Human decision](../supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md)
+confirms Development-only demo disposition, grants the separate Demo Safety
+approval, and permits valid non-CEP registry attribution. No canonical package
+scope, dependency, Product Decision or Production authority changed.
 
-Before preparation, a native custom-format Development dump was restored into a
-separate local database. All **520** table counts and row digests matched; the
-source was stable during capture. Dump SHA-256 and private recovery-manifest
-location are recorded in CEP-064-EV-002. The ignored dump and restored database
-remain available. Recovery uses an isolated restore, compatible preparation code
-and verified migration replay; it must not reactivate obsolete financial writers.
-Refresh/recheck checkpoint coverage before any future destructive contract.
+**Registry blocker closed by valid baseline attribution.** The original four
+architecture failure sets reproduce exactly at pre-retirement `784a5e6`:
+duplicated Payroll model registration, 17 absent Support codes, enforcement
+reference gaps and 77 namespace mismatches. The expanded required registry suite
+is **2 PASS / 6 baseline FAIL, 11 subtests PASS**. Its two additional database/flush
+failures reproduce the same existing Support registration defect using the
+baseline registry. Baseline/current registry code sets are identical and catalogue
+bootstrap source bytes are unchanged. The changed retirement namespaces have no
+new registration/enforcement defects. No permission or test was weakened; no
+full-registry PASS is claimed. See CEP-064-EV-006.
 
-A fresh isolated test database applied **428/428 migrations**, producing **523
-tables**. This proves the preparation graph. The complete destructive candidate
-graph is **UNVERIFIED**; its required order is documented in the
-[contract plan](../supporting/CEP-064_RETIREMENT_CONTRACT_PLAN.md).
-Reference preparation replayed twice under rollback with **zero duplicates**.
-Source/dependent-value and audit/document identity verification PASS.
+**Demo Safety blocker closed.** The seed calls the existing record submit and
+approve services before closure. Existing permission checks, review revisions,
+audit and closure guard remain unchanged. **6 Safety tests PASS**: the actual
+seed method's review/closure/idempotency case plus five existing source review
+regressions. An initial reused-test-DB catalogue absence was repaired by restoring
+canonical code-owned fixtures in the test database only. Human disposition is
+corroborated by all80 source records belonging to the four known demo seed tenants
+and all80 archived dispositions being `excluded_demo_test`.
 
-Main focused/affected run: **65 passed, 28 subtests passed, 1 failed**. All **16
-new transition cases PASS**, covering approved cash UI, CSRF, valid cross-tenant
-membership denial, source permissions, explicit AR, partial caps/retry, reversal,
-correction guard, concurrent allocations, DMS, retained evidence and no double
-counting. Existing Treasury/Subledger, financial, document and identifier checks
-are included. Current-form UI rerun: **1 PASS**. DMS temporary protected-storage
-rerun: **1 PASS**. Final precision/current-cash projection rerun: **2 PASS**.
-Private JUnit artifacts are ignored and retained.
+**Fresh recovery checkpoint PASS.** Native custom dump restored to a unique local
+DB; all **523 table counts and row digests match**, source stable during capture.
+The private dump/manifest and restored DB remain available. Original checkpoint
+was520 tables before reference preparation; the new checkpoint covers its523-table
+result. Source/evidence verification again proves80 snapshots,32 typed links,
+32 generic links and160 audit IDs. No source row was deleted and no Treasury/GL
+history was fabricated.
 
-The main run's demo failure first exposed absent approved Billing terms. The
-bounded seed guard now leaves such claims uncreated. An intermediate reused test
-database had lost its migration-seeded Expense groups after transactional flush;
-the seed test now restores the exact canonical six-group fixture. The latest
-full seed run reaches Safety closure and **FAILS** its unchanged separate-record
-approval requirement. Full demo generation is **not** claimed PASS.
+**Rehearsal preflight FAIL; destructive graph remains UNVERIFIED.** Dependency
+search found the active Reporting `claim_settlement` adapter still querying
+`billing.ClaimSettlementAllocation`, which depends on Legacy PaymentAllocation.
+It is registered in ADAPTERS and called by execute/replay reconciliation. Runtime
+reads were verified for all four demo tenants. Zero active allocation rows do not
+eliminate the schema dependency. The previous zero-reader inventory was incomplete
+and has been corrected. No Reporting product mutation was made under the request
+to close only the three named blockers.
 
-Required registry architecture regression: **2 passed / 4 failed**. The same
-four failures were independently reproduced against baseline registry source at
-`784a5e6`: duplicated Payroll model ownership, unregistered Support codes,
-missing enforcement declarations, and resource/permission namespace mismatches.
-Safety services/workflow bytes and the seed Safety method AST match baseline.
-These findings were recorded without changing unrelated domain authority.
+The required full demo seed now passes Safety and **FAILS Quality closure**:
+`_seed_quality_issue` never submits/approves the separately reviewed Quality record.
+That method's AST is unchanged from entry; the Quality guard is preserved. This
+new failure is recorded without absorbing unrelated Quality work or inferring a
+Human Quality decision. No full-demo PASS is claimed.
 
-An introduced missing required `message` argument on three Billing permission
-checks was fixed; subsequent Billing transition tests PASS. No introduced
-focused failure remains open. System checks, migration drift, applicable prompt
-hashes, touched-Python Ruff lint and diff whitespace checks PASS at closeout.
+Prior preparation proof remains **428/428 migrations from zero,523 tables**;
+it is explicitly not full destructive-graph proof. Existing focused/affected
+validation remains65 PASS/28 subtests PASS (with the separately failing seed),
+16 transition checks, and successful current UI/DMS/precision reruns. Current
+Django checks:0 issues; migration drift:no changes; touched-Python lint and diff
+whitespace:PASS. Private JUnit results are retained under the ignored output root.
 
-## Exact Human retirement gate
+## Current exact gate and blockers
 
-The original twelve-condition gate is evaluated separately from both remediation
-areas and canonical Acceptance Criteria. See
-[readiness evidence](../evidence/CEP-064_RETIREMENT_READINESS.json) and
-[transitional-surface inventory](../evidence/CEP-064_RUNTIME_REFERENCE_INVENTORY.json).
+[Exact gate evidence](../evidence/CEP-064_RETIREMENT_READINESS.json):
+**9 PASS / 2 FAIL / 1 UNVERIFIED**. Condition2 FAIL is the active Reporting reader;
+condition11 FAIL is the required full seed's Quality review prerequisite;
+condition10 remains UNVERIFIED. The other retained evidence is unchanged except
+for refreshed condition12 recovery proof. Valid registry attribution is supported
+by the latest explicit Human instruction, not a blanket regression waiver.
 
-| Condition | Result |
-| --- | --- |
-| 1. No active legacy runtime writer | PASS |
-| 2. No active legacy business/reporting reader | PASS |
-| 3. Required references have approved disposition/replacement | PASS |
-| 4. Approved Treasury/Subledger settlement flows | PASS |
-| 5. No Payment/Treasury double counting | PASS |
-| 6. No required active consumer of legacy compatibility surfaces | PASS |
-| 7. Current financial seed paths use approved Treasury flows | PASS |
-| 8. Transition coverage retained/replaced | PASS |
-| 9. Retained audit/document interpretation | PASS |
-| 10. Complete retirement graph from zero | **UNVERIFIED** |
-| 11. All required validation passes | **FAIL** |
-| 12. Verified Development database recovery checkpoint | PASS |
+- **CEP-064-FINDING-004 / BLOCKER-TEST:** required full seed fails Quality closure
+  because its separate record review is absent.
+- **CEP-064-FINDING-005 / BLOCKER-RUNTIME-REFERENCE:** registered Reporting
+  reconciliation still reads the obsolete Billing settlement model.
+- **CEP-064-FINDING-003 / BLOCKER-MIGRATION:** full destructive candidate graph
+  from zero remains UNVERIFIED; rehearsal preflight exposed the required consumer.
+
+Findings001 (registry) and002 (Safety) are closed with evidence. The Human STOP
+rule applies. No destructive migration/rehearsal, model/table/app removal,
+Production action, unrelated CEP, Sign-off or Certification was performed.
 
 `LEGACY_PAYMENT_RETIREMENT_READINESS = FAIL`
 
 `LEGACY_PAYMENT_RETIREMENT_COMPLETE = NO`
 
-## Blockers and closeout
-
-- **CEP-064-FINDING-001 / BLOCKER-TEST:** resolve the four required registry
-  architecture failures with approved resource/enforcement ownership, then rerun
-  the affected regression. Baseline attribution is not a waiver of gate 11.
-- **CEP-064-FINDING-002 / BLOCKER-TEST:** repair full-demo Safety seeding through
-  its approved independent record-approval flow. Do not bypass separation of
-  duties or invent an approver/policy to make this regression pass.
-- **CEP-064-FINDING-003 / BLOCKER-MIGRATION:** prepare and rehearse the complete
-  candidate contract/migration-only history arrangement from zero, bound to its
-  actual code/migration digest; preparation-graph success is not that evidence.
-
-Canonical AC: **12/14 PASS, 2 PARTIAL**; full target outcomes remain partial while
-the required gate/validation blocks closeout. Scoped DoD: **NOT_MET_BLOCKED**.
-The Acceptance/Evidence/Change manifests retain the individual proofs. Legacy
-positive service/UI/allocation/void cases were replaced by negative compatibility
-checks and current Treasury/Subledger behavior. Identifier/tenant source-model
-checks remain interpretive transition evidence; current operation seeds have no
-legacy writer. Old void-race coverage is superseded by denied legacy entry
-points and the approved settlement concurrency test.
-
-Remaining UTV: complete destructive candidate graph, gated Development contract
-execution and every required post-removal check. No downstream cutover readiness
-is inferred. GATE-04/GATE-06 remain unchanged. Registry records PARTIAL and stops
-automatic continuation. The historical Payment population decision is resolved;
-no historical financial dataset is requested.
-
-Implementation checkpoint `33e3da4098f49454d276298edeb9784744cc835f` was committed directly on existing
-`main`, pushed to `origin/main`, and verified with a clean tree (CEP-064-EV-009).
-A separate governance-only follow-up records those facts; tested product code
-is unchanged by that follow-up. No source data deletion,
-Legacy Payment model/table/app removal, Production migration/deployment/cutover,
-CEP-069..079 execution, Human Sign-off or Production Certification occurred.
+Canonical acceptance remains12/14 PASS and2 PARTIAL; scoped DoD NOT_MET_BLOCKED.
+GATE04/GATE06 and dependency semantics are unchanged. Full post-removal validation
+is NOT_EXECUTED. See [bounded closure evidence](../evidence/CEP-064_BLOCKER_CLOSURE_20261020.json).

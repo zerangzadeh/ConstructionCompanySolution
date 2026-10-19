@@ -1,0 +1,64 @@
+{
+  "date": "2026-10-20",
+  "baseline": "4a292332809431b89c060f4ac778d76377fb436a",
+  "authority": "supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md",
+  "permission_registry": {
+    "status": "CLOSED_VALID_NON_CEP_ATTRIBUTION",
+    "original_four_architecture_failures": "Identical complete defect sets at pre-retirement 784a5e6 and current main.",
+    "required_registry_suite": {
+      "passed": 2,
+      "baseline_failed": 6,
+      "subtests_passed": 11
+    },
+    "additional_two": "Database/post-flush assertions reproduce the same pre-existing 17 unregistered Support codes. Baseline registry code sets equal current; both tests independently reproduced with baseline registry.",
+    "attributable_failures": 0,
+    "permissions_or_tests_weakened": false,
+    "evidence": "CEP-064_REGRESSION_ATTRIBUTION.json"
+  },
+  "demo_safety": {
+    "status": "CLOSED",
+    "human_approval": "Granted in the current instruction; recorded verbatim in decision evidence.",
+    "implementation": "Seed invokes existing submit_safety_record and decide_safety_record(APPROVED) before existing close. Existing domain permissions, immutable review history and closure guard unchanged.",
+    "focused_and_affected_safety": {
+      "passed": 6,
+      "failed": 0
+    },
+    "coverage": "New actual seed method test verifies draft->submitted->approved revisions, closed state, actor/reason and idempotency; five existing record-review tests verify rejection/return/tenant/permission/evidence and closure prerequisites.",
+    "private_junit": "output/legacy-payment-retirement-private/demo-safety-registry-final.xml"
+  },
+  "full_seed": {
+    "status": "FAIL",
+    "test": "tests/test_seed_demo_data.py::test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent",
+    "failure": "Quality closure requires separate record approval; seed never submits/approves that Quality record.",
+    "location": "apps/accounts/management/commands/seed_demo_data.py:_seed_quality_issue -> apps/quality/services.py:_close_quality_issue_domain",
+    "finding_id": "CEP-064-FINDING-004",
+    "disposition": "Recorded; no Quality product or seed mutation under the instruction to close only the three named blockers. This is not a request to waive the record review guard.",
+    "private_junit": "output/legacy-payment-retirement-private/seed-approved-validation.xml",
+    "quality_seed_ast_unchanged_at_entry": true
+  },
+  "rehearsal": {
+    "status": "BLOCKED_PREFLIGHT",
+    "recovery": "PASS: fresh native custom dump restored to a separate local DB; all523 table counts/digests equal; source stable.",
+    "reader_finding": "CEP-064-FINDING-005; active Reporting claim_settlement adapter still queries the obsolete Billing settlement table. Runtime dispatch verified for all4 demo tenants even though active legacy settlement row count is zero. Empty rows do not remove the required schema dependency.",
+    "full_candidate_graph_from_zero": "UNVERIFIED; not executed after required preflight failure.",
+    "source_database_mutated": false,
+    "rollback_procedure": "Native restore to uniquely named local recovery DB was executed and content verified; private recovery manifest retained. No in-place source restore or destructive downgrade performed.",
+    "evidence": "CEP-064_REHEARSAL_PREFLIGHT.json; CEP-064_DEVELOPMENT_RECOVERY.json"
+  },
+  "checks": {
+    "django_system": "PASS: 0 issues",
+    "migration_drift": "PASS: no changes detected",
+    "source_and_reference_retention": "PASS:80 source snapshots;32 typed and32 generic links;160 audit IDs.",
+    "lint": "PASS",
+    "diff_whitespace": "PASS"
+  },
+  "test_infrastructure": {
+    "initial_safety_expansion": "Two existing tests could not find migration-owned WorkflowTemplate rows in the previously flushed reused test DB.",
+    "resolution": "Restored exact code-owned authorization/workflow catalogue fixtures into the test DB only before retry. All6 Safety tests then passed. No production service or existing test changed."
+  },
+  "readiness": "FAIL",
+  "complete": "NO",
+  "destructive_retirement": false,
+  "production_action": false,
+  "unrelated_cep_execution": false
+}
