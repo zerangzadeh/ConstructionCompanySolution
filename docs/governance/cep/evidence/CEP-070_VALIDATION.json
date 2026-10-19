@@ -1,0 +1,45 @@
+{
+  "schema": "bonira.cep070-validation.v1",
+  "recorded_at": "2026-10-19T21:14:41.677084+03:30",
+  "baseline_revision": "24d782aefed64f92c953d6469af46759444eb151",
+  "validation_source": "baseline plus bounded working-tree changes, exact file hashes below; not yet integration-SHA runtime proof",
+  "canonical_prompt_sha256": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+  "files_sha256": {
+    "scripts/backup_bundle.py": "4365861d412a70c1586c8e7d6e8b65110962e6213f951375acec20cd54b79718",
+    "tests/test_backup_bundle.py": "9957197b4fbf6f59972fec3be2dec2a67a21e71200e2c528a06faa7316bb795d",
+    "output/cep-070/run_rehearsal.py": "73e1ec53a86535a713cab9fa4e4858976d0860db22a94411e9326d6dc60d19af",
+    "output/cep-070/focused.txt": "00e14df5d54bf73a8b9d3cc6596fc3a14f290c3dc64def34393859d633926c2b",
+    "output/cep-070/rehearsal.json": "554defe8b540c5d3de69b33215dee827f0a4c007a1d7ece0e175a5da88d9858a"
+  },
+  "focused": {
+    "command": ".venv/Scripts/python.exe -m unittest tests.test_backup_bundle -v",
+    "tests": 9,
+    "invalid_plan_subtests": 12,
+    "failures": 0,
+    "errors": 0,
+    "result": "PASS",
+    "artifact": "output/cep-070/focused.txt"
+  },
+  "rehearsal": {
+    "command": ".venv/Scripts/python.exe -X utf8 output/cep-070/run_rehearsal.py",
+    "result": "PASS_SYNTHETIC_REHEARSAL_ONLY",
+    "artifact": "output/cep-070/rehearsal.json",
+    "no_erp_database_or_migrations": true
+  },
+  "checks": {
+    "ruff": "PASS3_FILES",
+    "format": "PASS3_FILES",
+    "diff_check": "PASS",
+    "initial_lint": "Exception handling and style findings corrected; no failing behavioral test",
+    "canonical_regression": "NOT_APPLICABLE; no full application regression claim",
+    "django_checks": "NOT_APPLICABLE_NO_DJANGO_OR_CONFIG_CHANGE",
+    "migrations": "NONE; no drift/migration command executed",
+    "evidence_normalization": "Staged diff check detected duplicated CRLF in focused transcript; line endings normalized only, results preserved; final staged diff check required."
+  },
+  "certified_acceptance": "0/6; mechanism support only, required certification unverified",
+  "dod": "PARTIAL_NOT_MET",
+  "blocker": "CEP-070-FINDING-001 / EXT0020 approved recovery objectives, assignees and environment-specific controls/ERP restore evidence unverified",
+  "human_signoff": "NOT_EXECUTED",
+  "production_certification": "NOT_EXECUTED",
+  "production_cutover": "NOT_EXECUTED"
+}

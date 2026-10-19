@@ -67,9 +67,9 @@ summary:
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 2
-  partial_current: 6
+  partial_current: 7
   failed_current: 0
-  not_started_other_current_governed: 14
+  not_started_other_current_governed: 13
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -3594,39 +3594,49 @@ ceps:
       status: DEVELOPMENT_SCHEMA_DELTA
       reason: CEP-055 applied pending local development schema; statutory source-package table now exists with zero packages. Official source/currentness/review/activation and Human final certification remain unverified; blocker unchanged.
   CEP-070:
-    title: null
+    title: Production backup mechanism
     phase: PRODUCTION_CERTIFICATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: NONPRODUCTION_PREPARATION_DONE_CERTIFICATION_BLOCKED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: PARTIAL
+      lifecycle: PARTIAL_PREPARATION_CERTIFICATION_BLOCKED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 0
+      total: 6
+      status: CERTIFICATION_UNVERIFIED_NONPRODUCTION_MECHANISM_PROVED
+    dod: PARTIAL_NOT_MET
+    blockers:
+    - CEP-070-FINDING-001 / BLOCKER-EXTERNAL / EXT0020 approved recovery objectives and named responsibilities unspecified; environment-specific production control and ERP restore qualification unverified
+    remaining_utv:
+    - Approved recovery objectives, responsible owners and operating access
+    - Actual ERP restore integrity, tenant access, cross-store coherence and secret/key recovery
+    - Environment-specific storage, encryption, retention, PITR and production certification
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-070_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_NONPRODUCTION_PREPARATION_ONLY
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      pushed: false
+      merged_to_main: false
+      remote_main_evidence: PENDING_SAFE_ATTRIBUTABLE_CHECKPOINT
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 24d782aefed64f92c953d6469af46759444eb151
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: STARTED_UNDER_STANDING_NONPRODUCTION_AUTHORITY
+      reason: Canonical SHA, no mandatory CEP dependencies and local PostgreSQL/file foundation verified; EXT0020 production-only does not block preparation. Explicit bounded touch set recorded before code mutation. Current Human permits safe Git checkpoints; no production action.
+    - date: '2026-10-19'
+      status: PARTIAL
+      reason: Non-production offline pg_dump/file capture adapter implemented. Nine focused tests and twelve invalid-plan subtests PASS; actual disposable PostgreSQL18.6 backup/restore and three file classes PASS; both disposable databases removed. Ruff/format/diff PASS. Zero of six AC production-certified; SPEC005 objectives/owners and actual ERP/environment controls unverified. Stop serial continuation; no migrations, GATE11 PASS, Human Sign-off or production action.
   CEP-071:
     title: null
     phase: PRODUCTION_CERTIFICATION
@@ -4237,9 +4247,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: d0eaa16803fd05442d70e80c00d30882c950a26a
-  origin_main: d0eaa16803fd05442d70e80c00d30882c950a26a
-  integration_checkpoint: d0eaa16803fd05442d70e80c00d30882c950a26a
+  last_reconciled_head: 24d782aefed64f92c953d6469af46759444eb151
+  origin_main: 24d782aefed64f92c953d6469af46759444eb151
+  integration_checkpoint: 24d782aefed64f92c953d6469af46759444eb151
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4261,18 +4271,18 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_AT_CEP006_COMPLETE_CEP073_ENTRY_BLOCKED_GATE06_EXT0023
+  current_session_continuation: STOP_AT_NEW_CEP070_PARTIAL_CERTIFICATION_EVIDENCE_BOUNDARY
   current_independent_cep: null
-  next_entry_review_candidate: CEP-073
-  next_candidate_full_entry_eligibility: BLOCKED_GATE06_NOT_PASSED_AND_CURRENT_EXT0023_READINESS_UNVERIFIED
+  next_entry_review_candidate: CEP-071
+  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED_NO_PRODUCTION_ONLY_EXTERNAL_PROMOTED_TO_BUILD_BLOCKER
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: CEP006 IMB0066 remediation COMPLETE and safely pushed as d0eaa16; 13 focused and 11 affected regression PASS with query/source/authorization proof and full implementation AC reconciliation. Historical A3 retained and current006 prerequisite finding resolved. Post-push073 entry remains blocked by canonical GATE06 NOT_PASSED and current-build EXT0023 readiness not established;073 NOT_STARTED. Preserve 57 COMPLETE/6 PARTIAL,065 BLOCKED, GATE05/06 NOT_PASSED; no production authority.
+  boundary_reason: CEP006 current-source and retained13-focused/11-regression evidence verified;073 NOT_STARTED at GATE06 NOT_PASSED/current EXT0023 UNVERIFIED. Independent070 non-production preparation executed with9 focused tests and synthetic PostgreSQL restore PASS;070 PARTIAL0/6 certified because EXT0020 objectives/owners and environment-specific controls unverified. Stop at new PARTIAL;57 COMPLETE/7 PARTIAL; all prior PARTIAL/BLOCKED states and GATE05/06 preserved. No production authority.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: NO_FULL_ENTRY_GRANTED_AFTER_MATERIAL_REGISTRY_CONFLICT
+  independent_candidates_entry_status: CEP071_072_REQUIRE_FULL_NONPRODUCTION_ENTRY_REVIEW; CEP078_EXT0024_CURRENT_READINESS_UNVERIFIED
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false
   human_signoff_executed: false

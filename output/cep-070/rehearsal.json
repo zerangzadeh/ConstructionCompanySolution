@@ -1,0 +1,55 @@
+{
+  "scope": "CEP070 synthetic non-production capture/restore only",
+  "started_at": "2026-10-19T17:41:23.182545+00:00",
+  "baseline_revision": "24d782aefed64f92c953d6469af46759444eb151",
+  "source_hashes": {
+    "scripts/backup_bundle.py": "4365861d412a70c1586c8e7d6e8b65110962e6213f951375acec20cd54b79718",
+    "output/cep-070/run_rehearsal.py": "73e1ec53a86535a713cab9fa4e4858976d0860db22a94411e9326d6dc60d19af"
+  },
+  "production_certification": "NOT_EXECUTED",
+  "production_objectives": "UNSPECIFIED",
+  "application_database_accessed": false,
+  "erp_tenant_restore_validation": "NOT_EXECUTED",
+  "cross_store_consistency": "QUIESCENT_SYNTHETIC_FIXTURE_ONLY",
+  "migrations_executed": false,
+  "scenario": "two synthetic relational rows and three file-class trees",
+  "status": "PASS_SYNTHETIC_REHEARSAL_ONLY",
+  "postgresql_version": "PostgreSQL 18.6 on x86_64-windows, compiled by msvc-19.44.35228, 64-bit",
+  "capture": {
+    "schema": "bonira.backup-capture.v1",
+    "environment": "non-production",
+    "source_revision": "24d782aefed64f92c953d6469af46759444eb151",
+    "operator_reference": "authorized-Codex-nonproduction-rehearsal",
+    "recovery_reference": "CEP070-synthetic-rehearsal-only",
+    "consistency_reference": "CEP070-private-quiescent-fixtures",
+    "started_at": "2026-10-19T17:41:23.776676+00:00",
+    "capture_status": "CAPTURED_NOT_RESTORE_VERIFIED",
+    "restore_status": "NOT_EXECUTED",
+    "cross_store_consistency": "UNVERIFIED",
+    "production_certification": "NOT_EXECUTED",
+    "classes": {
+      "transactional_database": {
+        "sha256": "3752b8e1cb05d111b41d6d16e184a93e12a9478b3b30976ce6daecac2f1cd0f0"
+      },
+      "audit_operational": {
+        "files": 1,
+        "inventory_sha256": "bb36149da0c6ecb93564ea2353a732478c60518d5862381d3c38d2fc762ffec2"
+      },
+      "configuration_metadata": {
+        "files": 1,
+        "inventory_sha256": "5a17b467e996acb43bfc6ed53fe4af2ca2d089c233e90aa5ae3c6ad7aaf7515d"
+      },
+      "document_media": {
+        "files": 1,
+        "inventory_sha256": "94ac06da815b5beb14679b3509b9cffc098a9ab4dbc9e7a4bc46336d8c471bb4"
+      }
+    },
+    "database_tool_exit_code": 0,
+    "completed_at": "2026-10-19T17:41:24.083579+00:00"
+  },
+  "restore_exit_code": 0,
+  "database_rows_match": true,
+  "all_file_class_hashes_match": true,
+  "disposable_databases_removed": 2,
+  "completed_at": "2026-10-19T17:41:25.737976+00:00"
+}

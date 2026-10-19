@@ -1,0 +1,638 @@
+{
+  "schema": "bonira.frontier-entry-review.v1",
+  "recorded_at": "2026-10-19T21:14:41.677084+03:30",
+  "baseline": {
+    "branch": "main",
+    "head": "24d782aefed64f92c953d6469af46759444eb151",
+    "origin_main": "24d782aefed64f92c953d6469af46759444eb151",
+    "remote_main": "24d782aefed64f92c953d6469af46759444eb151",
+    "initial_tree": "CLEAN",
+    "prior_registry_reconciled_head": "d0eaa16803fd05442d70e80c00d30882c950a26a",
+    "reconciliation": "24d782a is metadata-only closeout after d0eaa16; current product006 file hashes unchanged"
+  },
+  "prompt_hashes_verified": {
+    "CEP-028": "d740c17628f4e2282fa9dde68891f7d0f4f3945802345c4c0aa917a7c7a49e50",
+    "CEP-057": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+    "CEP-058": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1",
+    "CEP-059": "f2749d8216e8c62cacfe86a1e52ec267fc3ce763ea749b848c9e7e138133836a",
+    "CEP-060": "d301eee76e17a3e620964429592e941bbcc95cd6d8d9ac291aa9295d731e9bb7",
+    "CEP-061": "5446718cdc01fef8b1bf21c92cbdd0835b80ff80c119cfc1b7545447d823dabf",
+    "CEP-062": "de636c4166ce39794607dabd819c78d3791016151bc61b4db225043912b48d87",
+    "CEP-064": "643801a9d55948b75aa261653f7ceadd3bfeb720462d8def2e778da06b0c3132",
+    "CEP-065": "535bad1d9143c0c8e474872b683e70f899ceb7f13bebca9d71fcdf94b31599fc",
+    "CEP-066": "700eff25934b7c5aa0c0609bf852421fc45da5f46d584acdcafcb5cefbaccd6c",
+    "CEP-068": "6f157ca68cff50e8d5d94757b3065ffb40dddeba32803cec32179225a4ad9156",
+    "CEP-069": "41d138764cb8fcde81dfea26f6c6df82202c54e4da3a641b2b18382811f2ebba",
+    "CEP-070": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+    "CEP-071": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+    "CEP-072": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940",
+    "CEP-073": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+    "CEP-074": "7e723b4147d417418f6033b2185a843af92d14e297c649418624d805b34811b9",
+    "CEP-075": "2df7a9665e89d737046844df7ff4439f9ab08591f34e0844ab1871f1db9c7df0",
+    "CEP-076": "2d93e72adae5830ffeca0e3fe2cc711baecd0f313078620d4cd21717be50c2aa",
+    "CEP-077": "acba1a8bfc7825534ef660ac3e0c63097b957485a70c73f384b4309f69ace7e7",
+    "CEP-078": "313eb92ea69db33fe2ccaa6d881a6346949286aa8d9c688ac87dd820b0e92030",
+    "CEP-079": "c02eb0bf068da7a036cf20776fd212be9d5146e994a9e6364ad4ddff9f6fb342"
+  },
+  "cep006_prerequisite": {
+    "result": "SUPPORTED_CURRENT_IMPLEMENTATION_PREREQUISITE",
+    "source_hashes_match": {
+      "apps/accounting/views.py": true,
+      "apps/accounting/templates/accounting/journal_list.html": true,
+      "apps/audit/views.py": true,
+      "templates/audit/log.html": true,
+      "templates/components/bounded_table_pagination.html": true,
+      "apps/accounting/test_imb0066.py": true,
+      "apps/audit/test_imb0066.py": true,
+      "apps/audit/tests.py": true
+    },
+    "retained_evidence_hashes_match": {
+      "output/cep-006/run_focused.py": true,
+      "output/cep-006/focused-results.xml": true,
+      "output/cep-006/regression-results.xml": true
+    },
+    "retained_xml": {
+      "focused.xml": {
+        "tests": "13",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "timestamp": "2026-10-19T20:51:09.194687+03:30"
+      },
+      "regression.xml": {
+        "tests": "11",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0",
+        "timestamp": "2026-10-19T20:51:45.355062+03:30"
+      }
+    },
+    "runtime_load_or_cep073_pass": "NOT_CLAIMED",
+    "focused_tests_rerun": "NO_UNCHANGED_IMPLEMENTATION_REUSED"
+  },
+  "canonical_recovery_sources": {
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_PRODUCTION_DEPLOYMENT_SPECIFICATION.md": "437f4515abf52524421a5ad27286f06a7b774f52719069f5054d52f40b4dc0bc",
+        "BONIRA_RECOVERY_POLICY_MATRIX.csv": "579ac8da6323078508b486410880b9affcee4842aea5e8fb57b2ea2e219a7494",
+        "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    },
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "packages/CEP-070.md": "fe3cf54b89c7cf77be484bc07c46cb64565b5e1c7f1391f341d8ff612b08a410"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    }
+  },
+  "current_entry_reviews": {
+    "CEP-028": {
+      "execution_state": "PARTIAL",
+      "edges": [],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL; approved cutoff/dataset unresolved. No new migration execution."
+    },
+    "CEP-057": {
+      "execution_state": "PARTIAL",
+      "edges": [
+        {
+          "prerequisite": "CEP-023",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-029",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL; EXT0015 required before migration; no approved inputs newly supplied."
+    },
+    "CEP-058": {
+      "execution_state": "PARTIAL",
+      "edges": [
+        {
+          "prerequisite": "CEP-025",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-029",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL; EXT0017 required before migration; no approved inputs newly supplied."
+    },
+    "CEP-059": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-008",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-064",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-060": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-064",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-061": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-064",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-062": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-021",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-064",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-064": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-007",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-028",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "PARTIAL"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-065": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-049",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing entry BLOCKED; approved source/cutoff/bucket/replacement policy absent; unchanged."
+    },
+    "CEP-066": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-006",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-040",
+          "strength": "CONDITIONAL",
+          "condition": "Only for project closeout scopes where ProjectCostFact is an applicable closeout gate.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-044",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-061",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-068": {
+      "execution_state": "PARTIAL",
+      "edges": [
+        {
+          "prerequisite": "CEP-026",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-062",
+          "strength": "CONDITIONAL",
+          "condition": "For the Mission sub-flow; the Overtime request sub-flow does not require Mission financial routing.",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL; conditional Mission edge062 and required browser evidence unresolved; not reexecuted."
+    },
+    "CEP-069": {
+      "execution_state": "PARTIAL",
+      "edges": [
+        {
+          "prerequisite": "CEP-052",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL; current official statutory source/review/activation certification gap unchanged."
+    },
+    "CEP-070": {
+      "execution_state": "NOT_STARTED",
+      "edges": [],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Non-production BUILD entry eligible: no CEP prerequisites; PostgreSQL/file capture foundation known; EXT0020 is production-only. Executed bounded preparation; PARTIAL because actual canonical certification remains unverified."
+    },
+    "CEP-071": {
+      "execution_state": "NOT_STARTED",
+      "edges": [],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "No mandatory CEP prerequisites; EXT0021 production-only is not a build blocker. Full non-production entry/foundation review NOT_COMPLETED; no production action or eligibility PASS inferred."
+    },
+    "CEP-072": {
+      "execution_state": "NOT_STARTED",
+      "edges": [],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "No mandatory CEP prerequisites; EXT0022 production-only is not a build blocker. Full non-production entry/foundation review NOT_COMPLETED; no production action or eligibility PASS inferred."
+    },
+    "CEP-073": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-006",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-009",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-012",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-028",
+          "strength": "CONDITIONAL",
+          "condition": "When Legacy Payment reference/data migration to Treasury is included in the PostgreSQL migration verification run.",
+          "execution_state": "PARTIAL"
+        },
+        {
+          "prerequisite": "CEP-029",
+          "strength": "CONDITIONAL",
+          "condition": "When Employee \u2192 WorkRelationship migration and rehire history is included in the PostgreSQL migration verification run.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-057",
+          "strength": "CONDITIONAL",
+          "condition": "When Leave opening balance migration is included in the PostgreSQL migration verification run.",
+          "execution_state": "PARTIAL"
+        },
+        {
+          "prerequisite": "CEP-058",
+          "strength": "CONDITIONAL",
+          "condition": "When Historical Payroll/YTD opening-state migration is included in the PostgreSQL migration verification run.",
+          "execution_state": "PARTIAL"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "NOT_STARTED:006 current implementation prerequisite supported; GATE06 NOT_PASSED blocks IMB0103; current-build EXT0023 UNVERIFIED. Conditional migration scopes not assumed complete. CEP012 proof still requires review before eventual entry."
+    },
+    "CEP-074": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-070",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-075": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-071",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-076": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-072",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "NOT_STARTED"
+        }
+      ],
+      "mandatory_dependencies_satisfied": false,
+      "entry_disposition": "Unsatisfied mandatory prerequisite(s); no execution."
+    },
+    "CEP-077": {
+      "execution_state": "PARTIAL",
+      "edges": [
+        {
+          "prerequisite": "CEP-013",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "Existing PARTIAL/DNS blocker preserved from retained evidence; connectivity not retested, no new DNS claim."
+    },
+    "CEP-078": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-003",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-017",
+          "strength": "MANDATORY",
+          "condition": "ALWAYS",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "EXT0024 approved exact-build browser/device/viewport/accessibility matrix/environment must be established; no current entry readiness or runtime PASS inferred."
+    },
+    "CEP-079": {
+      "execution_state": "NOT_STARTED",
+      "edges": [
+        {
+          "prerequisite": "CEP-001",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-041 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-002",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-001 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-003",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-009, UAT-CASE-035, UAT-CASE-037, UAT-CASE-040 is included in the representative UAT execution set.; Required when any of UAT scenarios UAT-CASE-016, UAT-CASE-040 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-006",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-017 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-007",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-021, UAT-CASE-022 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-010",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-034 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-011",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-006, UAT-CASE-042 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-016",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-002, UAT-CASE-007 is included in the representative UAT execution set.; Required when any of UAT scenarios UAT-CASE-010, UAT-CASE-024, UAT-CASE-025, UAT-CASE-027, UAT-CASE-030, UAT-CASE-032, UAT-CASE-035, UAT-CASE-040 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-017",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-040 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-018",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-004 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-024",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-036 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-027",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-011, UAT-CASE-044 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-030",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-029 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-031",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-029 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-032",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-026 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-033",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-028 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-034",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-031 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-040",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-012 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-041",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-005 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-045",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-011, UAT-CASE-043 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-046",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-039 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-049",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-008 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        },
+        {
+          "prerequisite": "CEP-060",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-019, UAT-CASE-020 is included in the representative UAT execution set.",
+          "execution_state": "NOT_STARTED"
+        },
+        {
+          "prerequisite": "CEP-061",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-023 is included in the representative UAT execution set.",
+          "execution_state": "NOT_STARTED"
+        },
+        {
+          "prerequisite": "CEP-064",
+          "strength": "CONDITIONAL",
+          "condition": "Required when any of UAT scenarios UAT-CASE-003, UAT-CASE-017 is included in the representative UAT execution set.",
+          "execution_state": "NOT_STARTED"
+        },
+        {
+          "prerequisite": "CEP-066",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-005 is included in the representative UAT execution set.",
+          "execution_state": "NOT_STARTED"
+        },
+        {
+          "prerequisite": "CEP-067",
+          "strength": "CONDITIONAL",
+          "condition": "Required when UAT scenario UAT-CASE-003 is included in the representative UAT execution set.",
+          "execution_state": "COMPLETE"
+        }
+      ],
+      "mandatory_dependencies_satisfied": true,
+      "entry_disposition": "GATE09 and EXT0025 integrated approved44-case scenario readiness unverified; conditional incomplete dependencies apply when canonical cases selected. No selecting away required cases."
+    }
+  },
+  "all_prerequisite_records_complete": [
+    "CEP-028",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "mandatory_complete_conditional_scope_review_required": [
+    "CEP-068",
+    "CEP-073",
+    "CEP-079"
+  ],
+  "readiness_is_not_gate_or_execution_authority": true,
+  "selected_nonproduction_cep": "CEP-070",
+  "touch_set": "docs/governance/cep/manifests/CEP-070_EXECUTION_MANIFEST.md",
+  "gate05": "NOT_PASSED",
+  "gate06": "NOT_PASSED",
+  "ext0023_current_build": "UNVERIFIED",
+  "post070_queue": "STOP_NEW_PARTIAL_CERTIFICATION_GAP; independent071/072 remain future full entry-review candidates",
+  "production_authorized": false
+}
