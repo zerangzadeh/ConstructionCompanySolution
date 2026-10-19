@@ -1,0 +1,28 @@
+[
+  {
+    "finding_id": "CEP-058-FINDING-001",
+    "status": "OPEN",
+    "classification": "BLOCKER-EXTERNAL-DATA",
+    "canonical_dependency": "EXT-0017",
+    "affected_imb": "IMB-0080",
+    "affected_ac": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "expected": "Approved historical dataset, identity/source mapping, operational classification, versioned reset interval and reconciliation totals before migration execution",
+    "actual": "No approved packet established; loopback Development has zero Payroll years, cumulative states and finalized/reversed runs",
+    "evidence": [
+      "CEP-058_ENTRY.json",
+      "CEP-058_FRAMEWORK_BUILD.json"
+    ],
+    "build_disposition": "Read-only preparation permitted and tested; approval and execution always false",
+    "required_resolution": "Supply/establish authoritative EXT0017 packet; re-ground and review actual source-to-target migration contract before any backfill; do not synthesize finalized Payroll sources or infer statutory treatment",
+    "queue_action": "STOP_AFTER_PARTIAL_FRAMEWORK_CLOSEOUT",
+    "product_regression": false
+  }
+]

@@ -67,9 +67,9 @@ summary:
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 1
-  partial_current: 4
+  partial_current: 5
   failed_current: 0
-  not_started_other_current_governed: 17
+  not_started_other_current_governed: 16
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -3085,28 +3085,32 @@ ceps:
       actual_touch_set: docs/governance/cep/manifests/CEP-057_EXECUTION_MANIFEST.md
       evidence: docs/governance/cep/evidence/CEP-057_FRAMEWORK_BUILD.json
   CEP-058:
-    title: null
+    title: Payroll/YTD opening-state migration
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED_VERIFIED_CEP025_CEP029
+    eligibility_status: FRAMEWORK_BUILT_MIGRATION_BLOCKED_EXT0017
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: PARTIAL
+      lifecycle: PARTIAL_FRAMEWORK_MIGRATION_EXECUTION_BLOCKED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 0
+      total: 7
+      status: ACTUAL_MIGRATION_UNVERIFIED_FRAMEWORK_TESTS_ONLY
+    dod: NOT_MET_PARTIAL
+    blockers:
+    - CEP-058-FINDING-001 / BLOCKER-EXTERNAL-DATA / EXT-0017 approved historical dataset, source and employee mapping, cumulative classification, explicit approved reset boundary and reconciliation totals remain required before migration execution
+    remaining_utv:
+    - Actual approved historical/opening import and complete eligible source population reconciliation
+    - Backfill repeatability, source-target traceability and rollback/cutover verification against approved inputs
+    - Current statutory source activation, performance/concurrency and production certification remain unverified
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-058_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_SYNTHETIC_FRAMEWORK_ONLY_NO_ACTUAL_BACKFILL
     git:
       committed: null
       commit_sha: null
@@ -3114,10 +3118,19 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 93a42298392b790bd1b18a584518ab032bb375f1
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: STARTED
+      reason: Canonical prompt/SHA/source/dependencies verified;025 and029 COMPLETE with actual services; EXT0017 blocks migration execution but permits bounded non-production framework Build. Recorded touch set; no057/065/077 collision or schema mutation. Standing authority applies.
+    - date: '2026-10-19'
+      status: PARTIAL
+      reason: Versioned read-only historical preparation implemented;17 new service/isolation/integration tests plus4 existing YTD regression tests PASS. Approval claim never grants execution; current development has no approved year or finalized history.0/7 actual migration AC verified; DoD not met; no actual migration/backfill/cutover or business writes.
+    - date: '2026-10-19'
+      status: BLOCKED
+      reason: EXT0017 approved dataset/mappings/classification/reset interval/totals remain unestablished. Actual migration and its reconciliation/retry evidence cannot be inferred from synthetic preparation tests. Stop at material external-data boundary; no Gate or production authority inferred.
   CEP-059:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3811,11 +3824,12 @@ ceps:
       path: docs/governance/cep/reports/CEP-077_COMPLETION_REPORT.md
       evidence_presence: ACTUAL_BLOCKED_RUNTIME_OUTPUT_AND_PROVENANCE_RETAINED
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 93a42298392b790bd1b18a584518ab032bb375f1
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: VERIFIED_PARTIAL_EVIDENCE_CHECKPOINT_ONLY
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 3e9c6fa5e0101e747d93bab5b227854a0bcd4b4e
@@ -3842,6 +3856,9 @@ ceps:
     - date: '2026-10-19'
       status: BLOCKER_RECHECKED
       reason: Human-requested conditional rerun review at15:25:57UTC confirms unchanged main/control inputs/prompt and original result hashes. Approved artifact-host DNS still fails getaddrinfo11001. Keep PARTIAL; prior lock/config/image proof preserved, no product regression classification, acquisition/downstream checks not rerun while connectivity unavailable. Evidence CEP-077_CONNECTIVITY_RECHECK.json; no unrelated validation or business/production/Git action.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Human-authorized13-file partial evidence/Registry checkpoint93a4229 pushed and verified on origin/remote main;077 remains PARTIAL, no acquisition retry, unchanged controls and failure hashes verified. Evidence CEP-077_GIT_CHECKPOINT.json.
   CEP-078:
     title: null
     phase: VERIFICATION_UAT
@@ -4170,9 +4187,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 3e9c6fa5e0101e747d93bab5b227854a0bcd4b4e
-  origin_main: 3e9c6fa5e0101e747d93bab5b227854a0bcd4b4e
-  integration_checkpoint: 3e9c6fa5e0101e747d93bab5b227854a0bcd4b4e
+  last_reconciled_head: 93a42298392b790bd1b18a584518ab032bb375f1
+  origin_main: 93a42298392b790bd1b18a584518ab032bb375f1
+  integration_checkpoint: 93a42298392b790bd1b18a584518ab032bb375f1
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4194,18 +4211,18 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_CEP077_PARTIAL_MATERIAL_ENVIRONMENT_BLOCKER
+  current_session_continuation: STOP_CEP058_PARTIAL_MATERIAL_EXTERNAL_DATA_BLOCKER
   current_independent_cep: null
   next_entry_review_candidate: null
-  next_candidate_full_entry_eligibility: CEP077_PARTIAL_BLOCKED_ENVIRONMENT_OTHERS_REQUIRE_OWN_ENTRY_REVIEW
+  next_candidate_full_entry_eligibility: NO_FULLY_VERIFIED_UNBLOCKED_CANDIDATE_OTHER_SCOPES_REQUIRE_OWN_ENTRY_REVIEW
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Authorized five-file057 metadata checkpoint pushed3e9c6fa; independent077 actual verification is PARTIAL and blocked by approved artifact-host DNS. Stop serial queue without fallback, policy/lock changes or runtime PASS. Preserve057 PARTIAL0/7 EXT0015,065 BLOCKED,05/06 NOT_PASSED and no production authority.
+  boundary_reason: CEP077 partial evidence checkpoint93a4229 pushed; independent058 framework built and21 tests PASS, actual migration0/7 and DoD not met because EXT0017 approved inputs absent.058 remains PARTIAL; preserve057 PARTIAL0/7 EXT0015,065 BLOCKED,077 external DNS PARTIAL with no retry, gates05/06/08 NOT_PASSED and no production authority.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: CEP077_PARTIAL_ENVIRONMENT_BLOCKED_OTHERS_REQUIRE_PHASE_SPECIFIC_REVIEW
+  independent_candidates_entry_status: CEP058_PARTIAL_EXT0017_AND_CEP077_PARTIAL_DNS_OTHERS_REQUIRE_PHASE_SPECIFIC_REVIEW
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false
   human_signoff_executed: false

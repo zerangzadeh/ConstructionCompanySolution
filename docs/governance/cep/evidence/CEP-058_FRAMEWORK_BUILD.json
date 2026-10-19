@@ -1,0 +1,62 @@
+{
+  "cep": "CEP-058",
+  "imb": "IMB-0080",
+  "date": "2026-10-19",
+  "execution_state": "EXECUTION PARTIAL",
+  "baseline_head": "93a42298392b790bd1b18a584518ab032bb375f1",
+  "branch": "main",
+  "authority": "STANDING_NON_PRODUCTION_FRAMEWORK_PREPARATION_ONLY",
+  "migration_impact": "BACKFILL",
+  "migration_schema_backfill_execution": "NOT_EXECUTED",
+  "actual_migration_acceptance": {
+    "passed": 0,
+    "total": 7
+  },
+  "dod": "NOT_MET",
+  "product_hashes": {
+    "apps/payroll/opening_preparation.py": "1e4206251fa9364043a4919eaa8f1c87ea35aab5f6a7ac7cb12c46be6d5aee3e",
+    "apps/payroll/test_cep058.py": "d2182ffd747a87e3e008b8c5fb0e6509244845f55d513774b3e4099570299053"
+  },
+  "actual_output_hashes": {
+    "CEP-058_TEST_OUTPUT.txt": "54e9d5d1e3b7ed7b853cb30e2eb8d24d8dfe8fd6bfd23d78cff42a2be718cc5f",
+    "CEP-058_TEST_INITIAL_FAILURE.txt": "87e6472f53ac5ea9830cc4569784f185a6850dbd0718c5f2acbd5f58134f3153",
+    "CEP-058_CHECK_OUTPUT.txt": "2ff0ae05761a3e871cda27012651e79e774aacdeb315da1a412ca283da6e65b1"
+  },
+  "tests": {
+    "command": ".venv/Scripts/python.exe manage.py test apps.payroll.test_cep058 apps.payroll.test_cep025_cumulative --keepdb --noinput",
+    "result": "21_PASS_8.821_SECONDS_POSTGRESQL",
+    "new_preparation_tests": 17,
+    "affected_existing_YTD_tests": 4,
+    "initial_failure": "19 passed,1 new test-fixture error from forbidden immutable-target update; corrected using valid legacy unlinked target; original output retained",
+    "coverage": "Synthetic preparation/isolation and real existing source-to-YTD service integration; no approved dataset or actual migration proof"
+  },
+  "checks": "Ruff check/format, Django system check and migration dry-run drift PASS",
+  "configured_development_counts_before": {
+    "payroll_years": 0,
+    "approved_years": 0,
+    "cumulative_states": 0,
+    "finalized_or_reversed_runs": 0,
+    "work_relationships": 10
+  },
+  "configured_development_counts_after": {
+    "payroll_years": 0,
+    "approved_years": 0,
+    "cumulative_states": 0,
+    "finalized_or_reversed_runs": 0,
+    "work_relationships": 10
+  },
+  "configured_business_writes": 0,
+  "actual_source_approval_verified": false,
+  "blocking_input": "EXT-0017 approved source dataset, explicit employee/relationship mapping, cumulative classification, approved reset interval and reconciliation totals",
+  "history_and_authority": "Read-only source/target snapshots, no import/overwrite/cutover/second authority; supplied rows only",
+  "remaining_utv": [
+    "Actual source population migration/reconciliation/retry/rollback",
+    "Current statutory activation",
+    "Performance/concurrency",
+    "Production and Human Sign-off"
+  ],
+  "production_authorized": false,
+  "git_status_at_closeout": "UNCOMMITTED_BEFORE_AUTHORIZED_CHECKPOINT",
+  "protected_057_065_077_and_gates_unchanged": true,
+  "frontier": "Registry dependency frontier unchanged;058 PARTIAL does not satisfy downstream edges; conditional068/073/079 and external078 require own full entry review"
+}

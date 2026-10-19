@@ -1,0 +1,136 @@
+{
+  "date": "2026-10-19",
+  "baseline_main_origin_remote": "93a42298392b790bd1b18a584518ab032bb375f1",
+  "entry_tree": "CLEAN_BEFORE_PREPARATION_MANIFEST",
+  "authority": "STANDING_NON_PRODUCTION_FRAMEWORK_ONLY_EXT0017_REQUIRED_BEFORE_MIGRATION",
+  "canonical_prompt_hashes_verified": {
+    "CEP-058": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1",
+    "CEP-025": "aba57062896f23108f74bcc389ae03c4380190b95429e83ca609ed65403fac33",
+    "CEP-029": "2e5afec0c5fa4ef42dc5aef2439e3fd7458e64c5227a30129076a2bd6a33d93e",
+    "CEP-068": "6f157ca68cff50e8d5d94757b3065ffb40dddeba32803cec32179225a4ad9156",
+    "CEP-073": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+    "CEP-078": "313eb92ea69db33fe2ccaa6d881a6346949286aa8d9c688ac87dd820b0e92030",
+    "CEP-079": "c02eb0bf068da7a036cf20776fd212be9d5146e994a9e6364ad4ddff9f6fb342",
+    "CEP-070": "7d3de81556e62ed46c5fe90d1742742c5d0f07caa5dcf4b7d19b549fe2139e82",
+    "CEP-071": "e456aa9b63a18286448f513d29f1d81e47a1b2c2a555121110f89938bc4d3801",
+    "CEP-072": "9c52431a1c52c2ca41c2e10ca0eb35eea4871a8ebb7d38e3d57600ca1bbf0940"
+  },
+  "recovery_sources_verified": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "packages/CEP-058.md": "b0031449589bc6d6811b9566aa9cdea7fa7e79d754a441bd5cb3b56d25ad48df",
+        "BONIRA_CEP_DEPENDENCY_REGISTER.csv": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    },
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_PAYROLL_CUMULATIVE_YTD_SPECIFICATION.md": "aa46900237c4c9c1c0109d00645d07fa5dd3f195edf63470450752c2ed923f3f",
+        "BONIRA_PAYROLL_STATUTORY_SOURCE_PACKAGE_SPECIFICATION.md": "1b9daf5c9487ee3c30ddf641dda77345c2dbd0c97ee21566bfa9a17298d8b81b",
+        "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    },
+    "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip": {
+      "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+      "members": {
+        "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d"
+      }
+    }
+  },
+  "dependencies": [
+    {
+      "Dependency ID": "CEP-DEP-065",
+      "Prerequisite CEP": "CEP-025",
+      "Dependent CEP": "CEP-058",
+      "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+      "Source IMB Edge IDs / IMB Pair": "DEP-0084:IMB-0079\u2192IMB-0080",
+      "Strength": "MANDATORY",
+      "Condition": "ALWAYS",
+      "Roadmap Compatibility": "PASS",
+      "Justification": "Historical Payroll/YTD migration requires the target cumulative/YTD state model and versioned component keys.",
+      "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+    },
+    {
+      "Dependency ID": "CEP-DEP-076",
+      "Prerequisite CEP": "CEP-029",
+      "Dependent CEP": "CEP-058",
+      "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+      "Source IMB Edge IDs / IMB Pair": "DEP-0075:IMB-0070\u2192IMB-0080",
+      "Strength": "MANDATORY",
+      "Condition": "ALWAYS",
+      "Roadmap Compatibility": "PASS",
+      "Justification": "Historical Payroll/YTD opening state for existing staff requires canonical migrated WorkRelationship identity mapping.",
+      "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+    }
+  ],
+  "dependency_results": {
+    "CEP-025": "COMPLETE_WITH_ACTUAL_YTD_SERVICE",
+    "CEP-029": "COMPLETE_WITH_EXPLICIT_IDENTITY_LINKS"
+  },
+  "external_dependencies": [
+    {
+      "External Dependency ID": "EXT-0017",
+      "CEP ID": "CEP-058",
+      "Dependency Phase": "ACTIVATION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "YES",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "NO",
+      "Required Gate": "GATE-06",
+      "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE MIGRATION EXECUTION",
+      "Notes": "Historical Payroll/YTD opening dataset \u2014 Approved historical dataset, employee mapping, cumulative classification, reset boundary and reconciliation totals"
+    }
+  ],
+  "entry": "RELEVANT_SCHEMA_AUTHORITY_PREREQUISITES_SATISFIED_FOR_BUILD",
+  "exit_gate": "GATE-06_NOT_PASSED",
+  "dependency_ready_current_governed": [
+    "CEP-028",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "candidate_review": {
+    "CEP-058": "BUILD_ELIGIBLE; approved source dataset absent, so preparation only; no schema change needed",
+    "CEP-068": "Overtime conditional scope can be reviewed independently; Mission requires incomplete062; neither dependency graph nor complete-package AC may be reduced",
+    "CEP-073": "Conditional migration edges depend on selected scenario; EXT0023 requires its own approved target/scenario evidence; no performance/runtime PASS inferred",
+    "CEP-078": "Dependencies003/017 complete; EXT0024 approved browser/device/viewport/scenario matrix not established by static UI tests",
+    "CEP-079": "Full authoritative 44-case set and EXT0025 integrated environment required; cannot select away required missing implementations to claim full UAT",
+    "CEP-070_071_072": "Certification-phase contracts do not grant production authority; recovery/topology/operating inputs require separate evidence review"
+  },
+  "selection": "058 bounded existing-domain preparation is independent of057/065/077; no business reads/writes in their domains or shared code edits",
+  "configured_development_counts": {
+    "payroll_years": 0,
+    "approved_years": 0,
+    "cumulative_states": 0,
+    "finalized_or_reversed_runs": 0,
+    "work_relationships": 10
+  },
+  "schema": "Payroll0001..0008 already installed, read-only inventory; no schema apply",
+  "implementation_seams": [
+    "apps/payroll/models.py",
+    "apps/payroll/cumulative_services.py",
+    "apps/payroll/test_cep025_cumulative.py"
+  ],
+  "touch_set_manifest": "docs/governance/cep/manifests/CEP-058_EXECUTION_MANIFEST.md",
+  "protected": "057 PARTIAL0/7 EXT0015;065 BLOCKED;077 PARTIAL external DNS no retry;GATE05/06/08 NOT_PASSED;no production"
+}
