@@ -1,0 +1,9 @@
+evidence_id,type,path,result
+CEP-046-EV-001,ENTRY / SOURCE / HASH,CEP-046_ENTRY.json;CEP-046_FINAL_VALIDATION.json,All79 canonical/recovery identities verified; protected source unchanged
+CEP-046-EV-002,FOCUSED / WORKFLOW / SECURITY / TENANT / UI,CEP-046_FOCUSED_BROWSER_OUTPUT.txt,"17 PASS; full lifecycle and preserved history, template/routing privacy, CSRF, localization and browser/admin/navigation"
+CEP-046-EV-003,AFFECTED / BASELINE ATTRIBUTION,CEP-046_AFFECTED_OUTPUT.txt;CEP-046_BASELINE_OUTPUT.txt;CEP-046_FAILURE_ATTRIBUTION.json;CEP-046_QUERY_BASELINE_OUTPUT.txt;CEP-046_QUERY_BASELINE_PROVENANCE.json,47 PASS plus4 proven baseline failures; not full-suite PASS
+CEP-046-EV-004,SYNTHETIC SCREENSHOTS,CEP-046_BROWSER_OBSERVATIONS.json,8 visually reviewed screenshots in CEP-046_SCREENSHOTS; bounded Chrome/desktop/mobile/empty/error/denied proof
+CEP-046-EV-005,LINT / FORMAT / SYSTEM / DIFF,CEP-046_LINT_OUTPUT.txt;CEP-046_FORMAT_OUTPUT.txt;CEP-046_SYSTEM_OUTPUT.txt;CEP-046_DIFF_CHECK_OUTPUT.txt,PASS
+CEP-046-EV-006,CODE DIFF,CEP-046_CODE_DIFF.patch,UI and existing-service adapters only; no domain lifecycle/schema/grant change
+CEP-046-EV-007,FRONTIER / GATE,CEP-046_FRONTIER.json,Next047 full entry review; GATE05 NOT_PASSED
+CEP-046-EV-008,INITIAL OUTPUTS,CEP-046_FOCUSED_INITIAL_OUTPUT.txt;CEP-046_BROWSER_INITIAL_OUTPUT.txt;CEP-046_FOCUSED_BROWSER_FIRST_PASS.txt;CEP-046_AFFECTED_INITIAL_OUTPUT.txt,Historical failed browser fixture and legacy authority scenarios retained; final validation/attribution separate

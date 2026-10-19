@@ -1,0 +1,1262 @@
+--- /dev/null
++++ b/apps/workflows/administration.py
+@@ -0,0 +1,78 @@
++"""Tenant administration reads; lifecycle mutations stay in workflow services."""
++
++from django.db.models import QuerySet
++
++from apps.accounts.models import User
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++
++from .models import WorkflowVersion
++
++
++def visible_versions(*, actor: User, organization: Organization) -> QuerySet:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.WORKFLOWS_VIEW,
++        message="اجازه مشاهدهٔ تعریف‌های گردش‌کار این شرکت را ندارید.",
++    )
++    return (
++        WorkflowVersion.objects.filter(
++            organization=organization, definition__organization=organization
++        )
++        .select_related("definition__workflow_type", "published_by", "retired_by")
++        .order_by("definition__code", "-version_number")
++    )
++
++
++def configuration_payload(version: WorkflowVersion) -> dict:
++    """Round-trip existing service fields, including ordered routing/conditions."""
++    steps = []
++    for step in version.steps.prefetch_related("routing_rules").order_by("key"):
++        steps.append(
++            {
++                "key": step.key,
++                "name": step.name,
++                "step_type": step.step_type,
++                "is_start": step.is_start,
++                "is_terminal": step.is_terminal,
++                "domain_command": step.domain_command,
++                "required_permission": step.required_permission,
++                "configuration": step.configuration,
++                "routing": [
++                    {
++                        "resolver_type": rule.resolver_type,
++                        "configuration": rule.configuration,
++                        "order": rule.order,
++                        "is_fallback": rule.is_fallback,
++                    }
++                    for rule in step.routing_rules.order_by("order", "pk")
++                ],
++            }
++        )
++    transitions = []
++    for item in version.transitions.select_related(
++        "source_step", "target_step"
++    ).prefetch_related("conditions"):
++        transitions.append(
++            {
++                "source": item.source_step.key,
++                "target": item.target_step.key,
++                "outcome": item.outcome,
++                "domain_command": item.domain_command,
++                "required_permission": item.required_permission,
++                "priority": item.priority,
++                "is_default": item.is_default,
++                "conditions": [
++                    {
++                        "condition_type": condition.condition_type,
++                        "configuration": condition.configuration,
++                        "order": condition.order,
++                        "negate": condition.negate,
++                    }
++                    for condition in item.conditions.order_by("order", "pk")
++                ],
++            }
++        )
++    return {"steps": steps, "transitions": transitions}
+--- /dev/null
++++ b/apps/workflows/administration_forms.py
+@@ -0,0 +1,175 @@
++"""Bounded presentation of the existing declarative workflow service inputs."""
++
++import json
++
++from django import forms
++from django.apps import apps
++from django.core.exceptions import ValidationError
++
++from .models import WorkflowDefinition, WorkflowTemplate, WorkflowType
++from .registry import registry
++from .validators import validate_configuration_payload
++
++
++class DefinitionForm(forms.Form):
++    workflow_type = forms.ModelChoiceField(
++        label="نوع گردش‌کار", queryset=WorkflowType.objects.none()
++    )
++    code = forms.SlugField(label="کد", max_length=100)
++    name = forms.CharField(label="عنوان", max_length=255)
++    description = forms.CharField(
++        label="توضیحات", required=False, widget=forms.Textarea(attrs={"rows": 3})
++    )
++    scope = forms.JSONField(
++        label="محدودهٔ انتخاب گردش‌کار",
++        required=False,
++        initial=dict,
++        widget=forms.Textarea(attrs={"rows": 3, "dir": "ltr"}),
++        help_text="فقط فیلدهای محدودهٔ ثبت‌شده برای نوع انتخابی؛ {} یعنی محدودهٔ عمومی شرکت.",
++    )
++
++    def __init__(self, *args, organization, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.organization = organization
++        self.fields["workflow_type"].queryset = WorkflowType.objects.filter(
++            is_active=True, code__in=registry.workflow_types
++        )
++
++    def clean(self):
++        data = super().clean()
++        workflow_type = data.get("workflow_type")
++        scope = data.get("scope")
++        if scope is None:
++            scope = {}
++        if not workflow_type:
++            return data
++        definition = WorkflowDefinition(
++            organization=self.organization, workflow_type=workflow_type, scope=scope
++        )
++        definition.clean()
++        # IDs are configuration inputs, never tenant authority. Resolve each
++        # registered relationship within the active tenant without existence hints.
++        lookups = {
++            "project_id": ("projects", "Project"),
++            "site_id": ("projects", "ProjectSite"),
++            "phase_id": ("projects", "ProjectPhase"),
++            "contract_id": ("contracts", "Contract"),
++            "baseline_id": ("billing", "ProjectBaseline"),
++        }
++        resolved = {}
++        for key, (app_label, model_name) in lookups.items():
++            if key not in scope:
++                continue
++            model = apps.get_model(app_label, model_name)
++            try:
++                target = model.objects.filter(
++                    organization=self.organization, pk=scope[key]
++                ).first()
++            except (ValueError, TypeError, ValidationError):
++                target = None
++            if target is None:
++                raise ValidationError("محدودهٔ انتخاب‌شده در این شرکت معتبر نیست.")
++            resolved[key] = target
++        project = resolved.get("project_id")
++        project_ids = {project.pk} if project else set()
++        for key, target in resolved.items():
++            if key == "project_id":
++                continue
++            target_project_id = (
++                target.site.project_id if key == "phase_id" else target.project_id
++            )
++            project_ids.add(target_project_id)
++            if project and target_project_id != project.pk:
++                raise ValidationError("اجزای محدوده به یک پروژه تعلق ندارند.")
++        if len(project_ids) > 1:
++            raise ValidationError("اجزای محدوده به یک پروژه تعلق ندارند.")
++        if (
++            "phase_id" in resolved
++            and "site_id" in resolved
++            and resolved["phase_id"].site_id != resolved["site_id"].pk
++        ):
++            raise ValidationError("فاز به کارگاه انتخاب‌شده تعلق ندارد.")
++        data["scope"] = scope
++        return data
++
++
++class DeclarativeJSONField(forms.JSONField):
++    def prepare_value(self, value):
++        prepared = super().prepare_value(value)
++        try:
++            return json.dumps(json.loads(prepared), ensure_ascii=False, indent=2)
++        except (TypeError, ValueError):
++            return prepared
++
++
++class DraftForm(forms.Form):
++    change_summary = forms.CharField(
++        label="خلاصه تغییر", required=False, widget=forms.Textarea(attrs={"rows": 2})
++    )
++    template = forms.ModelChoiceField(
++        label="جایگزینی پیکربندی با الگوی ثبت‌شده",
++        queryset=WorkflowTemplate.objects.none(),
++        required=False,
++        help_text="انتخاب الگو، پیکربندی پیش‌نویس را با همان الگو جایگزین می‌کند؛ انتشار جداگانه است.",
++    )
++    configuration = DeclarativeJSONField(
++        label="پیکربندی ثبت‌شدهٔ گام‌ها و انتقال‌ها",
++        required=False,
++        widget=forms.Textarea(attrs={"rows": 24, "dir": "ltr", "spellcheck": "false"}),
++        help_text="ساختار اعلانی گام‌ها، انتقال‌ها و مسیریابی؛ فقط گزینه‌های کاتالوگ مجاز است.",
++    )
++
++    def __init__(self, *args, workflow_type_code, organization, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.workflow_type_code = workflow_type_code
++        self.organization = organization
++        self.fields["template"].queryset = WorkflowTemplate.objects.filter(
++            workflow_type__code=workflow_type_code, is_active=True
++        )
++
++    def clean(self):
++        data = super().clean()
++        if "configuration" not in data:
++            return data
++        template = data.get("template")
++        value = template.configuration if template else data["configuration"]
++        validate_configuration_payload(
++            value, workflow_type_code=self.workflow_type_code
++        )
++        for step in value.get("steps", []):
++            for rule in step.get("routing", []):
++                target = {
++                    "explicit_membership": (
++                        "organizations",
++                        "OrganizationMembership",
++                        "membership_id",
++                    ),
++                    "position": ("workforce", "Position", "position_id"),
++                    "work_team": ("workforce", "WorkTeam", "work_team_id"),
++                }.get(rule["resolver_type"])
++                if target is None:
++                    continue
++                app_label, model_name, key = target
++                model = apps.get_model(app_label, model_name)
++                try:
++                    valid = model.objects.filter(
++                        organization=self.organization, pk=rule["configuration"][key]
++                    ).exists()
++                except (ValueError, TypeError, ValidationError):
++                    valid = False
++                if not valid:
++                    raise ValidationError("هدف مسیریابی در این شرکت معتبر نیست.")
++        data["configuration"] = value
++        return data
++
++
++class LifecycleForm(forms.Form):
++    reason = forms.CharField(
++        label="دلیل / خلاصه تغییر",
++        required=False,
++        widget=forms.Textarea(attrs={"rows": 3}),
++    )
++
++    def __init__(self, *args, needs_reason=False, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.fields["reason"].required = needs_reason
+--- /dev/null
++++ b/apps/workflows/administration_views.py
+@@ -0,0 +1,223 @@
++"""Thin, tenant-scoped UI adapters over the existing workflow lifecycle."""
++
++import json
++
++from django.contrib import messages
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError
++from django.http import Http404, HttpRequest, HttpResponse
++from django.shortcuts import get_object_or_404, redirect, render
++from django.views.decorators.http import require_GET, require_http_methods
++
++from apps.organizations.decorators import (
++    active_organization_required,
++    require_organization_permission,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++
++from . import services
++from .administration import configuration_payload, visible_versions
++from .administration_forms import DefinitionForm, DraftForm, LifecycleForm
++from .models import WorkflowVersionStatus
++from .registry import registry
++
++PREFIX = "workflows/administration/"
++ACTIONS = {
++    "validate": (P.WORKFLOWS_CHANGE_DRAFT, "اعتبارسنجی"),
++    "publish": (P.WORKFLOWS_PUBLISH, "انتشار"),
++    "retire": (P.WORKFLOWS_RETIRE, "بازنشستگی"),
++    "supersede": (P.WORKFLOWS_PUBLISH, "جایگزینی نسخهٔ منتشرشده"),
++    "new-draft": (P.WORKFLOWS_CHANGE_DRAFT, "ایجاد نسخهٔ پیش‌نویس"),
++}
++
++
++def _safe_message(message: str) -> str:
++    if message in {
++        "هدف مسیریابی وجود ندارد یا معتبر نیست.",
++        "هدف مسیریابی متعلق به سازمان دیگری است.",
++        "هدف مسیریابی فعال نیست.",
++    }:
++        return "هدف مسیریابی در این شرکت معتبر نیست."
++    return message
++
++
++def _version(request, version_id):
++    return get_object_or_404(
++        visible_versions(actor=request.user, organization=request.organization),
++        pk=version_id,
++    )
++
++
++@active_organization_required
++@require_GET
++def definition_list(request: HttpRequest) -> HttpResponse:
++    versions = visible_versions(actor=request.user, organization=request.organization)
++    return render(request, PREFIX + "list.html", {"versions": versions})
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++def definition_create(request: HttpRequest) -> HttpResponse:
++    require_organization_permission(request, P.WORKFLOWS_VIEW)
++    require_organization_permission(request, P.WORKFLOWS_CREATE)
++    form = DefinitionForm(
++        request.POST if request.method == "POST" else None,
++        organization=request.organization,
++    )
++    if request.method == "POST" and form.is_valid():
++        data = form.cleaned_data
++        try:
++            version = services.create_workflow_draft(
++                actor=request.user,
++                organization=request.organization,
++                workflow_type_code=data["workflow_type"].code,
++                code=data["code"],
++                name=data["name"],
++                description=data["description"],
++                scope=data["scope"],
++            )
++        except (ValidationError, IntegrityError):
++            form.add_error(None, "تعریف با این مشخصات معتبر نیست یا قبلاً ثبت شده است.")
++        else:
++            return redirect("workflows:version_detail", version_id=version.pk)
++    return render(
++        request,
++        PREFIX + "form.html",
++        {"form": form, "page_title": "ایجاد تعریف گردش‌کار"},
++        status=400 if request.method == "POST" else 200,
++    )
++
++
++@active_organization_required
++@require_GET
++def version_detail(request: HttpRequest, version_id) -> HttpResponse:
++    version = _version(request, version_id)
++    configuration = configuration_payload(version)
++    siblings = visible_versions(
++        actor=request.user, organization=request.organization
++    ).filter(definition=version.definition)
++    return render(
++        request,
++        PREFIX + "detail.html",
++        {
++            "version": version,
++            "siblings": siblings,
++            "configuration": configuration,
++            "configuration_text": json.dumps(
++                configuration, ensure_ascii=False, indent=2
++            ),
++            "validation_report": [
++                {**issue, "message": _safe_message(issue["message"])}
++                for issue in version.validation_report
++            ],
++            "has_published": siblings.filter(status="published").exists(),
++        },
++    )
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++def version_edit(request: HttpRequest, version_id) -> HttpResponse:
++    require_organization_permission(request, P.WORKFLOWS_CHANGE_DRAFT)
++    version = _version(request, version_id)
++    if version.status != WorkflowVersionStatus.DRAFT:
++        raise PermissionDenied("تنها پیش‌نویس قابل ویرایش است.")
++    form = DraftForm(
++        request.POST if request.method == "POST" else None,
++        workflow_type_code=version.definition.workflow_type.code,
++        organization=request.organization,
++        initial={
++            "configuration": configuration_payload(version),
++            "change_summary": version.change_summary,
++        },
++    )
++    if request.method == "POST" and form.is_valid():
++        try:
++            services.edit_workflow_draft(
++                actor=request.user,
++                organization=request.organization,
++                version_id=version.pk,
++                configuration=form.cleaned_data["configuration"],
++                change_summary=form.cleaned_data["change_summary"],
++            )
++        except ValidationError as exc:
++            form.add_error(
++                None, ValidationError([_safe_message(m) for m in exc.messages])
++            )
++        else:
++            return redirect("workflows:version_detail", version_id=version.pk)
++    return render(
++        request,
++        PREFIX + "form.html",
++        {
++            "form": form,
++            "version": version,
++            "page_title": "ویرایش پیش‌نویس گردش‌کار",
++            "registered_step_types": sorted(registry.step_types),
++            "registered_resolvers": sorted(registry.routing_resolvers),
++        },
++        status=400 if request.method == "POST" else 200,
++    )
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++def version_action(request: HttpRequest, version_id, action: str) -> HttpResponse:
++    if action not in ACTIONS:
++        raise Http404
++    permission, title = ACTIONS[action]
++    require_organization_permission(request, permission)
++    version = _version(request, version_id)
++    form = LifecycleForm(
++        request.POST if request.method == "POST" else None,
++        needs_reason=action in {"retire", "supersede"},
++    )
++    if request.method == "POST" and form.is_valid():
++        kwargs = {"actor": request.user, "organization": request.organization}
++        try:
++            if action == "new-draft":
++                version = services.create_draft_version(
++                    **kwargs,
++                    definition_id=version.definition_id,
++                    change_summary=form.cleaned_data["reason"],
++                )
++            elif action == "supersede":
++                replaced = (
++                    visible_versions(**kwargs)
++                    .filter(definition=version.definition, status="published")
++                    .first()
++                )
++                if replaced is None:
++                    raise ValidationError("نسخهٔ منتشرشده‌ای برای جایگزینی وجود ندارد.")
++                version = services.supersede_workflow_version(
++                    **kwargs,
++                    new_version_id=version.pk,
++                    replaced_version_id=replaced.pk,
++                    reason=form.cleaned_data["reason"],
++                )
++            elif action == "retire":
++                services.retire_workflow_version(
++                    **kwargs, version_id=version.pk, reason=form.cleaned_data["reason"]
++                )
++            elif action == "validate":
++                report = services.validate_workflow_draft(
++                    **kwargs, version_id=version.pk
++                )
++                if report:
++                    messages.error(
++                        request, "اعتبارسنجی نیازمند اصلاح است؛ گزارش را ببینید."
++                    )
++            else:
++                services.publish_workflow_version(**kwargs, version_id=version.pk)
++        except ValidationError as exc:
++            form.add_error(
++                None, ValidationError([_safe_message(m) for m in exc.messages])
++            )
++        else:
++            return redirect("workflows:version_detail", version_id=version.pk)
++    return render(
++        request,
++        PREFIX + "form.html",
++        {"form": form, "version": version, "page_title": title},
++        status=400 if request.method == "POST" else 200,
++    )
+--- /dev/null
++++ b/apps/workflows/test_cep046_administration.py
+@@ -0,0 +1,440 @@
++"""UI lifecycle and tenant authority over existing definition/version services."""
++
++import json
++from copy import deepcopy
++from datetime import UTC, datetime
++from uuid import uuid4
++
++from django.test import Client, TestCase
++from django.urls import reverse
++
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.accounts.models import User
++from apps.audit.models import AuditAction, AuditEvent
++from apps.organizations.models import (
++    BusinessPermission,
++    OrganizationRole,
++    PlatformRoleAssignment,
++)
++from apps.organizations.services import create_organization_with_owner
++from apps.projects.models import Project
++
++from .administration import configuration_payload
++from .models import (
++    WorkflowDefinition,
++    WorkflowInstance,
++    WorkflowTemplate,
++    WorkflowType,
++    WorkflowVersion,
++)
++from .services import create_workflow_draft, edit_workflow_draft
++from .tests import valid_configuration
++
++
++class AdministrationFixture:
++    def organization_factory(self, *, owner, name, slug):
++        return create_organization_with_owner(owner=owner, name=name, slug=slug)
++
++    def setUp(self):
++        super().setUp()
++        self.owner = User.objects.create_user(username="cep046-owner", password="test")
++        self.organization = self.organization_factory(
++            owner=self.owner, name="شرکت آزمایشی گردش‌کار", slug="cep046-company"
++        )
++        self.other = User.objects.create_user(username="cep046-other")
++        self.other_organization = self.organization_factory(
++            owner=self.other, name="Other046", slug="cep046-other"
++        )
++        self.workflow_type = WorkflowType.objects.get(
++            code="procurement.purchase_request_approval"
++        )
++        self.login(self.owner)
++
++    def login(self, actor):
++        self.client.force_login(actor)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++
++    def draft(self, *, foreign=False):
++        return create_workflow_draft(
++            actor=self.other if foreign else self.owner,
++            organization=self.other_organization if foreign else self.organization,
++            workflow_type_code=self.workflow_type.code,
++            code="ordinary-admin",
++            name="گردش‌کار آزمایشی محرمانه" if foreign else "گردش‌کار خرید آزمایشی",
++        )
++
++    def reader(self, codes=("workflows.view",), *, superuser=False):
++        actor = User.objects.create_user(
++            username=f"reader-{uuid4()}", is_staff=superuser, is_superuser=superuser
++        )
++        role = OrganizationRole.objects.create(
++            organization=self.organization, code=f"role-{uuid4()}", name="Explicit test"
++        )
++        role.permissions.set(BusinessPermission.objects.filter(code__in=codes))
++        membership = self.organization.memberships.create(
++            user=actor, role_definition=role, role=role.code, status="active"
++        )
++        explicit_fixture_authority(membership, role)
++        return actor, membership
++
++    def action(self, version, action, **data):
++        return self.client.post(
++            reverse("workflows:version_action", args=[version.pk, action]), data
++        )
++
++
++class AdministrationTests(AdministrationFixture, TestCase):
++    def test_registered_template_is_applied_verbatim_without_publication(self):
++        version = self.draft()
++        template = WorkflowTemplate.objects.create(
++            workflow_type=self.workflow_type,
++            code="synthetic-admin-template",
++            name="الگوی آزمایشی ثبت‌شده",
++            configuration=valid_configuration(),
++        )
++        response = self.client.post(
++            reverse("workflows:version_edit", args=[version.pk]),
++            {"template": str(template.pk)},
++        )
++        self.assertEqual(response.status_code, 302)
++        version.refresh_from_db()
++        self.assertEqual(version.status, "draft")
++        self.assertEqual(version.steps.count(), len(template.configuration["steps"]))
++        self.assertEqual(
++            version.transitions.count(), len(template.configuration["transitions"])
++        )
++        self.assertEqual(
++            version.steps.get(key="decision").configuration, {"decision_policy": "any"}
++        )
++        self.assertEqual(
++            version.routing_rules.get().resolver_type, "organization_owner"
++        )
++        self.assertEqual(
++            version.transitions.get(outcome="approved").domain_command,
++            "procurement.purchase_request.approve",
++        )
++        foreign_type = WorkflowType.objects.exclude(pk=self.workflow_type.pk).first()
++        foreign_template = WorkflowTemplate.objects.create(
++            workflow_type=foreign_type,
++            code="foreign-type",
++            name="Other type",
++            configuration={"steps": [], "transitions": []},
++        )
++        self.assertEqual(
++            self.client.post(
++                reverse("workflows:version_edit", args=[version.pk]),
++                {"template": str(foreign_template.pk)},
++            ).status_code,
++            400,
++        )
++        # Removing active template availability cannot mutate the stored graph.
++        template.is_active = False
++        template.save()
++        graph = configuration_payload(version)
++        response = self.client.post(
++            reverse("workflows:version_edit", args=[version.pk]),
++            {"template": str(template.pk), "configuration": "{}"},
++        )
++        self.assertEqual(response.status_code, 400)
++        self.assertEqual(configuration_payload(version), graph)
++
++    def test_complete_lifecycle_uses_existing_services_and_preserves_old_graph(self):
++        response = self.client.post(
++            reverse("workflows:definition_create"),
++            {
++                "workflow_type": str(self.workflow_type.pk),
++                "code": "purchase-ui",
++                "name": "گردش‌کار خرید",
++                "scope": "{}",
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        version = WorkflowVersion.objects.get(organization=self.organization)
++        self.assertEqual(WorkflowInstance.objects.count(), 0)
++        edit = reverse("workflows:version_edit", args=[version.pk])
++        self.assertEqual(
++            self.client.post(
++                edit, {"configuration": json.dumps(valid_configuration())}
++            ).status_code,
++            302,
++        )
++        self.assertEqual(self.action(version, "validate").status_code, 302)
++        version.refresh_from_db()
++        self.assertEqual(version.validation_report, [])
++        self.assertIsNotNone(version.validated_at)
++        self.assertEqual(self.action(version, "publish").status_code, 302)
++        old_graph = configuration_payload(version)
++        self.assertEqual(self.client.get(edit).status_code, 403)
++        self.assertEqual(
++            self.client.post(edit, {"configuration": "{}"}).status_code, 403
++        )
++        self.assertEqual(
++            self.action(version, "new-draft", reason="اصلاح نسخه").status_code, 302
++        )
++        new = WorkflowVersion.objects.get(
++            organization=self.organization, version_number=2
++        )
++        self.assertEqual(
++            new.steps.count(), 0
++        )  # Existing service creates an empty draft.
++        edit_workflow_draft(
++            actor=self.owner,
++            organization=self.organization,
++            version_id=new.pk,
++            configuration=valid_configuration(),
++        )
++        self.assertEqual(self.action(new, "supersede").status_code, 400)
++        self.assertEqual(
++            self.action(new, "supersede", reason="نسخهٔ جایگزین").status_code, 302
++        )
++        version.refresh_from_db()
++        new.refresh_from_db()
++        self.assertEqual(version.status, "retired")
++        self.assertEqual(new.status, "published")
++        self.assertEqual(configuration_payload(version), old_graph)
++        self.assertEqual(
++            self.action(new, "retire", reason="پایان استفاده").status_code, 302
++        )
++        new.refresh_from_db()
++        self.assertEqual(new.status, "retired")
++        self.assertTrue(
++            AuditEvent.objects.filter(
++                action=AuditAction.WORKFLOW_VERSION_PUBLISHED
++            ).exists()
++        )
++        self.assertEqual(WorkflowInstance.objects.count(), 0)
++
++    def test_read_only_lifecycle_forms_and_navigation_do_not_mutate(self):
++        version = self.draft()
++        before = (
++            WorkflowDefinition.objects.count(),
++            WorkflowVersion.objects.count(),
++            AuditEvent.objects.count(),
++        )
++        for route, args in [
++            ("definition_list", []),
++            ("version_detail", [version.pk]),
++            ("version_edit", [version.pk]),
++        ]:
++            response = self.client.get(reverse("workflows:" + route, args=args))
++            self.assertContains(response, 'data-workspace-id="WS-19"')
++            self.assertContains(response, 'data-nav-id="NAV-039"')
++            markup = response.content.decode()
++            self.assertIn(
++                "is-active",
++                markup.split('data-nav-id="NAV-039"', 1)[1].split("</a>", 1)[0],
++            )
++            self.assertNotIn(
++                "is-active",
++                markup.split('data-nav-id="NAV-003"', 1)[1].split("</a>", 1)[0],
++            )
++        for action in ("validate", "publish", "retire", "supersede", "new-draft"):
++            self.assertEqual(
++                self.client.get(
++                    reverse("workflows:version_action", args=[version.pk, action])
++                ).status_code,
++                200,
++            )
++        self.assertEqual(
++            before,
++            (
++                WorkflowDefinition.objects.count(),
++                WorkflowVersion.objects.count(),
++                AuditEvent.objects.count(),
++            ),
++        )
++
++    def test_permissions_are_independent_and_direct_actions_fail_closed(self):
++        version = self.draft()
++        actor, _ = self.reader()
++        self.login(actor)
++        response = self.client.get(
++            reverse("workflows:version_detail", args=[version.pk])
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertNotContains(
++            response, reverse("workflows:version_edit", args=[version.pk])
++        )
++        for action in ("validate", "publish", "retire", "supersede", "new-draft"):
++            self.assertEqual(
++                self.action(version, action, reason="Denied").status_code, 403
++            )
++        self.assertEqual(
++            self.client.post(reverse("workflows:definition_create"), {}).status_code,
++            403,
++        )
++        self.assertEqual(
++            self.client.post(
++                reverse("workflows:version_edit", args=[version.pk]), {}
++            ).status_code,
++            403,
++        )
++        for superuser in (False, True):
++            denied, _ = self.reader(codes=(), superuser=superuser)
++            self.login(denied)
++            self.assertEqual(
++                self.client.get(reverse("workflows:definition_list")).status_code, 403
++            )
++        PlatformRoleAssignment.objects.create(
++            user=actor,
++            role="platform_admin",
++            assigned_by=self.owner,
++            approved_by=self.owner,
++            reason="Explicit synthetic platform authority",
++        )
++        self.login(actor)
++        self.assertEqual(
++            self.client.get(reverse("workflows:definition_list")).status_code, 200
++        )
++        # Platform authority did not expand the same reader's business capability.
++        self.assertEqual(self.action(version, "publish").status_code, 403)
++
++    def test_cross_tenant_objects_and_selected_context_do_not_expand_authority(self):
++        foreign = self.draft(foreign=True)
++        for target in (foreign.pk, uuid4()):
++            for route in ("version_detail", "version_edit"):
++                response = self.client.get(reverse("workflows:" + route, args=[target]))
++                self.assertEqual(response.status_code, 404)
++                self.assertNotContains(
++                    response, foreign.definition.name, status_code=404
++                )
++            self.assertEqual(
++                self.client.post(
++                    reverse("workflows:version_action", args=[target, "publish"])
++                ).status_code,
++                404,
++            )
++        actor, membership = self.reader()
++        membership.scope_grants.all().delete()
++        self.login(actor)
++        response = self.client.get(
++            reverse("workflows:definition_list"),
++            {"organization": str(self.other_organization.pk), "project": str(uuid4())},
++        )
++        self.assertEqual(response.status_code, 403)
++
++    def test_invalid_configuration_and_failed_publication_preserve_draft(self):
++        version = self.draft()
++        edit = reverse("workflows:version_edit", args=[version.pk])
++        self.assertEqual(
++            self.client.post(edit, {"configuration": "["}).status_code, 400
++        )
++        bad = deepcopy(valid_configuration())
++        bad["steps"][1]["configuration"] = {"python": "do_something()"}
++        self.assertEqual(
++            self.client.post(edit, {"configuration": json.dumps(bad)}).status_code, 400
++        )
++        self.assertEqual(version.steps.count(), 0)
++        self.assertEqual(self.action(version, "publish").status_code, 400)
++        version.refresh_from_db()
++        self.assertEqual(version.status, "draft")
++        self.assertEqual(self.action(version, "validate").status_code, 302)
++        response = self.client.get(
++            reverse("workflows:version_detail", args=[version.pk])
++        )
++        self.assertContains(response, "دقیقاً یک گام شروع")
++
++    def test_invalid_nested_fields_and_routing_targets_have_neutral_errors(self):
++        version = self.draft()
++        edit = reverse("workflows:version_edit", args=[version.pk])
++        invalid_key = valid_configuration()
++        invalid_key["steps"][1]["key"] = "invalid key!"
++        for transition in invalid_key["transitions"]:
++            if transition["source"] == "decision":
++                transition["source"] = "invalid key!"
++            if transition["target"] == "decision":
++                transition["target"] = "invalid key!"
++        self.assertEqual(
++            self.client.post(
++                edit, {"configuration": json.dumps(invalid_key)}
++            ).status_code,
++            400,
++        )
++        foreign_membership = self.other_organization.memberships.get(user=self.other)
++        for target in (foreign_membership.pk, uuid4()):
++            config = valid_configuration()
++            config["steps"][1]["routing"] = [
++                {
++                    "resolver_type": "explicit_membership",
++                    "configuration": {"membership_id": str(target)},
++                }
++            ]
++            response = self.client.post(edit, {"configuration": json.dumps(config)})
++            self.assertContains(
++                response, "هدف مسیریابی در این شرکت معتبر نیست.", status_code=400
++            )
++            self.assertNotContains(response, "متعلق به سازمان دیگری", status_code=400)
++
++    def test_history_dates_are_jalali_and_untrusted_names_are_escaped(self):
++        version = self.draft()
++        WorkflowVersion.objects.filter(pk=version.pk).update(
++            updated_at=datetime(2026, 1, 5, 12, tzinfo=UTC)
++        )
++        config = valid_configuration()
++        config["steps"][0]["name"] = "<script>alert('test')</script>"
++        edit_workflow_draft(
++            actor=self.owner,
++            organization=self.organization,
++            version_id=version.pk,
++            configuration=config,
++        )
++        WorkflowVersion.objects.filter(pk=version.pk).update(
++            updated_at=datetime(2026, 1, 5, 12, tzinfo=UTC)
++        )
++        response = self.client.get(
++            reverse("workflows:version_detail", args=[version.pk])
++        )
++        self.assertContains(response, "1404/10/15")
++        self.assertContains(response, "&lt;script&gt;")
++        self.assertNotContains(response, "<script>alert('test')</script>")
++
++    def test_creation_validates_tenant_scope_and_neutral_duplicate_error(self):
++        project = Project.objects.create(
++            organization=self.other_organization, code="FOREIGN", name="Secret"
++        )
++        data = {
++            "workflow_type": str(self.workflow_type.pk),
++            "code": "scoped",
++            "name": "Scoped",
++        }
++        for scope in (
++            {"project_id": str(project.pk)},
++            {"project_id": str(uuid4())},
++            {"organization_id": str(self.other_organization.pk)},
++            [],
++        ):
++            response = self.client.post(
++                reverse("workflows:definition_create"),
++                {**data, "scope": json.dumps(scope)},
++            )
++            self.assertEqual(response.status_code, 400)
++            self.assertNotContains(response, "Secret", status_code=400)
++        self.assertEqual(
++            WorkflowDefinition.objects.filter(organization=self.organization).count(), 0
++        )
++        for expected in (302, 400):
++            response = self.client.post(
++                reverse("workflows:definition_create"), {**data, "scope": "{}"}
++            )
++            self.assertEqual(response.status_code, expected)
++
++    def test_empty_csrf_and_inactive_tenant_states(self):
++        response = self.client.get(reverse("workflows:definition_list"))
++        self.assertContains(response, "تعریف گردش‌کاری در این شرکت ثبت نشده")
++        version = self.draft()
++        csrf_client = Client(enforce_csrf_checks=True)
++        csrf_client.force_login(self.owner)
++        session = csrf_client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        self.assertEqual(
++            csrf_client.post(
++                reverse("workflows:version_action", args=[version.pk, "publish"])
++            ).status_code,
++            403,
++        )
++        self.organization.status = "suspended"
++        self.organization.save(update_fields=["status"])
++        self.assertEqual(self.action(version, "publish").status_code, 403)
+--- /dev/null
++++ b/apps/workflows/test_cep046_browser.py
+@@ -0,0 +1,140 @@
++"""Bounded synthetic screenshots for tenant workflow administration."""
++
++import json
++import os
++import subprocess
++from pathlib import Path
++from unittest import skipUnless
++
++from django.contrib.staticfiles.testing import StaticLiveServerTestCase
++from django.urls import reverse
++
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.organizations.models import (
++    Organization,
++    OrganizationRole,
++    OrganizationSettings,
++)
++
++from .models import WorkflowTemplate
++from .services import (
++    edit_workflow_draft,
++    publish_workflow_version,
++    validate_workflow_draft,
++)
++from .test_cep046_administration import AdministrationFixture
++from .tests import valid_configuration
++
++
++@skipUnless(
++    os.getenv("BONIRA_CEP046_SCREENSHOTS"), "Explicit local screenshot run only"
++)
++class AdministrationBrowserTests(AdministrationFixture, StaticLiveServerTestCase):
++    def setUp(self):
++        super().setUp()
++        self.workflow_type.name = "تأیید درخواست خرید"
++        self.workflow_type.save(update_fields=["name"])
++        WorkflowTemplate.objects.create(
++            workflow_type=self.workflow_type,
++            code="synthetic-ui-starter",
++            name="الگوی آزمایشی تأیید خرید",
++            configuration=valid_configuration(),
++        )
++
++    def organization_factory(self, *, owner, name, slug):
++        # Explicit empty synthetic tenant. Production organization creation seeds
++        # compatibility workflows on_commit; those services are not changed here.
++        organization = Organization.objects.create(
++            name=name, slug=slug, created_by=owner, updated_by=owner
++        )
++        OrganizationSettings.objects.create(organization=organization)
++        role = OrganizationRole.objects.get(code="company_owner")
++        membership = organization.memberships.create(
++            user=owner, role_definition=role, role=role.code, status="active"
++        )
++        explicit_fixture_authority(membership, role)
++        return organization
++
++    def probe(self, cases):
++        root = Path(__file__).resolve().parents[2]
++        evidence = root / "docs/governance/cep/evidence"
++        result = subprocess.run(
++            [
++                "node",
++                str(evidence / "CEP-046_BROWSER_PROBE.mjs"),
++                self.live_server_url,
++                json.dumps(cases),
++                str(evidence / "CEP-046_SCREENSHOTS"),
++            ],
++            env={
++                **os.environ,
++                "CEP046_TEST_SESSION": self.client.cookies["sessionid"].value,
++            },
++            capture_output=True,
++            text=True,
++            encoding="utf-8",
++            timeout=90,
++            check=False,
++        )
++        self.assertEqual(result.returncode, 0, result.stderr[-2500:])
++        return json.loads(result.stdout)
++
++    def test_synthetic_admin_surfaces_history_error_mobile_and_denied(self):
++        def case(name, route, *args, status=200, mobile=False):
++            return {
++                "name": name,
++                "path": reverse("workflows:" + route, args=args),
++                "workspace": "WS-19" if status == 200 else "",
++                "status": status,
++                "mobile": mobile,
++            }
++
++        observations = self.probe(
++            [
++                case("empty-list", "definition_list"),
++                case("definition-create", "definition_create"),
++            ]
++        )
++        version = self.draft()
++        kwargs = {
++            "actor": self.owner,
++            "organization": self.organization,
++            "version_id": version.pk,
++        }
++        validate_workflow_draft(**kwargs)
++        observations += self.probe(
++            [case("validation-errors", "version_detail", version.pk)]
++        )
++        edit_workflow_draft(**kwargs, configuration=valid_configuration())
++        observations += self.probe([case("draft-editor", "version_edit", version.pk)])
++        publish_workflow_version(**kwargs)
++        observations += self.probe(
++            [
++                case("published-history", "version_detail", version.pk),
++                case("mobile-list", "definition_list", mobile=True),
++            ]
++        )
++        foreign = self.draft(foreign=True)
++        observations += self.probe(
++            [case("foreign-object", "version_detail", foreign.pk, status=404)]
++        )
++        denied, _ = self.reader(codes=())
++        self.login(denied)
++        observations += self.probe(
++            [case("unauthorized-list", "definition_list", status=403)]
++        )
++        root = Path(__file__).resolve().parents[2]
++        (
++            root / "docs/governance/cep/evidence/CEP-046_BROWSER_OBSERVATIONS.json"
++        ).write_text(
++            json.dumps(
++                {
++                    "environment": "Isolated synthetic StaticLiveServer / Chrome; no production data",
++                    "observations": observations,
++                    "runtime_certification": False,
++                },
++                indent=2,
++            )
++            + "\n",
++            "utf-8",
++        )
+--- /dev/null
++++ b/apps/workflows/test_cep046_regression.py
+@@ -0,0 +1,44 @@
++"""Legacy runtime/workbench scenarios with explicit current fixture authority."""
++
++from unittest.mock import patch
++
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.organizations.models import OrganizationMembership
++
++from . import test_runtime, test_workbench
++
++
++class ExplicitMembershipFixture:
++    def setUp(self):
++        original_save = OrganizationMembership.save
++        manager = OrganizationMembership.objects
++        original_bulk_create = manager.bulk_create
++
++        def assigned_save(membership, *args, **kwargs):
++            creating = membership._state.adding
++            result = original_save(membership, *args, **kwargs)
++            if creating:
++                explicit_fixture_authority(membership, membership.role_definition)
++            return result
++
++        def assigned_bulk_create(*args, **kwargs):
++            created = original_bulk_create(*args, **kwargs)
++            for membership in created:
++                explicit_fixture_authority(membership, membership.role_definition)
++            return created
++
++        for patcher in (
++            patch.object(OrganizationMembership, "save", assigned_save),
++            patch.object(manager, "bulk_create", assigned_bulk_create),
++        ):
++            patcher.start()
++            self.addCleanup(patcher.stop)
++        super().setUp()
++
++
++class RuntimeRegression(ExplicitMembershipFixture, test_runtime.WorkflowRuntimeTests):
++    pass
++
++
++class WorkbenchRegression(ExplicitMembershipFixture, test_workbench.WorkbenchTests):
++    pass
+diff --git a/apps/workflows/urls.py b/apps/workflows/urls.py
+index 76f7d31..697368e 100644
+--- a/apps/workflows/urls.py
++++ b/apps/workflows/urls.py
+@@ -1,10 +1,33 @@
+ from django.urls import path
+ 
+-from . import views
++from . import administration_views, views
+ 
+ app_name = "workflows"
+ 
+ urlpatterns = [
++    path(
++        "administration/", administration_views.definition_list, name="definition_list"
++    ),
++    path(
++        "administration/new/",
++        administration_views.definition_create,
++        name="definition_create",
++    ),
++    path(
++        "administration/versions/<uuid:version_id>/",
++        administration_views.version_detail,
++        name="version_detail",
++    ),
++    path(
++        "administration/versions/<uuid:version_id>/edit/",
++        administration_views.version_edit,
++        name="version_edit",
++    ),
++    path(
++        "administration/versions/<uuid:version_id>/<str:action>/",
++        administration_views.version_action,
++        name="version_action",
++    ),
+     path("workbench/", views.workbench, name="workbench"),
+     path("my-requests/", views.my_requests, name="my_requests"),
+     path("manager/", views.manager_workspace, name="manager_workspace"),
+diff --git a/core/test_cep017_navigation.py b/core/test_cep017_navigation.py
+index 4ec4dac..e2ef554 100644
+--- a/core/test_cep017_navigation.py
++++ b/core/test_cep017_navigation.py
+@@ -42,7 +42,6 @@ class Cep017NavigationTemplateTests(SimpleTestCase):
+             "NAV-013",
+             "NAV-015",
+             "NAV-019",
+-            "NAV-039",
+         ):
+             marker = f'data-nav-id="{node_id}"'
+             fragment = navigation[
+diff --git a/templates/components/navigation_links.html b/templates/components/navigation_links.html
+index 30313d0..69d5d21 100644
+--- a/templates/components/navigation_links.html
++++ b/templates/components/navigation_links.html
+@@ -2,7 +2,7 @@
+ <nav class="erp-nav" aria-label="ناوبری اصلی" data-canonical-navigation="43">
+     <a data-nav-id="NAV-001" class="erp-nav-link{% if current_url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">خانه</a>
+     <details data-nav-id="NAV-002" class="erp-nav-group" open><summary><span>کار من</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+-        {% if "work_items.view" in business_permission_codes %}<a data-nav-id="NAV-003" class="erp-nav-link{% if current_namespace == 'workflows' %} is-active{% endif %}" href="{% url 'workflows:workbench' %}">وظایف من</a>{% endif %}
++        {% if "work_items.view" in business_permission_codes %}<a data-nav-id="NAV-003" class="erp-nav-link{% if current_namespace == 'workflows' and current_url_name == 'workbench' %} is-active{% endif %}" href="{% url 'workflows:workbench' %}">وظایف من</a>{% endif %}
+         {% if my_requests_workspace_available %}<a data-nav-id="NAV-004" class="erp-nav-link{% if current_namespace == 'workflows' and current_url_name == 'my_requests' %} is-active{% endif %}" href="{% url 'workflows:my_requests' %}">درخواست‌های من</a>{% else %}<span data-nav-id="NAV-004" class="erp-nav-link is-unavailable" aria-disabled="true">درخواست‌های من</span>{% endif %}
+         {% if manager_workspace_available %}<a class="erp-nav-link{% if current_namespace == 'workflows' and current_url_name == 'manager_workspace' %} is-active{% endif %}" href="{% url 'workflows:manager_workspace' %}">فضای مدیر</a>{% endif %}
+         {% if "support.notifications_view" in business_permission_codes %}<a data-nav-id="NAV-005" class="erp-nav-link{% if current_namespace == 'support' and current_url_name == 'notifications' %} is-active{% endif %}" href="{% url 'support:notifications' %}">اعلان‌ها</a>{% endif %}
+@@ -45,7 +45,7 @@
+     <details data-nav-id="NAV-035" class="erp-nav-group" open><summary><span>تجهیزات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">{% if "equipment_operations.view" in business_permission_codes or "equipment.view" in business_permission_codes %}<a data-nav-id="NAV-036" data-workspace-id="WS-15A" class="erp-nav-link{% if current_namespace == 'equipment' %} is-active{% endif %}" href="{% if 'equipment_operations.view' in business_permission_codes %}{% url 'equipment:operations_workbench' %}{% else %}{% url 'equipment:list' %}{% endif %}">تجهیزات عملیاتی</a>{% endif %}</div></details>
+     {% if "reporting.metric_result.view" in business_permission_codes %}<a data-nav-id="NAV-037" class="erp-nav-link{% if current_namespace == 'reporting' %} is-active{% endif %}" href="{% url 'reporting:dashboard' %}">گزارش‌ها</a>{% endif %}
+     <details data-nav-id="NAV-038" class="erp-nav-group" open><summary><span>مدیریت سامانه</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+-        <span data-nav-id="NAV-039" class="erp-nav-link is-unavailable" aria-disabled="true">گردش‌کارها</span>
++        {% if "workflows.view" in business_permission_codes %}<a data-nav-id="NAV-039" data-workspace-id="WS-19" class="erp-nav-link{% if current_namespace == 'workflows' and current_url_name != 'workbench' and current_url_name != 'my_requests' and current_url_name != 'manager_workspace' %} is-active{% endif %}" href="{% url 'workflows:definition_list' %}">مدیریت گردش‌کارها</a>{% endif %}
+         {% if "company.settings.view" in business_permission_codes %}<a data-nav-id="NAV-040" class="erp-nav-link{% if current_namespace == 'organizations' and current_url_name == 'settings' %} is-active{% endif %}" href="{% url 'organizations:settings' %}">پیکربندی و داده‌های پایه</a>{% endif %}
+         {% if party_governance_available %}<a data-nav-id="NAV-043" class="erp-nav-link{% if current_namespace == 'parties' and party_governance_surface %} is-active{% endif %}" href="{% url 'parties:governance' %}">حاکمیت طرف‌های تجاری</a>{% endif %}
+     </div></details>
+--- /dev/null
++++ b/templates/workflows/administration/detail.html
+@@ -0,0 +1,30 @@
++{% extends "base.html" %}{% load erp_format %}
++{% block title %}{{ version.definition.name }} | گردش‌کار{% endblock %}
++{% block content %}
++<div data-workspace-id="WS-19">
++{% include "components/page_header.html" with page_eyebrow="مدیریت گردش‌کارها" page_title=version.definition.name page_description=version.definition.description only %}
++<p class="mt-3 text-sm">نسخه {{ version.version_number }} · {{ version.get_status_display }} · {{ version.definition.workflow_type.name }}</p>
++<div class="mt-4 flex flex-wrap gap-3"><a class="erp-btn erp-btn--secondary" href="{% url 'workflows:definition_list' %}">فهرست تعریف‌ها</a>
++{% if version.status == 'draft' %}
++{% if "workflows.change_draft" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_edit' version.id %}">ویرایش پیش‌نویس</a><a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'validate' %}">اعتبارسنجی</a>{% endif %}
++{% if "workflows.publish" in business_permission_codes %}{% if has_published %}<a class="erp-btn erp-btn--primary" href="{% url 'workflows:version_action' version.id 'supersede' %}">جایگزینی نسخهٔ منتشرشده</a>{% else %}<a class="erp-btn erp-btn--primary" href="{% url 'workflows:version_action' version.id 'publish' %}">انتشار</a>{% endif %}{% endif %}
++{% else %}{% if "workflows.change_draft" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'new-draft' %}">نسخهٔ پیش‌نویس جدید</a>{% endif %}
++{% if version.status == 'published' and "workflows.retire" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'retire' %}">بازنشستگی</a>{% endif %}{% endif %}
++</div>
++<div class="mt-5 grid gap-5 lg:grid-cols-2">
++<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">تاریخچهٔ نسخه و اعتبارسنجی</h2>
++<p class="mt-3 break-words text-sm" dir="ltr">{{ version.definition.code }} · {{ version.definition.workflow_type.code }}</p>
++<h3 class="mt-4 font-semibold">محدودهٔ انتخاب</h3><ul class="mt-2 space-y-2 text-sm">{% for key,value in version.definition.scope.items %}<li class="break-all" dir="ltr">{{ key }}: {{ value }}</li>{% empty %}<li>محدودهٔ عمومی شرکت</li>{% endfor %}</ul>
++<dl class="mt-3 space-y-3 text-sm"><div><dt>آخرین تغییر</dt><dd>{{ version.updated_at|jalali_datetime }}</dd></div><div><dt>خلاصه تغییر</dt><dd>{{ version.change_summary|default:"—" }}</dd></div>
++<div><dt>اعتبارسنجی</dt><dd>{{ version.validated_at|jalali_datetime|default:"انجام نشده" }}</dd></div>
++{% if version.published_at %}<div><dt>انتشار</dt><dd>{{ version.published_at|jalali_datetime }} · {{ version.published_by }}</dd></div>{% endif %}
++{% if version.retired_at %}<div><dt>بازنشستگی</dt><dd>{{ version.retired_at|jalali_datetime }} · {{ version.retired_by }}</dd></div>{% endif %}</dl>
++<ul class="mt-3 space-y-2" role="status">{% for issue in validation_report %}<li class="text-sm text-red-700">{{ issue.message }}</li>{% empty %}<li class="text-sm text-slate-500">{% if version.validated_at %}اعتبارسنجی ثبت‌شده بدون خطاست.{% else %}هنوز گزارش اعتبارسنجی ثبت نشده است.{% endif %}</li>{% endfor %}</ul>
++<h3 class="mt-5 font-bold">همهٔ نسخه‌های این تعریف</h3><ul class="mt-3 space-y-2">{% for item in siblings %}<li><a class="text-sm text-blue-700" href="{% url 'workflows:version_detail' item.id %}">نسخه {{ item.version_number }} · {{ item.get_status_display }}</a></li>{% endfor %}</ul>
++</section>
++<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">گام‌ها و انتقال‌های ثبت‌شده</h2>
++<ul class="mt-3 space-y-3">{% for step in configuration.steps %}<li class="rounded-lg border border-slate-200 p-3 text-sm"><span class="font-semibold">{{ step.name }}</span><span class="ms-2" dir="ltr">{{ step.key }} · {{ step.step_type }}</span></li>{% empty %}<li class="text-sm text-slate-500">گامی ثبت نشده است.</li>{% endfor %}</ul>
++<ul class="mt-4 space-y-2">{% for item in configuration.transitions %}<li class="break-words rounded-lg bg-slate-50 p-3 text-sm" dir="ltr">{{ item.source }} → {{ item.target }} · {{ item.outcome }}</li>{% empty %}<li class="text-sm text-slate-500">انتقالی ثبت نشده است.</li>{% endfor %}</ul>
++</section></div>
++<details class="erp-surface mt-5 min-w-0 rounded-xl p-5"><summary class="cursor-pointer font-bold">پیکربندی کامل ثبت‌شدهٔ این نسخه</summary><pre class="mt-4 max-w-full overflow-x-auto whitespace-pre-wrap break-all text-xs" dir="ltr">{{ configuration_text }}</pre></details>
++</div>{% endblock %}
+--- /dev/null
++++ b/templates/workflows/administration/form.html
+@@ -0,0 +1,18 @@
++{% extends "base.html" %}
++{% block title %}{{ page_title }}{% endblock %}
++{% block content %}
++<div data-workspace-id="WS-19" class="max-w-4xl">
++{% include "components/page_header.html" with page_eyebrow="مدیریت گردش‌کارها" page_title=page_title only %}
++<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'workflows:definition_list' %}">فهرست تعریف‌ها</a>
++{% if version %}<p class="mt-4 text-sm">{{ version.definition.name }} · نسخه {{ version.version_number }} · {{ version.get_status_display }}</p>{% endif %}
++<form method="post" class="erp-surface mt-5 space-y-5 rounded-xl p-5">
++{% csrf_token %}{% include "components/form_errors.html" with form=form only %}
++{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
++<button class="erp-btn erp-btn--primary" type="submit">تأیید و ثبت</button>
++</form>
++{% if registered_step_types %}<details class="erp-surface mt-5 rounded-xl p-5"><summary class="cursor-pointer font-bold">گزینه‌های ثبت‌شدهٔ پیکربندی</summary>
++<p class="mt-3 text-sm text-slate-600">پیکربندی شامل گام‌ها (steps) و انتقال‌ها (transitions) است. انتخاب‌ها و قواعد موجود هنگام ذخیره و انتشار اعتبارسنجی می‌شوند؛ محتوای اجرایی مجاز نیست.</p>
++<p class="mt-3 break-words text-sm" dir="ltr">{{ registered_step_types|join:", " }}</p>
++<p class="mt-3 text-sm font-semibold">مسیریاب‌های ثبت‌شده</p><p class="mt-2 break-words text-sm" dir="ltr">{{ registered_resolvers|join:", " }}</p>
++</details>{% endif %}
++</div>{% endblock %}
+--- /dev/null
++++ b/templates/workflows/administration/list.html
+@@ -0,0 +1,14 @@
++{% extends "base.html" %}{% load erp_format %}
++{% block title %}مدیریت گردش‌کارها{% endblock %}
++{% block content %}
++<div data-workspace-id="WS-19">
++{% include "components/page_header.html" with page_eyebrow="مدیریت شرکت" page_title="تعریف‌ها و نسخه‌های گردش‌کار" page_description="مدیریت نسخه‌های شرکت فعال؛ مرجع اجرا و اعتبارسنجی، حوزهٔ گردش‌کار است." only %}
++{% if "workflows.create" in business_permission_codes %}<a class="erp-btn erp-btn--primary mt-4" href="{% url 'workflows:definition_create' %}">ایجاد تعریف</a>{% endif %}
++<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-bold">نسخه‌ها</h2>
++<ul class="mt-4 space-y-3">{% for version in versions %}<li class="rounded-lg border border-slate-200 p-4">
++<a class="font-semibold text-blue-700" href="{% url 'workflows:version_detail' version.id %}">{{ version.definition.name }} · نسخه {{ version.version_number }}</a>
++<p class="mt-2 text-sm text-slate-600">{{ version.get_status_display }} · {{ version.definition.workflow_type.name }}</p>
++<p class="mt-1 text-xs text-slate-500">آخرین تغییر: {{ version.updated_at|jalali_datetime }}</p>
++</li>{% empty %}<li class="text-sm text-slate-500">تعریف گردش‌کاری در این شرکت ثبت نشده است.</li>{% endfor %}</ul>
++</section></div>
++{% endblock %}

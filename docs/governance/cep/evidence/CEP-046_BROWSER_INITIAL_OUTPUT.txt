@@ -1,0 +1,32 @@
+.........F                                                               [100%]
+================================== FAILURES ===================================
+_ AdministrationBrowserTests.test_synthetic_admin_surfaces_history_error_mobile_and_denied _
+apps\workflows\test_cep046_browser.py:65: in test_synthetic_admin_surfaces_history_error_mobile_and_denied
+    version = self.draft()
+              ^^^^^^^^^^^^
+apps\workflows\test_cep046_administration.py:47: in draft
+    return create_workflow_draft(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\services.py:86: in create_workflow_draft
+    definition.save()
+apps\workflows\models.py:201: in save
+    self.full_clean()
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'__all__': ['\u200fWorkflow definition با این Organization،Workflow type و کلید محدوده وجود دارد.']}
+---------------------------- Captured stderr call -----------------------------
+[19/Oct/2026 05:16:18,087] - Broken pipe from ('127.0.0.1', 58427)
+[19/Oct/2026 05:16:18,087] - Broken pipe from ('127.0.0.1', 51849)
+[19/Oct/2026 05:16:18,088] - Broken pipe from ('127.0.0.1', 64840)
+[19/Oct/2026 05:16:18,088] - Broken pipe from ('127.0.0.1', 52049)
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Not Found: /favicon.ico
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 58427)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 51849)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 64840)
+INFO     django.server:basehttp.py:81 - Broken pipe from ('127.0.0.1', 52049)
+=========================== short test summary info ===========================
+FAILED apps/workflows/test_cep046_browser.py::AdministrationBrowserTests::test_synthetic_admin_surfaces_history_error_mobile_and_denied
+1 failed, 9 passed in 30.95s

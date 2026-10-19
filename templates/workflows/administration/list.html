@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}مدیریت گردش‌کارها{% endblock %}
+{% block content %}
+<div data-workspace-id="WS-19">
+{% include "components/page_header.html" with page_eyebrow="مدیریت شرکت" page_title="تعریف‌ها و نسخه‌های گردش‌کار" page_description="مدیریت نسخه‌های شرکت فعال؛ مرجع اجرا و اعتبارسنجی، حوزهٔ گردش‌کار است." only %}
+{% if "workflows.create" in business_permission_codes %}<a class="erp-btn erp-btn--primary mt-4" href="{% url 'workflows:definition_create' %}">ایجاد تعریف</a>{% endif %}
+<section class="erp-surface mt-5 rounded-xl p-5"><h2 class="font-bold">نسخه‌ها</h2>
+<ul class="mt-4 space-y-3">{% for version in versions %}<li class="rounded-lg border border-slate-200 p-4">
+<a class="font-semibold text-blue-700" href="{% url 'workflows:version_detail' version.id %}">{{ version.definition.name }} · نسخه {{ version.version_number }}</a>
+<p class="mt-2 text-sm text-slate-600">{{ version.get_status_display }} · {{ version.definition.workflow_type.name }}</p>
+<p class="mt-1 text-xs text-slate-500">آخرین تغییر: {{ version.updated_at|jalali_datetime }}</p>
+</li>{% empty %}<li class="text-sm text-slate-500">تعریف گردش‌کاری در این شرکت ثبت نشده است.</li>{% endfor %}</ul>
+</section></div>
+{% endblock %}

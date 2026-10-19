@@ -1,0 +1,38 @@
+{
+  "baseline": {
+    "result": "14 PASS,1 failed at tests.py171 before mutation",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "detail": "Default-grant/catalog assertions passed until missing historical WorkflowTemplate in reused test DB. No production grant defect inferred or modified."
+  },
+  "initial_focused": "7 PASS",
+  "initial_browser": {
+    "result": "9 PASS,1 failure",
+    "classification": "TEST INFRASTRUCTURE DEBT",
+    "detail": "Transaction/live-server fixture executes organization on_commit compatibility-workflow seeding; default-scope definition already exists. Use explicit empty synthetic tenant with existing role assignments and source catalogs; no production bootstrap change."
+  },
+  "initial_affected": {
+    "result": "33 PASS,18 failures",
+    "classification": "TEST INFRASTRUCTURE DEBT plus known baseline",
+    "detail": "Legacy runtime/workbench memberships (including bulk pools) omit current explicit role/scope assignments. New administration code not reached. Wrappers add intended existing role and scope at fixture creation only; production permissions, routing, identity, runtime and assertions unchanged."
+  },
+  "final_affected": {
+    "result": "47 PASS,4 failures",
+    "classification": "PROVEN BASELINE DEBT",
+    "failures": [
+      "Missing historical WorkflowTemplate (same clean baseline failure)",
+      "NAV019 prior RFQ unavailable-node assertion (prior045 clean baseline proof; unchanged source RFQ fragment)",
+      "Two workbench query-bound assertions80 >45; both reproduce exactly80 with pre046 route/navigation bytes and same current explicit fixture; source runtime/workbench/authorization unchanged"
+    ],
+    "proof": [
+      "CEP-046_BASELINE_OUTPUT.txt",
+      "CEP-045_BASELINE_OUTPUT.txt",
+      "CEP-046_QUERY_BASELINE_OUTPUT.txt",
+      "CEP-046_QUERY_BASELINE_PROVENANCE.json"
+    ],
+    "no_threshold_or_production_semantics_changed": true
+  },
+  "final_focused": "17 PASS",
+  "lint": "One test import ordering issue fixed; final lint/format PASS",
+  "visual_refinements": "Wrong My Tasks active highlight corrected; JSON pretty printed; explicit active same-type existing template selection. No lifecycle/approval semantics changed. Final screenshots repeated.",
+  "no_full_regression_or_runtime_certification_claim": true
+}

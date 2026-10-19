@@ -1,0 +1,212 @@
+F..........F...F..FFF...F...FFFFFFFFFF............F                      [100%]
+================================== FAILURES ===================================
+____ WorkflowFoundationTests.test_catalog_and_default_grants_are_migrated _____
+apps\workflows\tests.py:171: in test_catalog_and_default_grants_are_migrated
+    self.assertTrue(
+E   AssertionError: False is not true
+__ WorkflowRuntimeTests.test_claim_release_reassign_history_and_immutability __
+apps\workflows\test_runtime.py:712: in test_claim_release_reassign_history_and_immutability
+    item = reassign_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:1288: in reassign_work_item
+    raise PermissionDenied("عضویت مقصد دامنه مؤثر این کار را ندارد.")
+E   django.core.exceptions.PermissionDenied: عضویت مقصد دامنه مؤثر این کار را ندارد.
+__ WorkflowRuntimeTests.test_effective_delegation_adds_only_current_delegate __
+apps\workflows\test_runtime.py:611: in test_effective_delegation_adds_only_current_delegate
+    active = create_workflow_delegation(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:2172: in create_workflow_delegation
+    raise PermissionDenied(
+E   django.core.exceptions.PermissionDenied: دامنه واگذاری خارج از اختیار مؤثر یکی از عوامل است.
+_ WorkflowRuntimeTests.test_large_role_candidate_pool_is_deduplicated_with_bounded_queries _
+apps\workflows\test_runtime.py:994: in test_large_role_candidate_pool_is_deduplicated_with_bounded_queries
+    self.assertEqual(item.candidates.count(), 250)
+E   AssertionError: 0 != 250
+_ WorkflowRuntimeTests.test_large_tenant_publishes_multi_stage_position_and_separation_flow _
+apps\workflows\test_runtime.py:1113: in test_large_tenant_publishes_multi_stage_position_and_separation_flow
+    self.assertEqual(triage.candidates.count(), 101)
+E   AssertionError: 0 != 101
+_ WorkflowRuntimeTests.test_membership_role_team_and_record_context_resolvers _
+apps\workflows\test_runtime.py:427: in test_membership_role_team_and_record_context_resolvers
+    self.assertEqual(
+E   AssertionError: Lists differ: [] != [UUID('77131b40-dcb5-4904-8354-dcf95c11cd3e')]
+E   
+E   Second list contains 1 additional elements.
+E   First extra element 0:
+E   UUID('77131b40-dcb5-4904-8354-dcf95c11cd3e')
+E   
+E   - []
+E   + [UUID('77131b40-dcb5-4904-8354-dcf95c11cd3e')]
+_ WorkflowRuntimeTests.test_position_single_multi_and_multi_position_deduplication _
+apps\workflows\test_runtime.py:482: in test_position_single_multi_and_multi_position_deduplication
+    self.assertEqual(item.candidates.count(), 2)
+E   AssertionError: 1 != 2
+_ WorkflowRuntimeTests.test_two_person_starter_completes_without_workforce_structures _
+apps\workflows\test_runtime.py:340: in test_two_person_starter_completes_without_workforce_structures
+    self.assertEqual(
+E   AssertionError: Items in the second set but not the first:
+E   UUID('e342304f-1076-4a61-8ec5-f7bdd03bdf87')
+_ WorkflowRuntimeTests.test_unresolved_route_recovers_after_position_assignment _
+apps\workflows\test_runtime.py:548: in test_unresolved_route_recovers_after_position_assignment
+    recovered = recover_unresolved_work_item(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\workflows\runtime.py:965: in recover_unresolved_work_item
+    raise ValidationError("هنوز نامزد واجد شرایطی برای این کار وجود ندارد.")
+E   django.core.exceptions.ValidationError: ['هنوز نامزد واجد شرایطی برای این کار وجود ندارد.']
+________ WorkbenchTests.test_claim_release_action_stale_and_htmx_csrf _________
+apps\workflows\test_workbench.py:326: in test_claim_release_action_stale_and_htmx_csrf
+    purchase_request = self._submitted_request("WB-ACTION")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+_ WorkbenchTests.test_high_open_item_volume_keeps_page_and_query_count_bounded _
+apps\workflows\test_workbench.py:285: in test_high_open_item_volume_keeps_page_and_query_count_bounded
+    base = self._item(self._submitted_request("WB-W6-VOLUME"))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+_____ WorkbenchTests.test_multi_position_dedup_counts_states_and_filters ______
+apps\workflows\test_workbench.py:112: in test_multi_position_dedup_counts_states_and_filters
+    purchase_request = self._submitted_request("WB-FILTER")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+______ WorkbenchTests.test_pagination_responsive_context_and_query_bound ______
+apps\workflows\test_workbench.py:270: in test_pagination_responsive_context_and_query_bound
+    self._submitted_request(f"WB-PAGE-{index:02d}")
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+___ WorkbenchTests.test_role_permission_count_and_tab_use_routing_evidence ____
+apps\workflows\test_workbench.py:209: in test_role_permission_count_and_tab_use_routing_evidence
+    purchase_request = self._submitted_request("WB-ROLE-PERMISSION")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+___ WorkbenchTests.test_tenant_isolation_permissions_and_secure_source_link ___
+apps\workflows\test_workbench.py:65: in test_tenant_isolation_permissions_and_secure_source_link
+    own_request = self._submitted_request("WB-OWN")
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+______ WorkbenchTests.test_unprivileged_viewer_sees_no_mutation_controls ______
+apps\workflows\test_workbench.py:398: in test_unprivileged_viewer_sees_no_mutation_controls
+    purchase_request = self._submitted_request("WB-VIEWER")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+_______ WorkbenchTests.test_work_reserved_by_another_member_is_excluded _______
+apps\workflows\test_workbench.py:228: in test_work_reserved_by_another_member_is_excluded
+    purchase_request = self._submitted_request("WB-RESERVED")
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\workflows\test_workbench.py:36: in _submitted_request
+    purchase_request = create_purchase_request(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\procurement\services.py:268: in create_purchase_request
+    _require_role(
+apps\procurement\services.py:71: in _require_role
+    return require_business_permission(
+apps\organizations\authorization.py:437: in require_business_permission
+    raise PermissionDenied(message)
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد درخواست خرید در این سازمان را ندارید.
+_ Cep017NavigationTemplateTests.test_unimplemented_targets_are_not_links_or_new_actions _
+core\test_cep017_navigation.py:50: in test_unimplemented_targets_are_not_links_or_new_actions
+    self.assertIn('aria-disabled="true"', fragment)
+E   AssertionError: 'aria-disabled="true"' not found in 'data-nav-id="NAV-019" class="erp-nav-link{% if current_namespace == \'procurement\' %} is-active{% endif %}" href="{% url \'procurement:rfq_list\' %}">استعلام و انتخاب تأمین\u200cکننده</a>{% endif %}\n        <span data-nav-id="NA'
+=========================== short test summary info ===========================
+FAILED apps/workflows/tests.py::WorkflowFoundationTests::test_catalog_and_default_grants_are_migrated
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_claim_release_reassign_history_and_immutability
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_effective_delegation_adds_only_current_delegate
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_large_role_candidate_pool_is_deduplicated_with_bounded_queries
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_large_tenant_publishes_multi_stage_position_and_separation_flow
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_membership_role_team_and_record_context_resolvers
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_position_single_multi_and_multi_position_deduplication
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_two_person_starter_completes_without_workforce_structures
+FAILED apps/workflows/test_runtime.py::WorkflowRuntimeTests::test_unresolved_route_recovers_after_position_assignment
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_claim_release_action_stale_and_htmx_csrf
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_high_open_item_volume_keeps_page_and_query_count_bounded
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_multi_position_dedup_counts_states_and_filters
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_pagination_responsive_context_and_query_bound
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_role_permission_count_and_tab_use_routing_evidence
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_tenant_isolation_permissions_and_secure_source_link
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_unprivileged_viewer_sees_no_mutation_controls
+FAILED apps/workflows/test_workbench.py::WorkbenchTests::test_work_reserved_by_another_member_is_excluded
+FAILED core/test_cep017_navigation.py::Cep017NavigationTemplateTests::test_unimplemented_targets_are_not_links_or_new_actions
+18 failed, 33 passed in 65.49s (0:01:05)

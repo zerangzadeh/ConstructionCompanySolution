@@ -1,10 +1,33 @@
 from django.urls import path
 
-from . import views
+from . import administration_views, views
 
 app_name = "workflows"
 
 urlpatterns = [
+    path(
+        "administration/", administration_views.definition_list, name="definition_list"
+    ),
+    path(
+        "administration/new/",
+        administration_views.definition_create,
+        name="definition_create",
+    ),
+    path(
+        "administration/versions/<uuid:version_id>/",
+        administration_views.version_detail,
+        name="version_detail",
+    ),
+    path(
+        "administration/versions/<uuid:version_id>/edit/",
+        administration_views.version_edit,
+        name="version_edit",
+    ),
+    path(
+        "administration/versions/<uuid:version_id>/<str:action>/",
+        administration_views.version_action,
+        name="version_action",
+    ),
     path("workbench/", views.workbench, name="workbench"),
     path("my-requests/", views.my_requests, name="my_requests"),
     path("manager/", views.manager_workspace, name="manager_workspace"),

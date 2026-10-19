@@ -1,0 +1,14 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ WorkbenchRegression.test_high_open_item_volume_keeps_page_and_query_count_bounded _
+apps\workflows\test_workbench.py:323: in test_high_open_item_volume_keeps_page_and_query_count_bounded
+    self.assertLessEqual(len(queries), 45)
+E   AssertionError: 80 not less than or equal to 45
+___ WorkbenchRegression.test_pagination_responsive_context_and_query_bound ____
+apps\workflows\test_workbench.py:282: in test_pagination_responsive_context_and_query_bound
+    self.assertLessEqual(len(queries), 45)
+E   AssertionError: 80 not less than or equal to 45
+=========================== short test summary info ===========================
+FAILED apps/workflows/test_cep046_regression.py::WorkbenchRegression::test_high_open_item_volume_keeps_page_and_query_count_bounded
+FAILED apps/workflows/test_cep046_regression.py::WorkbenchRegression::test_pagination_responsive_context_and_query_bound
+2 failed in 23.93s

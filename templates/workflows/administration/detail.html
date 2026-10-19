@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% load erp_format %}
+{% block title %}{{ version.definition.name }} | گردش‌کار{% endblock %}
+{% block content %}
+<div data-workspace-id="WS-19">
+{% include "components/page_header.html" with page_eyebrow="مدیریت گردش‌کارها" page_title=version.definition.name page_description=version.definition.description only %}
+<p class="mt-3 text-sm">نسخه {{ version.version_number }} · {{ version.get_status_display }} · {{ version.definition.workflow_type.name }}</p>
+<div class="mt-4 flex flex-wrap gap-3"><a class="erp-btn erp-btn--secondary" href="{% url 'workflows:definition_list' %}">فهرست تعریف‌ها</a>
+{% if version.status == 'draft' %}
+{% if "workflows.change_draft" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_edit' version.id %}">ویرایش پیش‌نویس</a><a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'validate' %}">اعتبارسنجی</a>{% endif %}
+{% if "workflows.publish" in business_permission_codes %}{% if has_published %}<a class="erp-btn erp-btn--primary" href="{% url 'workflows:version_action' version.id 'supersede' %}">جایگزینی نسخهٔ منتشرشده</a>{% else %}<a class="erp-btn erp-btn--primary" href="{% url 'workflows:version_action' version.id 'publish' %}">انتشار</a>{% endif %}{% endif %}
+{% else %}{% if "workflows.change_draft" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'new-draft' %}">نسخهٔ پیش‌نویس جدید</a>{% endif %}
+{% if version.status == 'published' and "workflows.retire" in business_permission_codes %}<a class="erp-btn erp-btn--secondary" href="{% url 'workflows:version_action' version.id 'retire' %}">بازنشستگی</a>{% endif %}{% endif %}
+</div>
+<div class="mt-5 grid gap-5 lg:grid-cols-2">
+<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">تاریخچهٔ نسخه و اعتبارسنجی</h2>
+<p class="mt-3 break-words text-sm" dir="ltr">{{ version.definition.code }} · {{ version.definition.workflow_type.code }}</p>
+<h3 class="mt-4 font-semibold">محدودهٔ انتخاب</h3><ul class="mt-2 space-y-2 text-sm">{% for key,value in version.definition.scope.items %}<li class="break-all" dir="ltr">{{ key }}: {{ value }}</li>{% empty %}<li>محدودهٔ عمومی شرکت</li>{% endfor %}</ul>
+<dl class="mt-3 space-y-3 text-sm"><div><dt>آخرین تغییر</dt><dd>{{ version.updated_at|jalali_datetime }}</dd></div><div><dt>خلاصه تغییر</dt><dd>{{ version.change_summary|default:"—" }}</dd></div>
+<div><dt>اعتبارسنجی</dt><dd>{{ version.validated_at|jalali_datetime|default:"انجام نشده" }}</dd></div>
+{% if version.published_at %}<div><dt>انتشار</dt><dd>{{ version.published_at|jalali_datetime }} · {{ version.published_by }}</dd></div>{% endif %}
+{% if version.retired_at %}<div><dt>بازنشستگی</dt><dd>{{ version.retired_at|jalali_datetime }} · {{ version.retired_by }}</dd></div>{% endif %}</dl>
+<ul class="mt-3 space-y-2" role="status">{% for issue in validation_report %}<li class="text-sm text-red-700">{{ issue.message }}</li>{% empty %}<li class="text-sm text-slate-500">{% if version.validated_at %}اعتبارسنجی ثبت‌شده بدون خطاست.{% else %}هنوز گزارش اعتبارسنجی ثبت نشده است.{% endif %}</li>{% endfor %}</ul>
+<h3 class="mt-5 font-bold">همهٔ نسخه‌های این تعریف</h3><ul class="mt-3 space-y-2">{% for item in siblings %}<li><a class="text-sm text-blue-700" href="{% url 'workflows:version_detail' item.id %}">نسخه {{ item.version_number }} · {{ item.get_status_display }}</a></li>{% endfor %}</ul>
+</section>
+<section class="erp-surface rounded-xl p-5"><h2 class="font-bold">گام‌ها و انتقال‌های ثبت‌شده</h2>
+<ul class="mt-3 space-y-3">{% for step in configuration.steps %}<li class="rounded-lg border border-slate-200 p-3 text-sm"><span class="font-semibold">{{ step.name }}</span><span class="ms-2" dir="ltr">{{ step.key }} · {{ step.step_type }}</span></li>{% empty %}<li class="text-sm text-slate-500">گامی ثبت نشده است.</li>{% endfor %}</ul>
+<ul class="mt-4 space-y-2">{% for item in configuration.transitions %}<li class="break-words rounded-lg bg-slate-50 p-3 text-sm" dir="ltr">{{ item.source }} → {{ item.target }} · {{ item.outcome }}</li>{% empty %}<li class="text-sm text-slate-500">انتقالی ثبت نشده است.</li>{% endfor %}</ul>
+</section></div>
+<details class="erp-surface mt-5 min-w-0 rounded-xl p-5"><summary class="cursor-pointer font-bold">پیکربندی کامل ثبت‌شدهٔ این نسخه</summary><pre class="mt-4 max-w-full overflow-x-auto whitespace-pre-wrap break-all text-xs" dir="ltr">{{ configuration_text }}</pre></details>
+</div>{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ page_title }}{% endblock %}
+{% block content %}
+<div data-workspace-id="WS-19" class="max-w-4xl">
+{% include "components/page_header.html" with page_eyebrow="مدیریت گردش‌کارها" page_title=page_title only %}
+<a class="erp-btn erp-btn--secondary mt-4" href="{% url 'workflows:definition_list' %}">فهرست تعریف‌ها</a>
+{% if version %}<p class="mt-4 text-sm">{{ version.definition.name }} · نسخه {{ version.version_number }} · {{ version.get_status_display }}</p>{% endif %}
+<form method="post" class="erp-surface mt-5 space-y-5 rounded-xl p-5">
+{% csrf_token %}{% include "components/form_errors.html" with form=form only %}
+{% for field in form %}{% include "components/form_field.html" with field=field only %}{% endfor %}
+<button class="erp-btn erp-btn--primary" type="submit">تأیید و ثبت</button>
+</form>
+{% if registered_step_types %}<details class="erp-surface mt-5 rounded-xl p-5"><summary class="cursor-pointer font-bold">گزینه‌های ثبت‌شدهٔ پیکربندی</summary>
+<p class="mt-3 text-sm text-slate-600">پیکربندی شامل گام‌ها (steps) و انتقال‌ها (transitions) است. انتخاب‌ها و قواعد موجود هنگام ذخیره و انتشار اعتبارسنجی می‌شوند؛ محتوای اجرایی مجاز نیست.</p>
+<p class="mt-3 break-words text-sm" dir="ltr">{{ registered_step_types|join:", " }}</p>
+<p class="mt-3 text-sm font-semibold">مسیریاب‌های ثبت‌شده</p><p class="mt-2 break-words text-sm" dir="ltr">{{ registered_resolvers|join:", " }}</p>
+</details>{% endif %}
+</div>{% endblock %}
