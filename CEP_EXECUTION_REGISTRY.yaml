@@ -2394,11 +2394,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-046_COMPLETION_REPORT.md
       evidence_presence: VERIFIED
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 46eec7aa81848fe83b8081cab57354d2acc059d0
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: docs/governance/cep/evidence/CEP-046_GIT_CHECKPOINT.json
     last_execution:
       branch: main
       sha: 50cd43d35c1422809b871610d5cea1386be27474
@@ -2410,6 +2410,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: EXECUTION COMPLETE;6/6 AC and IMB0011 DoD verified. WS19 NAV039 tenant definition/version UI delegates create/edit/validate/publish/retire/supersede to existing services; published history/configuration retained. Existing active same-type template selection and bounded declarative editor; no new lifecycle/approval/default grants/models/migrations. Focused/browser/admin/navigation17 PASS; affected47 PASS plus4 proven baseline failures (template fixture, NAV019, two unchanged80-query budgets). Lint/format/system/diff/source preservation PASS;8 synthetic screenshots. GATE05 NOT_PASSED; runtime UTV retained. Git checkpoint separate.
+    - date: '2026-10-19'
+      status: GIT_CHECKPOINT_VERIFIED
+      reason: Completed046 implementation/evidence checkpoint 46eec7aa81848fe83b8081cab57354d2acc059d0 directly committed and normally pushed to main under explicit session authority. HEAD/origin/remote matched and tree clean; no merge or rewrite. Separate metadata followup retains original execution baseline.
   CEP-047:
     title: null
     phase: V1_IMPLEMENTATION
