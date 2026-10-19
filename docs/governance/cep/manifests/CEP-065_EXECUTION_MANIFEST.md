@@ -1,0 +1,5 @@
+# CEP-065 entry manifest — blocked before product mutation
+
+2026-10-19; main @fe75a51dd477df3a0cc95f039c7f1007f683179a, clean and aligned HEAD/origin/remote. Prompt hash verified; canonical mandatory049 COMPLETE. Standing bounded non-production authority exists; no new explicit routine authorization is needed. Full entry was not established: CEP-065-FINDING-001 documents missing approved cash-flow source/cutoff/bucket bindings against PD020/SPEC004, PCM-CASHFLOW, canonical046/047 journeys and repository/configured-schema reality. Conditional schema authority exists and was not exercised; lack of the target table is not itself a blocker.
+
+Actual mutation surface is limited to this entry manifest,065 entry/schema/finding/acceptance/evidence/change/report files, Registry state and final session frontier/checkpoint metadata. No product file, model, migration, source record, runtime test fixture or canonical prompt changed for065. No new liquidity/EVM/cash-date/schedule allocation formula is inferred. Actual dataset absence is not misclassified as a framework-build blocker; approved source-contract semantics are the unresolved condition.

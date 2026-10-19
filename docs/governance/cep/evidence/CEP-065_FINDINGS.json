@@ -1,0 +1,25 @@
+[
+  {
+    "id": "CEP-065-FINDING-001",
+    "classification": "BLOCKER-SPEC / MATERIAL_BUSINESS_SOURCE_POLICY",
+    "state": "OPEN",
+    "affected": "IMB0041 AC1-5 and authoritative source/version/time-bucket DoD",
+    "canonical_basis": {
+      "PD020": "Metrics/thresholds/formulas exist only when explicitly specified; UNSPECIFIED PROJECT CONTROLS METRIC POLICY - DO NOT INVENT",
+      "PCM_CASHFLOW": "Approved time-phased plan/forecast/actual evidence; Approved dated source facts; Defined reporting bucket; Versioned source snapshot; Show as-of/freshness",
+      "E2E_PROJ_046": "approved forecast source/cutoff semantics required",
+      "E2E_PROJ_047": "approved as-of/freshness semantics required",
+      "PDM004": "Cash-flow plan/forecast linked to baseline, commitments, actuals and schedule milestones"
+    },
+    "repository_reality": "Budget allocations and aggregate approved cost forecasts have no cash-date/bucket allocation evidence; Project Cost recognition dates are cost recognition, not an approved cash timing rule. Treasury clearing evidence is cash-owned but choosing clearing/statement/movement/reversal dates and mapping to project planning periods requires an approved cash-flow source/cutoff contract. No native registered time-phased cash-flow source binding was found in inspected code/schema.",
+    "blocker_detail": "Inspected canonical matrix/journeys define required approved dated facts but do not establish the source-field/date/cutoff/replacement and schedule-to-cash allocation bindings needed for baseline-versus-forecast-versus-actual cash comparison. Existing004/049 metric lineage/coverage proves cost read projections, not those missing cash-flow business mappings. Choosing them would invent financial timing/source semantics.",
+    "not_blockers": [
+      "Absence of the target cash-flow table alone is not a blocker: conditional expand-only schema authority exists.",
+      "No new external dependency or dependency edge is inferred; mandatory049 is COMPLETE.",
+      "GlobalGATE05 NOT_PASSED alone is not the block: relevant source-family semantics are evaluated.",
+      "Actual approved tenant dataset is not required merely to build; the missing approved source contract is required."
+    ],
+    "resolution": "Recover or approve a bounded cash-flow source/cutoff contract identifying authoritative dated plan/forecast/actual source fields and versions, bucket boundary/time basis, schedule/commitment allocation input authority, and replacement/reversal/as-of treatment. Re-run065 entry without changing its Scope/AC/DoD. No liquidity formula, cash-date default or source ownership may be inferred.",
+    "safe_action": "Stop065 before product/schema/data mutation; preserve all completed work and existing057 block."
+  }
+]

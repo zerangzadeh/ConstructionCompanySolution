@@ -66,10 +66,10 @@ summary:
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
-  blocked_current: 1
+  blocked_current: 2
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 19
+  not_started_other_current_governed: 18
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -3258,8 +3258,10 @@ ceps:
       committed: true
       commit_sha: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
       pushed: true
-      merged_to_main: true
+      merged_to_main: false
       remote_main_evidence: VERIFIED_LS_REMOTE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: f8be5637d90dc023107de08054d46e4460820120
@@ -3271,6 +3273,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: IMB0085 all6 original AC and scoped DoD verified.71 tests plus14 subtests PASS;12 synthetic fixture screenshots prove Persian RTL/Jalali and responsive states. Source domains retain all calculation/state/history; own identity/URL/CSRF/scope enforced; no schema/default grants,057 inputs or production action. Global GATE07 not inferred.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit/push 195caaefd4ccfc19ab6f16bb65b14a24992b0bde verified on origin main; clean checkpoint, no merge or production action.
   CEP-064:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3306,28 +3311,30 @@ ceps:
     updated_at: null
     history: []
   CEP-065:
-    title: null
+    title: Time-phased project cash-flow planning
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: ENTRY_BLOCKED_MISSING_APPROVED_CASHFLOW_SOURCE_CUTOFF_BINDINGS
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      lifecycle: ENTRY_BLOCKED_BEFORE_MUTATION
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 0
+      total: 6
+      status: BLOCKED_NOT_VERIFIED
+    dod: NOT_MET_BLOCKED
+    blockers:
+    - CEP-065-FINDING-001 / BLOCKER-SPEC approved cash-flow dated-source/cutoff/bucket/replacement bindings unresolved; no product mutation or invented cash timing
+    remaining_utv:
+    - All065 implementation/runtime outcomes NOT_EXECUTED at blocked entry
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-065_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_ENTRY_AND_READ_ONLY_SCHEMA_NO_EXECUTION_PASS
     git:
       committed: null
       commit_sha: null
@@ -3335,10 +3342,13 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: fe75a51dd477df3a0cc95f039c7f1007f683179a
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: ENTRY_BLOCKED_BEFORE_MUTATION
+      reason: Prompt/hash049 dependency and standing authority verified. Canonical recovery and configured schema do not establish approved cash-flow source/cutoff/bucket binding; selecting cash timing/allocation would invent policy underPD020. Conditional schema authority unexercised; no actual-data requirement invented for build. Stop serial continuation on new material blocker.
   CEP-066:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3398,11 +3408,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-067_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_FOCUSED_REGRESSION_AND_SYNTHETIC_UI
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: fe75a51dd477df3a0cc95f039c7f1007f683179a
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: VERIFIED_LS_REMOTE
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
@@ -3414,6 +3426,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: IMB0047 all6 AC and DoD verified;88 tests plus2 subtests PASS, final UI3 PASS,10 styled RTL/Jalali fixture screenshots. Source-owned six metric projections only; current scoped snapshots never summed, incomplete source evidence withheld from reliable values. No schema/formula/source activation/057 inputs or global gate PASS.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit/push fe75a51dd477df3a0cc95f039c7f1007f683179a verified on origin main; clean checkpoint, no merge or production action.
   CEP-068:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4106,9 +4121,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
-  origin_main: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
-  integration_checkpoint: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
+  last_reconciled_head: fe75a51dd477df3a0cc95f039c7f1007f683179a
+  origin_main: fe75a51dd477df3a0cc95f039c7f1007f683179a
+  integration_checkpoint: fe75a51dd477df3a0cc95f039c7f1007f683179a
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4129,17 +4144,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP067_COMPLETE_CHECKPOINT_THEN_CEP065_ENTRY_REVIEW
+  current_session_continuation: STOP_NEW_MATERIAL_CEP065_SOURCE_POLICY_BLOCKER
   current_independent_cep: null
-  next_entry_review_candidate: CEP-065
-  next_candidate_full_entry_eligibility: NOT_YET_FULLY_VERIFIED_CEP065
+  next_entry_review_candidate: null
+  next_candidate_full_entry_eligibility: CEP065_ENTRY_BLOCKED_REST_REQUIRE_OWN_FULL_REVIEW
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: CEP063 and067 complete; checkpoint then full065 canonical cash-flow entry review.057 remains migration BLOCKED; global05/06 NOT_PASSED. No production authority.
+  boundary_reason: New material065 cash-flow source/cutoff policy blocker stops serial continuation before mutation;063/067 complete and pushed. Preserve023/029 COMPLETE,057 migration BLOCKED, global05/06 NOT_PASSED and no production authority.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: CEP063_AND067_COMPLETE_OTHER_CANDIDATES_REQUIRE_FULL_ENTRY_REVIEW
+  independent_candidates_entry_status: CEP063_AND067_COMPLETE_CEP065_ENTRY_BLOCKED_OTHERS_REQUIRE_FULL_REVIEW
   production_authorized: false
   human_signoff_executed: false
