@@ -5,7 +5,7 @@ from uuid import UUID
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db.models import Sum
+from django.db.models import OuterRef, Subquery, Sum
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
@@ -32,6 +32,7 @@ from apps.accounting.models import (
     FiscalYear,
     JournalEntry,
     JournalKind,
+    JournalLine,
     JournalStatus,
     OpeningBalanceImport,
     ReconciliationExceptionSnapshot,
@@ -67,6 +68,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import paginate_table
 
 
 def _form_error(form: object, exc: Exception) -> None:
@@ -293,13 +295,29 @@ def period_reopen(request: HttpRequest, period_id: str) -> HttpResponse:
 @organization_permission_required(BusinessPermissionCode.ACCOUNTING_VIEW)
 @require_GET
 def journal_list(request: HttpRequest) -> HttpResponse:
+    # Preserve the first-line debit display without loading whole line collections.
+    journals = JournalEntry.objects.filter(organization=request.organization).annotate(
+        list_debit=Subquery(
+            JournalLine.objects.filter(
+                organization=request.organization, journal_id=OuterRef("pk")
+            )
+            .order_by("line_number")
+            .values("debit")[:1]
+        )
+    )
+    page = paginate_table(
+        journals,
+        request,
+        sort_fields={},
+        default_ordering=("-accounting_date", "-created_at", "-pk"),
+        per_page=25,
+    )
     return render(
         request,
         "accounting/journal_list.html",
         {
-            "journals": JournalEntry.objects.filter(organization=request.organization)
-            .select_related("period", "prepared_by__user")
-            .prefetch_related("lines"),
+            "journals": page.object_list,
+            "page_obj": page,
         },
     )
 

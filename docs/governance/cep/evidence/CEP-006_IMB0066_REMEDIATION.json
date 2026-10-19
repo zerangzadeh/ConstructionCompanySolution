@@ -1,0 +1,122 @@
+{
+  "schema": "bonira.cep.imb0066-remediation.v1",
+  "recorded_at": "2026-10-19T20:53:41.371686+03:30",
+  "authorization": {
+    "source": "Current Human instruction, 2026-10-19",
+    "scope": "CEP006 IMB0066 only; bounded Development/Non-Production remediation, tests, AC/DoD/evidence reconciliation, commit/push and repeat CEP073 entry review",
+    "migration": "NONE",
+    "production": false,
+    "branch": "existing local main"
+  },
+  "repository": {
+    "baseline_head": "5bff28aa143e9048ca83461910d97b9cd30286c8",
+    "baseline_origin_main": "5bff28aa143e9048ca83461910d97b9cd30286c8",
+    "baseline_remote_main": "5bff28aa143e9048ca83461910d97b9cd30286c8",
+    "initial_working_tree": "CLEAN",
+    "validation_source": "Baseline plus bounded working-tree changes; integration SHA recorded after actual commit/push"
+  },
+  "canonical_prompt_sha256": "dfe2b61a485320d0347ebc40cb45a30569936481a52f11f033a3ed2970e0ea2a",
+  "product_files": [
+    "apps/accounting/views.py",
+    "apps/accounting/templates/accounting/journal_list.html",
+    "apps/audit/views.py",
+    "templates/audit/log.html",
+    "templates/components/bounded_table_pagination.html"
+  ],
+  "test_files": [
+    "apps/accounting/test_imb0066.py",
+    "apps/audit/test_imb0066.py",
+    "apps/audit/tests.py"
+  ],
+  "validation_file_sha256": {
+    "apps/accounting/views.py": "843322589e952fdbc32d56cad4614752d7260b4a0212d4a114bf1c5c0e4b551c",
+    "apps/accounting/templates/accounting/journal_list.html": "4b30ea158df8b6bef9c06c526f5e732b81126653e596681e213517cf9a0c44aa",
+    "apps/audit/views.py": "76b0764716466dcea9c5982bb858d4e0082e98b89481df413d64e08a72bd20ca",
+    "templates/audit/log.html": "17bfd04088fed83eab7629e9c8c9af9d9fb7f0b1f8653c454ec93310ff4d75be",
+    "templates/components/bounded_table_pagination.html": "648b1200e26b4a7568aa0c8b3e464e2a4705412c31f8fd564b17e32cbaf50af2",
+    "apps/accounting/test_imb0066.py": "151cdf5ca5f5a1928069464076a22d44095b579eaca7fda84bfb6da1339a2f1e",
+    "apps/audit/test_imb0066.py": "466dd68d1969f9348ad9346dc067505b0e7508a4f4eab3dda7a89f1e32b4dc96",
+    "apps/audit/tests.py": "f7b05e0e71567e18aa123e486213c8c33b939e11293339bf52a8ed824fcdb2a7"
+  },
+  "source_authority": {
+    "accounting": "JournalEntry/JournalLine remain authoritative. Existing first-line debit is selected with tenant-correlated LIMIT1; no total/financial semantic change. Existing detail links preserved.",
+    "audit": "Existing get_organization_audit_events authorization and core/statutory Payroll exclusions run before count/slicing. Actor eager join retained. Audit append-only behavior unchanged.",
+    "unchanged_from_session_baseline": [
+      "apps/audit/services.py",
+      "apps/reporting/reconciliation.py",
+      "apps/accounting/services.py",
+      "apps/subledgers/services.py",
+      "apps/treasury/services.py",
+      "apps/treasury/statement_services.py",
+      "apps/organizations/decorators.py",
+      "apps/organizations/authorization.py"
+    ],
+    "historical_reuse": "output/cep-006/imb0066/retained-evidence.json; historical 54-test and representative regression evidence retained, not rerun"
+  },
+  "query_proof": {
+    "artifact": "output/cep-006/imb0066/query-evidence.json",
+    "observed_per_hotspot": "One scoped count SELECT returns one count row; one source-page SELECT returns25 rows with LIMIT25 OFFSET25. Journal page query contains tenant-correlated LIMIT1 and no all-line prefetch; Audit page retains actor JOIN. Bound parameters excluded from evidence.",
+    "fixtures": "61 journals with 30 lines each in query test;61 audit events. Separate tied timestamp traversal of25/25/11 rows; Payroll authorization exclusions proved before scoped counts.",
+    "navigation": "At most previous/next links, independent of page count.",
+    "limits": "COUNT/OFFSET are not a constant-time or operational load guarantee; exact-SHA load/plans/concurrency/browser remain UTV."
+  },
+  "tests": {
+    "focused": {
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.626",
+      "timestamp": "2026-10-19T20:51:09.194687+03:30"
+    },
+    "affected_regression": {
+      "tests": "11",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.607",
+      "timestamp": "2026-10-19T20:51:45.355062+03:30"
+    },
+    "initial": {
+      "tests": "12",
+      "failures": "6",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1639.289",
+      "timestamp": "2026-10-19T20:23:16.701838+03:30"
+    },
+    "focused_command": ".venv/Scripts/python.exe output/cep-006/imb0066/run_validation.py",
+    "regression_command": ".venv/Scripts/python.exe output/cep-006/imb0066/run_validation.py --regression",
+    "regression_scope": "Existing AccountingTenantUiTests and AuditServiceTests; no whole CEP006 rerun",
+    "database": "Dedicated test_cep006_imb0066_20261019, PostgreSQL18.6, Django5.2.17, pytest9.1.1; normal clean test graph applied and DB retained; shared test_construction_erp untouched",
+    "failure_attribution": "Initial6/12 failures: new Accounting tied-clock and Viewer-permission fixture assumptions (2); legacy Audit fixture missing explicit organization scope denied before changed view body (4). Corrected test fixtures only. Final13/13 focused and11/11 affected regression PASS; no unresolved product regression.",
+    "redaction": "Ephemeral synthetic test CSRF values redacted from initial failure artifacts; test outcomes unchanged. Trailing whitespace normalized in initial failure artifacts only."
+  },
+  "checks": {
+    "ruff": "PASS6 files",
+    "format": "PASS6 files",
+    "django_check": "PASS",
+    "migration_drift": "NONE",
+    "configured_development_migration_state": "Configured existing migration graph applied; retained showmigrations plan has no unapplied nodes; isolated clean test setup completed.",
+    "new_models_or_migrations": "NONE",
+    "schema_or_data_product_change": "NONE",
+    "new_dependency": "NONE"
+  },
+  "acceptance": {
+    "canonical_total": 16,
+    "retained_criteria": "1-11, IMB0044/0048: historical valid implementation/evidence plus unchanged helper/source review; no newly executed whole-package claim",
+    "newly_proved_criteria": "12-16, IMB0066:13 focused and11 affected regression passes, executed SQL bounds and source-authority review",
+    "result": "16/16 implementation-required criteria supported; scoped DoD PASS; runtime UTV retained"
+  },
+  "disposition": {
+    "historical_A3": "Remains a true historical invalid-completion adjudication; new remediation does not invent original proof.",
+    "current_cep006": "EXECUTION COMPLETE / CLOSED_VERIFIED after bounded new proof",
+    "counts": "57 COMPLETE /6 PARTIAL preserved",
+    "gate05": "NOT_PASSED",
+    "gate06": "NOT_PASSED",
+    "cep073": "Entry review required after actual integration; no runtime execution or entry PASS inferred",
+    "human_signoff": "NOT_EXECUTED",
+    "production_certification": "NOT_EXECUTED",
+    "production_cutover": "NOT_EXECUTED"
+  }
+}

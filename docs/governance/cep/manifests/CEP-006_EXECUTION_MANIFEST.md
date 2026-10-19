@@ -85,3 +85,68 @@ CEP-005/CEP-008 regression passed **23 tests and 28 subtests**.
 Ruff, scoped formatting, Django system checks, migration drift and migration plan
 all passed. This completes the authorized CEP-006 scope. CEP-009 is ready for queue
 resume; CEP-011 and CEP-013 are not started.
+
+## 2026-10-19 IMB-0066 bounded remediation — pre-mutation entry
+
+Human instruction explicitly authorizes Development/Non-Production IMB-0066 only,
+including focused/affected regression, evidence reconciliation, commit/push and
+CEP-073 entry re-review. No whole-package redesign or rerun. Migration NONE;
+STOP before model/migration mutation if that changes. Historical evidence retained.
+
+Grounding: clean local main and origin/main at
+5bff28aa143e9048ca83461910d97b9cd30286c8; no branch/worktree creation.
+Registry checkpoint c884bad is stale metadata: intervening 5bff28a contains only
+adjudication/Registry changes. Canonical CEP-006 prompt SHA-256 verified as
+DFE2B61A485320D0347EBC40CB45A30569936481A52F11F033A3ED2970E0EA2A.
+No prerequisites/external dependencies; explicit remediation authority satisfies
+entry; GATE-01 PASS. Current generic main/Git rules supersede old branch mechanics.
+A3 is historical and is not erased by new remediation. Preserve 57 COMPLETE /
+6 PARTIAL unless actual evidence changes those states.
+
+Actual intended touch set:
+- apps/accounting/views.py and journal_list.html: fixed 25-row shared pagination,
+  existing date/time ordering plus UUID tie-break, first displayed line debit via
+  tenant-correlated LIMIT 1 subquery rather than all-line prefetch.
+- apps/audit/views.py and templates/audit/log.html: page the existing authorized,
+  payroll-filtered service queryset, stable created_at/UUID ordering.
+- templates/components/bounded_table_pagination.html: constant-size Persian RTL
+  previous/next navigation; no all-page link loop.
+- apps/accounting/test_imb0066.py and apps/audit/test_imb0066.py: bounded queries,
+  stable traversal, invalid/empty pages, tenant/object permissions, payroll filters,
+  unchanged source/linkage/read-only assertions.
+- output/cep-006/imb0066/: isolated test runner/results/query evidence/checks.
+- CEP-006 report/manifest, missing acceptance/evidence/change CSV mappings,
+  remediation evidence JSON; Registry and CEP-073 entry-review evidence.
+No models, schema, migration files, financial workflows, permission catalogs,
+settings, shared pagination helper behavior or previously valid evidence changed.
+
+UI finding CEP-006-FINDING-004: canonical UI NONE coexists with the explicitly
+owned list-bounding outcome. Human scope expressly includes related templates;
+only pagination navigation and existing displayed debit query are changed.
+Runtime load/performance/concurrency/browser verification remains UTV under CEP-073.
+
+### Touch-set adjustment after initial focused execution
+
+The initial isolated run completed schema initialization and reported 6 PASS /
+6 FAIL (12 tests). Two Accounting failures were new test-fixture assumptions:
+auto_now_add overrode supplied tied timestamps, and Viewer already grants
+accounting.view. Corrected with a frozen creation clock and explicit role revocation.
+Four Audit tests were denied before pagination because AuditServiceTests.setUp
+has legacy memberships without explicit organization scope. The unchanged view
+decorator rejects these fixtures before the new read path is entered. Add only
+explicit organization scope grants to apps/audit/tests.py's existing fixture;
+this also supplies the new Audit tests' reused setup. Product authorization and
+Audit service behavior remain unchanged. This bounded test-fixture correction is
+within the authorized focused authorization/object-scope tests and affected
+regression. Preserve initial outputs; rerun focused validation and affected
+AccountingTenantUiTests/AuditServiceTests on the now-migrated isolated database.
+
+
+### 2026-10-19 validation closure
+
+13 focused and 11 affected regression tests PASS. Executed scoped SQL bounds,
+source authority, no-write and authorization checks PASS. Ruff/format 6 files,
+Django checks and drift PASS; no product migration. AC1-11 retained, AC12-16 newly
+proved, scoped DoD PASS. See corrected completion-report addendum and evidence
+CEP-006-EV-001..009. Runtime load/concurrency/browser UTV. Safe Git integration
+and CEP073 entry re-review follow; neither is inferred from these test results.

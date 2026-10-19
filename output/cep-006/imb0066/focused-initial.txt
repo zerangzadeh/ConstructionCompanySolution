@@ -1,0 +1,171 @@
+...FF.FFFF..                                                             [100%]
+================================== FAILURES ===================================
+_ JournalListBoundingTests.test_missing_permission_and_inactive_membership_fail_closed _
+
+self = <apps.accounting.test_imb0066.JournalListBoundingTests testMethod=test_missing_permission_and_inactive_membership_fail_closed>
+
+        )
+
+    def test_missing_permission_and_inactive_membership_fail_closed(self) -> None:
+>       viewer = self._member("bounding-viewer", MembershipRole.VIEWER)
+E       AssertionError: 200 != 403
+
+apps\accounting\test_imb0066.py:157: AssertionError
+_ JournalListBoundingTests.test_pages_are_bounded_stable_disjoint_and_complete _
+
+self = <apps.accounting.test_imb0066.JournalListBoundingTests testMethod=test_pages_are_bounded_stable_disjoint_and_complete>
+
+            )
+
+    def test_pages_are_bounded_stable_disjoint_and_complete(self) -> None:
+        journals = self._journals(61)
+        self._activate_client(self.owner)
+        expected = [j.pk for j in sorted(journals, key=lambda j: j.pk, reverse=True)]
+        seen = []
+        for number, size in ((1, 25), (2, 25), (3, 11)):
+            response = self.client.get(
+                reverse("accounting:journal_list"),
+                {"page": number, "per_page": 100000, "sort": "organization"},
+            )
+            self.assertEqual(response.status_code, 200)
+            page = response.context["page_obj"]
+            self.assertEqual(len(page.object_list), size)
+            self.assertEqual(page.paginator.count, 61)
+>           seen.extend(j.pk for j in response.context["journals"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Lists differ: [UUID('d6d6c40b-3979-40ed-9485-699698a2500f'), U[2753 chars]12')] != [UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57'), U[2753 chars]78')]
+E
+E           First differing element 0:
+E           UUID('d6d6c40b-3979-40ed-9485-699698a2500f')
+E           UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57')
+E
+E           Diff is 4371 characters long. Set self.maxDiff to None to see it.
+
+apps\accounting\test_imb0066.py:59: AssertionError
+_ AuditListBoundingTests.test_cross_tenant_and_platform_events_do_not_affect_count _
+
+self = <apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_cross_tenant_and_platform_events_do_not_affect_count>
+
+                all(e.action not in hidden for e in response.context["events"])
+            )
+
+    def test_cross_tenant_and_platform_events_do_not_affect_count(self) -> None:
+        self._events(26)
+        for organization in (self.other_organization, None):
+            AuditEvent.objects.create(
+                organization=organization,
+                action=AuditAction.ORGANIZATION_CREATED,
+                entity_type="foreign-secret",
+            )
+        self._activate()
+        response = self.client.get(
+>           reverse("audit:log"),
+                         ^^^^^^^^^
+            {"page": 2, "organization": str(self.other_organization.pk)},
+        )
+
+apps\audit\test_imb0066.py:163:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: 'zP2plPYXVYQCH9tKW5PPVNdAa6KYoVe8obl..._title': '\u0627\u0645\u06a9\u0627\u0646 \u0646\u0645\u0627\u06cc\u0634 \u0627\u06cc\u0646 \u0628\u062e\u0634 \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f', 'page_description': '\u0628\u0631\u0627\u06cc \u0627\u062f\u0627\u0645\u0647\u060c \u06cc\u06a9\u06cc \u0627\u0632 \u0641\u0636\u0627\u0647\u0627\u06cc \u06a9\u0627\u0631\u06cc \u0645\u062c\u0627\u0632 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.'}]]
+key = 'page_obj'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+>           raise KeyError(key)
+E           KeyError: 'page_obj'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /audit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ AuditListBoundingTests.test_invalid_pages_and_empty_results_remain_bounded __
+
+self = <apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_invalid_pages_and_empty_results_remain_bounded>
+
+        self.assertEqual(len(response.context["events"]), 1)
+        self.assertNotContains(response, "foreign-secret")
+
+>   def test_invalid_pages_and_empty_results_remain_bounded(self) -> None:
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\audit\test_imb0066.py:170:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: 'PFj3LQ9ERmXaDsqdty9brJPnwMEvtQXiR5a..._title': '\u0627\u0645\u06a9\u0627\u0646 \u0646\u0645\u0627\u06cc\u0634 \u0627\u06cc\u0646 \u0628\u062e\u0634 \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f', 'page_description': '\u0628\u0631\u0627\u06cc \u0627\u062f\u0627\u0645\u0647\u060c \u06cc\u06a9\u06cc \u0627\u0632 \u0641\u0636\u0627\u0647\u0627\u06cc \u06a9\u0627\u0631\u06cc \u0645\u062c\u0627\u0632 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.'}]]
+key = 'events'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+>           raise KeyError(key)
+E           KeyError: 'events'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /audit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ AuditListBoundingTests.test_one_bounded_source_read_includes_actor_and_no_writes _
+
+self = <apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_one_bounded_source_read_includes_actor_and_no_writes>
+
+            self.assertContains(response, 'aria-label="\u0635\u0641\u062d\u0647\u200c\u0628\u0646\u062f\u06cc"')
+        self.assertEqual(seen, expected)
+
+    def test_one_bounded_source_read_includes_actor_and_no_writes(self) -> None:
+        self._events(61)
+        self._activate()
+>       before = list(AuditEvent.objects.values())
+                             ^^^^^^^^^^^^^^^^^^^^^^
+
+apps\audit\test_imb0066.py:93:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': <SimpleLazyObject: 'Z8h9V67P4J27SfEopx6OucL99PfTrufoqQt..._title': '\u0627\u0645\u06a9\u0627\u0646 \u0646\u0645\u0627\u06cc\u0634 \u0627\u06cc\u0646 \u0628\u062e\u0634 \u0648\u062c\u0648\u062f \u0646\u062f\u0627\u0631\u062f', 'page_description': '\u0628\u0631\u0627\u06cc \u0627\u062f\u0627\u0645\u0647\u060c \u06cc\u06a9\u06cc \u0627\u0632 \u0641\u0636\u0627\u0647\u0627\u06cc \u06a9\u0627\u0631\u06cc \u0645\u062c\u0627\u0632 \u0631\u0627 \u0627\u0646\u062a\u062e\u0627\u0628 \u06a9\u0646\u06cc\u062f.'}]]
+key = 'events'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+>           raise KeyError(key)
+E           KeyError: 'events'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /audit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+_ AuditListBoundingTests.test_pages_are_bounded_stable_disjoint_and_complete __
+
+self = <apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_pages_are_bounded_stable_disjoint_and_complete>
+
+        )
+        return user, role, membership
+
+    def test_pages_are_bounded_stable_disjoint_and_complete(self) -> None:
+        events = self._events(61)
+        self._activate()
+        expected = [
+            event.pk for event in sorted(events, key=lambda e: e.pk, reverse=True)
+        ]
+        seen = []
+        for number, size in ((1, 25), (2, 25), (3, 11)):
+>           response = self.client.get(
+                reverse("audit:log"), {"page": number, "per_page": 100000}
+            )
+E           AssertionError: 403 != 200
+
+apps\audit\test_imb0066.py:80: AssertionError
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden (Permission denied): /audit/\nTraceback (most recent call last):\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\exception.py", line 55, in inner\n    response = get_response(request)\n               ^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py", line 197, in _get_response\n    response = wrapped_callback(request, *callback_args, **callback_kwargs)\n               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 52, in wrapped\n    return view_func(request, *args, **kwargs)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 76, in wrapped\n    require_organization_permission(request, permission, message)\n  File "E:\\Construction_Company_Solution\\apps\\organizations\\decorators.py", line 30, in require_organization_permission\n    raise PermissionDenied(message)\ndjango.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u0646\u062c\u0627\u0645 \u0627\u06cc\u0646 \u0639\u0645\u0644\u06cc\u0627\u062a \u062f\u0631 \u0634\u0631\u06a9\u062a \u0641\u0639\u0627\u0644 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+=========================== short test summary info ===========================
+FAILED apps/accounting/test_imb0066.py::JournalListBoundingTests::test_missing_permission_and_inactive_membership_fail_closed
+FAILED apps/accounting/test_imb0066.py::JournalListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete
+FAILED apps/audit/test_imb0066.py::AuditListBoundingTests::test_cross_tenant_and_platform_events_do_not_affect_count
+FAILED apps/audit/test_imb0066.py::AuditListBoundingTests::test_invalid_pages_and_empty_results_remain_bounded
+FAILED apps/audit/test_imb0066.py::AuditListBoundingTests::test_one_bounded_source_read_includes_actor_and_no_writes
+FAILED apps/audit/test_imb0066.py::AuditListBoundingTests::test_pages_are_bounded_stable_disjoint_and_complete
+6 failed, 6 passed in 1639.34s (0:27:19)

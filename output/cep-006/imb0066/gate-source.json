@@ -1,0 +1,22 @@
+{
+  "authority": "Approved consolidated recovery source; repository prompt remains primary",
+  "archive": "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip",
+  "archive_sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+  "member": "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv",
+  "member_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+  "gate_06": {
+    "Gate ID": "GATE-06",
+    "Gate Name": "Data Migration Readiness",
+    "Gate Type": "DATA MIGRATION GATE",
+    "Purpose": "Ensure migration implementations preserve history, reconciliation and rollback before runtime migration verification.",
+    "Required IMB IDs": "IMB-0050; IMB-0070; IMB-0075; IMB-0080; IMB-0096; IMB-0097",
+    "Required External Dependencies": "EXT-0015; EXT-0017; EXT-0023 for runtime verification",
+    "Evidence Required": "Source\u2192target mapping; before/after counts; exception handling; rollback/cutover plan; source preservation; approved datasets where required.",
+    "Pass Condition": "Migration code/process is repeatable and reconcilable; required migration datasets exist before execution.",
+    "Failure Consequence": "Migration execution and IMB-0103 verification remain blocked.",
+    "Downstream Work Unlocked": "PostgreSQL migration/runtime verification",
+    "UTV?": "YES until target PostgreSQL execution",
+    "Human Sign-off?": "NO",
+    "Notes": "Migration implementation \u2260 migration execution."
+  }
+}

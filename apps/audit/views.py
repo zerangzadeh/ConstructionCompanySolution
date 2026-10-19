@@ -8,6 +8,7 @@ from apps.organizations.decorators import (
     organization_permission_required,
 )
 from apps.organizations.models import BusinessPermissionCode
+from core.list_filters import paginate_table
 
 
 @active_organization_required
@@ -20,4 +21,13 @@ def audit_log(request: HttpRequest) -> HttpResponse:
         user=request.user,
         organization=request.organization,
     )
-    return render(request, "audit/log.html", {"events": events})
+    page = paginate_table(
+        events,
+        request,
+        sort_fields={},
+        default_ordering=("-created_at", "-pk"),
+        per_page=25,
+    )
+    return render(
+        request, "audit/log.html", {"events": page.object_list, "page_obj": page}
+    )

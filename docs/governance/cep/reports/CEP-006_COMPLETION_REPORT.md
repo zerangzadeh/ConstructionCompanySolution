@@ -102,3 +102,56 @@ regression evidence. Scoped DoD is **PASS**. No unauthorized product semantics,
 production action, Human Sign-off, Git write or downstream CEP execution occurred.
 
 `CEP-009 = READY FOR QUEUE RESUME`; `CEP-011` and `CEP-013` remain **NOT STARTED**.
+
+
+## 2026-10-19 IMB-0066 remediation and corrected complete disposition
+
+**EXECUTION COMPLETE / CLOSED_VERIFIED.** This addendum supersedes the historical
+aggregate all-16 assertion for IMB-0066 only. The A3 adjudication remains correct:
+no original artifact proved AC12-16. New bounded implementation/evidence now
+supports those five criteria; valid IMB-0044/0048 code and evidence are retained.
+No whole CEP-006 rerun or redesign occurred.
+
+Explicit current Human authority: IMB-0066 Development/Non-Production only, plus
+focused/affected regression, reconciliation, safe commit/push and CEP-073 entry
+review. Baseline: clean existing local `main`, HEAD/origin/remote main
+`5bff28aa143e9048ca83461910d97b9cd30286c8`. No branch/worktree created.
+Canonical prompt hash verified unchanged; no dependencies/external prerequisite
+for this remediation. Current generic main/Git mechanics govern the old prompt.
+
+- Journal/Audit lists now use the existing shared helper with fixed 25-row pages
+  and unique tie ordering. Navigation has at most previous/next links.
+- Journal display retains the existing first-line debit through a tenant-correlated
+  LIMIT1 query; it no longer prefetches every line. Financial services unchanged.
+- Audit service authorization, sensitive Payroll action filters and eager actor
+  join are preserved before scoped count/page retrieval.
+- **Focused 13/13 PASS; affected Accounting UI/Audit regression 11/11 PASS.**
+  Each SQL observation records a scoped count and one 25-row page. Tests also prove
+  tied traversal, invalid/empty pages, denied permissions/membership/tenant/object
+  scope, foreign detail404, source links, payroll-filtered counts and no writes.
+- Initial 6/12 failures were test-fixture defects/debt: timestamp override, existing
+  Viewer permission, and missing explicit Audit organization scope. Test fixtures
+  corrected; original failed outputs retained with synthetic CSRF tokens redacted.
+  No product authorization change was made to obtain a PASS.
+- Ruff/format 6 files, Django check and migration drift PASS. The existing configured migration
+  graph was initialized in dedicated `test_cep006_imb0066_20261019`; it is retained.
+  Shared test database untouched. **New product schema/data migrations: NONE.**
+
+**AC/DoD:** AC1-11 retain supported historical source/test evidence. Seven relevant
+Reporting helpers are AST-identical to 89ca8f28, and the original 54-test XML hash
+is unchanged. AC12-16 now have item-specific tests, executed query evidence,
+source-authority and change mappings. All 16 implementation criteria and scoped
+DoD are supported. Mapping files explicitly distinguish retained and new claims.
+See [acceptance mapping](../evidence/CEP-006_ACCEPTANCE_MAPPING.csv),
+[evidence manifest](../evidence/CEP-006_EVIDENCE_MANIFEST.csv),
+[change manifest](../manifests/CEP-006_CHANGE_MANIFEST.csv), and
+[remediation record](../evidence/CEP-006_IMB0066_REMEDIATION.json).
+Evidence IDs: CEP-006-EV-001 through 009; 001/002 are retained historical artifacts.
+
+COUNT/OFFSET does not establish constant latency or operational capacity.
+Exact-SHA load/query plans/concurrency and browser/accessibility remain UTV.
+No downstream capability or runtime verification is declared complete.
+Registry reconciliation preserves 57 COMPLETE/6 PARTIAL, CEP057/058/068/077 PARTIAL,
+CEP065 BLOCKED, and GATE05/06 NOT_PASSED. No Human Sign-off, Production
+Certification/Cutover or production authority. Git checkpoint and subsequent
+CEP073 entry review are recorded separately after actual operations.

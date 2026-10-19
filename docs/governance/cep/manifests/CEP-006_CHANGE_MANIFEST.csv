@@ -1,0 +1,15 @@
+Path,Change,Scope
+apps/accounting/views.py,Tenant-filtered 25-row pagination with stable ordering; tenant-correlated LIMIT1 first debit; remove all-line prefetch,IMB-0066
+apps/accounting/templates/accounting/journal_list.html,Render existing first debit annotation and bounded navigation,IMB-0066
+apps/audit/views.py,Paginate existing service-authorized queryset with stable ordering after payroll exclusions,IMB-0066
+templates/audit/log.html,Include bounded navigation,IMB-0066
+templates/components/bounded_table_pagination.html,Constant-size RTL previous/next links and scoped count,IMB-0066
+apps/accounting/test_imb0066.py,Journal bounds ordering authorization scope links no-write and query tests,IMB-0066
+apps/audit/test_imb0066.py,Audit bounds ordering permissions payroll filters tenant isolation no-write query tests,IMB-0066
+output/cep-006/imb0066/,Dedicated non-production runner outputs and source preservation evidence,IMB-0066
+docs/governance/cep/manifests/CEP-006_EXECUTION_MANIFEST.md,Append bounded authorization entry touch set and closure; preserve history,IMB-0066
+docs/governance/cep/reports/CEP-006_COMPLETION_REPORT.md,Append corrected current AC/DoD disposition; preserve prior reports,IMB-0066
+docs/governance/cep/evidence/CEP-006_ACCEPTANCE_MAPPING.csv; docs/governance/cep/evidence/CEP-006_EVIDENCE_MANIFEST.csv; docs/governance/cep/manifests/CEP-006_CHANGE_MANIFEST.csv,Restore missing mappings; distinguish retained1-11 from newly proved12-16,IMB-0066
+docs/governance/cep/evidence/CEP-006_IMB0066_REMEDIATION.json; CEP_EXECUTION_REGISTRY.yaml,Evidence-supported authorization completion and frontier reconciliation,IMB-0066
+docs/governance/cep/evidence/CEP-073_POST_IMB0066_ENTRY_REVIEW.json,Post-integration entry review only; no CEP073 runtime execution,CEP-073 entry review
+apps/audit/tests.py,Explicit organization scope grants in reused legacy Audit fixture; no service/authorization change,IMB-0066 affected test infrastructure

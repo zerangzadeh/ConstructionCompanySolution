@@ -419,43 +419,54 @@ ceps:
     updated_at: '2026-10-16'
     history: []
   CEP-006:
-    title: null
+    title: Financial read-model scalability foundation
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
     eligibility_status: SATISFIED
     authorization:
-      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
+      status: AUTHORIZED_BOUNDED_IMB0066_REMEDIATION
       authorization_id: null
-      source: null
+      source: Current Human instruction 2026-10-19; IMB0066 only Development/Non-Production plus tests evidence commit/push and CEP073 entry review
     execution:
       status: COMPLETE
       lifecycle: CLOSED_VERIFIED
-      advisor_review: ACCEPTED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 16
+      total: 16
+      status: PASS_RETAINED_AC1_11_AND_NEW_IMB0066_AC12_16
+    dod: PASS_SCOPED_IMPLEMENTATION_RUNTIME_UTV_RETAINED
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Exact-SHA operational load/query plans/concurrency and browser/accessibility remain UTV; no CEP073 runtime PASS
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-006_COMPLETION_REPORT.md
+      evidence_presence: RETAINED_HISTORICAL_AND_NEW_IMB0066_PROOF
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: PARTIAL_BLOCKED
+      pushed: false
+      merged_to_main: false
+      remote_main_evidence: REMEDIATION_CHECKPOINT_PENDING
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
-      branch: null
-      sha: null
-    updated_at: '2026-10-16'
-    history: []
-    reconciliation:
+      branch: main
+      sha: 5bff28aa143e9048ca83461910d97b9cd30286c8
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
       status: A3_HISTORICAL_COMPLETION_INVALID_IMB0066
-      note: Current execution state treats CEP-006 as COMPLETE, while the last audited remote main report still showed PARTIAL/BLOCKED.
-        Blocker adjudication found no implementation or evidence that ever satisfied IMB-0066 AC12-16; the target GL/Audit paths are byte-identical at the CEP-006 implementation commit and current HEAD. Preserve the historical COMPLETE lifecycle and program counts; require bounded CEP-006 IMB-0066 remediation and proof before CEP-073 entry. Evidence docs/governance/cep/evidence/CEP-006_TO_CEP-073_BLOCKER_ADJUDICATION.json
+      reason: No original artifact satisfied AC12-16; adjudication retained unchanged. Historical COMPLETE and57/6 counts preserved pending bounded new proof.
+    - date: '2026-10-19'
+      status: AUTHORIZED_AND_STARTED_BOUNDED_REMEDIATION
+      reason: Current Human instruction explicitly authorizes only missing IMB0066 Development/Non-Production remediation on existing main, focused/affected tests, mappings, safe commit/push and repeat CEP073 entry review. Migration NONE; no production.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: New bounded list implementation with 13 focused and 11 affected regression PASS, executed SQL bounds, authorization/object/tenant and source-authority/no-write proof. Initial 6 test-fixture failures corrected with evidence retained. AC1-11 valid historical evidence and source retained; AC12-16 newly proved. Scoped DoD PASS, no product migration; runtime UTV retained.
+    reconciliation:
+      status: A3_REMEDIATED_WITH_NEW_IMB0066_PROOF
+      evidence: docs/governance/cep/evidence/CEP-006_IMB0066_REMEDIATION.json
+      note: Historical A3 remains true and its artifact is preserved. Current full implementation claim is now supported by retained valid IMB0044/0048 proof plus new IMB0066 evidence; no original proof is invented. Git integration and full CEP073 entry are separate checks.
   CEP-007:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4208,9 +4219,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: c884bad18786c19b5f3f02ac898963a2c886fd13
-  origin_main: c884bad18786c19b5f3f02ac898963a2c886fd13
-  integration_checkpoint: c884bad18786c19b5f3f02ac898963a2c886fd13
+  last_reconciled_head: 5bff28aa143e9048ca83461910d97b9cd30286c8
+  origin_main: 5bff28aa143e9048ca83461910d97b9cd30286c8
+  integration_checkpoint: 5bff28aa143e9048ca83461910d97b9cd30286c8
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4232,16 +4243,16 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_AFTER_CEP006_TO_CEP073_BLOCKER_ADJUDICATION_NO_PRODUCT_MUTATION
+  current_session_continuation: CEP006_IMB0066_COMPLETE_GIT_CHECKPOINT_THEN_CEP073_ENTRY_REVIEW
   current_independent_cep: null
   next_entry_review_candidate: CEP-073
-  next_candidate_full_entry_eligibility: BLOCKED_PENDING_CEP006_IMB0066_REMEDIATION_AND_PROOF
+  next_candidate_full_entry_eligibility: REQUIRES_POST_INTEGRATION_ENTRY_REVIEW_NO_PASS_INFERRED
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: CEP006-to-CEP073 blocker adjudicated A3 HISTORICAL COMPLETION INVALID for IMB0066. No artifact originally satisfied GL/Audit list bounding; target path blobs are unchanged since implementation commit89ca8f28. Preserve historical CEP006 COMPLETE and57 COMPLETE/6 PARTIAL counts, but CEP073 entry remains blocked pending bounded CEP006 IMB0066 product remediation and proof. No product/runtime mutation, Gate PASS or production authority. Evidence docs/governance/cep/evidence/CEP-006_TO_CEP-073_BLOCKER_ADJUDICATION.json
+  boundary_reason: Bounded Human-authorized CEP006 IMB0066 remediation COMPLETE with 13 focused and 11 affected regression PASS, query/source/authorization proof and 16 AC reconciliation. Historical A3 preserved;57 COMPLETE/6 PARTIAL unchanged. Safe Git checkpoint then repeat CEP073 entry review; GATE05/06 NOT_PASSED and no production authority.
   resume_cep_after_blocker_resolution: CEP-057
   independent_candidates_entry_status: NO_FULL_ENTRY_GRANTED_AFTER_MATERIAL_REGISTRY_CONFLICT
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED

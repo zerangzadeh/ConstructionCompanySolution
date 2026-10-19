@@ -1,0 +1,10 @@
+Evidence_ID,Type,Artifact,Result
+CEP-006-EV-001,RETAINED TEST OUTPUT,output/cep-006/focused-results.xml,54 historical passes; IMB0044/0048 relevant tests only; no original IMB0066 proof
+CEP-006-EV-002,RETAINED REGRESSION,output/cep-006/regression-results.xml,23 tests and 28 subtests retained; not rerun
+CEP-006-EV-003,FOCUSED TEST OUTPUT,output/cep-006/imb0066/focused.xml,"13/13 PASS, PostgreSQL isolated test database"
+CEP-006-EV-004,AFFECTED REGRESSION,output/cep-006/imb0066/regression.xml,"11/11 PASS, existing Accounting UI/Audit affected regression"
+CEP-006-EV-005,EXECUTED QUERY EVIDENCE,output/cep-006/imb0066/query-evidence.json,Actual scoped count1 row and page25 rows; Journal LIMIT1 and Audit actor JOIN; no parameters retained
+CEP-006-EV-006,STATIC AND ENVIRONMENT CHECKS,output/cep-006/imb0066/lint.txt; output/cep-006/imb0066/format.txt; output/cep-006/imb0066/system-check.txt; output/cep-006/imb0066/migration-drift.txt; output/cep-006/imb0066/migration-state.txt,"Ruff/format6 files, Django check, drift, configured migration state PASS; no new migration"
+CEP-006-EV-007,PRESERVED SOURCE AND EVIDENCE,output/cep-006/imb0066/retained-evidence.json,Seven Reporting helper ASTs unchanged since original implementation; original evidence hashes preserved
+CEP-006-EV-008,CODE DIFF AND RECONCILIATION,docs/governance/cep/evidence/CEP-006_IMB0066_REMEDIATION.json,Bounded code/source review and16/16 AC reconciliation supported; runtime load/concurrency/browser UTV
+CEP-006-EV-009,INITIAL FAILURE AND FIXTURE ATTRIBUTION,output/cep-006/imb0066/focused-initial.xml; output/cep-006/imb0066/focused-initial.txt,6/12 initially failed due identified test fixtures; final13 focused and11 regression pass; test CSRF values redacted

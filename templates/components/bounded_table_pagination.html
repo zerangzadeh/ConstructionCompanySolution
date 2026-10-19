@@ -1,0 +1,9 @@
+{% if page_obj.paginator.num_pages > 1 %}
+<nav class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600" aria-label="صفحه‌بندی">
+    <span>صفحه {{ page_obj.number }} از {{ page_obj.paginator.num_pages }} ({{ page_obj.paginator.count }} رکورد)</span>
+    <div class="flex items-center gap-2">
+        {% if page_obj.has_previous %}<a class="erp-btn erp-btn--secondary" href="?page={{ page_obj.previous_page_number }}" rel="prev">قبلی</a>{% endif %}
+        {% if page_obj.has_next %}<a class="erp-btn erp-btn--secondary" href="?page={{ page_obj.next_page_number }}" rel="next">بعدی</a>{% endif %}
+    </div>
+</nav>
+{% endif %}

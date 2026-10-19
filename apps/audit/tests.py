@@ -9,6 +9,7 @@ from apps.audit.services import (
     record_audit_event,
 )
 from apps.organizations.models import (
+    AuthorizationScopeType,
     MembershipRole,
     MembershipStatus,
     Organization,
@@ -48,6 +49,12 @@ class AuditServiceTests(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        for organization in (self.organization, self.other_organization):
+            organization.memberships.get().scope_grants.create(
+                organization=organization,
+                scope_type=AuthorizationScopeType.ORGANIZATION,
+                reason="Explicit Audit test organization scope",
+            )
 
     def test_record_audit_event_persists_metadata(self) -> None:
         event = record_audit_event(

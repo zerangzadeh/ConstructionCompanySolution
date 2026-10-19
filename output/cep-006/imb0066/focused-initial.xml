@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="6" skipped="0" tests="12" time="1639.289" timestamp="2026-10-19T20:23:16.701838+03:30" hostname="Zerangzadeh"><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_active_tenant_scope_and_detail_links_are_preserved" time="1619.471" /><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_inactive_tenant_and_anonymous_requests_fail_closed" time="1.632" /><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_invalid_pages_and_empty_results_remain_bounded" time="2.345" /><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_missing_permission_and_inactive_membership_fail_closed" time="2.256"><failure message="AssertionError: 200 != 403">self = &lt;apps.accounting.test_imb0066.JournalListBoundingTests testMethod=test_missing_permission_and_inactive_membership_fail_closed&gt;
+
+        )
+
+    def test_missing_permission_and_inactive_membership_fail_closed(self) -&gt; None:
+&gt;       viewer = self._member("bounding-viewer", MembershipRole.VIEWER)
+E       AssertionError: 200 != 403
+
+apps\accounting\test_imb0066.py:157: AssertionError</failure></testcase><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_pages_are_bounded_stable_disjoint_and_complete" time="2.284"><failure message="AssertionError: Lists differ: [UUID('d6d6c40b-3979-40ed-9485-699698a2500f'), U[2753 chars]12')] != [UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57'), U[2753 chars]78')]&#10;&#10;First differing element 0:&#10;UUID('d6d6c40b-3979-40ed-9485-699698a2500f')&#10;UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57')&#10;&#10;Diff is 4371 characters long. Set self.maxDiff to None to see it.">self = &lt;apps.accounting.test_imb0066.JournalListBoundingTests testMethod=test_pages_are_bounded_stable_disjoint_and_complete&gt;
+
+            )
+
+    def test_pages_are_bounded_stable_disjoint_and_complete(self) -&gt; None:
+        journals = self._journals(61)
+        self._activate_client(self.owner)
+        expected = [j.pk for j in sorted(journals, key=lambda j: j.pk, reverse=True)]
+        seen = []
+        for number, size in ((1, 25), (2, 25), (3, 11)):
+            response = self.client.get(
+                reverse("accounting:journal_list"),
+                {"page": number, "per_page": 100000, "sort": "organization"},
+            )
+            self.assertEqual(response.status_code, 200)
+            page = response.context["page_obj"]
+            self.assertEqual(len(page.object_list), size)
+            self.assertEqual(page.paginator.count, 61)
+&gt;           seen.extend(j.pk for j in response.context["journals"])
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Lists differ: [UUID('d6d6c40b-3979-40ed-9485-699698a2500f'), U[2753 chars]12')] != [UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57'), U[2753 chars]78')]
+E
+E           First differing element 0:
+E           UUID('d6d6c40b-3979-40ed-9485-699698a2500f')
+E           UUID('eee6d5db-4d54-4aa9-9df2-6fd6c85afe57')
+E
+E           Diff is 4371 characters long. Set self.maxDiff to None to see it.
+
+apps\accounting\test_imb0066.py:59: AssertionError</failure></testcase><testcase classname="apps.accounting.test_imb0066.JournalListBoundingTests" name="test_queries_limit_journals_and_first_debit_without_line_prefetch" time="2.977" /><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_cross_tenant_and_platform_events_do_not_affect_count" time="1.445"><failure message="KeyError: 'page_obj'">self = &lt;apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_cross_tenant_and_platform_events_do_not_affect_count&gt;
+
+                all(e.action not in hidden for e in response.context["events"])
+            )
+
+    def test_cross_tenant_and_platform_events_do_not_affect_count(self) -&gt; None:
+        self._events(26)
+        for organization in (self.other_organization, None):
+            AuditEvent.objects.create(
+                organization=organization,
+                action=AuditAction.ORGANIZATION_CREATED,
+                entity_type="foreign-secret",
+            )
+        self._activate()
+        response = self.client.get(
+&gt;           reverse("audit:log"),
+                         ^^^^^^^^^
+            {"page": 2, "organization": str(self.other_organization.pk)},
+        )
+
+apps\audit\test_imb0066.py:163:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': &lt;SimpleLazyObject: 'zP2plPYXVYQCH9tKW5PPVNdAa6KYoVe8obl..._title': 'امکان نمایش این بخش وجود ندارد', 'page_description': 'برای ادامه، یکی از فضاهای کاری مجاز را انتخاب کنید.'}]]
+key = 'page_obj'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+&gt;           raise KeyError(key)
+E           KeyError: 'page_obj'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError</failure></testcase><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_invalid_pages_and_empty_results_remain_bounded" time="1.221"><failure message="KeyError: 'events'">self = &lt;apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_invalid_pages_and_empty_results_remain_bounded&gt;
+
+        self.assertEqual(len(response.context["events"]), 1)
+        self.assertNotContains(response, "foreign-secret")
+
+&gt;   def test_invalid_pages_and_empty_results_remain_bounded(self) -&gt; None:
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\audit\test_imb0066.py:170:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': &lt;SimpleLazyObject: 'PFj3LQ9ERmXaDsqdty9brJPnwMEvtQXiR5a..._title': 'امکان نمایش این بخش وجود ندارد', 'page_description': 'برای ادامه، یکی از فضاهای کاری مجاز را انتخاب کنید.'}]]
+key = 'events'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+&gt;           raise KeyError(key)
+E           KeyError: 'events'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError</failure></testcase><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_one_bounded_source_read_includes_actor_and_no_writes" time="1.168"><failure message="KeyError: 'events'">self = &lt;apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_one_bounded_source_read_includes_actor_and_no_writes&gt;
+
+            self.assertContains(response, 'aria-label="صفحه‌بندی"')
+        self.assertEqual(seen, expected)
+
+    def test_one_bounded_source_read_includes_actor_and_no_writes(self) -&gt; None:
+        self._events(61)
+        self._activate()
+&gt;       before = list(AuditEvent.objects.values())
+                             ^^^^^^^^^^^^^^^^^^^^^^
+
+apps\audit\test_imb0066.py:93:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = [[{'True': True, 'False': False, 'None': None}, {'csrf_token': &lt;SimpleLazyObject: 'Z8h9V67P4J27SfEopx6OucL99PfTrufoqQt..._title': 'امکان نمایش این بخش وجود ندارد', 'page_description': 'برای ادامه، یکی از فضاهای کاری مجاز را انتخاب کنید.'}]]
+key = 'events'
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            for subcontext in self:
+                if key in subcontext:
+                    return subcontext[key]
+&gt;           raise KeyError(key)
+E           KeyError: 'events'
+
+.venv\Lib\site-packages\django\test\utils.py:84: KeyError</failure></testcase><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_pages_are_bounded_stable_disjoint_and_complete" time="1.057"><failure message="AssertionError: 403 != 200">self = &lt;apps.audit.test_imb0066.AuditListBoundingTests testMethod=test_pages_are_bounded_stable_disjoint_and_complete&gt;
+
+        )
+        return user, role, membership
+
+    def test_pages_are_bounded_stable_disjoint_and_complete(self) -&gt; None:
+        events = self._events(61)
+        self._activate()
+        expected = [
+            event.pk for event in sorted(events, key=lambda e: e.pk, reverse=True)
+        ]
+        seen = []
+        for number, size in ((1, 25), (2, 25), (3, 11)):
+&gt;           response = self.client.get(
+                reverse("audit:log"), {"page": number, "per_page": 100000}
+            )
+E           AssertionError: 403 != 200
+
+apps\audit\test_imb0066.py:80: AssertionError</failure></testcase><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_payroll_filters_apply_before_counts_and_page_boundaries" time="1.619" /><testcase classname="apps.audit.test_imb0066.AuditListBoundingTests" name="test_permission_scope_membership_tenant_and_login_fail_closed" time="1.252" /></testsuite></testsuites>
