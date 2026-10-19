@@ -1,3 +1,69 @@
+# CEP-057 framework build closeout — 2026-10-19
+
+**EXECUTION PARTIAL** — IMB-0075. Read-only opening-source preparation is
+implemented; actual migration remains blocked by EXT-0015. **0/7 full canonical
+AC verified; scoped DoD not met.** Serial continuation stopped.
+
+Branch: current local `main`. Start/end HEAD, origin/main and remote main:
+`532191d26ecb2d72deac9d0a32d53297493a0a7f`; entry tree clean. The intervening
+commit after Registry's `fe75a51` checkpoint contains only CEP065 entry/blocker
+evidence; repository metadata reconciled without changing its blocked status.
+057/023/029 prompt hashes and recovery archive/member identities were reverified
+against the existing manifest/source evidence. Standing bounded non-production
+build authority applies; both mandatory prerequisites remain complete.
+
+The new [preparation service](../../../../apps/workforce/leave_opening_preparation.py)
+validates explicit source IDs/versions/evidence, Employee-to-WorkRelationship links,
+identity revisions, effective policy/version, units, quantities and per-policy/unit
+control totals. Every valid candidate or exception retains source-to-target
+references. Duplicate/zero/ambiguous opening sources and existing target history
+require reconciliation; no balance is inferred from requests. A source approval
+reference is retained as a claim, never verified or converted into write authority.
+Every report explicitly disables migration execution and authority cutover.
+
+[Framework evidence](../evidence/CEP-057_FRAMEWORK_BUILD.json) / EV012 and
+[test output](../evidence/CEP-057_FRAMEWORK_TEST_OUTPUT.txt) / EV013:
+
+- **54/54 tests PASS**: 16 new preparation tests plus 38 prerequisite tests.
+  Synthetic isolated PostgreSQL fixtures only; isolation, same-tenant permission,
+  inactive membership, source/target validation, exceptions, control totals,
+  deterministic retry and zero business SQL writes verified.
+- Ruff, format check, Django system check and `makemigrations --check --dry-run`
+  PASS. No model/schema/migration changes. Final configured Development counts
+  unchanged: 0 policies, 0 entries, 10 WorkRelationships.
+- Full actual-data migration, durable run/mapping evidence, migration retry,
+  rollback and cutover NOT_IMPLEMENTED / NOT_EXECUTED. These required migration
+  outcomes remain unverified; preparation repeatability is not migration PASS.
+  Performance/concurrency and browser/accessibility remain UTV. No full-suite or
+  runtime acceptance claim is made.
+
+Actual touch set: the two new Python files, this report, execution manifest,
+Registry, acceptance/evidence/change manifests, finding002 update, framework JSON,
+test log and document-integrity JSON. Existing product modules are unchanged.
+Historical evidence is retained below; current acceptance mapping supersedes its
+old missing-prerequisite explanation without changing historical observations.
+
+The [open Finding002](../evidence/CEP-057_FINDINGS.json) still requires approved
+tenant opening source rows/versions/quantities, explicit row identity mapping,
+effective policy/version/unit, as-of/cutover and reconciliation totals before any
+actual migration. No such dataset was synthesized. Implement/verify the remaining
+import, durable source-target reconciliation and governed rollback/cutover only
+within the canonical scope once their required inputs/semantics are established.
+The preview writes no targets, so its rollback is discarding the report; this is
+not an implemented rollback for a future import.
+
+Registry synchronized: 57 COMPLETE, 3 PARTIAL, 1 other entry-blocked, 18 other
+NOT_STARTED, 7 deferred; no verified unblocked full-build candidate is asserted.
+GATE05/06 stay NOT_PASSED; 047/048 activation stays fail-closed. Next CEP:
+NOT_STARTED, queue stopped on partial 057. Resume 057 after the required inputs and
+remaining implementation/validation can be established.
+
+Git branch/worktree created: NO. `git add`, commit, push, merge: NOT_EXECUTED;
+changes remain uncommitted on current local main. Human Sign-off, Production
+Certification, Production Cutover and production action: NOT_EXECUTED.
+
+## Retained historical entry and prerequisite review records
+
 ## Repeat entry review after prerequisite remediation — 2026-10-19
 
 Current result: **Both canonical prerequisites VERIFIED COMPLETE. CEP-057 execution NOT_STARTED; opening migration BLOCKED by EXT-0015 data/policy prerequisites.** Framework build entry is ready for fail-closed construction; the activation-only dependency does not block framework code. This requested repeat entry review implements no057 product or backfill behavior.

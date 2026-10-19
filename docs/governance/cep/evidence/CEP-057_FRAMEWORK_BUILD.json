@@ -1,0 +1,154 @@
+{
+  "cep": "CEP-057",
+  "imb": "IMB-0075",
+  "date": "2026-10-19",
+  "execution_state": "EXECUTION PARTIAL",
+  "branch": "main",
+  "start_head": "532191d26ecb2d72deac9d0a32d53297493a0a7f",
+  "end_head": "532191d26ecb2d72deac9d0a32d53297493a0a7f",
+  "origin_main": "532191d26ecb2d72deac9d0a32d53297493a0a7f",
+  "remote_main": "532191d26ecb2d72deac9d0a32d53297493a0a7f",
+  "entry_working_tree": "CLEAN",
+  "repository_identity": "https://github.com/zerangzadeh/ConstructionCompanySolution.git",
+  "grounding_path": "E:\\Construction_Company_Solution",
+  "checkpoint_reconciliation": "fe75a51..532191d contains only CEP065 blocker/entry evidence; no product/dependency change",
+  "authority": "STANDING_BOUNDED_NON_PRODUCTION_FRAMEWORK_BUILD_ONLY",
+  "prompt_hashes_reverified": {
+    "CEP-057": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+    "CEP-023": "d5e4f4391d546d94a151206c299fbc7e061cdc6dcb9ac24d63358b5e6ebb42d3",
+    "CEP-029": "2e5afec0c5fa4ef42dc5aef2439e3fd7458e64c5227a30129076a2bd6a33d93e"
+  },
+  "recovery_archives_and_members_reverified": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip",
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "packages/CEP-057.md": "6f10a3bd7ed9c912cf7598d22e392411de3bdc9f841234930a21f77201a58c5e",
+        "BONIRA_CEP_DEPENDENCY_REGISTER.csv": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip",
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    },
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip",
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_LEAVE_POLICY_SPECIFICATION.md": "3216399546581d95c52ee04517c8a4cd0b02bcd7c9bf23f1e1da623a6cf036a6",
+        "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "path": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages\\BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip",
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    }
+  },
+  "sources": "PD026; SPEC011; IMB0075; dependency023/029; EXT0015 activation-only; existing repository sources precede recovery",
+  "entry_manifest": "docs/governance/cep/manifests/CEP-057_EXECUTION_MANIFEST.md",
+  "product_files": [
+    "apps/workforce/leave_opening_preparation.py",
+    "apps/workforce/test_cep057.py"
+  ],
+  "implementation": "Read-only typed source preparation, explicit identity/policy validation, exceptions, per-policy/unit control totals and deterministic source evidence report",
+  "configured_database": "loopback Development PostgreSQL; aggregate reads only",
+  "configured_counts_before": {
+    "LeavePolicyVersion": 0,
+    "LeaveBalanceEntry": 0,
+    "WorkRelationship": 10
+  },
+  "configured_counts_after": {
+    "LeavePolicyVersion": 0,
+    "LeaveBalanceEntry": 0,
+    "WorkRelationship": 10
+  },
+  "installed_workforce_prerequisite_migrations": [
+    "0014_cep023_leave_authority",
+    "0015_cep029_identity_migration"
+  ],
+  "tests": {
+    "command": ".venv\\Scripts\\python.exe manage.py test apps.workforce.test_cep057 apps.workforce.test_cep023 apps.workforce.test_cep029 --keepdb --noinput",
+    "result": "PASS",
+    "count": 54,
+    "new_preparation_tests": 16,
+    "prerequisite_regression_tests": 38,
+    "seconds": 15.709,
+    "database": "isolated PostgreSQL test database",
+    "output": "CEP-057_FRAMEWORK_TEST_OUTPUT.txt",
+    "new_assertions": [
+      "no business INSERT/UPDATE/DELETE during preparation",
+      "tenant isolation and explicit permission required",
+      "inactive membership denied",
+      "explicit source identity and evidence required",
+      "unit/precision/effective policy checks",
+      "superseded version not rebound",
+      "control-total mismatch and missing groups visible",
+      "exceptions preserve explicit source IDs",
+      "repeat reports deterministic and changed source changes hash",
+      "existing leave history unchanged",
+      "preview never permits migration or verifies approval"
+    ]
+  },
+  "checks": [
+    {
+      "command": ".venv\\Scripts\\python.exe -m ruff check apps/workforce/leave_opening_preparation.py apps/workforce/test_cep057.py",
+      "result": "PASS"
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe -m ruff format --check apps/workforce/leave_opening_preparation.py apps/workforce/test_cep057.py",
+      "result": "PASS"
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe manage.py check",
+      "result": "PASS_NO_ISSUES"
+    },
+    {
+      "command": ".venv\\Scripts\\python.exe manage.py makemigrations --check --dry-run",
+      "result": "PASS_NO_CHANGES"
+    }
+  ],
+  "schema_or_data_migrations": false,
+  "configured_business_writes": false,
+  "actual_migration_preparation": "FRAMEWORK_ONLY",
+  "actual_migration_execution": "NOT_EXECUTED",
+  "migration_retry": "NOT_IMPLEMENTED_OR_EXECUTED",
+  "durable_migration_run_mapping": "NOT_IMPLEMENTED",
+  "rollback_cutover": "NOT_IMPLEMENTED_OR_EXECUTED",
+  "canonical_acceptance": {
+    "passed": 0,
+    "total": 7,
+    "status": "NOT_VERIFIED_FULL_AC"
+  },
+  "dod": "NOT_MET_PARTIAL",
+  "blocker": "CEP-057-FINDING-002 / EXT-0015",
+  "required_inputs": [
+    "approved tenant source dataset/versions/quantities",
+    "approved explicit row identity mapping",
+    "effective policy/version/unit",
+    "approved as-of/cutover and reconciliation totals"
+  ],
+  "utv": [
+    "actual-data migration and reconciliation",
+    "migration repeatability and rollback/cutover",
+    "performance/concurrency",
+    "browser/accessibility"
+  ],
+  "scope_check": "No policy defaults, synthetic real balances, new permissions, source authority, schema, financial effect, UI or prerequisite repair",
+  "gates": {
+    "GATE-05": "NOT_PASSED",
+    "GATE-06": "NOT_PASSED"
+  },
+  "next_cep": "NOT_STARTED_STOP_ON_PARTIAL",
+  "git_writes": "NOT_EXECUTED",
+  "branch_worktree_created": false,
+  "production_action": false,
+  "human_signoff": false,
+  "production_certification": false
+}

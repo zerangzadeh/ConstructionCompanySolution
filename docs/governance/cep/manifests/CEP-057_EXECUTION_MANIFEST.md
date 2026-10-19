@@ -1,3 +1,41 @@
+## Framework preparation build — 2026-10-19
+
+Baseline: current local `main`, HEAD / origin/main / remote main all
+`532191d26ecb2d72deac9d0a32d53297493a0a7f`; clean working tree, empty diff.
+The sole intervening commit after the Registry checkpoint `fe75a51` records
+CEP065's entry blocker; it changes no product implementation or prerequisite.
+Canonical 057/023/029 prompt hashes and the four recovery archive/member hashes
+in `CEP-057_ENTRY.json` were reverified. PD026, SPEC011, IMB0075 and EXT0015
+permit fail-closed framework construction under standing non-production authority.
+Both prerequisite implementations remain present. Configured loopback Development
+PostgreSQL has 10 WorkRelationships, zero LeavePolicyVersions and zero balance
+entries; Workforce 0014/0015 are installed. No approved opening dataset exists in
+the inspected applicable evidence. Finding002 remains an activation blocker.
+
+Actual intended touch set, recorded before product mutation:
+
+- `apps/workforce/leave_opening_preparation.py`: read-only, permission/tenant-scoped
+  source validation, explicit identity/policy mapping and reconciliation report.
+- `apps/workforce/test_cep057.py`: synthetic isolated service/integration/isolation
+  and no-write/repeatability tests; no real opening migration or policy activation.
+- This manifest, the 057 report, acceptance/evidence/change manifests, a framework
+  validation log and build evidence JSON, and `CEP_EXECUTION_REGISTRY.yaml`.
+
+No models, schema, migrations, existing domain services, UI, permissions, grants,
+settings or configured business data are in the mutation surface. Preparation is
+not approval or an import command. Actual import, durable migration-run evidence,
+rollback execution and cutover remain unimplemented/deferred; no target is written
+by the framework. A partial result stops serial continuation; no full AC/DoD PASS
+or Gate06 PASS may be claimed from preview tests. Existing historical entry and
+adjudication records below are retained as dated observations.
+
+Closeout: **EXECUTION PARTIAL**. 54 framework/prerequisite tests PASS; Ruff,
+format, Django check and migration-drift checks PASS. Actual migration/retry,
+durable migration evidence, rollback and cutover remain NOT_EXECUTED; all 7 full
+AC remain unverified and DoD not met. No configured business writes, Git writes,
+production operation or gate change. See `CEP-057_FRAMEWORK_BUILD.json` and the
+current Completion Report. The following sections are historical entry reviews.
+
 ## Repeat entry review after prerequisite remediation — 2026-10-19
 
 Current result: **Both canonical prerequisites VERIFIED COMPLETE. CEP-057 execution NOT_STARTED; opening migration BLOCKED by EXT-0015 data/policy prerequisites.** Framework build entry is ready for fail-closed construction; the activation-only dependency does not block framework code. This requested repeat entry review implements no057 product or backfill behavior.

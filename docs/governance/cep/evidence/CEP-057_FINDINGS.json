@@ -48,10 +48,12 @@
     "phase": "ACTIVATION / BEFORE MIGRATION EXECUTION; does not block fail-closed framework build",
     "actual": "Both prerequisites now truly complete. No approved opening dataset, effective policy/version, approved dataset-row mapping, as-of/cutover or reconciliation totals established. Current Development policy/ledger tables empty.",
     "evidence": [
-      "CEP-057_REENTRY_REVIEW.json"
+      "CEP-057_REENTRY_REVIEW.json",
+      "CEP-057_FRAMEWORK_BUILD.json"
     ],
     "resolution": "Provide/establish approved tenant source rows and source evidence, policy/version/unit, explicit row mapping and approved as-of/cutover/totals before executing any opening backfill. No synthetic defaults or request-history-derived balances.",
     "framework_build": "MAY_PROCEED_FAIL_CLOSED_UNDER_STANDING_AUTHORITY",
-    "safe_action": "Requested repeat entry review complete; preserve prerequisite work. Stop actual migration execution; keep all057 AC unverified and no GATE06 PASS."
+    "safe_action": "STOP serial queue at PARTIAL057; retain tested preparation; establish approved EXT0015 inputs and complete canonical import/reconciliation/rollback before completion or downstream claims",
+    "current_framework_result": "PARTIAL_READ_ONLY_PREPARATION_TESTED; actual migration/import, durable mapping, migration retry and rollback/cutover incomplete; full AC remain unverified"
   }
 ]
