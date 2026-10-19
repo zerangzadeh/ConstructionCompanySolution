@@ -1,0 +1,71 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 1 item
+
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+ERROR
+
+=================================== ERRORS ====================================
+_ ERROR at setup of ActualTargetTests.test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.RaiseException: locked cost structures are immutable
+E   CONTEXT:  PL/pgSQL function projects_guard_locked_structure() line 11 at RAISE
+
+The above exception was the direct cause of the following exception:
+.venv\Lib\site-packages\django\db\backends\base\creation.py:163: in deserialize_db_from_string
+    obj.save()
+.venv\Lib\site-packages\django\core\serializers\base.py:265: in save
+    models.Model.save_base(self.object, using=using, raw=True, **kwargs)
+.venv\Lib\site-packages\django\db\models\base.py:1008: in save_base
+    updated = self._save_table(
+.venv\Lib\site-packages\django\db\models\base.py:1138: in _save_table
+    updated = self._do_update(
+.venv\Lib\site-packages\django\db\models\base.py:1203: in _do_update
+    return filtered._update(values) > 0
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:1288: in _update
+    return query.get_compiler(self.db).execute_sql(ROW_COUNT)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:2060: in execute_sql
+    row_count = super().execute_sql(result_type)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: locked cost structures are immutable
+E   CONTEXT:  PL/pgSQL function projects_guard_locked_structure() line 11 at RAISE
+=========================== short test summary info ===========================
+ERROR apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent - django.db.utils.ProgrammingError: locked cost structures are immutable
+CONTEXT:  PL/pgSQL function projects_guard_locked_structure() line 11 at RAISE
+============================== 1 error in 32.04s ==============================

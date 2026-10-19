@@ -1,0 +1,54 @@
+{
+  "final_required_checks": "PASS",
+  "retained_initial_baseline": "5 legacy permission fixture failures before producer behavior in CEP-047_BASELINE_OUTPUT.txt",
+  "historical_test_setup_diagnostics": [
+    "CEP-047_DIAGNOSTIC_OUTPUT.txt",
+    "CEP-047_TEST_BOOTSTRAP_DIAGNOSTIC.txt"
+  ],
+  "resume_attempts": [
+    {
+      "evidence": "CEP-047_RESUME_FOCUSED_OUTPUT.txt",
+      "classification": "TEST INFRASTRUCTURE DEBT",
+      "result": "Incomplete migration-loader setup interrupted only for this session runner; no test PASS inferred"
+    },
+    {
+      "evidence": "CEP-047_RESUME_FOCUSED_SCHEMA_OUTPUT.txt",
+      "classification": "TEST INFRASTRUCTURE DEBT",
+      "result": "2 PASS;7 setup failures because --no-migrations omits apps from serialized catalogue snapshot; current test-only code-owned catalogue bootstrap fixes setup"
+    },
+    {
+      "evidence": "CEP-047_FOCUSED_RECHECK_OUTPUT.txt",
+      "classification": "TEST EXPECTATION DEFECT",
+      "result": "3 PASS;1 failure expecting PermissionDenied rather than the existing neutral unavailable-contract rejection for a valid member of another tenant; expectation corrected, authorization unchanged"
+    },
+    {
+      "evidence": "CEP-047_AFFECTED_REGRESSION_OUTPUT.txt",
+      "classification": "TEST INFRASTRUCTURE DEBT",
+      "result": "17 PASS;5 Inventory fixture errors from incomplete old test schema, missing procurement_goodsreceipt.purchase_order_version_id; current schema-only isolated copies resolve setup"
+    },
+    {
+      "evidence": "CEP-047_FOCUSED_FINAL_OUTPUT.txt",
+      "classification": "TEST FIXTURE DEFECT",
+      "result": "8 PASS;1 missing equipment category in new native fixture; required category supplied"
+    },
+    {
+      "evidence": "CEP-047_NATIVE_RECHECK_OUTPUT.txt",
+      "classification": "CEP IMPLEMENTATION DEFECT — FIXED",
+      "result": "Native values with trailing zero precision rejected by Django fact DecimalField; exact two-place representability remains checked, then value-preserving normalization is applied; duplicate-authority test PASS"
+    },
+    {
+      "evidence": "CEP-047_NATIVE_PRECISION_RECHECK_OUTPUT.txt",
+      "classification": "CEP IMPLEMENTATION DEFECT — FIXED",
+      "result": "Inventory reversal_reason incorrectly changed immutable financial version; lifecycle reason excluded from fingerprint, while source identity/value and inverse lineage remain retained"
+    },
+    {
+      "evidence": "CEP-047_NATIVE_LINEAGE_RECHECK_OUTPUT.txt",
+      "classification": "CORRECTION VERIFICATION",
+      "result": "Native all-three forward/reverse/replay paths PASS; final full focused rerun supersedes this intermediate proof"
+    }
+  ],
+  "final_focused": "CEP-047_FOCUSED_VERIFIED_OUTPUT.txt:10 PASS,9 subtests PASS",
+  "final_regression": "CEP-047_AFFECTED_FINAL_OUTPUT.txt:22 PASS",
+  "regression_reuse_basis": "Subsequent fixes are confined to new Actual integration/readers and their focused tests; retained source services and projection paths exercised by the affected suite are unchanged",
+  "no_full_suite_or_migration_pass_claimed": true
+}

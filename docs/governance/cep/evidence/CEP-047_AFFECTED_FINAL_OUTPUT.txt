@@ -1,0 +1,35 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 22 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_regression_v2_20261019')...
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_internal_transfer_carries_wac_without_pool_gain_or_loss <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_missing_cost_exception_is_persistent_and_visible <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_one_proposal_per_source_and_consumer_prevents_double_count <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_reconciliation_detects_unvalued_posted_movement_and_is_read_only <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_rtl_workbench_is_reachable <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_wac_issue_reversal_restores_quantity_value_and_lineage <- apps\inventory\test_p8_s12_s17.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_cross_tenant_source_and_asset_access_fail_closed <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_daily_prorata_depreciation_uses_ready_for_use_days <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_assigns_rounding_residual_in_final_life_period <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_does_not_start_before_capitalization_date <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_rejects_backdated_period_after_later_finalization <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_equipment_cost_is_conserved_proposal_with_no_actual_or_journal <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_fixed_asset_workbench_is_tenant_permission_scoped <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_future_impairment_is_not_applied_to_prior_period <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_impairment_uses_review_and_linked_reversal <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_transfer_is_prospective_and_disposal_stops_depreciation <- apps\fixed_assets\test_p8_s24_s27.py PASSED
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_commitment_actual_accrual_replacement_and_projection <- apps\projects\test_p4_integrated_cost.py PASSED
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_contract_precedes_facts_is_idempotent_and_enforces_sod <- apps\projects\test_p4_integrated_cost.py PASSED
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_coverage_forecast_and_fail_closed_gates <- apps\projects\test_p4_integrated_cost.py PASSED
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_cross_tenant_and_database_immutability <- apps\projects\test_p4_integrated_cost.py PASSED
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_project_detail_exposes_permission_scoped_incomplete_projection <- apps\projects\test_p4_integrated_cost.py PASSED
+
+============================= 22 passed in 21.62s =============================

@@ -1,0 +1,191 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 9 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_resume_20261019')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates CEP047 pcp-inv-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+SUBPASSED(key='pcp-inv-actual')CEP047 pcp-eqp-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates SUBPASSED(key='pcp-eqp-actual')CEP047 pcp-fa-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates SUBPASSED(key='pcp-fa-actual')
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates PASSED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_existing_tenant_authority_is_required FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_explicit_successor_replaces_without_overwriting_finalized_facts FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_no_approved_binding_no_fact_and_no_inferred_rounding FAILED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_source_version_policy_and_candidate_tampering_fail_closed FAILED
+apps/projects/test_cep047_actual.py::ActualIdentityUnitTests::test_exact_contract_source_type_identity_version_and_recognition_key PASSED
+
+================================== FAILURES ===================================
+_ ActualTargetTests.test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+_ ActualTargetTests.test_all_three_source_reversals_preserve_original_and_replay_without_reactivation _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+________ ActualTargetTests.test_existing_tenant_authority_is_required _________
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+_ ActualTargetTests.test_explicit_successor_replaces_without_overwriting_finalized_facts _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+_ ActualTargetTests.test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+_ ActualTargetTests.test_no_approved_binding_no_fact_and_no_inferred_rounding _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+_ ActualTargetTests.test_source_version_policy_and_candidate_tampering_fail_closed _
+apps\projects\test_cep047_actual.py:81: in setUp
+    helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:60: in setUp
+    self.organization.memberships.create(
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:856: in create
+    return super(RelatedManager, self.db_manager(db)).create(**kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\organizations\models.py:2383: in save
+    self.role_definition = OrganizationRole.objects.get(code=self.role)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_existing_tenant_authority_is_required - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_explicit_successor_replaces_without_overwriting_finalized_facts - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_no_approved_binding_no_fact_and_no_inferred_rounding - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_source_version_policy_and_candidate_tampering_fail_closed - apps.organizations.models.OrganizationRole.DoesNotExist: OrganizationRole matching query does not exist.
+========= 7 failed, 2 passed, 3 subtests passed in 166.06s (0:02:46) ==========

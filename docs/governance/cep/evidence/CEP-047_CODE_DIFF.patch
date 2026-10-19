@@ -1,0 +1,2058 @@
+diff --git a/apps/projects/actual_integration.py b/apps/projects/actual_integration.py
+new file mode 100644
+index 0000000..466967e
+--- /dev/null
++++ b/apps/projects/actual_integration.py
+@@ -0,0 +1,684 @@
++"""L2 Actual candidates and explicit Project Controls consumption.
++
++No source hook is wired. No default mapping, cutoff, allocation or recognition
++policy is selected. Policy bindings are code-owned and ship unconfigured.
++"""
++
++from collections.abc import Callable, Mapping
++from dataclasses import dataclass
++from datetime import date
++from decimal import Decimal
++from types import MappingProxyType
++from uuid import uuid4
++
++from django.db import transaction
++
++from apps.audit.models import AuditAction, AuditEvent
++from apps.audit.services import record_audit_event
++from apps.organizations.authorization import get_active_membership
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++
++from .actual_sources import (
++    INTEGRATIONS,
++    SOURCE_MODELS,
++    ActualRejected,
++    NativeActualSource,
++    native_lineage,
++    read_native_actual,
++)
++from .models import (
++    CBSNode,
++    CostCenter,
++    Project,
++    ProjectCostFact,
++    ProjectCostSourceContract,
++    WBSNode,
++)
++from .services import (
++    _require_budget_access,
++    _stable_payload_hash,
++    record_project_cost_fact,
++)
++
++
++@dataclass(frozen=True)
++class ActualEffect:
++    line_reference: str
++    project: Project
++    cbs_node: CBSNode
++    wbs_node: WBSNode
++    cost_center: CostCenter | None
++    amount: Decimal
++    currency: str
++    recognition_date: date
++    valuation_reference: str
++    financial_evidence_reference: str
++
++
++@dataclass(frozen=True)
++class ActualMapping:
++    effects: tuple[ActualEffect, ...]
++    cutoff_reference: str
++    effective_date_rule_reference: str
++    unit_value_rate_book_reference: str
++    project_attribution_version: str
++
++
++@dataclass(frozen=True)
++class ActualPolicyBinding:
++    """Approved code-owned source policy, not a tenant-authored expression.
++
++    map_source must read/validate approved mapping evidence, including source
++    occurrence eligibility, value/rate/allocation and cutoff/date rules. It must
++    not mutate source state. This infrastructure does not supply those rules.
++    """
++
++    map_source: Callable[..., ActualMapping]
++
++
++# (producer key, classification policy, recognition policy, reconciliation policy)
++# No permissive fallback, default grant or automatic policy activation.
++POLICIES: Mapping[tuple[str, ...], ActualPolicyBinding] = MappingProxyType({})
++ENTITY = "project_cost_actual_integration"
++ACTION = AuditAction.PROJECT_COST_INTEGRATION_ATTEMPT
++
++
++@dataclass(frozen=True)
++class ActualCandidate:
++    contract_id: str
++    producer_key: str
++    source_id: str
++    source_version: str
++    identity: str
++    payload_hash: str
++    source: NativeActualSource
++    mapping: ActualMapping
++
++
++@dataclass(frozen=True)
++class ActualResult:
++    attempt_id: str
++    outcome: str
++    fact_ids: tuple[str, ...]
++    candidate_identity: str
++
++
++def _events(organization):
++    return AuditEvent.objects.filter(
++        organization=organization, action=ACTION, entity_type=ENTITY
++    )
++
++
++def _identity(contract, source):
++    # Exact SPEC008 identity; projects/lines/timestamps do not extend the key.
++    return _stable_payload_hash(
++        {
++            "key": (
++                str(contract.pk),
++                source.source_type,
++                source.source_id,
++                source.source_version,
++                "ACTUAL",
++            )
++        }
++    )
++
++
++def _payload(source, mapping, contract):
++    effects = []
++    for effect in mapping.effects:
++        if (
++            not isinstance(effect, ActualEffect)
++            or type(effect.recognition_date) is not date
++        ):
++            raise ActualRejected("explicit_mapped_effect_and_date_required")
++        effects.append(
++            {
++                "line": effect.line_reference,
++                "project": str(effect.project.pk),
++                "cbs": str(effect.cbs_node.pk),
++                "wbs": str(effect.wbs_node.pk),
++                "cost_center": str(getattr(effect.cost_center, "pk", "")),
++                "amount": str(effect.amount),
++                "currency": effect.currency,
++                "date": str(effect.recognition_date),
++                "valuation": effect.valuation_reference,
++                "financial_evidence": effect.financial_evidence_reference,
++            }
++        )
++    return _stable_payload_hash(
++        {
++            "source_version": source.source_version,
++            "operation": source.operation,
++            "predecessor": source.predecessor_id,
++            "effects": effects,
++            "contract_payload_hash": contract.payload_hash,
++            "cutoff": mapping.cutoff_reference,
++            "date_rule": mapping.effective_date_rule_reference,
++            "basis": mapping.unit_value_rate_book_reference,
++            "attribution_version": mapping.project_attribution_version,
++        }
++    )
++
++
++def _build(*, organization, actor, contract_id, source_id, permission):
++    get_active_membership(user=actor, organization=organization)
++    try:
++        contract = ProjectCostSourceContract.objects.get(
++            organization=organization,
++            pk=contract_id,
++            status="approved",
++            measure="actual",
++        )
++    except ProjectCostSourceContract.DoesNotExist as exc:
++        raise ActualRejected("approved_actual_contract_required") from exc
++    if (
++        contract.producer_key not in SOURCE_MODELS
++        or contract.source_model != SOURCE_MODELS[contract.producer_key]
++        or contract.event_schema != f"{contract.producer_key}.v1"
++    ):
++        raise ActualRejected("actual_native_contract_mismatch")
++    binding = POLICIES.get(
++        (
++            contract.producer_key,
++            contract.classification_policy_reference,
++            contract.recognition_policy_reference,
++            contract.reconciliation_policy_reference,
++        )
++    )
++    if binding is None:
++        raise ActualRejected("approved_mapping_cutoff_classification_required")
++    source = read_native_actual(
++        organization=organization,
++        actor=actor,
++        producer_key=contract.producer_key,
++        source_id=source_id,
++    )
++    mapping = binding.map_source(
++        organization=organization, actor=actor, contract=contract, source=source
++    )
++    if not isinstance(mapping, ActualMapping) or not mapping.effects:
++        raise ActualRejected("approved_mapping_evidence_required")
++    if (
++        not all(
++            (
++                mapping.cutoff_reference,
++                mapping.unit_value_rate_book_reference,
++                mapping.project_attribution_version,
++            )
++        )
++        or mapping.effective_date_rule_reference
++        != contract.recognition_policy_reference
++    ):
++        raise ActualRejected("mapping_basis_cutoff_date_attribution_required")
++    lines = set()
++    for effect in mapping.effects:
++        if not effect.line_reference or effect.line_reference in lines:
++            raise ActualRejected("ambiguous_mapping_line")
++        lines.add(effect.line_reference)
++        _require_budget_access(
++            organization=organization,
++            project=effect.project,
++            actor=actor,
++            permission=permission,
++        )
++        if (
++            any(
++                item.organization_id != organization.pk
++                for item in (effect.cbs_node, effect.wbs_node, effect.cost_center)
++                if item is not None
++            )
++            or effect.wbs_node.project_id != effect.project.pk
++        ):
++            raise ActualRejected("mapped_dimension_scope_mismatch")
++        if source.project_id and source.project_id != str(effect.project.pk):
++            raise ActualRejected("source_project_mapping_mismatch")
++        if effect.currency != source.currency or not effect.valuation_reference:
++            raise ActualRejected("source_currency_or_valuation_mismatch")
++        if (
++            not isinstance(effect.amount, Decimal)
++            or not effect.amount.is_finite()
++            or effect.amount == 0
++        ):
++            raise ActualRejected("invalid_mapped_amount")
++        # No inferred rounding from native4/6 decimal evidence to the existing
++        # two-place fact model. A mapping must supply an exact representable value.
++        if effect.amount != effect.amount.quantize(Decimal("0.01")):
++            raise ActualRejected("explicit_fact_precision_mapping_required")
++    after = read_native_actual(
++        organization=organization,
++        actor=actor,
++        producer_key=contract.producer_key,
++        source_id=source_id,
++    )
++    if after != source:
++        raise ActualRejected("policy_mutated_source")
++    return ActualCandidate(
++        str(contract.pk),
++        contract.producer_key,
++        source.source_id,
++        source.source_version,
++        _identity(contract, source),
++        _payload(source, mapping, contract),
++        source,
++        mapping,
++    ), contract
++
++
++@transaction.atomic
++def prepare_actual_candidate(
++    *, organization, actor, contract_id, source_id
++) -> ActualCandidate:
++    """Read-only derived L2 candidate; never records a recognized financial fact."""
++    candidate, _ = _build(
++        organization=organization,
++        actor=actor,
++        contract_id=contract_id,
++        source_id=source_id,
++        permission=P.PROJECT_COSTS_VIEW,
++    )
++    if not candidate.source.active:
++        raise ActualRejected("inactive_source")
++    return candidate
++
++
++def _emit(organization, actor, attempt_id, metadata):
++    return record_audit_event(
++        action=ACTION,
++        entity_type=ENTITY,
++        entity_id=attempt_id,
++        organization=organization,
++        actor=actor,
++        metadata=metadata,
++    )
++
++
++def _successful(organization):
++    return _events(organization).filter(metadata__stage="succeeded")
++
++
++def consume_actual_candidate(
++    *, organization, actor, candidate: ActualCandidate, retry_of=""
++) -> ActualResult:
++    """Explicit target-authorized record operation; no source calls this function.
++
++    An L2 candidate is input evidence, not authority. Reload sources/contract and
++    resolve the registered approved policy again inside the target transaction.
++    """
++    if transaction.get_connection().in_atomic_block:
++        raise ActualRejected("requires_autocommit_boundary")
++    get_active_membership(user=actor, organization=organization)
++    attempt_id = str(uuid4())
++    base = {
++        "integration_id": INTEGRATIONS.get(candidate.producer_key, ""),
++        "integration_level": "L2",
++        "contract_id": candidate.contract_id,
++        "source_id": candidate.source_id,
++        "source_version": candidate.source_version,
++        "candidate_identity": candidate.identity,
++        "retry_of": retry_of,
++    }
++    _emit(organization, actor, attempt_id, {**base, "stage": "attempted"})
++    try:
++        with transaction.atomic():
++            organization = Organization.objects.select_for_update(no_key=True).get(
++                pk=organization.pk
++            )
++            fresh, contract = _build(
++                organization=organization,
++                actor=actor,
++                contract_id=candidate.contract_id,
++                source_id=candidate.source_id,
++                permission=P.PROJECT_COST_FACTS_RECORD,
++            )
++            # Match the existing target service's Project -> Contract lock order.
++            list(
++                Project.objects.select_for_update()
++                .filter(
++                    organization=organization,
++                    pk__in={effect.project.pk for effect in fresh.mapping.effects},
++                )
++                .order_by("pk")
++            )
++            locked_contract = ProjectCostSourceContract.objects.select_for_update().get(
++                organization=organization,
++                pk=contract.pk,
++                status="approved",
++                measure="actual",
++            )
++            if locked_contract.payload_hash != contract.payload_hash:
++                raise ActualRejected("contract_changed_during_validation")
++            contract = locked_contract
++            if (
++                candidate.identity != fresh.identity
++                or candidate.payload_hash != fresh.payload_hash
++            ):
++                raise ActualRejected("candidate_source_or_policy_drift")
++            prior = (
++                _successful(organization)
++                .filter(metadata__candidate_identity=fresh.identity)
++                .first()
++            )
++            if prior:
++                if prior.metadata["payload_hash"] != fresh.payload_hash:
++                    raise ActualRejected("conflicting_replay")
++                fact_ids = tuple(prior.metadata["fact_ids"])
++                if ProjectCostFact.objects.filter(
++                    organization=organization,
++                    contract=contract,
++                    pk__in=fact_ids,
++                    source_id=fresh.source_id,
++                    source_version=fresh.source_version,
++                ).count() != len(fact_ids):
++                    raise ActualRejected("target_lineage_missing")
++                _emit(
++                    organization,
++                    actor,
++                    attempt_id,
++                    {**base, "stage": "replayed", "fact_ids": fact_ids},
++                )
++                return ActualResult(attempt_id, "replayed", fact_ids, fresh.identity)
++            if not fresh.source.active:
++                raise ActualRejected("inactive_source")
++            consumed = _successful(organization).filter(
++                metadata__producer_key=fresh.producer_key,
++                metadata__source_id=fresh.source_id,
++            )
++            if consumed.exists():
++                raise ActualRejected(
++                    "source_version_or_contract_changed_without_successor"
++                )
++            # ProjectCostFact remains authoritative even when a pre-existing
++            # fact was recorded outside this integration's audit path. Missing
++            # integration lineage never permits a second recognition.
++            if ProjectCostFact.objects.filter(
++                organization=organization,
++                contract__producer_key=fresh.producer_key,
++                source_id=fresh.source_id,
++            ).exists():
++                raise ActualRejected("source_facts_without_integration_lineage")
++            original_by_line = {}
++            if fresh.source.predecessor_id:
++                parent = (
++                    _successful(organization)
++                    .filter(
++                        metadata__producer_key=fresh.producer_key,
++                        metadata__source_id=fresh.source.predecessor_id,
++                    )
++                    .first()
++                )
++                if (
++                    parent is None
++                    or parent.metadata["contract_id"] != fresh.contract_id
++                ):
++                    raise ActualRejected("recognized_predecessor_required")
++                for line, fact_id in parent.metadata["recognition_lines"].items():
++                    original_by_line[line] = (
++                        ProjectCostFact.objects.select_for_update().get(
++                            organization=organization,
++                            contract=contract,
++                            pk=fact_id,
++                            kind="actual_recognized",
++                        )
++                    )
++                if set(original_by_line) != {
++                    e.line_reference for e in fresh.mapping.effects
++                }:
++                    raise ActualRejected("predecessor_mapping_lines_mismatch")
++            facts, recognition_lines = [], {}
++            for effect in fresh.mapping.effects:
++                old = original_by_line.get(effect.line_reference)
++                if fresh.source.operation in {"reverse", "replace"} and old is None:
++                    raise ActualRejected("explicit_predecessor_required")
++                common = {
++                    "organization": organization,
++                    "actor": actor,
++                    "contract": contract,
++                    "project": effect.project,
++                    "source_id": fresh.source_id,
++                    "source_version": fresh.source_version,
++                    "recognition_date": effect.recognition_date,
++                    "currency": effect.currency,
++                    "cbs_node": effect.cbs_node,
++                    "wbs_node": effect.wbs_node,
++                    "cost_center": effect.cost_center,
++                    "classification_version": contract.classification_policy_reference,
++                    "valuation_reference": effect.valuation_reference,
++                    "financial_evidence_reference": effect.financial_evidence_reference,
++                }
++                line_key = _stable_payload_hash(
++                    {"candidate": fresh.identity, "line": effect.line_reference}
++                )
++                if old:
++                    amount = (
++                        effect.amount
++                        if fresh.source.operation == "reverse"
++                        else -old.amount
++                    )
++                    reversal = record_project_cost_fact(
++                        **common,
++                        kind="actual_reversal",
++                        # _build proved exact two-place representability. Trim
++                        # native trailing zeroes without changing monetary value.
++                        amount=amount.quantize(Decimal("0.01")),
++                        reverses=old,
++                        economic_event_id=old.economic_event_id,
++                        source_line_id=old.source_line_id,
++                        occurrence_id=f"{line_key}:reverse",
++                    )
++                    facts.append(str(reversal.pk))
++                if fresh.source.operation != "reverse":
++                    fact = record_project_cost_fact(
++                        **common,
++                        kind="actual_recognized",
++                        amount=effect.amount.quantize(Decimal("0.01")),
++                        economic_event_id=fresh.identity,
++                        source_line_id=line_key,
++                        occurrence_id=f"{line_key}:actual",
++                    )
++                    facts.append(str(fact.pk))
++                    recognition_lines[effect.line_reference] = str(fact.pk)
++            metadata = {
++                **base,
++                "stage": "succeeded",
++                "producer_key": fresh.producer_key,
++                "payload_hash": fresh.payload_hash,
++                "fact_ids": facts,
++                "recognition_lines": recognition_lines,
++                "operation": fresh.source.operation,
++                "predecessor_id": fresh.source.predecessor_id,
++                "cutoff": fresh.mapping.cutoff_reference,
++                "effective_date_rule": fresh.mapping.effective_date_rule_reference,
++                "basis": fresh.mapping.unit_value_rate_book_reference,
++                "attribution_version": fresh.mapping.project_attribution_version,
++                "source_evidence_hash": fresh.source.source_version,
++                "native_lineage": native_lineage(fresh.source),
++            }
++            _emit(organization, actor, attempt_id, metadata)
++            return ActualResult(attempt_id, "recorded", tuple(facts), fresh.identity)
++    except Exception as exc:
++        code = str(exc) if isinstance(exc, ActualRejected) else "target_failure"
++        _emit(
++            organization,
++            actor,
++            attempt_id,
++            {**base, "stage": "failed", "error_code": code},
++        )
++        raise
++
++
++def reconcile_actual_candidate(*, organization, actor, contract_id, source_id) -> dict:
++    """Read-only reconciliation; never repairs or creates a source or target."""
++    with transaction.atomic():
++        candidate, _ = _build(
++            organization=organization,
++            actor=actor,
++            contract_id=contract_id,
++            source_id=source_id,
++            permission=P.PROJECT_COST_RECONCILIATIONS_VIEW,
++        )
++        results = list(
++            _successful(organization).filter(
++                metadata__candidate_identity=candidate.identity
++            )
++        )
++        ids = tuple(results[0].metadata["fact_ids"]) if results else ()
++        other_results = tuple(
++            _successful(organization)
++            .filter(
++                metadata__producer_key=candidate.producer_key,
++                metadata__source_id=candidate.source_id,
++            )
++            .exclude(metadata__candidate_identity=candidate.identity)
++        )
++        facts = tuple(
++            ProjectCostFact.objects.filter(organization=organization, pk__in=ids)
++        )
++        inverse_ids = tuple(
++            str(pk)
++            for pk in ProjectCostFact.objects.filter(
++                organization=organization,
++                reverses_id__in=ids,
++            ).values_list("pk", flat=True)
++        )
++        successors, pending, seen = [], [candidate.source_id], {candidate.source_id}
++        lineage_cycle = False
++        while pending:
++            parent_id = pending.pop()
++            for event in _successful(organization).filter(
++                metadata__producer_key=candidate.producer_key,
++                metadata__predecessor_id=parent_id,
++            ):
++                child_id = event.metadata["source_id"]
++                if child_id in seen:
++                    lineage_cycle = True
++                    continue
++                seen.add(child_id)
++                pending.append(child_id)
++                successors.append(event)
++        linked_ids = set(ids) | set(inverse_ids)
++        for event in (*successors, *other_results):
++            linked_ids.update(event.metadata["fact_ids"])
++        linked_facts = tuple(
++            ProjectCostFact.objects.filter(
++                organization=organization,
++                pk__in=linked_ids,
++            ).select_related("project")
++        )
++        unlinked_facts = tuple(
++            ProjectCostFact.objects.filter(
++                organization=organization,
++                contract__producer_key=candidate.producer_key,
++                source_id=candidate.source_id,
++            )
++            .exclude(pk__in=linked_ids)
++            .select_related("project")
++            .order_by("pk")
++        )
++        for project in {fact.project for fact in (*linked_facts, *unlinked_facts)}:
++            _require_budget_access(
++                organization=organization,
++                actor=actor,
++                project=project,
++                permission=P.PROJECT_COST_RECONCILIATIONS_VIEW,
++            )
++        successor_states = []
++        active_versions = []
++        if candidate.source.active:
++            active_versions.append(
++                {
++                    "source_id": candidate.source_id,
++                    "source_version": candidate.source_version,
++                }
++            )
++        for event in successors:
++            state = {
++                "source_id": event.metadata["source_id"],
++                "recorded_source_version": event.metadata["source_version"],
++                "operation": event.metadata["operation"],
++                "fact_ids": event.metadata["fact_ids"],
++            }
++            try:
++                native = read_native_actual(
++                    organization=organization,
++                    actor=actor,
++                    producer_key=candidate.producer_key,
++                    source_id=state["source_id"],
++                )
++            except ActualRejected:
++                state.update(
++                    source_active=None,
++                    source_version=None,
++                    source_evidence_unavailable=True,
++                )
++            else:
++                state.update(
++                    source_active=native.active,
++                    source_version=native.source_version,
++                    recorded_version_matches=native.source_version
++                    == state["recorded_source_version"],
++                )
++                if native.active:
++                    active_versions.append(
++                        {
++                            "source_id": native.source_id,
++                            "source_version": native.source_version,
++                        }
++                    )
++            successor_states.append(state)
++        recognized = sum(
++            (f.amount for f in facts if f.kind == "actual_recognized"), Decimal(0)
++        )
++        reversed_amount = sum(
++            (f.amount for f in facts if f.kind == "actual_reversal"), Decimal(0)
++        )
++        expected = sum(
++            (effect.amount for effect in candidate.mapping.effects), Decimal(0)
++        )
++        compared = (
++            reversed_amount if candidate.source.operation == "reverse" else recognized
++        )
++        return {
++            "source_id": candidate.source_id,
++            "source_version": candidate.source_version,
++            "active_source_version": candidate.source_version
++            if candidate.source.active
++            else None,
++            "active_source_versions": tuple(active_versions),
++            "source_active": candidate.source.active,
++            "native_amount": str(candidate.source.amount),
++            "mapped_amount": str(expected),
++            "target_recognized_amount": str(recognized),
++            "target_reversal_amount": str(reversed_amount),
++            "lineage_net_amount": str(
++                sum((fact.amount for fact in linked_facts), Decimal(0))
++            ),
++            "mapped_target_difference": str(expected - compared),
++            "approved_cutoff": candidate.mapping.cutoff_reference,
++            "unit_value_rate_book_reference": candidate.mapping.unit_value_rate_book_reference,
++            "project_attribution_version": candidate.mapping.project_attribution_version,
++            "operation": candidate.source.operation,
++            "predecessor_id": candidate.source.predecessor_id,
++            "target_fact_ids": ids,
++            "unlinked_target_fact_ids": tuple(str(f.pk) for f in unlinked_facts),
++            "target_reversals": tuple(
++                str(f.pk) for f in linked_facts if f.kind == "actual_reversal"
++            ),
++            "corresponding_successors": tuple(successor_states),
++            "other_recorded_source_versions": tuple(
++                {
++                    "contract_id": event.metadata["contract_id"],
++                    "source_version": event.metadata["source_version"],
++                    "fact_ids": event.metadata["fact_ids"],
++                }
++                for event in other_results
++            ),
++            "unlinked_version_or_contract_drift": bool(other_results),
++            "target_payload_matches": bool(results)
++            and results[0].metadata["payload_hash"] == candidate.payload_hash,
++            "missing_target": not results,
++            "duplicate_results": len(results) > 1,
++            "lineage_cycle": lineage_cycle,
++            "target_lineage_missing": len(linked_facts) != len(linked_ids),
++        }
+
+diff --git a/apps/projects/actual_sources.py b/apps/projects/actual_sources.py
+new file mode 100644
+index 0000000..d047575
+--- /dev/null
++++ b/apps/projects/actual_sources.py
+@@ -0,0 +1,416 @@
++"""Closed native source readers for INT-B04/B05/B06; never mutate sources.
++
++These readers prove source identity and evidence. Eligibility, classification,
++allocation and effective-date policy still require an approved registered binding.
++"""
++
++from dataclasses import dataclass
++from decimal import Decimal
++from typing import Any
++
++from django.core.exceptions import ObjectDoesNotExist, ValidationError
++from django.db import transaction
++
++from apps.equipment.models import EquipmentCostAllocation, EquipmentCostSourceEnvelope
++from apps.fixed_assets.models import FixedAssetSourceEnvelope
++from apps.inventory.models import DownstreamCostSourceEnvelope, InventoryValuationEvent
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++
++from .services import _stable_payload_hash
++
++SOURCE_MODELS = {
++    "pcp-inv-actual": "inventory.inventoryvaluationevent",
++    "pcp-eqp-actual": "equipment.equipmentcostallocation",
++    "pcp-fa-actual": "fixed_assets.fixedassetsourceenvelope",
++}
++INTEGRATIONS = {
++    "pcp-inv-actual": "INT-B04",
++    "pcp-eqp-actual": "INT-B05",
++    "pcp-fa-actual": "INT-B06",
++}
++REVIEWED = {"reviewed", "acknowledged", "reconciled"}
++
++
++class ActualRejected(ValueError):
++    """Stable diagnostic code; no protected names or confidential values."""
++
++
++@dataclass(frozen=True)
++class NativeActualSource:
++    producer_key: str
++    source_type: str
++    source_id: str
++    source_version: str
++    evidence: dict[str, Any]
++    amount: Decimal
++    currency: str
++    project_id: str
++    active: bool
++    operation: str
++    predecessor_id: str = ""
++
++
++def _row(record) -> dict[str, str]:
++    # Mutable lifecycle/audit presentation does not create a new economic version.
++    ignored = {
++        "status",
++        "updated_at",
++        "updated_by_id",
++        "reversed_by_id",
++        "reversed_at",
++        "reason",
++        "reversal_reason",
++        "consumer_reference",
++        "reconciliation_note",
++    }
++    return {
++        field.attname: str(getattr(record, field.attname))
++        for field in record._meta.concrete_fields
++        if field.attname not in ignored
++    }
++
++
++def _same_tenant(organization, *records):
++    if any(record.organization_id != organization.pk for record in records):
++        raise ActualRejected("source_tenant_mismatch")
++
++
++def _read_permission(actor, organization, permission, project=None):
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=project,
++        message="اجازه خواندن منبع هزینه در این دامنه را ندارید.",
++    )
++
++
++def _snapshot(
++    key,
++    source_id,
++    evidence,
++    amount,
++    currency,
++    project_id,
++    active,
++    operation,
++    predecessor="",
++):
++    return NativeActualSource(
++        key,
++        SOURCE_MODELS[key],
++        str(source_id),
++        _stable_payload_hash(evidence),
++        evidence,
++        amount,
++        currency,
++        str(project_id or ""),
++        active,
++        operation,
++        str(predecessor or ""),
++    )
++
++
++def _inventory(*, organization, actor, source_id):
++    event = InventoryValuationEvent.objects.select_for_update().get(
++        organization=organization, pk=source_id
++    )
++    movement = (
++        type(event.stock_transaction)
++        .objects.select_for_update()
++        .get(organization=organization, pk=event.stock_transaction_id)
++    )
++    _read_permission(actor, organization, P.INVENTORY_VALUATION_VIEW, movement.project)
++    envelope = DownstreamCostSourceEnvelope.objects.select_for_update().get(
++        organization=organization, consumer="project_controls", valuation_event=event
++    )
++    _same_tenant(organization, event, movement, envelope, event.material)
++    if event.material_id != movement.material_id or envelope.payload != {
++        "valuation_event_id": str(event.pk),
++        "amount": str(event.value_amount),
++        "currency": event.currency,
++        "source_version": event.source_version,
++    }:
++        raise ActualRejected("inventory_value_proposal_mismatch")
++    if not movement.project_id or envelope.project_id != movement.project_id:
++        raise ActualRejected("inventory_project_evidence_required")
++    if not event.source_reference or not event.source_version:
++        raise ActualRejected("inventory_unit_value_source_version_required")
++    predecessor = ""
++    operation = "recognize"
++    if event.reversal_of_id:
++        original = InventoryValuationEvent.objects.select_for_update().get(
++            organization=organization, pk=event.reversal_of_id
++        )
++        if (
++            event.event_type != "reversal"
++            or movement.transaction_type != "reversal"
++            or original.event_type != "issue"
++            or movement.reversal_of_id != original.stock_transaction_id
++            or event.value_amount != original.value_amount
++            or event.quantity != original.quantity
++            or event.currency != original.currency
++            or event.material_id != original.material_id
++            or event.unit_cost != original.unit_cost
++            or event.monetary_precision_version_id
++            != original.monetary_precision_version_id
++            or event.rounding_policy_version_id != original.rounding_policy_version_id
++        ):
++            raise ActualRejected("inventory_inverse_lineage_mismatch")
++        predecessor = original.pk
++        operation = "reverse"
++    elif event.event_type != "issue" or movement.transaction_type != "issue":
++        raise ActualRejected("not_project_consumption")
++    if movement.status not in {"posted", "reversed"}:
++        raise ActualRejected("consumption_not_posted")
++    evidence = {
++        "valuation": _row(event),
++        "movement": _row(movement),
++        "proposal": _row(envelope),
++        "unit_value_policies": {
++            "precision": str(event.monetary_precision_version_id),
++            "rounding": str(event.rounding_policy_version_id),
++        },
++    }
++    return _snapshot(
++        "pcp-inv-actual",
++        event.pk,
++        evidence,
++        event.value_amount,
++        event.currency,
++        movement.project_id,
++        event.status == "finalized" and movement.status == "posted",
++        operation,
++        predecessor,
++    )
++
++
++def _equipment(*, organization, actor, source_id):
++    allocation = EquipmentCostAllocation.objects.select_for_update().get(
++        organization=organization, pk=source_id
++    )
++    _read_permission(
++        actor, organization, P.EQUIPMENT_COST_ALLOCATION_VIEW, allocation.project
++    )
++    envelope = EquipmentCostSourceEnvelope.objects.select_for_update().get(
++        organization=organization, allocation=allocation, consumer="project_cost"
++    )
++    _same_tenant(organization, allocation, envelope, allocation.usage, allocation.rate)
++    if envelope.status not in REVIEWED or not envelope.reviewed_by_id:
++        raise ActualRejected("equipment_proposal_not_reviewed")
++    if (
++        envelope.source_amount != allocation.amount
++        or not allocation.finalized_at
++        or not allocation.reviewed_by_id
++    ):
++        raise ActualRejected("equipment_source_amount_or_approval_mismatch")
++    rate = allocation.rate
++    _same_tenant(organization, rate.policy)
++    operation, predecessor = "recognize", ""
++    if allocation.correction_of_id:
++        original = EquipmentCostAllocation.objects.select_for_update().get(
++            organization=organization, pk=allocation.correction_of_id
++        )
++        if allocation.amount != -original.amount or allocation.amount >= 0:
++            raise ActualRejected("unsupported_equipment_correction")
++        if allocation.rate_snapshot != -original.rate_snapshot or any(
++            getattr(allocation, field) != getattr(original, field)
++            for field in (
++                "usage_id",
++                "rate_id",
++                "project_id",
++                "site_id",
++                "wbs_node_id",
++                "activity_id",
++                "cost_center_id",
++                "measure",
++                "currency_code",
++            )
++        ):
++            raise ActualRejected("equipment_inverse_basis_or_dimension_mismatch")
++        operation, predecessor = "reverse", original.pk
++    elif envelope.supersedes_id:
++        previous = EquipmentCostSourceEnvelope.objects.get(
++            organization=organization,
++            pk=envelope.supersedes_id,
++            consumer="project_cost",
++        )
++        operation, predecessor = "replace", previous.allocation_id
++    evidence = {
++        "allocation": _row(allocation),
++        "proposal": _row(envelope),
++        "usage": _row(allocation.usage),
++        "rate": _row(rate),
++        "rate_policy": _row(rate.policy),
++    }
++    active = (
++        allocation.status == "finalized"
++        and not envelope.successors.filter(
++            organization=organization, status__in=REVIEWED
++        ).exists()
++    )
++    return _snapshot(
++        "pcp-eqp-actual",
++        allocation.pk,
++        evidence,
++        allocation.amount,
++        allocation.currency_code,
++        allocation.project_id,
++        active,
++        operation,
++        predecessor,
++    )
++
++
++def _assets(*, organization, actor, source_id):
++    envelope = FixedAssetSourceEnvelope.objects.select_for_update().get(
++        organization=organization, pk=source_id, consumer="project_cost"
++    )
++    _read_permission(actor, organization, P.FIXED_ASSETS_VIEW)
++    if envelope.status not in REVIEWED or not envelope.reviewed_by_id:
++        raise ActualRejected("asset_proposal_not_reviewed")
++    predecessor = ""
++    operation = "recognize"
++    if envelope.depreciation_line_id:
++        line = envelope.depreciation_line
++        run = (
++            type(line.run)
++            .objects.select_for_update()
++            .get(organization=organization, pk=line.run_id)
++        )
++        _same_tenant(organization, line, run, line.asset, run.book_policy)
++        if run.status not in {"finalized", "reversed"} or not run.finalized_by_id:
++            raise ActualRejected("depreciation_not_approved")
++        if envelope.amount != line.depreciation_amount:
++            raise ActualRejected("depreciation_amount_mismatch")
++        if run.reversal_of_id:
++            previous = type(line).objects.get(
++                organization=organization,
++                run_id=run.reversal_of_id,
++                asset_id=line.asset_id,
++            )
++            predecessor = FixedAssetSourceEnvelope.objects.get(
++                organization=organization,
++                consumer="project_cost",
++                depreciation_line=previous,
++            ).pk
++            if (
++                line.depreciation_amount != -previous.depreciation_amount
++                or run.book_policy_id != previous.run.book_policy_id
++            ):
++                raise ActualRejected("depreciation_inverse_mismatch")
++            operation = "reverse"
++        evidence = {
++            "proposal": _row(envelope),
++            "depreciation_line": _row(line),
++            "run": _row(run),
++            "book_policy": _row(run.book_policy),
++            # No current mutable Asset.project is substituted for attribution policy.
++            "native_kind": "depreciation",
++            "asset_id": str(line.asset_id),
++        }
++        active = run.status == "finalized"
++        currency = run.book_policy.currency_code
++    else:
++        # A generic capitalization/disposal/transfer event is not approved asset
++        # allocation evidence. No such equivalence is inferred by this adapter.
++        raise ActualRejected("approved_asset_allocation_evidence_required")
++    if envelope.supersedes_id and not predecessor:
++        operation, predecessor = "replace", envelope.supersedes_id
++    active = (
++        active
++        and not envelope.successors.filter(
++            organization=organization, status__in=REVIEWED
++        ).exists()
++    )
++    return _snapshot(
++        "pcp-fa-actual",
++        envelope.pk,
++        evidence,
++        envelope.amount,
++        currency,
++        "",
++        active,
++        operation,
++        predecessor,
++    )
++
++
++@transaction.atomic
++def read_native_actual(
++    *, organization, actor, producer_key: str, source_id
++) -> NativeActualSource:
++    reader = {
++        "pcp-inv-actual": _inventory,
++        "pcp-eqp-actual": _equipment,
++        "pcp-fa-actual": _assets,
++    }.get(producer_key)
++    if reader is None:
++        raise ActualRejected("unregistered_actual_source_family")
++    try:
++        return reader(organization=organization, actor=actor, source_id=source_id)
++    except (ObjectDoesNotExist, ValidationError, TypeError) as exc:
++        raise ActualRejected("native_source_evidence_unavailable") from exc
++
++
++def native_lineage(source: NativeActualSource) -> dict:
++    """Retain native version labels alongside the complete snapshot fingerprint.
++
++    Select lineage/value basis only, excluding free text and unrelated source data.
++    The fingerprint is the composite immutable version used for duplicate control.
++    """
++    fields = {
++        "valuation": (
++            "id",
++            "source_reference",
++            "source_version",
++            "unit_cost",
++            "quantity",
++            "monetary_precision_version_id",
++            "rounding_policy_version_id",
++        ),
++        "movement": ("id", "unit_of_measure_id", "project_id"),
++        "proposal": ("id", "source_version", "occurrence_key", "supersedes_id"),
++        "allocation": (
++            "id",
++            "source_key",
++            "correction_of_id",
++            "measure",
++            "rate_snapshot",
++            "site_id",
++            "activity_id",
++        ),
++        "usage": ("id", "source_key", "runtime_hours"),
++        "rate": ("id", "policy_id"),
++        "rate_policy": ("id", "code", "version", "effective_from"),
++        "depreciation_line": (
++            "id",
++            "asset_id",
++            "run_id",
++            "basis_snapshot",
++            "useful_life_months_snapshot",
++        ),
++        "run": (
++            "id",
++            "occurrence_key",
++            "source_watermark",
++            "reversal_of_id",
++            "book_policy_id",
++        ),
++        "book_policy": (
++            "id",
++            "code",
++            "version",
++            "effective_from",
++            "method",
++            "convention",
++        ),
++    }
++    return {
++        name: {
++            key: value for key, value in source.evidence[name].items() if key in keys
++        }
++        for name, keys in fields.items()
++        if isinstance(source.evidence.get(name), dict)
++    }
+
+diff --git a/apps/projects/test_cep047_actual.py b/apps/projects/test_cep047_actual.py
+new file mode 100644
+index 0000000..259a3da
+--- /dev/null
++++ b/apps/projects/test_cep047_actual.py
+@@ -0,0 +1,876 @@
++"""Real target transactions with explicit synthetic approved policy bindings.
++
++The native adapters are exercised separately. These bindings never activate a
++development tenant or select a production allocation/recognition policy.
++"""
++
++from dataclasses import replace
++from datetime import date
++from decimal import Decimal
++from types import SimpleNamespace
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied
++from django.test import SimpleTestCase, TransactionTestCase
++
++from apps.audit.models import AuditEvent
++from apps.organizations.catalog_bootstrap import synchronize_authorization_catalog
++from apps.projects import actual_integration as integration
++from apps.projects import test_p4_budget_preparation as helpers
++from apps.projects.actual_sources import (
++    SOURCE_MODELS,
++    ActualRejected,
++    NativeActualSource,
++)
++from apps.projects.models import ProjectCostFact
++from apps.projects.services import (
++    accept_budget_version,
++    approve_project_cost_source_contract,
++    create_project_cost_source_contract,
++)
++from apps.projects.test_cep005_commitment_integration import _authorized_project
++
++
++class ActualIdentityUnitTests(SimpleTestCase):
++    def test_exact_contract_source_type_identity_version_and_recognition_key(self):
++        source = NativeActualSource(
++            "pcp-inv-actual",
++            SOURCE_MODELS["pcp-inv-actual"],
++            "source-uuid",
++            "version-1",
++            {},
++            Decimal("10.00"),
++            "IRR",
++            "project-uuid",
++            True,
++            "recognize",
++        )
++        contract = SimpleNamespace(pk="contract-uuid")
++        expected = integration._stable_payload_hash(
++            {
++                "key": (
++                    "contract-uuid",
++                    source.source_type,
++                    source.source_id,
++                    source.source_version,
++                    "ACTUAL",
++                )
++            }
++        )
++        self.assertEqual(integration._identity(contract, source), expected)
++        self.assertEqual(
++            integration._identity(contract, replace(source, active=False)), expected
++        )
++        self.assertNotEqual(
++            integration._identity(
++                contract, replace(source, source_version="version-2")
++            ),
++            expected,
++        )
++        self.assertNotEqual(
++            integration._identity(SimpleNamespace(pk="other-contract"), source),
++            expected,
++        )
++
++
++class ActualTargetTests(TransactionTestCase):
++    _draft = helpers.BudgetPreparationTests._draft
++    _classify_and_submit = helpers.BudgetPreparationTests._classify_and_submit
++
++    def setUp(self):
++        # Also support an isolated, already-migrated PostgreSQL schema. When
++        # pytest skips migration setup, Django's serialized baseline excludes
++        # those apps; restore the existing code-owned catalogue after a flush.
++        synchronize_authorization_catalog(using="default")
++        with patch.object(helpers, "create_project", side_effect=_authorized_project):
++            helpers.BudgetPreparationTests.setUp(self)
++        self.budget = accept_budget_version(
++            budget=self._classify_and_submit(self._draft()),
++            actor=self.approver,
++            approval_reason="Independent synthetic CEP047 budget",
++        )
++        self.sources = {}
++        self.policies = {}
++        self.mapping_changes = {}
++        self.contracts = {}
++        for key, model in SOURCE_MODELS.items():
++            contract = create_project_cost_source_contract(
++                organization=self.organization,
++                actor=self.preparer,
++                producer_key=key,
++                version=1,
++                measure="actual",
++                source_model=model,
++                event_schema=f"{key}.v1",
++                classification_policy_reference="TEST-CLASSIFICATION-1",
++                recognition_policy_reference="TEST-EXPLICIT-DATE-1",
++                reconciliation_policy_reference="TEST-RECONCILIATION-1",
++                requires_financial_evidence=True,
++            )
++            self.contracts[key] = approve_project_cost_source_contract(
++                contract=contract,
++                actor=self.approver,
++            )
++            self.sources[key, "source-1"] = NativeActualSource(
++                key,
++                model,
++                "source-1",
++                "native-version-1",
++                {"native": "test"},
++                Decimal("100.00"),
++                "IRR",
++                str(self.project.pk),
++                True,
++                "recognize",
++            )
++            self.policies[
++                (
++                    key,
++                    "TEST-CLASSIFICATION-1",
++                    "TEST-EXPLICIT-DATE-1",
++                    "TEST-RECONCILIATION-1",
++                )
++            ] = integration.ActualPolicyBinding(self.map_source)
++        self.native_patch = patch.object(
++            integration, "read_native_actual", side_effect=self.read_source
++        )
++        self.native_patch.start()
++        self.addCleanup(self.native_patch.stop)
++        self.policy_patch = patch.object(integration, "POLICIES", self.policies)
++        self.policy_patch.start()
++        self.addCleanup(self.policy_patch.stop)
++
++    def read_source(self, *, organization, producer_key, source_id, **kwargs):
++        if organization.pk != self.organization.pk:
++            raise ActualRejected("native_source_evidence_unavailable")
++        return self.sources[producer_key, source_id]
++
++    def map_source(self, *, source, **kwargs):
++        effect = integration.ActualEffect(
++            "explicit-allocation-line-1",
++            self.project,
++            self.cbs,
++            self.wbs,
++            self.cost_center,
++            -source.amount
++            if source.operation == "reverse" and source.amount > 0
++            else source.amount,
++            source.currency,
++            date(2026, 10, 14),
++            "TEST-NATIVE-VALUE-1",
++            "TEST-FINANCIAL-EVIDENCE-1",
++        )
++        return integration.ActualMapping(
++            (replace(effect, **self.mapping_changes),),
++            "TEST-CUTOFF-1",
++            "TEST-EXPLICIT-DATE-1",
++            "TEST-NATIVE-UNIT-RATE-BOOK-1",
++            "TEST-ATTRIBUTION-VERSION-1",
++        )
++
++    def candidate(self, key, source_id="source-1", **kwargs):
++        return integration.prepare_actual_candidate(
++            organization=self.organization,
++            actor=kwargs.get("actor", self.preparer),
++            contract_id=self.contracts[key].pk,
++            source_id=source_id,
++        )
++
++    def consume(self, candidate, **kwargs):
++        return integration.consume_actual_candidate(
++            organization=self.organization,
++            actor=self.preparer,
++            candidate=candidate,
++            **kwargs,
++        )
++
++    def reconcile(self, key, source="source-1"):
++        return integration.reconcile_actual_candidate(
++            organization=self.organization,
++            actor=self.preparer,
++            contract_id=self.contracts[key].pk,
++            source_id=source,
++        )
++
++    def test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent(
++        self,
++    ):
++        for key in SOURCE_MODELS:
++            with self.subTest(key=key):
++                before = ProjectCostFact.objects.count()
++                candidate = self.candidate(key)
++                self.assertEqual(ProjectCostFact.objects.count(), before)
++                result = self.consume(candidate)
++                self.assertEqual(self.consume(candidate).outcome, "replayed")
++                self.assertEqual(ProjectCostFact.objects.count(), before + 1)
++                fact = ProjectCostFact.objects.get(pk=result.fact_ids[0])
++                self.assertEqual(fact.contract_id, self.contracts[key].pk)
++                self.assertEqual(
++                    (fact.source_id, fact.source_version),
++                    (candidate.source_id, candidate.source_version),
++                )
++                self.assertEqual(fact.amount, Decimal("100.00"))
++                report = self.reconcile(key)
++                self.assertFalse(report["missing_target"])
++                self.assertTrue(report["target_payload_matches"])
++                print(
++                    f"CEP047 {key}: L2 no-write -> explicit actual -> replay; reconciliation={report}"
++                )
++
++    def test_all_three_source_reversals_preserve_original_and_replay_without_reactivation(
++        self,
++    ):
++        for key in SOURCE_MODELS:
++            with self.subTest(key=key):
++                candidate = self.candidate(key)
++                result = self.consume(candidate)
++                self.sources[key, "source-1"] = replace(candidate.source, active=False)
++                self.sources[key, "reversal-2"] = replace(
++                    candidate.source,
++                    source_id="reversal-2",
++                    source_version="reversal-version-2",
++                    operation="reverse",
++                    predecessor_id="source-1",
++                )
++                reverse_candidate = self.candidate(key, "reversal-2")
++                inverse = self.consume(reverse_candidate)
++                self.assertEqual(self.consume(reverse_candidate).outcome, "replayed")
++                self.assertEqual(self.consume(candidate).fact_ids, result.fact_ids)
++                original = ProjectCostFact.objects.get(pk=result.fact_ids[0])
++                reversal = ProjectCostFact.objects.get(pk=inverse.fact_ids[0])
++                self.assertEqual(reversal.reverses_id, original.pk)
++                self.assertEqual(original.amount, -reversal.amount)
++                self.assertEqual(original.amount, Decimal("100.00"))
++                report = self.reconcile(key, "reversal-2")
++                self.assertEqual(report["target_reversals"], inverse.fact_ids)
++                print(
++                    f"CEP047 {key}: native predecessor -> exact inverse; reconciliation={report}"
++                )
++
++    def test_explicit_successor_replaces_without_overwriting_finalized_facts(self):
++        key = "pcp-eqp-actual"
++        initial = self.candidate(key)
++        first = self.consume(initial)
++        self.sources[key, "replacement-2"] = replace(
++            initial.source,
++            source_id="replacement-2",
++            source_version="replacement-version-2",
++            amount=Decimal("120.00"),
++            operation="replace",
++            predecessor_id="source-1",
++        )
++        self.sources[key, "source-1"] = replace(initial.source, active=False)
++        second = self.consume(self.candidate(key, "replacement-2"))
++        self.assertEqual(len(second.fact_ids), 2)
++        self.assertEqual(
++            list(
++                ProjectCostFact.objects.order_by("amount").values_list(
++                    "amount", flat=True
++                )
++            ),
++            [Decimal("-100.00"), Decimal("100.00"), Decimal("120.00")],
++        )
++        self.assertEqual(
++            ProjectCostFact.objects.get(pk=first.fact_ids[0]).amount, Decimal("100.00")
++        )
++        self.sources[key, "replacement-2"] = replace(
++            self.sources[key, "replacement-2"], active=False
++        )
++        self.sources[key, "replacement-3"] = replace(
++            initial.source,
++            source_id="replacement-3",
++            source_version="replacement-version-3",
++            amount=Decimal("130.00"),
++            operation="replace",
++            predecessor_id="replacement-2",
++        )
++        self.consume(self.candidate(key, "replacement-3"))
++        report = self.reconcile(key)
++        self.assertIsNone(report["active_source_version"])
++        self.assertEqual(
++            report["active_source_versions"],
++            (
++                {
++                    "source_id": "replacement-3",
++                    "source_version": "replacement-version-3",
++                },
++            ),
++        )
++        self.assertEqual(Decimal(report["lineage_net_amount"]), Decimal("130.00"))
++        self.assertEqual(len(report["target_reversals"]), 2)
++        self.assertFalse(report["lineage_cycle"])
++        self.assertEqual(self.consume(initial).fact_ids, first.fact_ids)
++        print(f"CEP047 explicit replacement chain reconciliation={report}")
++
++    def test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates(
++        self,
++    ):
++        for key in SOURCE_MODELS:
++            with self.subTest(key=key):
++                candidate = self.candidate(key)
++                before = ProjectCostFact.objects.count()
++                original = integration.record_project_cost_fact
++
++                def fail_after_write(original=original, **kwargs):
++                    original(**kwargs)
++                    raise RuntimeError("synthetic failure after target insert")
++
++                with (
++                    patch.object(
++                        integration,
++                        "record_project_cost_fact",
++                        side_effect=fail_after_write,
++                    ),
++                    self.assertRaises(RuntimeError),
++                ):
++                    self.consume(candidate)
++                self.assertEqual(ProjectCostFact.objects.count(), before)
++                event = AuditEvent.objects.filter(
++                    entity_type=integration.ENTITY, metadata__stage="failed"
++                ).first()
++                self.assertEqual(event.metadata["error_code"], "target_failure")
++                self.sources[key, "source-1"] = replace(candidate.source, active=False)
++                with self.assertRaisesMessage(ActualRejected, "inactive_source"):
++                    self.consume(candidate, retry_of=event.entity_id)
++                self.sources[key, "source-1"] = candidate.source
++                self.assertEqual(
++                    self.consume(candidate, retry_of=event.entity_id).outcome,
++                    "recorded",
++                )
++                self.assertEqual(ProjectCostFact.objects.count(), before + 1)
++                print(
++                    f"CEP047 {key}: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry"
++                )
++
++    def test_no_approved_binding_no_fact_and_no_inferred_rounding(self):
++        from uuid import uuid4
++
++        key = "pcp-inv-actual"
++        with self.assertRaisesMessage(
++            ActualRejected, "approved_actual_contract_required"
++        ):
++            integration.prepare_actual_candidate(
++                organization=self.organization,
++                actor=self.preparer,
++                contract_id=uuid4(),
++                source_id="source-1",
++            )
++        with (
++            patch.object(integration, "POLICIES", {}),
++            self.assertRaisesMessage(
++                ActualRejected, "approved_mapping_cutoff_classification_required"
++            ),
++        ):
++            self.candidate(key)
++        self.mapping_changes = {"amount": Decimal("1.001")}
++        with self.assertRaisesMessage(
++            ActualRejected, "explicit_fact_precision_mapping_required"
++        ):
++            self.candidate(key)
++        self.assertFalse(ProjectCostFact.objects.exists())
++
++    def test_source_version_policy_and_candidate_tampering_fail_closed(self):
++        key = "pcp-inv-actual"
++        candidate = self.candidate(key)
++        with self.assertRaisesMessage(
++            ActualRejected, "candidate_source_or_policy_drift"
++        ):
++            self.consume(replace(candidate, payload_hash="forged"))
++        self.mapping_changes = {"amount": Decimal("101.00")}
++        with self.assertRaisesMessage(
++            ActualRejected, "candidate_source_or_policy_drift"
++        ):
++            self.consume(candidate)
++        self.mapping_changes = {}
++        self.consume(candidate)
++        self.sources[key, "source-1"] = replace(
++            candidate.source, source_version="new-version"
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "source_version_or_contract_changed_without_successor"
++        ):
++            self.consume(self.candidate(key))
++        report = self.reconcile(key)
++        self.assertTrue(report["unlinked_version_or_contract_drift"])
++        self.assertTrue(report["missing_target"])
++        self.assertEqual(
++            report["other_recorded_source_versions"][0]["source_version"],
++            candidate.source_version,
++        )
++
++    def test_existing_tenant_authority_is_required(self):
++        key = "pcp-inv-actual"
++        with self.assertRaises(PermissionDenied):
++            self.candidate(key, actor=self.outsider)
++        candidate = self.candidate(key)
++        # This actor is a member of the other tenant. The foreign producer
++        # contract is deliberately indistinguishable from an unavailable one.
++        with self.assertRaisesMessage(
++            ActualRejected, "approved_actual_contract_required"
++        ):
++            integration.consume_actual_candidate(
++                organization=self.other_organization,
++                actor=self.outsider,
++                candidate=candidate,
++            )
++        self.assertFalse(ProjectCostFact.objects.exists())
++
++    def test_preexisting_authoritative_source_fact_cannot_be_recognized_twice(self):
++        key = "pcp-inv-actual"
++        candidate = self.candidate(key)
++        effect = candidate.mapping.effects[0]
++        original = integration.record_project_cost_fact(
++            organization=self.organization,
++            project=effect.project,
++            actor=self.preparer,
++            contract=self.contracts[key],
++            kind="actual_recognized",
++            source_id=candidate.source_id,
++            source_version=candidate.source_version,
++            source_line_id="previous-explicit-line",
++            economic_event_id="previous-explicit-occurrence",
++            occurrence_id="previous-explicit-target-write",
++            recognition_date=effect.recognition_date,
++            currency=effect.currency,
++            amount=effect.amount,
++            cbs_node=effect.cbs_node,
++            wbs_node=effect.wbs_node,
++            cost_center=effect.cost_center,
++            classification_version=self.contracts[key].classification_policy_reference,
++            valuation_reference=effect.valuation_reference,
++            financial_evidence_reference=effect.financial_evidence_reference,
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "source_facts_without_integration_lineage"
++        ):
++            self.consume(candidate)
++        self.assertEqual(
++            list(ProjectCostFact.objects.values_list("pk", flat=True)), [original.pk]
++        )
++        report = self.reconcile(key)
++        self.assertEqual(report["unlinked_target_fact_ids"], (str(original.pk),))
++        self.assertEqual(ProjectCostFact.objects.count(), 1)
++
++    def test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals(
++        self,
++    ):
++        import json
++        from datetime import timedelta
++
++        from django.utils import timezone
++
++        from apps.accounting.models import FiscalPeriod, FiscalYear, JournalEntry
++        from apps.accounting.test_cep042_regression import explicit_fixture_authority
++        from apps.accounts.models import User
++        from apps.equipment import cost_services as equipment
++        from apps.equipment.models import Equipment, EquipmentAssignment
++        from apps.equipment.p8_services import record_usage
++        from apps.fixed_assets import services as assets
++        from apps.fixed_assets.test_p8_s24_s27 import P8CostAndFixedAssetTests
++        from apps.inventory import p8_services as valuation
++        from apps.inventory import services as inventory
++        from apps.materials.models import Material, UnitOfMeasure
++        from apps.organizations.models import (
++            BusinessPermission,
++            OrganizationMembership,
++            OrganizationRole,
++            PlatformPolicy,
++            PlatformPolicyVersion,
++            TenantPolicySelection,
++        )
++        from apps.organizations.policy_specs import (
++            ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
++            ACCOUNTING_ROUNDING_POLICY_CODE,
++            get_platform_policy_spec,
++            initial_accounting_policy_parameters,
++        )
++        from apps.projects.actual_sources import read_native_actual
++        from apps.projects.models import ProjectSite
++
++        self.native_patch.stop()
++        self.owner = self.preparer
++        self.reviewer = User.objects.create_user(username="native-reviewer")
++        self.organization.memberships.create(
++            user=self.reviewer, role="company_owner", status="active"
++        )
++        role = OrganizationRole.objects.create(
++            organization=self.organization,
++            code="cep047-native-test-only",
++            name="Explicit synthetic source workflow authority",
++            created_by=self.preparer,
++        )
++        role.permissions.add(
++            *BusinessPermission.objects.exclude(
++                code__startswith="accounting_recognition."
++            )
++        )
++        for actor in (self.owner, self.reviewer, self.approver):
++            explicit_fixture_authority(
++                OrganizationMembership.objects.get(
++                    organization=self.organization,
++                    user=actor,
++                ),
++                role,
++            )
++        self.today = timezone.localdate()
++        self.site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project,
++            code="NATIVE",
++            name="Native site",
++        )
++        self.equipment = Equipment.objects.create(
++            organization=self.organization,
++            code="NATIVE-EQ",
++            name="Native equipment",
++            category="Machinery",
++        )
++        deployment = EquipmentAssignment.objects.create(
++            organization=self.organization,
++            equipment=self.equipment,
++            project=self.project,
++            site=self.site,
++            start_date=self.today - timedelta(days=30),
++            status="active",
++            created_by=self.owner,
++            updated_by=self.owner,
++        )
++        P8CostAndFixedAssetTests._published_cost_policy(self)
++        usage = record_usage(
++            organization=self.organization,
++            actor=self.owner,
++            equipment=self.equipment,
++            deployment=deployment,
++            started_at=timezone.now() - timedelta(hours=2),
++            ended_at=timezone.now(),
++            runtime_hours=Decimal(2),
++            source_key="CEP047-USAGE",
++        )
++        allocation = equipment.prepare_cost_allocation(
++            organization=self.organization,
++            actor=self.owner,
++            usage=usage,
++            source_key="CEP047-ALLOCATION",
++            wbs_node=self.wbs,
++            cost_center=self.cost_center,
++        )
++        equipment.finalize_cost_allocation(
++            organization=self.organization, actor=self.reviewer, allocation=allocation
++        )
++        proposal = equipment.prepare_cost_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            allocation=allocation,
++            occurrence_key="CEP047-EQ-PROPOSAL",
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "equipment_proposal_not_reviewed"
++        ):
++            self.candidate("pcp-eqp-actual", allocation.pk)
++        equipment.review_cost_handoff(
++            organization=self.organization, actor=self.reviewer, envelope=proposal
++        )
++
++        # Reuse the established native capitalization fixture, with its independent
++        # maker/reviewer/capitalizer and book policy; no direct finalized row seed.
++        self._published_asset_policies = lambda convention: (
++            P8CostAndFixedAssetTests._published_asset_policies(self, convention)
++        )
++        asset, book = P8CostAndFixedAssetTests._capitalized_asset(self)
++        generic_asset_proposal = assets.prepare_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            consumer="project_cost",
++            occurrence_key="CEP047-NOT-DEPRECIATION",
++            asset_transaction=asset.transactions.get(transaction_type="capitalization"),
++        )
++        assets.review_handoff(
++            organization=self.organization,
++            actor=self.reviewer,
++            envelope=generic_asset_proposal,
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "approved_asset_allocation_evidence_required"
++        ):
++            self.candidate("pcp-fa-actual", generic_asset_proposal.pk)
++        with self.assertRaisesMessage(
++            ActualRejected, "native_source_evidence_unavailable"
++        ):
++            self.candidate("pcp-eqp-actual", self.equipment.pk)
++        year = FiscalYear.objects.create(
++            organization=self.organization,
++            code="CEP047-FY",
++            name="2026",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++            created_by=self.owner,
++        )
++        period = FiscalPeriod.objects.create(
++            organization=self.organization,
++            fiscal_year=year,
++            number=1,
++            name="January",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 1, 31),
++        )
++        run = assets.preview_depreciation(
++            organization=self.organization,
++            actor=self.owner,
++            book_policy=book,
++            fiscal_period=period,
++            occurrence_key="CEP047-DEPRECIATION",
++        )
++        assets.finalize_depreciation(
++            organization=self.organization, actor=self.reviewer, run=run
++        )
++        asset_proposal = assets.prepare_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            consumer="project_cost",
++            occurrence_key="CEP047-FA-PROPOSAL",
++            depreciation_line=run.lines.get(asset=asset),
++        )
++        with self.assertRaisesMessage(ActualRejected, "asset_proposal_not_reviewed"):
++            self.candidate("pcp-fa-actual", asset_proposal.pk)
++        assets.review_handoff(
++            organization=self.organization, actor=self.reviewer, envelope=asset_proposal
++        )
++
++        for code in (
++            ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
++            ACCOUNTING_ROUNDING_POLICY_CODE,
++        ):
++            spec = get_platform_policy_spec(code)
++            policy, _ = PlatformPolicy.objects.get_or_create(
++                code=code,
++                defaults={
++                    "name": spec.name,
++                    "category": spec.category,
++                    "sensitivity": spec.sensitivity,
++                    "tenant_selectable": spec.tenant_selectable,
++                    "requires_source_provenance": False,
++                    "created_by": self.owner,
++                    "updated_by": self.owner,
++                },
++            )
++            version, _ = PlatformPolicyVersion.objects.get_or_create(
++                policy=policy,
++                version=1,
++                defaults={
++                    "parameters": initial_accounting_policy_parameters(code),
++                    "effective_from": self.today,
++                    "status": "published",
++                    "source_basis": "product_defined",
++                    "created_by": self.owner,
++                    "published_by": self.owner,
++                    "published_at": timezone.now(),
++                    "reason": "Synthetic native fixture",
++                },
++            )
++            membership = self.organization.memberships.get(user=self.owner)
++            TenantPolicySelection.objects.create(
++                organization=self.organization,
++                policy=policy,
++                policy_version=version,
++                status="active",
++                approved_by=membership,
++                approved_at=timezone.now(),
++                applied_by=membership,
++                applied_at=timezone.now(),
++                reason="Synthetic native fixture",
++            )
++        unit = UnitOfMeasure.objects.create(
++            organization=self.organization,
++            code="CEP047-UNIT",
++            name="Unit",
++            symbol="u",
++            category="count",
++        )
++        material = Material.objects.create(
++            organization=self.organization,
++            code="CEP047-MAT",
++            name="Material",
++            unit_of_measure=unit,
++        )
++        warehouse = inventory.create_warehouse(
++            organization=self.organization,
++            actor=self.owner,
++            code="CEP047-WH",
++            name="Warehouse",
++        )
++
++        def movement(kind, quantity, number):
++            item = inventory.create_stock_transaction(
++                organization=self.organization,
++                actor=self.owner,
++                transaction_number=number,
++                transaction_type=kind,
++                material=material,
++                unit_of_measure=unit,
++                quantity=Decimal(quantity),
++                occurred_at=timezone.now(),
++                project=self.project,
++                **(
++                    {"destination_warehouse": warehouse}
++                    if kind == "adjustment_in"
++                    else {"source_warehouse": warehouse}
++                ),
++            )
++            return inventory.post_stock_transaction(
++                organization=self.organization, actor=self.owner, stock_transaction=item
++            )
++
++        receipt = movement("adjustment_in", 10, "CEP047-OPENING")
++        opening_event = valuation.finalize_valuation(
++            organization=self.organization,
++            actor=self.owner,
++            stock_transaction=receipt,
++            source_reference="TEST-OPENING",
++            source_version="1",
++            unit_cost=Decimal(10),
++            idempotency_key="CEP047-OPENING",
++        )
++        valuation.supply_cost_envelope(
++            organization=self.organization,
++            actor=self.owner,
++            valuation_event=opening_event,
++            consumer="project_controls",
++            idempotency_key="CEP047-NOT-CONSUMPTION",
++        )
++        with self.assertRaisesMessage(ActualRejected, "not_project_consumption"):
++            self.candidate("pcp-inv-actual", opening_event.pk)
++        self.assertFalse(ProjectCostFact.objects.exists())
++        issue = movement("issue", 2, "CEP047-ISSUE")
++        event = valuation.finalize_valuation(
++            organization=self.organization,
++            actor=self.owner,
++            stock_transaction=issue,
++            source_reference="TEST-CONSUMPTION",
++            source_version="1",
++            unit_cost=Decimal(0),
++            idempotency_key="CEP047-ISSUE",
++        )
++        valuation.supply_cost_envelope(
++            organization=self.organization,
++            actor=self.owner,
++            valuation_event=event,
++            consumer="project_controls",
++            idempotency_key="CEP047-INV-PROPOSAL",
++        )
++
++        originals = {}
++        journal_count = JournalEntry.objects.count()
++        for key, source in (
++            ("pcp-inv-actual", event),
++            ("pcp-eqp-actual", allocation),
++            ("pcp-fa-actual", asset_proposal),
++        ):
++            before = ProjectCostFact.objects.count()
++            candidate = self.candidate(key, source.pk)
++            self.assertEqual(ProjectCostFact.objects.count(), before)
++            originals[key] = candidate, self.consume(candidate)
++            self.assertEqual(self.consume(candidate).outcome, "replayed")
++            self.assertEqual(
++                candidate.source,
++                read_native_actual(
++                    organization=self.organization,
++                    actor=self.owner,
++                    producer_key=key,
++                    source_id=source.pk,
++                ),
++            )
++            self.assertTrue(self.reconcile(key, source.pk)["target_payload_matches"])
++            print(
++                f"CEP047 NATIVE {key}: approved workflow evidence -> L2 -> explicit target -> replay"
++            )
++
++        inverse_stock = inventory.reverse_stock_transaction(
++            organization=self.organization,
++            actor=self.owner,
++            stock_transaction=issue,
++            reversal_number="CEP047-ISSUE-REV",
++            reason="Reviewed correction",
++        )
++        inverse_event = valuation.reverse_valuation(
++            organization=self.organization,
++            actor=self.owner,
++            stock_transaction=inverse_stock,
++            idempotency_key="CEP047-INV-REV",
++        )
++        valuation.supply_cost_envelope(
++            organization=self.organization,
++            actor=self.owner,
++            valuation_event=inverse_event,
++            consumer="project_controls",
++            idempotency_key="CEP047-INV-REV-PROPOSAL",
++        )
++        inverse_allocation = equipment.reverse_cost_allocation(
++            organization=self.organization,
++            actor=self.approver,
++            allocation=allocation,
++            reason="Reviewed correction",
++        )
++        inverse_proposal = equipment.prepare_cost_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            allocation=inverse_allocation,
++            occurrence_key="CEP047-EQ-REV-PROPOSAL",
++        )
++        equipment.review_cost_handoff(
++            organization=self.organization,
++            actor=self.reviewer,
++            envelope=inverse_proposal,
++        )
++        inverse_run = assets.reverse_depreciation(
++            organization=self.organization,
++            actor=self.approver,
++            run=run,
++            occurrence_key="CEP047-DEP-REV",
++            reason="Reviewed correction",
++        )
++        inverse_asset_proposal = assets.prepare_handoff(
++            organization=self.organization,
++            actor=self.owner,
++            consumer="project_cost",
++            occurrence_key="CEP047-FA-REV-PROPOSAL",
++            depreciation_line=inverse_run.lines.get(asset=asset),
++        )
++        assets.review_handoff(
++            organization=self.organization,
++            actor=self.reviewer,
++            envelope=inverse_asset_proposal,
++        )
++        for key, source in (
++            ("pcp-inv-actual", inverse_event),
++            ("pcp-eqp-actual", inverse_allocation),
++            ("pcp-fa-actual", inverse_asset_proposal),
++        ):
++            candidate, original_result = originals[key]
++            native = read_native_actual(
++                organization=self.organization,
++                actor=self.owner,
++                producer_key=key,
++                source_id=source.pk,
++            )
++            self.assertEqual(native.predecessor_id, candidate.source_id)
++            inverse = self.consume(self.candidate(key, source.pk))
++            self.assertEqual(self.consume(candidate).outcome, "replayed")
++            original = ProjectCostFact.objects.get(pk=original_result.fact_ids[0])
++            reversed_fact = ProjectCostFact.objects.get(pk=inverse.fact_ids[0])
++            self.assertEqual(
++                (reversed_fact.reverses_id, reversed_fact.amount),
++                (original.pk, -original.amount),
++            )
++            report = self.reconcile(key, candidate.source_id)
++            self.assertFalse(report["source_active"])
++            self.assertIn(str(reversed_fact.pk), report["target_reversals"])
++            print(
++                f"CEP047 NATIVE {key}: explicit source inverse -> linked target inverse; reconciliation={report}"
++            )
++        self.assertEqual(JournalEntry.objects.count(), journal_count)
++        for event in AuditEvent.objects.filter(
++            entity_type=integration.ENTITY,
++            metadata__stage="succeeded",
++        ).order_by("created_at"):
++            self.assertTrue(event.metadata["native_lineage"])
++            print("CEP047 TRACE " + json.dumps(event.metadata, sort_keys=True))
+
+diff --git a/apps/projects/test_cep047_regression.py b/apps/projects/test_cep047_regression.py
+new file mode 100644
+index 0000000..16ab7a9
+--- /dev/null
++++ b/apps/projects/test_cep047_regression.py
+@@ -0,0 +1,55 @@
++"""Retained source scenarios with explicit current test-only authority.
++
++No shared historical fixture, permission default or source workflow is changed.
++"""
++
++from unittest.mock import patch
++
++from apps.accounting.test_cep042_regression import explicit_fixture_authority
++from apps.inventory import test_p8_s12_s17 as scenarios
++from apps.organizations.models import (
++    BusinessPermission,
++    OrganizationMembership,
++    OrganizationRole,
++)
++
++
++def _explicit_memberships():
++    for membership in OrganizationMembership.objects.all():
++        role, _ = OrganizationRole.objects.get_or_create(
++            organization=membership.organization,
++            code="cep047-native-regression",
++            defaults={
++                "name": "Explicit synthetic native regression authority",
++                "created_by": membership.user,
++            },
++        )
++        role.permissions.add(
++            *BusinessPermission.objects.exclude(
++                code__startswith="accounting_recognition."
++            )
++        )
++        explicit_fixture_authority(membership, role)
++
++
++class InventoryValuationRegression(scenarios.InventoryValuationAcceptanceTests):
++    def setUp(self):
++        original = scenarios.InventoryFixtureMixin.setUp
++
++        def current_fixture(instance):
++            from apps.inventory import tests as base
++
++            create_warehouse = base.create_warehouse
++
++            def authorized_warehouse(**kwargs):
++                _explicit_memberships()
++                return create_warehouse(**kwargs)
++
++            with patch.object(
++                base, "create_warehouse", side_effect=authorized_warehouse
++            ):
++                original(instance)
++
++        with patch.object(scenarios.InventoryFixtureMixin, "setUp", current_fixture):
++            super().setUp()
++        _explicit_memberships()

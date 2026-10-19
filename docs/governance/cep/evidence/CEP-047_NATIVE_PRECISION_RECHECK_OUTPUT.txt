@@ -1,0 +1,39 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 1 item
+
+Using existing test database for alias 'default' ('test_bonira_cep047_focused_v2_20261019')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals CEP047 NATIVE pcp-inv-actual: approved workflow evidence -> L2 -> explicit target -> replay
+CEP047 NATIVE pcp-eqp-actual: approved workflow evidence -> L2 -> explicit target -> replay
+CEP047 NATIVE pcp-fa-actual: approved workflow evidence -> L2 -> explicit target -> replay
+FAILED
+IMMEDIATE FAILURE
+apps\projects\test_cep047_actual.py:854: in test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals
+    self.assertEqual(self.consume(candidate).outcome, "replayed")
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\test_cep047_actual.py:180: in consume
+    return integration.consume_actual_candidate(
+apps\projects\actual_integration.py:357: in consume_actual_candidate
+    raise ActualRejected("candidate_source_or_policy_drift")
+E   apps.projects.actual_sources.ActualRejected: candidate_source_or_policy_drift
+
+
+================================== FAILURES ===================================
+_ ActualTargetTests.test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals _
+apps\projects\test_cep047_actual.py:854: in test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals
+    self.assertEqual(self.consume(candidate).outcome, "replayed")
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\test_cep047_actual.py:180: in consume
+    return integration.consume_actual_candidate(
+apps\projects\actual_integration.py:357: in consume_actual_candidate
+    raise ActualRejected("candidate_source_or_policy_drift")
+E   apps.projects.actual_sources.ActualRejected: candidate_source_or_policy_drift
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals - apps.projects.actual_sources.ActualRejected: candidate_source_or_policy_drift
+============================= 1 failed in 14.85s ==============================

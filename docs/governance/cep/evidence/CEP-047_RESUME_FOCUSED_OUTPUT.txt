@@ -1,0 +1,20 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 9 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_resume_20261019')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying procurement.0009_p5_s10_admissibility... OK
+  Applying procurement.0010_p5_s11_comparison_award...

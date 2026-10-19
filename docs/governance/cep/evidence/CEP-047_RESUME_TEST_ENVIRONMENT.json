@@ -1,0 +1,107 @@
+{
+  "database": "test_bonira_cep047_resume_20261019",
+  "engine": "PostgreSQL18.6",
+  "source": "Consistent pg_dump of existing disposable test_construction_erp at resume; zero Organizations/Projects/Facts",
+  "schema_and_migration_guards_preserved": true,
+  "migration_374_count_at_copy": true,
+  "existing_test_process_preserved": true,
+  "development_mutation": false,
+  "production_mutation": false,
+  "validation_mode": "pytest --reuse-db --no-migrations against copied migrated affected-domain schema; not migration verification",
+  "copied_schema_unapplied_migrations": 37,
+  "copied_affected_domain_migrations": "All disk migrations applied for projects/inventory/equipment/fixed_assets/organizations/accounting/audit; other missing migrations are unrelated; syncdb may create absent unrelated tables",
+  "completeness_claim": "No all-application migration or full-suite PASS claimed",
+  "affected_schema_triggers": [
+    [
+      "projects_budgetallocation",
+      "projects_budget_allocation_guard"
+    ],
+    [
+      "projects_budgetmanifestline",
+      "projects_budget_manifest_line_guard"
+    ],
+    [
+      "projects_budgetsourcemanifest",
+      "projects_budget_manifest_guard"
+    ],
+    [
+      "projects_budgetversion",
+      "projects_budget_accepted_guard"
+    ],
+    [
+      "projects_cbsnode",
+      "projects_cbs_node_guard"
+    ],
+    [
+      "projects_costcenter",
+      "projects_cost_center_guard"
+    ],
+    [
+      "projects_coststructureversion",
+      "projects_cost_structure_guard"
+    ],
+    [
+      "projects_projectchangeproposal",
+      "projects_change_proposal_guard"
+    ],
+    [
+      "projects_projectcontrolitem",
+      "projects_control_item_guard"
+    ],
+    [
+      "projects_projectcontrolstatusevent",
+      "projects_control_status_guard"
+    ],
+    [
+      "projects_projectcostfact",
+      "projects_cost_fact_guard"
+    ],
+    [
+      "projects_projectcostforecast",
+      "projects_cost_forecast_guard"
+    ],
+    [
+      "projects_projectcostsourcecontract",
+      "projects_cost_contract_guard"
+    ],
+    [
+      "projects_projectscheduledependency",
+      "projects_schedule_dependency_guard"
+    ],
+    [
+      "projects_projectscheduleitem",
+      "projects_schedule_item_guard"
+    ],
+    [
+      "projects_projectschedulerevision",
+      "projects_schedule_revision_guard"
+    ],
+    [
+      "projects_schedulerebaselineproposal",
+      "projects_rebaseline_proposal_guard"
+    ]
+  ],
+  "final_test_databases": [
+    "test_bonira_cep047_focused_v2_20261019",
+    "test_bonira_cep047_regression_v2_20261019"
+  ],
+  "final_schema_source": "Read-only pg_dump --schema-only of configured loopback Development PostgreSQL; no business/catalog data copied",
+  "final_model_column_check": "All current managed model local fields exist in source schema",
+  "first_copy_failure_attribution": "37 incomplete unrelated migrations in preexisting test DB; missing procurement_goodsreceipt.purchase_order_version_id caused five legacy Inventory fixture failures; not047 regression",
+  "final_test_setup": "pytest --reuse-db --no-migrations on current full schema with native database triggers preserved and code-owned test catalogues bootstrapped",
+  "final_affected_guard_comparison": {
+    "result": "PASS: native public-schema triggers identical; full constraint identity set retained and equivalent",
+    "trigger_count": 17,
+    "constraint_count": 1402,
+    "exact_constraint_definitions": 1401,
+    "pg_dump_restore_expression_normalization": {
+      "constraint": [
+        "projects_projectcostfact",
+        "project_cost_fact_kind_sign_ck"
+      ],
+      "difference": "PostgreSQL array-to-text cast rendered elementwise on restore; equivalent predicate",
+      "equivalent_check_truth_table_cases": 24
+    },
+    "scope": "Public projects/inventory/equipment/fixed_assets schema metadata only; no business data copied"
+  }
+}

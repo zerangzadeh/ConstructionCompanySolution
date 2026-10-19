@@ -1,0 +1,65 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 2 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_focused_v2_20261019')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals FAILED
+IMMEDIATE FAILURE
+apps\projects\test_cep047_actual.py:768: in test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals
+    originals[key] = candidate, self.consume(candidate)
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\test_cep047_actual.py:180: in consume
+    return integration.consume_actual_candidate(
+apps\projects\actual_integration.py:470: in consume_actual_candidate
+    fact = record_project_cost_fact(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:2057: in record_project_cost_fact
+    fact = ProjectCostFact.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\projects\models.py:1203: in save
+    self.full_clean()
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'amount': ['نباید بیش از 2 رقم اعشار داشته باشد.']}
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_preexisting_authoritative_source_fact_cannot_be_recognized_twice PASSED
+
+================================== FAILURES ===================================
+_ ActualTargetTests.test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals _
+apps\projects\test_cep047_actual.py:768: in test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals
+    originals[key] = candidate, self.consume(candidate)
+                                ^^^^^^^^^^^^^^^^^^^^^^^
+apps\projects\test_cep047_actual.py:180: in consume
+    return integration.consume_actual_candidate(
+apps\projects\actual_integration.py:470: in consume_actual_candidate
+    fact = record_project_cost_fact(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:2057: in record_project_cost_fact
+    fact = ProjectCostFact.objects.create(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:665: in create
+    obj.save(force_insert=True, using=self.db)
+apps\projects\models.py:1203: in save
+    self.full_clean()
+.venv\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'amount': ['نباید بیش از 2 رقم اعشار داشته باشد.']}
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_native_domain_workflows_feed_all_three_candidates_and_exact_reversals - django.core.exceptions.ValidationError: {'amount': ['نباید بیش از 2 رقم اعشار داشته باشد.']}
+======================== 1 failed, 1 passed in 21.39s =========================

@@ -1,0 +1,18 @@
+{
+  "source": "CEP-047_FOCUSED_VERIFIED_OUTPUT.txt",
+  "asserted_failure_paths": [
+    "apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates CEP047 pcp-inv-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry",
+    "SUBPASSED(key='pcp-inv-actual')CEP047 pcp-eqp-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry",
+    "apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates SUBPASSED(key='pcp-eqp-actual')CEP047 pcp-fa-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry"
+  ],
+  "assertions": [
+    "Target insert and success evidence roll back atomically",
+    "Separate failure audit survives rollback",
+    "Inactive-source retry denied",
+    "Revalidated retry creates one fact",
+    "Three native source reversals retain originals and exact target inverse lineage",
+    "Existing authoritative source fact without integration lineage blocks duplicate recognition and is reported read-only"
+  ],
+  "native_success_audit_count": 6,
+  "test_result": "10 PASS;9 source-family subtests PASS"
+}

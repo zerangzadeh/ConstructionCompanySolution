@@ -1,0 +1,64 @@
+FFFFF                                                                    [100%]
+================================== FAILURES ===================================
+_ IntegratedProjectCostTests.test_commitment_actual_accrual_replacement_and_projection _
+apps\projects\test_p4_integrated_cost.py:33: in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:70: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+_ IntegratedProjectCostTests.test_contract_precedes_facts_is_idempotent_and_enforces_sod _
+apps\projects\test_p4_integrated_cost.py:33: in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:70: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+___ IntegratedProjectCostTests.test_coverage_forecast_and_fail_closed_gates ___
+apps\projects\test_p4_integrated_cost.py:33: in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:70: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+___ IntegratedProjectCostTests.test_cross_tenant_and_database_immutability ____
+apps\projects\test_p4_integrated_cost.py:33: in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:70: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+_ IntegratedProjectCostTests.test_project_detail_exposes_permission_scoped_incomplete_projection _
+apps\projects\test_p4_integrated_cost.py:33: in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+apps\projects\test_p4_budget_preparation.py:70: in setUp
+    self.project = create_project(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\projects\services.py:169: in create_project
+    raise PermissionDenied("اجازه ایجاد پروژه در این سازمان را ندارید.")
+E   django.core.exceptions.PermissionDenied: اجازه ایجاد پروژه در این سازمان را ندارید.
+=========================== short test summary info ===========================
+FAILED apps/projects/test_p4_integrated_cost.py::IntegratedProjectCostTests::test_commitment_actual_accrual_replacement_and_projection
+FAILED apps/projects/test_p4_integrated_cost.py::IntegratedProjectCostTests::test_contract_precedes_facts_is_idempotent_and_enforces_sod
+FAILED apps/projects/test_p4_integrated_cost.py::IntegratedProjectCostTests::test_coverage_forecast_and_fail_closed_gates
+FAILED apps/projects/test_p4_integrated_cost.py::IntegratedProjectCostTests::test_cross_tenant_and_database_immutability
+FAILED apps/projects/test_p4_integrated_cost.py::IntegratedProjectCostTests::test_project_detail_exposes_permission_scoped_incomplete_projection
+5 failed in 9.68s

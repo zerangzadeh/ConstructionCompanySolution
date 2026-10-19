@@ -1,0 +1,628 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 22 items
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_internal_transfer_carries_wac_without_pool_gain_or_loss <- apps\inventory\test_p8_s12_s17.py FAILED [  4%]
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:207: in test_internal_transfer_carries_wac_without_pool_gain_or_loss
+    opening = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_missing_cost_exception_is_persistent_and_visible <- apps\inventory\test_p8_s12_s17.py FAILED [  9%]
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:121: in test_missing_cost_exception_is_persistent_and_visible
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_one_proposal_per_source_and_consumer_prevents_double_count <- apps\inventory\test_p8_s12_s17.py FAILED [ 13%]
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:287: in test_one_proposal_per_source_and_consumer_prevents_double_count
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_reconciliation_detects_unvalued_posted_movement_and_is_read_only <- apps\inventory\test_p8_s12_s17.py FAILED [ 18%]
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:107: in test_reconciliation_detects_unvalued_posted_movement_and_is_read_only
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_rtl_workbench_is_reachable <- apps\inventory\test_p8_s12_s17.py PASSED [ 22%]
+apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_wac_issue_reversal_restores_quantity_value_and_lineage <- apps\inventory\test_p8_s12_s17.py FAILED [ 27%]
+IMMEDIATE FAILURE
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:149: in test_wac_issue_reversal_restores_quantity_value_and_lineage
+    receipt = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_cross_tenant_source_and_asset_access_fail_closed <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 31%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_daily_prorata_depreciation_uses_ready_for_use_days <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 36%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_assigns_rounding_residual_in_final_life_period <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 40%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_does_not_start_before_capitalization_date <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 45%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_depreciation_rejects_backdated_period_after_later_finalization <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 50%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_equipment_cost_is_conserved_proposal_with_no_actual_or_journal <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 54%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_fixed_asset_workbench_is_tenant_permission_scoped <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 59%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_future_impairment_is_not_applied_to_prior_period <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 63%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_impairment_uses_review_and_linked_reversal <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 68%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_straight_line_run_reversal_and_proposal_create_no_gl_or_actual <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 72%]
+apps/accounting/test_cep042_regression.py::AssetAffectedRegression::test_transfer_is_prospective_and_disposal_stops_depreciation <- apps\fixed_assets\test_p8_s24_s27.py PASSED [ 77%]
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_commitment_actual_accrual_replacement_and_projection <- apps\projects\test_p4_integrated_cost.py PASSED [ 81%]
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_contract_precedes_facts_is_idempotent_and_enforces_sod <- apps\projects\test_p4_integrated_cost.py PASSED [ 86%]
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_coverage_forecast_and_fail_closed_gates <- apps\projects\test_p4_integrated_cost.py PASSED [ 90%]
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_cross_tenant_and_database_immutability <- apps\projects\test_p4_integrated_cost.py PASSED [ 95%]
+apps/projects/test_cep005_commitment_integration.py::RetainedProjectionRegressionTests::test_project_detail_exposes_permission_scoped_incomplete_projection <- apps\projects\test_p4_integrated_cost.py PASSED [100%]
+
+================================== FAILURES ===================================
+_ InventoryValuationRegression.test_internal_transfer_carries_wac_without_pool_gain_or_loss _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:207: in test_internal_transfer_carries_wac_without_pool_gain_or_loss
+    opening = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+---------------------------- Captured stderr setup ----------------------------
+Using existing test database for alias 'default' ('test_bonira_cep047_regression_20261019')...
+
+_ InventoryValuationRegression.test_missing_cost_exception_is_persistent_and_visible _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:121: in test_missing_cost_exception_is_persistent_and_visible
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+_ InventoryValuationRegression.test_one_proposal_per_source_and_consumer_prevents_double_count _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:287: in test_one_proposal_per_source_and_consumer_prevents_double_count
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+_ InventoryValuationRegression.test_reconciliation_detects_unvalued_posted_movement_and_is_read_only _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:107: in test_reconciliation_detects_unvalued_posted_movement_and_is_read_only
+    movement = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+_ InventoryValuationRegression.test_wac_issue_reversal_restores_quantity_value_and_lineage _
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   psycopg.errors.UndefinedColumn: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+
+The above exception was the direct cause of the following exception:
+apps\inventory\test_p8_s12_s17.py:149: in test_wac_issue_reversal_restores_quantity_value_and_lineage
+    receipt = self.create_and_post(
+apps\inventory\tests.py:180: in create_and_post
+    return post_stock_transaction(
+apps\inventory\services.py:686: in post_stock_transaction
+    return post_stock_transaction_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\workflow.py:598: in post_stock_transaction_with_workflow
+    return _post_stock_transaction_domain(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\inventory\services.py:521: in _post_stock_transaction_domain
+    .get(pk=stock_transaction.pk, organization=organization)
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:631: in get
+    num = len(clone)
+          ^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:368: in __len__
+    self._fetch_all()
+.venv\Lib\site-packages\django\db\models\query.py:1954: in _fetch_all
+    self._result_cache = list(self._iterable_class(self))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:93: in __iter__
+    results = compiler.execute_sql(
+.venv\Lib\site-packages\django\db\models\sql\compiler.py:1623: in execute_sql
+    cursor.execute(sql, params)
+.venv\Lib\site-packages\django\db\backends\utils.py:79: in execute
+    return self._execute_with_wrappers(
+.venv\Lib\site-packages\django\db\backends\utils.py:92: in _execute_with_wrappers
+    return executor(sql, params, many, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\backends\utils.py:100: in _execute
+    with self.db.wrap_database_errors:
+.venv\Lib\site-packages\django\db\utils.py:91: in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+.venv\Lib\site-packages\django\db\backends\utils.py:105: in _execute
+    return self.cursor.execute(sql, params)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\psycopg\cursor.py:117: in execute
+    raise ex.with_traceback(None)
+E   django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+E   LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+E                                                                ^
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_internal_transfer_carries_wac_without_pool_gain_or_loss - django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+                                                             ^
+FAILED apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_missing_cost_exception_is_persistent_and_visible - django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+                                                             ^
+FAILED apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_one_proposal_per_source_and_consumer_prevents_double_count - django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+                                                             ^
+FAILED apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_reconciliation_detects_unvalued_posted_movement_and_is_read_only - django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+                                                             ^
+FAILED apps/projects/test_cep047_regression.py::InventoryValuationRegression::test_wac_issue_reversal_restores_quantity_value_and_lineage - django.db.utils.ProgrammingError: column procurement_goodsreceipt.purchase_order_version_id does not exist
+LINE 1: ..._id", "procurement_goodsreceipt"."updated_by_id", "procureme...
+                                                             ^
+================== 5 failed, 17 passed in 132.31s (0:02:12) ===================

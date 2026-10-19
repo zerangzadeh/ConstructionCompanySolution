@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 52
+  execution_state_complete: 53
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 0
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 25
+  not_started_other_current_governed: 24
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -107,8 +107,8 @@ gates:
   GATE-05:
     status: NOT_PASSED
     evaluated_at: '2026-10-19'
-    evidence: docs/governance/cep/evidence/CEP-044_GATE05_EVALUATION.json
-    note: CEP044 IMB0062 source-family L2 contribution verified; prior contributor reviews retained. Other required contracts remain incomplete or unverified. No global convergence PASS, tenant activation, UAT or production authority inferred.
+    evidence: docs/governance/cep/evidence/CEP-047_GATE05_EVALUATION.json
+    note: CEP047 IMB0034/35/36 conditional source-specific contract builds verified with18/18 AC and scoped DoD; prior contributor reviews retained. Other convergence contributors remain incomplete/unverified; runtime tenant mapping activation remains conditional. No global PASS, Human Sign-off or production authority.
 authorization_batches:
   AUTH-BATCH-003:
     execution_mode: SERIAL
@@ -189,6 +189,14 @@ human_decisions:
     scope: Finding002 full exact write-off reversal and optional replacement atomic correction set; explicit date, retained lineage, idempotency, existing permission/Self-Approval and exact Accounting boundary
     production_authorized: false
     git_writes_authorized: false
+  HUMAN-CEP047-CANONICAL-MAPPINGS-20261019:
+    source: docs/governance/cep/supporting/CEP-047_CANONICAL_MAPPING_RESOLUTION.md
+    authority: HUMAN_DECISION_AUTHORITY / Product Owner
+    status: CONFIRMED_CANONICAL_RESOLUTION
+    scope: Finding001 exact INT-B04/B05/B06 mappings and PD010 guardrails; no contract, scope, dependency or production authority amendment
+    provenance: docs/governance/cep/evidence/CEP-047_MAPPING_RESOLUTION_PROVENANCE.json
+    unresolved_material_semantics_must_stop: true
+    production_authorized: false
 registry_update_rules:
   on_start:
   - Read registry before product mutation
@@ -2414,39 +2422,60 @@ ceps:
       status: GIT_CHECKPOINT_VERIFIED
       reason: Completed046 implementation/evidence checkpoint 46eec7aa81848fe83b8081cab57354d2acc059d0 directly committed and normally pushed to main under explicit session authority. HEAD/origin/remote matched and tree clean; no merge or rewrite. Separate metadata followup retains original execution baseline.
   CEP-047:
-    title: null
+    title: Asset and inventory Project Cost actual producers
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: STANDING_NON_PRODUCTION_EXECUTION_AUTHORITY
+      source: Standing bounded non-production build authority; source-specific financial rules and activation conditions remain required
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 18
+      total: 18
+      status: PASS
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Tenant activation requires explicit approved registered mapping, cutoff/classification and unit-rate-book/attribution policies under EXT0006/7/8; registry ships empty and fails closed
+    - Performance/concurrency and broader browser/accessibility runtime remain UTV; no full-suite or migration verification PASS claimed
+    - UAT, Human Sign-off, Production Certification and production action NOT EXECUTED
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-047_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED
     git:
-      committed: null
+      committed: false
       commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      pushed: false
+      merged_to_main: false
+      remote_main_evidence: BASELINE_REMOTE_VERIFIED_CEP047_UNCOMMITTED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: a536359cc53055cdd5802cd036c70d8577349a9c
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: EXECUTION_PARTIAL
+      reason: Canonical identity, no CEP prerequisites, frozenPDs/SPEC008/IMBs/integration and activation-only external conditions recovered at clean pushed main. Existing source/fact frameworks remain usable only under approved source rules; complete INTB04/05/06 financial mappings not located in inspected sources. Finding001 BLOCKER-SPEC before any product mutation;0/18 AC verified, DoD NOT_MET. No generic source adapter, cost/rate/allocation/cutoff/reversal rule, schema or production effect invented. Baseline5 legacy tests fail permission setup, not047 code. Gate05 NOT_PASSED. No047 Git write under completed-work-only authorization.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Human confirmed exact canonical INTB04/05/06 source mappings; Finding001 resolved with verbatim retained provenance. Reverified79 prompt hashes and current main/dirty ownership. Bounded L2 candidate/explicit Project Controls recording framework may proceed; runtime policy values and activation remain fail-closed. No scope/AC/DoD/dependency/migration or production authority change.
+    - date: '2026-10-19'
+      status: BLOCKER_RESOLVED
+      reason: Finding001 exact approved INTB04/B05/B06 mapping resolution reconfirmed by current Human resume handoff; retained canonical input/provenance and79 prompt identities verified. No PD, Scope, AC, DoD or dependency amendment.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Repository handoff found four existing untracked047 implementation/test modules; historical before-product-mutation description superseded by actual tree. Entry hashes retained and valid existing work preserved; no reset, discard, cleanup or Git checkpoint. Current single-CEP boundary applies.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: EXECUTION COMPLETE;18/18 canonical AC and scoped IMB0034/35/36 DoD verified for conditional contract build. Focused10 PASS plus9 source-family subtests; affected regression22 PASS; lint/format/system PASS. Native valued Inventory consumption, approved Equipment allocation and reviewed depreciation evidence retain version/value/rate/book lineage, explicit L2 target consumption, idempotency, exact inverse, durable failure/retry and read-only reconciliation. Preexisting target facts without integration lineage block duplicate recognition. Native trailing-zero values normalize exactly without rounding; reversal lifecycle notes do not change financial version. Unconfigured runtime policies fail closed. No migration, source lifecycle, UI, catalog/default-grant or Accounting authority changes; no unresolved in-scope blocker.
+    - date: '2026-10-19'
+      status: CLOSED_VERIFIED
+      reason: Canonical evidence/report/acceptance and Registry synchronized; GATE05 remains NOT_PASSED because other contributors are incomplete/unverified and tenant activation is separately conditional. UTV retained. Work uncommitted; no Git writes, production action or Human Sign-off. STOP after047 under current Human instruction;048 NOT_STARTED.
   CEP-048:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3955,9 +3984,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: f0034b5589a2155547100aeac425f709c5e53722
-  origin_main: f0034b5589a2155547100aeac425f709c5e53722
-  integration_checkpoint: f0034b5589a2155547100aeac425f709c5e53722
+  last_reconciled_head: a536359cc53055cdd5802cd036c70d8577349a9c
+  origin_main: a536359cc53055cdd5802cd036c70d8577349a9c
+  integration_checkpoint: a536359cc53055cdd5802cd036c70d8577349a9c
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -3966,7 +3995,6 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-028
-  - CEP-047
   - CEP-048
   - CEP-050
   - CEP-057
@@ -3982,17 +4010,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP046_COMPLETE_CHECKPOINT_THEN_ENTRY_REVIEW
+  current_session_continuation: STOP_AFTER_CEP047_USER_SINGLE_CEP_BOUNDARY
   current_independent_cep: null
-  next_entry_review_candidate: CEP-047
-  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED
+  next_entry_review_candidate: CEP-048
+  next_candidate_full_entry_eligibility: NOT_REVIEWED_NO_CEP048_EXECUTION
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Completed046; bounded Git checkpoint and clean grounding precede047 entry review. Existing blocked028/069 excluded; no fixed package-count stop.
+  boundary_reason: CEP047 EXECUTION COMPLETE and closed verified; evidence and Registry synchronized. Current Human instruction requires one CEP only and STOP after047. CEP048 not started; runtime activation and GATE05 remain separate and fail closed.
   resume_cep_after_blocker_resolution: null
-  independent_candidates_entry_status: ENTRY_REVIEW_PENDING
+  independent_candidates_entry_status: NOT_REVIEWED_USER_SINGLE_CEP_BOUNDARY
   production_authorized: false
   human_signoff_executed: false

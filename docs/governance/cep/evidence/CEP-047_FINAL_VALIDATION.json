@@ -1,0 +1,75 @@
+{
+  "date": "2026-10-19",
+  "execution": "EXECUTION COMPLETE",
+  "lifecycle": "CLOSED_VERIFIED",
+  "AC": {
+    "passed": 18,
+    "total": 18
+  },
+  "scoped_DoD": "MET",
+  "head": "a536359cc53055cdd5802cd036c70d8577349a9c",
+  "origin_main": "a536359cc53055cdd5802cd036c70d8577349a9c",
+  "remote_main": "a536359cc53055cdd5802cd036c70d8577349a9c",
+  "branch": "main",
+  "product_files_sha256": {
+    "apps/projects/actual_integration.py": "a7325db179395d7e8ed6e86d8454d041a68b3192ae0ca5dca0f0d5b987694e56",
+    "apps/projects/actual_sources.py": "8670c516a8ee9297ae85004ef8534136a5d65c935287b33fa70b63d0994112cd",
+    "apps/projects/test_cep047_actual.py": "acaaab3114621b41446235a8b9092966b1c27978c2677ec17436dc821a4fb555",
+    "apps/projects/test_cep047_regression.py": "2c2c61263287ee5869abbdddd39b12717026287714d96707d6996643beaa8a6d"
+  },
+  "focused": {
+    "passed": 10,
+    "source_family_subtests_passed": 9,
+    "output": "CEP-047_FOCUSED_VERIFIED_OUTPUT.txt"
+  },
+  "affected_regression": {
+    "passed": 22,
+    "output": "CEP-047_AFFECTED_FINAL_OUTPUT.txt"
+  },
+  "lint": "PASS",
+  "format": "PASS",
+  "django_check": "PASS",
+  "migration_impact": "NONE; no migration or Development data mutation; schema-only read is test harness setup",
+  "schema_context": "CEP-047_RESUME_TEST_ENVIRONMENT.json",
+  "canonical_identity": "CEP-047_RESUME_SOURCE_CHECK.json",
+  "runtime_policies": "Empty code-owned binding registry; synthetic test bindings only; EXT0006/7/8 activation fail closed",
+  "gate05": "NOT_PASSED",
+  "unresolved_in_scope_blockers": [],
+  "git_writes": {
+    "branch_or_worktree_created": false,
+    "add": false,
+    "commit": false,
+    "push": false,
+    "merge": false,
+    "reset_clean_stash_or_discard": false
+  },
+  "temporary_test_harness": "Only files newly created in this session moved from output/cep-047/resume to OS temporary directory; no existing work removed",
+  "human_signoff": "NOT EXECUTED",
+  "production_certification": "NOT EXECUTED",
+  "production_cutover": "NOT EXECUTED",
+  "CEP048": "NOT STARTED",
+  "full_suite_or_concurrency_runtime_pass_claimed": false,
+  "registry_summary": {
+    "execution_state_complete": 53,
+    "in_progress": 0,
+    "partial_current": 2,
+    "failed_current": 0,
+    "not_started_other_current_governed": 24
+  },
+  "final_document_check": "PASS;47 attributable paths;22 evidence IDs;all other85 CEP records preserved; canonical18 criteria unchanged",
+  "schema_guards": {
+    "result": "PASS: native public-schema triggers identical; full constraint identity set retained and equivalent",
+    "trigger_count": 17,
+    "constraint_count": 1402,
+    "exact_constraint_definitions": 1401,
+    "pg_dump_restore_expression_normalization": {
+      "constraint": [
+        "projects_projectcostfact",
+        "project_cost_fact_kind_sign_ck"
+      ],
+      "difference": "PostgreSQL array-to-text cast rendered elementwise on restore; equivalent predicate",
+      "equivalent_check_truth_table_cases": 24
+    },
+    "scope": "Public projects/inventory/equipment/fixed_assets schema metadata only; no business data copied"
+  }
+}

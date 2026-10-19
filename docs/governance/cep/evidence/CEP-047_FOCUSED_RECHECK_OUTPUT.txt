@@ -1,0 +1,76 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 9 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_resume_20261019')...
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates CEP047 pcp-inv-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+SUBPASSED(key='pcp-inv-actual')CEP047 pcp-eqp-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates SUBPASSED(key='pcp-eqp-actual')CEP047 pcp-fa-actual: insert -> rollback + durable failure -> denied inactive retry -> revalidated retry
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates SUBPASSED(key='pcp-fa-actual')
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_failed_target_transactions_leave_durable_failure_and_retry_revalidates PASSED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent CEP047 pcp-inv-actual: L2 no-write -> explicit actual -> replay; reconciliation={'source_id': 'source-1', 'source_version': 'native-version-1', 'active_source_version': 'native-version-1', 'active_source_versions': ({'source_id': 'source-1', 'source_version': 'native-version-1'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '100.00', 'target_recognized_amount': '100.00', 'target_reversal_amount': '0', 'lineage_net_amount': '100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'recognize', 'predecessor_id': '', 'target_fact_ids': ('cd7577b6-f04c-4c52-bf87-22cb9a73c147',), 'target_reversals': (), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+SUBPASSED(key='pcp-inv-actual')CEP047 pcp-eqp-actual: L2 no-write -> explicit actual -> replay; reconciliation={'source_id': 'source-1', 'source_version': 'native-version-1', 'active_source_version': 'native-version-1', 'active_source_versions': ({'source_id': 'source-1', 'source_version': 'native-version-1'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '100.00', 'target_recognized_amount': '100.00', 'target_reversal_amount': '0', 'lineage_net_amount': '100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'recognize', 'predecessor_id': '', 'target_fact_ids': ('5a72274a-d98e-4822-b399-75831aa41dc5',), 'target_reversals': (), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent SUBPASSED(key='pcp-eqp-actual')CEP047 pcp-fa-actual: L2 no-write -> explicit actual -> replay; reconciliation={'source_id': 'source-1', 'source_version': 'native-version-1', 'active_source_version': 'native-version-1', 'active_source_versions': ({'source_id': 'source-1', 'source_version': 'native-version-1'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '100.00', 'target_recognized_amount': '100.00', 'target_reversal_amount': '0', 'lineage_net_amount': '100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'recognize', 'predecessor_id': '', 'target_fact_ids': ('71f93029-f9c0-4555-ac9f-1f630b4fd588',), 'target_reversals': (), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent SUBPASSED(key='pcp-fa-actual')
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_l2_candidates_are_read_only_and_explicit_consumption_is_idempotent PASSED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation CEP047 pcp-inv-actual: native predecessor -> exact inverse; reconciliation={'source_id': 'reversal-2', 'source_version': 'reversal-version-2', 'active_source_version': 'reversal-version-2', 'active_source_versions': ({'source_id': 'reversal-2', 'source_version': 'reversal-version-2'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '-100.00', 'target_recognized_amount': '0', 'target_reversal_amount': '-100.00', 'lineage_net_amount': '-100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'reverse', 'predecessor_id': 'source-1', 'target_fact_ids': ('dd6b0e1e-807c-4b51-be2e-bea64933e35b',), 'target_reversals': ('dd6b0e1e-807c-4b51-be2e-bea64933e35b',), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+SUBPASSED(key='pcp-inv-actual')CEP047 pcp-eqp-actual: native predecessor -> exact inverse; reconciliation={'source_id': 'reversal-2', 'source_version': 'reversal-version-2', 'active_source_version': 'reversal-version-2', 'active_source_versions': ({'source_id': 'reversal-2', 'source_version': 'reversal-version-2'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '-100.00', 'target_recognized_amount': '0', 'target_reversal_amount': '-100.00', 'lineage_net_amount': '-100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'reverse', 'predecessor_id': 'source-1', 'target_fact_ids': ('19655afe-9e99-404d-8407-426eff5d8feb',), 'target_reversals': ('19655afe-9e99-404d-8407-426eff5d8feb',), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation SUBPASSED(key='pcp-eqp-actual')CEP047 pcp-fa-actual: native predecessor -> exact inverse; reconciliation={'source_id': 'reversal-2', 'source_version': 'reversal-version-2', 'active_source_version': 'reversal-version-2', 'active_source_versions': ({'source_id': 'reversal-2', 'source_version': 'reversal-version-2'},), 'source_active': True, 'native_amount': '100.00', 'mapped_amount': '-100.00', 'target_recognized_amount': '0', 'target_reversal_amount': '-100.00', 'lineage_net_amount': '-100.00', 'mapped_target_difference': '0.00', 'approved_cutoff': 'TEST-CUTOFF-1', 'unit_value_rate_book_reference': 'TEST-NATIVE-UNIT-RATE-BOOK-1', 'project_attribution_version': 'TEST-ATTRIBUTION-VERSION-1', 'operation': 'reverse', 'predecessor_id': 'source-1', 'target_fact_ids': ('48a02be9-93ba-4020-aeca-75af40d2ae6a',), 'target_reversals': ('48a02be9-93ba-4020-aeca-75af40d2ae6a',), 'corresponding_successors': (), 'other_recorded_source_versions': (), 'unlinked_version_or_contract_drift': False, 'target_payload_matches': True, 'missing_target': False, 'duplicate_results': False, 'lineage_cycle': False, 'target_lineage_missing': False}
+
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation SUBPASSED(key='pcp-fa-actual')
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_all_three_source_reversals_preserve_original_and_replay_without_reactivation PASSED
+apps/projects/test_cep047_actual.py::ActualTargetTests::test_existing_tenant_authority_is_required FAILED
+IMMEDIATE FAILURE
+apps\projects\actual_integration.py:168: in _build
+    contract = ProjectCostSourceContract.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.projects.models.ProjectCostSourceContract.DoesNotExist: ProjectCostSourceContract matching query does not exist.
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep047_actual.py:407: in test_existing_tenant_authority_is_required
+    integration.consume_actual_candidate(
+apps\projects\actual_integration.py:328: in consume_actual_candidate
+    fresh, contract = _build(
+apps\projects\actual_integration.py:175: in _build
+    raise ActualRejected("approved_actual_contract_required") from exc
+E   apps.projects.actual_sources.ActualRejected: approved_actual_contract_required
+
+
+================================== FAILURES ===================================
+________ ActualTargetTests.test_existing_tenant_authority_is_required _________
+apps\projects\actual_integration.py:168: in _build
+    contract = ProjectCostSourceContract.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.projects.models.ProjectCostSourceContract.DoesNotExist: ProjectCostSourceContract matching query does not exist.
+
+The above exception was the direct cause of the following exception:
+apps\projects\test_cep047_actual.py:407: in test_existing_tenant_authority_is_required
+    integration.consume_actual_candidate(
+apps\projects\actual_integration.py:328: in consume_actual_candidate
+    fresh, contract = _build(
+apps\projects\actual_integration.py:175: in _build
+    raise ActualRejected("approved_actual_contract_required") from exc
+E   apps.projects.actual_sources.ActualRejected: approved_actual_contract_required
+=========================== short test summary info ===========================
+FAILED apps/projects/test_cep047_actual.py::ActualTargetTests::test_existing_tenant_authority_is_required - apps.projects.actual_sources.ActualRejected: approved_actual_contract_required
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+========= 1 failed, 3 passed, 9 subtests passed in 261.99s (0:04:21) ==========

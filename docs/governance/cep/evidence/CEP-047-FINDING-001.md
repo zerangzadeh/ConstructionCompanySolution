@@ -1,0 +1,23 @@
+**Current disposition: RESOLVED — 2026-10-19.** The Human supplied the canonical INT-B04/B05/B06 mappings in [retained resolution](../supporting/CEP-047_CANONICAL_MAPPING_RESOLUTION.md); [provenance](CEP-047_MAPPING_RESOLUTION_PROVENANCE.json) retains attachment/content hashes. Earlier discovery below is historical. No mapping, Scope/AC/DoD or PD amendment is made. Required runtime policy/mapping values must still be explicit and fail closed.
+
+# CEP-047-FINDING-001 — approved source-specific Actual mappings unresolved
+
+**BLOCKER-SPEC; Human source/decision resolution required before source-specific financial mutation.** Applies to IMB0034/0035/0036 (INT-B04/B05/B06). This is not a dependency-graph or Scope/AC/DoD amendment request.
+
+[Entry/source recovery](CEP-047_ENTRY.json) verifies canonical identity, frozen PD010/012/021, SPEC008, integration rows, conditional IMB records and approved P8 source boundaries. Sources exist; the unresolved material is their complete approved source-specific mapping. Repository absence is not treated as nonexistence: repository supporting/architecture and exact referenced approved latest consolidated sources were inspected. Provide other existing canonical locations if available.
+
+SPEC008 names PCP-INV-ACTUAL, PCP-EQP-ACTUAL and PCP-FA-ACTUAL, the common5-part identity, source corrections/reversals and the fail-closed rule. It does not select concrete eligible events, monetary/rate/allocation mapping, project/cost classification, cutoff/effective-date, source ordering or reversal treatment. IMB readiness explicitly requires these approved mappings. EXT0006/7/8 describe the same family-specific requirements. The accepted P8 handoff packets preserve source proposal authority and expressly defer consumer recognition to a separately accepted Project Cost source contract. A reviewed proposal, active source record, native book/rate, Accounting draft, nonempty policy-reference string or generic approved contract row does not supply the missing business rules.
+
+**Build/Activation distinction preserved:** EXT0006/7/8 block ACTIVATION, not Build. Existing internal source-contract/fact/idempotency/exact-inverse and native evidence frameworks remain available for permitted fail-closed construction. No new global Build gate is inferred. However the specific source adapters and the18 package AC cannot be truthfully completed by selecting financial rules or by adding generic empty scaffolding. No source occurrence, rate basis or allocation/effective-date/reversal rule is invented. GATE05 remains NOT_PASSED, as an exit/activation condition where canonical policy applies.
+
+Supply the approved contracts/mapping sections and approval/version provenance, or obtain a bounded Human Product Decision for the unresolved rules:
+
+| Integration | Required authoritative content |
+| --- | --- |
+| INT-B04 / Inventory | Eligible valued project-consumption occurrence/state and source identity/version; source-approved value/currency, exact project/CBS/WBS/cost dimensions; cutoff/effective date; correction/reversal/successor and reconciliation treatment. No generic stock-record producer or inferred historical cost. |
+| INT-B05 / Equipment | Eligible approved usage/cost-allocation occurrence and rate/version evidence; exact amount/currency/coding and effective date; source correction/reversal/supersession and reconciliation. No cost from equipment existence or new CMMS/approval behavior. |
+| INT-B06 / Fixed Assets | Eligible asset/depreciation cost occurrence; pinned asset-book/policy/source versions; approved allocation/value/currency/project/cost dimensions and effective date; correction/reversal/successor and reconciliation. No cost from asset existence or imported Accounting/settlement rules. |
+
+Only the missing rules need resolution. Existing domain ownership, PDs, package boundaries, authorities, explicit fact constraints, scopes, grants and finalized history remain intact. No production, migration, cutover, Human Sign-off or Certification is requested. CEP044 AP/AR decisions do not extend to these source families.
+
+No product mutation was made. [Read-only Development inspection](CEP-047_DEVELOPMENT_READ_ONLY.json) finds zero Actual source-contract rows and zero Actual facts; row absence is not proof no canonical mapping exists elsewhere. [Baseline](CEP-047_BASELINE_OUTPUT.txt) has5 permission-fixture setup failures before cost behavior, recorded as unrelated baseline debt and not used as the mapping blocker. Required new integration/transaction/reconciliation evidence and18 AC remain unverified. Resume047 once the approved mapping authority is inspectable; re-ground/hash-check and implement only that bounded contract.
