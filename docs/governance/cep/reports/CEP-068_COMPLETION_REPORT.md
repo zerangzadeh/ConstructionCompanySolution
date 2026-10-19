@@ -1,3 +1,17 @@
+# CEP-068 follow-up — 2026-10-20
+
+**EXECUTION PARTIAL — full-package0/6 AC; scoped DoD NOT MET.**
+
+Current verification baseline main96e3566, verified on origin/remote. Current Human V1 closure and standing authority apply to independent Overtime; canonical SHA reverified,026 COMPLETE/GATE02 PASS.062 conditional edge still blocks Mission.
+
+[Current tests](../evidence/CEP-068_CURRENT_OVERTIME_OUTPUT.txt):11 PASS/9 subtests. [Browser proof](../evidence/CEP-068_BROWSER.json):12 synthetic desktop/mobile screenshots PASS for empty/form/draft/submitted/error/denied states. RTL/Jalali/fonts/overflow/keyboard focus checked; representative mobile form inspected. The bounded Overtime screenshot gap is resolved. Historical browser settings were not changed or claimed unblocked: isolated headless fixture QA controls no signed-in browser and does not certify authenticated runtime/accessibility/UAT.
+
+No product/schema/permission/rate/cap/approval/Mission or monetary activation changed. Full Mission routing/entry/evidence remains blocked by062's NONE-migration persistence gap. EXT0016 monetary activation remains closed. No full-package criterion, GATE07, Human Sign-off or Production PASS inferred. [Current verification](../evidence/CEP-068_CURRENT_VERIFICATION.json) records this bounded result. CEP069..079 NOT_EXECUTED.
+
+---
+
+## Retained 2026-10-19 execution record
+
 # CEP-068 — EXECUTION PARTIAL
 
 2026-10-19. IMB-0091. Independent overtime implementation tested;
