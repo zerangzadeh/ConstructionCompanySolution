@@ -2350,11 +2350,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-045_COMPLETION_REPORT.md
       evidence_presence: VERIFIED
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 119e5c2f5039b0b7669b6fb9accb4950a1265307
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: docs/governance/cep/evidence/CEP-045_GIT_CHECKPOINT.json
     last_execution:
       branch: main
       sha: 38be3392346935f1e5fdff5efb5719968fc3ff63
@@ -2366,6 +2366,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: EXECUTION COMPLETE;12/12 AC and scoped IMB0020/0021 DoD verified. Separate Equipment/Fixed Assets identity, exact retained relationship and native Accounting drilldown, backend tenant/permission/scope checks, compatibility Financials owner/source/observation labels and canonical Home de-emphasis. Focused/browser23 PASS; affected29 PASS plus one identical NAV019 pre-mutation baseline assertion retained. Lint/format/system/source-preservation checks PASS;8 synthetic screenshots. No model/migration/grant/financial-source/metric/recognition change. UTV retained. GATE05 NOT_PASSED; Git checkpoint pending separately.
+    - date: '2026-10-19'
+      status: GIT_CHECKPOINT_VERIFIED
+      reason: Completed045 implementation/evidence checkpoint 119e5c2f5039b0b7669b6fb9accb4950a1265307 directly committed and normally pushed to main under explicit session authority. HEAD/origin/remote matched and tree clean; no merge or rewrite. Separate metadata followup retains original execution baseline.
   CEP-046:
     title: null
     phase: V1_IMPLEMENTATION
