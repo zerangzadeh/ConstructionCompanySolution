@@ -1,0 +1,12 @@
+{
+  "scope": "SYNTHETIC_CONTRACT_BUILD_NOT_ACTUAL_DATA_ACTIVATION",
+  "source": "Explicit code-owned FinancialOccurrence with canonical RecognitionRequest and exclusive native producer coverage; immutable evidence fingerprint",
+  "target": "Existing ProjectCostFact through existing Actual integration; no GL/cash/Payroll mutation",
+  "idempotency": "Read-only candidate -> one explicit fact -> replay same fact; alias rejected",
+  "failure_retry": "Target insert then raised exception rolls back fact; failure AuditEvent survives; missing binding retry rejected; revalidated retry succeeds",
+  "reversal": "New explicit source version creates exact negative fact linked by reverses; original retained; original replay unchanged; read-only reconciliation identifies inverse",
+  "reconciliation": "Asserted target_payload_matches=True and missing_target=False; same original source/version and correction history",
+  "authority": "Cash movement and Payroll disbursement settlement rejected; forged owner, source version and cross-tenant recognition identity rejected",
+  "activation": "BINDINGS and POLICIES ship empty; EXT0010 source/owner/eligibility/exclusive producer/classification/cutoff mapping still required before activation",
+  "native_configured_dataset": "NOT_EXECUTED_NOT_REQUIRED_FOR_CONDITIONAL_FRAMEWORK_BUILD"
+}

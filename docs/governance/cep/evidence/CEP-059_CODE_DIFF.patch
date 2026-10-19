@@ -1,0 +1,441 @@
+--- a/apps/projects/financial_actual_source.py
++++ b/apps/projects/financial_actual_source.py
+@@ -0,0 +1,142 @@
++"""INT-B03: explicitly enrolled, source-owned financial occurrences only.
++
++No journal, cash movement or recognition draft is automatically a cost. Approved
++code-owned bindings must validate the native occurrence and its exclusive producer
++ownership. The registry intentionally ships empty (EXT-0010).
++"""
++
++from collections.abc import Callable, Mapping
++from dataclasses import dataclass
++from types import MappingProxyType
++
++from django.core.exceptions import ValidationError
++
++from apps.accounting.recognition_registry import (
++    RecognitionRequest,
++    resolve_recognition_owner,
++)
++from apps.audit.models import AuditEvent
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++
++from .actual_sources import ActualRejected, NativeActualSource
++from .models import ProjectCostFact
++
++
++@dataclass(frozen=True)
++class FinancialOccurrence:
++    source: NativeActualSource
++    recognition: RecognitionRequest
++    # Native producer identities covered by this occurrence. The binding must
++    # prove complete/exclusive coverage; a journal alias cannot create a second
++    # cost for a source already owned by another actual producer.
++    covered_sources: tuple[tuple[str, str], ...]
++    exclusive_coverage_reference: str
++
++
++@dataclass(frozen=True)
++class FinancialSourceBinding:
++    read_occurrence: Callable[..., FinancialOccurrence]
++
++
++# Source model / identity / version / eligibility are explicit contract bindings,
++# never guesses from journal description, amount, username or cash status.
++BINDINGS: Mapping[str, FinancialSourceBinding] = MappingProxyType({})
++KEY = "pcp-fin-actual"
++
++
++def read_financial_actual(*, organization, actor, source_id) -> NativeActualSource:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.PROJECT_COSTS_VIEW,
++        allow_any_scope=True,
++        message="اجازه خواندن منبع مالی هزینه پروژه را ندارید.",
++    )
++    # source_id is an exact registered occurrence identity, not a request to
++    # discover or infer a source from an arbitrary financial record.
++    binding = BINDINGS.get(str(source_id))
++    if binding is None:
++        raise ActualRejected("approved_financial_occurrence_binding_required")
++    occurrence = binding.read_occurrence(
++        organization=organization, actor=actor, source_id=source_id
++    )
++    if not isinstance(occurrence, FinancialOccurrence):
++        raise ActualRejected("typed_financial_occurrence_required")
++    source, request = occurrence.source, occurrence.recognition
++    if (
++        not isinstance(source, NativeActualSource)
++        or source.producer_key != KEY
++        or source.source_type != "financial.recognition_occurrence"
++        or source.source_id != str(source_id)
++        or not source.source_version
++        or not isinstance(request, RecognitionRequest)
++        or request.organization_id != organization.pk
++        or request.source_organization_id != organization.pk
++        or not occurrence.exclusive_coverage_reference
++        or not occurrence.covered_sources
++        or any(
++            not model or not identity for model, identity in occurrence.covered_sources
++        )
++    ):
++        raise ActualRejected("financial_identity_owner_or_coverage_required")
++    try:
++        resolution = resolve_recognition_owner(request=request)
++    except ValidationError as exc:
++        raise ActualRejected("approved_recognition_owner_required") from exc
++    policy = resolution.policy
++    if (
++        policy.source_family == "Treasury Cash Movement"
++        or "settlement" in policy.recognition_type.lower()
++        or policy.creates_accounting_entry.startswith("NO")
++    ):
++        raise ActualRejected("cash_settlement_is_not_project_cost")
++    if not any(
++        identity == str(request.source_identity)
++        for _, identity in occurrence.covered_sources
++    ):
++        raise ActualRejected("recognition_identity_not_in_coverage")
++    if (
++        AuditEvent.objects.filter(
++            organization=organization,
++            entity_type="project_cost_actual_integration",
++            metadata__stage="succeeded",
++            metadata__producer_key=KEY,
++            metadata__native_lineage__financial__source_identity=str(
++                request.source_identity
++            ),
++            metadata__native_lineage__financial__source_version=request.source_version,
++            metadata__native_lineage__financial__economic_occurrence=request.economic_occurrence,
++            metadata__native_lineage__financial__recognition_type=request.recognition_type,
++        )
++        .exclude(metadata__source_id=source.source_id)
++        .exists()
++    ):
++        raise ActualRejected("financial_occurrence_alias_already_consumed")
++    # Native source reads and object permission checks belong to the registered
++    # binding. Repeated reads inside the target transaction detect source drift.
++    for model, identity in occurrence.covered_sources:
++        if (
++            ProjectCostFact.objects.filter(
++                organization=organization,
++                contract__source_model=model,
++                source_id=identity,
++            )
++            .exclude(contract__producer_key=KEY)
++            .exists()
++        ):
++            raise ActualRejected("economic_occurrence_already_has_actual_producer")
++    expected = {
++        **resolution.audit_metadata(),
++        "exclusive_coverage_reference": occurrence.exclusive_coverage_reference,
++        "covered_sources": occurrence.covered_sources,
++    }
++    if source.evidence.get("financial") != expected:
++        raise ActualRejected("financial_source_version_lineage_mismatch")
++    # Version must fingerprint the complete native evidence, including the
++    # canonical recognition owner and exclusive source coverage.
++    from .services import _stable_payload_hash
++
++    if source.source_version != _stable_payload_hash(source.evidence):
++        raise ActualRejected("financial_source_version_lineage_mismatch")
++    return source
+--- a/apps/projects/actual_sources.py
++++ b/apps/projects/actual_sources.py
+@@ -20,12 +20,14 @@
+ from .services import _stable_payload_hash
+ 
+ SOURCE_MODELS = {
++    "pcp-fin-actual": "financial.recognition_occurrence",
+     "pcp-inv-actual": "inventory.inventoryvaluationevent",
+     "pcp-eqp-actual": "equipment.equipmentcostallocation",
+     "pcp-fa-actual": "fixed_assets.fixedassetsourceenvelope",
+     "pcp-payr-actual": "payroll.financialhandoffproposal",
+ }
+ INTEGRATIONS = {
++    "pcp-fin-actual": "INT-B03",
+     "pcp-inv-actual": "INT-B04",
+     "pcp-eqp-actual": "INT-B05",
+     "pcp-fa-actual": "INT-B06",
+@@ -344,9 +346,11 @@
+ def read_native_actual(
+     *, organization, actor, producer_key: str, source_id
+ ) -> NativeActualSource:
++    from .financial_actual_source import read_financial_actual
+     from .payroll_actual_source import read_payroll_actual
+ 
+     reader = {
++        "pcp-fin-actual": read_financial_actual,
+         "pcp-inv-actual": _inventory,
+         "pcp-eqp-actual": _equipment,
+         "pcp-fa-actual": _assets,
+@@ -367,6 +371,16 @@
+     The fingerprint is the composite immutable version used for duplicate control.
+     """
+     fields = {
++        "financial": (
++            "source_family",
++            "economic_occurrence",
++            "source_identity",
++            "source_version",
++            "recognition_type",
++            "recognition_owner",
++            "exclusive_coverage_reference",
++            "covered_sources",
++        ),
+         "valuation": (
+             "id",
+             "source_reference",
+--- a/apps/projects/test_cep059_financial_actual.py
++++ b/apps/projects/test_cep059_financial_actual.py
+@@ -0,0 +1,247 @@
++"""Conditional INT-B03 framework; bindings here are synthetic, never activation."""
++
++from dataclasses import replace
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.test import TransactionTestCase
++
++from apps.accounting.recognition_registry import (
++    RecognitionRequest,
++    registered_recognition_owner_policies,
++    resolve_recognition_owner,
++)
++from apps.projects import actual_integration as integration
++from apps.projects import financial_actual_source as financial
++from apps.projects import test_cep047_actual as fixtures
++from apps.projects.actual_sources import ActualRejected
++from apps.projects.models import ProjectCostFact
++from apps.projects.services import (
++    _stable_payload_hash,
++    approve_project_cost_source_contract,
++    create_project_cost_source_contract,
++)
++
++KEY = financial.KEY
++
++
++class FinancialActualFrameworkTests(TransactionTestCase):
++    _draft = fixtures.ActualTargetTests._draft
++    _classify_and_submit = fixtures.ActualTargetTests._classify_and_submit
++    map_source = fixtures.ActualTargetTests.map_source
++    read_source = fixtures.ActualTargetTests.read_source
++    consume = fixtures.ActualTargetTests.consume
++    candidate = fixtures.ActualTargetTests.candidate
++    reconcile = fixtures.ActualTargetTests.reconcile
++
++    def setUp(self):
++        fixtures.ActualTargetTests.setUp(self)
++        self.native_patch.stop()
++        self.contracts[KEY] = approve_project_cost_source_contract(
++            contract=create_project_cost_source_contract(
++                organization=self.organization,
++                actor=self.preparer,
++                producer_key=KEY,
++                version=1,
++                measure="actual",
++                source_model="financial.recognition_occurrence",
++                event_schema=f"{KEY}.v1",
++                classification_policy_reference="TEST-CLASSIFICATION-1",
++                recognition_policy_reference="TEST-EXPLICIT-DATE-1",
++                reconciliation_policy_reference="TEST-RECONCILIATION-1",
++                requires_financial_evidence=True,
++            ),
++            actor=self.approver,
++        )
++        self.policies[
++            (
++                KEY,
++                "TEST-CLASSIFICATION-1",
++                "TEST-EXPLICIT-DATE-1",
++                "TEST-RECONCILIATION-1",
++            )
++        ] = integration.ActualPolicyBinding(self.map_source)
++        policy = next(
++            p
++            for p in registered_recognition_owner_policies()
++            if p.source_family == "Direct Expense"
++        )
++        self.request = RecognitionRequest(
++            self.organization.pk,
++            self.organization.pk,
++            policy.source_family,
++            policy.economic_occurrence,
++            uuid4(),
++            1,
++            policy.recognition_type,
++            policy.recognition_owner,
++            True,
++        )
++        self.occurrences = {}
++        self.bindings = {}
++        self.enroll("source-1")
++        self.binding_patch = patch.object(financial, "BINDINGS", self.bindings)
++        self.binding_patch.start()
++        self.addCleanup(self.binding_patch.stop)
++
++    def enroll(
++        self,
++        identity,
++        *,
++        request=None,
++        operation="recognize",
++        predecessor="",
++        active=True,
++    ):
++        request = request or self.request
++        covered = (("expenses.expense", str(request.source_identity)),)
++        evidence = {
++            "financial": {
++                **resolve_recognition_owner(request=request).audit_metadata(),
++                "exclusive_coverage_reference": "SYNTHETIC-EXCLUSIVE-COVERAGE-1",
++                "covered_sources": covered,
++            },
++            "operation": operation,
++            "predecessor": predecessor,
++        }
++        template = self.sources["pcp-inv-actual", "source-1"]
++        source = replace(
++            template,
++            producer_key=KEY,
++            source_type="financial.recognition_occurrence",
++            source_id=identity,
++            source_version=_stable_payload_hash(evidence),
++            evidence=evidence,
++            operation=operation,
++            predecessor_id=predecessor,
++            active=active,
++        )
++        self.occurrences[identity] = financial.FinancialOccurrence(
++            source, request, covered, "SYNTHETIC-EXCLUSIVE-COVERAGE-1"
++        )
++        self.bindings[identity] = financial.FinancialSourceBinding(
++            lambda source_id, **kwargs: self.occurrences[str(source_id)]
++        )
++
++    def test_no_binding_or_mapping_never_creates_fact(self):
++        with (
++            patch.object(financial, "BINDINGS", {}),
++            self.assertRaisesMessage(
++                ActualRejected, "approved_financial_occurrence_binding_required"
++            ),
++        ):
++            self.candidate(KEY)
++        with (
++            patch.object(integration, "POLICIES", {}),
++            self.assertRaises(ActualRejected),
++        ):
++            self.candidate(KEY)
++        self.assertEqual(ProjectCostFact.objects.count(), 0)
++
++    def test_source_owner_identity_replay_and_read_only_reconciliation(self):
++        candidate = self.candidate(KEY)
++        self.assertEqual(ProjectCostFact.objects.count(), 0)
++        result = self.consume(candidate)
++        self.assertEqual(self.consume(candidate).fact_ids, result.fact_ids)
++        self.assertEqual(ProjectCostFact.objects.count(), 1)
++        report = self.reconcile(KEY)
++        self.assertTrue(report["target_payload_matches"])
++        self.assertFalse(report["missing_target"])
++        print("CEP059 synthetic contract source/replay/reconciliation:", report)
++
++    def test_cash_and_payroll_settlement_never_become_cost(self):
++        for family, occurrence in [
++            ("Treasury Cash Movement", "Posted Treasury movement"),
++            ("Payroll", "Payroll payable/disbursement request"),
++        ]:
++            p = next(
++                p
++                for p in registered_recognition_owner_policies()
++                if p.source_family == family and p.economic_occurrence == occurrence
++            )
++            request = replace(
++                self.request,
++                source_family=family,
++                economic_occurrence=occurrence,
++                recognition_type=p.recognition_type,
++                recognition_owner=p.recognition_owner,
++            )
++            self.enroll("source-1", request=request)
++            with self.assertRaisesMessage(
++                ActualRejected, "cash_settlement_is_not_project_cost"
++            ):
++                self.candidate(KEY)
++
++    def test_alias_does_not_duplicate_same_economic_occurrence(self):
++        self.consume(self.candidate(KEY))
++        self.enroll("alias")
++        with self.assertRaisesMessage(
++            ActualRejected, "financial_occurrence_alias_already_consumed"
++        ):
++            self.candidate(KEY, "alias")
++        self.assertEqual(ProjectCostFact.objects.count(), 1)
++
++    def test_failed_target_rollback_retains_failure_and_revalidates_retry(self):
++        candidate = self.candidate(KEY)
++        original = integration.record_project_cost_fact
++
++        def fail(**kwargs):
++            original(**kwargs)
++            raise RuntimeError("synthetic failure")
++
++        with (
++            patch.object(integration, "record_project_cost_fact", side_effect=fail),
++            self.assertRaises(RuntimeError),
++        ):
++            self.consume(candidate)
++        self.assertEqual(ProjectCostFact.objects.count(), 0)
++        failure = integration._events(self.organization).get(metadata__stage="failed")
++        self.assertEqual(failure.metadata["error_code"], "target_failure")
++        self.bindings.clear()
++        with self.assertRaises(ActualRejected):
++            self.consume(candidate, retry_of=str(failure.entity_id))
++        self.enroll("source-1")
++        self.consume(candidate, retry_of=str(failure.entity_id))
++        self.assertEqual(ProjectCostFact.objects.count(), 1)
++
++    def test_exact_reversal_preserves_history_and_source_version(self):
++        candidate = self.candidate(KEY)
++        result = self.consume(candidate)
++        self.enroll(
++            "reverse-2",
++            request=replace(self.request, source_version=2),
++            operation="reverse",
++            predecessor="source-1",
++        )
++        inverse = self.consume(self.candidate(KEY, "reverse-2"))
++        original = ProjectCostFact.objects.get(pk=result.fact_ids[0])
++        reversal = ProjectCostFact.objects.get(pk=inverse.fact_ids[0])
++        self.assertEqual(reversal.reverses_id, original.pk)
++        self.assertEqual(reversal.amount, -original.amount)
++        self.assertEqual(self.consume(candidate).fact_ids, result.fact_ids)
++        self.assertEqual(len(self.reconcile(KEY, "reverse-2")["target_reversals"]), 1)
++
++    def test_forged_owner_or_source_version_fails_closed(self):
++        original = self.occurrences["source-1"]
++        self.occurrences["source-1"] = replace(
++            original, recognition=replace(self.request, recognition_owner="Treasury")
++        )
++        with self.assertRaises(ActualRejected):
++            self.candidate(KEY)
++        self.occurrences["source-1"] = replace(
++            original, source=replace(original.source, source_version="forged")
++        )
++        with self.assertRaisesMessage(
++            ActualRejected, "financial_source_version_lineage_mismatch"
++        ):
++            self.candidate(KEY)
++
++    def test_cross_tenant_recognition_identity_never_creates_fact(self):
++        original = self.occurrences["source-1"]
++        self.occurrences["source-1"] = replace(
++            original,
++            recognition=replace(self.request, source_organization_id=uuid4()),
++        )
++        with self.assertRaises(ActualRejected):
++            self.candidate(KEY)
++        self.assertEqual(ProjectCostFact.objects.count(), 0)

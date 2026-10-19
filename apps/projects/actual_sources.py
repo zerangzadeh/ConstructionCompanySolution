@@ -20,12 +20,14 @@ from apps.organizations.models import BusinessPermissionCode as P
 from .services import _stable_payload_hash
 
 SOURCE_MODELS = {
+    "pcp-fin-actual": "financial.recognition_occurrence",
     "pcp-inv-actual": "inventory.inventoryvaluationevent",
     "pcp-eqp-actual": "equipment.equipmentcostallocation",
     "pcp-fa-actual": "fixed_assets.fixedassetsourceenvelope",
     "pcp-payr-actual": "payroll.financialhandoffproposal",
 }
 INTEGRATIONS = {
+    "pcp-fin-actual": "INT-B03",
     "pcp-inv-actual": "INT-B04",
     "pcp-eqp-actual": "INT-B05",
     "pcp-fa-actual": "INT-B06",
@@ -344,9 +346,11 @@ def _assets(*, organization, actor, source_id):
 def read_native_actual(
     *, organization, actor, producer_key: str, source_id
 ) -> NativeActualSource:
+    from .financial_actual_source import read_financial_actual
     from .payroll_actual_source import read_payroll_actual
 
     reader = {
+        "pcp-fin-actual": read_financial_actual,
         "pcp-inv-actual": _inventory,
         "pcp-eqp-actual": _equipment,
         "pcp-fa-actual": _assets,
@@ -367,6 +371,16 @@ def native_lineage(source: NativeActualSource) -> dict:
     The fingerprint is the composite immutable version used for duplicate control.
     """
     fields = {
+        "financial": (
+            "source_family",
+            "economic_occurrence",
+            "source_identity",
+            "source_version",
+            "recognition_type",
+            "recognition_owner",
+            "exclusive_coverage_reference",
+            "covered_sources",
+        ),
         "valuation": (
             "id",
             "source_reference",

@@ -1,0 +1,7 @@
+# CEP-059 Execution Manifest â€” 2026-10-20
+
+Baseline: main @ 184a1def4198ebaadb242c7ce7a62469d0aae43d, clean and equal to origin/main. All V1 canonical prompt hashes verified. CEP-008/064 complete; obsolete Payment data blocker resolved. Standing bounded non-production authority and current serial/checkpoint instruction apply. EXT-0010 blocks activation only; no tenant mapping is activated.
+
+Actual intended touch set: `apps/projects/financial_actual_source.py`, existing `actual_sources.py` source dispatch/lineage only, financial-specific guard in `actual_integration.py` if necessary, `test_cep059_financial_actual.py`; this manifest, package acceptance/evidence/change manifests/report, dependency reconciliation evidence and root Registry. No model, migration, permission/default grant, source lifecycle, UI or Production changes.
+
+Use existing Project Controls Actual contract and fact services. Financial native read must prove approved native financial occurrence through an explicit code-owned binding, canonical recognition owner and explicit approved eligibility/mapping; cash settlement alone and already-owned native producers fail closed. No bindings ship active. Preserve exact identity, correction/reversal lineage, durable retry/failure and read-only reconciliation. Validate focused tests, retained affected integrations, lint/system/drift; baseline failures retain attribution. All six canonical AC and scoped DoD require evidence, never inference.
