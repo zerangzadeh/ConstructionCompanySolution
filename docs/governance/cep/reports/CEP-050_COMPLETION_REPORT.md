@@ -62,7 +62,7 @@ Development PostgreSQL copies with existing native constraints; synthetic fixtur
 use real capture/finalize, submit/review, correction and target read-model services.
 No migration, statutory, Payroll/ProjectCost producer, UAT, Human Sign-off or
 Production Certification PASS is claimed. Performance/concurrency and broader
-browser/accessibility remain UTV. Current completed-work Git checkpoint is pending;
+browser/accessibility remain UTV. Normal completed-work checkpoint `46baa4765628d5a8cee036c021b521ed800548d2` is pushed and verified on main/origin/remote with clean post-push tree. [Checkpoint proof](../evidence/CEP-050_GIT_CHECKPOINT.json) records current Git state separately from the execution baseline;
 no reset/clean/overwrite/discard/rebase/force/branch/merge operation occurred.
 [Recomputed frontier](../evidence/CEP-050_FRONTIER.json) selects CEP057 for full
 entry review only, after the authorized normal checkpoint. It is not yet eligible.
