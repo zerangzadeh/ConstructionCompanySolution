@@ -1,7 +1,7 @@
 [
   {
     "finding_id": "CEP-057-FINDING-001",
-    "status": "OPEN",
+    "status": "RESOLVED_BY_NEW_CANONICAL_REMEDIATIONS",
     "classification": "BLOCKER-REGISTRY-CONFLICT / BLOCKER-DEPENDENCY",
     "affected_imb": "IMB-0075",
     "affected_ac": [
@@ -23,6 +23,35 @@
     "scope_impact": "Implementing the missing authoritative engine would reopen/absorb CEP023 outside CEP057 BACKFILL scope. Must not invent it or replace with request history, generic JSON or Accounting balance authority.",
     "phase": "Blocks entry/framework against an unproved mandatory target prerequisite; distinct from EXT0015 activation-only dataset condition",
     "resolution": "Recover/reconcile approved prerequisite implementation and valid completion evidence; retain historical claims unchanged pending correction; then repeat full entry review. Approved EXT0015 dataset remains required before migration execution.",
-    "safe_action": "STOP serial queue before057 product mutation; preserve completed checkpoints and record entry evidence only."
+    "safe_action": "STOP serial queue before057 product mutation; preserve completed checkpoints and record entry evidence only.",
+    "resolution_evidence": [
+      "CEP-023_COMPLETION_REPORT.md",
+      "CEP-029_COMPLETION_REPORT.md",
+      "CEP-057_REENTRY_REVIEW.json"
+    ],
+    "resolution_date": "2026-10-19"
+  },
+  {
+    "finding_id": "CEP-057-FINDING-002",
+    "status": "OPEN_MIGRATION_EXECUTION_ONLY",
+    "classification": "BLOCKER-DATA / EXT-0015",
+    "affected_imb": "IMB-0075",
+    "affected_ac": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "phase": "ACTIVATION / BEFORE MIGRATION EXECUTION; does not block fail-closed framework build",
+    "actual": "Both prerequisites now truly complete. No approved opening dataset, effective policy/version, approved dataset-row mapping, as-of/cutover or reconciliation totals established. Current Development policy/ledger tables empty.",
+    "evidence": [
+      "CEP-057_REENTRY_REVIEW.json"
+    ],
+    "resolution": "Provide/establish approved tenant source rows and source evidence, policy/version/unit, explicit row mapping and approved as-of/cutover/totals before executing any opening backfill. No synthetic defaults or request-history-derived balances.",
+    "framework_build": "MAY_PROCEED_FAIL_CLOSED_UNDER_STANDING_AUTHORITY",
+    "safe_action": "Requested repeat entry review complete; preserve prerequisite work. Stop actual migration execution; keep all057 AC unverified and no GATE06 PASS."
   }
 ]
