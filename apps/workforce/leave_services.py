@@ -474,8 +474,21 @@ def reserve_request(
     source_key: str,
     evidence_reference: str,
     reason: str,
+    own_subject: bool = False,
 ) -> LeaveBalanceEntry:
-    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
+    organization = _access(
+        organization,
+        actor,
+        P.LEAVE_MISSION_REQUEST if own_subject else P.LEAVE_BALANCES_MANAGE,
+    )
+    if own_subject:
+        from .ess_services import resolve_ess_subject
+
+        subject = resolve_ess_subject(user=actor, organization=organization)
+        if subject.current_relationship.pk != relationship.pk:
+            raise PermissionDenied(
+                "Leave reservation requires the actor's explicit own subject."
+            )
     relationship = _relationship(organization, relationship)
     request = _request(organization, actor, request, P.LEAVE_MISSION_REQUEST)
     if request.state != RequestState.DRAFT or request.requested_by_id != actor.pk:

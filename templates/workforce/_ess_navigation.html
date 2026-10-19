@@ -1,4 +1,5 @@
 <nav class="erp-surface mb-5 flex flex-wrap gap-4 rounded-2xl p-4 text-sm font-bold" aria-label="خدمات شخصی کارکنان">
+  <a class="text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">مرخصی، حضور و کارکرد من</a>
   <a class="text-blue-700" href="{% url 'workforce:ess_dashboard' %}"{% if request.resolver_match.url_name == 'ess_dashboard' %} aria-current="page"{% endif %}>داشبورد من</a>
   <a class="text-blue-700" href="{% url 'workforce:ess_profile' %}"{% if request.resolver_match.url_name == 'ess_profile' or request.resolver_match.url_name == 'ess_profile_relationship' %} aria-current="page"{% endif %}>پروفایل من</a>
   {% if "employment_records.view_own" in business_permission_codes %}<a class="text-blue-700" href="{% url 'workforce:employment_history' %}"{% if request.resolver_match.url_name == 'employment_history' %} aria-current="page"{% endif %}>قرارداد و احکام من</a>{% endif %}

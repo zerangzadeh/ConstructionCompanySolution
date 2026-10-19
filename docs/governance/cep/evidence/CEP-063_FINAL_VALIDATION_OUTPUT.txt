@@ -1,0 +1,11 @@
+..........F................................................... [ 87%]
+.........                                                            [100%]
+================================== FAILURES ===================================
+_ ESSTimekeepingTests.test_permission_scope_revocation_filters_before_showing_own_sources _
+apps\workforce\test_cep063.py:510: in test_permission_scope_revocation_filters_before_showing_own_sources
+    MembershipScopeGrant.objects.filter(membership=membership).delete()
+    ^^^^^^^^^^^^^^^^^^^^
+E   NameError: name 'MembershipScopeGrant' is not defined
+=========================== short test summary info ===========================
+FAILED apps/workforce/test_cep063.py::ESSTimekeepingTests::test_permission_scope_revocation_filters_before_showing_own_sources
+1 failed, 70 passed, 14 subtests passed in 47.86s

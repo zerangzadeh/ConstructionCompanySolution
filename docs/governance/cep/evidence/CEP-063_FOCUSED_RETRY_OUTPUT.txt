@@ -1,0 +1,14 @@
+..F.........                                                             [100%]
+================================== FAILURES ===================================
+_ ESSTimekeepingTests.test_cross_tenant_peer_ids_and_unknown_ids_have_same_denial _
+apps\workforce\test_cep063.py:248: in test_cross_tenant_peer_ids_and_unknown_ids_have_same_denial
+    self.assertEqual(
+E   AssertionError: b'\n<[34350 chars]eave/adfce53e-5582-4f32-bd02-3612ac7d0299/">\n[6432 chars]l>\n' != b'\n<[34350 chars]eave/66cefc97-b3fc-400b-83d2-5a1d595414da/">\n[6432 chars]l>\n'
+------------------------------ Captured log call ------------------------------
+WARNING  django.request:log.py:253 Forbidden: /workforce/ess/timekeeping/leave/adfce53e-5582-4f32-bd02-3612ac7d0299/
+WARNING  django.request:log.py:253 Forbidden: /workforce/ess/timekeeping/leave/adfce53e-5582-4f32-bd02-3612ac7d0299/submit/
+WARNING  django.request:log.py:253 Forbidden: /workforce/ess/timekeeping/leave/66cefc97-b3fc-400b-83d2-5a1d595414da/
+WARNING  django.request:log.py:253 Forbidden: /workforce/ess/timekeeping/leave/66cefc97-b3fc-400b-83d2-5a1d595414da/submit/
+=========================== short test summary info ===========================
+FAILED apps/workforce/test_cep063.py::ESSTimekeepingTests::test_cross_tenant_peer_ids_and_unknown_ids_have_same_denial
+1 failed, 11 passed in 10.48s

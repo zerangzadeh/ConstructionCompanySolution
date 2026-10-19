@@ -1,0 +1,1257 @@
+diff --git a/apps/workforce/leave_services.py b/apps/workforce/leave_services.py
+index 462d20f..8e78f5a 100644
+--- a/apps/workforce/leave_services.py
++++ b/apps/workforce/leave_services.py
+@@ -476,0 +477 @@ def reserve_request(
++    own_subject: bool = False,
+@@ -478 +479,13 @@ def reserve_request(
+-    organization = _access(organization, actor, P.LEAVE_BALANCES_MANAGE)
++    organization = _access(
++        organization,
++        actor,
++        P.LEAVE_MISSION_REQUEST if own_subject else P.LEAVE_BALANCES_MANAGE,
++    )
++    if own_subject:
++        from .ess_services import resolve_ess_subject
++
++        subject = resolve_ess_subject(user=actor, organization=organization)
++        if subject.current_relationship.pk != relationship.pk:
++            raise PermissionDenied(
++                "Leave reservation requires the actor's explicit own subject."
++            )
+diff --git a/apps/workforce/urls.py b/apps/workforce/urls.py
+index b6cafca..60d293d 100644
+--- a/apps/workforce/urls.py
++++ b/apps/workforce/urls.py
+@@ -5,0 +6 @@ from apps.workforce import views
++from apps.workforce import ess_timekeeping_views as own_time
+@@ -10,0 +12,5 @@ urlpatterns = [
++    path("ess/timekeeping/",own_time.index,name="ess_timekeeping"),
++    path("ess/timekeeping/<str:kind>/new/",own_time.create,name="ess_timekeeping_create"),
++    path("ess/timekeeping/<str:kind>/<uuid:record_id>/",own_time.detail,name="ess_timekeeping_detail"),
++    path("ess/timekeeping/<str:kind>/<uuid:record_id>/submit/",own_time.submit,name="ess_timekeeping_submit"),
++    path("ess/timekeeping/<str:kind>/<uuid:record_id>/request/",own_time.edit_source,name="ess_timekeeping_edit_source"),
+diff --git a/templates/workforce/_ess_navigation.html b/templates/workforce/_ess_navigation.html
+index 613d7ff..22721b9 100644
+--- a/templates/workforce/_ess_navigation.html
++++ b/templates/workforce/_ess_navigation.html
+@@ -1,0 +2 @@
++  <a class="text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">مرخصی، حضور و کارکرد من</a>
+diff --git a/apps/workforce/ess_timekeeping.py b/apps/workforce/ess_timekeeping.py
+new file mode 100644
+index 0000000..1da150b
+--- /dev/null
++++ b/apps/workforce/ess_timekeeping.py
+@@ -0,0 +1,262 @@
++"""Own ESS orchestration; source domains retain every state and calculation."""
++
++from datetime import date
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.utils import timezone
++
++from apps.organizations.authorization import require_business_permission, scope_queryset
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.timekeeping import services as source
++from apps.timekeeping.models import (
++    AttendanceCorrectionRequest,
++    AttendanceRecord,
++    LeaveMissionRequest,
++    Timesheet,
++)
++
++from . import leave_services
++from .ess_services import resolve_ess_subject
++from .leave_models import LeavePolicyVersion
++from .models import EmployeeProjectAssignment
++
++DENIED = "اطلاعات مجاز در این شرکت یافت نشد."
++SOURCES = {
++    "leave": (LeaveMissionRequest, "employee", P.LEAVE_MISSION_VIEW),
++    "attendance": (AttendanceRecord, "employee", P.ATTENDANCE_VIEW),
++    "correction": (
++        AttendanceCorrectionRequest,
++        "attendance__employee",
++        P.ATTENDANCE_VIEW,
++    ),
++    "timesheet": (Timesheet, "employee", P.TIMESHEETS_VIEW),
++}
++
++
++def subject(*, actor, organization):
++    organization = Organization.objects.get(pk=organization.pk)
++    own = resolve_ess_subject(user=actor, organization=organization)
++    if own.current_relationship.legacy_employee_id is None:
++        raise PermissionDenied(DENIED)
++    return organization, own
++
++
++def own_rows(*, actor, organization, kind):
++    organization, own = subject(actor=actor, organization=organization)
++    if kind not in SOURCES:
++        raise PermissionDenied(DENIED)
++    model, employee_field, permission = SOURCES[kind]
++    membership = require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        message=DENIED,
++        allow_any_scope=True,
++    )
++    rows = model.objects.filter(
++        organization=organization,
++        **{employee_field: own.current_relationship.legacy_employee_id},
++    )
++    if kind == "leave":
++        rows = rows.filter(kind="leave")
++    if kind == "correction":
++        rows = rows.filter(requested_by=actor)
++    if kind != "timesheet":
++        prefix = "attendance__" if kind == "correction" else ""
++        rows = scope_queryset(
++            rows,
++            membership=membership,
++            project_lookup=prefix + "project",
++            site_lookup=prefix + "site",
++        )
++    else:
++        # Check every entry's source scope before exposing a parent timesheet.
++        visible_ids = []
++        for row in rows.prefetch_related("entries"):
++            entries = row.entries.all()
++            visible = scope_queryset(
++                entries,
++                membership=membership,
++                project_lookup="project",
++                site_lookup="site",
++            )
++            if entries.count() == visible.count():
++                visible_ids.append(row.pk)
++        rows = rows.filter(pk__in=visible_ids)
++    return rows.order_by("-created_at", "-pk")
++
++
++def own_record(*, actor, organization, kind, record_id):
++    record = (
++        own_rows(actor=actor, organization=organization, kind=kind)
++        .filter(pk=record_id)
++        .first()
++    )
++    if record is None:
++        raise PermissionDenied(DENIED)
++    return record
++
++
++def own_balances(*, actor, organization):
++    organization, own = subject(actor=actor, organization=organization)
++    today = timezone.localdate(timezone=ZoneInfo(organization.settings.timezone))
++    categories = (
++        LeavePolicyVersion.objects.filter(
++            organization=organization, effective_from__lte=today, effective_to__gt=today
++        )
++        .values_list("category_code", flat=True)
++        .distinct()
++    )
++    balances = []
++    for category in categories:
++        try:
++            balance = leave_services.balance_as_of(
++                organization=organization,
++                actor=actor,
++                relationship=own.current_relationship,
++                category_code=category,
++                as_of=today,
++            )
++        except ValidationError:
++            balances.append({"category": category, "state": "unavailable"})
++        else:
++            balances.append({"category": category, "state": "ready", "source": balance})
++    return balances
++
++
++@transaction.atomic
++def create_own_leave(
++    *, actor, organization, policy_id, starts_at, ends_at, quantity, reason
++):
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    organization, own = subject(actor=actor, organization=organization)
++    today = timezone.localdate(timezone=ZoneInfo(organization.settings.timezone))
++    policy = LeavePolicyVersion.objects.filter(
++        pk=policy_id, organization=organization
++    ).first()
++    if (
++        policy is None
++        or leave_services._policy(organization, policy.category_code, today).pk
++        != policy.pk
++    ):
++        raise ValidationError("سیاست مؤثر و مجاز مرخصی در دسترس نیست.")
++    request = source.create_leave_mission_request(
++        organization=organization,
++        actor=actor,
++        employee=own.current_relationship.legacy_employee,
++        kind="leave",
++        category_code=policy.category_code,
++        starts_at=starts_at,
++        ends_at=ends_at,
++        reason=reason,
++        policy_reference=policy.evidence_reference,
++    )
++    leave_services.reserve_request(
++        organization=organization,
++        actor=actor,
++        relationship=own.current_relationship,
++        request=request,
++        quantity=quantity,
++        effective_on=today,
++        source_key=f"ess-request:{request.pk}:reservation",
++        evidence_reference=f"native-request:{request.pk}",
++        reason=reason,
++        own_subject=True,
++    )
++    return request
++
++
++@transaction.atomic
++def submit_own(*, actor, organization, kind, record_id):
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    record = own_record(
++        actor=actor, organization=organization, kind=kind, record_id=record_id
++    )
++    if kind == "leave":
++        return source.submit_time_request(
++            organization=organization, actor=actor, request=record
++        )
++    if kind == "timesheet":
++        return source.submit_timesheet(
++            organization=organization, actor=actor, timesheet=record
++        )
++    raise PermissionDenied(DENIED)
++
++
++@transaction.atomic
++def correct_own_attendance(
++    *, actor, organization, record_id, reason, work_date, check_in_at, check_out_at
++):
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    attendance = own_record(
++        actor=actor, organization=organization, kind="attendance", record_id=record_id
++    )
++    return source.request_attendance_correction(
++        organization=organization,
++        requester=actor,
++        attendance=attendance,
++        reason=reason,
++        replacement_values={
++            "work_date": work_date,
++            "check_in_at": check_in_at,
++            "check_out_at": check_out_at,
++        },
++    )
++
++
++@transaction.atomic
++def create_own_timesheet(
++    *, actor, organization, period_start, period_end, declared_minutes
++):
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    organization, own = subject(actor=actor, organization=organization)
++    if period_start < own.current_relationship.effective_start or (
++        own.current_relationship.effective_end
++        and period_end > own.current_relationship.effective_end
++    ):
++        raise ValidationError("دوره باید در محدوده رابطه کاری باشد.")
++    return source.create_timesheet(
++        organization=organization,
++        actor=actor,
++        employee=own.current_relationship.legacy_employee,
++        period_start=period_start,
++        period_end=period_end,
++        declared_minutes=declared_minutes,
++    )
++
++
++@transaction.atomic
++def add_own_entry(
++    *, actor, organization, record_id, work_date: date, project, site, activity, minutes
++):
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    organization, own = subject(actor=actor, organization=organization)
++    timesheet = own_record(
++        actor=actor, organization=organization, kind="timesheet", record_id=record_id
++    )
++    assignments = EmployeeProjectAssignment.objects.filter(
++        organization=organization,
++        employee=own.current_relationship.legacy_employee,
++        project=project,
++        start_date__lte=work_date,
++    ).exclude(status="cancelled")
++    assignments = (
++        assignments.filter(site=site) if site else assignments.filter(site__isnull=True)
++    )
++    if not any(
++        row.end_date is None or row.end_date >= work_date for row in assignments
++    ):
++        raise PermissionDenied(DENIED)
++    return source.add_timesheet_entry(
++        organization=organization,
++        actor=actor,
++        timesheet=timesheet,
++        work_date=work_date,
++        project=project,
++        site=site,
++        activity=activity,
++        minutes=minutes,
++    )
+diff --git a/apps/workforce/ess_timekeeping_forms.py b/apps/workforce/ess_timekeeping_forms.py
+new file mode 100644
+index 0000000..e407b03
+--- /dev/null
++++ b/apps/workforce/ess_timekeeping_forms.py
+@@ -0,0 +1,131 @@
++"""Jalali forms over source-owned choices; no Employee/tenant identity inputs."""
++
++from zoneinfo import ZoneInfo
++
++from django import forms
++from django.utils import timezone
++
++from apps.organizations.authorization import get_active_membership, scope_queryset
++from apps.projects.models import Activity, Project, ProjectSite
++from core.forms import JalaliDateMixin
++
++from .ess_timekeeping import subject
++from .leave_models import LeavePolicyVersion
++from .models import EmployeeProjectAssignment
++
++
++class ESSForm(JalaliDateMixin, forms.Form):
++    def __init__(self, *args, organization, actor, **kwargs):
++        super().__init__(*args, **kwargs)
++        self.organization, self.own = subject(actor=actor, organization=organization)
++        for field in self.fields.values():
++            field.widget.attrs.setdefault("class", "erp-input w-full")
++
++
++class LeaveForm(ESSForm):
++    policy_id = forms.ChoiceField(label="نوع مرخصی و واحد سیاست")
++    starts_at = forms.DateTimeField(label="شروع مرخصی")
++    ends_at = forms.DateTimeField(label="پایان مرخصی")
++    quantity = forms.DecimalField(
++        label="مقدار در واحد سیاست انتخاب‌شده",
++        max_digits=14,
++        decimal_places=4,
++        min_value=0,
++    )
++    reason = forms.CharField(
++        label="دلیل درخواست", max_length=2000, widget=forms.Textarea(attrs={"rows": 3})
++    )
++
++    def __init__(self, *args, **kwargs):
++        super().__init__(*args, **kwargs)
++        today = timezone.localdate(
++            timezone=ZoneInfo(self.organization.settings.timezone)
++        )
++        policies = LeavePolicyVersion.objects.filter(
++            organization=self.organization,
++            effective_from__lte=today,
++            effective_to__gt=today,
++        ).order_by("category_code", "-version")
++        seen = set()
++        choices = []
++        for policy in policies:
++            if policy.category_code not in seen:
++                seen.add(policy.category_code)
++                choices.append(
++                    (
++                        str(policy.pk),
++                        f"{policy.category_code} · {'دقیقه' if policy.unit == 'minutes' else 'روز'} · نسخه {policy.version}",
++                    )
++                )
++        self.fields["policy_id"].choices = choices
++
++
++class CorrectionForm(ESSForm):
++    work_date = forms.DateField(label="تاریخ پیشنهادی")
++    check_in_at = forms.DateTimeField(label="ورود پیشنهادی")
++    check_out_at = forms.DateTimeField(label="خروج پیشنهادی")
++    reason = forms.CharField(
++        label="دلیل درخواست اصلاح",
++        max_length=2000,
++        widget=forms.Textarea(attrs={"rows": 3}),
++    )
++
++    def clean(self):
++        data = super().clean()
++        if (
++            data.get("check_in_at")
++            and data.get("check_out_at")
++            and data["check_out_at"] <= data["check_in_at"]
++        ):
++            raise forms.ValidationError("خروج باید پس از ورود باشد.")
++        return data
++
++
++class TimesheetForm(ESSForm):
++    period_start = forms.DateField(label="شروع دوره")
++    period_end = forms.DateField(label="پایان دوره")
++    declared_minutes = forms.IntegerField(label="کل دقیقه اعلام‌شده", min_value=1)
++
++
++class EntryForm(ESSForm):
++    work_date = forms.DateField(label="تاریخ کارکرد")
++    project = forms.ModelChoiceField(label="پروژه", queryset=Project.objects.none())
++    site = forms.ModelChoiceField(
++        label="کارگاه", queryset=ProjectSite.objects.none(), required=False
++    )
++    activity = forms.ModelChoiceField(
++        label="فعالیت", queryset=Activity.objects.none(), required=False
++    )
++    minutes = forms.IntegerField(label="مدت به دقیقه", min_value=1)
++
++    def __init__(self, *args, organization, actor, **kwargs):
++        super().__init__(*args, organization=organization, actor=actor, **kwargs)
++        assignments = EmployeeProjectAssignment.objects.filter(
++            organization=self.organization,
++            employee=self.own.current_relationship.legacy_employee,
++        ).exclude(status="cancelled")
++        membership = get_active_membership(user=actor, organization=self.organization)
++        self.fields["project"].queryset = scope_queryset(
++            Project.objects.filter(
++                organization=self.organization, pk__in=assignments.values("project_id")
++            ),
++            membership=membership,
++            project_lookup="pk",
++            include_site_parent=True,
++        )
++        self.fields["site"].queryset = scope_queryset(
++            ProjectSite.objects.filter(
++                organization=self.organization, pk__in=assignments.values("site_id")
++            ),
++            membership=membership,
++            project_lookup="project",
++            site_lookup="pk",
++        )
++        self.fields["activity"].queryset = scope_queryset(
++            Activity.objects.filter(
++                organization=self.organization, site__in=self.fields["site"].queryset
++            ),
++            membership=membership,
++            project_lookup="project",
++            site_lookup="site",
++        )
+diff --git a/apps/workforce/ess_timekeeping_views.py b/apps/workforce/ess_timekeeping_views.py
+new file mode 100644
+index 0000000..2d110a2
+--- /dev/null
++++ b/apps/workforce/ess_timekeeping_views.py
+@@ -0,0 +1,217 @@
++"""Thin own-data views; all mutations delegate to the authoritative source."""
++
++from functools import wraps
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.shortcuts import redirect, render
++from django.utils import timezone
++from django.views.decorators.http import require_GET, require_http_methods, require_POST
++
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.decorators import active_organization_required
++from apps.organizations.models import BusinessPermissionCode as P
++
++from . import ess_timekeeping as service
++from .ess_timekeeping_forms import CorrectionForm, EntryForm, LeaveForm, TimesheetForm
++
++
++def private(view):
++    @wraps(view)
++    def wrapped(request, *args, **kwargs):
++        try:
++            return view(request, *args, **kwargs)
++        except PermissionDenied:
++            return render(request, "workforce/ess_unavailable.html", status=403)
++        except ValidationError:
++            return render(
++                request,
++                "workforce/ess_timekeeping_form.html",
++                {"error": True, "heading": "درخواست قابل انجام نیست"},
++                status=400,
++            )
++
++    return wrapped
++
++
++@active_organization_required
++@require_GET
++@private
++def index(request):
++    service.subject(actor=request.user, organization=request.organization)
++    panels = []
++    for kind, label in [
++        ("leave", "درخواست‌های مرخصی من"),
++        ("attendance", "سوابق حضور من"),
++        ("correction", "درخواست‌های اصلاح حضور من"),
++        ("timesheet", "کارکرد من"),
++    ]:
++        try:
++            rows = list(
++                service.own_rows(
++                    actor=request.user, organization=request.organization, kind=kind
++                )
++            )
++        except PermissionDenied:
++            panels.append({"kind": kind, "label": label, "state": "unavailable"})
++        else:
++            panels.append(
++                {
++                    "kind": kind,
++                    "label": label,
++                    "state": "ready" if rows else "empty",
++                    "rows": rows,
++                }
++            )
++    try:
++        balances = service.own_balances(
++            actor=request.user, organization=request.organization
++        )
++    except PermissionDenied:
++        balances = None
++    return render(
++        request,
++        "workforce/ess_timekeeping.html",
++        {"panels": panels, "balances": balances, "observed_at": timezone.now()},
++    )
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++@private
++def create(request, kind):
++    forms = {
++        "leave": (LeaveForm, P.LEAVE_MISSION_REQUEST, "درخواست مرخصی"),
++        "timesheet": (TimesheetForm, P.TIMESHEETS_PREPARE, "کارکرد جدید"),
++    }
++    if kind not in forms:
++        raise PermissionDenied(service.DENIED)
++    form_type, permission, heading = forms[kind]
++    require_business_permission(
++        user=request.user,
++        organization=request.organization,
++        permission=permission,
++        message=service.DENIED,
++    )
++    service.subject(actor=request.user, organization=request.organization)
++    with timezone.override(ZoneInfo(request.organization.settings.timezone)):
++        form = form_type(
++            request.POST or None, organization=request.organization, actor=request.user
++        )
++        if request.method == "POST" and form.is_valid():
++            try:
++                record = (
++                    service.create_own_leave
++                    if kind == "leave"
++                    else service.create_own_timesheet
++                )(
++                    actor=request.user,
++                    organization=request.organization,
++                    **form.cleaned_data,
++                )
++            except ValidationError:
++                form.add_error(
++                    None,
++                    "اطلاعات درخواست با سیاست یا وضعیت منبع سازگار نیست؛ تنظیمات و مقادیر را بررسی کنید.",
++                )
++            else:
++                return redirect(
++                    "workforce:ess_timekeeping_detail", kind=kind, record_id=record.pk
++                )
++    return render(
++        request,
++        "workforce/ess_timekeeping_form.html",
++        {"form": form, "heading": heading},
++        status=400 if request.method == "POST" else 200,
++    )
++
++
++@active_organization_required
++@require_GET
++@private
++def detail(request, kind, record_id):
++    record = service.own_record(
++        actor=request.user,
++        organization=request.organization,
++        kind=kind,
++        record_id=record_id,
++    )
++    entries = record.entries.all() if kind == "timesheet" else ()
++    return render(
++        request,
++        "workforce/ess_timekeeping_detail.html",
++        {"record": record, "kind": kind, "entries": entries},
++    )
++
++
++@active_organization_required
++@require_POST
++@private
++def submit(request, kind, record_id):
++    service.submit_own(
++        actor=request.user,
++        organization=request.organization,
++        kind=kind,
++        record_id=record_id,
++    )
++    return redirect("workforce:ess_timekeeping_detail", kind=kind, record_id=record_id)
++
++
++@active_organization_required
++@require_http_methods(["GET", "POST"])
++@private
++def edit_source(request, kind, record_id):
++    if kind not in ("attendance", "timesheet"):
++        raise PermissionDenied(service.DENIED)
++    record = service.own_record(
++        actor=request.user,
++        organization=request.organization,
++        kind=kind,
++        record_id=record_id,
++    )
++    permission = P.ATTENDANCE_CORRECT if kind == "attendance" else P.TIMESHEETS_PREPARE
++    require_business_permission(
++        user=request.user,
++        organization=request.organization,
++        permission=permission,
++        message=service.DENIED,
++        project=record.project if kind == "attendance" else None,
++        site=record.site if kind == "attendance" else None,
++    )
++    form_type = CorrectionForm if kind == "attendance" else EntryForm
++    with timezone.override(ZoneInfo(request.organization.settings.timezone)):
++        form = form_type(
++            request.POST or None, organization=request.organization, actor=request.user
++        )
++        if request.method == "POST" and form.is_valid():
++            try:
++                result = (
++                    service.correct_own_attendance
++                    if kind == "attendance"
++                    else service.add_own_entry
++                )(
++                    actor=request.user,
++                    organization=request.organization,
++                    record_id=record_id,
++                    **form.cleaned_data,
++                )
++            except ValidationError:
++                form.add_error(
++                    None,
++                    "اطلاعات با وضعیت منبع سازگار نیست؛ تاریخ و مقادیر را بررسی کنید.",
++                )
++            else:
++                return redirect(
++                    "workforce:ess_timekeeping_detail",
++                    kind="correction" if kind == "attendance" else "timesheet",
++                    record_id=result.pk if kind == "attendance" else record_id,
++                )
++    return render(
++        request,
++        "workforce/ess_timekeeping_form.html",
++        {
++            "form": form,
++            "heading": "درخواست اصلاح حضور" if kind == "attendance" else "ردیف کارکرد",
++        },
++        status=400 if request.method == "POST" else 200,
++    )
+diff --git a/apps/workforce/test_cep063.py b/apps/workforce/test_cep063.py
+new file mode 100644
+index 0000000..4698c68
+--- /dev/null
++++ b/apps/workforce/test_cep063.py
+@@ -0,0 +1,528 @@
++"""Own ESS timekeeping journeys, source delegation and negative boundaries."""
++
++import os
++import re
++from datetime import timedelta
++from decimal import Decimal
++from pathlib import Path
++from unittest.mock import patch
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import Client, TestCase
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.organizations.models import (
++    BusinessPermission,
++    MembershipScopeGrant,
++    Organization,
++    OrganizationMembership,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.projects.models import Project
++from apps.timekeeping import services as source
++from apps.timekeeping.models import (
++    AttendanceCorrectionRequest,
++    AttendanceRecord,
++    LeaveMissionRequest,
++    Timesheet,
++)
++
++from . import ess_timekeeping as service
++from . import test_cep023 as fixture
++from .ess_timekeeping_forms import EntryForm, LeaveForm
++from .models import (
++    Employee,
++    EmployeeProjectAssignment,
++    LeaveBalanceEntry,
++    Person,
++)
++
++
++class ESSTimekeepingTests(TestCase):
++    policy = fixture.LeaveAuthorityTests.policy
++    credit = fixture.LeaveAuthorityTests.credit
++
++    def setUp(self):
++        fixture.LeaveAuthorityTests.setUp(self)
++        self.employee_user = self.reviewer
++        person = self.relationship.person
++        person.user = self.employee_user
++        person.save()
++        self.relationship.refresh_from_db()
++        membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.employee_user
++        )
++        self.role = membership.role_definition
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.LEAVE_BALANCES_MANAGE)
++        )
++        self.role.permissions.add(
++            *BusinessPermission.objects.filter(
++                code__in=[
++                    P.LEAVE_MISSION_VIEW,
++                    P.ATTENDANCE_VIEW,
++                    P.ATTENDANCE_CORRECT,
++                    P.TIMESHEETS_VIEW,
++                    P.TIMESHEETS_PREPARE,
++                ]
++            )
++        )
++        owner_membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.actor
++        )
++        for assignment in owner_membership.role_assignments.select_related("role"):
++            assignment.role.permissions.add(
++                *BusinessPermission.objects.filter(
++                    code__in=[
++                        P.TIME_CALENDARS_MANAGE,
++                        P.ATTENDANCE_CAPTURE,
++                        P.ATTENDANCE_REVIEW,
++                    ]
++                )
++            )
++        self.project = Project.objects.create(
++            organization=self.organization,
++            code="OWN-TIME",
++            name="پروژه مجاز من",
++            created_by=self.actor,
++        )
++        EmployeeProjectAssignment.objects.create(
++            organization=self.organization,
++            employee=self.employee,
++            project=self.project,
++            start_date=self.relationship.effective_start,
++            created_by=self.actor,
++        )
++        self.peer = Employee.objects.create(
++            organization=self.organization,
++            employee_number="PEER",
++            first_name="Peer",
++            last_name="Worker",
++        )
++
++    def client_for(self, user=None, csrf=False):
++        client = Client(enforce_csrf_checks=csrf)
++        client.force_login(user or self.employee_user)
++        session = client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        return client
++
++    def capture(self, name, response):
++        directory = os.environ.get("BONIRA_CEP063_CAPTURE_DIR")
++        if directory:
++            body = re.sub(
++                rb'name="csrfmiddlewaretoken" value="[^"]+"',
++                b'name="csrfmiddlewaretoken" value="SYNTHETIC-EVIDENCE"',
++                response.content,
++            )
++            Path(directory, name + ".html").write_bytes(body)
++
++    def leave(self, **changes):
++        start = timezone.now() + timedelta(days=2)
++        return service.create_own_leave(
++            **(
++                {
++                    "actor": self.employee_user,
++                    "organization": self.organization,
++                    "policy_id": self.policy_record.pk,
++                    "starts_at": start,
++                    "ends_at": start + timedelta(hours=4),
++                    "quantity": Decimal(240),
++                    "reason": "دلیل شخصی درخواست",
++                }
++                | changes
++            )
++        )
++
++    def prepared(self):
++        self.policy_record = self.policy()
++        self.credit()
++
++    def attendance(self, employee=None):
++        calendar = source.create_work_calendar(
++            organization=self.organization,
++            actor=self.actor,
++            code="SOURCE",
++            name="تقویم",
++            effective_from=self.relationship.effective_start,
++            working_weekdays=[1, 2, 3, 4, 5, 6, 7],
++        )
++        now = timezone.now() - timedelta(days=1)
++        # Synthetic immutable source fact; ESS never creates an attendance fact.
++        return AttendanceRecord.objects.create(
++            organization=self.organization,
++            employee=employee or self.employee,
++            calendar=calendar,
++            project=self.project,
++            work_date=now.date(),
++            check_in_at=now - timedelta(hours=4),
++            check_out_at=now,
++            source="manual",
++            state="finalized",
++            captured_by=self.actor,
++            finalized_by=self.actor,
++            finalized_at=now,
++        )
++
++    def test_empty_index_policy_absence_and_rtl_jalali_ui(self):
++        response = self.client_for().get(reverse("workforce:ess_timekeeping"))
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, 'dir="rtl"')
++        self.assertContains(response, "مرخصی، حضور و کارکرد من")
++        self.assertContains(response, "مانده صفر فرض نمی‌شود")
++        self.assertContains(response, "سابقه مجازی برای نمایش ثبت نشده است")
++        self.assertNotContains(response, "مانده قابل استفاده: ۰")
++        self.capture("empty", response)
++
++    def test_create_leave_requires_effective_source_policy_no_orphan_draft(self):
++        start = timezone.now() + timedelta(days=2)
++        with self.assertRaises(ValidationError):
++            service.create_own_leave(
++                actor=self.employee_user,
++                organization=self.organization,
++                policy_id=self.relationship.pk,
++                starts_at=start,
++                ends_at=start + timedelta(hours=1),
++                quantity=Decimal(1),
++                reason="No policy",
++            )
++        self.assertEqual(LeaveMissionRequest.objects.count(), 0)
++        self.prepared()
++        with self.assertRaises(ValidationError):
++            self.leave(quantity=Decimal(1001))
++        self.assertEqual(LeaveMissionRequest.objects.count(), 0)
++
++    def test_own_leave_reservation_and_source_submit_without_balance_manager(self):
++        self.prepared()
++        request = self.leave()
++        self.assertEqual(request.employee_id, self.employee.pk)
++        self.assertEqual(request.requested_by_id, self.employee_user.pk)
++        self.assertEqual(
++            LeaveBalanceEntry.objects.filter(
++                request=request, kind="reservation"
++            ).count(),
++            1,
++        )
++        response = self.client_for().post(
++            reverse("workforce:ess_timekeeping_submit", args=["leave", request.pk])
++        )
++        self.assertEqual(response.status_code, 302)
++        request.refresh_from_db()
++        self.assertEqual(request.state, "submitted")
++        response = self.client_for().get(reverse("workforce:ess_timekeeping"))
++        self.assertContains(response, str(request.pk))
++        self.assertContains(response, "submitted")
++        self.assertNotContains(response, "دلیل شخصی درخواست")
++        self.capture("ready", response)
++        self.assertEqual(
++            self.client_for()
++            .get(
++                reverse("workforce:ess_timekeeping_detail", args=["leave", request.pk])
++            )
++            .status_code,
++            200,
++        )
++
++    def test_cross_tenant_peer_ids_and_unknown_ids_have_same_denial(self):
++        self.prepared()
++        own = self.leave()
++        peer = LeaveMissionRequest.objects.create(
++            organization=self.organization,
++            employee=self.peer,
++            kind="leave",
++            category_code="EXPLICIT",
++            starts_at=own.starts_at,
++            ends_at=own.ends_at,
++            reason="PEER_SECRET",
++            requested_by=self.actor,
++        )
++        client = self.client_for()
++        denied = []
++        for pk in [peer.pk, self.other.pk]:
++            response = client.get(
++                reverse("workforce:ess_timekeeping_detail", args=["leave", pk])
++            )
++            self.assertEqual(response.status_code, 403)
++            denied.append(response.content)
++            self.assertEqual(
++                client.post(
++                    reverse("workforce:ess_timekeeping_submit", args=["leave", pk])
++                ).status_code,
++                403,
++            )
++        self.assertEqual(
++            *[
++                re.sub(
++                    rb'name="csrfmiddlewaretoken" value="[^"]+"',
++                    b'name="csrfmiddlewaretoken" value="REDACTED"',
++                    body.replace(str(pk).encode(), b"REQUESTED-ID"),
++                )
++                for body, pk in zip(denied, [peer.pk, self.other.pk], strict=True)
++            ]
++        )
++        self.assertNotIn(b"PEER_SECRET", denied[0])
++        self.capture("unauthorized", response)
++        self.assertNotContains(
++            client.get(reverse("workforce:ess_timekeeping")), str(peer.pk)
++        )
++
++    def test_unlinked_inactive_member_and_suspended_tenant_fail_closed(self):
++        self.assertEqual(
++            self.client_for(self.other_actor)
++            .get(reverse("workforce:ess_timekeeping"))
++            .status_code,
++            403,
++        )
++        Person.objects.filter(pk=self.relationship.person_id).update(user=None)
++        self.assertEqual(
++            self.client_for().get(reverse("workforce:ess_timekeeping")).status_code, 403
++        )
++        Person.objects.filter(pk=self.relationship.person_id).update(
++            user=self.employee_user
++        )
++        Organization.objects.filter(pk=self.organization.pk).update(status="suspended")
++        self.assertEqual(
++            self.client_for().get(reverse("workforce:ess_timekeeping")).status_code, 403
++        )
++
++    def test_mutations_require_post_csrf_and_own_source_permission(self):
++        self.prepared()
++        request = self.leave()
++        url = reverse("workforce:ess_timekeeping_submit", args=["leave", request.pk])
++        self.assertEqual(self.client_for().get(url).status_code, 405)
++        self.assertEqual(self.client_for(csrf=True).post(url).status_code, 403)
++        self.role.permissions.remove(
++            BusinessPermission.objects.get(code=P.LEAVE_MISSION_REQUEST)
++        )
++        self.assertEqual(self.client_for().post(url).status_code, 403)
++        request.refresh_from_db()
++        self.assertEqual(request.state, "draft")
++
++    def test_forms_exclude_identity_and_accept_jalali_dates(self):
++        self.prepared()
++        response = self.client_for().get(
++            reverse("workforce:ess_timekeeping_create", args=["leave"])
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, 'data-jalali-date="datetime"')
++        self.assertNotContains(response, 'name="employee"')
++        self.assertNotContains(response, 'name="organization"')
++        form = LeaveForm(
++            {
++                "policy_id": str(self.policy_record.pk),
++                "starts_at": "1405/08/01 08:00",
++                "ends_at": "1405/08/01 12:00",
++                "quantity": "240",
++                "reason": "درخواست",
++            },
++            organization=self.organization,
++            actor=self.employee_user,
++        )
++        self.assertTrue(form.is_valid(), form.errors)
++        self.capture("form", response)
++
++    def test_invalid_form_is_explicit_and_does_not_leak_internal_error(self):
++        response = self.client_for().post(
++            reverse("workforce:ess_timekeeping_create", args=["timesheet"]),
++            {
++                "period_start": "not-a-date",
++                "period_end": "not-a-date",
++                "declared_minutes": "-1",
++            },
++        )
++        self.assertEqual(response.status_code, 400)
++        self.assertContains(response, 'role="alert"', status_code=400)
++        self.assertEqual(Timesheet.objects.count(), 0)
++        self.capture("error", response)
++
++    def test_timesheet_create_add_submit_tracks_authoritative_source(self):
++        today = timezone.localdate()
++        sheet = service.create_own_timesheet(
++            actor=self.employee_user,
++            organization=self.organization,
++            period_start=today,
++            period_end=today,
++            declared_minutes=120,
++        )
++        service.add_own_entry(
++            actor=self.employee_user,
++            organization=self.organization,
++            record_id=sheet.pk,
++            work_date=today,
++            project=self.project,
++            site=None,
++            activity=None,
++            minutes=120,
++        )
++        response = self.client_for().post(
++            reverse("workforce:ess_timekeeping_submit", args=["timesheet", sheet.pk])
++        )
++        self.assertEqual(response.status_code, 302)
++        sheet.refresh_from_db()
++        self.assertEqual(sheet.state, "submitted")
++        response = self.client_for().get(
++            reverse("workforce:ess_timekeeping_detail", args=["timesheet", sheet.pk])
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, self.project.name)
++        self.capture("timesheet", response)
++
++    def test_timesheet_conservation_and_foreign_assignment_fail_closed(self):
++        today = timezone.localdate()
++        sheet = service.create_own_timesheet(
++            actor=self.employee_user,
++            organization=self.organization,
++            period_start=today,
++            period_end=today,
++            declared_minutes=120,
++        )
++        with self.assertRaises(ValidationError):
++            service.submit_own(
++                actor=self.employee_user,
++                organization=self.organization,
++                kind="timesheet",
++                record_id=sheet.pk,
++            )
++        foreign = Project.objects.create(
++            organization=self.other,
++            code="OTHER",
++            name="FORBIDDEN",
++            created_by=self.other_actor,
++        )
++        with self.assertRaises(PermissionDenied):
++            service.add_own_entry(
++                actor=self.employee_user,
++                organization=self.organization,
++                record_id=sheet.pk,
++                work_date=today,
++                project=foreign,
++                site=None,
++                activity=None,
++                minutes=120,
++            )
++        self.assertEqual(sheet.entries.count(), 0)
++        form = EntryForm(organization=self.organization, actor=self.employee_user)
++        self.assertNotIn(foreign, list(form.fields["project"].queryset))
++
++    def test_attendance_original_and_correction_request_remain_source_owned(self):
++        attendance = self.attendance()
++        original = list(AttendanceRecord.objects.values())
++        request = service.correct_own_attendance(
++            actor=self.employee_user,
++            organization=self.organization,
++            record_id=attendance.pk,
++            reason="اصلاح زمان ورود",
++            work_date=attendance.work_date,
++            check_in_at=attendance.check_in_at + timedelta(minutes=5),
++            check_out_at=attendance.check_out_at,
++        )
++        self.assertEqual(AttendanceCorrectionRequest.objects.count(), 1)
++        self.assertEqual(request.status, "pending")
++        self.assertEqual(list(AttendanceRecord.objects.values()), original)
++        response = self.client_for().get(
++            reverse("workforce:ess_timekeeping_detail", args=["correction", request.pk])
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, "pending")
++
++    def test_own_reservation_mode_cannot_be_used_for_peer_relationship(self):
++        self.prepared()
++        from .leave_services import reserve_request
++        from .person_services import create_person, create_work_relationship
++
++        person = create_person(
++            organization=self.organization,
++            actor=self.actor,
++            first_name="Peer",
++            last_name="Other",
++        )
++        relationship = create_work_relationship(
++            organization=self.organization,
++            actor=self.actor,
++            person=person,
++            employee_number="PEER",
++            effective_start=self.relationship.effective_start,
++            legacy_employee=self.peer,
++        )
++        request = LeaveMissionRequest.objects.create(
++            organization=self.organization,
++            employee=self.peer,
++            kind="leave",
++            category_code="EXPLICIT",
++            starts_at=timezone.now() + timedelta(days=2),
++            ends_at=timezone.now() + timedelta(days=3),
++            reason="PRIVATE",
++            requested_by=self.employee_user,
++        )
++        with self.assertRaises(PermissionDenied):
++            reserve_request(
++                organization=self.organization,
++                actor=self.employee_user,
++                relationship=relationship,
++                request=request,
++                quantity=Decimal(1),
++                effective_on=timezone.localdate(),
++                source_key="forged",
++                evidence_reference="forged",
++                reason="forged",
++                own_subject=True,
++            )
++
++    def test_direct_form_posts_use_own_identity_and_source_status_links(self):
++        from core.jalali import format_jalali
++
++        today = timezone.localdate()
++        response = self.client_for().post(
++            reverse("workforce:ess_timekeeping_create", args=["timesheet"]),
++            {
++                "period_start": format_jalali(today),
++                "period_end": format_jalali(today),
++                "declared_minutes": "30",
++                "employee": str(self.peer.pk),
++                "organization": str(self.other.pk),
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        sheet = Timesheet.objects.get()
++        self.assertEqual(sheet.employee_id, self.employee.pk)
++        response = self.client_for().post(
++            reverse(
++                "workforce:ess_timekeeping_edit_source", args=["timesheet", sheet.pk]
++            ),
++            {
++                "work_date": format_jalali(today),
++                "project": str(self.project.pk),
++                "site": "",
++                "activity": "",
++                "minutes": "30",
++            },
++        )
++        self.assertEqual(response.status_code, 302)
++        self.assertEqual(sheet.entries.count(), 1)
++
++    def test_permission_scope_revocation_filters_before_showing_own_sources(self):
++        self.prepared()
++        request = self.leave()
++        membership = OrganizationMembership.objects.get(
++            organization=self.organization, user=self.employee_user
++        )
++        MembershipScopeGrant.objects.filter(membership=membership).delete()
++        response = self.client_for().get(
++            reverse("workforce:ess_timekeeping_detail", args=["leave", request.pk])
++        )
++        self.assertEqual(response.status_code, 403)
++        self.assertNotContains(response, "دلیل شخصی درخواست", status_code=403)
++
++    def test_source_validation_error_is_neutral_and_fail_closed(self):
++        with patch.object(
++            service,
++            "own_rows",
++            side_effect=ValidationError("PRIVATE_INTERNAL_SOURCE_DETAIL"),
++        ):
++            response = self.client_for().get(reverse("workforce:ess_timekeeping"))
++        self.assertEqual(response.status_code, 400)
++        self.assertNotContains(
++            response, "PRIVATE_INTERNAL_SOURCE_DETAIL", status_code=400
++        )
+diff --git a/apps/workforce/templates/workforce/ess_timekeeping.html b/apps/workforce/templates/workforce/ess_timekeeping.html
+new file mode 100644
+index 0000000..6fafe89
+--- /dev/null
++++ b/apps/workforce/templates/workforce/ess_timekeeping.html
+@@ -0,0 +1,17 @@
++{% extends "base.html" %}
++{% load erp_format %}
++{% block title %}مرخصی، حضور و کارکرد من | بنیرا{% endblock %}
++{% block content %}
++{% include "workforce/_ess_navigation.html" %}
++<header class="erp-surface rounded-2xl p-5"><h1 class="text-xl font-black">مرخصی، حضور و کارکرد من</h1><p class="mt-2 text-sm text-slate-600">وضعیت و سوابق شخصی از منبع مجاز نمایش داده می‌شود.</p><p class="mt-2 text-xs">زمان مشاهده: {{ observed_at|jalali_datetime }}</p></header>
++<section class="erp-surface mt-5 rounded-2xl p-5" aria-labelledby="balances-heading">
++  <h2 id="balances-heading" class="text-lg font-bold">مانده مرخصی در تاریخ مشاهده</h2>
++  {% if balances %}<ul class="mt-3 space-y-3">{% for balance in balances %}<li><bdi>{{ balance.category }}</bdi>: {% if balance.state == "ready" %}<span>مانده قابل استفاده: {{ balance.source.available|erp_number }} {% if balance.source.unit == "minutes" %}دقیقه{% else %}روز{% endif %}</span><span class="block text-xs text-slate-600">تاریخ مبنا: {{ balance.source.as_of|jalali_date }} · مقدار رزروشده: {{ balance.source.reserved|erp_number }}</span>{% else %}<span>مانده معتبر در منبع در دسترس نیست.</span>{% endif %}</li>{% endfor %}</ul>{% else %}<p class="mt-3 text-sm text-slate-600" role="status">سیاست یا مانده مجاز برای نمایش در دسترس نیست؛ مانده صفر فرض نمی‌شود.</p>{% endif %}
++</section>
++<div class="mt-5 grid gap-5 lg:grid-cols-2">
++{% for panel in panels %}<section class="erp-surface min-w-0 rounded-2xl p-5" aria-labelledby="{{ panel.kind }}-heading"><h2 id="{{ panel.kind }}-heading" class="text-lg font-bold">{{ panel.label }}</h2>
++{% if panel.state == "unavailable" %}<p class="mt-3 text-sm" role="status">این منبع برای حساب شما در دسترس نیست.</p>{% elif panel.state == "empty" %}<p class="mt-3 text-sm text-slate-600" role="status">سابقه مجازی برای نمایش ثبت نشده است.</p>{% else %}<ul class="mt-3 divide-y divide-slate-100">{% for row in panel.rows %}<li class="py-3 text-sm"><a class="font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_detail' panel.kind row.pk %}">مشاهده سابقه · {{ row.created_at|jalali_datetime }}</a><p>وضعیت منبع: <bdi>{% if panel.kind == "correction" %}{{ row.status }}{% else %}{{ row.state }}{% endif %}</bdi></p></li>{% endfor %}</ul>{% endif %}
++{% if panel.kind == "leave" and "leave_mission.request" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_create' 'leave' %}">درخواست مرخصی</a>{% endif %}
++{% if panel.kind == "timesheet" and "timesheets.prepare" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_create' 'timesheet' %}">کارکرد جدید</a>{% endif %}
++</section>{% endfor %}</div>
++{% endblock %}
+diff --git a/apps/workforce/templates/workforce/ess_timekeeping_detail.html b/apps/workforce/templates/workforce/ess_timekeeping_detail.html
+new file mode 100644
+index 0000000..bb6e773
+--- /dev/null
++++ b/apps/workforce/templates/workforce/ess_timekeeping_detail.html
+@@ -0,0 +1,13 @@
++{% extends "base.html" %}
++{% load erp_format %}
++{% block title %}وضعیت سابقه شخصی | بنیرا{% endblock %}
++{% block content %}
++{% include "workforce/_ess_navigation.html" %}
++<section class="erp-surface rounded-2xl p-5 sm:p-6"><h1 class="text-xl font-black">وضعیت سابقه شخصی</h1><p class="mt-3">وضعیت منبع: <bdi>{% if kind == "correction" %}{{ record.status }}{% else %}{{ record.state }}{% endif %}</bdi></p><p class="mt-2 text-xs text-slate-600">ثبت منبع: {{ record.created_at|jalali_datetime }}</p>
++{% if kind == "leave" %}<p class="mt-4">شروع: {{ record.starts_at|jalali_datetime }} · پایان: {{ record.ends_at|jalali_datetime }}</p><p class="mt-2 whitespace-pre-wrap text-sm">{{ record.reason }}</p>{% endif %}
++{% if kind == "attendance" %}<p class="mt-4">تاریخ حضور: {{ record.work_date|jalali_date }}</p>{% if "attendance.correct" in business_permission_codes %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_edit_source' kind record.pk %}">درخواست اصلاح حضور</a>{% endif %}{% endif %}
++{% if kind == "correction" %}<p class="mt-4 whitespace-pre-wrap text-sm">{{ record.reason }}</p><p class="mt-2">تاریخ پیشنهادی: {{ record.replacement_work_date|jalali_date }}</p>{% endif %}
++{% if kind == "timesheet" %}<p class="mt-4">دوره: {{ record.period_start|jalali_date }} تا {{ record.period_end|jalali_date }}</p><p class="mt-2">کل دقیقه اعلام‌شده: {{ record.declared_minutes|erp_number }}</p><ul class="mt-4 divide-y divide-slate-100">{% for entry in entries %}<li class="py-3 text-sm">{{ entry.work_date|jalali_date }} · {{ entry.project.name }} · {{ entry.minutes|erp_number }} دقیقه</li>{% empty %}<li class="text-sm">ردیفی در منبع ثبت نشده است.</li>{% endfor %}</ul>{% if record.state == "draft" and "timesheets.prepare" in business_permission_codes %}<a class="mt-4 inline-flex font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_edit_source' kind record.pk %}">افزودن ردیف کارکرد</a>{% endif %}{% endif %}
++{% if record.state == "draft" %}{% if kind == "leave" or kind == "timesheet" %}<form method="post" action="{% url 'workforce:ess_timekeeping_submit' kind record.pk %}" class="mt-5">{% csrf_token %}<button class="rounded-lg bg-blue-700 px-5 py-2 font-bold text-white" type="submit">ارسال برای بررسی</button></form>{% endif %}{% endif %}
++<a class="mt-5 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">بازگشت به سوابق من</a></section>
++{% endblock %}
+diff --git a/apps/workforce/templates/workforce/ess_timekeeping_form.html b/apps/workforce/templates/workforce/ess_timekeeping_form.html
+new file mode 100644
+index 0000000..6c71562
+--- /dev/null
++++ b/apps/workforce/templates/workforce/ess_timekeeping_form.html
+@@ -0,0 +1,8 @@
++{% extends "base.html" %}
++{% block title %}{{ heading }} | بنیرا{% endblock %}
++{% block content %}
++{% include "workforce/_ess_navigation.html" %}
++<section class="erp-surface mx-auto max-w-3xl rounded-2xl p-5 sm:p-6"><h1 class="text-xl font-black">{{ heading }}</h1>
++{% if error %}<p class="mt-4 text-sm" role="alert">درخواست با سیاست یا وضعیت فعلی منبع سازگار نیست. دوباره بررسی کنید.</p>{% else %}<form method="post" class="mt-5 space-y-4">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}<div><label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-bold">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="mt-1 text-sm text-red-700" role="alert">{{ field.errors }}</div>{% endif %}</div>{% endfor %}<button type="submit" class="rounded-lg bg-blue-700 px-5 py-2 font-bold text-white">ثبت در منبع</button></form>{% endif %}
++<a class="mt-5 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">بازگشت به سوابق من</a></section>
++{% endblock %}

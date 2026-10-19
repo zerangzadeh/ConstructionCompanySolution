@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load erp_format %}
+{% block title %}مرخصی، حضور و کارکرد من | بنیرا{% endblock %}
+{% block content %}
+{% include "workforce/_ess_navigation.html" %}
+<header class="erp-surface rounded-2xl p-5"><h1 class="text-xl font-black">مرخصی، حضور و کارکرد من</h1><p class="mt-2 text-sm text-slate-600">وضعیت و سوابق شخصی از منبع مجاز نمایش داده می‌شود.</p><p class="mt-2 text-xs">زمان مشاهده: {{ observed_at|jalali_datetime }}</p></header>
+<section class="erp-surface mt-5 rounded-2xl p-5" aria-labelledby="balances-heading">
+  <h2 id="balances-heading" class="text-lg font-bold">مانده مرخصی در تاریخ مشاهده</h2>
+  {% if balances %}<ul class="mt-3 space-y-3">{% for balance in balances %}<li><bdi>{{ balance.category }}</bdi>: {% if balance.state == "ready" %}<span>مانده قابل استفاده: {{ balance.source.available|erp_number }} {% if balance.source.unit == "minutes" %}دقیقه{% else %}روز{% endif %}</span><span class="block text-xs text-slate-600">تاریخ مبنا: {{ balance.source.as_of|jalali_date }} · مقدار رزروشده: {{ balance.source.reserved|erp_number }}</span>{% else %}<span>مانده معتبر در منبع در دسترس نیست.</span>{% endif %}</li>{% endfor %}</ul>{% else %}<p class="mt-3 text-sm text-slate-600" role="status">سیاست یا مانده مجاز برای نمایش در دسترس نیست؛ مانده صفر فرض نمی‌شود.</p>{% endif %}
+</section>
+<div class="mt-5 grid gap-5 lg:grid-cols-2">
+{% for panel in panels %}<section class="erp-surface min-w-0 rounded-2xl p-5" aria-labelledby="{{ panel.kind }}-heading"><h2 id="{{ panel.kind }}-heading" class="text-lg font-bold">{{ panel.label }}</h2>
+{% if panel.state == "unavailable" %}<p class="mt-3 text-sm" role="status">این منبع برای حساب شما در دسترس نیست.</p>{% elif panel.state == "empty" %}<p class="mt-3 text-sm text-slate-600" role="status">سابقه مجازی برای نمایش ثبت نشده است.</p>{% else %}<ul class="mt-3 divide-y divide-slate-100">{% for row in panel.rows %}<li class="py-3 text-sm"><a class="font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_detail' panel.kind row.pk %}">مشاهده سابقه · {{ row.created_at|jalali_datetime }}</a><p>وضعیت منبع: <bdi>{% if panel.kind == "correction" %}{{ row.status }}{% else %}{{ row.state }}{% endif %}</bdi></p></li>{% endfor %}</ul>{% endif %}
+{% if panel.kind == "leave" and "leave_mission.request" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_create' 'leave' %}">درخواست مرخصی</a>{% endif %}
+{% if panel.kind == "timesheet" and "timesheets.prepare" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping_create' 'timesheet' %}">کارکرد جدید</a>{% endif %}
+</section>{% endfor %}</div>
+{% endblock %}

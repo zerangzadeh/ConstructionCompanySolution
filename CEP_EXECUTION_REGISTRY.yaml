@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 55
+  execution_state_complete: 56
   authorized_not_started: 0
-  eligible_under_standing_authority: 1
+  eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 1
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 21
+  not_started_other_current_governed: 20
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -109,6 +109,10 @@ gates:
     evaluated_at: '2026-10-19'
     evidence: docs/governance/cep/evidence/CEP-048_GATE05_EVALUATION.json
     note: CEP047 IMB0034/35/36 and CEP048 IMB0037 conditional contract builds verified; other contributors incomplete/unverified. Tenant mapping activation remains fail closed. GATE05 NOT_PASSED; no Human Sign-off or production authority.
+  GATE-06:
+    status: NOT_PASSED
+    source: Current Human instruction reaffirming unpassed migration gate; no completion inference
+    updated_at: '2026-10-19'
 authorization_batches:
   AUTH-BATCH-003:
     execution_mode: SERIAL
@@ -3227,28 +3231,29 @@ ceps:
     updated_at: null
     history: []
   CEP-063:
-    title: null
+    title: ESS leave, attendance and timesheet self-service
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: VERIFIED
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Full browser/accessibility and performance/concurrency runtime remain UTV under canonical contract; fixture responsive evidence is bounded
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-063_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_FOCUSED_REGRESSION_AND_UI_FIXTURE_EVIDENCE
     git:
       committed: null
       commit_sha: null
@@ -3256,10 +3261,16 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: f8be5637d90dc023107de08054d46e4460820120
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: STARTED
+      reason: Current Human serial continuation; prompt hash and023/026/050 prerequisites and GATE02 verified. ESS orchestration only; no057 data/gate dependency or new persistence. Actual touch set recorded before mutation.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: IMB0085 all6 original AC and scoped DoD verified.71 tests plus14 subtests PASS;12 synthetic fixture screenshots prove Persian RTL/Jalali and responsive states. Source domains retain all calculation/state/history; own identity/URL/CSRF/scope enforced; no schema/default grants,057 inputs or production action. Global GATE07 not inferred.
   CEP-064:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4088,9 +4099,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: ddf479162a9d13e674599edcd1ef6120727dab2f
-  origin_main: ddf479162a9d13e674599edcd1ef6120727dab2f
-  integration_checkpoint: ddf479162a9d13e674599edcd1ef6120727dab2f
+  last_reconciled_head: f8be5637d90dc023107de08054d46e4460820120
+  origin_main: f8be5637d90dc023107de08054d46e4460820120
+  integration_checkpoint: f8be5637d90dc023107de08054d46e4460820120
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4101,7 +4112,6 @@ execution_frontier:
   - CEP-028
   - CEP-057
   - CEP-058
-  - CEP-063
   - CEP-065
   - CEP-067
   - CEP-069
@@ -4111,20 +4121,19 @@ execution_frontier:
   - CEP-077
   - CEP-078
   dependency_ready_is_not_entry_gate_or_execution_authority: true
-  verified_build_eligible_unblocked:
-  - CEP-057
+  verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: REQUESTED_REMEDIATIONS_COMPLETE_REENTRY_REVIEW_COMPLETE_MIGRATION_BLOCKED_EXT0015
+  current_session_continuation: CEP063_COMPLETE_CHECKPOINT_THEN_RELEVANT_CONVERGENCE_ENTRY_REVIEW
   current_independent_cep: null
-  next_entry_review_candidate: null
-  next_candidate_full_entry_eligibility: CEP057_FRAMEWORK_BUILD_READY_MIGRATION_EXECUTION_BLOCKED_EXT0015
+  next_entry_review_candidate: CEP-067
+  next_candidate_full_entry_eligibility: NOT_YET_FULLY_VERIFIED_CEP067
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Authorized serial023/029 remediations and repeated057 entry review finished. Both prerequisite outcomes verified; 057 framework build may proceed fail-closed, but no approved EXT0015 opening dataset/effective policy/cutoff/totals permit migration execution. No057 implementation/backfill or gate/certification inference. GATE05 NOT_PASSED and047/048 activation remains fail-closed.
+  boundary_reason: CEP063 complete and independently validated; checkpoint then full CEP067 source-family convergence entry review. Preserve023/029 COMPLETE,057 migration BLOCKED, GATE05/06 NOT_PASSED and no production authority. Dependency readiness alone is not entry eligibility.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: NOT_REVIEWED_AT_REQUESTED_SERIAL_REMEDIATION_BOUNDARY
+  independent_candidates_entry_status: CEP063_COMPLETE_OTHER_CANDIDATES_REQUIRE_FULL_ENTRY_REVIEW
   production_authorized: false
   human_signoff_executed: false

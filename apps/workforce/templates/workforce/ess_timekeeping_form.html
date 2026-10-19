@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }} | بنیرا{% endblock %}
+{% block content %}
+{% include "workforce/_ess_navigation.html" %}
+<section class="erp-surface mx-auto max-w-3xl rounded-2xl p-5 sm:p-6"><h1 class="text-xl font-black">{{ heading }}</h1>
+{% if error %}<p class="mt-4 text-sm" role="alert">درخواست با سیاست یا وضعیت فعلی منبع سازگار نیست. دوباره بررسی کنید.</p>{% else %}<form method="post" class="mt-5 space-y-4">{% csrf_token %}{{ form.non_field_errors }}{% for field in form %}<div><label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-bold">{{ field.label }}</label>{{ field }}{% if field.errors %}<div class="mt-1 text-sm text-red-700" role="alert">{{ field.errors }}</div>{% endif %}</div>{% endfor %}<button type="submit" class="rounded-lg bg-blue-700 px-5 py-2 font-bold text-white">ثبت در منبع</button></form>{% endif %}
+<a class="mt-5 inline-flex text-sm font-bold text-blue-700" href="{% url 'workforce:ess_timekeeping' %}">بازگشت به سوابق من</a></section>
+{% endblock %}
