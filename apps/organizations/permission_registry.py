@@ -373,7 +373,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.CLAIM_SETTLEMENTS_ALLOCATE,
             P.CLAIM_SETTLEMENTS_REVERSE,
         ),
-        ("apps.billing.services", "apps.payments.services"),
+        ("apps.billing.services",),
     ),
     PermissionResource(
         "payable_measurements",
@@ -665,7 +665,11 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "payments",
         "پرداخت‌ها",
-        ("payments.Payment", "payments.PaymentAllocation"),
+        (
+            "payments.Payment",
+            "payments.PaymentAllocation",
+            "payments.PaymentDocumentLink",
+        ),
         (P.PAYMENTS_VIEW, P.PAYMENTS_CREATE, P.PAYMENTS_VOID, P.PAYMENTS_ALLOCATE),
         ("apps.payments.services",),
     ),
@@ -674,6 +678,8 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         "اسناد",
         (
             "documents.Document",
+            "documents.RetiredPaymentEvidence",
+            "documents.RetiredPaymentDocumentLink",
             "documents.DocumentNumberSequence",
             "documents.DocumentVersion",
             "documents.DocumentProcessingAssessment",
@@ -1742,6 +1748,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "treasury.TreasuryAccountMappingVersion",
             "treasury.TreasuryAccountLifecycleEvent",
             "treasury.TreasuryMovement",
+            "treasury.TreasuryMovementDocumentLink",
             "treasury.TreasuryMovementLeg",
             "treasury.TreasuryMovementTransition",
             "treasury.TreasuryPostingEvidence",

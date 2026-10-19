@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
+from apps.documents.models import AbstractTypedDocumentLink
 from core.identifiers import canonicalize_upper_identifier
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
@@ -320,7 +321,10 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
         "parties.BusinessParty", on_delete=models.PROTECT, null=True, blank=True
     )
     origin_request = models.OneToOneField(
-        "treasury.PaymentRequest", on_delete=models.PROTECT, null=True, blank=True,
+        "treasury.PaymentRequest",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="originated_movement",
     )
     created_by = models.ForeignKey(
@@ -467,7 +471,9 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
             or self.site_id != self.origin_request.site_id
             or self.party_id is not None
         ):
-            raise ValidationError("The reimbursement movement must match its approved request.")
+            raise ValidationError(
+                "The reimbursement movement must match its approved request."
+            )
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
@@ -1002,7 +1008,10 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
         "workforce.Employee", on_delete=models.PROTECT, null=True, blank=True
     )
     source_expense = models.OneToOneField(
-        "expenses.Expense", on_delete=models.PROTECT, null=True, blank=True,
+        "expenses.Expense",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="treasury_payment_request",
     )
     source_expense_version = models.PositiveIntegerField(null=True, blank=True)
@@ -1151,7 +1160,9 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                 or self.currency != "IRR"
                 or self.party_id is not None
             ):
-                raise ValidationError("Reimbursement request must match an approved direct Expense version.")
+                raise ValidationError(
+                    "Reimbursement request must match an approved direct Expense version."
+                )
         elif self.source_expense_id or self.source_expense_version is not None:
             raise ValidationError("Only reimbursement requests may link an Expense.")
         self.full_clean(validate_constraints=False)
@@ -1833,3 +1844,24 @@ class BankReconciliationRunProvenance(
     def clean(self) -> None:
         if self.classification not in {"legacy_unverified", "prospective"}:
             raise ValidationError("طبقه‌بندی منشأ تطبیق بانکی معتبر نیست.")
+
+
+
+
+class TreasuryMovementDocumentLink(AbstractTypedDocumentLink):
+    """Treasury-owned document evidence; it never creates a cash effect."""
+
+    target_field_name = "treasury_movement"
+    treasury_movement = models.ForeignKey(
+        "treasury.TreasuryMovement",
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "treasury_movement"],
+                name="treasury_movement_document_uq",
+            )
+        ]

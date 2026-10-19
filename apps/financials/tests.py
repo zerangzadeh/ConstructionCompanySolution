@@ -1,23 +1,46 @@
 from datetime import date
 from decimal import Decimal
+from types import SimpleNamespace
+from uuid import uuid4
 
 from django.core.exceptions import PermissionDenied
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.estimates.services import add_estimate_item, approve_estimate, create_estimate
 from apps.expenses.models import ExpenseStatus
 from apps.expenses.services import create_expense
 from apps.financials.services import (
+    _build_report,
     get_organization_dashboard,
     get_organization_financial_reports,
     get_project_financial_report,
 )
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
-from apps.payments.models import PaymentDirection
-from apps.payments.services import create_payment, void_payment
 from apps.projects.services import create_project
+
+
+class TreasuryProjectionPrecisionTests(SimpleTestCase):
+    def test_cash_projection_preserves_approved_source_precision(self):
+        project = SimpleNamespace(
+            estimates=SimpleNamespace(all=list),
+            expenses=SimpleNamespace(all=list),
+            cash_movements=[
+                SimpleNamespace(
+                    kind=kind, amount=amount, pk=uuid4(), version=3, journal_id=uuid4()
+                )
+                for kind, amount in (
+                    ("receipt", Decimal("100.123456")),
+                    ("disbursement", Decimal("10.111111")),
+                )
+            ],
+        )
+        report = _build_report(project, cash_cutoff=timezone.now())
+        self.assertEqual(report.receipt_total, Decimal("100.123456"))
+        self.assertEqual(report.disbursement_total, Decimal("10.111111"))
+        self.assertEqual(report.net_cash_flow, Decimal("90.012345"))
 
 
 class FinancialReportTests(TestCase):
@@ -47,6 +70,9 @@ class FinancialReportTests(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,
@@ -167,27 +193,35 @@ class FinancialReportTests(TestCase):
             amount=Decimal("125.50"),
             incurred_on=date(2026, 8, 29),
         )
-        create_payment(
+        from apps.treasury.services import create_movement
+        from tests.retirement_fixtures import CashFixture
+
+        cash = CashFixture(organization=self.organization, owner=self.owner)
+        cash.post(
+            create_movement(
+                organization=self.organization,
+                project=self.project,
+                actor=self.owner,
+                kind="receipt",
+                amount=Decimal(600),
+                movement_date=date(2026, 8, 29),
+                description="Test receipt",
+                idempotency_key="DASH-RECEIPT",
+                account=cash.bank,
+            )
+        )
+        # A draft disbursement has no cash effect.
+        create_movement(
             organization=self.organization,
             project=self.project,
             actor=self.owner,
-            payment_number="PAY-DASH-RECEIPT",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("600.00"),
-            paid_on=date(2026, 8, 29),
-            counterparty_name="Client LLC",
+            kind="disbursement",
+            amount=Decimal(90),
+            movement_date=date(2026, 8, 29),
+            description="Test pending",
+            idempotency_key="DASH-DRAFT",
+            account=cash.bank,
         )
-        payment_to_void = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="PAY-DASH-VOID",
-            direction=PaymentDirection.DISBURSEMENT,
-            amount=Decimal("90.00"),
-            paid_on=date(2026, 8, 29),
-            counterparty_name="Supplier LLC",
-        )
-        void_payment(payment=payment_to_void, actor=self.owner, reason="Duplicate")
 
         summary = get_organization_dashboard(
             user=self.owner,
@@ -200,7 +234,7 @@ class FinancialReportTests(TestCase):
         self.assertEqual(summary.approved_estimate_total, Decimal("1000.00"))
         self.assertEqual(summary.recorded_expense_total, Decimal("125.50"))
         self.assertEqual(summary.variance, Decimal("874.50"))
-        self.assertEqual(summary.posted_payment_count, 1)
+        self.assertEqual(summary.posted_movement_count, 1)
         self.assertEqual(summary.receipt_total, Decimal("600.00"))
         self.assertEqual(summary.disbursement_total, Decimal("0.00"))
         self.assertEqual(summary.net_cash_flow, Decimal("600.00"))

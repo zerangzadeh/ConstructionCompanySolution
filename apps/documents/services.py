@@ -57,6 +57,7 @@ from apps.documents.models import (
     RecoveryEvidenceState,
     RetentionPolicyVersionState,
     RetentionTrigger,
+    RetiredPaymentEvidence,
     SignatureVerificationState,
 )
 from apps.estimates.models import Estimate
@@ -82,9 +83,9 @@ from apps.organizations.models import (
     ProtectedOperationCode,
 )
 from apps.partner_qualification.models import PartnerQualification
-from apps.payments.models import Payment
 from apps.payroll.models import PayrollInquiry, PayrollInquiryEvidenceLink
 from apps.projects.models import Project, ProjectSite
+from apps.treasury.models import TreasuryMovement
 from apps.workforce.models import (
     EmployeeQualification,
     EmployeeTrainingRecord,
@@ -119,7 +120,8 @@ TARGET_MODELS = {
     "contract": Contract,
     "estimate": Estimate,
     "expense": Expense,
-    "payment": Payment,
+    "payment": RetiredPaymentEvidence,
+    "treasury_movement": TreasuryMovement,
     "daily_report": DailyReport,
     "field_observation": FieldObservation,
     "work_relationship": WorkRelationship,
@@ -143,7 +145,8 @@ TARGET_VIEW_PERMISSIONS = {
     "contract": BusinessPermissionCode.CONTRACTS_VIEW,
     "estimate": BusinessPermissionCode.ESTIMATES_VIEW,
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
-    "payment": BusinessPermissionCode.PAYMENTS_VIEW,
+    "payment": BusinessPermissionCode.DOCUMENTS_VIEW,
+    "treasury_movement": BusinessPermissionCode.TREASURY_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
     "field_observation": BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
     "work_relationship": BusinessPermissionCode.EMPLOYEES_VIEW,
@@ -229,6 +232,7 @@ def _validate_target_access(
     )
     if field_name == "payroll_inquiry":
         from apps.payroll.ess_services import get_inquiry
+
         get_inquiry(actor=actor, organization=organization, inquiry_id=target.pk)
     return field_name
 
@@ -265,8 +269,14 @@ def _validate_certificate_context_access(*, document: Document, actor: User) -> 
     """A pinned generated artifact retains its certificate case privacy too."""
     from apps.workforce.certificate_services import get_request
     from apps.workforce.models import HRCertificateGeneration
-    for request_id in HRCertificateGeneration.objects.filter(organization_id=document.organization_id,document_version__document_id=document.pk).values_list("request_id",flat=True):
-        get_request(actor=actor,organization=document.organization,request_id=request_id)
+
+    for request_id in HRCertificateGeneration.objects.filter(
+        organization_id=document.organization_id,
+        document_version__document_id=document.pk,
+    ).values_list("request_id", flat=True):
+        get_request(
+            actor=actor, organization=document.organization, request_id=request_id
+        )
 
 
 def _validate_document_context_access(
@@ -306,7 +316,7 @@ def _validate_document_context_access(
             organization=document.organization,
             target=target,
         )
-    _validate_certificate_context_access(document=document,actor=actor)
+    _validate_certificate_context_access(document=document, actor=actor)
 
 
 def _validate_uploaded_file(upload: "UploadedFile") -> tuple[str, int, str, str]:
@@ -346,9 +356,13 @@ def _create_version(
     )
     if stored_names is not None:
         version = DocumentVersion(
-            organization=document.organization, document=document,
-            version_number=version_number, original_file_name=original_file_name,
-            content_type=content_type, file_size=file_size, sha256=sha256,
+            organization=document.organization,
+            document=document,
+            version_number=version_number,
+            original_file_name=original_file_name,
+            content_type=content_type,
+            file_size=file_size,
+            sha256=sha256,
             uploaded_by=actor,
         )
         version.file.save(original_file_name, upload, save=False)
@@ -734,21 +748,35 @@ def get_organization_documents(
         if not membership_has_permission(membership, link_type.view_permission):
             documents = documents.exclude(pk__in=registered_links.values("document_id"))
     from apps.payroll.ess_services import visible_inquiries
+
     try:
-        inquiry_ids = [item.pk for item in visible_inquiries(actor=user, organization=organization)]
+        inquiry_ids = [
+            item.pk for item in visible_inquiries(actor=user, organization=organization)
+        ]
     except PermissionDenied:
         inquiry_ids = []
-    denied_inquiry_documents = PayrollInquiryEvidenceLink.objects.filter(organization=organization).exclude(payroll_inquiry_id__in=inquiry_ids).values("document_id")
+    denied_inquiry_documents = (
+        PayrollInquiryEvidenceLink.objects.filter(organization=organization)
+        .exclude(payroll_inquiry_id__in=inquiry_ids)
+        .values("document_id")
+    )
     documents = documents.exclude(pk__in=denied_inquiry_documents)
     from apps.workforce.certificate_services import visible_requests as certificates
     from apps.workforce.models import HRCertificateGeneration
-    generated=HRCertificateGeneration.objects.filter(organization=organization)
+
+    generated = HRCertificateGeneration.objects.filter(organization=organization)
     if generated.exists():
         try:
-            visible_certificate_ids=[item.pk for item in certificates(actor=user,organization=organization)]
+            visible_certificate_ids = [
+                item.pk for item in certificates(actor=user, organization=organization)
+            ]
         except PermissionDenied:
-            visible_certificate_ids=[]
-        documents=documents.exclude(pk__in=generated.exclude(request_id__in=visible_certificate_ids).values("document_version__document_id"))
+            visible_certificate_ids = []
+        documents = documents.exclude(
+            pk__in=generated.exclude(request_id__in=visible_certificate_ids).values(
+                "document_version__document_id"
+            )
+        )
     grants = effective_scope_grants(membership)
     if not membership_has_scope(membership):
         project_ids = list(

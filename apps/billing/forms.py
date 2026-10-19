@@ -8,12 +8,12 @@ from apps.contracts.models import (
     ContractType,
 )
 from apps.documents.models import DocumentVersion
-from apps.payments.models import (
-    PaymentAllocation,
-    PaymentAllocationStatus,
-    PaymentDirection,
-    PaymentStatus,
+from apps.treasury.models import (
+    TreasuryMovement,
+    TreasuryMovementKind,
+    TreasuryMovementStatus,
 )
+from core.forms import JalaliDateMixin
 
 from .models import (
     AssuranceRevisionAction,
@@ -303,37 +303,36 @@ class SubmissionResolutionForm(forms.Form):
     )
 
 
-class ClaimSettlementAllocationForm(forms.Form):
-    """Select an already-posted receipt allocation for one approved claim."""
+class ClaimSettlementAllocationForm(JalaliDateMixin, forms.Form):
+    """Choose a posted Treasury receipt; Subledger owns capacity and reversal."""
 
-    payment_allocation = forms.ModelChoiceField(
-        label="تخصیص دریافت",
-        queryset=PaymentAllocation.objects.none(),
+    movement = forms.ModelChoiceField(
+        label="دریافت خزانه‌داری", queryset=TreasuryMovement.objects.none()
     )
     amount = forms.DecimalField(label="مبلغ تسویه", max_digits=18, decimal_places=2)
+    effective_date = forms.DateField(
+        label="تاریخ مؤثر", widget=forms.DateInput(attrs={"type": "date"})
+    )
+    idempotency_key = forms.CharField(widget=forms.HiddenInput, max_length=120)
     reason = forms.CharField(
-        label="دلیل تسویه",
-        max_length=1000,
-        widget=forms.Textarea(attrs={"rows": 3}),
+        label="دلیل تسویه", max_length=1000, widget=forms.Textarea(attrs={"rows": 3})
     )
 
     def __init__(self, *args, organization, claim, **kwargs):
+        from uuid import uuid4
+
         super().__init__(*args, **kwargs)
-        if not claim.contract.party_id:
-            return
-        self.fields["payment_allocation"].queryset = (
-            PaymentAllocation.objects.filter(
+        self.fields["idempotency_key"].initial = str(uuid4())
+        if claim.contract.party_id:
+            self.fields["movement"].queryset = TreasuryMovement.objects.filter(
                 organization=organization,
-                contract=claim.contract,
-                status=PaymentAllocationStatus.ACTIVE,
-                payment__status=PaymentStatus.POSTED,
-                payment__direction=PaymentDirection.RECEIPT,
-                payment__project=claim.project,
-                payment__party=claim.contract.party,
-            )
-            .select_related("payment", "contract")
-            .order_by("payment__paid_on", "payment__payment_number")
-        )
+                project_id=claim.project_id,
+                party_id=claim.contract.party_id,
+                kind=TreasuryMovementKind.RECEIPT,
+                status=TreasuryMovementStatus.POSTED,
+                reverses__isnull=True,
+                reversal_movement__isnull=True,
+            ).order_by("movement_date", "pk")
 
     def clean_reason(self) -> str:
         return self.cleaned_data["reason"].strip()

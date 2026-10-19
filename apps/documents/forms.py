@@ -19,15 +19,15 @@ from apps.organizations.authorization import (
     scope_queryset,
 )
 from apps.organizations.models import BusinessPermissionCode
-from apps.payments.models import Payment
 from apps.projects.models import Project
+from apps.treasury.models import TreasuryMovement
 
 TARGET_FIELDS = (
     "project",
     "contract",
     "estimate",
     "expense",
-    "payment",
+    "treasury_movement",
     "daily_report",
     "field_observation",
 )
@@ -36,7 +36,7 @@ TARGET_PERMISSIONS = {
     "contract": BusinessPermissionCode.CONTRACTS_VIEW,
     "estimate": BusinessPermissionCode.ESTIMATES_VIEW,
     "expense": BusinessPermissionCode.EXPENSES_VIEW,
-    "payment": BusinessPermissionCode.PAYMENTS_VIEW,
+    "treasury_movement": BusinessPermissionCode.TREASURY_VIEW,
     "daily_report": BusinessPermissionCode.DAILY_REPORTS_VIEW,
     "field_observation": BusinessPermissionCode.FIELD_OBSERVATIONS_VIEW,
 }
@@ -55,8 +55,8 @@ class DocumentTargetForm(forms.Form):
     expense = forms.ModelChoiceField(
         label="هزینه", queryset=Expense.objects.none(), required=False
     )
-    payment = forms.ModelChoiceField(
-        label="پرداخت", queryset=Payment.objects.none(), required=False
+    treasury_movement = forms.ModelChoiceField(
+        label="حرکت خزانه‌داری", queryset=TreasuryMovement.objects.none(), required=False
     )
     daily_report = forms.ModelChoiceField(
         label="گزارش روزانه", queryset=DailyReport.objects.none(), required=False
@@ -87,9 +87,9 @@ class DocumentTargetForm(forms.Form):
             "expense": Expense.objects.filter(
                 organization=organization, project__deleted_at__isnull=True
             ).order_by("-incurred_on"),
-            "payment": Payment.objects.filter(
+            "treasury_movement": TreasuryMovement.objects.filter(
                 organization=organization, project__deleted_at__isnull=True
-            ).order_by("-paid_on", "payment_number"),
+            ).order_by("-movement_date", "pk"),
             "daily_report": DailyReport.objects.filter(
                 organization=organization, project__deleted_at__isnull=True
             ).order_by("-reporting_date"),
@@ -106,8 +106,12 @@ class DocumentTargetForm(forms.Form):
                 queryset = queryset.none()
             if document is not None:
                 link_lookup = (
-                    "evidence_links__document"
-                    if field_name == "field_observation"
+                    (
+                        "evidence_links__document"
+                        if field_name == "field_observation"
+                        else "typed_document_links__document"
+                    )
+                    if field_name in {"field_observation", "treasury_movement"}
                     else "document_links__document"
                 )
                 queryset = queryset.exclude(**{link_lookup: document})
@@ -117,7 +121,9 @@ class DocumentTargetForm(forms.Form):
             try:
                 membership = get_active_membership(user=user, organization=organization)
             except PermissionDenied:
-                self.fields["field_observation"].queryset = FieldObservation.objects.none()
+                self.fields[
+                    "field_observation"
+                ].queryset = FieldObservation.objects.none()
             else:
                 if not has_business_permission(
                     user=user,
@@ -125,7 +131,9 @@ class DocumentTargetForm(forms.Form):
                     permission=BusinessPermissionCode.FIELD_OBSERVATIONS_CAPTURE,
                     allow_any_scope=True,
                 ):
-                    self.fields["field_observation"].queryset = FieldObservation.objects.none()
+                    self.fields[
+                        "field_observation"
+                    ].queryset = FieldObservation.objects.none()
                 else:
                     self.fields["field_observation"].queryset = scope_queryset(
                         self.fields["field_observation"].queryset.filter(

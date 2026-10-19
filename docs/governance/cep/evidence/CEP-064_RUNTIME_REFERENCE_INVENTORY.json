@@ -1,0 +1,41 @@
+{
+  "active_runtime_writers": 0,
+  "active_business_reporting_readers": 0,
+  "current_sources": [
+    "apps.treasury.services",
+    "apps.subledgers.services"
+  ],
+  "retained_transitional_surfaces": [
+    {
+      "surface": "apps/payments/models.py; historical migrations; Billing ClaimSettlementAllocation declaration",
+      "purpose": "Source-schema compatibility pending gated contract; original values already retained; no current business caller."
+    },
+    {
+      "surface": "apps/payments/services.py",
+      "purpose": "Fail-closed compatibility facades; all entry points raise before any query or mutation."
+    },
+    {
+      "surface": "apps/payments/views.py, forms.py, urls.py; templates/payments",
+      "purpose": "Dormant source compatibility until gated contract; removed from root URL configuration; no navigation consumer."
+    },
+    {
+      "surface": "apps/payments/admin.py",
+      "purpose": "Module/view/add/change/delete all disabled; no active audit/business reader through old admin."
+    },
+    {
+      "surface": "Legacy permission enum/catalog/default-grant metadata",
+      "purpose": "Transitional catalogue evidence only; cannot activate disabled facades or removed routes; contract plan removes obsolete consumers."
+    },
+    {
+      "surface": "apps/treasury/legacy_payment_migration.py; scripts/verify_legacy_payment_retention.py",
+      "purpose": "Explicit migration/retention forensics only; no operational caller or financial target creation."
+    },
+    {
+      "surface": "Remaining source-model fixtures and identifier form checks",
+      "purpose": "Excluded demo interpretation, negative compatibility, tenant-model validation and double-counting witnesses; current-operation seeds use Treasury requests."
+    }
+  ],
+  "required_legacy_business_consumer": false,
+  "retained_audit_action_labels": "Interpretive evidence only; AuditEvent stores entity_type/entity_id strings, not a live Payment generic FK.",
+  "active_app_model_table_removal": false
+}

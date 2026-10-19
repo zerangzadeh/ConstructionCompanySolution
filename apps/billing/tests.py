@@ -5,10 +5,8 @@ from threading import Barrier
 from unittest.mock import patch
 
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.db import close_old_connections, connection
-from django.test import Client, TestCase, TransactionTestCase
-from django.test.utils import CaptureQueriesContext
-from django.urls import reverse
+from django.db import close_old_connections
+from django.test import TestCase, TransactionTestCase
 
 from apps.accounting.posting_registry import get_posting_contract
 from apps.accounts.models import User
@@ -19,7 +17,6 @@ from apps.billing.handoffs import (
     resolve_progress_claim_obligation_source,
 )
 from apps.billing.models import (
-    ClaimSettlementAllocation,
     ProgressClaim,
     ProgressClaimCorrectionKind,
     ProgressRecordStatus,
@@ -28,7 +25,6 @@ from apps.billing.models import (
 from apps.billing.services import (
     _resolve_regulatory_rule_version,
     add_baseline_item,
-    allocate_progress_claim_settlement,
     approve_progress_claim,
     approve_project_baseline,
     create_progress_claim,
@@ -37,12 +33,10 @@ from apps.billing.services import (
     create_progress_correction,
     create_progress_record,
     create_project_baseline,
-    get_progress_claim_settlement_summary,
     recalculate_progress_claim,
     request_progress_verification,
     request_project_baseline_approval,
     return_progress_claim,
-    reverse_progress_claim_settlement,
     submit_progress_claim,
     update_billing_configuration,
     verify_progress_record,
@@ -78,16 +72,8 @@ from apps.organizations.policy_services import (
     retire_platform_policy_version,
 )
 from apps.organizations.policy_specs import RECEIVABLE_CLAIM_REGULATORY_POLICY_CODE
-from apps.organizations.services import set_active_organization
 from apps.parties.models import PartyKind
 from apps.parties.services import create_business_party, update_business_party
-from apps.payments.models import PaymentAllocationStatus, PaymentDirection
-from apps.payments.services import (
-    allocate_payment,
-    create_payment,
-    reverse_payment_allocation,
-    void_payment,
-)
 from apps.projects.services import create_project
 from apps.subledgers.services import recognize_obligation
 from apps.workflows.models import (
@@ -149,6 +135,9 @@ class ProjectBaselineWorkflowTests(TestCase):
             role=MembershipRole.TENANT_ADMIN,
             status=MembershipStatus.ACTIVE,
         )
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,
@@ -1347,407 +1336,6 @@ class ProgressClaimApprovalWorkflowTests(ProgressClaimCalculationTests):
         self.assertEqual(instance.work_items.get().status, WorkItemStatus.OPEN)
 
 
-class ProgressClaimSettlementTests(ProgressClaimApprovalWorkflowTests):
-    def _approved_claim(self) -> ProgressClaim:
-        claim = self._claim_for_approval()
-        submit_progress_claim(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-        )
-        return approve_progress_claim(
-            organization=self.organization,
-            actor=self.manager,
-            claim=claim,
-            reason="Settlement approval",
-        )
-
-    def _receipt_allocation(self, *, amount: Decimal = Decimal("100.00")):
-        payment = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number=f"F65-R-{int(amount)}",
-            direction=PaymentDirection.RECEIPT,
-            amount=amount,
-            paid_on=date(2026, 9, 20),
-            counterparty_name=self.party.display_name,
-            party=self.party,
-            contract=self.contract,
-        )
-        return payment, allocate_payment(
-            payment=payment,
-            contract=self.contract,
-            actor=self.owner,
-            amount=amount,
-        )
-
-    def test_partial_settlement_uses_existing_allocation_and_caps_claim_balance(self):
-        claim = self._approved_claim()
-        payment, payment_allocation = self._receipt_allocation()
-        first = allocate_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-            payment_allocation=payment_allocation,
-            amount=Decimal("20.00"),
-            reason="First partial receipt",
-        )
-        second = allocate_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-            payment_allocation=payment_allocation,
-            amount=Decimal("40.00"),
-            reason="Final partial receipt",
-        )
-
-        summary = get_progress_claim_settlement_summary(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-        )
-        self.assertEqual(summary.approved_net_amount, Decimal("60.0000"))
-        self.assertEqual(summary.settled_amount, Decimal("60.00"))
-        self.assertEqual(summary.outstanding_amount, Decimal("0.0000"))
-        self.assertEqual(ClaimSettlementAllocation.objects.count(), 2)
-        self.assertEqual(payment.amount, Decimal("100.00"))
-        self.assertEqual(payment_allocation.amount, Decimal("100.00"))
-        self.assertTrue(
-            AuditEvent.objects.filter(
-                action=AuditAction.CLAIM_SETTLEMENT_ALLOCATED,
-                entity_id=str(first.pk),
-            ).exists()
-        )
-        with self.assertRaises(ValidationError) as context:
-            allocate_progress_claim_settlement(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-                payment_allocation=payment_allocation,
-                amount=Decimal("0.01"),
-                reason="Over settlement",
-            )
-        self.assertIn(
-            "مبلغ تسویه از مانده طلب صورت‌وضعیت بیشتر است.",
-            context.exception.messages,
-        )
-        self.assertEqual(second.status, "active")
-
-    def test_receipt_party_is_required_and_must_match_contract_party(self):
-        claim = self._approved_claim()
-        payment = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="F65-R-NO-PARTY",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("60.00"),
-            paid_on=date(2026, 9, 20),
-            counterparty_name=self.party.display_name,
-            contract=self.contract,
-        )
-        payment_allocation = allocate_payment(
-            payment=payment,
-            contract=self.contract,
-            actor=self.owner,
-            amount=Decimal("60.00"),
-        )
-        with self.assertRaises(ValidationError) as context:
-            allocate_progress_claim_settlement(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-                payment_allocation=payment_allocation,
-                amount=Decimal("20.00"),
-                reason="Name-only match is insufficient",
-            )
-        self.assertIn(
-            "طرف‌حساب دریافت و قرارداد باید با شناسه طرف تجاری یکسان و کامل باشد.",
-            context.exception.messages,
-        )
-
-    def test_settlement_cannot_exceed_existing_payment_allocation(self):
-        claim = self._approved_claim()
-        _, payment_allocation = self._receipt_allocation(amount=Decimal("30.00"))
-        with self.assertRaisesMessage(
-            ValidationError,
-            "مبلغ تسویه از مانده تخصیص پرداخت بیشتر است.",
-        ):
-            allocate_progress_claim_settlement(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-                payment_allocation=payment_allocation,
-                amount=Decimal("30.01"),
-                reason="Over existing allocation",
-            )
-
-    def test_settlement_requires_receipt_and_matching_contract(self):
-        claim = self._approved_claim()
-        disbursement = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="F65-DISBURSEMENT",
-            direction="disbursement",
-            amount=Decimal("60.00"),
-            paid_on=date(2026, 9, 20),
-            counterparty_name=self.party.display_name,
-            party=self.party,
-            contract=self.contract,
-        )
-        disbursement_allocation = allocate_payment(
-            payment=disbursement,
-            contract=self.contract,
-            actor=self.owner,
-            amount=Decimal("60.00"),
-        )
-        with self.assertRaises(ValidationError) as context:
-            allocate_progress_claim_settlement(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-                payment_allocation=disbursement_allocation,
-                amount=Decimal("20.00"),
-                reason="Disbursement cannot settle a claim",
-            )
-        self.assertIn(
-            "فقط دریافت قابل اتصال به صورت‌وضعیت است.",
-            context.exception.messages,
-        )
-
-        other_contract = create_contract(
-            organization=self.organization,
-            actor=self.owner,
-            project=self.project,
-            contract_number="F65-OTHER-CONTRACT",
-            title="Other receivable contract",
-            counterparty_name=self.party.display_name,
-            party=self.party,
-            direction=ContractDirection.RECEIVABLE,
-            status=ContractStatus.ACTIVE,
-            contract_value=Decimal("100.00"),
-        )
-        other_payment = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="F65-OTHER-RECEIPT",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("60.00"),
-            paid_on=date(2026, 9, 20),
-            counterparty_name=self.party.display_name,
-            party=self.party,
-            contract=other_contract,
-        )
-        other_allocation = allocate_payment(
-            payment=other_payment,
-            contract=other_contract,
-            actor=self.owner,
-            amount=Decimal("60.00"),
-        )
-        with self.assertRaises(ValidationError) as context:
-            allocate_progress_claim_settlement(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-                payment_allocation=other_allocation,
-                amount=Decimal("20.00"),
-                reason="Other contract cannot settle this claim",
-            )
-        self.assertIn(
-            "دریافت و تخصیص آن باید با سازمان، پروژه و قرارداد صورت‌وضعیت یکسان باشد.",
-            context.exception.messages,
-        )
-
-    def test_reverse_and_payment_void_reverse_settlements_atomically(self):
-        claim = self._approved_claim()
-        payment, payment_allocation = self._receipt_allocation()
-        settlement = allocate_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-            payment_allocation=payment_allocation,
-            amount=Decimal("20.00"),
-            reason="Manual settlement",
-        )
-        reverse_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            settlement=settlement,
-            reason="Correction",
-        )
-        settlement.refresh_from_db()
-        self.assertEqual(settlement.status, "reversed")
-        self.assertEqual(
-            get_progress_claim_settlement_summary(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-            ).outstanding_amount,
-            Decimal("60.0000"),
-        )
-
-        active_settlement = allocate_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-            payment_allocation=payment_allocation,
-            amount=Decimal("20.00"),
-            reason="Settlement before payment void",
-        )
-        void_payment(payment=payment, actor=self.owner, reason="Bank correction")
-        payment_allocation.refresh_from_db()
-        active_settlement.refresh_from_db()
-        self.assertEqual(payment_allocation.status, PaymentAllocationStatus.REVERSED)
-        self.assertEqual(active_settlement.status, "reversed")
-        self.assertTrue(payment_allocation.reversal_reason)
-        self.assertTrue(active_settlement.reversal_reason)
-        self.assertEqual(
-            get_progress_claim_settlement_summary(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-            ).outstanding_amount,
-            Decimal("60.0000"),
-        )
-
-    def test_payment_allocation_reversal_reverses_dependent_settlement(self):
-        claim = self._approved_claim()
-        _, payment_allocation = self._receipt_allocation()
-        settlement = allocate_progress_claim_settlement(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-            payment_allocation=payment_allocation,
-            amount=Decimal("20.00"),
-            reason="Settlement before allocation reversal",
-        )
-        reverse_payment_allocation(
-            allocation=payment_allocation,
-            actor=self.owner,
-            reason="Allocation correction",
-        )
-        settlement.refresh_from_db()
-        self.assertEqual(settlement.status, "reversed")
-        self.assertEqual(
-            get_progress_claim_settlement_summary(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-            ).outstanding_amount,
-            Decimal("60.0000"),
-        )
-
-    def test_settlement_service_denies_cross_tenant_claim_and_allocation(self):
-        claim = self._approved_claim()
-        _, payment_allocation = self._receipt_allocation()
-        outsider = User.objects.create_user(username="f65-outsider")
-        other_organization = Organization.objects.create(
-            name="F65 Other", slug="f65-other"
-        )
-        other_organization.memberships.create(
-            user=outsider,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
-        )
-
-        with self.assertRaises(PermissionDenied):
-            allocate_progress_claim_settlement(
-                organization=other_organization,
-                actor=outsider,
-                claim=claim,
-                payment_allocation=payment_allocation,
-                amount=Decimal("20.00"),
-                reason="Cross tenant attempt",
-            )
-        self.assertFalse(ClaimSettlementAllocation.objects.exists())
-
-    def test_claim_views_enforce_role_tenant_scope_and_csrf(self):
-        claim = self._approved_claim()
-        _, payment_allocation = self._receipt_allocation()
-        self.client.force_login(self.owner)
-        set_active_organization(self.client.session, self.organization)
-
-        detail_url = reverse("billing:claim_detail", args=[claim.pk])
-        response = self.client.get(reverse("billing:claim_list"))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, claim.contract.contract_number)
-        with CaptureQueriesContext(connection) as detail_queries:
-            detail_response = self.client.get(detail_url)
-        self.assertEqual(detail_response.status_code, 200)
-        self.assertContains(detail_response, "مقادیر تجمعی")
-        self.assertContains(detail_response, "0.5000")
-        self.assertContains(detail_response, "60.0000")
-        self.assertLessEqual(
-            len(detail_queries),
-            40,
-            "Claim detail must keep a bounded query budget as settlements grow.",
-        )
-
-        csrf_client = Client(enforce_csrf_checks=True)
-        csrf_client.force_login(self.owner)
-        set_active_organization(csrf_client.session, self.organization)
-        self.assertEqual(
-            csrf_client.post(
-                reverse("billing:claim_settlement_allocate", args=[claim.pk]),
-                {
-                    "payment_allocation": payment_allocation.pk,
-                    "amount": "20.00",
-                    "reason": "CSRF-protected manual settlement",
-                },
-            ).status_code,
-            403,
-        )
-
-        other_user = User.objects.create_user(username="f66-other")
-        other_organization = Organization.objects.create(
-            name="F66 Other", slug="f66-other"
-        )
-        other_organization.memberships.create(
-            user=other_user,
-            role=MembershipRole.COMPANY_OWNER,
-            status=MembershipStatus.ACTIVE,
-        )
-        other_client = Client()
-        other_client.force_login(other_user)
-        set_active_organization(other_client.session, other_organization)
-        self.assertEqual(other_client.get(detail_url).status_code, 404)
-
-        viewer = User.objects.create_user(username="f66-viewer")
-        self.organization.memberships.create(
-            user=viewer,
-            role=MembershipRole.VIEWER,
-            status=MembershipStatus.ACTIVE,
-        )
-        viewer_client = Client()
-        viewer_client.force_login(viewer)
-        set_active_organization(viewer_client.session, self.organization)
-        self.assertEqual(
-            viewer_client.post(
-                reverse("billing:claim_settlement_allocate", args=[claim.pk]),
-                {
-                    "payment_allocation": payment_allocation.pk,
-                    "amount": "20.00",
-                    "reason": "Viewer must not allocate",
-                },
-            ).status_code,
-            403,
-        )
-
-        response = self.client.post(
-            reverse("billing:claim_settlement_allocate", args=[claim.pk]),
-            {
-                "payment_allocation": payment_allocation.pk,
-                "amount": "20.00",
-                "reason": "Manual partial settlement",
-            },
-        )
-        self.assertRedirects(response, detail_url)
-        self.assertEqual(ClaimSettlementAllocation.objects.count(), 1)
-
-
 class ProgressClaimApprovalWorkflowConcurrencyTests(TransactionTestCase):
     """The submission lock creates one shared runtime instance under retries."""
 
@@ -1814,67 +1402,4 @@ class ProgressClaimApprovalWorkflowConcurrencyTests(TransactionTestCase):
                 action=AuditAction.PROGRESS_CLAIM_SUBMITTED,
             ).count(),
             1,
-        )
-
-    def test_concurrent_partial_settlements_cannot_exceed_claim_outstanding(self):
-        claim = self._claim()
-        submit_progress_claim(
-            organization=self.organization,
-            actor=self.owner,
-            claim=claim,
-        )
-        approve_progress_claim(
-            organization=self.organization,
-            actor=self.manager,
-            claim=claim,
-            reason="Concurrency settlement approval",
-        )
-        payment = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="F65-CONCURRENT-RECEIPT",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("100.00"),
-            paid_on=date(2026, 9, 20),
-            counterparty_name=self.party.display_name,
-            party=self.party,
-            contract=self.contract,
-        )
-        payment_allocation = allocate_payment(
-            payment=payment,
-            contract=self.contract,
-            actor=self.owner,
-            amount=Decimal("100.00"),
-        )
-        barrier = Barrier(2)
-
-        def settle() -> object | None:
-            barrier.wait(timeout=10)
-            try:
-                return self._run_in_thread(
-                    lambda: allocate_progress_claim_settlement(
-                        organization=Organization.objects.get(pk=self.organization.pk),
-                        actor=User.objects.get(pk=self.owner.pk),
-                        claim=ProgressClaim.objects.get(pk=claim.pk),
-                        payment_allocation=payment_allocation.__class__.objects.get(
-                            pk=payment_allocation.pk
-                        ),
-                        amount=Decimal("40.00"),
-                        reason="Concurrent receipt settlement",
-                    )
-                )
-            except ValidationError:
-                return None
-
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            settlements = list(pool.map(lambda _: settle(), range(2)))
-        self.assertEqual(sum(settlement is not None for settlement in settlements), 1)
-        self.assertEqual(
-            get_progress_claim_settlement_summary(
-                organization=self.organization,
-                actor=self.owner,
-                claim=claim,
-            ).settled_amount,
-            Decimal("40.00"),
         )

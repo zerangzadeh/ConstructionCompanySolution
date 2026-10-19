@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-20",
+  "baseline": "784a5e6290a250dcdd4fa1a0fafc2225c64e5215",
+  "main_run": {
+    "command": "pytest apps/billing/test_payment_retirement.py apps/treasury/test_payment_retirement.py apps/treasury/test_legacy_payment_migration.py apps/financials/tests.py apps/documents/tests.py apps/payments/tests.py apps/payments/test_admin.py apps/treasury/tests.py::TreasuryFoundationTests apps/subledgers/tests.py::SubledgerFoundationTests tests/test_identifier_canonicalization.py tests/test_seed_demo_data.py --reuse-db -q --tb=short --maxfail=6",
+    "passed": 65,
+    "failed": 1,
+    "subtests_passed": 28,
+    "failure": "Full demo seed lacked approved Billing terms; seed now omits unconfigured claims rather than creating terms/policy."
+  },
+  "treasury_ui_current_form_rerun": {
+    "passed": 1,
+    "failed": 0,
+    "artifact": "private seed-ui-validation.xml"
+  },
+  "full_seed_latest": {
+    "status": "FAIL",
+    "command": "pytest tests/test_seed_demo_data.py --reuse-db -q --tb=short",
+    "failure": "Safety incident closure requires separate record approval",
+    "source_services_unchanged_at_baseline": true,
+    "seed_safety_call_unchanged": true,
+    "artifact": "private seed-final-validation.xml"
+  },
+  "registry_regression": {
+    "passed": 2,
+    "failed": 4,
+    "baseline_same_four_failures": true,
+    "evidence": "CEP-064_REGRESSION_ATTRIBUTION.json"
+  },
+  "resolved_introduced_failure": "Missing mandatory message argument on three new Billing permission checks; corrected and all eight new Billing transition tests PASS.",
+  "test_environment": "Reused transactional tests flush migration-owned catalogue rows. Seed regression explicitly restores the canonical six Expense groups; command itself restores its existing authorization/workflow catalogues. No production policy mutation.",
+  "destructive_retirement_executed": false,
+  "new_transition_tests": {
+    "passed": 16,
+    "names": [
+      "test_active_subledger_allocation_blocks_claim_correction",
+      "test_claim_endpoint_uses_posted_treasury_receipt_with_csrf",
+      "test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources",
+      "test_partial_settlement_retry_and_caps_use_one_subledger_authority",
+      "test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear",
+      "test_tenant_permission_state_and_receipt_context_fail_closed",
+      "test_settlement_does_not_implicitly_recognize_ar",
+      "test_demo_requests_are_pending_idempotent_and_do_not_fabricate_cash",
+      "test_dms_links_current_treasury_without_legacy_reference",
+      "test_financial_projection_requires_treasury_source_permission",
+      "test_legacy_service_compatibility_cannot_read_or_mutate",
+      "test_projection_counts_one_cash_event_and_excludes_drafts_and_reversals",
+      "test_retained_source_snapshot_is_interpretable_and_immutable",
+      "test_ui_create_submit_post_and_reverse_preserve_treasury_history",
+      "test_ui_csrf_and_cross_tenant_targets_fail_closed",
+      "test_concurrent_partial_settlements_cannot_exceed_claim_capacity"
+    ]
+  },
+  "dms_temporary_storage_rerun": {
+    "passed": 1,
+    "failed": 0,
+    "private_artifact": "dms-isolation-validation.xml"
+  },
+  "system_checks": "PASS: no issues",
+  "migration_drift": "PASS: no changes detected",
+  "seed_safety_ast_matches_baseline": true,
+  "private_junit_files_are_ignored": true,
+  "ruff_touched_python": {
+    "status": "PASS",
+    "file_count": 32
+  },
+  "diff_whitespace": "PASS",
+  "cash_precision_and_current_source_rerun": {
+    "passed": 2,
+    "failed": 0,
+    "private_artifact": "cash-precision-validation.xml",
+    "behavior": "Cash projections preserve already-approved source Decimal precision; no separate rounding policy."
+  }
+}

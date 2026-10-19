@@ -79,6 +79,7 @@ from .payable_services import (
 )
 from .services import (
     allocate_progress_claim_settlement,
+    claim_settlements_queryset,
     get_progress_claim_settlement_summary,
     get_progress_claims,
     get_progress_records,
@@ -322,8 +323,12 @@ def claim_detail(request: HttpRequest, claim_id: str) -> HttpResponse:
             "claim_items": claim.items.select_related("baseline_item"),
             "adjustments": claim.adjustments.all(),
             "correction_revisions": claim.correction_claims.order_by("revision_number"),
-            "settlements": claim.settlement_allocations.select_related(
-                "payment_allocation__payment", "created_by", "reversed_by"
+            "settlements": (
+                claim_settlements_queryset(
+                    organization=request.organization, claim=claim
+                ).select_related("treasury_movement", "created_by__user", "reversal")
+                if can_view_settlements
+                else ()
             ),
             "settlement_summary": (
                 get_progress_claim_settlement_summary(
@@ -363,7 +368,9 @@ def claim_settlement_allocate(request: HttpRequest, claim_id: str) -> HttpRespon
                 organization=request.organization,
                 actor=request.user,
                 claim=claim,
-                payment_allocation=form.cleaned_data["payment_allocation"],
+                movement=form.cleaned_data["movement"],
+                effective_date=form.cleaned_data["effective_date"],
+                idempotency_key=form.cleaned_data["idempotency_key"],
                 amount=form.cleaned_data["amount"],
                 reason=form.cleaned_data["reason"],
             )

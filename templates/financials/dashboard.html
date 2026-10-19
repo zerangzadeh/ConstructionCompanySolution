@@ -1,13 +1,14 @@
 {% extends "base.html" %}{% load erp_format %} {% block title %}نمای سازگاری مالی | بنیرا{% endblock %} {% block content %}
 <p class="mb-4 text-sm text-slate-600" data-legacy-financial-surface>نمای سازگاری مالی برای مرور سوابق قدیمی پروژه‌ها</p>
 {% include "components/financial_authority_links.html" %}
+<p class="mb-4 text-xs text-slate-500">زمان مبنای جریان نقد خزانه‌داری: {{ summary.cash_cutoff|jalali_datetime }}</p>
 <span class="sr-only">داشبورد شرکت</span>
 <section class="overflow-hidden rounded-xl border border-slate-800 bg-slate-900 px-5 py-6 text-white sm:px-7" aria-labelledby="dashboard-title">
 <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div>
         <p class="text-xs font-semibold text-blue-300">سوابق قدیمی شرکت</p>
         <h1 id="dashboard-title" class="mt-1 text-2xl font-bold tracking-tight text-white">نمای سازگاری مالی</h1>
-        <p class="mt-1 text-sm text-slate-300">مرور سوابق پروژه‌ها و اسناد مالی قدیمی {{ request.organization.name }}</p>
+        <p class="mt-1 text-sm text-slate-300">مرور سوابق پروژه‌ها و جریان نقد قطعی خزانه‌داری {{ request.organization.name }}</p>
     </div>
     <div class="flex items-center gap-2 text-xs text-slate-300">
         <span class="grid h-8 w-8 place-items-center rounded-lg border border-slate-700 bg-slate-800 text-blue-300"><svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M8 2v3m8-3v3M3 9h18M5 4h14a2 2 0 0 1 2 2v14H3V6a2 2 0 0 1 2-2Z"/></svg></span>
@@ -41,13 +42,13 @@
             </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-violet-50 text-violet-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 19h8"/></svg></span></div>
         <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">سوابق ثبت‌شده</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
     </a>{% endif %}
-    {% if "payments.view" in business_permission_codes %}<a class="erp-surface group rounded-xl border-t-2 border-t-amber-500 p-4 transition hover:border-blue-200" href="{% url 'payments:list' %}">
+    {% if "treasury.view" in business_permission_codes %}<a class="erp-surface group rounded-xl border-t-2 border-t-amber-500 p-4 transition hover:border-blue-200" href="{% url 'treasury:workbench' %}">
         <div class="flex items-start justify-between">
             <div>
                 <p class="text-xs font-medium text-slate-500">اسناد قطعی قدیمی دریافت و پرداخت</p>
-                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.posted_payment_count }}</p>
+                <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950">{{ summary.posted_movement_count }}</p>
             </div><span class="grid h-10 w-10 place-items-center rounded-xl bg-amber-50 text-amber-600"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></span></div>
-        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">اسناد قدیمی ثبت نهایی</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
+        <div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-[11px]"><span class="text-slate-400">حرکت‌های قطعی خزانه‌داری</span><span class="font-semibold text-blue-600 group-hover:text-blue-700">مشاهده ←</span></div>
     </a>{% endif %}
 </section>
 
@@ -56,7 +57,7 @@
         <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
             <div>
                 <h2 id="financial-position-title" class="font-bold text-slate-900">خلاصهٔ منابع نمای قدیمی</h2>
-                <p class="mt-1 text-xs text-slate-500">برآوردهای مصوب، هزینه‌های ثبت‌شده و اسناد قدیمی دریافت و پرداخت</p>
+                <p class="mt-1 text-xs text-slate-500">برآوردهای مصوب، هزینه‌های ثبت‌شده و حرکت‌های قطعی خزانه‌داری</p>
             </div>
             <a class="text-xs font-semibold text-blue-600 hover:text-blue-700" href="{% url 'financials:report' %}">گزارش کامل ←</a>
         </div>
@@ -76,7 +77,7 @@
         </div>
         <div class="border-t border-slate-100 bg-slate-50/60 p-5">
             <div class="mb-4 flex items-center justify-between">
-                <p class="text-xs font-semibold text-slate-700">خالص اسناد قدیمی دریافت و پرداخت</p><span class="erp-badge text-[11px] {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|rial }}</span></div>
+                <p class="text-xs font-semibold text-slate-700">خالص حرکت‌های قطعی خزانه‌داری</p><span class="erp-badge text-[11px] {% if summary.net_cash_flow < 0 %}erp-badge--danger{% else %}erp-badge--success{% endif %}" dir="ltr">{{ summary.net_cash_flow|rial }}</span></div>
             <div class="grid gap-3 sm:grid-cols-2">
                 <div class="rounded-lg border border-emerald-100 bg-white p-3">
                     <div class="flex items-center justify-between"><span class="text-xs text-slate-500">اسناد قدیمی دریافت</span><span class="h-2 w-2 rounded-full bg-emerald-500"></span></div>

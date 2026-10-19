@@ -31,8 +31,6 @@ from apps.organizations.models import (
     Organization,
     OrganizationMembership,
 )
-from apps.payments.models import Payment, PaymentDirection, PaymentStatus
-from apps.payments.services import void_payment
 from apps.projects.models import (
     Project,
     ProjectPhase,
@@ -124,18 +122,7 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
             created_by=self.owner,
             updated_by=self.owner,
         )
-        self.payment = Payment.objects.create(
-            organization=self.organization,
-            project=self.project,
-            phase=self.active_phase,
-            payment_number="LOCK-PAYMENT",
-            direction=PaymentDirection.DISBURSEMENT,
-            amount=Decimal("10.00"),
-            paid_on=date(2026, 9, 3),
-            counterparty_name="Lock supplier",
-            created_by=self.owner,
-            updated_by=self.owner,
-        )
+
         self.inventory_unit = UnitOfMeasure.objects.create(
             organization=self.organization,
             code="LOCK-KG",
@@ -288,27 +275,9 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
             1,
         )
 
-    def test_concurrent_payment_void_has_one_winner(self) -> None:
-        def void() -> object:
-            return void_payment(
-                payment=Payment.objects.get(pk=self.payment.pk),
-                actor=User.objects.get(pk=self.owner.pk),
-                reason="Duplicate request race",
-            )
-
-        self._assert_one_success_and_one_state_rejection(self._run_race(void))
-
-        self.payment.refresh_from_db()
-        self.assertEqual(self.payment.status, PaymentStatus.VOID)
-        self.assertEqual(self.payment.amount, Decimal("10.00"))
-        self.assertEqual(
-            AuditEvent.objects.filter(
-                organization=self.organization,
-                action=AuditAction.PAYMENT_VOIDED,
-                entity_id=str(self.payment.pk),
-            ).count(),
-            1,
-        )
+    # Cash/settlement concurrency is covered through Treasury/Subledger in
+    # apps.billing.test_payment_retirement and apps.treasury.tests. Legacy
+    # void entry points are fail-closed in apps.payments.tests.
 
     def test_concurrent_phase_transition_has_one_winner(self) -> None:
         def transition() -> object:

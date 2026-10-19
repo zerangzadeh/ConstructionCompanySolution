@@ -48,14 +48,10 @@ from apps.organizations.policy_specs import (
     validate_policy_for_consumer,
 )
 from apps.parties.models import PartyIdentitySnapshot
-from apps.payments.models import (
-    Payment,
-    PaymentAllocation,
-    PaymentAllocationStatus,
-    PaymentDirection,
-    PaymentStatus,
-)
 from apps.projects.models import Activity, Project, WBSNode
+from apps.subledgers.models import Obligation, ObligationDirection, SettlementAllocation
+from apps.subledgers.services import allocate_settlement, reverse_settlement
+from apps.treasury.models import TreasuryMovement
 
 from .models import (
     MONEY_QUANTUM,
@@ -65,8 +61,6 @@ from .models import (
     ClaimAdjustmentType,
     ClaimNumberScope,
     ClaimPeriodBoundary,
-    ClaimSettlementAllocation,
-    ClaimSettlementAllocationStatus,
     ProgressClaim,
     ProgressClaimCorrectionKind,
     ProgressClaimItem,
@@ -1605,9 +1599,11 @@ def recalculate_progress_claim(
 def _assert_claim_correction_downstream_clear(
     *, organization: Organization, claim: ProgressClaim
 ) -> None:
-    if claim.settlement_allocations.filter(
-        status=ClaimSettlementAllocationStatus.ACTIVE
-    ).exists():
+    if (
+        claim_settlements_queryset(organization=organization, claim=claim)
+        .filter(reversal__isnull=True)
+        .exists()
+    ):
         raise ValidationError("صورت‌وضعیت دارای تسویه فعال ابتدا باید تسویه معکوس شود.")
 
     from apps.billing.handoffs import PROGRESS_CLAIM_SOURCE_KIND
@@ -2097,74 +2093,28 @@ def _locked_settlement_claim(
         raise PermissionDenied("صورت‌وضعیت متعلق به این سازمان نیست.") from exc
 
 
-def _locked_payment_allocation_for_settlement(
-    *, organization: Organization, payment_allocation: PaymentAllocation
-) -> tuple[Payment, PaymentAllocation]:
-    """Lock cash, its contract allocation, then the claim in one global order."""
+def claim_settlements_queryset(*, organization: Organization, claim: ProgressClaim):
+    """Project only exact AR source/version allocations; never read Legacy Payment."""
+    from .handoffs import PROGRESS_CLAIM_SOURCE_KIND
 
-    try:
-        preliminary = PaymentAllocation.objects.select_related("payment").get(
-            pk=payment_allocation.pk,
-            organization=organization,
-        )
-    except PaymentAllocation.DoesNotExist as exc:
-        raise PermissionDenied("تخصیص پرداخت متعلق به این سازمان نیست.") from exc
-    payment = Payment.objects.select_for_update().get(pk=preliminary.payment_id)
-    allocation = (
-        PaymentAllocation.objects.select_for_update(of=("self",))
-        .select_related("contract", "payment__party")
-        .get(pk=preliminary.pk, organization=organization)
+    return SettlementAllocation.objects.filter(
+        organization=organization,
+        obligation__organization=organization,
+        obligation__source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+        obligation__source_uuid=claim.pk,
+        obligation__source_version=claim.revision_number,
+        obligation__direction=ObligationDirection.RECEIVABLE,
+        obligation__project_id=claim.project_id,
+        obligation__contract_id=claim.contract_id,
     )
-    return payment, allocation
 
 
 def _active_settlement_total(*, claim: ProgressClaim) -> Decimal:
-    return ClaimSettlementAllocation.objects.filter(
-        claim=claim,
-        status=ClaimSettlementAllocationStatus.ACTIVE,
-    ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
-
-
-def _active_payment_allocation_settlement_total(
-    *, payment_allocation: PaymentAllocation
-) -> Decimal:
-    return ClaimSettlementAllocation.objects.filter(
-        payment_allocation=payment_allocation,
-        status=ClaimSettlementAllocationStatus.ACTIVE,
-    ).aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
-
-
-def _validate_settlement_context(
-    *, claim: ProgressClaim, payment: Payment, payment_allocation: PaymentAllocation
-) -> None:
-    if claim.status != "approved":
-        raise ValidationError("فقط صورت‌وضعیت تأییدشده قابل تسویه است.")
-    if payment.status != PaymentStatus.POSTED:
-        raise ValidationError("فقط دریافت ثبت‌شده و باطل‌نشده قابل تسویه است.")
-    if payment.direction != PaymentDirection.RECEIPT:
-        raise ValidationError("فقط دریافت قابل اتصال به صورت‌وضعیت است.")
-    if payment_allocation.status != PaymentAllocationStatus.ACTIVE:
-        raise ValidationError("فقط تخصیص پرداخت فعال قابل تسویه است.")
-    if (
-        payment.organization_id != claim.organization_id
-        or payment_allocation.organization_id != claim.organization_id
-        or payment.project_id != claim.project_id
-        or payment_allocation.contract_id != claim.contract_id
-        or (
-            payment.contract_id is not None and payment.contract_id != claim.contract_id
-        )
-    ):
-        raise ValidationError(
-            "دریافت و تخصیص آن باید با سازمان، پروژه و قرارداد صورت‌وضعیت یکسان باشد."
-        )
-    if (
-        not payment.party_id
-        or not claim.contract.party_id
-        or payment.party_id != claim.contract.party_id
-    ):
-        raise ValidationError(
-            "طرف‌حساب دریافت و قرارداد باید با شناسه طرف تجاری یکسان و کامل باشد."
-        )
+    return claim_settlements_queryset(
+        organization=claim.organization, claim=claim
+    ).filter(reversal__isnull=True).aggregate(total=Sum("amount"))["total"] or Decimal(
+        "0.00"
+    )
 
 
 @transaction.atomic
@@ -2173,109 +2123,53 @@ def allocate_progress_claim_settlement(
     organization: Organization,
     actor: User,
     claim: ProgressClaim,
-    payment_allocation: PaymentAllocation,
+    movement: TreasuryMovement,
     amount: Decimal | int | str,
+    effective_date: date,
     reason: str,
-) -> ClaimSettlementAllocation:
-    """Link an approved claim to an existing receipt allocation without cash mutation."""
+    idempotency_key: str,
+) -> SettlementAllocation:
+    """Use an explicitly recognized AR obligation and the existing settlement owner."""
+    from .handoffs import PROGRESS_CLAIM_SOURCE_KIND
 
-    _require_claim_settlement_permission(
-        actor=actor,
+    Organization.objects.select_for_update().get(pk=organization.pk)
+    locked_claim = _locked_settlement_claim(organization=organization, claim=claim)
+    require_business_permission(
+        user=actor,
         organization=organization,
         permission=BusinessPermissionCode.CLAIM_SETTLEMENTS_ALLOCATE,
+        message="مجوز تخصیص تسویه صورت‌وضعیت را ندارید.",
+        project=locked_claim.project,
     )
-    normalized_amount = _decimal_with_scale(
-        amount,
-        quantum=MONEY_QUANTUM,
-        label="مبلغ تسویه",
-        positive=True,
-    )
-    if not reason.strip():
-        raise ValidationError("دلیل تسویه الزامی است.")
-
-    payment, locked_payment_allocation = _locked_payment_allocation_for_settlement(
-        organization=organization,
-        payment_allocation=payment_allocation,
-    )
-    locked_claim = _locked_settlement_claim(organization=organization, claim=claim)
-    _validate_settlement_context(
-        claim=locked_claim,
-        payment=payment,
-        payment_allocation=locked_payment_allocation,
-    )
-    allocation_remaining = (
-        locked_payment_allocation.amount
-        - _active_payment_allocation_settlement_total(
-            payment_allocation=locked_payment_allocation
+    if locked_claim.status != "approved":
+        raise ValidationError("فقط صورت‌وضعیت تأییدشده قابل تسویه است.")
+    try:
+        obligation = Obligation.objects.get(
+            organization=organization,
+            source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+            source_uuid=locked_claim.pk,
+            source_version=locked_claim.revision_number,
+            direction=ObligationDirection.RECEIVABLE,
+            source_line_key="",
+            project_id=locked_claim.project_id,
+            contract_id=locked_claim.contract_id,
         )
-    )
-    claim_outstanding = locked_claim.net_amount - _active_settlement_total(
-        claim=locked_claim
-    )
-    if normalized_amount > allocation_remaining:
-        raise ValidationError("مبلغ تسویه از مانده تخصیص پرداخت بیشتر است.")
-    if normalized_amount > claim_outstanding:
-        raise ValidationError("مبلغ تسویه از مانده طلب صورت‌وضعیت بیشتر است.")
-
-    settlement = ClaimSettlementAllocation.objects.create(
-        organization=organization,
-        claim=locked_claim,
-        payment_allocation=locked_payment_allocation,
-        amount=normalized_amount,
-        reason=reason.strip(),
-        created_by=actor,
-    )
-    record_audit_event(
-        action=AuditAction.CLAIM_SETTLEMENT_ALLOCATED,
-        entity_type="billing.ClaimSettlementAllocation",
-        entity_id=str(settlement.pk),
+    except Obligation.DoesNotExist as exc:
+        raise ValidationError(
+            "ابتدا تعهد دریافتنی صورت‌وضعیت را از خدمت مجاز AR شناسایی کنید."
+        ) from exc
+    return allocate_settlement(
         organization=organization,
         actor=actor,
-        metadata={
-            "claim_id": str(locked_claim.pk),
-            "payment_allocation_id": str(locked_payment_allocation.pk),
-            "payment_id": str(payment.pk),
-            "amount": str(settlement.amount),
-            "reason": settlement.reason,
-        },
+        obligation=obligation,
+        movement=movement,
+        amount=_decimal_with_scale(
+            amount, quantum=MONEY_QUANTUM, label="مبلغ تسویه", positive=True
+        ),
+        effective_date=effective_date,
+        reason=reason,
+        idempotency_key=idempotency_key,
     )
-    return settlement
-
-
-def _reverse_locked_claim_settlement(
-    *, settlement: ClaimSettlementAllocation, actor: User, reason: str
-) -> ClaimSettlementAllocation:
-    if settlement.status != ClaimSettlementAllocationStatus.ACTIVE:
-        raise ValidationError("فقط تسویه فعال قابل برگشت است.")
-    if not reason.strip():
-        raise ValidationError("دلیل برگشت تسویه الزامی است.")
-    settlement.status = ClaimSettlementAllocationStatus.REVERSED
-    settlement.reversed_at = timezone.now()
-    settlement.reversed_by = actor
-    settlement.reversal_reason = reason.strip()
-    settlement.save(
-        update_fields=[
-            "status",
-            "reversed_at",
-            "reversed_by",
-            "reversal_reason",
-            "updated_at",
-        ]
-    )
-    record_audit_event(
-        action=AuditAction.CLAIM_SETTLEMENT_REVERSED,
-        entity_type="billing.ClaimSettlementAllocation",
-        entity_id=str(settlement.pk),
-        organization=settlement.organization,
-        actor=actor,
-        metadata={
-            "claim_id": str(settlement.claim_id),
-            "payment_allocation_id": str(settlement.payment_allocation_id),
-            "amount": str(settlement.amount),
-            "reason": settlement.reversal_reason,
-        },
-    )
-    return settlement
 
 
 @transaction.atomic
@@ -2283,86 +2177,66 @@ def reverse_progress_claim_settlement(
     *,
     organization: Organization,
     actor: User,
-    settlement: ClaimSettlementAllocation,
+    settlement: SettlementAllocation,
+    effective_date: date,
     reason: str,
-) -> ClaimSettlementAllocation:
-    """Reverse a settlement append-only, retaining its payment allocation history."""
+    idempotency_key: str,
+):
+    """Reverse through Subledger authority, retaining its append-only lineage."""
+    from .handoffs import PROGRESS_CLAIM_SOURCE_KIND
 
-    _require_claim_settlement_permission(
-        actor=actor,
+    Organization.objects.select_for_update().get(pk=organization.pk)
+    try:
+        allocation = SettlementAllocation.objects.select_related(
+            "obligation__project"
+        ).get(
+            pk=settlement.pk,
+            organization=organization,
+            obligation__source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+        )
+    except SettlementAllocation.DoesNotExist as exc:
+        raise PermissionDenied("تخصیص صورت‌وضعیت متعلق به این سازمان نیست.") from exc
+    require_business_permission(
+        user=actor,
         organization=organization,
         permission=BusinessPermissionCode.CLAIM_SETTLEMENTS_REVERSE,
+        message="مجوز برگشت تسویه صورت‌وضعیت را ندارید.",
+        project=allocation.obligation.project,
     )
-    try:
-        preliminary = ClaimSettlementAllocation.objects.select_related(
-            "payment_allocation__payment"
-        ).get(pk=settlement.pk, organization=organization)
-    except ClaimSettlementAllocation.DoesNotExist as exc:
-        raise PermissionDenied("تخصیص تسویه متعلق به این سازمان نیست.") from exc
-    payment = Payment.objects.select_for_update().get(
-        pk=preliminary.payment_allocation.payment_id
-    )
-    payment_allocation = PaymentAllocation.objects.select_for_update().get(
-        pk=preliminary.payment_allocation_id,
+    return reverse_settlement(
         organization=organization,
-    )
-    locked_claim = _locked_settlement_claim(
-        organization=organization,
-        claim=preliminary.claim,
-    )
-    locked_settlement = ClaimSettlementAllocation.objects.select_for_update().get(
-        pk=preliminary.pk,
-        organization=organization,
-        claim=locked_claim,
-        payment_allocation=payment_allocation,
-    )
-    if payment.organization_id != organization.pk:
-        raise PermissionDenied("پرداخت متعلق به این سازمان نیست.")
-    return _reverse_locked_claim_settlement(
-        settlement=locked_settlement,
         actor=actor,
+        allocation=allocation,
+        effective_date=effective_date,
         reason=reason,
+        idempotency_key=idempotency_key,
     )
-
-
-def reverse_claim_settlements_for_payment_allocation(
-    *, payment_allocation: PaymentAllocation, actor: User, reason: str
-) -> None:
-    """Causally reverse claim settlements when their source allocation is reversed."""
-
-    for settlement in (
-        ClaimSettlementAllocation.objects.select_for_update()
-        .filter(
-            payment_allocation=payment_allocation,
-            status=ClaimSettlementAllocationStatus.ACTIVE,
-        )
-        .order_by("pk")
-    ):
-        _reverse_locked_claim_settlement(
-            settlement=settlement,
-            actor=actor,
-            reason=reason,
-        )
 
 
 def get_progress_claim_settlement_summary(
     *, organization: Organization, actor: User, claim: ProgressClaim
 ) -> ProgressClaimSettlementSummary:
-    """Return the tenant-scoped outstanding receivable without changing cash state."""
-
-    _require_claim_settlement_permission(
-        actor=actor,
+    scoped_claim = _locked_free_scoped_claim(organization=organization, claim=claim)
+    require_business_permission(
+        user=actor,
         organization=organization,
         permission=BusinessPermissionCode.CLAIM_SETTLEMENTS_VIEW,
+        message="مجوز مشاهده تسویه صورت‌وضعیت را ندارید.",
+        project=scoped_claim.project,
     )
-    try:
-        scoped_claim = ProgressClaim.objects.get(pk=claim.pk, organization=organization)
-    except ProgressClaim.DoesNotExist as exc:
-        raise PermissionDenied("صورت‌وضعیت متعلق به این سازمان نیست.") from exc
-    settled_amount = _active_settlement_total(claim=scoped_claim)
+    settled = _active_settlement_total(claim=scoped_claim)
     return ProgressClaimSettlementSummary(
         claim_id=scoped_claim.pk,
         approved_net_amount=scoped_claim.net_amount,
-        settled_amount=settled_amount,
-        outstanding_amount=scoped_claim.net_amount - settled_amount,
+        settled_amount=settled,
+        outstanding_amount=scoped_claim.net_amount - settled,
     )
+
+
+def _locked_free_scoped_claim(*, organization: Organization, claim: ProgressClaim):
+    try:
+        return ProgressClaim.objects.select_related("project").get(
+            pk=claim.pk, organization=organization
+        )
+    except ProgressClaim.DoesNotExist as exc:
+        raise PermissionDenied("صورت‌وضعیت متعلق به این سازمان نیست.") from exc

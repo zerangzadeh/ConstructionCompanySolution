@@ -1,0 +1,47 @@
+{
+  "baseline_784a5e6": {
+    "tests": 6,
+    "failures": [
+      {
+        "test": "test_every_managed_business_model_is_registered_exactly_once",
+        "detail": "Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']"
+      },
+      {
+        "test": "test_every_permission_code_is_registered_exactly_once",
+        "detail": "Items in the second set but not the first:\n'support.case_create'\n'support.case_assign'\n'support.access_request'\n'support.access_use'\n'support.notifications_view'\n'support.evidence_link'\n'support.calendar_view'\n'support.evidence_sensitive_view'\n'support.access_platform_approve'\n'support.case_view'\n'support.notifications_acknowledge'\n'support.case_resolve'\n'support.access_revoke'\n'support.case_update'\n'support.audit_reconcile'\n'support.case_reopen'\n'support.access_tenant_confirm'"
+      },
+      {
+        "test": "test_every_registered_permission_is_referenced_by_its_enforcement_module",
+        "detail": "{'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\nDiff is 2521 characters long. Set self.maxDiff to None to see it."
+      },
+      {
+        "test": "test_resource_keys_are_unique_and_match_permission_namespaces",
+        "detail": "Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\nDiff is 2506 characters long. Set self.maxDiff to None to see it."
+      }
+    ],
+    "errors": 0
+  },
+  "current": {
+    "tests": 6,
+    "failures": [
+      {
+        "test": "test_every_managed_business_model_is_registered_exactly_once",
+        "detail": "Lists differ: ['payroll.FinancialHandoffLine', 'payroll.[74 chars]lip'] != []\n\nFirst list contains 4 additional elements.\nFirst extra element 0:\n'payroll.FinancialHandoffLine'\n\n+ []\n- ['payroll.FinancialHandoffLine',\n-  'payroll.FinancialHandoffProposal',\n-  'payroll.FinancialHandoffReview',\n-  'payroll.Payslip']"
+      },
+      {
+        "test": "test_every_permission_code_is_registered_exactly_once",
+        "detail": "Items in the second set but not the first:\n'support.case_create'\n'support.case_assign'\n'support.access_request'\n'support.access_use'\n'support.notifications_view'\n'support.evidence_link'\n'support.calendar_view'\n'support.evidence_sensitive_view'\n'support.access_platform_approve'\n'support.case_view'\n'support.notifications_acknowledge'\n'support.case_resolve'\n'support.access_revoke'\n'support.case_update'\n'support.audit_reconcile'\n'support.case_reopen'\n'support.access_tenant_confirm'"
+      },
+      {
+        "test": "test_every_registered_permission_is_referenced_by_its_enforcement_module",
+        "detail": "{'leave_authority': ['LEAVE_BALANCES_MANAG[1766 chars]EN']} != {}\nDiff is 2521 characters long. Set self.maxDiff to None to see it."
+      },
+      {
+        "test": "test_resource_keys_are_unique_and_match_permission_namespaces",
+        "detail": "Lists differ: ['billing_variation_eligibility.retry', 'b[2223 chars]age'] != []\n\nFirst list contains 77 additional elements.\nFirst extra element 0:\n'billing_variation_eligibility.retry'\n\nDiff is 2506 characters long. Set self.maxDiff to None to see it."
+      }
+    ],
+    "errors": 0
+  },
+  "interpretation": "Four architecture regression failures also occur at baseline; no risk waiver or retirement PASS is inferred."
+}

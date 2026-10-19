@@ -67,12 +67,12 @@ summary:
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 2
-  partial_current: 6
+  partial_current: 7
   failed_current: 0
-  not_started_other_current_governed: 13
+  not_started_other_current_governed: 12
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
-  last_updated: '2026-10-19'
+  last_updated: '2026-10-20'
   remote_main_complete_count_status: REQUIRES_FULL_REPORT_RECONCILIATION
 gates:
   GATE-01:
@@ -1505,11 +1505,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-028_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_IN_REPOSITORY
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 784a5e6290a250dcdd4fa1a0fafc2225c64e5215
+      pushed: true
+      merged_to_main: true
+      remote_main_evidence: VERIFIED_DIRECT_MAIN_COMMIT_20261019
     last_execution:
       branch: main
       sha: fb6a1feaa78168748741c3c3253e2dea0871cda8
@@ -3397,33 +3397,38 @@ ceps:
   CEP-064:
     closure_triage:
       category: B
-      disposition: AWAIT_HUMAN_INPUT_NO_REVISIT_THIS_SESSION
+      disposition: BLOCKED_REQUIRED_VALIDATION_AND_CONTRACT_REHEARSAL
       root_human_input_cep: CEP-028
-      minimum_resolution: "Supply the approved input packet specified by CEP-028 closure_triage.minimum_resolution; then complete canonical path CEP-028 -> CEP-064. No additional Human decision or dependency waiver is required for ordinary implementation."
+      minimum_resolution: "Zero historical population is resolved. Fix required registry and Safety seed regressions under their approved authority, rehearse the complete retirement contract graph, then re-evaluate the exact Human all12 gate. No historical Payment dataset is required."
       evidence: docs/governance/cep/evidence/V1_CLOSURE_TRIAGE_20261019.json
       assessed_at: '2026-10-19'
-    title: null
+    title: Treasury authority cutover and read-model convergence
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
-      status: NOT_AUTHORIZED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-20261019
+      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_AUTHORIZATION_20261019.md
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: PARTIAL
+      lifecycle: BLOCKED_REQUIRED_VALIDATION
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 12
+      total: 14
+      status: PARTIAL_BLOCKED_REQUIRED_VALIDATION
+    dod: NOT_MET_BLOCKED
+    blockers:
+    - CEP-064-FINDING-001 / BLOCKER-TEST four baseline registry architecture failures remain required FAIL
+    - CEP-064-FINDING-002 / BLOCKER-TEST full demo Safety closure lacks separate record approval
+    - CEP-064-FINDING-003 / BLOCKER-MIGRATION complete destructive contract graph from zero UNVERIFIED
+    remaining_utv:
+    - Complete candidate retirement graph from zero
+    - Gated destructive Development contract and all required post-removal validation
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-064_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_PREPARATION_AND_BLOCKERS_NO_RETIREMENT_PASS
     git:
       committed: null
       commit_sha: null
@@ -3431,10 +3436,16 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 784a5e6290a250dcdd4fa1a0fafc2225c64e5215
+    updated_at: '2026-10-20'
+    history:
+    - date: '2026-10-19'
+      status: STARTED
+      reason: CEP007 COMPLETE; CEP028 zero historical population disposition COMPLETE at784a5e6 pushed; exact Human all12 retirement gate governs destructive removal.
+    - date: '2026-10-20'
+      status: PARTIAL
+      reason: 65 focused/affected tests and 28 subtests PASS; 16 new transition checks and 2 final precision/current-cash checks PASS. Development reference preparation applied;80 retained sources,32 document identities,160 audit IDs and520-table recovery verified. Empty preparation graph428/428 PASS. Required four baseline registry failures plus full seed Safety separate-approval failure remain; complete destructive graph UNVERIFIED. Exact twelve-condition tally is 10 PASS/1 FAIL/1 UNVERIFIED; conditions10 and11 block readiness; no destructive retirement, production, signoff or069..079 execution. Stop bounded continuation.
   CEP-065:
     closure_triage:
       category: B
@@ -4357,18 +4368,18 @@ v1_closure_triage:
   - CEP-068
   category_c_external_parked: []
   v1_complete: 58
-  v1_partial: 3
-  v1_not_started: 7
+  v1_partial: 4
+  v1_not_started: 6
   v1_entry_blocked_not_started: 1
   implementation_closable_now: false
   next_action: ESTABLISH_RECORDED_HUMAN_INPUTS_THEN_REPEAT_ENTRY_CHECKS
 repository_state:
   branch: main
-  last_reconciled_head: 45a06ad5531fd7069df8b5f74aa6eb06db2988fb
-  origin_main: 45a06ad5531fd7069df8b5f74aa6eb06db2988fb
+  last_reconciled_head: 784a5e6290a250dcdd4fa1a0fafc2225c64e5215
+  origin_main: 784a5e6290a250dcdd4fa1a0fafc2225c64e5215
   integration_checkpoint: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
   integration_method: DIRECT_COMMIT_TO_MAIN
-  last_reconciled_at: '2026-10-19'
+  last_reconciled_at: '2026-10-20'
 execution_frontier:
   standing_authority_active: true
   execution_mode: SERIAL_BY_DEFAULT
@@ -4376,6 +4387,7 @@ execution_frontier:
   dependency_ready_current_governed:
   - CEP-057
   - CEP-058
+  - CEP-064
   - CEP-065
   - CEP-069
   - CEP-070
@@ -4384,11 +4396,10 @@ execution_frontier:
   - CEP-077
   - CEP-078
   dependency_ready_is_not_entry_gate_or_execution_authority: true
-  verified_build_eligible_unblocked:
-  - CEP-064
+  verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
-  next_autonomous_cep: CEP-064
-  current_session_continuation: HUMAN_BOUNDED_PAYMENT_RETIREMENT_CEP028_COMPLETE_CEP064_NEXT
+  next_autonomous_cep: null
+  current_session_continuation: STOP_LEGACY_PAYMENT_RETIREMENT_READINESS_FAIL
   current_independent_cep: null
   next_entry_review_candidate: null
   next_candidate_full_entry_eligibility: NO_UNBLOCKED_CANDIDATE_WITHIN_HUMAN_V1_ONLY_SESSION_SCOPE
@@ -4397,8 +4408,8 @@ execution_frontier:
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: V1-only closure triage verified all11 non-COMPLETE canonical prompt hashes and mandatory/conditional dependencies. A0/B11/C0; four missing Human input packages and seven inherited blockers. No CEP executed, no COMPLETE reopened, no migration, Gate change, Production Certification or Verification/UAT. See v1_closure_triage; historical outside-range frontier remains context only.
-  resume_cep_after_blocker_resolution: CEP-057
+  boundary_reason: Human-bounded Payment retirement stopped at PARTIAL. Exact12 readiness10 PASS/1 FAIL/1 UNVERIFIED; required registry and Safety seed regressions remain FAIL and final contract graph unverified. CEP028 zero historical population decision resolved; no new historical dataset, production action or069..079 execution authorized.
+  resume_cep_after_blocker_resolution: CEP-064
   independent_candidates_entry_status: CEP071_072_REQUIRE_FULL_NONPRODUCTION_ENTRY_REVIEW; CEP078_EXT0024_CURRENT_READINESS_UNVERIFIED
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false

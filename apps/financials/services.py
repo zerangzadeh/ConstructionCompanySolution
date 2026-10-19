@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from datetime import datetime
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
+from django.utils import timezone
 
 from apps.accounts.models import User
 from apps.contracts.models import Contract
@@ -14,8 +16,12 @@ from apps.organizations.models import (
     Organization,
     OrganizationStatus,
 )
-from apps.payments.models import Payment, PaymentDirection, PaymentStatus
 from apps.projects.models import Project
+from apps.treasury.models import (
+    TreasuryMovement,
+    TreasuryMovementKind,
+    TreasuryMovementStatus,
+)
 
 ZERO = Decimal("0.00")
 
@@ -31,7 +37,9 @@ class ProjectFinancialReport:
     receipt_total: Decimal
     disbursement_total: Decimal
     net_cash_flow: Decimal
-    posted_payment_count: int
+    posted_movement_count: int
+    cash_source_references: tuple[tuple[str, int, str], ...]
+    cash_cutoff: datetime
 
 
 @dataclass(frozen=True)
@@ -45,7 +53,8 @@ class OrganizationDashboard:
     receipt_total: Decimal
     disbursement_total: Decimal
     net_cash_flow: Decimal
-    posted_payment_count: int
+    posted_movement_count: int
+    cash_cutoff: datetime
 
 
 def _money(value: Decimal) -> Decimal:
@@ -66,35 +75,39 @@ def _validate_view_context(user: User, organization: Organization) -> None:
         permission=BusinessPermissionCode.FINANCIALS_VIEW,
         message="اجازه مشاهده گزارش‌های مالی این سازمان را ندارید.",
     )
+    require_business_permission(
+        user=user,
+        organization=organization,
+        permission=BusinessPermissionCode.TREASURY_VIEW,
+        message="مشاهده جریان نقد به مجوز خزانه‌داری همین سازمان نیاز دارد.",
+    )
 
 
-def _build_report(project: Project) -> ProjectFinancialReport:
+def _build_report(project: Project, *, cash_cutoff: datetime) -> ProjectFinancialReport:
     approved_estimates = list(project.estimates.all())
     recorded_expenses = list(project.expenses.all())
-    posted_payments = list(project.payments.all())
+    posted_movements = project.cash_movements
     estimate_total = _money(
         sum((estimate.total_amount for estimate in approved_estimates), ZERO)
     )
     expense_total = _money(sum((expense.amount for expense in recorded_expenses), ZERO))
-    receipt_total = _money(
-        sum(
-            (
-                payment.amount
-                for payment in posted_payments
-                if payment.direction == PaymentDirection.RECEIPT
-            ),
-            ZERO,
-        )
+    # Project already-approved cash amounts exactly; presentation cannot choose
+    # a second monetary precision or rounding policy for Treasury.
+    receipt_total = sum(
+        (
+            movement.amount
+            for movement in posted_movements
+            if movement.kind == TreasuryMovementKind.RECEIPT
+        ),
+        ZERO,
     )
-    disbursement_total = _money(
-        sum(
-            (
-                payment.amount
-                for payment in posted_payments
-                if payment.direction == PaymentDirection.DISBURSEMENT
-            ),
-            ZERO,
-        )
+    disbursement_total = sum(
+        (
+            movement.amount
+            for movement in posted_movements
+            if movement.kind == TreasuryMovementKind.DISBURSEMENT
+        ),
+        ZERO,
     )
     return ProjectFinancialReport(
         project=project,
@@ -105,8 +118,12 @@ def _build_report(project: Project) -> ProjectFinancialReport:
         recorded_expense_count=len(recorded_expenses),
         receipt_total=receipt_total,
         disbursement_total=disbursement_total,
-        net_cash_flow=_money(receipt_total - disbursement_total),
-        posted_payment_count=len(posted_payments),
+        net_cash_flow=receipt_total - disbursement_total,
+        posted_movement_count=len(posted_movements),
+        cash_source_references=tuple(
+            (str(m.pk), m.version, str(m.journal_id)) for m in posted_movements
+        ),
+        cash_cutoff=cash_cutoff,
     )
 
 
@@ -119,6 +136,7 @@ def get_project_financial_report(
     """Build one tenant-scoped financial report for a project."""
 
     _validate_view_context(user, organization)
+    cash_cutoff = timezone.now()
     project = (
         Project.objects.filter(
             pk=project_id,
@@ -141,15 +159,26 @@ def get_project_financial_report(
                 ),
             ),
             Prefetch(
-                "payments",
-                queryset=Payment.objects.filter(status=PaymentStatus.POSTED),
+                "treasurymovement_set",
+                queryset=TreasuryMovement.objects.filter(
+                    organization=organization,
+                    status=TreasuryMovementStatus.POSTED,
+                    posted_at__lte=cash_cutoff,
+                    kind__in=(
+                        TreasuryMovementKind.RECEIPT,
+                        TreasuryMovementKind.DISBURSEMENT,
+                    ),
+                    reverses__isnull=True,
+                    reversal_movement__isnull=True,
+                ),
+                to_attr="cash_movements",
             ),
         )
         .first()
     )
     if project is None:
         raise PermissionDenied("پروژه در این سازمان یافت نشد.")
-    return _build_report(project)
+    return _build_report(project, cash_cutoff=cash_cutoff)
 
 
 def get_organization_financial_reports(
@@ -160,6 +189,7 @@ def get_organization_financial_reports(
     """Build tenant-scoped financial reports for all active projects."""
 
     _validate_view_context(user, organization)
+    cash_cutoff = timezone.now()
     projects = (
         Project.objects.filter(
             organization=organization,
@@ -181,13 +211,24 @@ def get_organization_financial_reports(
                 ),
             ),
             Prefetch(
-                "payments",
-                queryset=Payment.objects.filter(status=PaymentStatus.POSTED),
+                "treasurymovement_set",
+                queryset=TreasuryMovement.objects.filter(
+                    organization=organization,
+                    status=TreasuryMovementStatus.POSTED,
+                    posted_at__lte=cash_cutoff,
+                    kind__in=(
+                        TreasuryMovementKind.RECEIPT,
+                        TreasuryMovementKind.DISBURSEMENT,
+                    ),
+                    reverses__isnull=True,
+                    reversal_movement__isnull=True,
+                ),
+                to_attr="cash_movements",
             ),
         )
         .order_by("name")
     )
-    return [_build_report(project) for project in projects]
+    return [_build_report(project, cash_cutoff=cash_cutoff) for project in projects]
 
 
 def get_organization_dashboard(
@@ -208,10 +249,8 @@ def get_organization_dashboard(
     recorded_expense_total = _money(
         sum((report.recorded_expense_total for report in reports), ZERO)
     )
-    receipt_total = _money(sum((report.receipt_total for report in reports), ZERO))
-    disbursement_total = _money(
-        sum((report.disbursement_total for report in reports), ZERO)
-    )
+    receipt_total = sum((report.receipt_total for report in reports), ZERO)
+    disbursement_total = sum((report.disbursement_total for report in reports), ZERO)
     return OrganizationDashboard(
         project_count=len(reports),
         contract_count=Contract.objects.filter(
@@ -229,6 +268,7 @@ def get_organization_dashboard(
         variance=_money(approved_estimate_total - recorded_expense_total),
         receipt_total=receipt_total,
         disbursement_total=disbursement_total,
-        net_cash_flow=_money(receipt_total - disbursement_total),
-        posted_payment_count=sum(report.posted_payment_count for report in reports),
+        net_cash_flow=receipt_total - disbursement_total,
+        posted_movement_count=sum(report.posted_movement_count for report in reports),
+        cash_cutoff=reports[0].cash_cutoff if reports else timezone.now(),
     )

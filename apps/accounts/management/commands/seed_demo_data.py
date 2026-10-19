@@ -16,14 +16,12 @@ from apps.accounts.models import LoginPageSettings, User
 from apps.audit.models import AuditEvent
 from apps.billing.models import (
     BaselineItem,
-    ClaimSettlementAllocation,
     ProgressClaim,
     ProgressRecord,
     ProjectBaseline,
 )
 from apps.billing.services import (
     add_baseline_item,
-    allocate_progress_claim_settlement,
     approve_progress_claim,
     approve_project_baseline,
     create_progress_claim,
@@ -62,7 +60,7 @@ from apps.daily_reports.services import (
     submit_daily_report,
 )
 from apps.documents.models import Document, DocumentLink, DocumentVersion
-from apps.documents.services import add_document_link, create_document
+from apps.documents.services import create_document
 from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
 from apps.equipment.services import (
     assign_equipment,
@@ -108,8 +106,6 @@ from apps.parties.services import (
     assign_party_role,
     create_business_party,
 )
-from apps.payments.models import Payment, PaymentAllocation
-from apps.payments.services import allocate_payment, create_payment
 from apps.procurement.models import (
     GoodsReceipt,
     GoodsReceiptItem,
@@ -166,6 +162,8 @@ from apps.safety.services import (
     review_safety_incident,
     start_corrective_action,
 )
+from apps.treasury.models import PaymentRequest
+from apps.treasury.services import create_payment_request
 from apps.workflows.models import (
     WorkflowCondition,
     WorkflowDefinition,
@@ -376,13 +374,11 @@ class Command(BaseCommand):
         EstimateItem,
         ExpenseCategory,
         Expense,
-        Payment,
-        PaymentAllocation,
+        PaymentRequest,
         ProjectBaseline,
         BaselineItem,
         ProgressRecord,
         ProgressClaim,
-        ClaimSettlementAllocation,
         Document,
         DocumentVersion,
         DocumentLink,
@@ -1342,7 +1338,7 @@ class Command(BaseCommand):
             actor=owner,
             contracts=contracts,
         )
-        payments = self._seed_payments(
+        self._seed_treasury_requests(
             organization_index,
             project_index,
             organization,
@@ -1360,7 +1356,6 @@ class Command(BaseCommand):
             owner=owner,
             project=project,
             contract=contracts[0],
-            payments=payments,
             start=start,
         )
         self._seed_expenses(
@@ -1380,7 +1375,6 @@ class Command(BaseCommand):
             organization,
             owner,
             project,
-            payments,
         )
         self._seed_daily_reports(
             organization,
@@ -1462,10 +1456,9 @@ class Command(BaseCommand):
         owner: User,
         project: Project,
         contract: Contract,
-        payments: list[Payment],
         start: date,
     ) -> None:
-        """Seed one approved, partially-settled F6 lifecycle per project."""
+        """Seed measurements; create claims only with existing approved terms."""
 
         baseline = (
             ProjectBaseline.objects.filter(
@@ -1569,6 +1562,21 @@ class Command(BaseCommand):
                 reason="راستی‌آزمایی دادهٔ نمایشی F6",
             )
 
+        # Demo generation is not authority to invent or approve commercial
+        # terms. Keep measurements available and Treasury requests pending when
+        # this tenant has no approved terms at the measurement cutoff. All other
+        # claim prerequisites remain enforced by the normal Billing services.
+        if not contract.term_versions.filter(
+            organization=organization,
+            status__in=("approved", "superseded"),
+            effective_from__lte=period_end,
+        ).exists():
+            self.stdout.write(
+                "Demo claim omitted: approved commercial terms are required; "
+                "no AR or cash history was fabricated."
+            )
+            return
+
         claim = ProgressClaim.objects.filter(
             organization=organization,
             contract=contract,
@@ -1601,35 +1609,8 @@ class Command(BaseCommand):
                 reason="تأیید دادهٔ نمایشی F6",
             )
 
-        payment_allocation = PaymentAllocation.objects.filter(
-            organization=organization,
-            payment=payments[0],
-            contract=contract,
-            status="active",
-        ).first()
-        if (
-            payment_allocation is not None
-            and not ClaimSettlementAllocation.objects.filter(
-                organization=organization,
-                claim=claim,
-                payment_allocation=payment_allocation,
-                status="active",
-            ).exists()
-        ):
-            settlement_amount = min(
-                Decimal("1000000000.00"),
-                payment_allocation.amount,
-                claim.net_amount.quantize(Decimal("0.01")),
-            )
-            if settlement_amount > 0:
-                allocate_progress_claim_settlement(
-                    organization=organization,
-                    actor=owner,
-                    claim=claim,
-                    payment_allocation=payment_allocation,
-                    amount=settlement_amount,
-                    reason="تسویهٔ جزئی دادهٔ نمایشی F6",
-                )
+        # No synthetic receipt or settlement. Explicit AR recognition and posted
+        # Treasury receipts require the tenant's approved financial configuration.
 
     def _seed_open_inventory_workflow(
         self,
@@ -2296,61 +2277,30 @@ class Command(BaseCommand):
                 amendment=amendment,
             )
 
-    def _seed_payments(
+    def _seed_treasury_requests(
         self,
-        organization_index: int,
-        project_index: int,
-        organization: Organization,
-        owner: User,
-        project: Project,
-        phases: list[ProjectPhase],
-        contracts: list[Contract],
-        parties: list[BusinessParty],
-        start: date,
-    ) -> list[Payment]:
-        result = []
-        methods = ("bank_transfer", "check", "bank_transfer", "cash", "bank_transfer")
-        for payment_index in range(1, 6):
-            number = (
-                f"PAY-{organization_index:02d}-{project_index:02d}-{payment_index:02d}"
+        organization_index,
+        project_index,
+        organization,
+        owner,
+        project,
+        phases,
+        contracts,
+        parties,
+        start,
+    ) -> None:
+        """Create pending Treasury requests without inventing GL/cash history."""
+        for index in range(2, 6):
+            create_payment_request(
+                organization=organization,
+                actor=owner,
+                kind="payment",
+                amount=Decimal(2_200_000_000 + index * 475_000_000),
+                purpose=f"Demo pending payment {organization_index}-{project_index}-{index}",
+                idempotency_key=f"DEMO-TR-{organization_index}-{project_index}-{index}",
+                project=project,
+                party=parties[min(index, 5)],
             )
-            contract = (
-                contracts[0] if payment_index == 1 else contracts[payment_index - 1]
-            )
-            party = parties[0] if payment_index == 1 else parties[min(payment_index, 5)]
-            direction = "receipt" if payment_index == 1 else "disbursement"
-            amount = Decimal(2_200_000_000 + payment_index * 475_000_000)
-            payment = Payment.objects.filter(
-                organization=organization, payment_number=number
-            ).first()
-            if payment is None:
-                payment = create_payment(
-                    organization=organization,
-                    project=project,
-                    actor=owner,
-                    payment_number=number,
-                    direction=direction,
-                    amount=amount,
-                    paid_on=start + timedelta(days=payment_index * 18),
-                    method=methods[payment_index - 1],
-                    counterparty_name=party.display_name,
-                    party=party,
-                    contract=contract,
-                    phase=phases[0],
-                    reference=f"REF-{organization_index:02d}{project_index:02d}{payment_index:02d}",
-                    notes="پرداخت پس از کنترل صورت‌وضعیت و تأیید مسئول پروژه ثبت شده است.",
-                )
-            if not PaymentAllocation.objects.filter(
-                payment=payment, contract=contract, status="active"
-            ).exists():
-                allocate_payment(
-                    payment=payment,
-                    contract=contract,
-                    actor=owner,
-                    amount=amount * Decimal("0.75"),
-                )
-            result.append(payment)
-        return result
 
     def _seed_expenses(
         self,
@@ -2398,7 +2348,6 @@ class Command(BaseCommand):
         organization: Organization,
         owner: User,
         project: Project,
-        payments: list[Payment],
     ) -> None:
         titles = ("صورت‌جلسه هماهنگی اجرایی", "گزارش کنترل کیفیت مصالح")
         for document_index, title in enumerate(titles, start=1):
@@ -2414,7 +2363,7 @@ class Command(BaseCommand):
                 b"%PDF-1.4\n1 0 obj<</Type/Catalog>>endobj\n%%EOF\n",
                 content_type="application/pdf",
             )
-            document = create_document(
+            create_document(
                 organization=organization,
                 actor=owner,
                 document_type="general" if document_index == 1 else "other",
@@ -2423,11 +2372,6 @@ class Command(BaseCommand):
                 description="سند نمونه نسخه‌بندی‌شده و خصوصی پروژه.",
                 upload=upload,
                 target=project,
-            )
-            add_document_link(
-                document=document,
-                actor=owner,
-                target=payments[document_index - 1],
             )
 
     def _seed_daily_reports(

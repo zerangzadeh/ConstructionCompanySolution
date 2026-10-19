@@ -6,6 +6,12 @@ from apps.payments.models import Payment
 
 @admin.register(Payment)
 class PaymentAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_view_permission(self, request: HttpRequest, obj=None) -> bool:
+        return False
+
     list_display = (
         "payment_number",
         "organization",

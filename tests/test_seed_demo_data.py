@@ -1,3 +1,4 @@
+from importlib import import_module
 from io import StringIO
 from pathlib import Path
 from typing import Any
@@ -12,7 +13,6 @@ from apps.accounts.management.commands.seed_demo_data import (
 from apps.accounts.models import User
 from apps.billing.models import (
     BaselineItem,
-    ClaimSettlementAllocation,
     ProgressClaim,
     ProgressRecord,
     ProjectBaseline,
@@ -20,6 +20,7 @@ from apps.billing.models import (
 from apps.daily_reports.models import DailyReport, DailyReportStatus
 from apps.documents.models import Document, DocumentLink, DocumentVersion
 from apps.equipment.models import Equipment, EquipmentAssignment, MaintenanceRecord
+from apps.expenses.models import PlatformExpenseGroup
 from apps.inventory.models import StockTransaction, Warehouse
 from apps.organizations.models import Organization, OrganizationMembership
 from apps.procurement.models import (
@@ -34,6 +35,8 @@ from apps.procurement.models import (
 from apps.projects.models import Project
 from apps.quality.models import QualityIssue
 from apps.safety.models import SafetyIncident
+from apps.subledgers.models import SettlementAllocation
+from apps.treasury.models import PaymentRequest, TreasuryMovement
 from apps.workflows.models import (
     WorkflowCondition,
     WorkflowInstance,
@@ -56,7 +59,16 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     settings: Any, tmp_path: Path
 ) -> None:
     settings.MEDIA_ROOT = tmp_path
+    settings.DOCUMENT_PROTECTED_ROOT = tmp_path
     settings.DEBUG = True
+
+    # Transactional suite teardown flushes data-migration catalogues in a reused
+    # test database. Restore the exact migration-owned fixture, not a new policy.
+    expense_catalog = import_module(
+        "apps.expenses.migrations.0006_platformexpensegroup_expensecategory_primary_group"
+    )
+    for code, name in expense_catalog.LEGACY_GROUPS:
+        PlatformExpenseGroup.objects.get_or_create(code=code, defaults={"name": name})
 
     call_command("seed_demo_data", stdout=StringIO())
 
@@ -91,13 +103,17 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
         ProgressClaim.objects.filter(
             organization__in=organizations, status="approved"
         ).count()
-        == 16
+        == 0
     )
     assert (
-        ClaimSettlementAllocation.objects.filter(
-            organization__in=organizations, status="active"
+        PaymentRequest.objects.filter(
+            organization__in=organizations, status="draft"
         ).count()
-        == 16
+        == 64
+    )
+    assert TreasuryMovement.objects.filter(organization__in=organizations).count() == 0
+    assert (
+        SettlementAllocation.objects.filter(organization__in=organizations).count() == 0
     )
     assert Department.objects.filter(organization__in=organizations).count() == 8
     assert Position.objects.filter(organization__in=organizations).count() == 8
@@ -213,7 +229,9 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
             BaselineItem,
             ProgressRecord,
             ProgressClaim,
-            ClaimSettlementAllocation,
+            PaymentRequest,
+            TreasuryMovement,
+            SettlementAllocation,
             DailyReport,
             Department,
             Position,

@@ -1,6 +1,4 @@
 import hashlib
-from datetime import date
-from decimal import Decimal
 from tempfile import TemporaryDirectory
 
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -12,7 +10,8 @@ from django.urls import reverse
 from apps.accounts.models import User
 from apps.audit.models import AuditAction, AuditEvent
 from apps.documents.forms import DocumentCreateForm
-from apps.documents.models import DocumentLink, DocumentType
+from apps.documents.models import DocumentLink, DocumentType, RetiredPaymentEvidence
+from apps.documents.models import RetiredPaymentDocumentLink as PaymentDocumentLink
 from apps.documents.services import (
     add_document_link,
     add_document_version,
@@ -37,8 +36,6 @@ from apps.organizations.models import (
     OrganizationSettings,
     PlatformRoleCode,
 )
-from apps.payments.models import PaymentDirection, PaymentDocumentLink
-from apps.payments.services import create_payment
 from apps.projects.models import ProjectDocumentLink
 from apps.projects.services import create_project
 
@@ -93,6 +90,10 @@ class DocumentServiceTests(TestCase):
                 scope_type=AuthorizationScopeType.ORGANIZATION,
                 reason="Document regression fixture scope",
             )
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
+        explicit_fixture_roles(self.other_organization)
         self.project = create_project(
             organization=self.organization,
             actor=self.owner,
@@ -226,15 +227,13 @@ class DocumentServiceTests(TestCase):
             )
 
     def _payment(self):
-        return create_payment(
+        return RetiredPaymentEvidence.objects.create(
             organization=self.organization,
             project=self.project,
-            actor=self.owner,
-            payment_number=f"PAY-{self.organization.payments.count() + 1}",
-            direction=PaymentDirection.DISBURSEMENT,
-            amount=Decimal("75.00"),
-            paid_on=date(2026, 9, 3),
-            counterparty_name="Supplier LLC",
+            payment_number="RETIRED-DEMO",
+            source_snapshot={"disposition": "excluded_demo_test"},
+            source_sha256="a" * 64,
+            authority_reference="test-only retained evidence",
         )
 
     def test_add_link_supports_an_existing_financial_entity_and_audits(self) -> None:

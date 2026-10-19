@@ -10,6 +10,8 @@ class PaymentAdminTests(SimpleTestCase):
         admin = PaymentAdmin(Payment, AdminSite())
         request = RequestFactory().get("/admin/payments/payment/")
 
+        self.assertFalse(admin.has_module_permission(request))
+        self.assertFalse(admin.has_view_permission(request))
         self.assertFalse(admin.has_add_permission(request))
         self.assertFalse(admin.has_change_permission(request))
         self.assertFalse(admin.has_delete_permission(request))

@@ -1,0 +1,85 @@
+{
+  "gate_source": "Exact Human twelve-condition retirement readiness gate; not the twelve remediation areas",
+  "evaluated_at": "2026-10-20",
+  "conditions": [
+    {
+      "number": 1,
+      "condition": "Zero active runtime writers to Legacy Payment",
+      "status": "PASS",
+      "evidence": "Disabled service facades, hidden admin, removed route; negative transition checks."
+    },
+    {
+      "number": 2,
+      "condition": "Zero active business/reporting readers from Legacy Payment",
+      "status": "PASS",
+      "evidence": "Financial projections read posted Treasury movements; Billing reads exact Subledger AR allocations. Forensics classified separately."
+    },
+    {
+      "number": 3,
+      "condition": "Zero unresolved required FK/generic/document references",
+      "status": "PASS",
+      "evidence": "Approved exclusion disposition; all80 source values and dependents retained;32 generic and typed document identities preserved. Physical source FK declarations await contract."
+    },
+    {
+      "number": 4,
+      "condition": "Approved Treasury/Subledger settlement flows in place",
+      "status": "PASS",
+      "evidence": "Eight Billing transition tests including caps/retry/reversal/no implicit AR and concurrency; existing Treasury/Subledger authority retained."
+    },
+    {
+      "number": 5,
+      "condition": "No Payment + Treasury double counting",
+      "status": "PASS",
+      "evidence": "Behavioral witness retains a demo Payment alongside Treasury receipt; report counts Treasury once and reversal returns zero. Settlement creates no cash event."
+    },
+    {
+      "number": 6,
+      "condition": "Legacy permissions/routes/forms/templates/navigation have no required active consumer",
+      "status": "PASS",
+      "evidence": "Explicit transitional compatibility classification in CEP-064_RUNTIME_REFERENCE_INVENTORY.json; old routes absent and admin/facades disabled."
+    },
+    {
+      "number": 7,
+      "condition": "Current-operation seed/demo fixtures use Treasury-approved flows",
+      "status": "PASS",
+      "evidence": "Pending Treasury request generator is idempotent and creates no Payment/cash/GL history. Full seed has a separate unresolved Safety regression under condition11."
+    },
+    {
+      "number": 8,
+      "condition": "Required transition-test coverage retained or replaced",
+      "status": "PASS",
+      "evidence": "16 new transition tests PASS; negative legacy, original identifier/tenant coverage and existing Treasury/Subledger regression retained. Coverage map in completion report."
+    },
+    {
+      "number": 9,
+      "condition": "Audit/document identifiers interpretable after retirement",
+      "status": "PASS",
+      "evidence": "80 immutable Documents-owned snapshots,32 typed/generic identities and160 audit IDs verified; DMS target registry is independent of source Payment classes."
+    },
+    {
+      "number": 10,
+      "condition": "Full migration graph builds from empty database with retirement changes",
+      "status": "UNVERIFIED",
+      "evidence": "Preparation graph428/428 from zero PASS,523 tables. Full destructive contract candidate is not installed/rehearsed; see contract plan."
+    },
+    {
+      "number": 11,
+      "condition": "System/migration/focused/affected regression all PASS, none FAIL or UNVERIFIED",
+      "status": "FAIL",
+      "evidence": "System and drift PASS;65 focused/affected tests and28 subtests PASS. Four baseline registry failures and latest full-seed Safety approval failure remain required FAIL results."
+    },
+    {
+      "number": 12,
+      "condition": "Verified Development database rollback/recovery checkpoint before destructive mutation",
+      "status": "PASS",
+      "evidence": "Custom dump restored to separate local DB; all520 source tables counts/digests matched, source stable during capture; private dump and manifest retained."
+    }
+  ],
+  "LEGACY_PAYMENT_RETIREMENT_READINESS": "FAIL",
+  "LEGACY_PAYMENT_RETIREMENT_COMPLETE": "NO",
+  "destructive_retirement_authorized_now": false,
+  "destructive_removal_executed": false,
+  "post_removal_checks": "NOT_EXECUTED; no retirement completion claim",
+  "production_action": false,
+  "cep_069_079_executed": false
+}

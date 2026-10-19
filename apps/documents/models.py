@@ -1065,6 +1065,62 @@ class AbstractTypedDocumentLink(UUIDModel, CreatedAtModel):
         raise ValidationError("لینک نوع‌دار سند جزئی از سابقه و حذف‌ناپذیر است.")
 
 
+class RetainedEvidenceQuerySet(models.QuerySet):
+    def update(self, **kwargs):
+        raise ValidationError("Retired source evidence is immutable.")
+
+    def delete(self):
+        raise ValidationError("Retired source evidence cannot be deleted.")
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError("Retired source evidence is immutable.")
+
+
+class RetiredPaymentEvidence(UUIDModel, CreatedAtModel):
+    """Immutable interpretation of excluded demo history; never a cash authority."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    project = models.ForeignKey("projects.Project", on_delete=models.PROTECT)
+    payment_number = models.CharField(max_length=80)
+    source_snapshot = models.JSONField()
+    source_sha256 = models.CharField(max_length=64)
+    authority_reference = models.CharField(max_length=255)
+    objects = RetainedEvidenceQuerySet.as_manager()
+
+    def __str__(self):
+        return f"Retired demo Payment {self.payment_number} ({self.pk})"
+
+    def save(self, *args, **kwargs):
+        if not self._state.adding:
+            raise ValidationError("Retired source evidence is immutable.")
+        validate_related_organizations(self, project=self.project)
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        raise ValidationError("Retired source evidence cannot be deleted.")
+
+
+class RetiredPaymentDocumentLink(AbstractTypedDocumentLink):
+    """DMS-owned retained source link; original link/document UUIDs are unchanged."""
+
+    target_field_name = "payment"
+    payment = models.ForeignKey(
+        RetiredPaymentEvidence,
+        on_delete=models.PROTECT,
+        related_name="typed_document_links",
+    )
+
+    class Meta(AbstractTypedDocumentLink.Meta):
+        constraints = [  # noqa: RUF012
+            models.UniqueConstraint(
+                fields=["document", "payment"], name="retired_payment_document_uq"
+            )
+        ]
+
+
 class DocumentLink(UUIDModel, CreatedAtModel):
     """A controlled link from a document to exactly one supported entity."""
 
@@ -1113,8 +1169,8 @@ class DocumentLink(UUIDModel, CreatedAtModel):
         related_name="document_links",
     )
     payment = models.ForeignKey(
-        "payments.Payment",
-        verbose_name="پرداخت",
+        "documents.RetiredPaymentEvidence",
+        verbose_name="شاهد پرداخت نمایشی بازنشسته",
         on_delete=models.PROTECT,
         null=True,
         blank=True,

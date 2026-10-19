@@ -2,7 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth import authenticate
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
@@ -60,6 +60,9 @@ class IdentifierCanonicalizationTests(TestCase):
             role=MembershipRole.COMPANY_OWNER,
             status=MembershipStatus.ACTIVE,
         )
+        from tests.retirement_fixtures import explicit_fixture_roles
+
+        explicit_fixture_roles(self.organization)
         self.project = Project.objects.create(
             organization=self.organization,
             code="BASE-PROJECT",
@@ -266,20 +269,20 @@ class IdentifierCanonicalizationTests(TestCase):
             estimate_number="  est-mixed  ",
             title="Mixed estimate",
         )
-        payment = create_payment(
-            organization=self.organization,
-            project=self.project,
-            actor=self.owner,
-            payment_number="  pay-mixed  ",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("100.00"),
-            paid_on=self.business_date,
-            counterparty_name="Client",
-        )
+        with self.assertRaises(PermissionDenied):
+            create_payment(
+                organization=self.organization,
+                project=self.project,
+                actor=self.owner,
+                payment_number="  pay-mixed  ",
+                direction=PaymentDirection.RECEIPT,
+                amount=Decimal("100.00"),
+                paid_on=self.business_date,
+                counterparty_name="Client",
+            )
 
         self.assertEqual(contract.contract_number, "CON-MIXED")
         self.assertEqual(estimate.estimate_number, "EST-MIXED")
-        self.assertEqual(payment.payment_number, "PAY-MIXED")
         self.assertEqual(
             Contract.objects.get(
                 organization=self.organization,
@@ -293,13 +296,6 @@ class IdentifierCanonicalizationTests(TestCase):
                 estimate_number="EST-MIXED",
             ),
             estimate,
-        )
-        self.assertEqual(
-            Payment.objects.get(
-                organization=self.organization,
-                payment_number="PAY-MIXED",
-            ),
-            payment,
         )
 
         with self.assertRaisesMessage(ValueError, "از قبل"):
@@ -319,7 +315,7 @@ class IdentifierCanonicalizationTests(TestCase):
                 estimate_number=" est-MIXED ",
                 title="Duplicate estimate",
             )
-        with self.assertRaisesMessage(ValueError, "از قبل"):
+        with self.assertRaises(PermissionDenied):
             create_payment(
                 organization=self.organization,
                 project=self.project,

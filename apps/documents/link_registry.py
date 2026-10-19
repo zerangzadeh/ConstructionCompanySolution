@@ -29,11 +29,14 @@ class DocumentLinkType:
 
 DOCUMENT_LINK_TYPES = (
     DocumentLinkType(
-        key="payroll_inquiry", owner="payroll",
-        model_label="payroll.PayrollInquiryEvidenceLink", target_field="payroll_inquiry",
+        key="payroll_inquiry",
+        owner="payroll",
+        model_label="payroll.PayrollInquiryEvidenceLink",
+        target_field="payroll_inquiry",
         view_permission=BusinessPermissionCode.PAYROLL_INQUIRIES_VIEW,
         project_lookup="payroll_inquiry__payslip__run_employee__project_id",
-        site_lookup="payroll_inquiry__payslip__run_employee__site_id", legacy_compatible=False,
+        site_lookup="payroll_inquiry__payslip__run_employee__site_id",
+        legacy_compatible=False,
     ),
     DocumentLinkType(
         key="material",
@@ -87,11 +90,21 @@ DOCUMENT_LINK_TYPES = (
         project_lookup="expense__project_id",
     ),
     DocumentLinkType(
+        key="treasury_movement",
+        owner="treasury",
+        model_label="treasury.TreasuryMovementDocumentLink",
+        target_field="treasury_movement",
+        view_permission=BusinessPermissionCode.TREASURY_VIEW,
+        project_lookup="treasury_movement__project_id",
+        site_lookup="treasury_movement__site_id",
+        legacy_compatible=False,
+    ),
+    DocumentLinkType(
         key="payment",
-        owner="payments",
-        model_label="payments.PaymentDocumentLink",
+        owner="documents",
+        model_label="documents.RetiredPaymentDocumentLink",
         target_field="payment",
-        view_permission=BusinessPermissionCode.PAYMENTS_VIEW,
+        view_permission=BusinessPermissionCode.DOCUMENTS_VIEW,
         project_lookup="payment__project_id",
     ),
     DocumentLinkType(
