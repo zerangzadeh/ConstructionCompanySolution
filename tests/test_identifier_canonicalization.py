@@ -1,8 +1,7 @@
 from datetime import date
-from decimal import Decimal
 
 from django.contrib.auth import authenticate
-from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 
@@ -22,9 +21,6 @@ from apps.organizations.models import (
     OrganizationMembership,
 )
 from apps.organizations.services import create_organization_with_owner
-from apps.payments.forms import PaymentForm
-from apps.payments.models import Payment, PaymentDirection, PaymentMethod
-from apps.payments.services import create_payment
 from apps.projects.forms import ProjectForm, ProjectPhaseForm, ProjectSiteForm
 from apps.projects.models import (
     Project,
@@ -269,17 +265,6 @@ class IdentifierCanonicalizationTests(TestCase):
             estimate_number="  est-mixed  ",
             title="Mixed estimate",
         )
-        with self.assertRaises(PermissionDenied):
-            create_payment(
-                organization=self.organization,
-                project=self.project,
-                actor=self.owner,
-                payment_number="  pay-mixed  ",
-                direction=PaymentDirection.RECEIPT,
-                amount=Decimal("100.00"),
-                paid_on=self.business_date,
-                counterparty_name="Client",
-            )
 
         self.assertEqual(contract.contract_number, "CON-MIXED")
         self.assertEqual(estimate.estimate_number, "EST-MIXED")
@@ -315,17 +300,6 @@ class IdentifierCanonicalizationTests(TestCase):
                 estimate_number=" est-MIXED ",
                 title="Duplicate estimate",
             )
-        with self.assertRaises(PermissionDenied):
-            create_payment(
-                organization=self.organization,
-                project=self.project,
-                actor=self.owner,
-                payment_number=" pay-MIXED ",
-                direction=PaymentDirection.RECEIPT,
-                amount=Decimal("1.00"),
-                paid_on=self.business_date,
-                counterparty_name="Client",
-            )
 
         direct_contract = Contract.objects.create(
             organization=self.organization,
@@ -340,18 +314,8 @@ class IdentifierCanonicalizationTests(TestCase):
             estimate_number=" direct-estimate ",
             title="Direct estimate",
         )
-        direct_payment = Payment.objects.create(
-            organization=self.organization,
-            project=self.project,
-            payment_number=" direct-payment ",
-            direction=PaymentDirection.RECEIPT,
-            amount=Decimal("1.00"),
-            paid_on=self.business_date,
-            counterparty_name="Client",
-        )
         self.assertEqual(direct_contract.contract_number, "DIRECT-CONTRACT")
         self.assertEqual(direct_estimate.estimate_number, "DIRECT-ESTIMATE")
-        self.assertEqual(direct_payment.payment_number, "DIRECT-PAYMENT")
 
     def test_identifier_forms_return_canonical_codes_and_numbers(self) -> None:
         project_form = ProjectForm(
@@ -404,22 +368,6 @@ class IdentifierCanonicalizationTests(TestCase):
             },
             organization=self.organization,
         )
-        payment_form = PaymentForm(
-            data={
-                "project": self.project.pk,
-                "contract": "",
-                "phase": "",
-                "payment_number": " form-payment ",
-                "direction": PaymentDirection.RECEIPT,
-                "amount": "1.00",
-                "paid_on": self.business_date.isoformat(),
-                "method": PaymentMethod.BANK_TRANSFER,
-                "counterparty_name": "Client",
-                "reference": "",
-                "notes": "",
-            },
-            organization=self.organization,
-        )
 
         forms_and_values = (
             (project_form, "code", "FORM-PROJECT"),
@@ -427,7 +375,6 @@ class IdentifierCanonicalizationTests(TestCase):
             (phase_form, "code", "FORM-PHASE"),
             (contract_form, "contract_number", "FORM-CONTRACT"),
             (estimate_form, "estimate_number", "FORM-ESTIMATE"),
-            (payment_form, "payment_number", "FORM-PAYMENT"),
         )
         for form, field_name, expected in forms_and_values:
             with self.subTest(form=form.__class__.__name__):

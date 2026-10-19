@@ -873,10 +873,6 @@ class BusinessPermissionCode(models.TextChoices):
         "بایگانی دسته هزینه",
     )
 
-    PAYMENTS_VIEW = "payments.view", "مشاهده پرداخت‌ها"
-    PAYMENTS_CREATE = "payments.create", "ثبت پرداخت"
-    PAYMENTS_VOID = "payments.void", "ابطال پرداخت"
-    PAYMENTS_ALLOCATE = "payments.allocate", "تخصیص پرداخت"
 
     DOCUMENTS_VIEW = "documents.view", "مشاهده اسناد"
     DOCUMENTS_UPLOAD = "documents.upload", "بارگذاری و نسخه‌بندی اسناد"

@@ -140,6 +140,7 @@ from apps.quality.models import (
     QualityIssueSeverity,
     QualityIssueType,
 )
+from apps.quality.record_review import decide_quality_record, submit_quality_record
 from apps.quality.services import (
     assign_quality_issue,
     close_quality_issue,
@@ -1970,6 +1971,21 @@ class Command(BaseCommand):
         )
         if project_index == 2:
             return
+        # Source-owned record review is distinct from corrective verification.
+        # Existing services retain the approved snapshot, actor, reason and audit.
+        submit_quality_record(
+            organization=organization,
+            actor=manager,
+            issue_id=str(issue.pk),
+            reason="Development demo Quality record submitted for review.",
+        )
+        decide_quality_record(
+            organization=organization,
+            actor=owner,
+            issue_id=str(issue.pk),
+            outcome="approved",
+            reason="Development demo Quality record and specification reviewed.",
+        )
         close_quality_issue(
             organization=organization,
             actor=owner,

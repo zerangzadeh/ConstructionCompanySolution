@@ -6,91 +6,89 @@
       "number": 1,
       "condition": "Zero active runtime writers to Legacy Payment",
       "status": "PASS",
-      "evidence": "Disabled service facades, hidden admin, removed route; negative transition checks."
+      "evidence": "No runtime Payment model, service or writer in candidate; current Treasury create/submit/post/reverse tests PASS."
     },
     {
       "number": 2,
       "condition": "Zero active business/reporting readers from Legacy Payment",
-      "status": "FAIL",
-      "evidence": "CEP-064_REHEARSAL_PREFLIGHT.json: registered Reporting claim_settlement adapter queries billing.ClaimSettlementAllocation, with FK to payments.PaymentAllocation. Earlier zero-reader finding was incomplete; runtime dependency remains even with zero active allocation rows."
+      "status": "PASS",
+      "evidence": "Reporting exact Subledger AR allocations replace legacy ClaimSettlementAllocation. Four behavioral/cutoff/tenant tests PASS;25 existing Reporting reconciliation tests PASS."
     },
     {
       "number": 3,
       "condition": "Zero unresolved required FK/generic/document references",
       "status": "PASS",
-      "evidence": "Approved exclusion disposition; all80 source values and dependents retained;32 generic and typed document identities preserved. Physical source FK declarations await contract."
+      "evidence": "Populated contract deletes only four old tables after source/dependent snapshot and document identity verification. No required live FK remains."
     },
     {
       "number": 4,
       "condition": "Approved Treasury/Subledger settlement flows in place",
       "status": "PASS",
-      "evidence": "Eight Billing transition tests including caps/retry/reversal/no implicit AR and concurrency; existing Treasury/Subledger authority retained."
+      "evidence": "Billing exact-version AR recognition plus Treasury receipt allocation/reversal/caps/idempotency/concurrency tests PASS. No implicit AR or fabricated cash."
     },
     {
       "number": 5,
       "condition": "No Payment + Treasury double counting",
       "status": "PASS",
-      "evidence": "Behavioral witness retains a demo Payment alongside Treasury receipt; report counts Treasury once and reversal returns zero. Settlement creates no cash event."
+      "evidence": "Treasury financial projection counts current cash once alongside excluded retained demo evidence; Subledger allocation counted once without adding cash. Behavioral/reversal tests PASS."
     },
     {
       "number": 6,
       "condition": "Legacy permissions/routes/forms/templates/navigation have no required active consumer",
       "status": "PASS",
-      "evidence": "Explicit transitional compatibility classification in CEP-064_RUNTIME_REFERENCE_INVENTORY.json; old routes absent and admin/facades disabled."
+      "evidence": "Candidate has no apps.payments runtime package or Payment UI/templates/admin; permissions removed. Historical migration-only payments label preserved byte-for-byte."
     },
     {
       "number": 7,
       "condition": "Current-operation seed/demo fixtures use Treasury-approved flows",
       "status": "PASS",
-      "evidence": "Financial seeds use pending Treasury requests, no Legacy Payment/cash/GL history. Full seed now fails a separate unchanged Quality record-review prerequisite under condition11; Safety flow fixed and verified."
+      "evidence": "Full clean seed and retry PASS before contract; full empty candidate seed and retry PASS;64 pending requests and no fabricated cash. Existing Quality separate-record approval retained."
     },
     {
       "number": 8,
       "condition": "Required transition-test coverage retained or replaced",
       "status": "PASS",
-      "evidence": "16 new transition tests PASS; negative legacy, original identifier/tenant coverage and existing Treasury/Subledger regression retained. Coverage map in completion report."
+      "evidence": "107 candidate tests PASS; two introduced tenant-fixture subtest failures resolved by3-test/21-subtest rerun. Required transition coverage preserved/replaced;3 affected authorization tests PASS."
     },
     {
       "number": 9,
       "condition": "Audit/document identifiers interpretable after retirement",
       "status": "PASS",
-      "evidence": "80 immutable Documents-owned snapshots,32 typed/generic identities and160 audit IDs verified; DMS target registry is independent of source Payment classes."
+      "evidence": "Populated clone retains80 snapshots,32 typed links,32 generic references and160 audit IDs; exact original inventory fingerprints unchanged after app removal. Recovery pre-contract code verifies same."
     },
     {
       "number": 10,
       "condition": "Full migration graph builds from empty database with retirement changes",
-      "status": "UNVERIFIED",
-      "evidence": "Full destructive candidate graph remains UNVERIFIED. Rehearsal preflight exposed an active required legacy Reporting reader; full seed remains FAIL. Stop under exact Human gate; preparation graph428/428 remains separate evidence."
+      "status": "PASS",
+      "evidence": "Complete430-migration graph applied from zero, including both destructive contracts; candidate empty seed/check/drift/retention PASS."
     },
     {
       "number": 11,
       "condition": "System/migration/focused/affected regression all PASS, none FAIL or UNVERIFIED",
-      "status": "FAIL",
-      "evidence": "System/drift PASS. Safety6/6 PASS. Registry2 PASS/6 reproduced baseline failures validly attributed under latest Human instruction; zero attributable registry failure. Required full seed FAIL at unchanged Quality separate-record approval prerequisite. See blocker closure evidence."
+      "status": "PASS",
+      "evidence": "Required scoped focused/affected regression and system/drift/lint PASS. Registry6 baseline failures retain exact defect sets;3 ancillary permission-fixture failures reproduce on original restored schema before changed assertions. Accepted non-CEP attribution preserved; zero attributable unresolved failure."
     },
     {
       "number": 12,
       "condition": "Verified Development database rollback/recovery checkpoint before destructive mutation",
       "status": "PASS",
-      "evidence": "Fresh custom Development dump restored to separate local DB; all523 source tables counts/digests match; source stable during capture. CEP-064_DEVELOPMENT_RECOVERY.json; native recovery procedure executed."
+      "evidence": "Native Development checkpoint after full seed restored with all523 table counts/digests equal; after destructive rehearsal another native restore matched all523 and passed pre-contract code checks. Source equals checkpoint immediately before gate."
     }
   ],
-  "LEGACY_PAYMENT_RETIREMENT_READINESS": "FAIL",
-  "LEGACY_PAYMENT_RETIREMENT_COMPLETE": "NO",
-  "destructive_retirement_authorized_now": false,
-  "destructive_removal_executed": false,
-  "post_removal_checks": "NOT_EXECUTED; no retirement completion claim",
+  "LEGACY_PAYMENT_RETIREMENT_READINESS": "PASS",
+  "LEGACY_PAYMENT_RETIREMENT_COMPLETE": "YES",
+  "destructive_retirement_authorized_now": true,
+  "destructive_removal_executed": true,
+  "post_removal_checks": "PASS:430 fresh migrations;full seed/retry;107 tests/40 subtests;system/drift/lint/reference/retention;accepted exact baseline attribution",
   "production_action": false,
   "cep_069_079_executed": false,
-  "followup_authority": "supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md",
+  "followup_authority": "supporting/LEGACY_PAYMENT_RETIREMENT_CONTINUATION_20261020.md",
   "tally": {
-    "PASS": 9,
-    "FAIL": 2,
-    "UNVERIFIED": 1
+    "PASS": 12,
+    "FAIL": 0,
+    "UNVERIFIED": 0
   },
-  "remaining_blockers": [
-    "CEP-064-FINDING-004: full seed Quality record approval prerequisite",
-    "CEP-064-FINDING-005: active legacy Reporting settlement reader",
-    "CEP-064-FINDING-003: full destructive contract graph from zero UNVERIFIED; rehearsal preflight blocked"
-  ]
+  "remaining_blockers": [],
+  "candidate_digest": "e4d485fa172ce93d7c9694f255ad88daeb354b47b5c09d5c9c1e9f4ae8dfd10a",
+  "configured_development_contract": "billing.0018 and payments.0007 APPLIED"
 }

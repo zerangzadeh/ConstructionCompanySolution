@@ -52,7 +52,6 @@ OBJECT_SCOPED_PERMISSION_NAMESPACES = frozenset(
         "estimates",
         "estimate_items",
         "expenses",
-        "payments",
         "documents",
         "daily_reports",
         "project_assignments",

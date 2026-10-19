@@ -17,8 +17,8 @@ from apps.estimates.services import (
 )
 from apps.materials.models import UnitOfMeasure
 from apps.organizations.models import MembershipRole, MembershipStatus, Organization
-from apps.payments.models import Payment
 from apps.projects.services import create_project
+from apps.treasury.models import TreasuryMovement
 
 
 class EstimateDepthTests(TestCase):
@@ -136,7 +136,7 @@ class EstimateDepthTests(TestCase):
 
     def test_preview_rejects_formula_and_unknown_mapping_without_mutation(self) -> None:
         before = self.estimate.items.count()
-        payments_before = Payment.objects.count()
+        payments_before = TreasuryMovement.objects.count()
         formula = preview_estimate_csv(
             estimate=self.estimate,
             actor=self.owner,
@@ -151,4 +151,4 @@ class EstimateDepthTests(TestCase):
         self.assertIn("فرمول", formula.errors[0])
         self.assertIn("P4-G04", unknown.errors[0])
         self.assertEqual(self.estimate.items.count(), before)
-        self.assertEqual(Payment.objects.count(), payments_before)
+        self.assertEqual(TreasuryMovement.objects.count(), payments_before)

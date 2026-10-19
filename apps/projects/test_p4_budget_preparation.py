@@ -19,7 +19,6 @@ from apps.organizations.models import (
     Organization,
     OrganizationSettings,
 )
-from apps.payments.models import Payment, PaymentAllocation
 from apps.projects.models import BudgetVersionStatus
 from apps.projects.services import (
     BudgetAllocationInput,
@@ -281,8 +280,7 @@ class BudgetPreparationTests(TestCase):
             Obligation,
             SettlementAllocation,
             Expense,
-            Payment,
-            PaymentAllocation,
+            TreasuryMovement,
             Contract,
         )
         before = {model: model.objects.count() for model in models}

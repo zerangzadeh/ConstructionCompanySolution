@@ -62,12 +62,12 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 58
+  execution_state_complete: 59
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 2
-  partial_current: 7
+  partial_current: 6
   failed_current: 0
   not_started_other_current_governed: 12
   deferred_post_v1: 7
@@ -242,6 +242,14 @@ human_decisions:
     demo_safety_approval: GRANTED
     destructive_retirement_requires: ALL_12_READINESS_PASS_AND_VERIFIED_DEVELOPMENT_DB_CHECKPOINT
     git_writes_authorized: SAFE_ATTRIBUTABLE_CHECKPOINTS
+    production_authorized: false
+  HUMAN-LEGACY-PAYMENT-RETIREMENT-CONTINUATION-20261020:
+    source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_CONTINUATION_20261020.md
+    date: '2026-10-20'
+    status: APPROVED_BOUNDED_CONDITIONAL_RETIREMENT
+    baseline: d2f9abdd53b4995dbd377dde8aec965970ac5d0d
+    scope: Close Reporting reader and existing Quality demo review; full local rehearsal and exact12 conditional Development retirement
+    destructive_retirement_requires: ALL_12_READINESS_PASS_AND_VERIFIED_DEVELOPMENT_DB_CHECKPOINT
     production_authorized: false
 registry_update_rules:
   on_start:
@@ -3408,10 +3416,10 @@ ceps:
   CEP-064:
     closure_triage:
       category: B
-      disposition: BLOCKED_REQUIRED_VALIDATION_AND_CONTRACT_REHEARSAL
+      disposition: RESOLVED_DEVELOPMENT_RETIREMENT_COMPLETE
       root_human_input_cep: CEP-064
-      minimum_resolution: "Registry baseline attribution and Human-approved Demo Safety closure verified. Full seed now fails unchanged Quality record review; rehearsal preflight found an active Reporting legacy-settlement reader. Resolve these within bounded authority before full graph rehearsal and exact12 re-evaluation. No historical Payment dataset is required."
-      evidence: docs/governance/cep/evidence/CEP-064_BLOCKER_CLOSURE_20261020.json
+      minimum_resolution: All three authorized blockers closed;exact12 and post-removal proof PASS.
+      evidence: docs/governance/cep/evidence/CEP-064_FINAL_VALIDATION.json
       assessed_at: '2026-10-20'
     title: Treasury authority cutover and read-model convergence
     phase: V1_IMPLEMENTATION
@@ -3419,27 +3427,24 @@ ceps:
     eligibility_status: SATISFIED
     authorization:
       status: AUTHORIZED
-      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-20261020
-      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md
+      authorization_id: HUMAN-LEGACY-PAYMENT-RETIREMENT-CONTINUATION-20261020
+      source: docs/governance/cep/supporting/LEGACY_PAYMENT_RETIREMENT_CONTINUATION_20261020.md
     execution:
-      status: PARTIAL
-      lifecycle: BLOCKED_REQUIRED_VALIDATION
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
       advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 12
+      passed: 14
       total: 14
-      status: PARTIAL_BLOCKED_REQUIRED_VALIDATION
-    dod: NOT_MET_BLOCKED
-    blockers:
-    - CEP-064-FINDING-004 / BLOCKER-TEST required full demo seed now fails unchanged Quality separate record approval prerequisite
-    - CEP-064-FINDING-005 / BLOCKER-RUNTIME-REFERENCE registered Reporting claim_settlement adapter still reads legacy Billing settlement model
-    - CEP-064-FINDING-003 / BLOCKER-MIGRATION complete destructive contract graph from zero UNVERIFIED; required reader found at rehearsal preflight
+      status: PASS
+    dod: MET
+    blockers: []
     remaining_utv:
-    - Complete candidate retirement graph from zero
-    - Gated destructive Development contract and all required post-removal validation
+    - Performance/load and browser/accessibility runtime certification not required by bounded retirement;remains UTV
+    - Human Sign-off and Production Certification/Cutover NOT_EXECUTED
     completion_report:
       path: docs/governance/cep/reports/CEP-064_COMPLETION_REPORT.md
-      evidence_presence: VERIFIED_PREPARATION_AND_BLOCKERS_NO_RETIREMENT_PASS
+      evidence_presence: VERIFIED_COMPLETE_DEVELOPMENT_RETIREMENT
     git:
       committed: true
       commit_sha: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
@@ -3450,7 +3455,7 @@ ceps:
       remote_main_evidence: VERIFIED_IMPLEMENTATION_CHECKPOINT_ON_ORIGIN_MAIN_20261020
     last_execution:
       branch: main
-      sha: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
+      sha: d2f9abdd53b4995dbd377dde8aec965970ac5d0d
     updated_at: '2026-10-20'
     history:
     - date: '2026-10-19'
@@ -3468,6 +3473,18 @@ ceps:
     - date: '2026-10-20'
       status: GIT_INTEGRATED
       reason: Bounded follow-up checkpoint e150cf5838a49d4a62f9a6897c740ac0d978f7bf committed on existing main, pushed and verified equal to remote main with clean tree. Governance-only follow-up records integration facts. Readiness remains FAIL; no destructive retirement or serial continuation.
+    - date: '2026-10-20'
+      status: RESUMED
+      reason: Clean main d2f9abd equals origin/main; docs-only reconciliation boundary from e150cf5 verified. Latest Human continuation authorizes only Reporting replacement, unchanged Quality approval seed and full rehearsal with exact12 conditional retirement. No unrelated CEP or Production authority.
+    - date: '2026-10-20'
+      status: BLOCKER_RESOLVED
+      reason: Reporting legacy reader replaced by exact Subledger allocation adapter;4 behavioral tests PASS. Existing Quality approval seed uses unchanged submit/decide services;6 Quality tests PASS. Fresh428 migration preparation graph PASS. Required full seed reached obsolete64 document-link assertion (actual32 project links after approved Payment link removal); expectation corrected with zero-Payment and approved-Quality assertions; rerun pending. No destructive source mutation.
+    - date: '2026-10-20'
+      status: MIGRATION_STATE_CHANGED
+      reason: Reporting/Quality and full seed blockers resolved. Exact12 readiness PASS bound to validated candidate digest; populated four-table contract,430 graph from zero, full seed/retry, native523-table recovery and scoped regression verified. billing0018/payments0007 applied only to configured local Development. Post-removal regression and fresh empty graph running; COMPLETE remains NO. No Production or unrelated CEP.
+    - date: '2026-10-20'
+      status: CLOSED_VERIFIED
+      reason: Exact12 PASS;configured local Development billing0018/payments0007 applied.80 snapshots,32 typed/32 generic/160 audit identities and authoritative table counts/digests unchanged;523-to519 tables. Post107 tests plus40 subtests PASS;430 fresh migrations and full seed/retry PASS;system/drift/lint/runtime scans PASS. Registry6 baseline and3 ancillary fixture failures exactly reproduced/attributed;zero unresolved attributable failure.14/14 AC and scoped DoD MET;LEGACY_PAYMENT_RETIREMENT_COMPLETE YES. Production,Human Sign-off,unrelated CEP and wider Gate activation NOT_EXECUTED.
   CEP-065:
     closure_triage:
       category: B
@@ -4384,21 +4401,20 @@ v1_closure_triage:
   - CEP-060
   - CEP-061
   - CEP-062
-  - CEP-064
   - CEP-065
   - CEP-066
   - CEP-068
   category_c_external_parked: []
-  v1_complete: 58
-  v1_partial: 4
+  v1_complete: 59
+  v1_partial: 3
   v1_not_started: 6
   v1_entry_blocked_not_started: 1
   implementation_closable_now: false
   next_action: ESTABLISH_RECORDED_HUMAN_INPUTS_THEN_REPEAT_ENTRY_CHECKS
 repository_state:
   branch: main
-  last_reconciled_head: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
-  origin_main: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
+  last_reconciled_head: d2f9abdd53b4995dbd377dde8aec965970ac5d0d
+  origin_main: d2f9abdd53b4995dbd377dde8aec965970ac5d0d
   integration_checkpoint: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
@@ -4409,7 +4425,6 @@ execution_frontier:
   dependency_ready_current_governed:
   - CEP-057
   - CEP-058
-  - CEP-064
   - CEP-065
   - CEP-069
   - CEP-070
@@ -4421,7 +4436,7 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_LEGACY_PAYMENT_RETIREMENT_READINESS_FAIL
+  current_session_continuation: STOP_AUTHORIZED_RETIREMENT_COMPLETE_NO_UNRELATED_CEP
   current_independent_cep: null
   next_entry_review_candidate: null
   next_candidate_full_entry_eligibility: NO_UNBLOCKED_CANDIDATE_WITHIN_HUMAN_V1_ONLY_SESSION_SCOPE
@@ -4430,8 +4445,8 @@ execution_frontier:
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Human-bounded retirement stopped at PARTIAL. Named registry and Demo Safety blockers closed with valid baseline attribution and6 Safety tests PASS. Exact12 readiness9 PASS/2 FAIL/1 UNVERIFIED; active Reporting legacy settlement reader and full seed Quality review failure remain; full contract graph unverified after failed preflight. Recovery523 tables PASS. No destructive retirement, unrelated CEP, historical dataset reopening or Production action.
-  resume_cep_after_blocker_resolution: CEP-064
+  boundary_reason: Authorized Development Legacy Payment retirement COMPLETE after exact12 PASS and full post-removal proof. Human scope excludes unrelated CEP and Production action;stop at clean authorized boundary.
+  resume_cep_after_blocker_resolution: null
   independent_candidates_entry_status: CEP071_072_REQUIRE_FULL_NONPRODUCTION_ENTRY_REVIEW; CEP078_EXT0024_CURRENT_READINESS_UNVERIFIED
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false

@@ -15,11 +15,8 @@ from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
-from django.db.models import QuerySet
-
 from apps.audit.models import AuditEvent
-from apps.billing.models import ClaimSettlementAllocation
-from apps.payments.models import Payment, PaymentAllocation, PaymentDocumentLink
+from apps.documents.models import RetiredPaymentEvidence
 from apps.treasury.models import TreasuryMovement, TreasuryMovementStatus
 
 PLAN_VERSION = "legacy-payment-disposition-v1"
@@ -119,77 +116,65 @@ def _digest(value: dict[str, Any]) -> str:
 def inventory_legacy_payments(
     *, organization_id: UUID, cutoff: date
 ) -> tuple[SourceRow, ...]:
-    """Inventory every pre-cutoff Payment and its retained dependent identities."""
-    payments: QuerySet[Payment] = Payment.objects.filter(
-        organization_id=organization_id, paid_on__lt=cutoff
-    ).order_by("pk")
-    rows: list[SourceRow] = []
-    for payment in payments.iterator():
+    """Interpret retained excluded sources without importing the retired app."""
+    rows = []
+    for evidence in RetiredPaymentEvidence.objects.filter(
+        organization_id=organization_id
+    ).order_by("pk"):
+        snapshot = evidence.source_snapshot
+        payment = snapshot["payment"]
+        paid_on = date.fromisoformat(payment["paid_on"])
+        if paid_on >= cutoff:
+            continue
+        if _digest(snapshot) != evidence.source_sha256:
+            raise ValueError("Retained source digest mismatch")
         allocations = tuple(
-            (str(pk), str(amount), status, str(contract_id))
-            for pk, amount, status, contract_id in PaymentAllocation.objects.filter(
-                organization_id=organization_id, payment_id=payment.pk
-            )
-            .order_by("pk")
-            .values_list("pk", "amount", "status", "contract_id")
+            (r["id"], r["amount"], r["status"], r["contract_id"])
+            for r in snapshot["allocations"]
         )
-        allocation_ids = tuple(item[0] for item in allocations)
         settlements = tuple(
-            (str(pk), str(amount), status, str(claim_id))
-            for pk, amount, status, claim_id in ClaimSettlementAllocation.objects.filter(
-                organization_id=organization_id,
-                payment_allocation_id__in=allocation_ids,
-            )
-            .order_by("pk")
-            .values_list("pk", "amount", "status", "claim_id")
+            (r["id"], r["amount"], r["status"], r["claim_id"])
+            for r in snapshot["billing_settlements"]
         )
-        settlement_ids = tuple(item[0] for item in settlements)
-        document_links = tuple(
-            (str(pk), str(document_id))
-            for pk, document_id in PaymentDocumentLink.objects.filter(
-                organization_id=organization_id, payment_id=payment.pk
-            )
-            .order_by("pk")
-            .values_list("pk", "document_id")
+        links = tuple(
+            (r["id"], r["document_id"]) for r in snapshot["typed_document_links"]
         )
-        document_link_ids = tuple(item[0] for item in document_links)
-        audit_event_ids = tuple(
+        audit_ids = tuple(
             str(pk)
             for pk in AuditEvent.objects.filter(
-                organization_id=organization_id,
-                entity_id=str(payment.pk),
+                organization_id=organization_id, entity_id=str(evidence.pk)
             )
             .order_by("pk")
             .values_list("pk", flat=True)
         )
         source = {
-            "payment_id": str(payment.pk),
+            "payment_id": str(evidence.pk),
             "organization_id": str(organization_id),
-            "direction": payment.direction,
-            "amount": str(payment.amount),
-            "paid_on": payment.paid_on.isoformat(),
-            "status": payment.status,
-            "party_id": str(payment.party_id or ""),
-            "project_id": str(payment.project_id),
+            "direction": payment["direction"],
+            "amount": payment["amount"],
+            "paid_on": payment["paid_on"],
+            "status": payment["status"],
+            "party_id": payment.get("party_id") or "",
+            "project_id": payment["project_id"],
             "allocations": allocations,
             "settlements": settlements,
-            "document_links": document_links,
-            "audit_event_ids": audit_event_ids,
+            "document_links": links,
+            "audit_event_ids": audit_ids,
         }
         rows.append(
             SourceRow(
-                payment_id=payment.pk,
+                payment_id=evidence.pk,
                 organization_id=organization_id,
-                direction=payment.direction,
-                amount=payment.amount,
-                paid_on=payment.paid_on,
-                status=payment.status,
-                party_id=payment.party_id,
-                project_id=payment.project_id,
-                allocation_ids=allocation_ids,
-                settlement_ids=settlement_ids,
-                document_link_ids=document_link_ids,
-                audit_event_ids=audit_event_ids,
+                direction=payment["direction"],
+                amount=Decimal(payment["amount"]),
+                paid_on=paid_on,
+                status=payment["status"],
+                party_id=UUID(payment["party_id"]) if payment.get("party_id") else None,
+                project_id=UUID(payment["project_id"]),
+                allocation_ids=tuple(r[0] for r in allocations),
+                settlement_ids=tuple(r[0] for r in settlements),
+                document_link_ids=tuple(r[0] for r in links),
+                audit_event_ids=audit_ids,
                 fingerprint=_digest(source),
             )
         )

@@ -367,7 +367,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
     PermissionResource(
         "claim_settlements",
         "تسویه صورت‌وضعیت‌ها",
-        ("billing.ClaimSettlementAllocation",),
+        (),  # Billing adapter; Subledger owns the registered model.
         (
             P.CLAIM_SETTLEMENTS_VIEW,
             P.CLAIM_SETTLEMENTS_ALLOCATE,
@@ -661,17 +661,6 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             P.EXPENSE_CATEGORIES_ARCHIVE,
         ),
         ("apps.expenses.services",),
-    ),
-    PermissionResource(
-        "payments",
-        "پرداخت‌ها",
-        (
-            "payments.Payment",
-            "payments.PaymentAllocation",
-            "payments.PaymentDocumentLink",
-        ),
-        (P.PAYMENTS_VIEW, P.PAYMENTS_CREATE, P.PAYMENTS_VOID, P.PAYMENTS_ALLOCATE),
-        ("apps.payments.services",),
     ),
     PermissionResource(
         "documents",
@@ -2032,7 +2021,6 @@ PERMISSION_MANAGED_APPS = frozenset(
         "billing",
         "estimates",
         "expenses",
-        "payments",
         "documents",
         "daily_reports",
         "workforce",

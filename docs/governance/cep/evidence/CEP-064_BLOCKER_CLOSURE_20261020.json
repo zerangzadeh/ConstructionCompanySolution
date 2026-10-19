@@ -60,5 +60,38 @@
   "complete": "NO",
   "destructive_retirement": false,
   "production_action": false,
-  "unrelated_cep_execution": false
+  "unrelated_cep_execution": false,
+  "continuation": {
+    "baseline": "d2f9abdd53b4995dbd377dde8aec965970ac5d0d",
+    "authority": "supporting/LEGACY_PAYMENT_RETIREMENT_CONTINUATION_20261020.md",
+    "reporting": {
+      "status": "PASS",
+      "focused_tests": 4,
+      "behavior": "Exact AR claim source/version/project/contract; tenant isolation; cutoff and reversal; no Legacy Payment query; no cash plus allocation sum"
+    },
+    "quality": {
+      "status": "PASS",
+      "focused_tests": 6,
+      "policy_change": false,
+      "approval": "Existing submit_quality_record and decide_quality_record services; immutable snapshot, actor, reason and audit; optional document evidence unchanged"
+    },
+    "source_focused": {
+      "passed": 10,
+      "subtests_passed": 6,
+      "private_junit": "report-quality-fresh.xml"
+    },
+    "full_seed": {
+      "development_command": "PASS",
+      "fresh_test": "PASS",
+      "initial_test_failure": "Obsolete64 document-link assertion after approved Legacy Payment link removal; actual32 project links. Corrected to assert32 project links and zero Payment links, plus4 approved closed Quality records. No financial data fabricated.",
+      "empty_preparation_graph": 428,
+      "private_junit": "source-seed-rerun.xml"
+    },
+    "recovery": "Fresh native dump and verified523-table restoration after successful configured Development seed; CEP-064_DEVELOPMENT_RECOVERY.json",
+    "rehearsal": "PASS:populated,430 empty graph,seed/retry,native recovery",
+    "configured_development_destructive_retirement": true,
+    "production_action": false,
+    "post_removal": "PASS",
+    "retirement_complete": "YES"
+  }
 }

@@ -8,7 +8,7 @@ from decimal import Decimal, InvalidOperation
 from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import connection, transaction
-from django.db.models import OuterRef, Subquery, Sum
+from django.db.models import Exists, OuterRef, Q, Subquery, Sum
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -322,9 +322,24 @@ def _claim_settlement(
     )
     claims = _at_cutoff(claims, cutoff_at)
     claims = _scoped(claims, project)
-    allocations = _model("billing.ClaimSettlementAllocation").objects.filter(
-        organization=organization, status="active", claim__in=claims
+    from apps.billing.handoffs import PROGRESS_CLAIM_SOURCE_KIND
+
+    # Exact source/version/context matching prevents unrelated AR or superseded
+    # claim revisions from being counted. Cash is never added to allocations.
+    matched_claims = claims.filter(
+        pk=OuterRef("obligation__source_uuid"),
+        revision_number=OuterRef("obligation__source_version"),
+        project_id=OuterRef("obligation__project_id"),
+        contract_id=OuterRef("obligation__contract_id"),
     )
+    allocations = _model("subledgers.SettlementAllocation").objects.filter(
+        Exists(matched_claims),
+        organization=organization,
+        obligation__organization=organization,
+        obligation__source_kind=PROGRESS_CLAIM_SOURCE_KIND,
+        obligation__direction="receivable",
+        treasury_movement__organization=organization,
+    ).filter(Q(reversal__isnull=True) | Q(reversal__created_at__gt=cutoff_at))
     allocations = _at_cutoff(allocations, cutoff_at)
     return PairData(
         _side(
@@ -335,7 +350,7 @@ def _claim_settlement(
         ),
         _side(
             "Treasury and AP/AR",
-            "billing.ClaimSettlementAllocation",
+            "subledgers.SettlementAllocation",
             allocations,
             amount=_sum(allocations, "amount"),
         ),

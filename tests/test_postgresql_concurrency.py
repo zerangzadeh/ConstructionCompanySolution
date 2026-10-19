@@ -276,8 +276,8 @@ class PostgreSQLSelectForUpdateConcurrencyTests(TransactionTestCase):
         )
 
     # Cash/settlement concurrency is covered through Treasury/Subledger in
-    # apps.billing.test_payment_retirement and apps.treasury.tests. Legacy
-    # void entry points are fail-closed in apps.payments.tests.
+    # apps.billing.test_payment_retirement and apps.treasury.tests. Retired
+    # Payment has no runtime models, services or routes.
 
     def test_concurrent_phase_transition_has_one_winner(self) -> None:
         def transition() -> object:

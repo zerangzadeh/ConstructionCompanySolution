@@ -36,7 +36,7 @@ INSTALLED_APPS: list[str] = [
     "apps.billing",
     "apps.estimates",
     "apps.expenses",
-    "apps.payments",
+    "core.retired_payments.apps.RetiredPaymentsConfig",
     "apps.documents",
     "apps.financials",
     "apps.reporting",

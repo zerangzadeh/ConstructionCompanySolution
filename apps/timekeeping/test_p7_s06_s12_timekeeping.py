@@ -19,7 +19,6 @@ from apps.organizations.models import (
     OrganizationRole,
 )
 from apps.organizations.services import create_organization_with_owner
-from apps.payments.models import Payment
 from apps.projects.models import (
     Activity,
     Project,
@@ -461,7 +460,6 @@ class P7TimekeepingTests(TestCase):
             JournalEntry.objects.count(),
             Obligation.objects.count(),
             TreasuryMovement.objects.count(),
-            Payment.objects.count(),
         )
         preview = generate_labor_distribution_preview(
             organization=self.organization, actor=self.approver, timesheet=sheet
@@ -478,7 +476,6 @@ class P7TimekeepingTests(TestCase):
                 JournalEntry.objects.count(),
                 Obligation.objects.count(),
                 TreasuryMovement.objects.count(),
-                Payment.objects.count(),
             ),
         )
 

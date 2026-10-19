@@ -1,6 +1,6 @@
 # Development retirement contract plan
 
-Status: PREPARED ORDER ONLY; destructive migrations are not installed or executed.
+Status: DEVELOPMENT RETIREMENT COMPLETE after exact12 PASS and all required post-removal validation.
 The exact twelve-condition Human gate remains mandatory. The source population
 decision is final: zero authoritative history, all existing rows excluded demo/test.
 
@@ -36,13 +36,14 @@ decision is final: zero authoritative history, all existing rows excluded demo/t
 8. Only all twelve readiness PASS results permit configured Development contract
    execution. Repeat every required post-removal check before COMPLETE=YES.
 
-Current boundaries: preparation/reference migrations only; no old table/model/app
-removal, no source-row deletion, no Production action, no CEP-069..079 execution.
-The final destructive candidate graph has not been rehearsed and remains
-UNVERIFIED. The prepared reference graph is a separate validation result.
+Current boundary: billing.0018 and payments.0007 are applied to configured local
+Development after exact12 PASS. Four obsolete tables and the runtime app/UI are
+removed; the migration-only payments label remains under core/retired_payments.
+The complete430-migration candidate graph and full seed/retry passed from zero;
+populated contract and native523-table recovery passed. Post-removal107 tests/40 subtests and another complete430-migration empty build,
+full seed/retry and checks PASS;COMPLETE=YES.
+No Production action or unrelated CEP is authorized.
 
-Follow-up2026-10-20: refreshed523-table recovery PASS. Preflight found an active
-Reporting dependency on billing.ClaimSettlementAllocation and full seed Quality
-record-review failure after Safety was fixed. Full destructive graph remains
-UNVERIFIED and is not executed under the exact Human STOP rule. See
-CEP-064_REHEARSAL_PREFLIGHT.json. No new source contract is installed.
+The earlier preflight reader/Quality failures are historical and resolved under
+LEGACY_PAYMENT_RETIREMENT_CONTINUATION_20261020.md. See current readiness,
+DESTRUCTIVE_REHEARSAL and DEVELOPMENT_RETIREMENT evidence.

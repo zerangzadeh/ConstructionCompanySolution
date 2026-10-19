@@ -1,0 +1,96 @@
+{
+  "status": "PASS_SCOPED_RETIREMENT",
+  "date": "2026-10-20",
+  "baseline": "d2f9abdd53b4995dbd377dde8aec965970ac5d0d",
+  "candidate_digest": "e4d485fa172ce93d7c9694f255ad88daeb354b47b5c09d5c9c1e9f4ae8dfd10a",
+  "pre_contract": {
+    "focused_reporting_quality": "10 tests and6 subtests PASS",
+    "full_clean_seed_and_retry": "PASS",
+    "populated_destructive_contract": "PASS",
+    "complete_empty_graph_migrations": 430,
+    "native_recovery_all523_table_counts_and_digests": "PASS",
+    "transition_suite": "107 tests PASS;two introduced tenant-fixture subtests fixed and3-test/21-subtest rerun PASS"
+  },
+  "post_removal": {
+    "focused_and_affected_regression": {
+      "passed": 107,
+      "subtests_passed": 40,
+      "failed": 0,
+      "errors": 0,
+      "junit": "post-tests.xml"
+    },
+    "fresh_empty_database": {
+      "status": "PASS",
+      "database": "bonira_retire_post_empty_20261019_221742",
+      "initial_tables": 0,
+      "applied_migrations": 430,
+      "full_seed_retry_counts_stable": true,
+      "financial_documents_quality_audit_unchanged": true,
+      "tenants": 4,
+      "pending_requests": 64
+    },
+    "configured_development": {
+      "status": "PASS",
+      "environment": "configured-local-development",
+      "removed_tables": [
+        "billing_claimsettlementallocation",
+        "payments_payment",
+        "payments_paymentallocation",
+        "payments_paymentdocumentlink"
+      ],
+      "public_tables_before": 523,
+      "public_tables_after": 519,
+      "treasury_accounting_subledger_documents_audit_quality_counts_and_digests_unchanged": true,
+      "legacy_business_permission_rows": 0,
+      "migration_compatibility_models": 0,
+      "legacy_historical_migrations_byte_identical": true,
+      "candidate_digest": "e4d485fa172ce93d7c9694f255ad88daeb354b47b5c09d5c9c1e9f4ae8dfd10a",
+      "full_post_seed": "PASS",
+      "production_action": false
+    },
+    "system_check": "PASS:0 issues",
+    "migration_drift": "PASS:no changes detected",
+    "full_configured_demo_seed": "PASS:0 new records",
+    "runtime_reference_and_lint": {
+      "status": "PASS",
+      "runtime_imports_of_legacy_app": 0,
+      "old_runtime_package_exists": false,
+      "old_templates_exist": false,
+      "lint_python_files": 26,
+      "remaining_legacy_labels": "Historical migrations, audit action strings and immutable retained-source interpretation only",
+      "production_action": false
+    },
+    "retained_evidence": "80 snapshots;32 typed links;32 generic references;160 audit identifiers"
+  },
+  "baseline_attribution": {
+    "registry": {
+      "passed": 2,
+      "baseline_failed": 6,
+      "subtests_passed": 11,
+      "baseline_defect_sets_equal": true
+    },
+    "ancillary_fixtures": {
+      "passed": 3,
+      "baseline_failed": 3,
+      "original_failure_messages_equal": true
+    },
+    "evidence": "CEP-064_FINAL_REGRESSION_ATTRIBUTION.json",
+    "global_registry_pass_claimed": false,
+    "unresolved_attributable_failure": 0
+  },
+  "private_logs": [
+    "development-contract.log",
+    "post-tests.log",
+    "post-empty-migrate.log",
+    "post-empty-seed.log",
+    "post-empty-seed-retry.log",
+    "post-registry.log",
+    "post-affected-fixtures.log",
+    "post-lint.log"
+  ],
+  "production_action": false,
+  "unrelated_cep_execution": false,
+  "human_signoff": "NOT_EXECUTED",
+  "production_certification": "NOT_EXECUTED",
+  "remaining_utv": "Performance/load and browser/accessibility runtime certification; not required for bounded retirement"
+}

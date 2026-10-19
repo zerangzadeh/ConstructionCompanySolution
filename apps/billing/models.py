@@ -727,11 +727,6 @@ class ClaimAdjustmentType(models.TextChoices):
     OTHER = "other", "سایر"
 
 
-class ClaimSettlementAllocationStatus(models.TextChoices):
-    ACTIVE = "active", "فعال"
-    REVERSED = "reversed", "برگشت‌خورده"
-
-
 class ProgressClaimCorrectionKind(models.TextChoices):
     ORDINARY = "ordinary", "عادی"
     REPLACEMENT = "replacement", "اصلاح جایگزین"
@@ -1049,121 +1044,6 @@ class ProgressClaim(UUIDModel, TimeStampedModel):
                     raise ValidationError("تصویر صورت‌وضعیت ارسالی قابل تغییر نیست.")
         self.full_clean()
         super().save(*args, **kwargs)
-
-
-class ClaimSettlementAllocation(UUIDModel, TimeStampedModel):
-    """An append-only settlement against an existing contract payment allocation."""
-
-    organization = models.ForeignKey(
-        "organizations.Organization",
-        on_delete=models.CASCADE,
-        related_name="claim_settlement_allocations",
-    )
-    claim = models.ForeignKey(
-        ProgressClaim,
-        on_delete=models.PROTECT,
-        related_name="settlement_allocations",
-    )
-    payment_allocation = models.ForeignKey(
-        "payments.PaymentAllocation",
-        on_delete=models.PROTECT,
-        related_name="claim_settlement_allocations",
-    )
-    amount = models.DecimalField(max_digits=18, decimal_places=2)
-    reason = models.TextField()
-    status = models.CharField(
-        max_length=20,
-        choices=ClaimSettlementAllocationStatus.choices,
-        default=ClaimSettlementAllocationStatus.ACTIVE,
-    )
-    reversed_at = models.DateTimeField(null=True, blank=True)
-    reversed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="claim_settlement_allocations_reversed",
-    )
-    reversal_reason = models.TextField(blank=True)
-    created_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="claim_settlement_allocations_created",
-    )
-
-    class Meta:
-        verbose_name = "تخصیص تسویه صورت‌وضعیت"
-        verbose_name_plural = "تخصیص‌های تسویه صورت‌وضعیت"
-        constraints = [  # noqa: RUF012
-            models.CheckConstraint(
-                condition=Q(amount__gt=0),
-                name="claim_settlement_amount_positive",
-            )
-        ]
-        indexes = [  # noqa: RUF012
-            models.Index(
-                fields=["organization", "claim", "status"],
-                name="clm_set_org_clm_stat_idx",
-            ),
-            models.Index(
-                fields=["organization", "payment_allocation", "status"],
-                name="clm_set_org_pay_stat_idx",
-            ),
-        ]
-
-    def clean(self) -> None:
-        super().clean()
-        relations = {}
-        if self.claim_id:
-            relations["claim"] = self.claim
-        if self.payment_allocation_id:
-            relations["payment_allocation"] = self.payment_allocation
-        validate_related_organizations(self, **relations)
-        if self.amount <= 0:
-            raise ValidationError({"amount": "مبلغ تسویه باید مثبت باشد."})
-        if self.amount != self.amount.quantize(MONEY_QUANTUM):
-            raise ValidationError({"amount": "مبلغ تسویه حداکثر دو رقم اعشار دارد."})
-        if not self.reason.strip():
-            raise ValidationError({"reason": "دلیل تسویه الزامی است."})
-        if self.claim_id and self.payment_allocation_id:
-            allocation = self.payment_allocation
-            if (
-                allocation.contract_id != self.claim.contract_id
-                or allocation.payment.project_id != self.claim.project_id
-            ):
-                raise ValidationError(
-                    "تخصیص پرداخت باید با پروژه و قرارداد صورت‌وضعیت هم‌راستا باشد."
-                )
-        if self.status == ClaimSettlementAllocationStatus.REVERSED and (
-            not self.reversed_at or not self.reversed_by_id or not self.reversal_reason
-        ):
-            raise ValidationError("برگشت تسویه باید شواهد کامل داشته باشد.")
-
-    def save(self, *args: object, **kwargs: object) -> None:
-        if self.pk and not self._state.adding:
-            previous = type(self).objects.get(pk=self.pk)
-            immutable_fields = (
-                "organization_id",
-                "claim_id",
-                "payment_allocation_id",
-                "amount",
-                "reason",
-                "created_by_id",
-            )
-            if any(
-                getattr(previous, field) != getattr(self, field)
-                for field in immutable_fields
-            ):
-                raise ValidationError("تخصیص تسویه قابل تغییر نیست.")
-            if previous.status == ClaimSettlementAllocationStatus.REVERSED:
-                raise ValidationError("تخصیص تسویه برگشت‌خورده قابل تغییر نیست.")
-        self.full_clean()
-        super().save(*args, **kwargs)
-
-    def delete(self, *args: object, **kwargs: object) -> tuple[int, dict[str, int]]:
-        raise ValidationError("تخصیص تسویه حذف نمی‌شود؛ مسیر برگشت را استفاده کنید.")
 
 
 class ProgressClaimItem(UUIDModel, TimeStampedModel):

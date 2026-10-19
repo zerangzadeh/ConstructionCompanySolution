@@ -1,0 +1,42 @@
+{
+  "status": "PASS",
+  "environment": "local Development only",
+  "baseline": "d2f9abdd53b4995dbd377dde8aec965970ac5d0d",
+  "populated_clone": {
+    "status": "PASS",
+    "database": "bonira_retire_populated_20261019_215426",
+    "removed_tables": [
+      "billing_claimsettlementallocation",
+      "payments_payment",
+      "payments_paymentallocation",
+      "payments_paymentdocumentlink"
+    ],
+    "table_count": 519,
+    "authoritative_financial_documents_audit_unchanged": true,
+    "checkpoint": "E:\\Construction_Company_Solution\\output\\legacy-payment-retirement-private\\20261019_212443\\recovery.json",
+    "contract_sha256": "46ce869cd4c6722355c8dbd3698d947a252651be6390d16107c8fa3883a23941",
+    "source_inventory_fingerprints_stable": true
+  },
+  "complete_empty_graph": {
+    "status": "PASS",
+    "database": "bonira_retire_empty_20261019_215551",
+    "initial_tables": 0,
+    "applied_migrations": 430,
+    "full_seed_retry_counts_stable": true,
+    "financial_documents_quality_audit_unchanged": true,
+    "tenants": 4,
+    "pending_requests": 64
+  },
+  "rollback_recovery": {
+    "status": "PASS",
+    "database": "bonira_retire_recovered_20261019_215517",
+    "all_tables_counts_digests_match": true,
+    "table_count": 523,
+    "after_destructive_rehearsal": true,
+    "recovery_method": "Native checkpoint restored into new local DB; configured Development untouched",
+    "pre_contract_code_system_check": "PASS",
+    "pre_contract_code_original_source_retention": "PASS:80 sources,32 typed links,32 generic references,160 audit identifiers"
+  },
+  "rollback_method": "Restore full native pre-contract checkpoint to a separate database; verify all tables and use pre-contract code d2f9abd. Destructive schema downgrade intentionally unavailable; it cannot reconstruct deleted rows.",
+  "production_action": false
+}

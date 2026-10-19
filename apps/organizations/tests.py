@@ -590,7 +590,7 @@ class GlobalRoleAuthorizationTests(TestCase):
             has_business_permission(
                 user=self.user,
                 organization=self.organization,
-                permission=BusinessPermissionCode.PAYMENTS_CREATE,
+                permission=BusinessPermissionCode.TREASURY_MOVEMENTS_CREATE,
             )
         )
 
@@ -634,7 +634,9 @@ class GlobalRoleAuthorizationTests(TestCase):
             name="کارشناس پرداخت",
         )
         powerful_role.permissions.add(
-            BusinessPermission.objects.get(code=BusinessPermissionCode.PAYMENTS_CREATE)
+            BusinessPermission.objects.get(
+                code=BusinessPermissionCode.TREASURY_MOVEMENTS_CREATE
+            )
         )
         actor_membership = OrganizationMembership.objects.create(
             organization=self.organization,

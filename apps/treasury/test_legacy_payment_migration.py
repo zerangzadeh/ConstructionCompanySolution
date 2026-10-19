@@ -21,8 +21,8 @@ from apps.treasury.legacy_payment_migration import (
 class LegacyPopulationInventoryTests(TestCase):
     def test_inventory_is_tenant_scoped_and_retains_stable_source_evidence(self):
         from apps.accounts.models import User
+        from apps.documents.models import RetiredPaymentEvidence
         from apps.organizations.services import create_organization_with_owner
-        from apps.payments.models import Payment
         from apps.projects.services import create_project
 
         owner = User.objects.create_user(username="retirement-inventory")
@@ -34,16 +34,29 @@ class LegacyPopulationInventoryTests(TestCase):
             project = create_project(
                 organization=org, actor=owner, code="INV", name="Inventory"
             )
-            # Deliberate demo source fixture, never a current operation.
-            payment = Payment.objects.create(
+            # Retained evidence represents excluded demo data, never new cash.
+            from apps.treasury.legacy_payment_migration import _digest
+
+            snapshot = {
+                "payment": {
+                    "direction": "receipt",
+                    "amount": "10.00",
+                    "paid_on": "2026-01-01",
+                    "status": "posted",
+                    "party_id": None,
+                    "project_id": str(project.pk),
+                },
+                "allocations": [],
+                "billing_settlements": [],
+                "typed_document_links": [],
+            }
+            payment = RetiredPaymentEvidence.objects.create(
                 organization=org,
                 project=project,
                 payment_number="DEMO",
-                direction="receipt",
-                amount=Decimal(10),
-                paid_on=date(2026, 1, 1),
-                counterparty_name="Demo",
-                created_by=owner,
+                source_snapshot=snapshot,
+                source_sha256=_digest(snapshot),
+                authority_reference=ZERO_POPULATION_AUTHORITY,
             )
             sources.append((org, payment))
         for org, payment in sources:

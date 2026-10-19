@@ -13,7 +13,7 @@
                                 <svg viewBox="0 0 24 24"><path d="M3 7h6l2 2h10v11H3zM3 7V5h6l2 2"/></svg>
                             {% elif app.app_label == "contracts" or app.app_label == "documents" %}
                                 <svg viewBox="0 0 24 24"><path d="M6 2h9l4 4v16H6zM14 2v5h5M9 12h7M9 16h7"/></svg>
-                            {% elif app.app_label == "estimates" or app.app_label == "payments" or app.app_label == "expenses" %}
+                            {% elif app.app_label == "estimates" or app.app_label == "expenses" %}
                                 <svg viewBox="0 0 24 24"><path d="M4 3h16v18H4zM8 7h8M8 11h2M14 11h2M8 15h2M14 15h2M8 19h8"/></svg>
                             {% elif app.app_label == "materials" %}
                                 <svg viewBox="0 0 24 24"><path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/></svg>
@@ -26,7 +26,7 @@
                             {% endif %}
                         </span>
                         <span class="erp-admin-app-title-copy">
-                            <strong>{% if app.app_label == "accounts" %}حساب‌های کاربری{% elif app.app_label == "organizations" %}شرکت‌ها{% elif app.app_label == "projects" %}پروژه‌ها{% elif app.app_label == "contracts" %}قراردادها{% elif app.app_label == "estimates" %}برآوردها{% elif app.app_label == "expenses" %}هزینه‌ها{% elif app.app_label == "payments" %}پرداخت‌ها{% elif app.app_label == "documents" %}اسناد{% elif app.app_label == "daily_reports" %}گزارش‌های روزانه{% elif app.app_label == "parties" %}طرف‌های تجاری{% elif app.app_label == "materials" %}مصالح و واحدها{% elif app.app_label == "audit" %}ممیزی{% elif app.app_label == "auth" %}احراز هویت و مجوزهای فنی{% else %}{{ app.name }}{% endif %}</strong>
+                            <strong>{% if app.app_label == "accounts" %}حساب‌های کاربری{% elif app.app_label == "organizations" %}شرکت‌ها{% elif app.app_label == "projects" %}پروژه‌ها{% elif app.app_label == "contracts" %}قراردادها{% elif app.app_label == "estimates" %}برآوردها{% elif app.app_label == "expenses" %}هزینه‌ها{% elif app.app_label == "documents" %}اسناد{% elif app.app_label == "daily_reports" %}گزارش‌های روزانه{% elif app.app_label == "parties" %}طرف‌های تجاری{% elif app.app_label == "materials" %}مصالح و واحدها{% elif app.app_label == "audit" %}ممیزی{% elif app.app_label == "auth" %}احراز هویت و مجوزهای فنی{% else %}{{ app.name }}{% endif %}</strong>
                             {% if not sidebar_mode %}<small>مدیریت اطلاعات و عملیات این بخش</small>{% endif %}
                         </span>
                     {% if sidebar_mode %}</span>{% else %}</a>{% endif %}

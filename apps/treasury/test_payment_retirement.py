@@ -6,6 +6,7 @@ from datetime import date
 from decimal import Decimal
 from tempfile import TemporaryDirectory
 
+from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase, override_settings
@@ -27,14 +28,6 @@ from apps.organizations.models import (
 )
 from apps.organizations.services import create_organization_with_owner
 from apps.parties.models import BusinessParty, PartyKind
-from apps.payments.models import Payment
-from apps.payments.services import (
-    allocate_payment,
-    create_payment,
-    get_organization_payments,
-    reverse_payment_allocation,
-    void_payment,
-)
 from apps.projects.services import create_project
 from apps.treasury.models import (
     PaymentRequest,
@@ -140,7 +133,7 @@ class TreasuryPaymentReplacementTests(TestCase):
         self.assertTrue(
             TreasuryMovement.objects.filter(reverses=movement, status="posted").exists()
         )
-        self.assertEqual(Payment.objects.count(), 0)
+        self.assertEqual(list(apps.get_app_config("payments").get_models()), [])
 
     def test_ui_csrf_and_cross_tenant_targets_fail_closed(self):
         client = self.login(Client(enforce_csrf_checks=True))
@@ -167,17 +160,11 @@ class TreasuryPaymentReplacementTests(TestCase):
         self.assertNotContains(response, str(self.cash.bank.pk))
         self.assertEqual(self.client.get("/payments/").status_code, 404)
 
-    def test_legacy_service_compatibility_cannot_read_or_mutate(self):
-        for service in (
-            create_payment,
-            void_payment,
-            allocate_payment,
-            reverse_payment_allocation,
-            get_organization_payments,
-        ):
-            with self.subTest(service=service), self.assertRaises(PermissionDenied):
-                service(organization=self.organization, actor=self.owner)
-        self.assertEqual(Payment.objects.count(), 0)
+    def test_retired_runtime_has_no_models_or_service_module(self):
+        import importlib.util
+
+        self.assertEqual(list(apps.get_app_config("payments").get_models()), [])
+        self.assertIsNone(importlib.util.find_spec("apps.payments"))
 
     def test_financial_projection_requires_treasury_source_permission(self):
         user = User.objects.create_user(username="projection-only")
@@ -202,15 +189,19 @@ class TreasuryPaymentReplacementTests(TestCase):
         movement = self.cash.post(self.movement())
         self.movement(kind="disbursement", idempotency_key="PENDING")
         # Excluded demo data is deliberately present to prove source separation.
-        Payment.objects.create(
+        snapshot = {
+            "disposition": "excluded_demo_test",
+            "payment": {"amount": "100.00"},
+        }
+        RetiredPaymentEvidence.objects.create(
             organization=self.organization,
             project=self.project,
             payment_number="EXCLUDED-DEMO",
-            direction="receipt",
-            amount=Decimal(100),
-            paid_on=date(2026, 10, 19),
-            counterparty_name="Demo",
-            created_by=self.owner,
+            source_snapshot=snapshot,
+            source_sha256=hashlib.sha256(
+                json.dumps(snapshot, sort_keys=True, separators=(",", ":")).encode()
+            ).hexdigest(),
+            authority_reference="test-only",
         )
 
         def report():
@@ -313,4 +304,4 @@ class TreasuryPaymentReplacementTests(TestCase):
         self.assertEqual(PaymentRequest.objects.count(), 4)
         self.assertEqual(PaymentRequest.objects.exclude(status="draft").count(), 0)
         self.assertEqual(TreasuryMovement.objects.count(), 0)
-        self.assertEqual(Payment.objects.count(), 0)
+        self.assertEqual(list(apps.get_app_config("payments").get_models()), [])

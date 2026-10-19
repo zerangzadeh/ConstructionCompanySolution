@@ -149,13 +149,13 @@ class P11AuthorizationTests(TestCase):
             reason="project A only",
         )
         codes = membership_permission_codes(membership)
-        self.assertIn(BusinessPermissionCode.PAYMENTS_VIEW, codes)
+        self.assertIn(BusinessPermissionCode.TREASURY_VIEW, codes)
         self.assertIn(BusinessPermissionCode.ACTIVITIES_CREATE, codes)
         self.assertTrue(
             has_business_permission(
                 user=membership.user,
                 organization=self.organization,
-                permission=BusinessPermissionCode.PAYMENTS_VIEW,
+                permission=BusinessPermissionCode.TREASURY_VIEW,
                 project=self.project_a,
             )
         )
@@ -163,7 +163,7 @@ class P11AuthorizationTests(TestCase):
             has_business_permission(
                 user=membership.user,
                 organization=self.organization,
-                permission=BusinessPermissionCode.PAYMENTS_VIEW,
+                permission=BusinessPermissionCode.TREASURY_VIEW,
                 project=self.project_b,
             )
         )

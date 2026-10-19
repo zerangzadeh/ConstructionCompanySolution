@@ -1,0 +1,310 @@
+{
+  "status": "PASS_NO_NEW_REGISTRY_DEFECT",
+  "exact_baseline_defect_sets_equal": true,
+  "obsolete_registered_codes_removed": [
+    "payments.allocate",
+    "payments.create",
+    "payments.view",
+    "payments.void"
+  ],
+  "global_registry_status": "BASELINE_FAILURES_PRESERVED",
+  "diagnostics": {
+    "database_extra": [
+      "support.access_platform_approve",
+      "support.access_request",
+      "support.access_revoke",
+      "support.access_tenant_confirm",
+      "support.access_use",
+      "support.audit_reconcile",
+      "support.calendar_view",
+      "support.case_assign",
+      "support.case_create",
+      "support.case_reopen",
+      "support.case_resolve",
+      "support.case_update",
+      "support.case_view",
+      "support.evidence_link",
+      "support.evidence_sensitive_view",
+      "support.notifications_acknowledge",
+      "support.notifications_view"
+    ],
+    "database_missing": [],
+    "duplicate_models": [
+      "payroll.FinancialHandoffLine",
+      "payroll.FinancialHandoffProposal",
+      "payroll.FinancialHandoffReview",
+      "payroll.Payslip"
+    ],
+    "extra_models": [
+      "commercial.TenderBid",
+      "commercial.TenderBidEvidence",
+      "commercial.TenderBidRevision",
+      "compliance.CapaAction",
+      "compliance.ComplianceDownstreamProposal",
+      "compliance.ComplianceEvidenceLink",
+      "compliance.ComplianceLifecycleEvent",
+      "compliance.Inspection",
+      "compliance.InspectionFinding",
+      "compliance.InspectionTemplate",
+      "compliance.InspectionTemplateVersion",
+      "compliance.Nonconformance",
+      "compliance.Permit",
+      "compliance.QualityTest",
+      "compliance.TestResult",
+      "fixed_assets.AssetBookPolicyVersion",
+      "fixed_assets.AssetReconciliationEvidence",
+      "fixed_assets.AssetSourceReference",
+      "fixed_assets.AssetTransaction",
+      "fixed_assets.DepreciationLine",
+      "fixed_assets.DepreciationRun",
+      "fixed_assets.FixedAsset",
+      "fixed_assets.FixedAssetClassVersion",
+      "fixed_assets.FixedAssetEquipmentLink",
+      "fixed_assets.FixedAssetSourceEnvelope",
+      "knowledge.KnowledgeCandidate",
+      "knowledge.KnowledgeCandidateRevision",
+      "knowledge.KnowledgePromotion",
+      "knowledge.KnowledgePromotionEvent",
+      "knowledge.KnowledgePublication",
+      "knowledge.KnowledgePublicationEvent",
+      "knowledge.KnowledgePublicationVersion",
+      "knowledge.KnowledgeRecurrenceEvidence",
+      "knowledge.KnowledgeRecurrenceSource",
+      "knowledge.KnowledgeReuseEvidence",
+      "knowledge.KnowledgeReview",
+      "knowledge.KnowledgeSourcePin",
+      "partner_qualification.PartnerCategoryApproval",
+      "partner_qualification.PartnerEligibilityProposal",
+      "partner_qualification.PartnerEvaluation",
+      "partner_qualification.PartnerEvaluationAppeal",
+      "partner_qualification.PartnerEvidence",
+      "partner_qualification.PartnerProfile",
+      "partner_qualification.PartnerQualification",
+      "partner_qualification.QualificationRequirement",
+      "reporting.MetricDefinition",
+      "reporting.MetricDefinitionVersion",
+      "reporting.MetricExportManifest",
+      "reporting.MetricRefreshRun",
+      "reporting.MetricResult",
+      "reporting.MetricResultReview",
+      "reporting.ProjectCloseoutAssessment",
+      "reporting.ProjectCloseoutCase",
+      "reporting.ProjectCloseoutEvent",
+      "reporting.ProjectCloseoutEvidenceLink",
+      "reporting.ProjectCloseoutExportManifest",
+      "reporting.ProjectCloseoutItemSnapshot",
+      "reporting.ProjectCloseoutProfileDefinition",
+      "reporting.ProjectCloseoutProfileVersion",
+      "reporting.ReconciliationEvidenceLink",
+      "reporting.ReconciliationException",
+      "reporting.ReconciliationExceptionEvent",
+      "reporting.ReconciliationPairDefinition",
+      "reporting.ReconciliationPairVersion",
+      "reporting.ReconciliationRebuildCheck",
+      "reporting.ReconciliationRun",
+      "reporting.ReconciliationRunReview",
+      "reporting.ReconciliationSideSnapshot",
+      "reporting.ReconciliationTieOut",
+      "reporting.ReportingSavedView",
+      "timekeeping.AttendanceAdjustment",
+      "timekeeping.AttendanceCorrectionRequest",
+      "timekeeping.AttendanceImportBatch",
+      "timekeeping.AttendanceImportRow",
+      "timekeeping.AttendanceReconciliation",
+      "timekeeping.AttendanceRecord",
+      "timekeeping.CalendarHoliday",
+      "timekeeping.LaborDistributionPreview",
+      "timekeeping.LaborDistributionPreviewLine",
+      "timekeeping.LeaveMissionRequest",
+      "timekeeping.OvertimeRequest",
+      "timekeeping.RosterSlot",
+      "timekeeping.RosterVersion",
+      "timekeeping.ShiftBreak",
+      "timekeeping.ShiftDefinition",
+      "timekeeping.Timesheet",
+      "timekeeping.TimesheetEntry",
+      "timekeeping.TimesheetReview",
+      "timekeeping.WorkCalendar"
+    ],
+    "missing_enforcement": {
+      "accounting_recognition": [
+        "ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE",
+        "ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE",
+        "ACCOUNTING_RECOGNITION_PREPARE",
+        "ACCOUNTING_RECOGNITION_VIEW"
+      ],
+      "attendance": [
+        "ATTENDANCE_VIEW"
+      ],
+      "compliance_controls": [
+        "COMPLIANCE_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "equipment_operations": [
+        "EQUIPMENT_OPERATIONS_VIEW",
+        "EQUIPMENT_SPARE_LINKS_RECONCILE",
+        "EQUIPMENT_WORK_ORDERS_REOPEN"
+      ],
+      "hr_certificates": [
+        "HR_CERTIFICATES_CANCEL",
+        "HR_CERTIFICATES_CONFIGURE",
+        "HR_CERTIFICATES_GENERATE",
+        "HR_CERTIFICATES_REQUEST",
+        "HR_CERTIFICATES_REVIEW",
+        "HR_CERTIFICATES_VIEW"
+      ],
+      "inventory_traceability": [
+        "INVENTORY_TRACEABILITY_VIEW"
+      ],
+      "inventory_valuation": [
+        "INVENTORY_VALUATION_VIEW"
+      ],
+      "knowledge": [
+        "KNOWLEDGE_AUDIT_RECONCILE",
+        "KNOWLEDGE_EXPORT",
+        "KNOWLEDGE_TAXONOMY_MANAGE"
+      ],
+      "leave_authority": [
+        "LEAVE_BALANCES_MANAGE",
+        "LEAVE_BALANCES_VIEW",
+        "LEAVE_POLICIES_MANAGE"
+      ],
+      "leave_mission": [
+        "LEAVE_MISSION_VIEW"
+      ],
+      "material_attributes": [
+        "MATERIAL_DOCUMENTS_LINK"
+      ],
+      "overtime": [
+        "OVERTIME_VIEW"
+      ],
+      "partner_qualification": [
+        "PARTNER_AUDIT_RECONCILE",
+        "PARTNER_EXPORT",
+        "PARTNER_SENSITIVE_EVIDENCE_VIEW"
+      ],
+      "payroll_ess": [
+        "PAYROLL_ESS_EXPORT",
+        "PAYROLL_ESS_VIEW"
+      ],
+      "payroll_inquiries": [
+        "PAYROLL_INQUIRIES_REQUEST",
+        "PAYROLL_INQUIRIES_RESPOND"
+      ],
+      "personal_data": [
+        "PERSONAL_DATA_CONFIGURE",
+        "PERSONAL_DATA_REQUEST",
+        "PERSONAL_DATA_REVIEW",
+        "PERSONAL_DATA_VIEW"
+      ],
+      "price_books": [
+        "PRICE_BOOKS_ACTIVATE",
+        "PRICE_BOOKS_MANAGE",
+        "PRICE_BOOK_MAPPINGS_MANAGE"
+      ],
+      "subledgers_payroll": [
+        "SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE",
+        "SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE",
+        "SUBLEDGERS_PAYROLL_PREPARE",
+        "SUBLEDGERS_PAYROLL_VIEW"
+      ],
+      "time_calendars": [
+        "TIME_CALENDARS_VIEW"
+      ],
+      "timesheets": [
+        "TIMESHEETS_VIEW"
+      ],
+      "variation_billing_eligibility": [
+        "BILLING_VARIATION_ELIGIBILITY_RETRY",
+        "BILLING_VARIATION_ELIGIBILITY_VIEW"
+      ]
+    },
+    "missing_models": [
+      "contracts.ContractDocumentLink",
+      "daily_reports.DailyReportDocumentLink",
+      "documents.PhotoMetadata",
+      "equipment.DowntimeEvent",
+      "equipment.EquipmentUsageLog",
+      "equipment.FuelLog",
+      "equipment.MaintenancePlan",
+      "equipment.MaintenanceSparePartReference",
+      "equipment.MaintenanceWorkOrderEvidence",
+      "equipment.MeterReading",
+      "equipment.OperatorEquipmentQualification",
+      "estimates.EstimateDocumentLink",
+      "expenses.ExpenseDocumentLink",
+      "expenses.PlatformExpenseGroup",
+      "inventory.InventoryValuationException",
+      "inventory.InventoryValuationPool",
+      "materials.MaterialAlias",
+      "materials.MaterialAttributeImportRow",
+      "materials.MaterialDocumentLink",
+      "materials.MaterialDuplicateCandidate",
+      "materials.MaterialRelationship",
+      "materials.MaterialSupersession",
+      "materials.MaterialTechnicalApproval",
+      "materials.QuantityConversionSnapshot",
+      "materials.QuantityRoundingPolicyVersion",
+      "materials.UnitConversionVersion",
+      "materials.UnitFamily",
+      "organizations.PlatformPolicyVersionSource",
+      "payroll.StatutorySourcePackage",
+      "projects.ProjectDocumentLink",
+      "projects.ProjectSiteDocumentLink",
+      "subledgers.WriteOffCorrection",
+      "workforce.EmployeeIdentityMigration",
+      "workforce.Person",
+      "workforce.WorkRelationship",
+      "workforce.WorkRelationshipDocumentLink",
+      "workforce.WorkRelationshipRevision"
+    ],
+    "unregistered_enum": [
+      "support.access_platform_approve",
+      "support.access_request",
+      "support.access_revoke",
+      "support.access_tenant_confirm",
+      "support.access_use",
+      "support.audit_reconcile",
+      "support.calendar_view",
+      "support.case_assign",
+      "support.case_create",
+      "support.case_reopen",
+      "support.case_resolve",
+      "support.case_update",
+      "support.case_view",
+      "support.evidence_link",
+      "support.evidence_sensitive_view",
+      "support.notifications_acknowledge",
+      "support.notifications_view"
+    ]
+  },
+  "ancillary_fixtures": {
+    "classification": "BASELINE TEST DEBT",
+    "count": 3,
+    "baseline": "original fixtures/current pre-retirement code on restored pre-contract schema",
+    "same_failure_messages_proved": true,
+    "before_any_modified_retirement_assertion": true,
+    "cause": "Project creation permission missing in Estimate and Budget fixtures; timesheet reviewer permission/scope missing in Timekeeping fixture.",
+    "affected_tests": [
+      "EstimateDepthTests.test_preview_rejects_formula_and_unknown_mapping_without_mutation",
+      "BudgetPreparationTests.test_acceptance_does_not_mutate_financial_or_legacy_authorities",
+      "P7TimekeepingTests.test_s11_s12_conservation_immutability_review_and_non_posting_preview"
+    ],
+    "existing_tests_or_product_authorization_weakened": false
+  },
+  "registry_test_outcome": {
+    "passed": 2,
+    "baseline_failed": 6,
+    "subtests_passed": 11,
+    "new_defect_sets": 0
+  },
+  "accepted_authority": "LEGACY_PAYMENT_RETIREMENT_DECISION_20261020.md; latest continuation preserves settled registry disposition; Execution Policy section16.",
+  "post_registry": {
+    "passed": 2,
+    "baseline_failed": 6,
+    "subtests_passed": 11,
+    "defect_sets_equal_after_order_normalization": true,
+    "remaining_unregistered_support_codes": 17,
+    "obsolete_payment_codes_present": 0,
+    "candidate_test_catalog_pollution": "Initial candidate database catalog assertion included4 obsolete codes recreated by pre-contract characterization. Final configured/post catalogs contain zero; independent diagnostic sets matched baseline. This was test infrastructure, not runtime authority."
+  }
+}

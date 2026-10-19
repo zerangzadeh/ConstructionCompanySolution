@@ -176,7 +176,14 @@ def test_seed_demo_data_creates_four_persian_tenants_and_is_idempotent(
     assert QualityIssue.objects.filter(organization__in=organizations).count() == 16
     assert Document.objects.filter(organization__in=organizations).count() == 32
     assert DocumentVersion.objects.filter(organization__in=organizations).count() == 32
-    assert DocumentLink.objects.filter(organization__in=organizations).count() == 64
+    # Each of 32 documents has its project link. Pending Treasury requests do
+    # not fabricate cash or the 32 obsolete Legacy Payment document links.
+    links = DocumentLink.objects.filter(organization__in=organizations)
+    assert links.count() == 32
+    assert links.filter(project__isnull=False, payment__isnull=True).count() == 32
+    assert QualityIssue.objects.filter(
+        organization__in=organizations, status="closed", review_status="approved"
+    ).count() == 4
     assert WorkflowCondition.objects.filter(organization__in=organizations).count() == 4
     assert (
         WorkflowInstance.objects.filter(

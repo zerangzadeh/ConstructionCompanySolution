@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
+from apps.accounts.models import User
 from apps.contracts.models import Contract
 from apps.daily_reports.models import (
     DailyReport,
@@ -17,8 +18,8 @@ from apps.documents.models import Document, DocumentLink, DocumentVersion
 from apps.estimates.models import Estimate, EstimateItem
 from apps.expenses.models import Expense
 from apps.organizations.models import Organization
-from apps.payments.models import Payment, PaymentDirection
 from apps.projects.models import Project, ProjectPhase, ProjectSite
+from apps.treasury.models import TreasuryMovement
 
 
 class TenantModelValidationTests(TestCase):
@@ -59,6 +60,11 @@ class TenantModelValidationTests(TestCase):
         )
 
     def test_direct_saves_reject_cross_tenant_relationships(self) -> None:
+        actor = self.organization.memberships.create(
+            user=User.objects.create_user(username="tenant-movement-actor"),
+            role="company_owner",
+            status="active",
+        )
         invalid_models = [
             ProjectSite(
                 organization=self.organization,
@@ -93,14 +99,16 @@ class TenantModelValidationTests(TestCase):
                 amount=Decimal("1.00"),
                 incurred_on=timezone.localdate(),
             ),
-            Payment(
+            TreasuryMovement(
                 organization=self.organization,
                 project=self.other_project,
-                payment_number="X",
-                direction=PaymentDirection.RECEIPT,
+                kind="receipt",
                 amount=Decimal("1.00"),
-                paid_on=timezone.localdate(),
-                counterparty_name="Counterparty",
+                movement_date=timezone.localdate(),
+                description="Invalid tenant",
+                idempotency_key="TENANT-FAIL",
+                payload_hash="x" * 64,
+                created_by=actor,
             ),
             DailyReport(
                 organization=self.organization,
@@ -155,6 +163,8 @@ class TenantModelValidationTests(TestCase):
     def test_business_admin_mutations_are_disabled(self) -> None:
         request = RequestFactory().get("/admin/")
         request.user = AnonymousUser()
+        # Treasury exposes its governed product services; there is no admin CRUD.
+        self.assertNotIn(TreasuryMovement, admin.site._registry)
         models = [
             Organization,
             Project,
@@ -163,7 +173,6 @@ class TenantModelValidationTests(TestCase):
             Contract,
             Estimate,
             Expense,
-            Payment,
             Document,
             DocumentVersion,
             DocumentLink,
