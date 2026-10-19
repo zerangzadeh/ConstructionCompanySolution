@@ -1,0 +1,759 @@
+diff --git a/apps/reporting/read_models.py b/apps/reporting/read_models.py
+new file mode 100644
+index 0000000..3f5b88c
+--- /dev/null
++++ b/apps/reporting/read_models.py
+@@ -0,0 +1,247 @@
++"""Read-only reporting layers over the closed, source-owned metric catalogue."""
++
++from dataclasses import dataclass
++from datetime import datetime
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db.models import F, Q, Window
++from django.db.models.functions import RowNumber
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.authorization import (
++    has_business_permission,
++    require_business_permission,
++    scope_queryset,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.projects.models import Project
++
++from .catalog import METRIC_SPECS
++from .models import (
++    MetricFreshness,
++    MetricResult,
++    MetricResultReview,
++    MetricRunStatus,
++    MetricVersionStatus,
++)
++
++DENIED = "نتیجه شاخص در دسترس نیست."
++
++
++@dataclass(frozen=True)
++class MetricCard:
++    result: MetricResult
++    reviewed: bool
++    usable: bool
++    can_drillthrough: bool
++
++
++@dataclass(frozen=True)
++class ReportingLayer:
++    code: str
++    title: str
++    description: str
++    cards: tuple[MetricCard, ...]
++    available: bool = True
++
++
++@dataclass(frozen=True)
++class ReportingReadModel:
++    as_of: datetime
++    observed_at: datetime
++    layers: tuple[ReportingLayer, ...]
++
++
++def _visible(
++    *, result: MetricResult, organization: Organization, actor: User, projects: dict
++) -> bool:
++    """Check the whole retained source scope before any grouping or display."""
++    definition = result.run.metric_version.definition
++    if (
++        result.organization_id != organization.pk
++        or result.run.organization_id != organization.pk
++        or result.project_id != result.run.project_id
++        or result.metric_code != definition.code
++        or result.metric_code not in METRIC_SPECS
++        or definition.source_permission
++        != METRIC_SPECS[result.metric_code]["source_permission"]
++    ):
++        return False
++    permissions = [P.REPORTING_METRIC_RESULT_VIEW, definition.source_permission]
++    if definition.sensitivity != "normal":
++        permissions.append(P.REPORTING_METRIC_RESULT_VIEW_SENSITIVE)
++    manifest = result.source_manifest
++    if manifest.get("scope_kind") == "organization":
++        return all(
++            has_business_permission(
++                user=actor, organization=organization, permission=permission
++            )
++            for permission in permissions
++        )
++    ids = manifest.get("scope_project_ids")
++    if (
++        manifest.get("scope_kind") != "project_set"
++        or not isinstance(ids, list)
++        or any(not isinstance(value, str) or value not in projects for value in ids)
++        or (result.project_id and set(ids) != {str(result.project_id)})
++    ):
++        return False
++    # An empty result still requires source permission and explicit active scope.
++    return all(
++        has_business_permission(
++            user=actor,
++            organization=organization,
++            permission=permission,
++            project=projects[project_id] if project_id else None,
++            allow_any_scope=project_id is None,
++        )
++        for permission in permissions
++        for project_id in (ids or [None])
++    )
++
++
++def _projects(*, organization: Organization, actor: User) -> dict:
++    membership = require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.REPORTING_METRIC_RESULT_VIEW,
++        message=DENIED,
++        allow_any_scope=True,
++    )
++    # A site grant cannot expose an aggregate for its entire parent project.
++    return {
++        str(project.pk): project
++        for project in scope_queryset(
++            Project.objects.filter(organization=organization, deleted_at__isnull=True),
++            membership=membership,
++            project_lookup="pk",
++        )
++    }
++
++
++def reporting_layers(
++    *, organization: Organization, actor: User, as_of: datetime | None = None
++) -> ReportingReadModel:
++    observed_at = timezone.now()
++    as_of = as_of or observed_at
++    if timezone.is_naive(as_of) or as_of > observed_at:
++        raise ValidationError("زمان مبنا باید معتبر و حداکثر زمان مشاهده باشد.")
++    projects = _projects(organization=organization, actor=actor)
++    rows = (
++        MetricResult.objects.filter(
++            organization=organization,
++            run__organization=organization,
++            metric_code__in=METRIC_SPECS,
++            run__status=MetricRunStatus.SUCCEEDED,
++            run__metric_version__status=MetricVersionStatus.PUBLISHED,
++            run__metric_version__definition__is_active=True,
++            created_at__lte=as_of,
++            as_of__lte=as_of,
++            run__finished_at__lte=as_of,
++        )
++        .filter(Q(project__isnull=True) | Q(project_id__in=projects))
++        .annotate(
++            latest_row=Window(
++                expression=RowNumber(),
++                partition_by=[F("metric_code"), F("project_id")],
++                order_by=[F("created_at").desc(), F("pk").desc()],
++            )
++        )
++        .filter(latest_row=1)
++        .select_related("project", "run__metric_version__definition")
++        .order_by("-created_at", "-pk")
++    )
++    selected = {}
++    for result in rows:
++        if not _visible(
++            result=result, organization=organization, actor=actor, projects=projects
++        ):
++            continue
++        # Retained snapshots are alternatives, never additive source facts.
++        selected.setdefault((result.metric_code, result.project_id), result)
++    reviewed = set(
++        MetricResultReview.objects.filter(
++            organization=organization,
++            result_id__in=[result.pk for result in selected.values()],
++            created_at__lte=as_of,
++        ).values_list("result_id", flat=True)
++    )
++    cards = []
++    for result in selected.values():
++        definition = result.run.metric_version.definition
++        reviewed_result = (
++            not definition.requires_independent_review or result.pk in reviewed
++        )
++        cards.append(
++            MetricCard(
++                result=result,
++                reviewed=reviewed_result,
++                usable=reviewed_result
++                and result.freshness == MetricFreshness.FRESH
++                and result.coverage.get("complete") is True,
++                can_drillthrough=has_business_permission(
++                    user=actor,
++                    organization=organization,
++                    permission=P.REPORTING_SOURCE_DRILLTHROUGH_VIEW,
++                    project=result.project,
++                    allow_any_scope=result.project_id is None
++                    and result.source_manifest.get("scope_kind") != "organization",
++                ),
++            )
++        )
++    cards = tuple(
++        sorted(
++            cards,
++            key=lambda card: (card.result.metric_code, str(card.result.project_id)),
++        )
++    )
++    usable = tuple(card for card in cards if card.usable)
++    portfolio = has_business_permission(
++        user=actor,
++        organization=organization,
++        permission=P.REPORTING_PORTFOLIO_VIEW,
++        allow_any_scope=True,
++    )
++    return ReportingReadModel(
++        as_of=as_of,
++        observed_at=observed_at,
++        layers=(
++            ReportingLayer(
++                "operational", "عملیاتی", "وضعیت آخرین شواهد مجاز و مسیر منبع", cards
++            ),
++            ReportingLayer(
++                "exception",
++                "استثناها",
++                "شواهد ناقص، قدیمی یا در انتظار بررسی؛ بدون مقدار قابل اتکا",
++                tuple(card for card in cards if not card.usable),
++            ),
++            ReportingLayer(
++                "management",
++                "مدیریتی",
++                "نتایج کامل و به‌روز با بررسی لازم؛ هر دامنه جداگانه",
++                usable,
++            ),
++            ReportingLayer(
++                "executive",
++                "اجرایی و سبد پروژه",
++                "همان نتایج مجاز در دامنه سبد؛ بدون جمع‌زدن اسنپ‌شات‌ها",
++                usable if portfolio else (),
++                portfolio,
++            ),
++        ),
++    )
++
++
++def require_result_scope(
++    *, organization: Organization, actor: User, result: MetricResult
++) -> None:
++    """Retained drill-through rechecks full source scope, including history."""
++    if not _visible(
++        result=result,
++        organization=organization,
++        actor=actor,
++        projects=_projects(organization=organization, actor=actor),
++    ):
++        raise PermissionDenied(DENIED)
+diff --git a/apps/reporting/views.py b/apps/reporting/views.py
+index d38569f..5a369e3 100644
+--- a/apps/reporting/views.py
++++ b/apps/reporting/views.py
+@@ -15,0 +16 @@ from apps.projects.models import Project
++from apps.reporting.catalog import METRIC_SPECS
+@@ -33,0 +35 @@ from apps.reporting.project_closeout import (
++from apps.reporting.read_models import reporting_layers, require_result_scope
+@@ -42 +43,0 @@ from apps.reporting.services import (
+-    dashboard_results,
+@@ -59,2 +60,4 @@ def dashboard(request: HttpRequest) -> HttpResponse:
+-    results = dashboard_results(organization=request.organization, actor=request.user)
+-    definitions = MetricDefinition.objects.filter(is_active=True).order_by("code")
++    model = reporting_layers(organization=request.organization, actor=request.user)
++    definitions = MetricDefinition.objects.filter(
++        is_active=True, code__in=METRIC_SPECS
++    ).order_by("code")
+@@ -65 +68 @@ def dashboard(request: HttpRequest) -> HttpResponse:
+-            {"results": results, "definitions": definitions},
++            {"read_model": model, "definitions": definitions},
+@@ -100,0 +104,3 @@ def drillthrough(request: HttpRequest, result_id: str) -> HttpResponse:
++    require_result_scope(
++        organization=request.organization, actor=request.user, result=result
++    )
+diff --git a/apps/reporting/test_cep067.py b/apps/reporting/test_cep067.py
+new file mode 100644
+index 0000000..8e7f601
+--- /dev/null
++++ b/apps/reporting/test_cep067.py
+@@ -0,0 +1,381 @@
++"""CEP-067 source reconciliation and fail-closed reporting layer boundaries."""
++
++import os
++import re
++from datetime import timedelta
++from pathlib import Path
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import connection
++from django.test import TestCase
++from django.test.utils import CaptureQueriesContext
++from django.urls import reverse
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipScopeGrant,
++    OrganizationStatus,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.projects.models import ProjectSite
++from apps.reporting import test_p10_s02_s06 as fixture
++from apps.reporting.models import (
++    MetricDefinitionVersion,
++    MetricFreshness,
++    MetricRefreshRun,
++    MetricResult,
++    MetricRunStatus,
++    MetricVersionStatus,
++)
++from apps.reporting.read_models import reporting_layers, require_result_scope
++from apps.reporting.services import refresh_metric, review_metric_result
++
++
++class ReportingLayersTests(TestCase):
++    setUpTestData = classmethod(fixture.P10S02S06AcceptanceTests.setUpTestData.__func__)
++    _grant = classmethod(fixture.P10S02S06AcceptanceTests._grant.__func__)
++
++    def snapshot(
++        self,
++        *,
++        code="procurement_cycle_time",
++        project=None,
++        complete=True,
++        freshness=MetricFreshness.FRESH,
++        review=False,
++        scope=None,
++    ):
++        version = MetricDefinitionVersion.objects.get(
++            definition__code=code, status="published"
++        )
++        now = timezone.now()
++        run = MetricRefreshRun.objects.create(
++            organization=self.organization,
++            metric_version=version,
++            project=project,
++            status=MetricRunStatus.SUCCEEDED,
++            idempotency_key=f"cep067-{MetricRefreshRun.objects.count()}",
++            request_fingerprint="a" * 64,
++            source_watermark="b" * 64,
++            requested_by=self.user,
++            started_at=now,
++            finished_at=now,
++        )
++        result = MetricResult.objects.create(
++            organization=self.organization,
++            run=run,
++            project=project,
++            metric_code=code,
++            value={"amount": "6754321.50"},
++            currency="IRR",
++            unit="money",
++            as_of=now,
++            freshness=freshness,
++            coverage={"complete": complete, "source_count": 1},
++            source_manifest=scope
++            or {
++                "model": "fixture.AuthoritativeSource",
++                "ids": ["synthetic-source-v2"],
++                "source_versions": [{"id": "synthetic-source", "version": 2}],
++                "scope_kind": "project_set",
++                "scope_project_ids": [str(project.pk)]
++                if project
++                else [str(self.project_a.pk), str(self.project_b.pk)],
++            },
++            calculation_hash="c" * 64,
++        )
++        if review:
++            review_metric_result(
++                result=result,
++                reviewer=self.reviewer,
++                reason="Synthetic independent review",
++            )
++        return result
++
++    def model(self, actor=None, **kwargs):
++        return reporting_layers(
++            organization=self.organization, actor=actor or self.user, **kwargs
++        )
++
++    def page(self):
++        self.client.force_login(self.user)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        return self.client.get(reverse("reporting:dashboard"))
++
++    def capture(self, name, response):
++        if not (directory := os.environ.get("BONIRA_CEP067_CAPTURE_DIR")):
++            return
++        output = Path(directory)
++        output.mkdir(parents=True, exist_ok=True)
++        content = re.sub(
++            rb'name="csrfmiddlewaretoken" value="[^"]+"',
++            b'name="csrfmiddlewaretoken" value="SYNTHETIC-EVIDENCE"',
++            response.content,
++        ).decode("utf-8")
++        (output / f"{name}.html").write_text(
++            "\n".join(line.rstrip() for line in content.splitlines()) + "\n",
++            encoding="utf-8",
++        )
++
++    def test_four_layers_reconcile_exact_retained_source_and_version(self):
++        result = self.snapshot(
++            code="approved_budget", project=self.project_a, review=True
++        )
++        model = self.model()
++        self.assertEqual(
++            [layer.code for layer in model.layers],
++            ["operational", "exception", "management", "executive"],
++        )
++        self.assertEqual(model.layers[1].cards, ())
++        for index in (0, 2, 3):
++            card = model.layers[index].cards[0]
++            self.assertEqual(card.result.pk, result.pk)
++            self.assertEqual(card.result.value, result.value)
++            self.assertEqual(card.result.source_manifest, result.source_manifest)
++            self.assertEqual(
++                card.result.run.metric_version_id, result.run.metric_version_id
++            )
++            self.assertEqual(card.result.as_of, result.as_of)
++            self.assertEqual(
++                card.result.run.source_watermark, result.run.source_watermark
++            )
++        self.assertLessEqual(model.as_of, model.observed_at)
++
++    def test_projection_executes_only_reads_and_does_not_refresh(self):
++        self.snapshot()
++        with CaptureQueriesContext(connection) as queries:
++            self.model()
++        self.assertTrue(queries)
++        self.assertFalse(
++            [
++                q["sql"]
++                for q in queries
++                if re.search(r"\b(INSERT|UPDATE|DELETE)\b", q["sql"], re.IGNORECASE)
++            ]
++        )
++
++    def test_latest_unreviewed_shadows_old_reviewed_values(self):
++        self.snapshot(code="approved_budget", review=True)
++        newest = self.snapshot(code="approved_budget")
++        model = self.model()
++        self.assertEqual(
++            [card.result.pk for card in model.layers[0].cards], [newest.pk]
++        )
++        self.assertEqual(
++            [card.result.pk for card in model.layers[1].cards], [newest.pk]
++        )
++        self.assertEqual(model.layers[2].cards, ())
++
++    def test_latest_incomplete_and_stale_are_exceptions_without_values(self):
++        self.snapshot()
++        latest = self.snapshot(complete=False)
++        self.snapshot(
++            code="approved_budget", freshness=MetricFreshness.STALE, review=True
++        )
++        model = self.model()
++        self.assertEqual(len(model.layers[0].cards), 2)
++        self.assertEqual(len(model.layers[1].cards), 2)
++        self.assertEqual(model.layers[2].cards, ())
++        self.assertIn(latest.pk, [card.result.pk for card in model.layers[1].cards])
++        response = self.page()
++        self.assertNotContains(response, "6754321")
++        self.capture("exceptions", response)
++
++    def test_repeated_snapshots_are_selected_once_not_summed(self):
++        for _ in range(3):
++            newest = self.snapshot()
++        cards = self.model().layers[2].cards
++        self.assertEqual(len(cards), 1)
++        self.assertEqual(cards[0].result.pk, newest.pk)
++        self.assertEqual(cards[0].result.value["amount"], "6754321.50")
++
++    def test_cutoff_uses_available_evidence_and_rejects_naive_or_future(self):
++        old = self.snapshot()
++        cutoff = timezone.now()
++        self.snapshot()
++        selected = self.model(as_of=cutoff).layers[0].cards
++        self.assertEqual([card.result.pk for card in selected], [old.pk])
++        for invalid in (cutoff.replace(tzinfo=None), cutoff + timedelta(days=1)):
++            with self.subTest(invalid=invalid), self.assertRaises(ValidationError):
++                self.model(as_of=invalid)
++
++    def test_source_native_incomplete_result_is_not_promoted(self):
++        result = refresh_metric(
++            organization=self.organization,
++            actor=self.user,
++            metric_code="actual_cost_coverage",
++            idempotency_key="cep067-native-incomplete",
++            project=self.project_a,
++        )
++        review_metric_result(
++            result=result, reviewer=self.reviewer, reason="Coverage review"
++        )
++        model = self.model()
++        self.assertEqual(
++            model.layers[1].cards[0].result.source_manifest, result.source_manifest
++        )
++        self.assertEqual(model.layers[1].cards[0].result.value, {"amount": None})
++        self.assertEqual(model.layers[2].cards, ())
++
++    def test_project_scope_filters_before_grouping_and_direct_drill(self):
++        viewer = User.objects.create_user(username="cep067-project", password="x")
++        self._grant(viewer, project=self.project_a)
++        allowed = self.snapshot(project=self.project_a)
++        self.snapshot(project=self.project_b)
++        aggregate = self.snapshot()
++        cards = self.model(actor=viewer).layers[0].cards
++        self.assertEqual([card.result.pk for card in cards], [allowed.pk])
++        with self.assertRaises(PermissionDenied):
++            require_result_scope(
++                organization=self.organization, actor=viewer, result=aggregate
++            )
++
++    def test_unknown_scope_fails_closed_and_cannot_drill(self):
++        result = self.snapshot(scope={"ids": []})
++        self.assertEqual(self.model().layers[0].cards, ())
++        with self.assertRaises(PermissionDenied):
++            require_result_scope(
++                organization=self.organization, actor=self.user, result=result
++            )
++
++    def test_foreign_tenant_result_and_source_project_are_denied(self):
++        result = self.snapshot()
++        with self.assertRaises(PermissionDenied):
++            require_result_scope(
++                organization=self.other_organization, actor=self.user, result=result
++            )
++        MetricResult.objects.filter(pk=result.pk).update(
++            source_manifest={
++                "scope_kind": "project_set",
++                "scope_project_ids": ["unknown-foreign-id"],
++            }
++        )
++        self.assertEqual(self.model().layers[0].cards, ())
++
++    def test_revoked_source_permission_or_scope_and_cancelled_tenant_deny(self):
++        self.snapshot()
++        role = self.member.role_assignments.get().role
++        permission = BusinessPermission.objects.get(code=P.PURCHASE_ORDERS_VIEW)
++        role.permissions.remove(permission)
++        self.assertEqual(self.model().layers[0].cards, ())
++        role.permissions.add(permission)
++        MembershipScopeGrant.objects.filter(membership=self.member).delete()
++        with self.assertRaises(PermissionDenied):
++            self.model()
++        self.organization.status = OrganizationStatus.CANCELLED
++        self.organization.save(update_fields=["status"])
++        with self.assertRaises(PermissionDenied):
++            self.model()
++
++    def test_executive_permission_does_not_grant_sources(self):
++        viewer = User.objects.create_user(username="cep067-executive", password="x")
++        self._grant(
++            viewer, organization_scope=True, permissions=fixture.REPORTING_PERMISSIONS
++        )
++        self.snapshot()
++        self.assertEqual(self.model(actor=viewer).layers[3].cards, ())
++        role = self.member.role_assignments.get().role
++        role.permissions.remove(
++            BusinessPermission.objects.get(code=P.REPORTING_PORTFOLIO_VIEW)
++        )
++        model = self.model()
++        self.assertFalse(model.layers[3].available)
++        self.assertTrue(model.layers[2].cards)
++
++    def test_sensitive_result_requires_separate_permission(self):
++        result = self.snapshot()
++        definition = result.run.metric_version.definition
++        type(definition).objects.filter(pk=definition.pk).update(
++            sensitivity="sensitive"
++        )
++        role = self.member.role_assignments.get().role
++        role.permissions.remove(
++            BusinessPermission.objects.get(
++                code=P.REPORTING_METRIC_RESULT_VIEW_SENSITIVE
++            )
++        )
++        self.assertEqual(self.model().layers[0].cards, ())
++
++    def test_model_evidence_immutable_and_ui_has_four_layers_no_new_metrics(self):
++        result = self.snapshot(
++            code="approved_budget", project=self.project_a, review=True
++        )
++        result.value = {"amount": "999"}
++        with self.assertRaises(ValidationError):
++            result.save()
++        response = self.page()
++        self.assertEqual(response.status_code, 200)
++        self.assertIn("no-store", response["Cache-Control"])
++        for code in ("operational", "exception", "management", "executive"):
++            self.assertContains(response, f'id="reporting-{code}"')
++        self.assertContains(response, 'dir="rtl"')
++        self.assertContains(response, "زمان مبنای منبع")
++        self.assertContains(response, "نسخه شاخص")
++        for invented in ("CPI", "SPI", "EVM", "liquidity_score"):
++            self.assertNotContains(response, invented)
++        self.capture("ready", response)
++
++    def test_empty_neutral_and_unauthenticated_views(self):
++        self.assertEqual(
++            self.client.get(reverse("reporting:dashboard")).status_code, 302
++        )
++        response = self.page()
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, "نتیجه واجد شرایطی")
++        self.capture("empty", response)
++
++    def test_site_only_grant_cannot_expand_to_parent_project_aggregate(self):
++        viewer = User.objects.create_user(username="cep067-site", password="x")
++        membership = self._grant(viewer, project=self.project_a)
++        site = ProjectSite.objects.create(
++            organization=self.organization,
++            project=self.project_a,
++            code="CEP067-SITE",
++            name="Synthetic site",
++            created_by=self.user,
++            updated_by=self.user,
++        )
++        MembershipScopeGrant.objects.filter(membership=membership).update(
++            scope_type=AuthorizationScopeType.SITE, site=site
++        )
++        self.snapshot(project=self.project_a)
++        self.assertEqual(self.model(actor=viewer).layers[0].cards, ())
++
++    def test_superseded_definition_is_not_a_current_metric(self):
++        result = self.snapshot()
++        MetricDefinitionVersion.objects.filter(pk=result.run.metric_version_id).update(
++            status=MetricVersionStatus.SUPERSEDED
++        )
++        self.assertEqual(self.model().layers[0].cards, ())
++
++    def test_organization_metric_requires_organization_scope(self):
++        viewer = User.objects.create_user(username="cep067-no-org", password="x")
++        self._grant(viewer, project=self.project_a)
++        result = self.snapshot(
++            code="cleared_cash_position",
++            review=True,
++            scope={"scope_kind": "organization", "ids": ["synthetic-clearing"]},
++        )
++        self.assertEqual(self.model(actor=viewer).layers[0].cards, ())
++        self.assertEqual(self.model().layers[2].cards[0].result.pk, result.pk)
++
++    def test_direct_url_rechecks_full_scope_and_uses_neutral_denial(self):
++        viewer = User.objects.create_user(username="cep067-url", password="x")
++        self._grant(viewer, project=self.project_a)
++        aggregate = self.snapshot()
++        self.client.force_login(viewer)
++        session = self.client.session
++        session["active_organization_id"] = str(self.organization.pk)
++        session.save()
++        response = self.client.get(
++            reverse("reporting:drillthrough", args=[aggregate.pk])
++        )
++        self.assertEqual(response.status_code, 403)
++        self.assertNotIn(b"synthetic-source-v2", response.content)
+diff --git a/templates/reporting/dashboard.html b/templates/reporting/dashboard.html
+index 6265770..85eaa3c 100644
+--- a/templates/reporting/dashboard.html
++++ b/templates/reporting/dashboard.html
+@@ -7 +7 @@
+-    <p class="text-xs font-semibold text-blue-700">P10 — گزارش‌گیری بدون اثر عملیاتی یا مالی</p>
++    <p class="text-xs font-semibold text-blue-700">گزارش‌ها و اطلاعات مدیریتی</p>
+@@ -9 +9 @@
+-    <p class="mt-2 text-sm text-slate-600">هر مقدار از نسخه منتشرشده شاخص و مدل خواندنی بازسازی‌پذیر می‌آید. این صفحه محاسبه مستقل انجام نمی‌دهد.</p>
++    <p class="mt-2 text-sm text-slate-600">وضعیت عملیات، استثناها و نتایج مدیریتی از شواهد حاکم‌شده؛ هر نتیجه با زمان مبنا و مسیر منبع.</p>
+@@ -12,8 +12,11 @@
+-  <section aria-labelledby="metric-results-title">
+-    <div class="mb-3 flex items-center justify-between gap-3">
+-      <h2 id="metric-results-title" class="text-lg font-bold text-slate-900">آخرین نتایج مجاز</h2>
+-      {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}" class="flex gap-2">{% csrf_token %}
+-        <input type="hidden" name="purpose" value="داشبورد مدیریتی">
+-        <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
+-      </form>{% endif %}
+-    </div>
++  <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · انتخاب شواهد تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>
++  <nav aria-label="لایه‌های گزارش" class="flex flex-wrap gap-3">
++    {% for layer in read_model.layers %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="#reporting-{{ layer.code }}">{{ layer.title }}</a>{% endfor %}
++  </nav>
++  {% for layer in read_model.layers %}
++  <section id="reporting-{{ layer.code }}" aria-labelledby="title-{{ layer.code }}" class="space-y-3">
++    <h2 id="title-{{ layer.code }}" class="text-lg font-bold text-slate-900">{{ layer.title }}</h2>
++    <p class="text-sm text-slate-600">{{ layer.description }}</p>
++    {% if not layer.available %}
++      <p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">این لایه در دامنه مجاز شما در دسترس نیست.</p>
++    {% else %}
+@@ -21,17 +24,7 @@
+-      {% for result in results %}
+-      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+-        <div class="flex items-start justify-between gap-3">
+-          <div>
+-            <h3 class="font-bold text-slate-900">{{ result.run.metric_version.definition.persian_name }}</h3>
+-            <p class="mt-1 font-mono text-xs text-slate-500" dir="ltr">{{ result.metric_code }} / v{{ result.run.metric_version.version }}</p>
+-          </div>
+-          <span class="rounded-full px-2 py-1 text-xs font-semibold {% if result.freshness == 'fresh' %}bg-emerald-50 text-emerald-700{% else %}bg-amber-50 text-amber-800{% endif %}">{{ result.get_freshness_display }}</span>
+-        </div>
+-        <dl class="mt-4 space-y-2 text-sm">
+-          {% for key, value in result.value.items %}<div class="flex justify-between gap-3"><dt class="text-slate-500">{{ key }}</dt><dd class="font-semibold text-slate-900" dir="ltr">{{ value }}</dd></div>{% endfor %}
+-          <div class="flex justify-between gap-3"><dt class="text-slate-500">واحد / ارز</dt><dd>{{ result.unit }}{% if result.currency %} / {{ result.currency }}{% endif %}</dd></div>
+-          <div class="flex justify-between gap-3"><dt class="text-slate-500">زمان مبنا</dt><dd>{{ result.as_of|jalali_datetime }}</dd></div>
+-        </dl>
+-        {% if "reporting.source_drillthrough.view" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:drillthrough' result.pk %}">مشاهده شجره منبع ←</a>{% endif %}
+-      </article>
+-      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">هنوز نتیجه حاکم‌شده‌ای در دامنه مجاز شما ساخته نشده است.</p>{% endfor %}
++      {% for card in layer.cards %}
++        {% if layer.code == 'management' or layer.code == 'executive' %}
++          {% include 'reporting/_read_model_card.html' with show_values=True %}
++        {% else %}
++          {% include 'reporting/_read_model_card.html' with show_values=False %}
++        {% endif %}
++      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">نتیجه واجد شرایطی در دامنه مجاز شما وجود ندارد.</p>{% endfor %}
+@@ -38,0 +32 @@
++    {% endif %}
+@@ -39,0 +34,5 @@
++  {% endfor %}
++  {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}">{% csrf_token %}
++    <input type="hidden" name="purpose" value="داشبورد مدیریتی">
++    <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
++  </form>{% endif %}
+@@ -42 +41 @@
+-    <h2 id="catalogue-title" class="text-lg font-bold text-slate-900">کاتالوگ بسته شش شاخص</h2>
++    <h2 id="catalogue-title" class="text-lg font-bold text-slate-900">کاتالوگ شاخص‌های مصوب</h2>
+diff --git a/apps/reporting/templates/reporting/_read_model_card.html b/apps/reporting/templates/reporting/_read_model_card.html
+new file mode 100644
+index 0000000..8278663
+--- /dev/null
++++ b/apps/reporting/templates/reporting/_read_model_card.html
+@@ -0,0 +1,23 @@
++{% load erp_format %}
++<article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
++  <h3 class="font-bold text-slate-900">{{ card.result.run.metric_version.definition.persian_name }}</h3>
++  <p class="mt-1 text-sm text-slate-600">{% if card.result.project %}{{ card.result.project.name }}{% else %}دامنه ثبت‌شده شرکت / سبد{% endif %}</p>
++  <dl class="mt-3 space-y-2 text-sm">
++    <div><dt class="inline text-slate-500">وضعیت: </dt><dd class="inline">{{ card.result.get_freshness_display }}{% if not card.reviewed %} · در انتظار بررسی مستقل{% endif %}</dd></div>
++    <div><dt class="inline text-slate-500">پوشش: </dt><dd class="inline">{% if card.result.coverage.complete %}کامل طبق منبع{% else %}ناقص؛ مقدار قابل اتکا نیست{% endif %}</dd></div>
++    <div><dt class="inline text-slate-500">زمان مبنای منبع: </dt><dd class="inline">{{ card.result.as_of|jalali_datetime }}</dd></div>
++    <div><dt class="inline text-slate-500">ثبت شواهد: </dt><dd class="inline">{{ card.result.created_at|jalali_datetime }}</dd></div>
++    <div><dt class="inline text-slate-500">نسخه شاخص: </dt><dd class="inline">{{ card.result.run.metric_version.version|erp_number }}</dd></div>
++    <div><dt class="inline text-slate-500">مالک منبع: </dt><dd class="inline">{{ card.result.run.metric_version.definition.source_owner }}</dd></div>
++    {% if show_values and card.usable %}
++      {% for key, value in card.result.value.items %}<div class="flex flex-wrap justify-between gap-2"><dt class="text-slate-500">{% if key == 'amount' %}مبلغ{% elif key == 'quantity' %}مقدار{% elif key == 'value_amount' %}ارزش{% elif key == 'average_seconds' %}میانگین زمان (ثانیه){% elif key == 'completed_cycles' %}چرخه‌های تکمیل‌شده{% else %}{{ key }}{% endif %}</dt><dd class="font-semibold" dir="ltr">{{ value|erp_number }}</dd></div>{% endfor %}
++      <div><dt class="inline text-slate-500">واحد / ارز: </dt><dd class="inline">{% if card.result.unit == 'money' %}مبلغ{% elif card.result.unit == 'seconds' %}ثانیه{% elif card.result.unit == 'quantity_and_money' %}مقدار و ارزش{% else %}{{ card.result.unit }}{% endif %} {{ card.result.currency }}</dd></div>
++    {% endif %}
++  </dl>
++  <details class="mt-3 text-xs text-slate-500">
++    <summary class="cursor-pointer">شناسه و نسخه شواهد</summary>
++    <p class="mt-2 break-all font-mono" dir="ltr">{{ card.result.metric_code }} / {{ card.result.pk }}</p>
++    <p class="mt-1 break-all font-mono" dir="ltr">{{ card.result.run.source_watermark }}</p>
++  </details>
++  {% if card.can_drillthrough %}<a class="mt-4 inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:drillthrough' card.result.pk %}">مشاهده شجره منبع ←</a>{% endif %}
++</article>

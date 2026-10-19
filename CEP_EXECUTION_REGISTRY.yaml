@@ -62,14 +62,14 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 56
+  execution_state_complete: 57
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 1
   partial_current: 2
   failed_current: 0
-  not_started_other_current_governed: 20
+  not_started_other_current_governed: 19
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -3255,11 +3255,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-063_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_FOCUSED_REGRESSION_AND_UI_FIXTURE_EVIDENCE
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
+      pushed: true
+      merged_to_main: true
+      remote_main_evidence: VERIFIED_LS_REMOTE
     last_execution:
       branch: main
       sha: f8be5637d90dc023107de08054d46e4460820120
@@ -3374,28 +3374,29 @@ ceps:
     updated_at: null
     history: []
   CEP-067:
-    title: null
+    title: Management and executive reporting read models
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: SATISFIED
+    eligibility_status: SATISFIED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
+      passed: 6
+      total: 6
+      status: VERIFIED
+    dod: MET
     blockers: []
-    remaining_utv: []
+    remaining_utv:
+    - Full browser/accessibility and performance/concurrency runtime remain UTV; bounded synthetic responsive screenshots only
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-067_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_FOCUSED_REGRESSION_AND_SYNTHETIC_UI
     git:
       committed: null
       commit_sha: null
@@ -3403,10 +3404,16 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: STARTED
+      reason: Prompt hash verified;004/049 COMPLETE;69 baseline tests PASS. GATE05 relevant read-projection build convergence satisfied per source-family semantics, global05/06 NOT_PASSED. Existing six metric definitions only; no schema/source activation/057 inputs. Touch set recorded before mutation.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: IMB0047 all6 AC and DoD verified;88 tests plus2 subtests PASS, final UI3 PASS,10 styled RTL/Jalali fixture screenshots. Source-owned six metric projections only; current scoped snapshots never summed, incomplete source evidence withheld from reliable values. No schema/formula/source activation/057 inputs or global gate PASS.
   CEP-068:
     title: null
     phase: V1_IMPLEMENTATION
@@ -4099,9 +4106,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: f8be5637d90dc023107de08054d46e4460820120
-  origin_main: f8be5637d90dc023107de08054d46e4460820120
-  integration_checkpoint: f8be5637d90dc023107de08054d46e4460820120
+  last_reconciled_head: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
+  origin_main: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
+  integration_checkpoint: 195caaefd4ccfc19ab6f16bb65b14a24992b0bde
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4113,7 +4120,6 @@ execution_frontier:
   - CEP-057
   - CEP-058
   - CEP-065
-  - CEP-067
   - CEP-069
   - CEP-070
   - CEP-071
@@ -4123,17 +4129,17 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP063_COMPLETE_CHECKPOINT_THEN_RELEVANT_CONVERGENCE_ENTRY_REVIEW
+  current_session_continuation: CEP067_COMPLETE_CHECKPOINT_THEN_CEP065_ENTRY_REVIEW
   current_independent_cep: null
-  next_entry_review_candidate: CEP-067
-  next_candidate_full_entry_eligibility: NOT_YET_FULLY_VERIFIED_CEP067
+  next_entry_review_candidate: CEP-065
+  next_candidate_full_entry_eligibility: NOT_YET_FULLY_VERIFIED_CEP065
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: CEP063 complete and independently validated; checkpoint then full CEP067 source-family convergence entry review. Preserve023/029 COMPLETE,057 migration BLOCKED, GATE05/06 NOT_PASSED and no production authority. Dependency readiness alone is not entry eligibility.
+  boundary_reason: CEP063 and067 complete; checkpoint then full065 canonical cash-flow entry review.057 remains migration BLOCKED; global05/06 NOT_PASSED. No production authority.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: CEP063_COMPLETE_OTHER_CANDIDATES_REQUIRE_FULL_ENTRY_REVIEW
+  independent_candidates_entry_status: CEP063_AND067_COMPLETE_OTHER_CANDIDATES_REQUIRE_FULL_ENTRY_REVIEW
   production_authorized: false
   human_signoff_executed: false

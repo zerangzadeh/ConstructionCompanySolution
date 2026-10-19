@@ -13,6 +13,7 @@ from apps.organizations.authorization import require_business_permission, scope_
 from apps.organizations.decorators import active_organization_required
 from apps.organizations.models import BusinessPermissionCode
 from apps.projects.models import Project
+from apps.reporting.catalog import METRIC_SPECS
 from apps.reporting.models import (
     MetricDefinition,
     ProjectCloseoutCase,
@@ -31,6 +32,7 @@ from apps.reporting.project_closeout import (
     reopen_closeout_case,
     run_closeout_assessment,
 )
+from apps.reporting.read_models import reporting_layers, require_result_scope
 from apps.reporting.reconciliation import (
     execute_reconciliation,
     reconciliation_drillthrough,
@@ -39,7 +41,6 @@ from apps.reporting.reconciliation import (
     replay_reconciliation,
 )
 from apps.reporting.services import (
-    dashboard_results,
     drillthrough_manifest,
     export_dashboard_csv,
     refresh_metric,
@@ -56,13 +57,15 @@ def _private(response: HttpResponse) -> HttpResponse:
 @require_GET
 @active_organization_required
 def dashboard(request: HttpRequest) -> HttpResponse:
-    results = dashboard_results(organization=request.organization, actor=request.user)
-    definitions = MetricDefinition.objects.filter(is_active=True).order_by("code")
+    model = reporting_layers(organization=request.organization, actor=request.user)
+    definitions = MetricDefinition.objects.filter(
+        is_active=True, code__in=METRIC_SPECS
+    ).order_by("code")
     return _private(
         render(
             request,
             "reporting/dashboard.html",
-            {"results": results, "definitions": definitions},
+            {"read_model": model, "definitions": definitions},
         )
     )
 
@@ -97,6 +100,9 @@ def drillthrough(request: HttpRequest, result_id: str) -> HttpResponse:
         organization=request.organization,
         actor=request.user,
         result_id=result_id,
+    )
+    require_result_scope(
+        organization=request.organization, actor=request.user, result=result
     )
     return _private(render(request, "reporting/drillthrough.html", {"result": result}))
 

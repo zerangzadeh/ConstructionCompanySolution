@@ -1,0 +1,7 @@
+AC,outcome,verification,status,evidence
+1,Four explicit source-linked layers,four_layers_reconcile_exact_retained_source_and_version; UI screenshot,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005
+2,Source-owned retained facts; SELECT-only projection,projection_executes_only_reads_and_does_not_refresh; native incomplete source projection,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005
+3,"Aware as-of, observed freshness and exact version/watermark",cutoff_uses_available_evidence; UI screenshot,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005
+4,Tenant/project/site/source/sensitive permissions before display/grouping/direct URL,project_scope; site_only; foreign_tenant; direct_url; revoked_source; sensitive; organization_metric,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005
+5,Newest result once per metric/context; superseded definitions absent; no snapshot sums,repeated_snapshots; latest_unreviewed; latest_incomplete; superseded_definition,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005
+6,Existing six approved metric definitions only; no new formula,UI no unsupported metric checks; diff; catalogue/screenshot,PASS,CEP-067-EV-002; CEP-067-EV-004; CEP-067-EV-005

@@ -4,42 +4,41 @@
 {% block content %}
 <main class="mx-auto max-w-7xl space-y-6 px-4 py-6" dir="rtl">
   <header class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-    <p class="text-xs font-semibold text-blue-700">P10 — گزارش‌گیری بدون اثر عملیاتی یا مالی</p>
+    <p class="text-xs font-semibold text-blue-700">گزارش‌ها و اطلاعات مدیریتی</p>
     <h1 class="mt-2 text-2xl font-bold text-slate-900">داشبورد شاخص‌های حاکم‌شده</h1>
-    <p class="mt-2 text-sm text-slate-600">هر مقدار از نسخه منتشرشده شاخص و مدل خواندنی بازسازی‌پذیر می‌آید. این صفحه محاسبه مستقل انجام نمی‌دهد.</p>
+    <p class="mt-2 text-sm text-slate-600">وضعیت عملیات، استثناها و نتایج مدیریتی از شواهد حاکم‌شده؛ هر نتیجه با زمان مبنا و مسیر منبع.</p>
   </header>
 
-  <section aria-labelledby="metric-results-title">
-    <div class="mb-3 flex items-center justify-between gap-3">
-      <h2 id="metric-results-title" class="text-lg font-bold text-slate-900">آخرین نتایج مجاز</h2>
-      {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}" class="flex gap-2">{% csrf_token %}
-        <input type="hidden" name="purpose" value="داشبورد مدیریتی">
-        <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
-      </form>{% endif %}
-    </div>
+  <p class="text-sm text-slate-600">زمان مشاهده: {{ read_model.observed_at|jalali_datetime }} · انتخاب شواهد تا: {{ read_model.as_of|jalali_datetime }}. وضعیت تازگی، وضعیت ثبت‌شده منبع در زمان مشاهده است.</p>
+  <nav aria-label="لایه‌های گزارش" class="flex flex-wrap gap-3">
+    {% for layer in read_model.layers %}<a class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-blue-700" href="#reporting-{{ layer.code }}">{{ layer.title }}</a>{% endfor %}
+  </nav>
+  {% for layer in read_model.layers %}
+  <section id="reporting-{{ layer.code }}" aria-labelledby="title-{{ layer.code }}" class="space-y-3">
+    <h2 id="title-{{ layer.code }}" class="text-lg font-bold text-slate-900">{{ layer.title }}</h2>
+    <p class="text-sm text-slate-600">{{ layer.description }}</p>
+    {% if not layer.available %}
+      <p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">این لایه در دامنه مجاز شما در دسترس نیست.</p>
+    {% else %}
     <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {% for result in results %}
-      <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div class="flex items-start justify-between gap-3">
-          <div>
-            <h3 class="font-bold text-slate-900">{{ result.run.metric_version.definition.persian_name }}</h3>
-            <p class="mt-1 font-mono text-xs text-slate-500" dir="ltr">{{ result.metric_code }} / v{{ result.run.metric_version.version }}</p>
-          </div>
-          <span class="rounded-full px-2 py-1 text-xs font-semibold {% if result.freshness == 'fresh' %}bg-emerald-50 text-emerald-700{% else %}bg-amber-50 text-amber-800{% endif %}">{{ result.get_freshness_display }}</span>
-        </div>
-        <dl class="mt-4 space-y-2 text-sm">
-          {% for key, value in result.value.items %}<div class="flex justify-between gap-3"><dt class="text-slate-500">{{ key }}</dt><dd class="font-semibold text-slate-900" dir="ltr">{{ value }}</dd></div>{% endfor %}
-          <div class="flex justify-between gap-3"><dt class="text-slate-500">واحد / ارز</dt><dd>{{ result.unit }}{% if result.currency %} / {{ result.currency }}{% endif %}</dd></div>
-          <div class="flex justify-between gap-3"><dt class="text-slate-500">زمان مبنا</dt><dd>{{ result.as_of|jalali_datetime }}</dd></div>
-        </dl>
-        {% if "reporting.source_drillthrough.view" in business_permission_codes %}<a class="mt-4 inline-flex text-sm font-semibold text-blue-700" href="{% url 'reporting:drillthrough' result.pk %}">مشاهده شجره منبع ←</a>{% endif %}
-      </article>
-      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500">هنوز نتیجه حاکم‌شده‌ای در دامنه مجاز شما ساخته نشده است.</p>{% endfor %}
+      {% for card in layer.cards %}
+        {% if layer.code == 'management' or layer.code == 'executive' %}
+          {% include 'reporting/_read_model_card.html' with show_values=True %}
+        {% else %}
+          {% include 'reporting/_read_model_card.html' with show_values=False %}
+        {% endif %}
+      {% empty %}<p class="rounded-xl border border-dashed border-slate-300 bg-white p-5 text-sm text-slate-500">نتیجه واجد شرایطی در دامنه مجاز شما وجود ندارد.</p>{% endfor %}
     </div>
+    {% endif %}
   </section>
+  {% endfor %}
+  {% if "reporting.export.create" in business_permission_codes and "reporting.export.download" in business_permission_codes %}<form method="post" action="{% url 'reporting:export' %}">{% csrf_token %}
+    <input type="hidden" name="purpose" value="داشبورد مدیریتی">
+    <button class="rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-white" type="submit">خروجی کنترل‌شده CSV</button>
+  </form>{% endif %}
 
   <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="catalogue-title">
-    <h2 id="catalogue-title" class="text-lg font-bold text-slate-900">کاتالوگ بسته شش شاخص</h2>
+    <h2 id="catalogue-title" class="text-lg font-bold text-slate-900">کاتالوگ شاخص‌های مصوب</h2>
     <div class="mt-4 overflow-x-auto"><table class="min-w-full text-right text-sm"><thead><tr class="border-b text-slate-500"><th class="p-2">شناسه</th><th class="p-2">نام فارسی</th><th class="p-2">دامنه منبع</th><th class="p-2">مالک منبع</th></tr></thead><tbody>{% for metric in definitions %}<tr class="border-b border-slate-100"><td class="p-2 font-mono" dir="ltr">{{ metric.code }}</td><td class="p-2 font-semibold">{{ metric.persian_name }}</td><td class="p-2">{{ metric.source_domain }}</td><td class="p-2">{{ metric.source_owner }}</td></tr>{% endfor %}</tbody></table></div>
   </section>
 </main>
