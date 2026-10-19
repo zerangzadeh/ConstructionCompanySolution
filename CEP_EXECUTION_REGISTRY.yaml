@@ -62,11 +62,11 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 54
+  execution_state_complete: 55
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
-  blocked_current: 2
+  blocked_current: 1
   partial_current: 2
   failed_current: 0
   not_started_other_current_governed: 21
@@ -1493,40 +1493,47 @@ ceps:
     title: Employee to WorkRelationship migration
     phase: V1_IMPLEMENTATION
     dependency_status: SATISFIED
-    eligibility_status: BLOCKED_CANONICAL_REMEDIATION_REQUIRED
+    eligibility_status: SATISFIED
     authorization:
-      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
-      authorization_id: null
-      source: null
+      status: AUTHORIZED
+      authorization_id: HUMAN-CEP023-029-REMEDIATION-20261019
+      source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
     execution:
-      status: NOT_STARTED
-      lifecycle: BLOCKED_BEFORE_MUTATION
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
       advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 0
+      passed: 7
       total: 7
-      status: NOT_VERIFIED
-    dod: NOT_MET
-    blockers:
-    - CEP-029-FINDING-001 / B4_IMPLEMENTATION_MIGRATION_GAP / Canonical outcome absent; remediation owned by this CEP, not057; see CEP057 prerequisite adjudication
-    remaining_utv: []
+      status: VERIFIED
+    dod: MET
+    blockers: []
+    remaining_utv:
+    - Performance/concurrency and browser/accessibility runtime remain UTV under canonical contract
+    - Production migration/cutover and all User/ESS activation remain unauthorized; GATE06 not inferred
     completion_report:
-      path: null
-      evidence_presence: NO_QUALIFYING_COMPLETION_EVIDENCE_RECOVERED
+      path: docs/governance/cep/reports/CEP-029_COMPLETION_REPORT.md
+      evidence_presence: VERIFIED_NEW_REMEDIATION_AND_DEVELOPMENT_CONVERSION
     git:
       committed: null
       commit_sha: null
       pushed: null
       merged_to_main: null
-      remote_main_evidence: REPORT_NOT_FOUND
+      remote_main_evidence: NOT_YET_CHECKPOINTED
     last_execution:
-      branch: null
-      sha: null
+      branch: main
+      sha: 61fad0cb61e72411322fe74686c67f70834ceac8
     updated_at: '2026-10-19'
     history:
     - date: '2026-10-19'
       status: PREREQUISITE_ADJUDICATION
       reason: B4_IMPLEMENTATION_MIGRATION_GAP established under explicit adjudication-only Human instruction. Original imported COMPLETE/CLOSED_VERIFIED stamp in2f16cc05 had no AC/DoD/report/commit history; raw prior record preserved in CEP-057_ADJUDICATION_SOURCES.json. Current canonical outcome not started/verified; no product or migration remediation performed.
+    - date: '2026-10-19'
+      status: RESUMED
+      reason: Human-authorized IMB0070 remediation starts after newly proved023 completion and safe checkpoint; actual touch set recorded. DATA-MIGRATION remains non-production only; existing source/target facts retained, ambiguity becomes exception.
+    - date: '2026-10-19'
+      status: COMPLETE
+      reason: New IMB0070 remediation proves7/7 original AC and DoD.51 tests plus13 subtests PASS; configured Development additive schema preserved source/target/grant hashes; rehearsal rolled back targets and actual apply mapped10 Employees to10 Persons/episodes/revisions, zero exceptions, per-tenant retries created no duplicates. Source/assignment hashes preserved; no User link, leave backfill or cutover. Historical B4 and original imported stamp retained; GATE06 not inferred.
     adjudication:
       classification: B4_IMPLEMENTATION_MIGRATION_GAP
       evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
@@ -4069,9 +4076,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
-  origin_main: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
-  integration_checkpoint: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
+  last_reconciled_head: 61fad0cb61e72411322fe74686c67f70834ceac8
+  origin_main: 61fad0cb61e72411322fe74686c67f70834ceac8
+  integration_checkpoint: 61fad0cb61e72411322fe74686c67f70834ceac8
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4080,7 +4087,8 @@ execution_frontier:
   fixed_cep_count_per_session: NONE
   dependency_ready_current_governed:
   - CEP-028
-  - CEP-029
+  - CEP-057
+  - CEP-058
   - CEP-063
   - CEP-065
   - CEP-067
@@ -4093,16 +4101,16 @@ execution_frontier:
   dependency_ready_is_not_entry_gate_or_execution_authority: true
   verified_build_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP023_COMPLETE_CHECKPOINT_THEN_CEP029_ENTRY
+  current_session_continuation: CEP029_COMPLETE_CHECKPOINT_THEN_CEP057_ENTRY_REVIEW
   current_independent_cep: null
-  next_entry_review_candidate: CEP-029
-  next_candidate_full_entry_eligibility: CEP029_REQUIRES_FULL_ENTRY_REVIEW
+  next_entry_review_candidate: CEP-057
+  next_candidate_full_entry_eligibility: CEP057_REQUIRES_REPEAT_FULL_ENTRY_REVIEW
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Newly evidenced023 remediation COMPLETE; Human-authorized serial029 entry follows safe checkpoint. Historical A3/B4 provenance retained. CEP057 remains blocked until029 is proven; no EXT0015 or GATE06 inference. GATE05 NOT_PASSED and047/048 activation remains fail-closed.
+  boundary_reason: Newly evidenced023 and029 remediations COMPLETE. Development029 conversion10/10 reconciled with zero exceptions and repeatability proof. Repeat057 full entry review after checkpoint; no EXT0015 dataset, effective Leave Policy or GATE06 PASS inferred. GATE05 remains NOT_PASSED and047/048 activation remains fail-closed.
   resume_cep_after_blocker_resolution: CEP-057
   independent_candidates_entry_status: NOT_REVIEWED_QUEUE_STOPPED_ON_MATERIAL_CONFLICT
   production_authorized: false

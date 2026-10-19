@@ -14,6 +14,8 @@ from core.identifiers import canonicalize_upper_identifier
 from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
+from .identity_migration_models import EmployeeIdentityMigration  # noqa: F401
+
 # These records are owned by Workforce; imported here for Django model discovery.
 from .leave_models import LeaveBalanceEntry, LeavePolicyVersion  # noqa: F401
 

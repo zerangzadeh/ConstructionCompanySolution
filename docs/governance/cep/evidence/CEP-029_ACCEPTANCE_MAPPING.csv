@@ -1,0 +1,8 @@
+AC,Outcome,Evidence,Status
+1,Evidence-backed Person/WorkRelationship creation and preserved legacy references,test_source_mapping_counts_lineage_and_repeatability; Development apply,PASS
+2,All eligible source rows map or are explicit exceptions,"test_missing_dates_and_undated_inactive_history_are_exceptions; test_undated_rehire_transition_is_not_fabricated; 10/10 Development mapping, empty exception CSV",PASS
+3,Counts and stable identifiers reconcile,CEP-029_SOURCE_TARGET_MAPPING.csv; CEP-029_DEVELOPMENT_APPLY.json,PASS
+4,Retry creates no duplicate targets,test_source_mapping_counts_lineage_and_repeatability; every Development apply replay verified,PASS
+5,"History, assignment and source lineage preserved",test_explicit_dated_sources_reconstruct_rehire_without_rewriting; test_existing_person_relationship_and_revision_facts_preserved; test_assignment_sources_are_preserved_and_never_transferred,PASS
+6,Authority boundary preserved without cutover/User inference,test_explicit_user_source_does_not_grant_workforce_access; test_no_inferred_merge_of_similar_names,PASS
+7,Unmigrated records identifiable; rollback retains authority,test_rehearsal_rollback_then_apply_then_retry; test_failed_run_rolls_back_all_targets_and_evidence; bounded schema preservation test,PASS
