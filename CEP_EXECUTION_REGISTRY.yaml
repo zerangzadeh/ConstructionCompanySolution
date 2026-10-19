@@ -3442,13 +3442,15 @@ ceps:
       evidence_presence: VERIFIED_PREPARATION_AND_BLOCKERS_NO_RETIREMENT_PASS
     git:
       committed: true
-      commit_sha: 33e3da4098f49454d276298edeb9784744cc835f
+      commit_sha: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
       pushed: true
-      merged_to_main: true
+      merged_to_main: false
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
       remote_main_evidence: VERIFIED_IMPLEMENTATION_CHECKPOINT_ON_ORIGIN_MAIN_20261020
     last_execution:
       branch: main
-      sha: 33e3da4098f49454d276298edeb9784744cc835f
+      sha: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
     updated_at: '2026-10-20'
     history:
     - date: '2026-10-19'
@@ -3463,6 +3465,9 @@ ceps:
     - date: '2026-10-20'
       status: PARTIAL_BOUNDED_BLOCKER_FOLLOWUP
       reason: Clean main4a29233 entry; latest Human demo disposition and Demo Safety approval recorded. Findings001/002 closed with complete baseline attribution and6 Safety tests PASS. Required registry suite2 PASS/6 reproduced baseline failures; no attributable failure or permission/test weakening. Fresh523-table native restore matches all counts/digests;80 sources and32 typed/32 generic/160 audit identities reverified. Required full seed now fails unchanged Quality record review; active Reporting legacy settlement reader found at rehearsal preflight. Exact12 gate9 PASS/2 FAIL/1 UNVERIFIED. Full destructive graph remains unverified; stop under Human rule, no destructive retirement, unrelated CEP or Production action.
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: Bounded follow-up checkpoint e150cf5838a49d4a62f9a6897c740ac0d978f7bf committed on existing main, pushed and verified equal to remote main with clean tree. Governance-only follow-up records integration facts. Readiness remains FAIL; no destructive retirement or serial continuation.
   CEP-065:
     closure_triage:
       category: B
@@ -4392,9 +4397,9 @@ v1_closure_triage:
   next_action: ESTABLISH_RECORDED_HUMAN_INPUTS_THEN_REPEAT_ENTRY_CHECKS
 repository_state:
   branch: main
-  last_reconciled_head: 4a292332809431b89c060f4ac778d76377fb436a
-  origin_main: 4a292332809431b89c060f4ac778d76377fb436a
-  integration_checkpoint: 4a292332809431b89c060f4ac778d76377fb436a
+  last_reconciled_head: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
+  origin_main: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
+  integration_checkpoint: e150cf5838a49d4a62f9a6897c740ac0d978f7bf
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
 execution_frontier:

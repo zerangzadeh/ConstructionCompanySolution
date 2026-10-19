@@ -126,3 +126,8 @@ Production action, unrelated CEP, Sign-off or Certification was performed.
 Canonical acceptance remains12/14 PASS and2 PARTIAL; scoped DoD NOT_MET_BLOCKED.
 GATE04/GATE06 and dependency semantics are unchanged. Full post-removal validation
 is NOT_EXECUTED. See [bounded closure evidence](../evidence/CEP-064_BLOCKER_CLOSURE_20261020.json).
+
+Bounded follow-up checkpoint `e150cf5838a49d4a62f9a6897c740ac0d978f7bf` was committed directly
+on existing main, pushed to origin/main and independently verified with a clean
+tree. A governance-only follow-up records these Git facts; tested product code
+is unchanged by that follow-up.
