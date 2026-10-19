@@ -13,7 +13,13 @@ from apps.organizations.decorators import active_organization_required
 from apps.organizations.models import BusinessPermissionCode as P
 
 from . import ess_timekeeping as service
-from .ess_timekeeping_forms import CorrectionForm, EntryForm, LeaveForm, TimesheetForm
+from .ess_timekeeping_forms import (
+    CorrectionForm,
+    EntryForm,
+    LeaveForm,
+    OvertimeForm,
+    TimesheetForm,
+)
 
 
 def private(view):
@@ -45,6 +51,7 @@ def index(request):
         ("attendance", "سوابق حضور من"),
         ("correction", "درخواست‌های اصلاح حضور من"),
         ("timesheet", "کارکرد من"),
+        ("overtime", "درخواست‌های اضافه‌کاری من"),
     ]:
         try:
             rows = list(
@@ -83,6 +90,7 @@ def create(request, kind):
     forms = {
         "leave": (LeaveForm, P.LEAVE_MISSION_REQUEST, "درخواست مرخصی"),
         "timesheet": (TimesheetForm, P.TIMESHEETS_PREPARE, "کارکرد جدید"),
+        "overtime": (OvertimeForm, P.OVERTIME_REQUEST, "درخواست اضافه‌کاری"),
     }
     if kind not in forms:
         raise PermissionDenied(service.DENIED)
@@ -100,11 +108,12 @@ def create(request, kind):
         )
         if request.method == "POST" and form.is_valid():
             try:
-                record = (
-                    service.create_own_leave
-                    if kind == "leave"
-                    else service.create_own_timesheet
-                )(
+                command = {
+                    "leave": service.create_own_leave,
+                    "timesheet": service.create_own_timesheet,
+                    "overtime": service.create_own_overtime,
+                }[kind]
+                record = command(
                     actor=request.user,
                     organization=request.organization,
                     **form.cleaned_data,

@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-19",
+  "cep": "CEP-068",
+  "execution": "EXECUTION PARTIAL",
+  "full_package_ac": {
+    "passed": 0,
+    "total": 6
+  },
+  "dod": "NOT_MET",
+  "branch": "main",
+  "source_head": "b412b09cc9f42c73f67007d13de9305353a8fae3",
+  "product_hashes": {
+    "apps/workforce/ess_timekeeping.py": "5a323e651348d925812b37b3febc50e3a31874c5b1afc123e17d795bac2fb9a1",
+    "apps/workforce/ess_timekeeping_forms.py": "7efcd58d1845b15fe5a82f218c9e3e2c626c89853e9d32168192de5d562a0fbd",
+    "apps/workforce/ess_timekeeping_views.py": "e9841e31ea21faa69b25f44fcc1789069939eef4bf940db34cafd339da752203",
+    "apps/workforce/test_cep068.py": "3c91eb1ab636a80a0843420b2d276f60f3cb4002ba8b0c5c9f0528af3edf2a1a",
+    "apps/workforce/templates/workforce/ess_timekeeping.html": "119864246436061fc28036ad595aced0979313c08e2c784ef5f87e540afe9148",
+    "apps/workforce/templates/workforce/ess_timekeeping_detail.html": "2fa91dcd8ec1f53fc17b26ed4bb456c0adf936b3590246126dd702c82f66779c"
+  },
+  "migration": "NONE_NO_SCHEMA_BACKFILL_OR_CONFIGURED_BUSINESS_MUTATION",
+  "authority": "STANDING_NON_PRODUCTION_INDEPENDENT_OVERTIME_ONLY",
+  "test_command": ".venv/Scripts/python.exe manage.py test apps.workforce.test_cep068 apps.workforce.test_cep063 apps.workforce.test_cep026_ess_privacy --keepdb --noinput",
+  "tests": {
+    "passed": 32,
+    "new_overtime": 11,
+    "affected_timekeeping": 15,
+    "existing_identity_privacy": 6,
+    "seconds": 11.723,
+    "database": "DISPOSABLE_POSTGRESQL_TEST_DATABASE"
+  },
+  "checks": "Ruff/format4 changed Python,Django system check,migration dry-run drift PASS",
+  "output_hashes": {
+    "CEP-068_TEST_OUTPUT.txt": "aa9afba75cfbff451e2d0cc07bbb7ce7218a69d987a0982dbd36a9db8356536e",
+    "CEP-068_TEST_INITIAL_FAILURE.txt": "b373dc46257c77d53805c77e144034f7ff0cade43dc53c1235e67f391a68b803",
+    "CEP-068_TEST_FIXTURE_FAILURE.txt": "697558e2b78eec296b5c63bfd3aa3de11c6b7783b6ba553eb2adf2cbc2ec8baf",
+    "CEP-068_CHECK_OUTPUT.txt": "14199618e66773ba76d24f896f636268e8aaf4f3c2ab28a326295bbe37e92868"
+  },
+  "failure_attribution": "New test import/fixture/assertion errors corrected; existing security guards preserved; dynamic HTML CSRF/request-path diffs redacted",
+  "synthetic_html_hashes": {
+    "denied.html": "d8e95cad50426033dd947806bf009a27355b0d714952d7385438ac97aeff0872",
+    "draft.html": "83610d8e57cf61da4bd4ec2e8146f7f177f84c7656815b814b5a0f82cc7c7350",
+    "empty.html": "f021c065cbd0ba26f98463cd9de8546bd418659ab1d842a26191fa4609211692",
+    "error.html": "a867f4235bd988d177795bf8d4c273d57a53bd62c5ccca8765547cf40cbf9fc8",
+    "form.html": "e27a834c4624cea4d2bce46e90cd02567cbddb250c0ad44b24d9002c735614f0",
+    "submitted.html": "b1ca64cd7c132343bec99a6d2b892948d76d4e9629a9a340b805a3d16771e18d"
+  },
+  "html_location": "Ignored .pytest_cache/cep068/captures;CSRF sanitized;not screenshots",
+  "screenshots": 0,
+  "browser_status": "BLOCKED_WORK_SETTINGS_LOCAL_BROWSER_DISABLED",
+  "browser_settings_bypass": false,
+  "unimplemented": "Mission/financial linkage pending062; attachments absent without source policy; project-specific create not added",
+  "remaining_utv": [
+    "Required screenshot/responsive/browser review",
+    "Mission/full package outcomes",
+    "Full accessibility/performance/concurrency/UAT/production"
+  ],
+  "dependency_ready_frontier": [
+    "CEP-028",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "dependency_ready_not_full_entry": true,
+  "gates_changed": false,
+  "production_authority": false,
+  "git_before_checkpoint": "NOT_EXECUTED_FOR068",
+  "diff_check": "Product and metadata whitespace PASS; two retained actual test-output files have a blank line at EOF, preserved as measured output (not a product defect)"
+}

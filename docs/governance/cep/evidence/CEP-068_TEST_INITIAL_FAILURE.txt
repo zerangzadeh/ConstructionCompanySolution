@@ -1,0 +1,24 @@
+Using existing test database for alias 'default'...
+
+E...............
+======================================================================
+ERROR: test_cep068 (unittest.loader._FailedTest.test_cep068)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_cep068
+Traceback (most recent call last):
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\unittest\loader.py", line 154, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep068.py", line 10, in <module>
+    from core.localization import format_jalali
+ModuleNotFoundError: No module named 'core.localization'
+
+
+----------------------------------------------------------------------
+Ran 16 tests in 5.962s
+
+FAILED (errors=1)
+Preserving test database for alias 'default'...
+
+Found 16 test(s).
+System check identified no issues (0 silenced).

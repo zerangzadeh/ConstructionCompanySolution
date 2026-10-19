@@ -1,12 +1,15 @@
 """Own ESS orchestration; source domains retain every state and calculation."""
 
-from datetime import date
+from datetime import date, datetime, time, timedelta
 from zoneinfo import ZoneInfo
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.utils import timezone
 
+from apps.accounts.models import User
+from apps.audit.models import AuditAction
+from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission, scope_queryset
 from apps.organizations.models import BusinessPermissionCode as P
 from apps.organizations.models import Organization
@@ -15,6 +18,7 @@ from apps.timekeeping.models import (
     AttendanceCorrectionRequest,
     AttendanceRecord,
     LeaveMissionRequest,
+    OvertimeRequest,
     Timesheet,
 )
 
@@ -33,6 +37,7 @@ SOURCES = {
         P.ATTENDANCE_VIEW,
     ),
     "timesheet": (Timesheet, "employee", P.TIMESHEETS_VIEW),
+    "overtime": (OvertimeRequest, "employee", P.OVERTIME_VIEW),
 }
 
 
@@ -64,6 +69,22 @@ def own_rows(*, actor, organization, kind):
         rows = rows.filter(kind="leave")
     if kind == "correction":
         rows = rows.filter(requested_by=actor)
+    if kind == "overtime":
+        zone = ZoneInfo(organization.settings.timezone)
+        relationship = own.current_relationship
+        rows = rows.filter(
+            starts_at__gte=datetime.combine(
+                relationship.effective_start, time.min, tzinfo=zone
+            )
+        )
+        if relationship.effective_end:
+            rows = rows.filter(
+                ends_at__lt=datetime.combine(
+                    relationship.effective_end + timedelta(days=1),
+                    time.min,
+                    tzinfo=zone,
+                )
+            )
     if kind != "timesheet":
         prefix = "attendance__" if kind == "correction" else ""
         rows = scope_queryset(
@@ -175,15 +196,78 @@ def submit_own(*, actor, organization, kind, record_id):
     record = own_record(
         actor=actor, organization=organization, kind=kind, record_id=record_id
     )
-    if kind == "leave":
-        return source.submit_time_request(
+    if kind in {"leave", "overtime"}:
+        result = source.submit_time_request(
             organization=organization, actor=actor, request=record
         )
+        if kind == "overtime":
+            _overtime_identity_audit(
+                actor=actor, organization=organization, record=result
+            )
+        return result
     if kind == "timesheet":
         return source.submit_timesheet(
             organization=organization, actor=actor, timesheet=record
         )
     raise PermissionDenied(DENIED)
+
+
+def _overtime_identity_audit(
+    *, actor: User, organization: Organization, record: OvertimeRequest
+) -> None:
+    _, own = subject(actor=actor, organization=organization)
+    record_audit_event(
+        action=AuditAction.TIME_REQUEST_TRANSITIONED,
+        organization=organization,
+        actor=actor,
+        entity_type=record._meta.label_lower,
+        entity_id=str(record.pk),
+        changes={"state": record.state},
+        metadata={
+            "origin": "ess_overtime",
+            "person_id": str(own.person.pk),
+            "relationship_id": str(own.current_relationship.pk),
+            "relationship_start": own.current_relationship.effective_start.isoformat(),
+            "relationship_end": str(own.current_relationship.effective_end or ""),
+            "employee_id": str(record.employee_id),
+        },
+    )
+
+
+@transaction.atomic
+def create_own_overtime(
+    *,
+    actor: User,
+    organization: Organization,
+    starts_at: datetime,
+    ends_at: datetime,
+    reason: str,
+) -> OvertimeRequest:
+    organization = Organization.objects.select_for_update().get(pk=organization.pk)
+    organization, own = subject(actor=actor, organization=organization)
+    zone = ZoneInfo(organization.settings.timezone)
+    relationship = own.current_relationship
+    if (
+        not timezone.is_aware(starts_at)
+        or not timezone.is_aware(ends_at)
+        or ends_at <= starts_at
+        or timezone.localtime(starts_at, zone).date() < relationship.effective_start
+        or (
+            relationship.effective_end
+            and timezone.localtime(ends_at, zone).date() > relationship.effective_end
+        )
+    ):
+        raise ValidationError("بازه اضافه‌کاری باید در محدوده رابطه کاری مجاز باشد.")
+    record = source.create_overtime_request(
+        organization=organization,
+        actor=actor,
+        employee=relationship.legacy_employee,
+        starts_at=starts_at,
+        ends_at=ends_at,
+        reason=reason,
+    )
+    _overtime_identity_audit(actor=actor, organization=organization, record=record)
+    return record
 
 
 @transaction.atomic

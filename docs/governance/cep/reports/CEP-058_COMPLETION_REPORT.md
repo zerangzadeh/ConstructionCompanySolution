@@ -107,3 +107,11 @@ Git add/commit/push are authorized for this session; record their actual results
 only after checkpointing. Branch/worktree creation, merge/rebase/cherry-pick,
 reset/clean/stash/force/history rewrite: NOT EXECUTED. Human Sign-off, Production
 Certification and Production Cutover: NOT EXECUTED.
+
+Checkpoint addendum: the authorized 16-file preparation/evidence checkpoint
+`b412b09cc9f42c73f67007d13de9305353a8fae3` was committed, pushed to origin main
+and verified against local main/origin/remote with a clean tree before the next
+CEP entry review. Add/commit/push EXECUTED; no merge. PARTIAL, 0/7 migration AC,
+EXT-0017 and all production boundaries are unchanged. On the Human's subsequent
+continuation instruction, independent CEP-068 overtime entry was reviewed under
+its explicit conditional dependency semantics; no Payroll backfill was resumed.

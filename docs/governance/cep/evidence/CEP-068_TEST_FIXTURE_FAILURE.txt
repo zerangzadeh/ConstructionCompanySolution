@@ -1,0 +1,60 @@
+Using existing test database for alias 'default'...
+
+......F.E................
+======================================================================
+ERROR: test_project_scope_intersection_applies_to_source_reads_and_creation (apps.workforce.test_cep068.ESSOvertimeTests.test_project_scope_intersection_applies_to_source_reads_and_creation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep068.py", line 216, in test_project_scope_intersection_applies_to_source_reads_and_creation
+    service.own_rows(
+  File "E:\Construction_Company_Solution\apps\workforce\ess_timekeeping.py", line 56, in own_rows
+    membership = require_business_permission(
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\organizations\authorization.py", line 437, in require_business_permission
+    raise PermissionDenied(message)
+django.core.exceptions.PermissionDenied: \u0627\u0637\u0644\u0627\u0639\u0627\u062a \u0645\u062c\u0627\u0632 \u062f\u0631 \u0627\u06cc\u0646 \u0634\u0631\u06a9\u062a \u06cc\u0627\u0641\u062a \u0646\u0634\u062f.
+
+======================================================================
+FAIL: test_own_source_filter_and_missing_or_foreign_urls_have_same_denial (apps.workforce.test_cep068.ESSOvertimeTests.test_own_source_filter_and_missing_or_foreign_urls_have_same_denial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep068.py", line 204, in test_own_source_filter_and_missing_or_foreign_urls_have_same_denial
+    self.assertEqual(denied.content, missing.content)
+AssertionError: [DYNAMIC_HTML_DIFF_REDACTED: randomized CSRF / current request path]
+
+----------------------------------------------------------------------
+Ran 25 tests in 13.594s
+
+FAILED (failures=1, errors=1)
+Preserving test database for alias 'default'...
+
+Found 25 test(s).
+System check identified no issues (0 silenced).
+Using existing test database for alias 'default'...
+
+..E....F........................
+======================================================================
+ERROR: test_foreign_tenant_context_and_period_scope_fail_closed (apps.workforce.test_cep068.ESSOvertimeTests.test_foreign_tenant_context_and_period_scope_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep068.py", line 355, in test_foreign_tenant_context_and_period_scope_fail_closed
+    client.post(
+    ^^^^^^
+NameError: name 'client' is not defined
+
+======================================================================
+FAIL: test_own_source_filter_and_missing_or_foreign_urls_have_same_denial (apps.workforce.test_cep068.ESSOvertimeTests.test_own_source_filter_and_missing_or_foreign_urls_have_same_denial)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+Found 32 test(s).
+System check identified no issues (0 silenced).
+  File "E:\Construction_Company_Solution\apps\workforce\test_cep068.py", line 207, in test_own_source_filter_and_missing_or_foreign_urls_have_same_denial
+    self.assertEqual(normalize(denied.content), normalize(missing.content))
+AssertionError: [DYNAMIC_HTML_DIFF_REDACTED: randomized CSRF / current request path]
+
+----------------------------------------------------------------------
+Ran 32 tests in 11.097s
+
+FAILED (failures=1, errors=1)
+Preserving test database for alias 'default'...
+

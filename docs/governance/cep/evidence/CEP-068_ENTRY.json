@@ -1,0 +1,103 @@
+{
+  "date": "2026-10-19",
+  "cep": "CEP-068",
+  "baseline_main_origin_remote": "b412b09cc9f42c73f67007d13de9305353a8fae3",
+  "tree": "CLEAN_BEFORE_ENTRY_METADATA",
+  "standing_authority": "BOUNDED_NON_PRODUCTION_OVERTIME_SUBFLOW_ONLY",
+  "prompt_hashes_verified": {
+    "CEP-068": "6f157ca68cff50e8d5d94757b3065ffb40dddeba32803cec32179225a4ad9156",
+    "CEP-026": "a9a8c61c5bb1b68c8f988ec4d085801af44dfff4993e6c8ba49c2c098ac9fe8a",
+    "CEP-062": "de636c4166ce39794607dabd819c78d3791016151bc61b4db225043912b48d87"
+  },
+  "recovery_sources_verified": {
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "packages/CEP-068.md": "2e4804e6ccb422763c0e6c012f166f0d07733866729102bbf2eef3b297b30c2c",
+        "BONIRA_CEP_DEPENDENCY_REGISTER.csv": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    },
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_MISSION_ROUTING_SPECIFICATION.md": "fc629054e488358c05fd9753063b3fff0ea5f02a578e99eb553a715a94825747",
+        "BONIRA_CONFIGURATION_PROFILE_MATRIX.csv": "ca891039bcd6a503d2e4c5e370487003e7ba5944858c8473e600bb6f1773eb52"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    },
+    "BONIRA_IMPLEMENTATION_ROADMAP_CONSOLIDATED_LATEST.zip": {
+      "sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+      "members": {
+        "BONIRA_IMPLEMENTATION_GATE_REGISTER.csv": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d"
+      }
+    }
+  },
+  "dependencies": [
+    {
+      "Dependency ID": "CEP-DEP-071",
+      "Prerequisite CEP": "CEP-026",
+      "Dependent CEP": "CEP-068",
+      "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+      "Source IMB Edge IDs / IMB Pair": "DEP-0099:IMB-0093\u2192IMB-0091",
+      "Strength": "MANDATORY",
+      "Condition": "ALWAYS",
+      "Roadmap Compatibility": "PASS",
+      "Justification": "ESS mission and overtime request entry exposes or submits employee-specific data and requires ESS own-data/backend object-scope enforcement.",
+      "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+    },
+    {
+      "Dependency ID": "CEP-DEP-102",
+      "Prerequisite CEP": "CEP-062",
+      "Dependent CEP": "CEP-068",
+      "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+      "Source IMB Edge IDs / IMB Pair": "DEP-0083:IMB-0078\u2192IMB-0091",
+      "Strength": "CONDITIONAL",
+      "Condition": "For the Mission sub-flow; the Overtime request sub-flow does not require Mission financial routing.",
+      "Roadmap Compatibility": "PASS",
+      "Justification": "ESS Mission request entry must hand approved monetary effects to exactly one governed Mission financial route.",
+      "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+    }
+  ],
+  "entry_gate": "GATE-02_PASS_AND_CEP026_COMPLETE",
+  "mission_dependency": "CEP062_NOT_STARTED; conditional edge applies to Mission only, remains blocked; not waived or removed",
+  "external": [
+    {
+      "External Dependency ID": "EXT-0016",
+      "CEP ID": "CEP-068",
+      "Dependency Phase": "ACTIVATION",
+      "Blocks Build?": "NO",
+      "Blocks Activation?": "YES",
+      "Blocks Verification?": "NO",
+      "Blocks Production?": "NO",
+      "Required Gate": "GATE-07",
+      "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED FOR MONETARY ROUTE ACTIVATION",
+      "Notes": "Mission financial-effect classification \u2014 Effect-type classification to exactly one route and source-identity policy"
+    }
+  ],
+  "sources": "PD027/029, SPEC018; no Mission financial route or employee loan authority",
+  "seams": [
+    "apps/workforce/ess_timekeeping.py",
+    "apps/workforce/ess_timekeeping_forms.py",
+    "apps/workforce/ess_timekeeping_views.py",
+    "apps/timekeeping/services.py:create_overtime_request/submit_time_request",
+    "apps/timekeeping/models.py:OvertimeRequest",
+    "templates/workforce/_ess_navigation.html"
+  ],
+  "scope": "Existing ESS Timekeeping create/read/submit routes gain overtime; current explicit ESS subject supplies Employee; no Employee/tenant/policy/amount input. Existing Timekeeping source transitions and permissions retained. No manager review route added. Evidence attachments unavailable absent approved source attachment policy; Mission unavailable. Identity episode audit retained at create/submit. No schema/migration required.",
+  "migration": "NONE",
+  "touch_set_manifest": "docs/governance/cep/manifests/CEP-068_EXECUTION_MANIFEST.md",
+  "independence": "No057/058 migration inputs or writes, no065 cashflow, no077 acquisition/network/security policy. Only ESS Timekeeping seam; no production.",
+  "outcome_boundary": "Package remains PARTIAL if required Mission target cannot execute; overtime completion never claims full IMB0091 AC/DoD."
+}

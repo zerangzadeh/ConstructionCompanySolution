@@ -81,6 +81,49 @@ class CorrectionForm(ESSForm):
         return data
 
 
+class OvertimeForm(ESSForm):
+    starts_at = forms.DateTimeField(label="شروع اضافه‌کاری")
+    ends_at = forms.DateTimeField(label="پایان اضافه‌کاری")
+    reason = forms.CharField(
+        label="دلیل درخواست اضافه‌کاری",
+        max_length=2000,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
+    def clean(self):
+        data = super().clean()
+        if any(
+            key in self.data
+            for key in (
+                "organization",
+                "organization_id",
+                "employee",
+                "employee_id",
+                "person_id",
+                "relationship_id",
+                "work_relationship_id",
+                "policy_reference",
+                "project",
+                "project_id",
+                "site",
+                "site_id",
+                "rate",
+                "amount",
+                "multiplier",
+                "state",
+                "approved_by",
+            )
+        ):
+            raise forms.ValidationError("درخواست شامل مقدار غیرمجاز است.")
+        if (
+            data.get("starts_at")
+            and data.get("ends_at")
+            and data["ends_at"] <= data["starts_at"]
+        ):
+            raise forms.ValidationError("پایان اضافه‌کاری باید پس از شروع باشد.")
+        return data
+
+
 class TimesheetForm(ESSForm):
     period_start = forms.DateField(label="شروع دوره")
     period_end = forms.DateField(label="پایان دوره")

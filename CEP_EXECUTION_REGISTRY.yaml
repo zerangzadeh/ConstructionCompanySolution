@@ -67,9 +67,9 @@ summary:
   eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 1
-  partial_current: 5
+  partial_current: 6
   failed_current: 0
-  not_started_other_current_governed: 16
+  not_started_other_current_governed: 15
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -3112,11 +3112,12 @@ ceps:
       path: docs/governance/cep/reports/CEP-058_COMPLETION_REPORT.md
       evidence_presence: CONFIRMED_SYNTHETIC_FRAMEWORK_ONLY_NO_ACTUAL_BACKFILL
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: b412b09cc9f42c73f67007d13de9305353a8fae3
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: VERIFIED_PARTIAL_FRAMEWORK_CHECKPOINT_ONLY
+      integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
       sha: 93a42298392b790bd1b18a584518ab032bb375f1
@@ -3131,6 +3132,9 @@ ceps:
     - date: '2026-10-19'
       status: BLOCKED
       reason: EXT0017 approved dataset/mappings/classification/reset interval/totals remain unestablished. Actual migration and its reconciliation/retry evidence cannot be inferred from synthetic preparation tests. Stop at material external-data boundary; no Gate or production authority inferred.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Authorized16-file preparation/evidence checkpoint b412b09 pushed and verified;058 remains PARTIAL0/7 actual migration AC and EXT0017 unresolved; no backfill or production.
   CEP-059:
     title: null
     phase: V1_IMPLEMENTATION
@@ -3467,28 +3471,32 @@ ceps:
       status: GIT_INTEGRATED
       reason: Authorized direct commit/push fe75a51dd477df3a0cc95f039c7f1007f683179a verified on origin main; clean checkpoint, no merge or production action.
   CEP-068:
-    title: null
+    title: ESS mission and overtime requests
     phase: V1_IMPLEMENTATION
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: OVERTIME_SATISFIED_CEP026_MISSION_CONDITIONAL_CEP062_UNSATISFIED
+    eligibility_status: OVERTIME_IMPLEMENTED_MISSION_AND_BROWSER_EVIDENCE_BLOCKED
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      status: PARTIAL
+      lifecycle: PARTIAL_OVERTIME_ONLY_REQUIRED_BROWSER_EVIDENCE_UNVERIFIED
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      passed: 0
+      total: 6
+      status: FULL_PACKAGE_PARTIAL_UNVERIFIED_MISSION_AND_SCREENSHOT_GAPS
+    dod: NOT_MET_PARTIAL
+    blockers:
+    - CEP-068-FINDING-001 / BLOCKER-DEPENDENCY / CEP062 Mission routing linkage incomplete; conditional Mission edge preserved, overtime independent
+    - CEP-068-FINDING-002 / BLOCKER-ENVIRONMENT / Local browser use disabled in Work settings; required screenshots and representative browser review unverified
+    remaining_utv:
+    - Mission after conditional062 prerequisite; required screenshots and responsive keyboard/focus/browser review
+    - Full accessibility performance/concurrency UAT and production remain unverified
     completion_report:
-      path: null
-      evidence_presence: UNVERIFIED
+      path: docs/governance/cep/reports/CEP-068_COMPLETION_REPORT.md
+      evidence_presence: CONFIRMED_OVERTIME_TEST_ONLY_BROWSER_SCREENSHOTS_UNAVAILABLE
     git:
       committed: null
       commit_sha: null
@@ -3496,10 +3504,19 @@ ceps:
       merged_to_main: null
       remote_main_evidence: UNVERIFIED
     last_execution:
-      branch: null
-      sha: null
-    updated_at: null
-    history: []
+      branch: main
+      sha: b412b09cc9f42c73f67007d13de9305353a8fae3
+    updated_at: '2026-10-19'
+    history:
+    - date: '2026-10-19'
+      status: STARTED
+      reason: Human continuation and standing authority; canonical prompt/source SHA verified,026 COMPLETE and GATE02 PASS;062 edge applies only to Mission. Recorded bounded overtime touch set; no migration or057/058/065/077 collision.
+    - date: '2026-10-19'
+      status: PARTIAL
+      reason: Own overtime create/read/submit uses existing Timekeeping authority with explicit ESS identity and episode audit;32 focused/affected tests PASS including11 new overtime tests. Migration NONE;0/6 full-package AC closed, DoD not met.
+    - date: '2026-10-19'
+      status: BLOCKED
+      reason: Mission unavailable pending conditional062 prerequisite; browser tool returned local browser use disabled in Work settings. Required screenshots/review unverified; no settings bypass or invented proof. Stop at material environment/partial boundary; no Gate or production authority.
   CEP-069:
     title: Statutory package production activation control
     phase: PRODUCTION_CERTIFICATION
@@ -4187,9 +4204,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 93a42298392b790bd1b18a584518ab032bb375f1
-  origin_main: 93a42298392b790bd1b18a584518ab032bb375f1
-  integration_checkpoint: 93a42298392b790bd1b18a584518ab032bb375f1
+  last_reconciled_head: b412b09cc9f42c73f67007d13de9305353a8fae3
+  origin_main: b412b09cc9f42c73f67007d13de9305353a8fae3
+  integration_checkpoint: b412b09cc9f42c73f67007d13de9305353a8fae3
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4211,7 +4228,7 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_CEP058_PARTIAL_MATERIAL_EXTERNAL_DATA_BLOCKER
+  current_session_continuation: STOP_CEP068_PARTIAL_BROWSER_ENVIRONMENT_AND_MISSION_DEPENDENCY
   current_independent_cep: null
   next_entry_review_candidate: null
   next_candidate_full_entry_eligibility: NO_FULLY_VERIFIED_UNBLOCKED_CANDIDATE_OTHER_SCOPES_REQUIRE_OWN_ENTRY_REVIEW
@@ -4220,9 +4237,9 @@ execution_frontier:
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: CEP077 partial evidence checkpoint93a4229 pushed; independent058 framework built and21 tests PASS, actual migration0/7 and DoD not met because EXT0017 approved inputs absent.058 remains PARTIAL; preserve057 PARTIAL0/7 EXT0015,065 BLOCKED,077 external DNS PARTIAL with no retry, gates05/06/08 NOT_PASSED and no production authority.
+  boundary_reason: CEP077 evidence93a4229 and CEP058 preparationb412b09 pushed; independent068 overtime implemented and32 tests PASS.068 PARTIAL because conditional Mission062 incomplete and required browser/screenshot proof unavailable in Work settings. Preserve057/058 PARTIAL0/7 EXT0015/17,065 BLOCKED,077 PARTIAL external DNS no retry,gates05/06/08 NOT_PASSED,no production authority.
   resume_cep_after_blocker_resolution: CEP-057
-  independent_candidates_entry_status: CEP058_PARTIAL_EXT0017_AND_CEP077_PARTIAL_DNS_OTHERS_REQUIRE_PHASE_SPECIFIC_REVIEW
+  independent_candidates_entry_status: CEP068_PARTIAL_BROWSER_UNAVAILABLE_OTHERS_REQUIRE_PHASE_SPECIFIC_REVIEW
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false
   human_signoff_executed: false
