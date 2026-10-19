@@ -57,3 +57,9 @@ Ruff/format and diff checks. Application regression and migration/system checks
 are N/A for this standalone tool with no Django/configuration changes. Required
 production-certification evidence remains unavailable; report PARTIAL if canonical
 certification AC/DoD cannot be proved. Stop serial continuation at that boundary.
+
+Git checkpoint: `1b1eb74757f88ee914c32153e366b4a273a8a1bd` committed/pushed on
+existing `main`; local/origin/remote verified, tree clean after push. Normal
+`git add`, `git commit`, `git push origin main` executed under current explicit
+Human authority. Direct commit, no merge. This follow-up records integration
+metadata only; execution remains PARTIAL and no production authority is granted.

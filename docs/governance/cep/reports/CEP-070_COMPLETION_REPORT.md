@@ -64,3 +64,9 @@ actual checkpoint evidence separately from this execution baseline; no branch,
 worktree, merge/rebase/reset/clean/stash/force-push operation.
 
 Human Sign-off / Production Certification / Production Cutover: **NOT EXECUTED**.
+
+Git checkpoint: `1b1eb74757f88ee914c32153e366b4a273a8a1bd` committed/pushed on
+existing `main`; local/origin/remote verified, tree clean after push. Normal
+`git add`, `git commit`, `git push origin main` executed under current explicit
+Human authority. Direct commit, no merge. This follow-up records integration
+metadata only; execution remains PARTIAL and no production authority is granted.

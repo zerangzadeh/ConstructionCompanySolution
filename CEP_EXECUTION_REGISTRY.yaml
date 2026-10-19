@@ -3621,11 +3621,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-070_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_NONPRODUCTION_PREPARATION_ONLY
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: PENDING_SAFE_ATTRIBUTABLE_CHECKPOINT
+      remote_main_evidence: VERIFIED_LOCAL_ORIGIN_REMOTE_MAIN_DIRECT_PUSH
     last_execution:
       branch: main
       sha: 24d782aefed64f92c953d6469af46759444eb151
@@ -3637,6 +3637,9 @@ ceps:
     - date: '2026-10-19'
       status: PARTIAL
       reason: Non-production offline pg_dump/file capture adapter implemented. Nine focused tests and twelve invalid-plan subtests PASS; actual disposable PostgreSQL18.6 backup/restore and three file classes PASS; both disposable databases removed. Ruff/format/diff PASS. Zero of six AC production-certified; SPEC005 objectives/owners and actual ERP/environment controls unverified. Stop serial continuation; no migrations, GATE11 PASS, Human Sign-off or production action.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Current Human-authorized safe attributable15-file partial checkpoint1b1eb74 pushed and verified on local/origin/remote main with clean tree. Source validation hashes unchanged;070 remains PARTIAL0/6 production-certified. No migration, production authority, Gate PASS or completion inference. Evidence CEP-070_GIT_CHECKPOINT.json.
   CEP-071:
     title: null
     phase: PRODUCTION_CERTIFICATION
@@ -4247,9 +4250,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 24d782aefed64f92c953d6469af46759444eb151
-  origin_main: 24d782aefed64f92c953d6469af46759444eb151
-  integration_checkpoint: 24d782aefed64f92c953d6469af46759444eb151
+  last_reconciled_head: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
+  origin_main: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
+  integration_checkpoint: 1b1eb74757f88ee914c32153e366b4a273a8a1bd
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
