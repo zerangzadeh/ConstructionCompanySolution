@@ -1,0 +1,33 @@
+[
+  {
+    "finding_id": "CEP-077-FINDING-001",
+    "status": "OPEN",
+    "classification": "BLOCKER-ENVIRONMENT",
+    "failure_attribution": "TEST_INFRASTRUCTURE_DEBT_ENVIRONMENT_DNS_NOT_PRODUCT_REGRESSION",
+    "imb": "IMB-0107",
+    "affected_ac": [
+      1,
+      3
+    ],
+    "expected": "Approved hash-checked HTTPS PyPI acquisition must succeed before offline verification, current SCA, license/SBOM and provenance checks.",
+    "actual": "Existing gate exited1: files.pythonhosted.org DNS resolution failed (getaddrinfo11001) while fetching exact asgiref3.12.1 wheel. Pinned image/locks/config passed; zero wheels acquired; no complete prod/dev set or advisory/license/SBOM/provenance result.",
+    "evidence": [
+      "CEP-077_RUNTIME/gate-result.json",
+      "CEP-077_RUNTIME_OUTPUT.txt",
+      "CEP-077_RUNTIME_PROVENANCE.json"
+    ],
+    "scope_impact": "Environment failure only; no dependency/policy/index/CI/code or canonical external-dependency change authorized or performed.",
+    "resolution": "Restore DNS and HTTPS reachability to the approved PyPI artifact host, then rerun the unchanged gate with fresh timestamped output on the grounded candidate; retain this failed attempt. No alternate index, cached-pass substitution, downgrade, waiver or lock edit.",
+    "queue_action": "STOP_PARTIAL_VERIFICATION; no downstream or production PASS",
+    "identified_at": "2026-10-19T15:19:12.580184+00:00",
+    "connectivity_rechecks": [
+      {
+        "completed_at": "2026-10-19T15:25:57.061843+00:00",
+        "evidence": "CEP-077_CONNECTIVITY_RECHECK.json",
+        "result": "DNS_STILL_UNAVAILABLE_GETADDRINFO_11001",
+        "product_regression": "NOT_PROVEN_NOT_CLASSIFIED",
+        "acquisition_or_downstream_rerun": false
+      }
+    ]
+  }
+]

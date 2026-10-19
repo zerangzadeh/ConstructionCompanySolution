@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "started_at": "2026-10-19T15:17:51.655621+00:00",
+  "status": "BLOCKED",
+  "production_readiness": "UTV",
+  "source": "https://pypi.org/simple/",
+  "target": "CPython 3.11.17 Debian 12 linux/amd64",
+  "checks": {
+    "locks": "PASS",
+    "secret_config": "PASS",
+    "image_identity": "PASS"
+  },
+  "image_digest": "sha256:8a00ecb83ed9d0864dfd102a1bdb2067fda907ceb30bb86d09da9ee558b19590",
+  "sets": {},
+  "failure": "Hash-checked PyPI acquisition failed:  connection broken by 'NameResolutionError(\"HTTPSConnection(host='files.pythonhosted.org', port=443): Failed to resolve 'files.pythonhosted.org' ([Errno 11001] getaddrinfo failed)\")': /packages/c0/1b/54f4ad77cd8a584fa70746c47df988e002cf1ee1eba43364d46f87803647/asgiref-3.12.1-py3-none-any.whl\n  WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NameResolutionError(\"HTTPSConnection(host='files.pythonhosted.org', port=443): Failed to resolve 'files.pythonhosted.org' ([Errno 11001] getaddrinfo failed)\")': /packages/c0/1b/54f4ad77cd8a584fa70746c47df988e002cf1ee1eba43364d46f87803647/asgiref-3.12.1-py3-none-any.whl\nerror: connection-failed\n\nFailed to connect to files.pythonhosted.org while fetching https://files.pythonhosted.org/packages/c0/1b/54f4ad77cd8a584fa70746c47df988e002cf1ee1eba43364d46f87803647/asgiref-3.12.1-py3-none-any.whl\n\nFailed to resolve IP address for 'files.pythonhosted.org' ([Errno 11001] getaddrinfo failed)\n\nhint: Are you connected to the Internet? If so, check whether your system can connect to files.pythonhosted.org before trying again. There may be a firewall or proxy that's preventing the connection.\n",
+  "completed_at": "2026-10-19T15:19:12.580184+00:00"
+}
