@@ -2,28 +2,16 @@ diff --git a/CEP_EXECUTION_REGISTRY.yaml b/CEP_EXECUTION_REGISTRY.yaml
 index 567627b..10426fa 100644
 --- a/CEP_EXECUTION_REGISTRY.yaml
 +++ b/CEP_EXECUTION_REGISTRY.yaml
-@@ -62,14 +62,14 @@ inventory:
-   verification_uat: CEP-073..CEP-079
-   post_v1_range: CEP-080..CEP-086
- summary:
+@@ -65 +65 @@ summary:
 -  execution_state_complete: 55
 +  execution_state_complete: 54
-   authorized_not_started: 0
-   eligible_under_standing_authority: 0
-   in_progress: 0
+@@ -69 +69 @@ summary:
 -  blocked_current: 0
 +  blocked_current: 2
-   partial_current: 2
-   failed_current: 0
+@@ -72 +72 @@ summary:
 -  not_started_other_current_governed: 22
 +  not_started_other_current_governed: 21
-   deferred_post_v1: 7
-   remote_main_verified_complete_from_last_audit: null
-   last_updated: '2026-10-19'
-@@ -197,6 +197,15 @@ human_decisions:
-     provenance: docs/governance/cep/evidence/CEP-047_MAPPING_RESOLUTION_PROVENANCE.json
-     unresolved_material_semantics_must_stop: true
-     production_authorized: false
+@@ -199,0 +200,9 @@ human_decisions:
 +  HUMAN-CEP023-029-REMEDIATION-20261019:
 +    source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
 +    authority: HUMAN_DECISION_AUTHORITY / Product Owner
@@ -33,31 +21,20 @@ index 567627b..10426fa 100644
 +    no_057_opening_backfill_in_023: true
 +    git_writes_authorized: SAFE_ATTRIBUTABLE_COMPLETED_WORK_ONLY
 +    production_authorized: false
-   HUMAN-SERIAL-CEP-GIT-CHECKPOINTS-20261019:
-     source: Current Human instruction to proceed autonomously from completed047 boundary
-     authority: HUMAN_DECISION_AUTHORITY / Product Owner
-@@ -1154,39 +1163,56 @@ ceps:
-       status: GIT_INTEGRATED
-       reason: Authorized direct commit and fast-forward push1533f7f verified main/HEAD/origin/main/remote main; clean working tree.
-   CEP-023:
+@@ -1157 +1166 @@ ceps:
 -    title: null
 +    title: Leave entitlement and balance authority
-     phase: V1_IMPLEMENTATION
-     dependency_status: SATISFIED
-     eligibility_status: SATISFIED
-     authorization:
+@@ -1162,3 +1171,3 @@ ceps:
 -      status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
 -      authorization_id: null
 -      source: null
 +      status: AUTHORIZED
 +      authorization_id: HUMAN-CEP023-029-REMEDIATION-20261019
 +      source: docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt
-     execution:
-       status: COMPLETE
-       lifecycle: CLOSED_VERIFIED
+@@ -1168 +1177 @@ ceps:
 -      advisor_review: ACCEPTED
 +      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
-     acceptance:
+@@ -1170,4 +1179,4 @@ ceps:
 -      passed: null
 -      total: null
 -      status: UNRECORDED
@@ -66,25 +43,21 @@ index 567627b..10426fa 100644
 +      total: 6
 +      status: VERIFIED
 +    dod: MET
-     blockers: []
+@@ -1175 +1184,4 @@ ceps:
 -    remaining_utv: []
 +    remaining_utv:
 +    - Performance/concurrency and browser/accessibility runtime remain UTV per canonical contract; no production or statutory activation
 +    - EXT0014 explicit effective tenant Leave Policy remains required; configured Development has zero policies and balances
 +    - Three legacy Timekeeping fixtures require documented test-only explicit scope overlay; HEAD baseline reproduces same failures
-     completion_report:
+@@ -1177,2 +1189,2 @@ ceps:
 -      path: null
 -      evidence_presence: UNVERIFIED
 +      path: docs/governance/cep/reports/CEP-023_COMPLETION_REPORT.md
 +      evidence_presence: VERIFIED_NEW_REMEDIATION_EVIDENCE_HISTORICAL_PROVENANCE_RETAINED
-     git:
-       committed: null
-       commit_sha: null
-       pushed: null
-       merged_to_main: null
+@@ -1184 +1196 @@ ceps:
 -      remote_main_evidence: REPORT_NOT_FOUND
 +      remote_main_evidence: NOT_YET_CHECKPOINTED
-     last_execution:
+@@ -1186,4 +1198,18 @@ ceps:
 -      branch: null
 -      sha: null
 -    updated_at: '2026-10-16'
@@ -107,31 +80,20 @@ index 567627b..10426fa 100644
 +      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
 +      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
 +      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
-   CEP-024:
-     title: Timekeeping object-scope enforcement
-     phase: V1_IMPLEMENTATION
-@@ -1461,28 +1487,29 @@ ceps:
-       status: PARTIAL
-       reason: Human Decision Authority granted bounded non-production migration preparation and rehearsal authority in BONIRA-CONSOLIDATED-20261017 but expressly withheld dataset-dependent backfill pending named tenant, exclusive cutoff, authoritative source/opening dataset and accountable reviewers. BLOCKER-DATA remains.
-   CEP-029:
+@@ -1464 +1490 @@ ceps:
 -    title: null
 +    title: Employee to WorkRelationship migration
-     phase: V1_IMPLEMENTATION
-     dependency_status: SATISFIED
+@@ -1467 +1493 @@ ceps:
 -    eligibility_status: SATISFIED
 +    eligibility_status: BLOCKED_CANONICAL_REMEDIATION_REQUIRED
-     authorization:
-       status: AUTHORIZED_OR_HISTORICALLY_EXECUTED
-       authorization_id: null
-       source: null
-     execution:
+@@ -1473,3 +1499,3 @@ ceps:
 -      status: COMPLETE
 -      lifecycle: CLOSED_VERIFIED
 -      advisor_review: ACCEPTED
 +      status: NOT_STARTED
 +      lifecycle: BLOCKED_BEFORE_MUTATION
 +      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
-     acceptance:
+@@ -1477,5 +1503,6 @@ ceps:
 -      passed: null
 -      total: null
 -      status: UNRECORDED
@@ -143,18 +105,10 @@ index 567627b..10426fa 100644
 +    dod: NOT_MET
 +    blockers:
 +    - CEP-029-FINDING-001 / B4_IMPLEMENTATION_MIGRATION_GAP / Canonical outcome absent; remediation owned by this CEP, not057; see CEP057 prerequisite adjudication
-     remaining_utv: []
-     completion_report:
-       path: null
+@@ -1485 +1512 @@ ceps:
 -      evidence_presence: UNVERIFIED
 +      evidence_presence: NO_QUALIFYING_COMPLETION_EVIDENCE_RECOVERED
-     git:
-       committed: null
-       commit_sha: null
-@@ -1492,8 +1519,16 @@ ceps:
-     last_execution:
-       branch: null
-       sha: null
+@@ -1495,2 +1522,10 @@ ceps:
 -    updated_at: '2026-10-16'
 -    history: []
 +    updated_at: '2026-10-19'
@@ -167,32 +121,23 @@ index 567627b..10426fa 100644
 +      evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
 +      prior_imported_claim: COMPLETE / CLOSED_VERIFIED / ACCEPTED at2f16cc05
 +      original_history_preserved_in: docs/governance/cep/evidence/CEP-057_ADJUDICATION_SOURCES.json
-   CEP-030:
-     title: Party operational/governance surfaces
-     phase: V1_IMPLEMENTATION
-@@ -2956,28 +2991,32 @@ ceps:
-       status: GIT_INTEGRATED
-       reason: Authorized direct commit/push343391c verified main/origin and clean tree; no production action.
-   CEP-057:
+@@ -2959 +2994 @@ ceps:
 -    title: null
 +    title: Leave opening-balance migration
-     phase: V1_IMPLEMENTATION
+@@ -2961,2 +2996,2 @@ ceps:
 -    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
 -    eligibility_status: NOT_ELIGIBLE
 +    dependency_status: UNSATISFIED_CONFIRMED_A3_B4
 +    eligibility_status: BLOCKED_BEFORE_MUTATION
-     authorization:
-       status: NOT_AUTHORIZED
-       authorization_id: null
+@@ -2966 +3001 @@ ceps:
 -      source: null
 +      source: Standing bounded non-production authority exists; entry blocked by mandatory-prerequisite implementation conflict
-     execution:
-       status: NOT_STARTED
+@@ -2969,2 +3004,2 @@ ceps:
 -      lifecycle: NOT_ELIGIBLE
 -      advisor_review: PENDING
 +      lifecycle: BLOCKED_BEFORE_MUTATION
 +      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
-     acceptance:
+@@ -2972,6 +3007,10 @@ ceps:
 -      passed: null
 -      total: null
 -      status: UNRECORDED
@@ -209,18 +154,12 @@ index 567627b..10426fa 100644
 +    - All CEP057 service, isolation, integration, migration, reconciliation and rollback execution NOT_EXECUTED
 +    - EXT0015 approved dataset, explicit identity mapping, as-of/cutover and totals not verified; required before migration execution
 +    - Performance/concurrency and browser/accessibility remain UTV
-     completion_report:
+@@ -2979,2 +3018,2 @@ ceps:
 -      path: null
 -      evidence_presence: UNVERIFIED
 +      path: docs/governance/cep/reports/CEP-057_COMPLETION_REPORT.md
 +      evidence_presence: VERIFIED_ENTRY_ONLY_NO_EXECUTION_PASS
-     git:
-       committed: null
-       commit_sha: null
-@@ -2985,10 +3024,16 @@ ceps:
-       merged_to_main: null
-       remote_main_evidence: UNVERIFIED
-     last_execution:
+@@ -2988,4 +3027,10 @@ ceps:
 -      branch: null
 -      sha: null
 -    updated_at: null
@@ -235,166 +174,125 @@ index 567627b..10426fa 100644
 +    - date: '2026-10-19'
 +      status: BLOCKER_CAUSES_ADJUDICATED
 +      reason: A3 for023 and B4 for029 separately established; required authority and migrated-identity outcome absent, not a stale report-link problem. Initial057 finding and entry evidence retained; both mandatory prerequisites unsatisfied. No057 product/migration repair or checkpoint; scoped remediation remains023/029, with Human resolution required before any necessary023 schema under its NONE contract.
-   CEP-058:
-     title: null
-     phase: V1_IMPLEMENTATION
-@@ -4021,9 +4066,9 @@ authority_scope:
-   - Production Certification
- repository_state:
-   branch: main
+@@ -4024,3 +4069,3 @@ repository_state:
 -  last_reconciled_head: 46baa4765628d5a8cee036c021b521ed800548d2
 -  origin_main: 46baa4765628d5a8cee036c021b521ed800548d2
 -  integration_checkpoint: 46baa4765628d5a8cee036c021b521ed800548d2
 +  last_reconciled_head: ad167f58714577620666a0efb7f5518895cac4a0
 +  origin_main: ad167f58714577620666a0efb7f5518895cac4a0
 +  integration_checkpoint: ad167f58714577620666a0efb7f5518895cac4a0
-   integration_method: DIRECT_COMMIT_TO_MAIN
-   last_reconciled_at: '2026-10-19'
- execution_frontier:
-@@ -4032,8 +4077,7 @@ execution_frontier:
-   fixed_cep_count_per_session: NONE
-   dependency_ready_current_governed:
-   - CEP-028
+@@ -4035,2 +4080 @@ execution_frontier:
 -  - CEP-057
 -  - CEP-058
 +  - CEP-029
-   - CEP-063
-   - CEP-065
-   - CEP-067
-@@ -4046,17 +4090,17 @@ execution_frontier:
-   dependency_ready_is_not_entry_gate_or_execution_authority: true
-   verified_build_eligible_unblocked: []
-   next_autonomous_cep: null
+@@ -4049 +4093 @@ execution_frontier:
 -  current_session_continuation: CEP050_CHECKPOINT_VERIFIED_SERIAL_ENTRY_REVIEW
 +  current_session_continuation: CEP023_COMPLETE_CHECKPOINT_THEN_CEP029_ENTRY
-   current_independent_cep: null
+@@ -4051,2 +4095,2 @@ execution_frontier:
 -  next_entry_review_candidate: CEP-057
 -  next_candidate_full_entry_eligibility: NOT_YET_EVALUATED
 +  next_entry_review_candidate: CEP-029
 +  next_candidate_full_entry_eligibility: CEP029_REQUIRES_FULL_ENTRY_REVIEW
-   conditional_dependency_entry_review_candidates:
-   - CEP-068
-   - CEP-073
-   - CEP-079
-   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
+@@ -4058,3 +4102,3 @@ execution_frontier:
 -  boundary_reason: Completed050 comparison/history contract verified; authorized normal checkpoint precedes057 full entry review. Dependency readiness is not eligibility; no producer activation or global Gate PASS inferred.
 -  resume_cep_after_blocker_resolution: null
 -  independent_candidates_entry_status: SERIAL_ENTRY_REVIEW_PENDING
 +  boundary_reason: Newly evidenced023 remediation COMPLETE; Human-authorized serial029 entry follows safe checkpoint. Historical A3/B4 provenance retained. CEP057 remains blocked until029 is proven; no EXT0015 or GATE06 inference. GATE05 NOT_PASSED and047/048 activation remains fail-closed.
 +  resume_cep_after_blocker_resolution: CEP-057
 +  independent_candidates_entry_status: NOT_REVIEWED_QUEUE_STOPPED_ON_MATERIAL_CONFLICT
-   production_authorized: false
-   human_signoff_executed: false
 diff --git a/apps/organizations/configuration_profiles.py b/apps/organizations/configuration_profiles.py
 index dd3ee27..334cae1 100644
 --- a/apps/organizations/configuration_profiles.py
 +++ b/apps/organizations/configuration_profiles.py
-@@ -96,8 +96,8 @@ def apply_profile_suggestion(
-     ):
-         raise PermissionDenied("نقش داخلی لازم برای اعمال سیاست را ندارید.")
-     if suggestion.policy_code is None:
+@@ -99,2 +99,2 @@ def apply_profile_suggestion(
 -        # The current repository has no approved Leave Policy version authority.
 -        # A profile cannot create or infer one.
 +        # A profile cannot select, create or infer a Workforce Leave Policy.
 +        # Explicit effective source configuration is still required.
-         raise ValidationError("نسخه تأییدشده سیاست مرخصی برای این کلید موجود نیست.")
- 
-     Organization.objects.select_for_update().get(pk=organization.pk)
+diff --git a/apps/organizations/migrations/0122_cep023_leave_permissions.py b/apps/organizations/migrations/0122_cep023_leave_permissions.py
+new file mode 100644
+index 0000000..de75156
+--- /dev/null
++++ b/apps/organizations/migrations/0122_cep023_leave_permissions.py
+@@ -0,0 +1,28 @@
++"""CEP-023 catalog only; no existing or default role grants."""
++
++from django.db import migrations
++
++PERMISSIONS = (
++    ("leave_policies.manage", "ثبت نسخه سیاست مرخصی"),
++    ("leave_balances.manage", "ثبت منبع مانده مرخصی"),
++    ("leave_balances.view", "مشاهده مانده مجاز مرخصی"),
++)
++
++
++def forward(apps, schema_editor):
++    permission = apps.get_model("organizations", "BusinessPermission")
++    for code, name in PERMISSIONS:
++        permission.objects.using(schema_editor.connection.alias).update_or_create(
++            code=code, defaults={"name": name, "description": name, "is_active": True}
++        )
++
++
++def reverse(apps, schema_editor):
++    apps.get_model("organizations", "BusinessPermission").objects.using(
++        schema_editor.connection.alias
++    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
++
++
++class Migration(migrations.Migration):
++    dependencies = [("organizations", "0121_cep043_payroll_ap_permissions")]
++    operations = [migrations.RunPython(forward, reverse)]
 diff --git a/apps/organizations/models.py b/apps/organizations/models.py
 index 9815ada..b48cf9d 100644
 --- a/apps/organizations/models.py
 +++ b/apps/organizations/models.py
-@@ -573,6 +573,9 @@ class BusinessPermissionCode(models.TextChoices):
-     INDEXATION_RULES_MANAGE = "indexation_rules.manage", "تهیه نسخه قانون تعدیل"
-     INDEXATION_CALCULATE = "indexation.calculate", "محاسبه تعدیل با سیاست مجاز"
-     INDEXATION_CORRECT = "indexation.correct", "اصلاح و برگشت تعدیل با سیاست مجاز"
+@@ -575,0 +576,3 @@ class BusinessPermissionCode(models.TextChoices):
 +    LEAVE_POLICIES_MANAGE = "leave_policies.manage", "ثبت نسخه سیاست مرخصی"
 +    LEAVE_BALANCES_MANAGE = "leave_balances.manage", "ثبت منبع مانده مرخصی"
 +    LEAVE_BALANCES_VIEW = "leave_balances.view", "مشاهده مانده مجاز مرخصی"
-     EMPLOYMENT_RECORDS_MANAGE = "employment_records.manage", "ثبت نسخه سابقه استخدام"
-     EMPLOYMENT_RECORDS_VIEW_OWN = "employment_records.view_own", "مشاهده سوابق استخدام شخصی"
-     OFFBOARDING_START = "offboarding.start", "آغاز بررسی تسویه همکاری"
 diff --git a/apps/organizations/permission_registry.py b/apps/organizations/permission_registry.py
 index da816e9..e61c547 100644
 --- a/apps/organizations/permission_registry.py
 +++ b/apps/organizations/permission_registry.py
-@@ -17,6 +17,12 @@ class PermissionResource:
- P = BusinessPermissionCode
- 
- PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
+@@ -19,0 +20,6 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
 +    PermissionResource(
 +        "leave_authority", "سیاست و مانده مرخصی",
 +        ("workforce.LeavePolicyVersion", "workforce.LeaveBalanceEntry"),
 +        (P.LEAVE_POLICIES_MANAGE, P.LEAVE_BALANCES_MANAGE, P.LEAVE_BALANCES_VIEW),
 +        ("apps.workforce.leave_services",),
 +    ),
-     PermissionResource(
-         "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
-         ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
 diff --git a/apps/organizations/role_defaults.py b/apps/organizations/role_defaults.py
 index 3a6675e..4749d6d 100644
 --- a/apps/organizations/role_defaults.py
 +++ b/apps/organizations/role_defaults.py
-@@ -7,6 +7,9 @@ from apps.organizations.permission_registry import registered_permission_codes
- 
- # CEP035 source activation/mapping require explicit grants; no implicit role expansion.
- ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
+@@ -9,0 +10,3 @@ ALL_PERMISSIONS = registered_permission_codes() - permission_codes(
 +    BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
 +    BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
 +    BusinessPermissionCode.LEAVE_BALANCES_VIEW,
-     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
-     BusinessPermissionCode.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
-     BusinessPermissionCode.SUBLEDGERS_PAYROLL_PREPARE,
-@@ -782,6 +785,12 @@ for _role in (MembershipRole.PROJECT_MANAGER, MembershipRole.OPERATIONS_MANAGER)
- # P3-S27-Q03 is unresolved. Catalogue the permissions but grant neither approval
- # nor reversal to any default role until authority and SoD policy are accepted.
- for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
+@@ -784,0 +788,6 @@ for _default_permissions in DEFAULT_ROLE_PERMISSIONS.values():
 +    # CEP-023: suffix-derived read permissions must also remain explicit.
 +    _default_permissions.difference_update(permission_codes(
 +        BusinessPermissionCode.LEAVE_POLICIES_MANAGE,
 +        BusinessPermissionCode.LEAVE_BALANCES_MANAGE,
 +        BusinessPermissionCode.LEAVE_BALANCES_VIEW,
 +    ))
-     _default_permissions.difference_update(permission_codes(
-         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
-         BusinessPermissionCode.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,
 diff --git a/apps/timekeeping/services.py b/apps/timekeeping/services.py
 index 51838d6..5daf717 100644
 --- a/apps/timekeeping/services.py
 +++ b/apps/timekeeping/services.py
-@@ -812,6 +812,8 @@ def submit_time_request(
-     actor: User,
-     request: LeaveMissionRequest | OvertimeRequest,
- ) -> Any:
+@@ -814,0 +815,2 @@ def submit_time_request(
 +    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
 +        organization = Organization.objects.select_for_update().get(pk=organization.pk)
-     request = (
-         type(request)
-         .objects.select_for_update()
-@@ -831,6 +833,10 @@ def submit_time_request(
-     )
-     if request.requested_by_id != actor.pk or request.state != RequestState.DRAFT:
-         raise PermissionDenied("فقط سازنده می‌تواند پیش‌نویس را ارسال کند.")
+@@ -833,0 +836,4 @@ def submit_time_request(
 +    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
 +        from apps.workforce.leave_services import _require_reservation
 +
 +        _require_reservation(organization=organization, request=request)
-     type(request).objects.filter(pk=request.pk).update(state=RequestState.SUBMITTED)
-     request.refresh_from_db()
-     _audit(
-@@ -852,6 +858,8 @@ def review_time_request(
-     approve: bool,
-     reason: str,
- ) -> Any:
+@@ -854,0 +861,2 @@ def review_time_request(
 +    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
 +        organization = Organization.objects.select_for_update().get(pk=organization.pk)
-     request = (
-         type(request)
-         .objects.select_for_update()
-@@ -875,6 +883,18 @@ def review_time_request(
-         raise ValidationError("فقط درخواست ارسال‌شده با دلیل قابل بررسی است.")
-     if approve and not request.policy_reference.strip():
-         raise ValidationError("تأیید بدون مرجع سیاست مصوب مجاز نیست.")
+@@ -877,0 +886,12 @@ def review_time_request(
 +    if isinstance(request, LeaveMissionRequest) and request.kind == "leave":
 +        from apps.workforce.leave_services import (
 +            _release_rejected_request,
@@ -407,17 +305,11 @@ index 51838d6..5daf717 100644
 +            _release_rejected_request(
 +                organization=organization, actor=actor, request=request, reason=reason
 +            )
-     state = RequestState.APPROVED if approve else RequestState.REJECTED
-     type(request).objects.filter(pk=request.pk).update(
-         state=state, reviewed_by=actor, reviewed_at=timezone.now(), review_reason=reason
 diff --git a/apps/timekeeping/test_p7_s06_s12_timekeeping.py b/apps/timekeeping/test_p7_s06_s12_timekeeping.py
 index b44e5bf..afb0054 100644
 --- a/apps/timekeeping/test_p7_s06_s12_timekeeping.py
 +++ b/apps/timekeeping/test_p7_s06_s12_timekeeping.py
-@@ -306,9 +306,11 @@ class P7TimekeepingTests(TestCase):
-             ends_at=datetime(2026, 3, 1, 12, tzinfo=self.zone),
-             reason="Request",
-         )
+@@ -309,3 +309,5 @@ class P7TimekeepingTests(TestCase):
 -        submit_time_request(
 -            organization=self.organization, actor=self.owner, request=leave
 -        )
@@ -426,13 +318,7 @@ index b44e5bf..afb0054 100644
 +            submit_time_request(
 +                organization=self.organization, actor=self.owner, request=leave
 +            )
-         with self.assertRaises(ValidationError):
-             review_time_request(
-                 organization=self.organization,
-@@ -322,13 +324,10 @@ class P7TimekeepingTests(TestCase):
-             policy_reference=leave.policy_reference
-         )
-         leave.refresh_from_db()
+@@ -325,7 +327,4 @@ class P7TimekeepingTests(TestCase):
 -        review_time_request(
 -            organization=self.organization,
 -            actor=self.reviewer,
@@ -444,70 +330,6 @@ index b44e5bf..afb0054 100644
 +            submit_time_request(
 +                organization=self.organization, actor=self.owner, request=leave
 +            )
-         overtime = create_overtime_request(
-             organization=self.organization,
-             actor=self.owner,
-diff --git a/apps/workforce/models.py b/apps/workforce/models.py
-index 74e66e7..83889c3 100644
---- a/apps/workforce/models.py
-+++ b/apps/workforce/models.py
-@@ -14,6 +14,9 @@ from core.identifiers import canonicalize_upper_identifier
- from core.models import CreatedAtModel, TimeStampedModel, UUIDModel
- from core.tenant_validation import validate_related_organizations
- 
-+# These records are owned by Workforce; imported here for Django model discovery.
-+from .leave_models import LeaveBalanceEntry, LeavePolicyVersion  # noqa: F401
-+
- 
- def employee_profile_image_upload_path(instance: "Employee", filename: str) -> str:
-     """Store employee images under opaque tenant-scoped names."""
-diff --git a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
-index f2a38a4..46b4191 100644
---- a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
-+++ b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
-@@ -117,7 +117,7 @@ prompts:
-     path: docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
-     canonical: true
-     immutable: true
--    sha256: b0b06c4b7f2395485749de134f28fe11ae62650b29347e3352a6ab2b7acfd7c8
-+    sha256: d5e4f4391d546d94a151206c299fbc7e061cdc6dcb9ac24d63358b5e6ebb42d3
-   CEP-024:
-     path: docs/governance/cep/PROMPTS/CEP-024_EXECUTION_PROMPT.md
-     canonical: true
-diff --git a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
-index 130c977..0ffb7ba 100644
---- a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
-+++ b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
-@@ -124,8 +124,10 @@ Where applicable preserve `ROLE/PERMISSION + OBJECT SCOPE + TENANT + WORKFLOW AU
- If these concerns are N/A for the canonical CEP, do not invent new authorization behavior.
- 
- ## 16. Data / Migration Requirements
--Migration Impact = `NONE`.
--- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
-+Migration Impact = `ADDITIVE SCHEMA — DEVELOPMENT / NON-PRODUCTION ONLY`.
-+
-+Human amendment 2026-10-19: minimum additive persistence/schema and Development / Non-Production migration execution solely for existing IMB-0074 Leave Policy and entitlement/balance authority. Original Scope, AC, DoD, dependencies, PD-024/PD-026 and SPEC-011 remain unchanged. No CEP-057 opening-balance backfill, production migration, cutover or activation without effective explicit policy. Source: `docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt`.
-+- Verify additive schema forward/reverse/reapply in an isolated non-production database; retain migration output and preservation evidence. No existing leave balances may be synthesized or backfilled.
- - If repository reality reveals an unavoidable schema migration required solely to implement approved scope, record a finding before proceeding and follow the Playbook; do not silently expand scope.
- 
- ## 17. Integration Requirements
-@@ -151,14 +153,14 @@ NOT APPLICABLE. Do not infer profile, regulatory or feature-flag semantics.
- ## 21. Test Plan
- Use the corrected CEP-specific applicability exactly; do not replace it with a universal test matrix.
- 
--UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
-+UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=REQUIRED (bounded additive schema); UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
- 
- UTV rule: performance/concurrency and browser/accessibility remain UTV until the applicable runtime verification produces evidence.
- 
- ## 22. Evidence Plan
- Use only package-relevant evidence; no fabricated evidence IDs or results.
- 
--CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
-+CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED (bounded additive schema); DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
- 
- Future authorized execution must produce:
- - `CEP-023_EXECUTION_MANIFEST.md`
 diff --git a/apps/workforce/leave_models.py b/apps/workforce/leave_models.py
 new file mode 100644
 index 0000000..9097ca9
@@ -1566,6 +1388,14 @@ index 0000000..22df409
 +        ),
 +        migrations.RunPython(migrations.RunPython.noop, preserve_leave_history),
 +    ]
+diff --git a/apps/workforce/models.py b/apps/workforce/models.py
+index 74e66e7..83889c3 100644
+--- a/apps/workforce/models.py
++++ b/apps/workforce/models.py
+@@ -16,0 +17,3 @@ from core.tenant_validation import validate_related_organizations
++# These records are owned by Workforce; imported here for Django model discovery.
++from .leave_models import LeaveBalanceEntry, LeavePolicyVersion  # noqa: F401
++
 diff --git a/apps/workforce/test_cep023.py b/apps/workforce/test_cep023.py
 new file mode 100644
 index 0000000..256bf9a
@@ -2320,37 +2150,27 @@ index 0000000..047516b
 +                    editor.create_model(LeavePolicyVersion)
 +                if LeaveBalanceEntry._meta.db_table not in tables:
 +                    editor.create_model(LeaveBalanceEntry)
-diff --git a/apps/organizations/migrations/0122_cep023_leave_permissions.py b/apps/organizations/migrations/0122_cep023_leave_permissions.py
-new file mode 100644
-index 0000000..de75156
---- /dev/null
-+++ b/apps/organizations/migrations/0122_cep023_leave_permissions.py
-@@ -0,0 +1,28 @@
-+"""CEP-023 catalog only; no existing or default role grants."""
+diff --git a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+index f2a38a4..46b4191 100644
+--- a/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
++++ b/docs/governance/cep/CEP_PROMPT_MANIFEST.yaml
+@@ -120 +120 @@ prompts:
+-    sha256: b0b06c4b7f2395485749de134f28fe11ae62650b29347e3352a6ab2b7acfd7c8
++    sha256: d5e4f4391d546d94a151206c299fbc7e061cdc6dcb9ac24d63358b5e6ebb42d3
+diff --git a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
+index 130c977..0ffb7ba 100644
+--- a/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
++++ b/docs/governance/cep/PROMPTS/CEP-023_EXECUTION_PROMPT.md
+@@ -127,2 +127,4 @@ If these concerns are N/A for the canonical CEP, do not invent new authorization
+-Migration Impact = `NONE`.
+-- Do not create migration evidence, run migration tests, design cutover or perform data reconciliation unless a separate canonical requirement is discovered during repository grounding.
++Migration Impact = `ADDITIVE SCHEMA — DEVELOPMENT / NON-PRODUCTION ONLY`.
 +
-+from django.db import migrations
-+
-+PERMISSIONS = (
-+    ("leave_policies.manage", "ثبت نسخه سیاست مرخصی"),
-+    ("leave_balances.manage", "ثبت منبع مانده مرخصی"),
-+    ("leave_balances.view", "مشاهده مانده مجاز مرخصی"),
-+)
-+
-+
-+def forward(apps, schema_editor):
-+    permission = apps.get_model("organizations", "BusinessPermission")
-+    for code, name in PERMISSIONS:
-+        permission.objects.using(schema_editor.connection.alias).update_or_create(
-+            code=code, defaults={"name": name, "description": name, "is_active": True}
-+        )
-+
-+
-+def reverse(apps, schema_editor):
-+    apps.get_model("organizations", "BusinessPermission").objects.using(
-+        schema_editor.connection.alias
-+    ).filter(code__in=[code for code, _ in PERMISSIONS]).update(is_active=False)
-+
-+
-+class Migration(migrations.Migration):
-+    dependencies = [("organizations", "0121_cep043_payroll_ap_permissions")]
-+    operations = [migrations.RunPython(forward, reverse)]
++Human amendment 2026-10-19: minimum additive persistence/schema and Development / Non-Production migration execution solely for existing IMB-0074 Leave Policy and entitlement/balance authority. Original Scope, AC, DoD, dependencies, PD-024/PD-026 and SPEC-011 remain unchanged. No CEP-057 opening-balance backfill, production migration, cutover or activation without effective explicit policy. Source: `docs/governance/cep/evidence/CEP-023_029_HUMAN_REMEDIATION_AUTHORIZATION.txt`.
++- Verify additive schema forward/reverse/reapply in an isolated non-production database; retain migration output and preservation evidence. No existing leave balances may be synthesized or backfilled.
+@@ -154 +156 @@ Use the corrected CEP-specific applicability exactly; do not replace it with a u
+-UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=NOT APPLICABLE; UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
++UNIT=REQUIRED; MODEL=REQUIRED; SERVICE=REQUIRED; PERMISSION=NOT APPLICABLE; TENANT-ISOLATION=NOT APPLICABLE; WORKFLOW=NOT APPLICABLE; INTEGRATION=NOT APPLICABLE; MIGRATION=REQUIRED (bounded additive schema); UI / TEMPLATE=NOT APPLICABLE; END-TO-END=NOT APPLICABLE; REGRESSION=REQUIRED; RUNTIME VERIFICATION=NOT APPLICABLE; UAT=NOT APPLICABLE; PRODUCTION-CERTIFICATION=NOT APPLICABLE | Canonical basis: IMB-0074:UNIT; DOMAIN; REGRESSION
+@@ -161 +163 @@ Use only package-relevant evidence; no fabricated evidence IDs or results.
+-CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=NOT APPLICABLE; DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.
++CODE DIFF=REQUIRED; TEST OUTPUT=REQUIRED; LINT OUTPUT=REQUIRED; MIGRATION OUTPUT=REQUIRED (bounded additive schema); DATA RECONCILIATION=NOT APPLICABLE; PERMISSION TEST=NOT APPLICABLE; TENANT-ISOLATION TEST=NOT APPLICABLE; INTEGRATION TRACE=NOT APPLICABLE; TRANSACTION TRACE=NOT APPLICABLE; SCREENSHOT=NOT APPLICABLE; UI RUNTIME EVIDENCE=NOT APPLICABLE; LOG / DIAGNOSTIC EVIDENCE=NOT APPLICABLE; UAT SCENARIO RESULT=NOT APPLICABLE; RESTORE / RECOVERY EVIDENCE=NOT APPLICABLE; PERFORMANCE RESULT=NOT APPLICABLE; ACCESSIBILITY / BROWSER RESULT=NOT APPLICABLE; PRODUCTION-CERTIFICATION EVIDENCE=NOT APPLICABLE | Canonical basis: IMB-0074:Authoritative leave entitlement/balance engine: domain lifecycle tests; valid/invalid transition evidence; source-of-truth persistence; correction/history evidence; policy-boundary negative tests; audit linkage.

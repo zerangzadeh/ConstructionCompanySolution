@@ -1189,11 +1189,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-023_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_NEW_REMEDIATION_EVIDENCE_HISTORICAL_PROVENANCE_RETAINED
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: NOT_YET_CHECKPOINTED
+      committed: true
+      commit_sha: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
+      pushed: true
+      merged_to_main: false
+      remote_main_evidence: VERIFIED_DIRECT_COMMIT_PUSH
     last_execution:
       branch: main
       sha: ad167f58714577620666a0efb7f5518895cac4a0
@@ -1208,6 +1208,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: Explicit bounded IMB0074 remediation proved 6/6 original AC and scoped DoD. Final49 tests plus12 subtests and bounded migration preservation test PASS; actual isolated forward/reverse/reapply and configured Development additive apply/recheck retained. Package-induced four system read grants removed; exact correction retained. No existing worker conversion or057 opening backfill; no default values or activation inferred. Prior imported invalid completion remains in adjudication source evidence.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Authorized direct commit2cadad2 pushed and verified against remote main; includes retained057 prerequisite adjudication provenance, not057 completion.
     adjudication:
       classification: A3_HISTORICAL_COMPLETION_INVALID
       evidence: docs/governance/cep/evidence/CEP-057_PREREQUISITE_ADJUDICATION.json
@@ -4066,9 +4069,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: ad167f58714577620666a0efb7f5518895cac4a0
-  origin_main: ad167f58714577620666a0efb7f5518895cac4a0
-  integration_checkpoint: ad167f58714577620666a0efb7f5518895cac4a0
+  last_reconciled_head: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
+  origin_main: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
+  integration_checkpoint: 2cadad223250f1deea7ff9ac005ce2adcf3d67a9
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
