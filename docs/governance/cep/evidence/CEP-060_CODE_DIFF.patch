@@ -1,0 +1,1542 @@
+--- a/apps/treasury/operational_forms.py
++++ b/apps/treasury/operational_forms.py
+@@ -0,0 +1,251 @@
++"""Native Treasury forms. All mutations remain owned by existing services."""
++
++from decimal import Decimal
++from uuid import uuid4
++
++from django import forms
++
++from apps.accounting.models import Account, FiscalPeriod
++from apps.expenses.models import Expense
++from apps.organizations.authorization import (
++    get_active_membership,
++    has_business_permission,
++    scope_queryset,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import OrganizationMembership
++from apps.parties.models import BusinessParty
++from apps.projects.models import Project, ProjectSite
++from apps.workforce.models import Employee
++from core.forms import JalaliDateMixin
++from core.jalali import format_jalali
++
++from .models import (
++    ChequeDirection,
++    ChequeStatus,
++    PaymentRequestKind,
++    TreasuryAccount,
++    TreasuryAccountKind,
++    TreasuryAccountStatus,
++    TreasuryMovement,
++)
++
++
++class OperationalForm(JalaliDateMixin, forms.Form):
++    def __init__(self, *args, organization, actor, target=None, **kwargs):
++        super().__init__(*args, **kwargs)
++        membership = get_active_membership(user=actor, organization=organization)
++        for field in self.fields.values():
++            if not isinstance(field, forms.ModelChoiceField):
++                continue
++            model = field.queryset.model
++            queryset = model.objects.filter(organization=organization)
++            lookup = {
++                Project: "pk",
++                ProjectSite: "project_id",
++                TreasuryMovement: "project_id",
++                Expense: "project_id",
++            }.get(model)
++            if lookup:
++                queryset = scope_queryset(
++                    queryset,
++                    membership=membership,
++                    project_lookup=lookup,
++                    site_lookup="pk"
++                    if model is ProjectSite
++                    else "site_id"
++                    if model is TreasuryMovement
++                    else None,
++                )
++            if model is OrganizationMembership:
++                queryset = queryset.filter(status="active").select_related("user")
++            if model is Expense:
++                queryset = queryset.filter(status="approved", classification="direct")
++                if not has_business_permission(
++                    user=actor,
++                    organization=organization,
++                    permission=P.EXPENSES_VIEW,
++                    allow_any_scope=True,
++                ):
++                    queryset = queryset.none()
++            field.queryset = queryset
++            if model is TreasuryAccount:
++                field.label_from_instance = lambda item: f"{item.code} · {item.name}"
++            elif model is TreasuryMovement:
++                field.label_from_instance = lambda item: (
++                    f"{item.get_kind_display()} · {item.amount} ریال · {format_jalali(item.movement_date)}"
++                )
++            elif model is OrganizationMembership:
++                field.label_from_instance = lambda item: (
++                    item.user.get_full_name() or item.user.username
++                )
++            elif model is FiscalPeriod:
++                field.label_from_instance = lambda item: item.name
++
++
++def choice(model, label, *, required=True):
++    return forms.ModelChoiceField(
++        queryset=model.objects.none(), label=label, required=required
++    )
++
++
++def money():
++    return forms.DecimalField(
++        label="مبلغ (ریال)",
++        max_digits=24,
++        decimal_places=6,
++        min_value=Decimal("0.000001"),
++    )
++
++
++def reason():
++    return forms.CharField(
++        label="دلیل", max_length=1000, widget=forms.Textarea(attrs={"rows": 3})
++    )
++
++
++def key():
++    return forms.CharField(widget=forms.HiddenInput, initial=uuid4, max_length=120)
++
++
++class AccountCreateForm(OperationalForm):
++    code = forms.CharField(label="کد حساب", max_length=50)
++    name = forms.CharField(label="نام حساب", max_length=200)
++    kind = forms.ChoiceField(label="نوع حساب", choices=TreasuryAccountKind.choices)
++    sensitive_identifier = forms.CharField(
++        label="شناسه بانکی محرمانه",
++        required=False,
++        max_length=100,
++        widget=forms.PasswordInput,
++    )
++    custodian = choice(OrganizationMembership, "متولی", required=False)
++
++
++class AccountTransitionForm(OperationalForm):
++    to_status = forms.ChoiceField(
++        label="وضعیت مقصد", choices=TreasuryAccountStatus.choices
++    )
++    requested_by = choice(OrganizationMembership, "درخواست‌کننده مستقل", required=False)
++    reason = reason()
++
++
++class AccountMappingForm(OperationalForm):
++    cash_ledger_account = choice(Account, "حساب نقد دفترکل")
++    clearing_ledger_account = choice(Account, "حساب واسط دفترکل")
++    effective_from = forms.DateField(label="تاریخ شروع اعتبار")
++    requested_by = choice(OrganizationMembership, "درخواست‌کننده مستقل", required=False)
++    reason = reason()
++
++
++class TransferForm(OperationalForm):
++    source_account = choice(TreasuryAccount, "حساب مبدأ")
++    destination_account = choice(TreasuryAccount, "حساب مقصد")
++    project = choice(Project, "پروژه", required=False)
++    site = choice(ProjectSite, "کارگاه", required=False)
++    movement_date = forms.DateField(label="تاریخ انتقال")
++    amount = money()
++    description = forms.CharField(label="شرح", max_length=500)
++    idempotency_key = key()
++
++
++class RequestCreateForm(OperationalForm):
++    kind = forms.ChoiceField(label="نوع درخواست", choices=PaymentRequestKind.choices)
++    amount = money()
++    purpose = forms.CharField(label="شرح درخواست", max_length=500)
++    employee = choice(Employee, "کارمند ذی‌نفع", required=False)
++    party = choice(BusinessParty, "طرف تجاری", required=False)
++    project = choice(Project, "پروژه", required=False)
++    site = choice(ProjectSite, "کارگاه", required=False)
++    source_expense = choice(Expense, "هزینه مصوب بازپرداخت", required=False)
++    idempotency_key = key()
++
++
++class ReasonForm(OperationalForm):
++    reason = reason()
++
++
++class DecisionForm(ReasonForm):
++    approve = forms.TypedChoiceField(
++        label="تصمیم",
++        choices=(("yes", "تأیید"), ("no", "رد")),
++        coerce=lambda value: value == "yes",
++    )
++
++
++class ReleaseForm(ReasonForm):
++    movement = choice(TreasuryMovement, "حرکت پرداخت قطعی")
++
++
++class ChequeCreateForm(OperationalForm):
++    direction = forms.ChoiceField(label="جهت چک", choices=ChequeDirection.choices)
++    controlled_account = choice(TreasuryAccount, "حساب بانکی")
++    amount = money()
++    due_date = forms.DateField(label="سررسید")
++    serial = forms.CharField(
++        label="سریال چک", max_length=100, widget=forms.PasswordInput
++    )
++    party = choice(BusinessParty, "طرف تجاری", required=False)
++    custodian = choice(OrganizationMembership, "متولی", required=False)
++
++
++class ChequeTransitionForm(ReasonForm):
++    to_status = forms.ChoiceField(label="وضعیت مقصد", choices=ChequeStatus.choices)
++
++    def __init__(self, *args, target=None, **kwargs):
++        super().__init__(*args, **kwargs)
++        if target:
++            from .services import _CHEQUE_TRANSITIONS
++
++            allowed = _CHEQUE_TRANSITIONS.get(target.direction, {}).get(
++                target.status, set()
++            ) - {ChequeStatus.CLEARED}
++            self.fields["to_status"].choices = [
++                (value, label)
++                for value, label in ChequeStatus.choices
++                if value in allowed
++            ]
++
++
++class ChequeClearForm(ReasonForm):
++    accounting_preparer = choice(OrganizationMembership, "تهیه‌کننده مستقل حسابداری")
++    period = choice(FiscalPeriod, "دوره مالی")
++    clearing_date = forms.DateField(label="تاریخ وصول")
++
++
++class ReverseForm(ReasonForm):
++    requested_by = choice(OrganizationMembership, "درخواست‌کننده مستقل برگشت")
++    period = choice(FiscalPeriod, "دوره مالی")
++    accounting_date = forms.DateField(label="تاریخ برگشت")
++
++
++class SettlementCreateForm(OperationalForm):
++    receipt_movement = choice(TreasuryMovement, "حرکت دریافت قطعی")
++    amount = money()
++    idempotency_key = key()
++
++
++class AdvanceReconcileForm(OperationalForm):
++    cutoff_date = forms.DateField(label="تاریخ مبنای تطبیق")
++    idempotency_key = key()
++
++
++class GLReconcileForm(OperationalForm):
++    cutoff_date = forms.DateField(label="تاریخ مبنای تطبیق")
++
++
++class StatementPreviewForm(OperationalForm):
++    account = choice(TreasuryAccount, "حساب بانکی")
++    provider_code = forms.CharField(label="مرجع ارائه‌دهنده صورت‌حساب", max_length=80)
++    period_start = forms.DateField(label="ابتدای بازه")
++    period_end = forms.DateField(label="انتهای بازه")
++    file = forms.FileField(
++        label="فایل CSV",
++        help_text="فایل UTF-8 تا ۶۴ کیلوبایت و ۱۰۰۰ ردیف؛ ستون‌های transaction_date، direction، amount، provider_row_id و reference با جهت in یا out. تاریخ شمسی یا ISO پذیرفته می‌شود.",
++    )
++    idempotency_key = key()
++
++    def clean_file(self):
++        upload = self.cleaned_data["file"]
++        if not upload.name.lower().endswith(".csv") or upload.size > 65536:
++            raise forms.ValidationError("فایل CSV تا ۶۴ کیلوبایت لازم است.")
++        return upload
+--- a/apps/treasury/operational_views.py
++++ b/apps/treasury/operational_views.py
+@@ -0,0 +1,555 @@
++"""Whitelisted native UI adapters; no generic state writer or domain workflow."""
++
++import csv
++import io
++from dataclasses import dataclass
++from datetime import date
++from decimal import InvalidOperation
++
++from django.contrib import messages
++from django.core.exceptions import ValidationError
++from django.core.paginator import Paginator
++from django.http import Http404
++from django.shortcuts import get_object_or_404, redirect, render
++from django.urls import reverse
++from django.views.decorators.http import require_GET, require_http_methods
++
++from apps.organizations.authorization import (
++    get_active_membership,
++    has_business_permission,
++    scope_queryset,
++)
++from apps.organizations.decorators import (
++    active_organization_required,
++    organization_permission_required,
++    require_organization_permission,
++)
++from apps.organizations.models import BusinessPermissionCode as P
++from core.jalali import format_jalali
++
++from . import operational_forms as forms
++from . import services, statement_services
++from .models import (
++    AdvanceSettlement,
++    BankStatementImport,
++    ChequeInstrument,
++    PaymentRequest,
++    TreasuryAccount,
++    TreasuryAdvance,
++    TreasuryAdvanceReconciliationRun,
++    TreasuryMovement,
++)
++
++
++@dataclass(frozen=True)
++class Operation:
++    title: str
++    permission: str
++    form: type
++    service: object
++    model: type | None = None
++    argument: str = ""
++    statuses: tuple[str, ...] = ()
++
++
++def _transfer(**kwargs):
++    return services.create_movement(kind="transfer", **kwargs)
++
++
++def _preview_statement(*, file, **kwargs):
++    from core.forms import parse_jalali_date
++
++    source_bytes = file.read(65537)
++    try:
++        reader = csv.DictReader(
++            io.StringIO(source_bytes.decode("utf-8-sig")), strict=True
++        )
++        if reader.fieldnames != [
++            "transaction_date",
++            "direction",
++            "amount",
++            "provider_row_id",
++            "reference",
++        ]:
++            raise ValueError
++        rows = []
++        for index, row in enumerate(reader, 1):
++            if (
++                index > 1000
++                or None in row
++                or any(value is None for value in row.values())
++            ):
++                raise ValueError
++            raw = row["transaction_date"]
++            try:
++                transaction_date = parse_jalali_date(raw)
++            except ValueError:
++                transaction_date = date.fromisoformat(raw)
++            rows.append(
++                statement_services.StatementRowInput(
++                    row_number=index,
++                    transaction_date=transaction_date,
++                    direction=row["direction"],
++                    amount=forms.money().clean(row["amount"]),
++                    provider_row_id=row["provider_row_id"],
++                    reference=row["reference"],
++                )
++            )
++    except (UnicodeError, ValueError, InvalidOperation, csv.Error) as exc:
++        raise ValidationError("ساختار، تاریخ یا مبلغ فایل CSV معتبر نیست.") from exc
++    return statement_services.preview_statement_import(
++        **kwargs,
++        format_code="bonira_native_csv_v1",
++        file_name=file.name,
++        source_bytes=source_bytes,
++        rows=rows,
++        max_file_bytes=65536,
++        max_rows=1000,
++    )
++
++
++# Each UI action names an existing service and existing business permission.
++# No request-supplied service, field assignment, permission or state expression.
++OPERATIONS = {
++    "account_create": Operation(
++        "حساب جدید",
++        P.TREASURY_ACCOUNTS_MANAGE,
++        forms.AccountCreateForm,
++        services.create_treasury_account,
++    ),
++    "account_status": Operation(
++        "تغییر وضعیت حساب",
++        P.TREASURY_ACCOUNTS_MANAGE,
++        forms.AccountTransitionForm,
++        services.transition_treasury_account,
++        TreasuryAccount,
++        "account",
++    ),
++    "account_mapping": Operation(
++        "نگاشت حسابداری حساب",
++        P.TREASURY_MAPPINGS_MANAGE,
++        forms.AccountMappingForm,
++        services.create_account_mapping_version,
++        TreasuryAccount,
++        "account",
++    ),
++    "transfer": Operation(
++        "انتقال بین حساب‌ها", P.TREASURY_MOVEMENTS_CREATE, forms.TransferForm, _transfer
++    ),
++    "request_create": Operation(
++        "درخواست پرداخت یا تنخواه",
++        P.TREASURY_PAYMENT_REQUESTS_CREATE,
++        forms.RequestCreateForm,
++        services.create_payment_request,
++    ),
++    "request_submit": Operation(
++        "ارسال درخواست",
++        P.TREASURY_PAYMENT_REQUESTS_SUBMIT,
++        forms.ReasonForm,
++        services.submit_payment_request,
++        PaymentRequest,
++        "request",
++        ("draft",),
++    ),
++    "request_decide": Operation(
++        "بررسی درخواست",
++        P.TREASURY_PAYMENT_REQUESTS_APPROVE,
++        forms.DecisionForm,
++        services.decide_payment_request,
++        PaymentRequest,
++        "request",
++        ("submitted",),
++    ),
++    "request_cancel": Operation(
++        "لغو درخواست",
++        P.TREASURY_PAYMENT_REQUESTS_CREATE,
++        forms.ReasonForm,
++        services.cancel_payment_request,
++        PaymentRequest,
++        "request",
++        ("draft", "submitted", "approved"),
++    ),
++    "request_release": Operation(
++        "اتصال پرداخت قطعی",
++        P.TREASURY_PAYMENT_REQUESTS_RELEASE,
++        forms.ReleaseForm,
++        services.release_payment_request,
++        PaymentRequest,
++        "request",
++        ("approved",),
++    ),
++    "advance_open": Operation(
++        "بازکردن تنخواه پرداخت‌شده",
++        P.TREASURY_ADVANCES_MANAGE,
++        forms.OperationalForm,
++        services.open_advance,
++        PaymentRequest,
++        "request",
++        ("released",),
++    ),
++    "cheque_create": Operation(
++        "چک جدید",
++        P.TREASURY_CHEQUES_MANAGE,
++        forms.ChequeCreateForm,
++        services.create_cheque,
++    ),
++    "cheque_status": Operation(
++        "گردش چک",
++        P.TREASURY_CHEQUES_MANAGE,
++        forms.ChequeTransitionForm,
++        services.transition_cheque,
++        ChequeInstrument,
++        "cheque",
++        ("draft", "received", "issued", "deposited", "delivered", "presented"),
++    ),
++    "cheque_clear": Operation(
++        "وصول چک و ثبت قطعی",
++        P.TREASURY_CHEQUES_CLEAR,
++        forms.ChequeClearForm,
++        services.clear_cheque,
++        ChequeInstrument,
++        "cheque",
++        ("presented",),
++    ),
++    "cheque_bounce": Operation(
++        "برگشت چک وصول‌شده",
++        P.TREASURY_CHEQUES_CLEAR,
++        forms.ReverseForm,
++        services.bounce_cleared_cheque,
++        ChequeInstrument,
++        "cheque",
++        ("cleared",),
++    ),
++    "advance_settle": Operation(
++        "ثبت تسویه تنخواه",
++        P.TREASURY_ADVANCES_SETTLE,
++        forms.SettlementCreateForm,
++        services.create_advance_settlement,
++        TreasuryAdvance,
++        "advance",
++        ("open", "partially_settled"),
++    ),
++    "advance_reverse": Operation(
++        "برگشت پرداخت تنخواه",
++        P.TREASURY_ADVANCES_REVERSE,
++        forms.ReverseForm,
++        services.reverse_advance_issue,
++        TreasuryAdvance,
++        "advance",
++        ("open", "partially_settled", "settled"),
++    ),
++    "settlement_submit": Operation(
++        "ارسال تسویه",
++        P.TREASURY_ADVANCES_SETTLE,
++        forms.ReasonForm,
++        services.submit_advance_settlement,
++        AdvanceSettlement,
++        "settlement",
++        ("draft",),
++    ),
++    "settlement_decide": Operation(
++        "بررسی تسویه",
++        P.TREASURY_ADVANCES_SETTLE,
++        forms.DecisionForm,
++        services.decide_advance_settlement,
++        AdvanceSettlement,
++        "settlement",
++        ("submitted",),
++    ),
++    "settlement_cancel": Operation(
++        "لغو تسویه",
++        P.TREASURY_ADVANCES_SETTLE,
++        forms.ReasonForm,
++        services.cancel_advance_settlement,
++        AdvanceSettlement,
++        "settlement",
++        ("draft", "submitted"),
++    ),
++    "settlement_reverse": Operation(
++        "برگشت تسویه",
++        P.TREASURY_ADVANCES_REVERSE,
++        forms.ReverseForm,
++        services.reverse_advance_settlement,
++        AdvanceSettlement,
++        "settlement",
++        ("approved",),
++    ),
++    "advance_reconcile": Operation(
++        "تطبیق تنخواه",
++        P.TREASURY_RECONCILIATIONS_RUN,
++        forms.AdvanceReconcileForm,
++        services.run_advance_reconciliation,
++    ),
++    "gl_reconcile": Operation(
++        "تطبیق خزانه با دفترکل",
++        P.TREASURY_RECONCILIATIONS_RUN,
++        forms.GLReconcileForm,
++        services.run_treasury_gl_reconciliation,
++    ),
++    "statement_preview": Operation(
++        "پیش‌نمایش صورت‌حساب",
++        P.TREASURY_STATEMENTS_IMPORT,
++        forms.StatementPreviewForm,
++        _preview_statement,
++    ),
++    "statement_accept": Operation(
++        "پذیرش صورت‌حساب",
++        P.TREASURY_STATEMENTS_ACCEPT,
++        forms.ReasonForm,
++        statement_services.accept_statement_import,
++        BankStatementImport,
++        "statement_import",
++        ("previewed",),
++    ),
++}
++
++SCOPES = {
++    PaymentRequest: ("project_id", "site_id"),
++    TreasuryAdvance: ("request__project_id", "request__site_id"),
++    AdvanceSettlement: ("advance__request__project_id", "advance__request__site_id"),
++}
++RESOURCES = {
++    "account": TreasuryAccount,
++    "request": PaymentRequest,
++    "cheque": ChequeInstrument,
++    "advance": TreasuryAdvance,
++    "settlement": AdvanceSettlement,
++    "statement": BankStatementImport,
++}
++
++
++def _objects(model, request):
++    queryset = model.objects.filter(organization=request.organization)
++    if model in SCOPES:
++        project, site = SCOPES[model]
++        return scope_queryset(
++            queryset,
++            membership=get_active_membership(
++                user=request.user, organization=request.organization
++            ),
++            project_lookup=project,
++            site_lookup=site,
++        )
++    if not has_business_permission(
++        user=request.user, organization=request.organization, permission=P.TREASURY_VIEW
++    ):
++        return queryset.none()
++    return queryset
++
++
++def _allowed(request, operation, target=None):
++    project = site = None
++    scoped = target
++    if isinstance(scoped, AdvanceSettlement):
++        scoped = scoped.advance.request
++    elif isinstance(scoped, TreasuryAdvance):
++        scoped = scoped.request
++    if isinstance(scoped, PaymentRequest):
++        project, site = scoped.project, scoped.site
++    return has_business_permission(
++        user=request.user,
++        organization=request.organization,
++        permission=operation.permission,
++        project=project,
++        site=site,
++        allow_any_scope=target is None,
++    )
++
++
++def _summary(target):
++    """Display the authorized source being reviewed; never derive a balance."""
++    if target is None:
++        return []
++    rows = [("شناسه مرجع", str(target.pk)), ("وضعیت", target.get_status_display())]
++    source = target
++    if isinstance(target, TreasuryAdvance):
++        source = target.request
++    elif isinstance(target, AdvanceSettlement):
++        source = target.advance.request
++    if isinstance(source, PaymentRequest):
++        rows += [
++            ("نوع درخواست", source.get_kind_display()),
++            ("شرح", source.purpose),
++            ("مبلغ درخواست (ریال)", source.amount),
++            ("طرف تجاری", source.party or "—"),
++            ("کارمند ذی‌نفع", source.employee or "—"),
++            ("پروژه", source.project or "—"),
++            ("کارگاه", source.site or "—"),
++        ]
++    if isinstance(target, AdvanceSettlement):
++        rows += [("مبلغ تسویه (ریال)", target.amount)]
++    if isinstance(target, TreasuryAccount):
++        rows += [("حساب", target.name), ("کد", target.code)]
++    if isinstance(target, ChequeInstrument):
++        rows += [
++            ("جهت", target.get_direction_display()),
++            ("مبلغ (ریال)", target.amount),
++            ("حساب", target.controlled_account.name),
++            ("سررسید", format_jalali(target.due_date)),
++            ("سریال پوشیده", "••••" + target.serial_last4),
++            ("طرف تجاری", target.party or "—"),
++        ]
++    if isinstance(target, BankStatementImport):
++        rows += [
++            ("حساب", target.account.name),
++            ("فایل منبع", target.file_name),
++            ("ابتدای بازه", format_jalali(target.period_start)),
++            ("انتهای بازه", format_jalali(target.period_end)),
++            ("تعداد ردیف", target.row_count),
++        ]
++    return rows
++
++
++@active_organization_required
++@organization_permission_required(P.TREASURY_VIEW)
++@require_GET
++def workspace(request):
++    creation = [
++        {"title": op.title, "url": reverse("treasury:operation", args=[name])}
++        for name, op in OPERATIONS.items()
++        if op.model is None and _allowed(request, op)
++    ]
++    groups = []
++    for model, title in [
++        (TreasuryAccount, "حساب‌ها"),
++        (PaymentRequest, "درخواست‌ها"),
++        (ChequeInstrument, "چک‌ها"),
++        (TreasuryAdvance, "تنخواه‌ها"),
++        (AdvanceSettlement, "تسویه‌های تنخواه"),
++        (BankStatementImport, "صورت‌حساب‌ها"),
++    ]:
++        rows = []
++        page_key = model._meta.model_name + "_page"
++        page = Paginator(
++            _objects(model, request).order_by("-created_at", "pk"), 25
++        ).get_page(request.GET.get(page_key))
++        for item in page:
++            actions = []
++            for name, op in OPERATIONS.items():
++                if op.model is not model or not _allowed(request, op, item):
++                    continue
++                if op.statuses and item.status not in op.statuses:
++                    continue
++                if name == "advance_open" and item.kind not in {
++                    "employee_advance",
++                    "vendor_advance",
++                }:
++                    continue
++                actions.append(
++                    {
++                        "title": op.title,
++                        "url": reverse(
++                            "treasury:object_operation", args=[name, item.pk]
++                        ),
++                    }
++                )
++            label = getattr(item, "name", "")
++            if not label:
++                display = getattr(item, "get_kind_display", None) or getattr(
++                    item, "get_direction_display", None
++                )
++                label = display() if display else title
++            resource = next(key for key, value in RESOURCES.items() if value is model)
++            rows.append(
++                {
++                    "object": item,
++                    "title": label,
++                    "actions": actions,
++                    "detail_url": reverse(
++                        "treasury:operational_detail", args=[resource, item.pk]
++                    ),
++                }
++            )
++        links = {}
++        for direction, number in [
++            ("previous", page.previous_page_number() if page.has_previous() else None),
++            ("next", page.next_page_number() if page.has_next() else None),
++        ]:
++            if number:
++                query = request.GET.copy()
++                query[page_key] = str(number)
++                links[direction] = "?" + query.urlencode()
++        groups.append({"title": title, "rows": rows, "links": links})
++    advance_runs = (
++        TreasuryAdvanceReconciliationRun.objects.filter(
++            organization=request.organization
++        ).order_by("-created_at")[:20]
++        if has_business_permission(
++            user=request.user,
++            organization=request.organization,
++            permission=P.TREASURY_VIEW,
++        )
++        else []
++    )
++    return render(
++        request,
++        "treasury/operations.html",
++        {"creation": creation, "groups": groups, "advance_runs": advance_runs},
++    )
++
++
++@active_organization_required
++@organization_permission_required(P.TREASURY_VIEW)
++@require_GET
++def detail(request, resource, object_id):
++    model = RESOURCES.get(resource)
++    if model is None:
++        raise Http404
++    target = get_object_or_404(_objects(model, request), pk=object_id)
++    return render(
++        request, "treasury/operational_detail.html", {"summary": _summary(target)}
++    )
++
++
++@active_organization_required
++@organization_permission_required(P.TREASURY_VIEW)
++@require_http_methods(["GET", "POST"])
++def operation(request, operation, object_id=None):
++    op = OPERATIONS.get(operation)
++    if op is None or (op.model is None) != (object_id is None):
++        raise Http404
++    require_organization_permission(request, op.permission)
++    target = (
++        get_object_or_404(_objects(op.model, request), pk=object_id)
++        if op.model
++        else None
++    )
++    if not _allowed(request, op, target):
++        from django.core.exceptions import PermissionDenied
++
++        raise PermissionDenied
++    kwargs = {
++        "organization": request.organization,
++        "actor": request.user,
++        "target": target,
++    }
++    form = op.form(
++        request.POST if request.method == "POST" else None,
++        request.FILES if request.method == "POST" else None,
++        **kwargs,
++    )
++    if request.method == "POST" and form.is_valid():
++        values = dict(form.cleaned_data)
++        if op.argument:
++            values[op.argument] = target
++        try:
++            result = op.service(
++                organization=request.organization, actor=request.user, **values
++            )
++        except ValidationError as exc:
++            form.add_error(None, ValidationError(exc.messages))
++        else:
++            messages.success(request, "عملیات خزانه‌داری با حفظ سابقه ثبت شد.")
++            if isinstance(result, TreasuryMovement):
++                return redirect("treasury:movement_detail", movement_id=result.pk)
++            return redirect("treasury:operations")
++    return render(
++        request,
++        "treasury/operation_form.html",
++        {
++            "form": form,
++            "title": op.title,
++            "target": target,
++            "summary": _summary(target),
++        },
++    )
+--- a/apps/treasury/forms.py
++++ b/apps/treasury/forms.py
+@@ -4,11 +4,19 @@
+ from django import forms
+ 
+ from apps.accounting.models import FiscalPeriod
+-from apps.organizations.authorization import get_active_membership, scope_queryset
+-from apps.organizations.models import MembershipStatus, OrganizationMembership
++from apps.organizations.authorization import (
++    get_active_membership,
++    has_business_permission,
++    scope_queryset,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode,
++    MembershipStatus,
++    OrganizationMembership,
++)
+ from apps.parties.models import BusinessParty
+ from apps.projects.models import Project
+-from apps.treasury.models import TreasuryAccount, TreasuryAccountStatus
++from apps.treasury.models import PaymentRequest, TreasuryAccount, TreasuryAccountStatus
+ from core.forms import JalaliDateMixin
+ 
+ 
+@@ -31,6 +39,11 @@
+         label="طرف حساب", queryset=BusinessParty.objects.none(), required=False
+     )
+     description = forms.CharField(label="شرح", max_length=500)
++    origin_request = forms.ModelChoiceField(
++        label="درخواست پرداخت مصوب",
++        queryset=PaymentRequest.objects.none(),
++        required=False,
++    )
+     idempotency_key = forms.CharField(
+         widget=forms.HiddenInput, initial=uuid4, max_length=120
+     )
+@@ -48,6 +61,25 @@
+         )
+         self.fields["party"].queryset = BusinessParty.objects.filter(
+             organization=organization
++        )
++        self.fields["origin_request"].queryset = scope_queryset(
++            PaymentRequest.objects.filter(
++                organization=organization,
++                status="approved",
++                kind="employee_reimbursement",
++            ),
++            membership=membership,
++            project_lookup="project_id",
++            site_lookup="site_id",
++        )
++        if not has_business_permission(
++            user=actor,
++            organization=organization,
++            permission=BusinessPermissionCode.TREASURY_VIEW,
++        ):
++            self.fields["origin_request"].queryset = PaymentRequest.objects.none()
++        self.fields["origin_request"].label_from_instance = lambda item: (
++            f"{item.purpose[:60]} · {item.amount} ریال"
+         )
+ 
+ 
+--- a/apps/treasury/views.py
++++ b/apps/treasury/views.py
+@@ -50,8 +50,14 @@
+ 
+ 
+ def _date(request: HttpRequest) -> date:
+-    try:
+-        return date.fromisoformat(request.POST["as_of_date"])
++    from core.forms import parse_jalali_date
++
++    try:
++        raw = request.POST["as_of_date"]
++        try:
++            return parse_jalali_date(raw)
++        except ValueError:
++            return date.fromisoformat(raw)
+     except (KeyError, ValueError) as exc:
+         raise ValidationError("تاریخ معتبر الزامی است.") from exc
+ 
+@@ -72,11 +78,18 @@
+         project_lookup="project_id",
+         site_lookup="site_id",
+     )
++    global_scope = has_business_permission(
++        user=request.user,
++        organization=organization,
++        permission=BusinessPermissionCode.TREASURY_VIEW,
++    )
+     return render(
+         request,
+         "treasury/workbench.html",
+         {
+-            "accounts": organization.treasury_accounts.all(),
++            "accounts": organization.treasury_accounts.all()
++            if global_scope
++            else organization.treasury_accounts.none(),
+             "can_create_movement": has_business_permission(
+                 user=request.user,
+                 organization=organization,
+@@ -86,10 +99,14 @@
+             "recent_movements": movements.select_related("project", "party")[:30],
+             "bank_runs": BankReconciliationRun.objects.filter(
+                 organization=organization
+-            ).select_related("account")[:12],
++            ).select_related("account")[:12]
++            if global_scope
++            else [],
+             "gl_runs": TreasuryGLReconciliationRun.objects.filter(
+                 organization=organization
+-            ).select_related("run_by__user", "review__reviewed_by__user")[:20],
++            ).select_related("run_by__user", "review__reviewed_by__user")[:20]
++            if global_scope
++            else [],
+             "can_review_reconciliation": has_business_permission(
+                 user=request.user,
+                 organization=organization,
+@@ -111,13 +128,20 @@
+         project_lookup="project_id",
+         site_lookup="site_id",
+     )
++    global_scope = has_business_permission(
++        user=request.user,
++        organization=organization,
++        permission=BusinessPermissionCode.TREASURY_VIEW,
++    )
+     return render(
+         request,
+         "treasury/statement_workbench.html",
+         {
+             "imports": BankStatementImport.objects.filter(organization=organization)
+             .select_related("account")
+-            .prefetch_related("lines")[:25],
++            .prefetch_related("lines")[:25]
++            if global_scope
++            else [],
+             "proposals": StatementMatchProposal.objects.filter(
+                 organization=organization, movement__in=visible_movements
+             ).select_related("statement_line", "movement", "movement_leg")[:50],
+--- a/apps/treasury/urls.py
++++ b/apps/treasury/urls.py
+@@ -1,10 +1,22 @@
+ from django.urls import path
+ 
+-from apps.treasury import views
++from apps.treasury import operational_views, views
+ 
+ app_name = "treasury"
+ 
+ urlpatterns = [
++    path(
++        "operations/records/<str:resource>/<uuid:object_id>/",
++        operational_views.detail,
++        name="operational_detail",
++    ),
++    path("operations/", operational_views.workspace, name="operations"),
++    path("operations/<str:operation>/", operational_views.operation, name="operation"),
++    path(
++        "operations/<str:operation>/<uuid:object_id>/",
++        operational_views.operation,
++        name="object_operation",
++    ),
+     path("movements/new/", views.movement_create, name="movement_create"),
+     path(
+         "movements/<uuid:movement_id>/", views.movement_detail, name="movement_detail"
+--- a/apps/treasury/test_cep060_workspace.py
++++ b/apps/treasury/test_cep060_workspace.py
+@@ -0,0 +1,500 @@
++"""Native WS10 service-backed HTTP journeys, isolation and rendered fixtures."""
++
++import re
++from pathlib import Path
++
++from django.core.files.uploadedfile import SimpleUploadedFile
++from django.test import Client, TestCase
++from django.urls import reverse
++
++from apps.accounts.models import User
++from apps.organizations.models import (
++    AuthorizationScopeType,
++    BusinessPermission,
++    MembershipRoleAssignment,
++    MembershipScopeGrant,
++    OrganizationRole,
++)
++from apps.organizations.models import (
++    BusinessPermissionCode as P,
++)
++from apps.organizations.services import create_organization_with_owner
++from apps.projects.services import create_project
++from apps.treasury import operational_views
++from apps.treasury.models import (
++    AdvanceSettlement,
++    BankStatementImport,
++    ChequeInstrument,
++    PaymentRequest,
++    TreasuryAccount,
++    TreasuryAdvance,
++    TreasuryAdvanceReconciliationRun,
++    TreasuryGLReconciliationRun,
++    TreasuryMovement,
++)
++from apps.treasury.services import create_treasury_account
++from apps.treasury.test_payment_retirement import (
++    TreasuryPaymentReplacementTests as Fixtures,
++)
++
++
++class NativeTreasuryWorkspaceTests(TestCase):
++    setUpTestData = classmethod(Fixtures.setUpTestData.__func__)
++    movement = Fixtures.movement
++    login = Fixtures.login
++
++    def setUp(self):
++        self.login()
++
++    def url(self, operation, target=None):
++        if target:
++            return reverse("treasury:object_operation", args=[operation, target.pk])
++        return reverse("treasury:operation", args=[operation])
++
++    def post(self, operation, data=None, target=None):
++        response = self.client.post(self.url(operation, target), data or {})
++        self.assertEqual(response.status_code, 302, response.content.decode()[:2000])
++        return response
++
++    def request(self, **overrides):
++        data = {
++            "kind": "payment",
++            "amount": "100",
++            "purpose": "پرداخت آزمایشی",
++            "party": str(self.party.pk),
++            "project": str(self.project.pk),
++            "idempotency_key": "NATIVE-REQUEST",
++        }
++        data.update(overrides)
++        self.post("request_create", data)
++        return PaymentRequest.objects.get(idempotency_key=data["idempotency_key"])
++
++    def approved_request(self, **overrides):
++        request = self.request(**overrides)
++        self.post("request_submit", {"reason": "ارسال"}, request)
++        review = self.client.get(self.url("request_decide", request))
++        self.assertContains(review, request.purpose)
++        self.assertContains(review, "مبلغ درخواست (ریال)")
++        self.post(
++            "request_decide",
++            {"reason": "تأیید با خط‌مشی صریح", "approve": "yes"},
++            request,
++        )
++        request.refresh_from_db()
++        self.assertEqual(request.status, "approved")
++        return request
++
++    def fixture(self, name, response):
++        path = Path("docs/governance/cep/evidence/CEP-060_UI")
++        path.mkdir(exist_ok=True)
++        html = response.content.decode()
++        # Synthetic test pages only; retain no usable session/CSRF token.
++        html = re.sub(
++            r'(name="csrfmiddlewaretoken" value=")[^"]+', r"\1SYNTHETIC", html
++        )
++        (path / f"{name}.html").write_text(html, encoding="utf-8")
++
++    def test_all_creation_forms_use_native_routes_persian_and_jalali(self):
++        for name, op in operational_views.OPERATIONS.items():
++            if op.model is None:
++                with self.subTest(operation=name):
++                    response = self.client.get(self.url(name))
++                    self.assertEqual(response.status_code, 200)
++                    self.assertContains(response, 'dir="rtl"')
++                    self.assertNotContains(response, "/admin/")
++        response = self.client.get(self.url("cheque_create"))
++        self.assertContains(response, 'data-jalali-date="date"')
++        self.fixture("form", response)
++        self.fixture("statement_form", self.client.get(self.url("statement_preview")))
++
++    def test_request_create_replay_approval_cash_link_and_release(self):
++        request = self.approved_request()
++        self.request()
++        self.assertEqual(PaymentRequest.objects.count(), 1)
++        form = self.client.get(reverse("treasury:movement_create"))
++        self.assertNotContains(form, str(request.pk))
++        movement = self.cash.post(self.movement(kind="disbursement"))
++        self.post(
++            "request_release",
++            {"movement": str(movement.pk), "reason": "تخصیص پرداخت قطعی"},
++            request,
++        )
++        request.refresh_from_db()
++        self.assertEqual(request.released_movement_id, movement.pk)
++        self.assertEqual(request.status, "released")
++        response = self.client.get(reverse("treasury:operations"))
++        self.assertContains(
++            response, reverse("treasury:movement_detail", args=[movement.pk])
++        )
++        self.fixture("ready", response)
++        detail = self.client.get(
++            reverse("treasury:operational_detail", args=["request", request.pk])
++        )
++        self.assertContains(detail, request.purpose)
++        self.fixture("detail", detail)
++
++    def test_account_create_mapping_and_activation_preserve_sensitive_identity(self):
++        serial = "TEST-PRIVATE-567890"
++        self.post(
++            "account_create",
++            {
++                "code": "NATIVE-BANK",
++                "name": "حساب آزمایشی",
++                "kind": "bank",
++                "sensitive_identifier": serial,
++            },
++        )
++        account = TreasuryAccount.objects.get(code="NATIVE-BANK")
++        self.assertEqual(account.status, "draft")
++        self.post(
++            "account_mapping",
++            {
++                "cash_ledger_account": str(self.cash.cash_gl.pk),
++                "clearing_ledger_account": str(self.cash.clearing_gl.pk),
++                "effective_from": "1405/01/01",
++                "reason": "نگاشت صریح",
++            },
++            account,
++        )
++        self.post(
++            "account_status",
++            {"to_status": "active", "reason": "فعال‌سازی با خط‌مشی مصوب"},
++            account,
++        )
++        account.refresh_from_db()
++        self.assertEqual(account.status, "active")
++        self.assertNotContains(self.client.get(reverse("treasury:operations")), serial)
++
++    def test_cheque_lifecycle_clear_and_bounce_use_atomic_domain_services(self):
++        self.post(
++            "cheque_create",
++            {
++                "direction": "incoming",
++                "controlled_account": str(self.cash.bank.pk),
++                "amount": "100",
++                "due_date": "1405/07/28",
++                "serial": "TEST-CHEQUE-09876",
++                "party": str(self.party.pk),
++            },
++        )
++        cheque = ChequeInstrument.objects.get()
++        for state in ["received", "deposited", "presented"]:
++            self.post(
++                "cheque_status", {"to_status": state, "reason": "گردش مصوب چک"}, cheque
++            )
++        self.post(
++            "cheque_clear",
++            {
++                "accounting_preparer": str(self.cash.accountant_membership.pk),
++                "period": str(self.cash.period.pk),
++                "clearing_date": "1405/07/28",
++                "reason": "وصول",
++            },
++            cheque,
++        )
++        cheque.refresh_from_db()
++        self.assertEqual(cheque.status, "cleared")
++        self.assertEqual(cheque.cleared_movement.status, "posted")
++        self.post(
++            "cheque_bounce",
++            {
++                "requested_by": str(self.cash.accountant_membership.pk),
++                "period": str(self.cash.period.pk),
++                "accounting_date": "1405/07/28",
++                "reason": "برگشت وصول",
++            },
++            cheque,
++        )
++        cheque.refresh_from_db()
++        self.assertEqual(cheque.status, "bounced")
++        self.assertTrue(cheque.transitions.exists())
++
++    def test_advance_request_issue_settlement_reversal_and_reconciliation(self):
++        request = self.approved_request(kind="vendor_advance")
++        issue = self.cash.post(self.movement(kind="disbursement"))
++        self.post(
++            "request_release",
++            {"movement": str(issue.pk), "reason": "پرداخت تنخواه"},
++            request,
++        )
++        self.post("advance_open", target=request)
++        advance = TreasuryAdvance.objects.get(request=request)
++        receipt = self.cash.post(self.movement(idempotency_key="NATIVE-RETURN"))
++        self.post(
++            "advance_settle",
++            {
++                "receipt_movement": str(receipt.pk),
++                "amount": "60",
++                "idempotency_key": "NATIVE-SETTLE",
++            },
++            advance,
++        )
++        settlement = AdvanceSettlement.objects.get()
++        self.post("settlement_submit", {"reason": "ارسال"}, settlement)
++        self.post(
++            "settlement_decide", {"approve": "yes", "reason": "تأیید"}, settlement
++        )
++        advance.refresh_from_db()
++        self.assertEqual(advance.status, "partially_settled")
++        self.post(
++            "settlement_reverse",
++            {
++                "requested_by": str(self.cash.accountant_membership.pk),
++                "period": str(self.cash.period.pk),
++                "accounting_date": "1405/07/28",
++                "reason": "برگشت تسویه",
++            },
++            settlement,
++        )
++        self.post(
++            "advance_reconcile",
++            {"cutoff_date": "1405/07/28", "idempotency_key": "NATIVE-ADV-RECON"},
++        )
++        self.post(
++            "advance_reverse",
++            {
++                "requested_by": str(self.cash.accountant_membership.pk),
++                "period": str(self.cash.period.pk),
++                "accounting_date": "1405/07/28",
++                "reason": "برگشت پرداخت تنخواه",
++            },
++            advance,
++        )
++        advance.refresh_from_db()
++        self.assertEqual(advance.status, "reversed")
++        self.post("gl_reconcile", {"cutoff_date": "1405/07/28"})
++        self.assertEqual(
++            TreasuryGLReconciliationRun.objects.latest("created_at").exceptions, []
++        )
++        self.assertEqual(
++            TreasuryAdvanceReconciliationRun.objects.latest("created_at").exceptions, []
++        )
++        response = self.client.get(reverse("treasury:operations"))
++        self.assertContains(response, "تطبیق‌های نگهداری‌شده تنخواه")
++        self.fixture("advance_recon", response)
++
++    def test_transfer_uses_native_two_leg_draft_without_posting(self):
++        destination = self.cash._bank(
++            "NATIVE-DEST", "TEST-DEST-1234", self.cash.cash_gl
++        )
++        self.post(
++            "transfer",
++            {
++                "source_account": str(self.cash.bank.pk),
++                "destination_account": str(destination.pk),
++                "project": str(self.project.pk),
++                "movement_date": "1405/07/28",
++                "amount": "20",
++                "description": "انتقال صریح",
++                "idempotency_key": "NATIVE-TRANSFER",
++            },
++        )
++        movement = TreasuryMovement.objects.get(idempotency_key="NATIVE-TRANSFER")
++        self.assertEqual(movement.kind, "transfer")
++        self.assertEqual(movement.status, "draft")
++        self.assertEqual(movement.legs.count(), 2)
++        self.assertIsNone(movement.journal_id)
++
++    def test_cancel_reject_and_payload_conflict_preserve_native_history(self):
++        cancelled = self.request(idempotency_key="NATIVE-CANCEL")
++        self.post("request_cancel", {"reason": "لغو درخواست"}, cancelled)
++        cancelled.refresh_from_db()
++        self.assertEqual(cancelled.status, "cancelled")
++        rejected = self.request(idempotency_key="NATIVE-REJECT")
++        self.post("request_submit", {"reason": "ارسال"}, rejected)
++        self.post("request_decide", {"approve": "no", "reason": "رد درخواست"}, rejected)
++        rejected.refresh_from_db()
++        self.assertEqual(rejected.status, "rejected")
++        response = self.client.post(
++            self.url("request_create"),
++            {
++                "kind": "payment",
++                "amount": "101",
++                "purpose": "DIFFERENT",
++                "party": str(self.party.pk),
++                "idempotency_key": "NATIVE-REJECT",
++            },
++        )
++        self.assertEqual(response.status_code, 200)
++        rejected.refresh_from_db()
++        self.assertEqual(str(rejected.amount), "100.000000")
++        self.assertEqual(PaymentRequest.objects.count(), 2)
++
++    def test_statement_preview_accept_and_bad_file_are_bounded_without_cash_effect(
++        self,
++    ):
++        csv = b"transaction_date,direction,amount,provider_row_id,reference\n2026-10-20,in,100,ROW-1,TEST\n"
++        data = {
++            "account": str(self.cash.bank.pk),
++            "provider_code": "SYNTHETIC",
++            "period_start": "1405/07/28",
++            "period_end": "1405/07/28",
++            "idempotency_key": "NATIVE-STATEMENT",
++            "file": SimpleUploadedFile("test.csv", csv, content_type="text/csv"),
++        }
++        self.post("statement_preview", data)
++        statement = BankStatementImport.objects.get()
++        self.assertEqual(statement.row_count, 1)
++        self.post("statement_accept", {"reason": "پذیرش منبع صریح"}, statement)
++        statement.refresh_from_db()
++        self.assertEqual(statement.status, "accepted")
++        self.assertEqual(TreasuryMovement.objects.count(), 0)
++        data["file"] = SimpleUploadedFile("bad.csv", b"wrong,headers\n")
++        response = self.client.post(self.url("statement_preview"), data)
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, 'role="alert"')
++        self.assertEqual(BankStatementImport.objects.count(), 1)
++        for value in ["1e999999999", "NaN", "0.1234567"]:
++            with self.subTest(invalid_amount=value):
++                data["file"] = SimpleUploadedFile(
++                    "invalid.csv",
++                    (
++                        "transaction_date,direction,amount,provider_row_id,reference\n2026-10-20,in,"
++                        + value
++                        + ",BAD,TEST\n"
++                    ).encode(),
++                )
++                denied = self.client.post(self.url("statement_preview"), data)
++                self.assertEqual(denied.status_code, 200)
++                self.assertEqual(BankStatementImport.objects.count(), 1)
++
++    def test_empty_validation_and_no_get_mutation_have_explicit_states(self):
++        response = self.client.get(reverse("treasury:operations"))
++        self.assertContains(response, "رکورد مجاز وجود ندارد")
++        self.fixture("empty", response)
++        response = self.client.post(self.url("request_create"), {"amount": "-1"})
++        self.assertEqual(response.status_code, 200)
++        self.assertContains(response, 'role="alert"')
++        self.fixture("error", response)
++        request = self.request()
++        self.assertEqual(
++            self.client.get(self.url("request_submit", request)).status_code, 200
++        )
++        request.refresh_from_db()
++        self.assertEqual(request.status, "draft")
++
++    def test_csrf_cross_tenant_choice_and_direct_url_are_enforced(self):
++        strict = self.login(Client(enforce_csrf_checks=True))
++        self.assertEqual(strict.post(self.url("request_create"), {}).status_code, 403)
++        other_owner = User.objects.create_user(username="cep060-other")
++        other = create_organization_with_owner(
++            owner=other_owner, name="SECRET", slug="cep060-other"
++        )
++        project = create_project(
++            organization=other, actor=other_owner, code="SECRET", name="SECRET"
++        )
++        other_account = create_treasury_account(
++            organization=other,
++            actor=other_owner,
++            code="SECRET",
++            name="SECRET",
++            kind="cash",
++            custodian=other.memberships.get(user=other_owner),
++        )
++        direct = self.client.get(self.url("account_status", other_account))
++        self.assertEqual(direct.status_code, 404)
++        self.assertNotContains(direct, "SECRET", status_code=404)
++        self.assertEqual(
++            self.client.get(
++                reverse(
++                    "treasury:operational_detail", args=["account", other_account.pk]
++                )
++            ).status_code,
++            404,
++        )
++        response = self.client.post(
++            self.url("request_create"),
++            {
++                "kind": "payment",
++                "amount": "100",
++                "purpose": "test",
++                "party": str(self.party.pk),
++                "project": str(project.pk),
++                "idempotency_key": "BAD-TENANT",
++            },
++        )
++        self.assertEqual(response.status_code, 200)
++        self.assertNotContains(response, "SECRET")
++        request = self.request()
++        self.organization.memberships.filter(user=self.owner).update(status="removed")
++        self.assertIn(
++            self.client.post(
++                self.url("request_submit", request), {"reason": "DENIED"}
++            ).status_code,
++            [302, 403],
++        )
++        request.refresh_from_db()
++        self.assertEqual(request.status, "draft")
++
++    def test_view_only_role_cannot_invoke_mutations_or_unknown_services(self):
++        user = User.objects.create_user(username="cep060-reader")
++        role = OrganizationRole.objects.create(
++            organization=self.organization, code="cep060-reader", name="خواننده"
++        )
++        role.permissions.add(BusinessPermission.objects.get(code=P.TREASURY_VIEW))
++        membership = self.organization.memberships.create(
++            user=user, role_definition=role, status="active"
++        )
++        MembershipRoleAssignment.objects.create(
++            organization=self.organization,
++            membership=membership,
++            role=role,
++            reason="Explicit synthetic UI role",
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=membership,
++            scope_type=AuthorizationScopeType.ORGANIZATION,
++            reason="Explicit synthetic scope",
++        )
++        self.client.force_login(user)
++        response = self.client.post(self.url("account_create"), {"code": "DENIED"})
++        self.assertEqual(response.status_code, 403)
++        self.fixture("unauthorized", response)
++        self.assertFalse(TreasuryAccount.objects.filter(code="DENIED").exists())
++        self.assertEqual(
++            self.client.get(self.url("arbitrary_service")).status_code, 404
++        )
++
++    def test_project_scope_does_not_expose_global_accounts_or_unrelated_requests(self):
++        allowed = self.request()
++        other_project = create_project(
++            organization=self.organization,
++            actor=self.owner,
++            code="SECOND",
++            name="Hidden project",
++        )
++        hidden = self.request(project=str(other_project.pk), idempotency_key="HIDDEN")
++        user = User.objects.create_user(username="cep060-project-reader")
++        role = OrganizationRole.objects.create(
++            organization=self.organization,
++            code="cep060-project-reader",
++            name="خواننده پروژه",
++        )
++        role.permissions.add(BusinessPermission.objects.get(code=P.TREASURY_VIEW))
++        membership = self.organization.memberships.create(
++            user=user, role_definition=role, status="active"
++        )
++        MembershipRoleAssignment.objects.create(
++            organization=self.organization,
++            membership=membership,
++            role=role,
++            reason="Explicit scoped fixture",
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization,
++            membership=membership,
++            scope_type=AuthorizationScopeType.PROJECT,
++            project=self.project,
++            reason="Explicit project scope",
++        )
++        self.client.force_login(user)
++        response = self.client.get(reverse("treasury:operations"))
++        # Registered Treasury read authority requires organization scope. A
++        # project title/grant must not expand it into organization cash access.
++        self.assertEqual(response.status_code, 403)
++        self.assertNotContains(response, str(allowed.pk), status_code=403)
++        self.assertNotContains(response, str(hidden.pk), status_code=403)
++        root = self.client.get(reverse("treasury:workbench"))
++        self.assertEqual(root.status_code, 403)
++        self.assertNotContains(root, self.cash.bank.name, status_code=403)
+--- a/apps/treasury/templates/treasury/operational_detail.html
++++ b/apps/treasury/templates/treasury/operational_detail.html
+@@ -0,0 +1,5 @@
++{% extends "base.html" %}
++{% block title %}جزئیات خزانه‌داری{% endblock %}
++{% block content %}
++<section class="mx-auto max-w-3xl space-y-6"><header><a href="{% url 'treasury:operations' %}">عملیات خزانه‌داری</a><h1 class="mt-2 text-2xl font-bold">جزئیات خزانه‌داری</h1></header><dl class="erp-surface grid gap-4 rounded-xl p-5 sm:grid-cols-2">{% for label,value in summary %}<div class="min-w-0"><dt class="text-sm text-slate-500">{{ label }}</dt><dd class="mt-1 break-words">{{ value }}</dd></div>{% endfor %}</dl></section>
++{% endblock %}
+--- a/apps/treasury/templates/treasury/operations.html
++++ b/apps/treasury/templates/treasury/operations.html
+@@ -0,0 +1,10 @@
++{% extends "base.html" %}
++{% block title %}عملیات خزانه‌داری{% endblock %}
++{% block content %}
++<section class="space-y-6" aria-labelledby="operations-title">
++  <header><a href="{% url 'treasury:workbench' %}" class="text-sm text-slate-600">خزانه‌داری</a><h1 id="operations-title" class="mt-2 text-2xl font-bold">عملیات خزانه‌داری</h1><p class="mt-2 text-slate-600">حساب‌ها، درخواست‌ها، چک‌ها و تنخواه‌ها؛ مبالغ به ریال هستند.</p></header>
++  <nav aria-label="عملیات مجاز" class="flex flex-wrap gap-3">{% for action in creation %}<a class="erp-btn erp-btn--secondary" href="{{ action.url }}">{{ action.title }}</a>{% endfor %}<a class="erp-btn erp-btn--secondary" href="{% url 'treasury:statement_workbench' %}">صورت‌حساب و مغایرت بانکی</a></nav>
++  {% for group in groups %}<section class="erp-surface rounded-xl p-4"><h2 class="text-lg font-bold">{{ group.title }}</h2><ul class="mt-3 divide-y">{% for row in group.rows %}<li class="space-y-3 py-4"><div class="flex flex-wrap items-center justify-between gap-3"><span>{{ row.title }} · {{ row.object.get_status_display }}</span>{% if row.object.amount %}<bdi dir="ltr">{{ row.object.amount }} IRR</bdi>{% endif %}</div>{% if row.object.purpose %}<p class="text-sm text-slate-600">{{ row.object.purpose }}</p>{% endif %}{% if row.object.due_date %}<p class="text-sm">سررسید: {{ row.object.due_date|jalali_date }} · ••••{{ row.object.serial_last4 }}</p>{% endif %}{% if row.object.cleared_movement_id %}<a class="text-sm underline" href="{% url 'treasury:movement_detail' row.object.cleared_movement_id %}">حرکت وصول قطعی</a>{% endif %}{% if row.object.released_movement_id %}<a class="text-sm underline" href="{% url 'treasury:movement_detail' row.object.released_movement_id %}">حرکت پرداخت قطعی</a>{% endif %}<nav aria-label="عملیات ردیف" class="flex flex-wrap gap-2"><a class="erp-btn erp-btn--secondary" href="{{ row.detail_url }}">جزئیات</a>{% for action in row.actions %}<a class="erp-btn erp-btn--secondary" href="{{ action.url }}">{{ action.title }}</a>{% empty %}<span class="text-sm text-slate-500">عملیاتی برای این وضعیت در دسترس نیست.</span>{% endfor %}</nav></li>{% empty %}<li class="py-4 text-slate-500">رکورد مجاز وجود ندارد.</li>{% endfor %}</ul><nav aria-label="صفحه‌های {{ group.title }}" class="mt-4 flex gap-3">{% if group.links.previous %}<a class="erp-btn erp-btn--secondary" href="{{ group.links.previous }}">قبلی</a>{% endif %}{% if group.links.next %}<a class="erp-btn erp-btn--secondary" href="{{ group.links.next }}">بعدی</a>{% endif %}</nav></section>{% endfor %}
++  <section class="erp-surface rounded-xl p-4"><h2 class="text-lg font-bold">تطبیق‌های نگهداری‌شده تنخواه</h2><p class="mt-2 text-sm text-slate-600">شواهد ثبت‌شده در زمان اجرا، برای تاریخ مبنای هر تطبیق؛ مبالغ به ریال هستند.</p><ul class="mt-3 divide-y">{% for run in advance_runs %}<li class="space-y-2 py-3"><p>تاریخ مبنا: {{ run.cutoff_date|jalali_date }} · {{ run.exceptions|length }} مغایرت</p><dl class="grid gap-2 sm:grid-cols-3"><div><dt>پرداخت‌شده</dt><dd>{{ run.issued_total }}</dd></div><div><dt>تسویه‌شده</dt><dd>{{ run.settled_total }}</dd></div><div><dt>مانده در زمان اجرا</dt><dd>{{ run.outstanding_total }}</dd></div></dl><bdi dir="ltr" class="text-xs text-slate-500">{{ run.evidence_hash|slice:':12' }}</bdi></li>{% empty %}<li class="py-3 text-slate-500">اجرای تطبیق مجاز وجود ندارد.</li>{% endfor %}</ul></section>
++</section>
++{% endblock %}
+--- a/apps/treasury/templates/treasury/operation_form.html
++++ b/apps/treasury/templates/treasury/operation_form.html
+@@ -0,0 +1,9 @@
++{% extends "base.html" %}
++{% block title %}{{ title }}{% endblock %}
++{% block content %}
++<section class="mx-auto max-w-3xl space-y-6">
++  <header><a href="{% url 'treasury:operations' %}" class="text-sm text-slate-600">عملیات خزانه‌داری</a><h1 class="mt-2 text-2xl font-bold">{{ title }}</h1>{% if target %}<p class="mt-2 text-slate-600">وضعیت فعلی: {{ target.get_status_display }}</p>{% endif %}</header>
++  {% if summary %}<dl class="erp-surface grid gap-4 rounded-xl p-5 sm:grid-cols-2">{% for label,value in summary %}<div class="min-w-0"><dt class="text-sm text-slate-500">{{ label }}</dt><dd class="mt-1 break-words">{{ value }}</dd></div>{% endfor %}</dl>{% endif %}
++  <form method="post" enctype="multipart/form-data" class="erp-surface space-y-5 rounded-xl p-5">{% csrf_token %}{% if form.non_field_errors %}<div class="erp-alert erp-alert--error" role="alert">{{ form.non_field_errors }}</div>{% endif %}{% for field in form %}{% if field.is_hidden %}{{ field }}{{ field.errors }}{% else %}{% include "components/form_field.html" with field=field %}{% endif %}{% endfor %}<div class="flex flex-wrap gap-3"><button class="erp-btn erp-btn--primary" type="submit">ثبت {{ title }}</button><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:operations' %}">بازگشت</a></div></form>
++</section>
++{% endblock %}
+--- a/apps/treasury/templates/treasury/statement_workbench.html
++++ b/apps/treasury/templates/treasury/statement_workbench.html
+@@ -3,7 +3,7 @@
+ {% block content %}
+ <section class="space-y-6" aria-labelledby="statement-title">
+ <header><nav aria-label="مسیر راهنما" class="text-slate-500 text-sm"><a href="{% url 'treasury:workbench' %}">خزانه‌داری</a> / صورت‌حساب</nav><h1 id="statement-title" class="mt-2 text-2xl font-bold">صورت‌حساب و مغایرت‌های بانکی</h1><p class="text-slate-600">فقط تطبیق دقیق پیشنهاد می‌شود؛ شواهد منبع و حرکت هرگز ویرایش نمی‌شوند. فایل، ردیف ارائه‌دهنده، شواهد دقیق ردیف و کلید تکرارپذیری در برابر ورود تکراری کنترل می‌شوند.</p></header>
+-{% for item in imports %}<section class="erp-surface rounded-xl p-4"><h2 class="font-bold">{{ item.account.name }} — {{ item.get_status_display }}</h2><p class="text-slate-600"><bdi dir="ltr">{{ item.period_start }} تا {{ item.period_end }}</bdi> · {{ item.row_count }} ردیف</p><div class="mt-3 flex flex-wrap gap-2">{% if item.status == 'accepted' %}<form method="post" action="{% url 'treasury:bank_reconcile' item.pk %}" class="flex flex-wrap gap-2">{% csrf_token %}<label>تاریخ مبنای تطبیق <input type="date" name="as_of_date" required></label><button class="erp-btn erp-btn--primary">اجرای تطبیق</button></form>{% endif %}</div><ul class="mt-3 divide-y">{% for line in item.lines.all %}<li class="py-2"><bdi dir="ltr">{{ line.transaction_date }} · {{ line.amount }} IRR</bdi> — {{ line.reference|default:"بدون مرجع" }} {% if item.status == 'accepted' %}<form class="inline" method="post" action="{% url 'treasury:suggest_match' line.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--secondary">پیشنهاد دقیق</button></form>{% endif %}</li>{% endfor %}</ul></section>{% empty %}<p class="erp-surface rounded-xl p-4 text-slate-500">صورت‌حساب مجاز وجود ندارد.</p>{% endfor %}
+-<section class="erp-surface rounded-xl p-4"><h2 class="font-bold">پیشنهادهای تطبیق و مغایرت‌های بانکی</h2><ul class="mt-3 divide-y">{% for proposal in proposals %}<li class="py-3"><bdi dir="ltr">{{ proposal.statement_line.transaction_date }} · {{ proposal.movement.amount }} IRR</bdi> — {{ proposal.get_status_display }}{% if proposal.status == 'suggested' %}<div class="mt-2 flex flex-wrap gap-2"><form method="post" action="{% url 'treasury:confirm_match' proposal.pk %}">{% csrf_token %}<label class="sr-only" for="reason-{{ proposal.pk }}">دلیل تأیید</label><input id="reason-{{ proposal.pk }}" name="reason" required placeholder="دلیل تأیید"><button class="erp-btn erp-btn--primary">تأیید دقیق</button></form><form method="post" action="{% url 'treasury:reject_match' proposal.pk %}">{% csrf_token %}<label class="sr-only" for="reject-{{ proposal.pk }}">دلیل رد</label><input id="reject-{{ proposal.pk }}" name="reason" required placeholder="دلیل رد"><button class="erp-btn erp-btn--secondary">رد</button></form></div>{% endif %}</li>{% empty %}<li class="py-3 text-slate-500">پیشنهادی وجود ندارد.</li>{% endfor %}</ul></section>
++{% for item in imports %}<section class="erp-surface rounded-xl p-4"><h2 class="font-bold">{{ item.account.name }} — {{ item.get_status_display }}</h2><p class="text-slate-600"><bdi dir="ltr">{{ item.period_start|jalali_date }} تا {{ item.period_end|jalali_date }}</bdi> · {{ item.row_count }} ردیف</p><div class="mt-3 flex flex-wrap gap-2">{% if item.status == 'accepted' %}<form method="post" action="{% url 'treasury:bank_reconcile' item.pk %}" class="flex flex-wrap gap-2">{% csrf_token %}<label>تاریخ مبنای تطبیق <input type="text" data-jalali-date="date" data-input-mask="####/##/##" inputmode="numeric" name="as_of_date" required></label><button class="erp-btn erp-btn--primary">اجرای تطبیق</button></form>{% endif %}</div><ul class="mt-3 divide-y">{% for line in item.lines.all %}<li class="py-2"><bdi dir="ltr">{{ line.transaction_date|jalali_date }} · {{ line.amount }} IRR</bdi> — {{ line.reference|default:"بدون مرجع" }} {% if item.status == 'accepted' %}<form class="inline" method="post" action="{% url 'treasury:suggest_match' line.pk %}">{% csrf_token %}<button class="erp-btn erp-btn--secondary">پیشنهاد دقیق</button></form>{% endif %}</li>{% endfor %}</ul></section>{% empty %}<p class="erp-surface rounded-xl p-4 text-slate-500">صورت‌حساب مجاز وجود ندارد.</p>{% endfor %}
++<section class="erp-surface rounded-xl p-4"><h2 class="font-bold">پیشنهادهای تطبیق و مغایرت‌های بانکی</h2><ul class="mt-3 divide-y">{% for proposal in proposals %}<li class="py-3"><bdi dir="ltr">{{ proposal.statement_line.transaction_date|jalali_date }} · {{ proposal.movement.amount }} IRR</bdi> — {{ proposal.get_status_display }}{% if proposal.status == 'suggested' %}<div class="mt-2 flex flex-wrap gap-2"><form method="post" action="{% url 'treasury:confirm_match' proposal.pk %}">{% csrf_token %}<label class="sr-only" for="reason-{{ proposal.pk }}">دلیل تأیید</label><input id="reason-{{ proposal.pk }}" name="reason" required placeholder="دلیل تأیید"><button class="erp-btn erp-btn--primary">تأیید دقیق</button></form><form method="post" action="{% url 'treasury:reject_match' proposal.pk %}">{% csrf_token %}<label class="sr-only" for="reject-{{ proposal.pk }}">دلیل رد</label><input id="reject-{{ proposal.pk }}" name="reason" required placeholder="دلیل رد"><button class="erp-btn erp-btn--secondary">رد</button></form></div>{% endif %}</li>{% empty %}<li class="py-3 text-slate-500">پیشنهادی وجود ندارد.</li>{% endfor %}</ul></section>
+ <section class="erp-surface rounded-xl p-4"><h2 class="font-bold">تسویه‌های فعال</h2><ul class="mt-3 divide-y">{% for clearing in clearings %}<li class="py-3"><bdi dir="ltr">{{ clearing.movement.amount }} IRR</bdi> — ردیف و حرکت با شواهد دقیق پیوند دارند.<form class="mt-2" method="post" action="{% url 'treasury:reverse_clearing' clearing.pk %}">{% csrf_token %}<label class="sr-only" for="clear-{{ clearing.pk }}">دلیل برگشت</label><input id="clear-{{ clearing.pk }}" name="reason" required placeholder="دلیل برگشت"><button class="erp-btn erp-btn--secondary">برگشت تطبیق</button></form></li>{% empty %}<li class="py-3 text-slate-500">تسویه فعال وجود ندارد.</li>{% endfor %}</ul></section>
+ </section>{% endblock %}
+--- a/apps/treasury/templates/treasury/workbench.html
++++ b/apps/treasury/templates/treasury/workbench.html
+@@ -2,9 +2,9 @@
+ {% block title %}خزانه‌داری{% endblock %}
+ {% block content %}
+ <section class="space-y-6" aria-labelledby="treasury-title">
+-  <header><nav aria-label="مسیر راهنما" class="text-slate-500 text-sm"><a href="{% url 'organizations:select' %}">سازمان</a> / خزانه‌داری</nav><h1 id="treasury-title" class="mt-2 text-2xl font-bold">خزانه‌داری</h1><p class="text-slate-600">شواهد حساب، حرکت و تطبیق؛ مقادیر مالی به ریال هستند.</p>{% if can_create_movement %}<a class="erp-btn erp-btn--primary mt-3" href="{% url 'treasury:movement_create' %}">ثبت دریافت یا پرداخت</a>{% endif %}</header>
++  <header><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:operations' %}">عملیات، درخواست‌ها و چک‌ها</a><nav aria-label="مسیر راهنما" class="text-slate-500 text-sm"><a href="{% url 'organizations:select' %}">سازمان</a> / خزانه‌داری</nav><h1 id="treasury-title" class="mt-2 text-2xl font-bold">خزانه‌داری</h1><p class="text-slate-600">شواهد حساب، حرکت و تطبیق؛ مقادیر مالی به ریال هستند.</p>{% if can_create_movement %}<a class="erp-btn erp-btn--primary mt-3" href="{% url 'treasury:movement_create' %}">ثبت دریافت یا پرداخت</a>{% endif %}</header>
+   <div class="grid gap-4 md:grid-cols-2"><section class="erp-surface rounded-xl p-4"><h2 class="font-bold">حساب‌های خزانه</h2><ul class="mt-3 divide-y">{% for account in accounts %}<li class="py-2"><bdi dir="ltr">{{ account.code }}</bdi> — {{ account.name }} <span class="text-slate-500">{{ account.get_status_display }} · IRR</span></li>{% empty %}<li class="py-3 text-slate-500">حساب مجاز وجود ندارد.</li>{% endfor %}</ul></section><section class="erp-surface rounded-xl p-4"><h2 class="font-bold">حرکت‌های اخیر</h2><ul class="mt-3 divide-y">{% for movement in recent_movements %}<li class="py-2"><a href="{% url 'treasury:movement_detail' movement.pk %}">{{ movement.get_kind_display }} · {{ movement.get_status_display }}</a> <bdi dir="ltr" class="float-left">{{ movement.amount }} IRR</bdi>{% if movement.project %}<div class="text-slate-500 text-xs">{{ movement.project }}</div>{% endif %}</li>{% empty %}<li class="py-3 text-slate-500">حرکتی ثبت نشده است.</li>{% endfor %}</ul></section></div>
+-  <section class="erp-surface rounded-xl p-4"><div class="flex items-center justify-between gap-3"><h2 class="font-bold">تطبیق‌های بانکی نگهداری‌شده</h2><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:statement_workbench' %}">صورت‌حساب و مغایرت بانکی</a></div><div class="overflow-x-auto"><table class="mt-3 min-w-full text-right"><caption class="sr-only">تطبیق‌های بانکی نگهداری‌شده</caption><thead><tr><th>حساب</th><th>تاریخ مبنای تطبیق</th><th>مغایرت بانکی</th></tr></thead><tbody>{% for run in bank_runs %}<tr class="border-t"><td>{{ run.account.name }}</td><td dir="ltr">{{ run.as_of_date }}</td><td>{{ run.exceptions|length }}</td></tr>{% empty %}<tr><td colspan="3" class="py-3 text-slate-500">اجرایی وجود ندارد.</td></tr>{% endfor %}</tbody></table></div></section>
+-  <section class="erp-surface rounded-xl p-4"><h2 class="font-bold">بررسی مستقل تطبیق خزانه با دفترکل</h2><p class="text-sm text-slate-600">بررسی، شواهد نگهداری‌شده را امضا می‌کند و هیچ حرکت یا سند حسابداری را تغییر نمی‌دهد.</p><ul class="mt-3 divide-y">{% for run in gl_runs %}<li class="py-3"><div class="flex flex-wrap justify-between gap-2"><span>تاریخ مبنای تطبیق <bdi dir="ltr">{{ run.cutoff_date }}</bdi> · {{ run.exceptions|length }} مغایرت خزانه با حسابداری</span><bdi dir="ltr">{{ run.evidence_hash|slice:':12' }}…</bdi></div>{% if run.review %}<p class="mt-2 text-emerald-700">بررسی مستقل توسط {{ run.review.reviewed_by.user.get_full_name|default:run.review.reviewed_by.user.username }} ثبت شده است.</p>{% elif can_review_reconciliation %}<form method="post" action="{% url 'treasury:review_gl_reconciliation' run.pk %}" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<label class="sr-only" for="gl-review-{{ run.pk }}">دلیل بررسی مستقل</label><input id="gl-review-{{ run.pk }}" name="reason" required placeholder="دلیل بررسی مستقل"><button class="erp-btn erp-btn--primary">ثبت بررسی مستقل</button></form>{% endif %}</li>{% empty %}<li class="py-3 text-slate-500">اجرای خزانه به دفترکل وجود ندارد.</li>{% endfor %}</ul></section>
++  <section class="erp-surface rounded-xl p-4"><div class="flex items-center justify-between gap-3"><h2 class="font-bold">تطبیق‌های بانکی نگهداری‌شده</h2><a class="erp-btn erp-btn--secondary" href="{% url 'treasury:statement_workbench' %}">صورت‌حساب و مغایرت بانکی</a></div><div class="overflow-x-auto"><table class="mt-3 min-w-full text-right"><caption class="sr-only">تطبیق‌های بانکی نگهداری‌شده</caption><thead><tr><th>حساب</th><th>تاریخ مبنای تطبیق</th><th>مغایرت بانکی</th></tr></thead><tbody>{% for run in bank_runs %}<tr class="border-t"><td>{{ run.account.name }}</td><td dir="ltr">{{ run.as_of_date|jalali_date }}</td><td>{{ run.exceptions|length }}</td></tr>{% empty %}<tr><td colspan="3" class="py-3 text-slate-500">اجرایی وجود ندارد.</td></tr>{% endfor %}</tbody></table></div></section>
++  <section class="erp-surface rounded-xl p-4"><h2 class="font-bold">بررسی مستقل تطبیق خزانه با دفترکل</h2><p class="text-sm text-slate-600">بررسی، شواهد نگهداری‌شده را امضا می‌کند و هیچ حرکت یا سند حسابداری را تغییر نمی‌دهد.</p><ul class="mt-3 divide-y">{% for run in gl_runs %}<li class="py-3"><div class="flex flex-wrap justify-between gap-2"><span>تاریخ مبنای تطبیق <bdi dir="ltr">{{ run.cutoff_date|jalali_date }}</bdi> · {{ run.exceptions|length }} مغایرت خزانه با حسابداری</span><bdi dir="ltr">{{ run.evidence_hash|slice:':12' }}…</bdi></div>{% if run.review %}<p class="mt-2 text-emerald-700">بررسی مستقل توسط {{ run.review.reviewed_by.user.get_full_name|default:run.review.reviewed_by.user.username }} ثبت شده است.</p>{% elif can_review_reconciliation %}<form method="post" action="{% url 'treasury:review_gl_reconciliation' run.pk %}" class="mt-2 flex flex-wrap gap-2">{% csrf_token %}<label class="sr-only" for="gl-review-{{ run.pk }}">دلیل بررسی مستقل</label><input id="gl-review-{{ run.pk }}" name="reason" required placeholder="دلیل بررسی مستقل"><button class="erp-btn erp-btn--primary">ثبت بررسی مستقل</button></form>{% endif %}</li>{% empty %}<li class="py-3 text-slate-500">اجرای خزانه به دفترکل وجود ندارد.</li>{% endfor %}</ul></section>
+ </section>
+ {% endblock %}

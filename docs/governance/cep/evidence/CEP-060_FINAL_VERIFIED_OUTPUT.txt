@@ -1,0 +1,116 @@
+....................FFF
+================================== FAILURES ===================================
+_ TreasuryClaimSettlementTransitionTests.test_active_subledger_allocation_blocks_claim_correction _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ TreasuryClaimSettlementTransitionTests.test_claim_endpoint_uses_posted_treasury_receipt_with_csrf _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ TreasuryClaimSettlementTransitionTests.test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_active_subledger_allocation_blocks_claim_correction
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_claim_endpoint_uses_posted_treasury_receipt_with_csrf
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 3 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+3 failed, 20 passed, 7 subtests passed in 35.84s

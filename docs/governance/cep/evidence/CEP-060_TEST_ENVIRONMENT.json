@@ -1,0 +1,27 @@
+{
+  "database": "test_construction_erp",
+  "engine": "PostgreSQL",
+  "schema": "Current migrated disposable test schema",
+  "issue": "Missing migration-seeded WorkflowTemplate catalogue following earlier TransactionTestCase flushes; not a product regression",
+  "workflow_type_bootstrap": "Existing bootstrap restores types only; does not seed templates",
+  "repair": "Replayed unchanged existing workflow migrations0018/0019 seed functions only against test database; no schema operations",
+  "template_count_before": 0,
+  "template_count_after": 2,
+  "development_mutation": false,
+  "production_action": false,
+  "additional_template_restore": {
+    "migration": "0020_progress_claim_approval_compatibility_catalog",
+    "before": 2,
+    "after": 3
+  },
+  "final_session_restore": {
+    "migrations": [
+      "workflows0018",
+      "workflows0019",
+      "workflows0020"
+    ],
+    "before": 0,
+    "after": 3,
+    "reason": "Previous TransactionTestCase teardown leaves reusable database without migration-seeded templates; restore canonical seed baseline before fresh pytest session"
+  }
+}

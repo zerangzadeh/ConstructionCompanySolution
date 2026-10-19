@@ -1,0 +1,95 @@
+.............F......FF
+================================== FAILURES ===================================
+_ NativeTreasuryWorkspaceTests.test_csrf_cross_tenant_choice_and_direct_url_are_enforced _
+apps\treasury\test_cep060_workspace.py:354: in test_csrf_cross_tenant_choice_and_direct_url_are_enforced
+    other_account = create_treasury_account(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\treasury\services.py:214: in create_treasury_account
+    account.save()
+apps\treasury\models.py:197: in save
+    self.full_clean(validate_constraints=False)
+.venv-2\Lib\site-packages\django\db\models\base.py:1679: in full_clean
+    raise ValidationError(errors)
+E   django.core.exceptions.ValidationError: {'custodian': ['\u0635\u0646\u062f\u0648\u0642 \u0648 \u062a\u0646\u062e\u0648\u0627\u0647 \u0628\u0647 \u0645\u062a\u0648\u0644\u06cc \u0641\u0639\u0627\u0644 \u0646\u06cc\u0627\u0632 \u062f\u0627\u0631\u0646\u062f.']}
+------------------------------ Captured log call ------------------------------
+WARNING  django.security.csrf:log.py:253 Forbidden (CSRF cookie not set.): /treasury/operations/request_create/
+_ TreasuryClaimSettlementTransitionTests.test_active_subledger_allocation_blocks_claim_correction _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ TreasuryClaimSettlementTransitionTests.test_claim_endpoint_uses_posted_treasury_receipt_with_csrf _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep060_workspace.py::NativeTreasuryWorkspaceTests::test_csrf_cross_tenant_choice_and_direct_url_are_enforced
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_active_subledger_allocation_blocks_claim_correction
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_claim_endpoint_uses_posted_treasury_receipt_with_csrf
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 3 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+3 failed, 19 passed, 7 subtests passed in 26.96s

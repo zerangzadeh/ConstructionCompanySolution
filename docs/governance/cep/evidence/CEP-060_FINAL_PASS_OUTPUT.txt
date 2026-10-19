@@ -1,0 +1,80 @@
+....................FFF
+================================== FAILURES ===================================
+_ TreasuryClaimSettlementTransitionTests.test_active_subledger_allocation_blocks_claim_correction _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:961: in _approve_claim
+    submit_progress_claim(
+apps\billing\services.py:2037: in submit_progress_claim
+    return submit_progress_claim_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:1148: in submit_progress_claim_with_workflow
+    ensure_progress_claim_approval_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:938: in ensure_progress_claim_approval_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ TreasuryClaimSettlementTransitionTests.test_claim_endpoint_uses_posted_treasury_receipt_with_csrf _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:961: in _approve_claim
+    submit_progress_claim(
+apps\billing\services.py:2037: in submit_progress_claim
+    return submit_progress_claim_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:1148: in submit_progress_claim_with_workflow
+    ensure_progress_claim_approval_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:938: in ensure_progress_claim_approval_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+_ TreasuryClaimSettlementTransitionTests.test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources _
+apps\billing\test_payment_retirement.py:53: in setUp
+    self.claim = self._approve_claim(self._claim_for_approval())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:961: in _approve_claim
+    submit_progress_claim(
+apps\billing\services.py:2037: in submit_progress_claim
+    return submit_progress_claim_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:1148: in submit_progress_claim_with_workflow
+    ensure_progress_claim_approval_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:938: in ensure_progress_claim_approval_workflow
+    template = WorkflowTemplate.objects.get(
+.venv-2\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv-2\Lib\site-packages\django\db\models\query.py:635: in get
+    raise self.model.DoesNotExist(
+E   apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+=========================== short test summary info ===========================
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_active_subledger_allocation_blocks_claim_correction
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_claim_endpoint_uses_posted_treasury_receipt_with_csrf
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 3 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+3 failed, 20 passed, 7 subtests passed in 31.27s

@@ -4,11 +4,19 @@ from uuid import uuid4
 from django import forms
 
 from apps.accounting.models import FiscalPeriod
-from apps.organizations.authorization import get_active_membership, scope_queryset
-from apps.organizations.models import MembershipStatus, OrganizationMembership
+from apps.organizations.authorization import (
+    get_active_membership,
+    has_business_permission,
+    scope_queryset,
+)
+from apps.organizations.models import (
+    BusinessPermissionCode,
+    MembershipStatus,
+    OrganizationMembership,
+)
 from apps.parties.models import BusinessParty
 from apps.projects.models import Project
-from apps.treasury.models import TreasuryAccount, TreasuryAccountStatus
+from apps.treasury.models import PaymentRequest, TreasuryAccount, TreasuryAccountStatus
 from core.forms import JalaliDateMixin
 
 
@@ -31,6 +39,11 @@ class MovementForm(JalaliDateMixin, forms.Form):
         label="طرف حساب", queryset=BusinessParty.objects.none(), required=False
     )
     description = forms.CharField(label="شرح", max_length=500)
+    origin_request = forms.ModelChoiceField(
+        label="درخواست پرداخت مصوب",
+        queryset=PaymentRequest.objects.none(),
+        required=False,
+    )
     idempotency_key = forms.CharField(
         widget=forms.HiddenInput, initial=uuid4, max_length=120
     )
@@ -48,6 +61,25 @@ class MovementForm(JalaliDateMixin, forms.Form):
         )
         self.fields["party"].queryset = BusinessParty.objects.filter(
             organization=organization
+        )
+        self.fields["origin_request"].queryset = scope_queryset(
+            PaymentRequest.objects.filter(
+                organization=organization,
+                status="approved",
+                kind="employee_reimbursement",
+            ),
+            membership=membership,
+            project_lookup="project_id",
+            site_lookup="site_id",
+        )
+        if not has_business_permission(
+            user=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.TREASURY_VIEW,
+        ):
+            self.fields["origin_request"].queryset = PaymentRequest.objects.none()
+        self.fields["origin_request"].label_from_instance = lambda item: (
+            f"{item.purpose[:60]} · {item.amount} ریال"
         )
 
 

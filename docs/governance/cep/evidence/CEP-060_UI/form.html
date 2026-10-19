@@ -1,0 +1,983 @@
+
+<!doctype html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>چک جدید</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/erp_jalali.css">
+    <link rel="stylesheet" href="/static/css/erp_money.css">
+    <script src="/static/js/erp_jalali.js" defer></script>
+    <script src="/static/js/erp_money.js" defer></script>
+    <script src="/static/js/erp_table.js" defer></script>
+    <script src="/static/js/erp_context.js" defer></script>
+    <style>
+         :root {
+            --erp-canvas: #f8fafc;
+            --erp-surface: #ffffff;
+            --erp-surface-subtle: #f1f5f9;
+            --erp-border: #e2e8f0;
+            --erp-border-strong: #cbd5e1;
+            --erp-text: #0f172a;
+            --erp-text-muted: #64748b;
+            --erp-primary: #1d4ed8;
+            --erp-primary-hover: #1e40af;
+            --erp-sidebar: #0f172a;
+            --erp-sidebar-border: #1e293b;
+            --erp-radius-control: .5rem;
+            --erp-radius-card: .75rem;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("/static/fonts/vazirmatn/Vazirmatn-Regular.woff2") format("woff2");
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("/static/fonts/vazirmatn/Vazirmatn-Medium.woff2") format("woff2");
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("/static/fonts/vazirmatn/Vazirmatn-SemiBold.woff2") format("woff2");
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+        }
+        
+        @font-face {
+            font-family: "Vazirmatn";
+            src: url("/static/fonts/vazirmatn/Vazirmatn-Bold.woff2") format("woff2");
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+        }
+        
+        body {
+            font-family: "Vazirmatn", Tahoma, "Segoe UI", Arial, sans-serif;
+            font-feature-settings: "ss01";
+            overflow-x: hidden;
+            font-size: .875rem;
+            line-height: 1.5;
+        }
+        
+         :where(a,
+        button,
+        input,
+        select,
+        textarea,
+        summary):focus-visible {
+            outline: 2px solid rgb(59 130 246);
+            outline-offset: 2px;
+        }
+        
+        main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+        main select,
+        main textarea {
+            display: block;
+            width: 100%;
+            min-height: 2.75rem;
+            border: 1px solid rgb(203 213 225);
+            border-radius: .625rem;
+            background: white;
+            padding: .625rem .75rem;
+            color: rgb(15 23 42);
+        }
+        
+        main textarea {
+            min-height: 7rem;
+        }
+        
+        main input[type="file"],
+        main select[multiple] {
+            height: auto;
+        }
+        
+        main input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus,
+        main select:focus,
+        main textarea:focus {
+            border-color: rgb(37 99 235);
+            outline: none;
+            box-shadow: 0 0 0 3px rgb(219 234 254);
+        }
+        
+        main input:disabled,
+        main select:disabled,
+        main textarea:disabled {
+            background: rgb(248 250 252);
+            color: rgb(100 116 139);
+        }
+        
+        main input[type="email"],
+        main input[type="url"],
+        main input[type="password"],
+        main input[type="number"],
+        main input[type="date"],
+        main input[type="datetime-local"],
+        main input[type="time"],
+        main input[name="username"],
+        main input[name="code"],
+        main input[name$="-code"],
+        main input[name$="_code"],
+        main input[name$="number"],
+        main input[name*="uuid"],
+        main input[name$="_id"] {
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: plaintext;
+        }
+        
+        .erp-surface {
+            border: 1px solid var(--erp-border);
+            background: var(--erp-surface);
+            box-shadow: 0 1px 2px rgb(15 23 42 / .035);
+        }
+        
+        .erp-surface--raised {
+            box-shadow: 0 4px 6px -1px rgb(15 23 42 / .06), 0 2px 4px -2px rgb(15 23 42 / .04);
+        }
+        
+        .erp-btn {
+            display: inline-flex;
+            min-height: 2.5rem;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            border: 1px solid transparent;
+            border-radius: var(--erp-radius-control);
+            padding: .5rem 1rem;
+            font-size: .8125rem;
+            font-weight: 600;
+            line-height: 1.25rem;
+            transition: border-color .15s ease, background-color .15s ease, color .15s ease, box-shadow .15s ease;
+        }
+        
+        .erp-btn--primary {
+            background: var(--erp-primary);
+            color: white;
+            box-shadow: 0 1px 2px rgb(15 23 42 / .08);
+        }
+        
+        .erp-btn--primary:hover {
+            background: var(--erp-primary-hover);
+        }
+        
+        .erp-btn--secondary {
+            border-color: var(--erp-border-strong);
+            background: white;
+            color: rgb(51 65 85);
+        }
+        
+        .erp-btn--secondary:hover {
+            border-color: rgb(148 163 184);
+            background: var(--erp-surface-subtle);
+            color: var(--erp-text);
+        }
+
+        .erp-btn--compact {
+            min-height: 2rem;
+            padding: .25rem .5rem;
+            font-size: .6875rem;
+            line-height: 1rem;
+        }
+        
+        .erp-btn--active,
+        .erp-btn--active:hover {
+            border-color: var(--erp-primary);
+            background: var(--erp-primary);
+            color: white;
+            box-shadow: 0 1px 2px rgb(15 23 42 / .08);
+        }
+        
+        .erp-btn--danger {
+            border-color: rgb(254 202 202);
+            background: white;
+            color: rgb(185 28 28);
+        }
+        
+        .erp-btn--danger:hover {
+            background: rgb(254 242 242);
+        }
+        
+        .erp-badge {
+            display: inline-flex;
+            min-height: 1.5rem;
+            align-items: center;
+            gap: .35rem;
+            border: 1px solid;
+            border-radius: .375rem;
+            padding: .15rem .5rem;
+            font-size: .7rem;
+            font-weight: 600;
+            line-height: 1rem;
+            white-space: nowrap;
+        }
+        
+        .erp-badge::before {
+            width: .35rem;
+            height: .35rem;
+            flex: 0 0 .35rem;
+            border-radius: 9999px;
+            background: currentColor;
+            content: "";
+        }
+        
+        .erp-badge--neutral {
+            border-color: rgb(203 213 225);
+            background: rgb(241 245 249);
+            color: rgb(71 85 105);
+        }
+        
+        .erp-badge--info {
+            border-color: rgb(191 219 254);
+            background: rgb(239 246 255);
+            color: rgb(29 78 216);
+        }
+        
+        .erp-badge--success {
+            border-color: rgb(187 247 208);
+            background: rgb(240 253 244);
+            color: rgb(21 128 61);
+        }
+        
+        .erp-badge--warning {
+            border-color: rgb(253 230 138);
+            background: rgb(255 251 235);
+            color: rgb(180 83 9);
+        }
+        
+        .erp-badge--danger {
+            border-color: rgb(254 202 202);
+            background: rgb(254 242 242);
+            color: rgb(185 28 28);
+        }
+        
+        .erp-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border-bottom: 1px solid var(--erp-border);
+            padding: .875rem 1rem;
+        }
+        
+        .erp-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            overscroll-behavior-inline: contain;
+        }
+        
+        .erp-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: rgb(71 85 105) transparent;
+        }
+        
+        .erp-skip-link {
+            position: fixed;
+            top: .5rem;
+            right: .5rem;
+            z-index: 100;
+            transform: translateY(-150%);
+            border-radius: .5rem;
+            background: rgb(37 99 235);
+            padding: .65rem 1rem;
+            color: white;
+            font-size: .75rem;
+            font-weight: 700;
+            transition: transform .15s ease;
+        }
+        
+        .erp-skip-link:focus {
+            transform: translateY(0);
+        }
+        
+        .erp-nav {
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+        
+        .erp-nav-link {
+            position: relative;
+            display: flex;
+            min-height: 2.5rem;
+            align-items: center;
+            gap: .7rem;
+            border-radius: .55rem;
+            padding: .55rem .7rem;
+            color: rgb(203 213 225);
+            font-size: .78rem;
+            font-weight: 500;
+            transition: color .15s ease, background-color .15s ease, transform .15s ease;
+        }
+        
+        .erp-nav-link:hover {
+            background: rgb(255 255 255 / .08);
+            color: white;
+        }
+        
+        .erp-nav-link.is-active {
+            background: rgb(29 78 216);
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 6px 16px rgb(2 6 23 / .22);
+        }
+        
+        .erp-nav-link.is-active::after {
+            position: absolute;
+            inset-block: .55rem;
+            right: -.75rem;
+            width: 3px;
+            border-radius: 99px 0 0 99px;
+            background: rgb(147 197 253);
+            content: "";
+        }
+
+        .erp-nav-link.is-unavailable {
+            cursor: default;
+            color: rgb(100 116 139);
+        }
+        
+        .erp-nav-link>svg {
+            width: 1.1rem;
+            height: 1.1rem;
+            flex: 0 0 1.1rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 1.7;
+        }
+        
+        .erp-nav-group {
+            margin-top: .35rem;
+            border-top: 1px solid rgb(255 255 255 / .055);
+            padding-top: .35rem;
+        }
+        
+        .erp-nav-group>summary {
+            display: flex;
+            min-height: 1.9rem;
+            cursor: pointer;
+            list-style: none;
+            align-items: center;
+            justify-content: space-between;
+            padding: .25rem .7rem;
+            color: rgb(148 163 184);
+            font-size: .64rem;
+            font-weight: 600;
+            letter-spacing: .025em;
+        }
+        
+        .erp-nav-group>summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .erp-nav-group>summary svg {
+            width: .9rem;
+            height: .9rem;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            transition: transform .15s ease;
+        }
+        
+        .erp-nav-group:not([open])>summary svg {
+            transform: rotate(90deg);
+        }
+        
+        .erp-nav-group>summary:hover {
+            color: rgb(226 232 240);
+        }
+        
+        .erp-nav-group__items {
+            display: grid;
+            gap: .1rem;
+            border-right: 1px solid rgb(148 163 184 / .14);
+            margin-right: .7rem;
+            padding-right: .35rem;
+        }
+        
+        .erp-page-header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 1rem;
+            min-height: 4.5rem;
+        }
+        
+        .erp-page-header__copy {
+            min-width: 0;
+        }
+        
+        .erp-page-header__action:focus-visible {
+            outline-color: rgb(30 64 175);
+            outline-offset: 3px;
+        }
+        
+        .erp-required {
+            margin-right: .2rem;
+            color: rgb(220 38 38);
+            font-weight: 700;
+        }
+        
+        .erp-form-field--invalid label {
+            color: rgb(153 27 27);
+        }
+        
+        .erp-form-field--invalid :where(input,
+        select,
+        textarea) {
+            border-color: rgb(248 113 113) !important;
+            background-color: rgb(254 242 242 / .5);
+        }
+        
+        .erp-field-help {
+            line-height: 1.6;
+        }
+        
+        .erp-field-error {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            font-size: .75rem;
+            font-weight: 500;
+        }
+        
+        .erp-field-error::before {
+            display: grid;
+            width: 1rem;
+            height: 1rem;
+            place-items: center;
+            border-radius: 50%;
+            background: rgb(254 226 226);
+            content: "!";
+            font-size: .65rem;
+            font-weight: 700;
+        }
+        
+        .erp-message {
+            display: flex;
+            align-items: flex-start;
+            gap: .65rem;
+            line-height: 1.7;
+        }
+        
+        .erp-message__icon {
+            display: grid;
+            width: 1.35rem;
+            height: 1.35rem;
+            flex: 0 0 1.35rem;
+            place-items: center;
+            border-radius: 50%;
+            color: white;
+            font-size: .7rem;
+            font-weight: 800;
+        }
+        
+        .erp-message--error .erp-message__icon {
+            background: rgb(220 38 38);
+        }
+        
+        .erp-message--warning .erp-message__icon {
+            background: rgb(217 119 6);
+        }
+        
+        .erp-message--success .erp-message__icon {
+            background: rgb(5 150 105);
+        }
+        
+        .erp-message--info .erp-message__icon {
+            background: rgb(37 99 235);
+        }
+        
+        main form.erp-surface>section+section {
+            border-top: 1px solid rgb(241 245 249);
+            padding-top: 1.25rem;
+        }
+        
+        main form.erp-surface>section>h2,
+        main .erp-surface>h2 {
+            color: rgb(15 23 42);
+            font-weight: 700;
+            letter-spacing: -.01em;
+        }
+        
+        main form.erp-surface> :last-child:is(.border-t) {
+            margin-top: 1.25rem;
+            background: rgb(248 250 252 / .7);
+            margin-inline: -1.25rem;
+            margin-bottom: -1.25rem;
+            padding: 1rem 1.25rem;
+        }
+        
+        main .overflow-x-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgb(148 163 184) rgb(241 245 249);
+        }
+        
+        main table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        main table thead th {
+            position: relative;
+            background: rgb(248 250 252);
+            color: rgb(71 85 105);
+            font-size: .72rem;
+            font-weight: 700;
+            letter-spacing: .01em;
+            line-height: 1.45;
+            white-space: nowrap;
+        }
+        
+        main table tbody tr {
+            transition: background-color .12s ease, box-shadow .12s ease;
+        }
+        
+        main table tbody tr:hover {
+            background: rgb(239 246 255 / .68);
+            box-shadow: inset -3px 0 0 rgb(59 130 246);
+        }
+        
+        main table tbody td {
+            color: rgb(51 65 85);
+            vertical-align: middle;
+            font-size: .8125rem;
+        }
+        
+        main table :where(td,
+        th)[dir="ltr"],
+        main table :where(.tabular-nums) {
+            text-align: left;
+            font-feature-settings: "ss01", "tnum";
+            font-variant-numeric: tabular-nums;
+        }
+        
+         :where(code,
+        kbd,
+        samp,
+        [dir="ltr"]) {
+            direction: ltr;
+            unicode-bidi: isolate;
+        }
+        
+        main :where(button,
+        a)[class*="bg-blue-600"] {
+            transition: background-color .15s ease, box-shadow .15s ease;
+        }
+        
+        main :where(button,
+        input,
+        select,
+        textarea):disabled {
+            cursor: not-allowed;
+            opacity: .68;
+        }
+        
+        main [aria-busy="true"] {
+            cursor: progress;
+            opacity: .72;
+        }
+        
+        main .erp-surface> :where(.p-12,
+        .py-16):where(.text-center) {
+            min-height: 11rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, white, rgb(248 250 252 / .75));
+            color: rgb(100 116 139);
+        }
+        
+        @media (max-width: 639px) {
+            .erp-page-header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+            .erp-page-header__action {
+                width: 100%;
+            }
+            main form.erp-surface> :last-child:is(.border-t) {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+            main form.erp-surface> :last-child:is(.border-t) :where(a,
+            button) {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        .erp-mobile-nav>summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .erp-mobile-nav__backdrop {
+            display: none;
+            position: fixed;
+            inset: 3.75rem 0 0;
+            z-index: 40;
+            cursor: default;
+            background: rgb(15 23 42 / .55);
+        }
+        
+        .erp-mobile-nav__panel {
+            display: none;
+            position: fixed;
+            top: 3.75rem;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            width: min(20rem, 88vw);
+            overflow-y: auto;
+            border-left: 1px solid var(--erp-sidebar-border);
+            background: var(--erp-sidebar);
+            padding: 1rem .75rem;
+            box-shadow: -20px 0 30px rgb(15 23 42 / .18);
+        }
+        
+        .erp-mobile-nav[open] :where(.erp-mobile-nav__backdrop,
+        .erp-mobile-nav__panel) {
+            display: block;
+        }
+        
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+    
+</head>
+
+<body class="min-h-screen bg-slate-50 text-slate-900 antialiased">
+    <a class="erp-skip-link" href="#main-content">رفتن به محتوای اصلی</a> 
+    <div class="min-h-screen lg:pr-[260px]">
+        <aside class="erp-sidebar fixed inset-y-0 right-0 z-40 hidden w-[260px] flex-col overflow-hidden border-l border-slate-800 bg-slate-900 text-slate-200 lg:flex" aria-label="نوار کناری سامانه">
+            <a class="flex h-[72px] shrink-0 items-center gap-3 border-b border-slate-800 px-5" href="/">
+                <span class="grid h-10 w-10 place-items-center rounded-lg bg-blue-600 text-white ring-1 ring-blue-400/40"><svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 21h18M5 21V9l4-3v15M9 21V4l6-3v20M15 21V8l4 2v11M12 6v2m0 3v2m0 3v2"/></svg></span>
+                <span><strong class="block text-sm font-semibold text-white">بنیرا</strong><small class="mt-0.5 block text-[10px] text-slate-400">راهکار یکپارچه مدیریت ساخت</small></span>
+            </a>
+            <div class="erp-scrollbar flex-1 overflow-y-auto px-3 py-4">
+                
+<nav class="erp-nav" aria-label="ناوبری اصلی" data-canonical-navigation="43">
+    <a data-nav-id="NAV-001" class="erp-nav-link" href="/">خانه</a>
+    <details data-nav-id="NAV-002" class="erp-nav-group" open><summary><span>کار من</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-003" class="erp-nav-link" href="/workflows/workbench/">وظایف من</a>
+        <span data-nav-id="NAV-004" class="erp-nav-link is-unavailable" aria-disabled="true">درخواست‌های من</span>
+        
+        
+    </div></details>
+    <span data-nav-id="NAV-006" class="erp-nav-link is-unavailable" aria-disabled="true">خدمات من</span>
+    <details data-nav-id="NAV-007" class="erp-nav-group" open><summary><span>پروژه‌ها</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-008" class="erp-nav-link" href="/projects/">نمای پروژه</a>
+        <span data-nav-id="NAV-009" class="erp-nav-link is-unavailable" aria-disabled="true">کنترل پروژه</span>
+        <a data-nav-id="NAV-010" class="erp-nav-link" href="/contracts/">قراردادها</a>
+        <a data-nav-id="NAV-011" class="erp-nav-link" href="/billing/claims/">صورت‌وضعیت و صورتحساب</a>
+        <a data-nav-id="NAV-012" class="erp-nav-link" href="/estimates/">برآورد و فهرست‌بها</a>
+        <span data-nav-id="NAV-013" class="erp-nav-link is-unavailable" aria-disabled="true">تجاری و مناقصه</span>
+        <a data-nav-id="NAV-014" class="erp-nav-link" href="/daily-reports/">عملیات کارگاه</a>
+        <span data-nav-id="NAV-015" class="erp-nav-link is-unavailable" aria-disabled="true">HSE و کیفیت</span>
+        <a data-nav-id="NAV-016" class="erp-nav-link" href="/documents/">اسناد پروژه</a>
+    </div></details>
+    <details data-nav-id="NAV-017" class="erp-nav-group" open><summary><span>تأمین و تدارکات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-018" class="erp-nav-link" href="/procurement/">درخواست‌های خرید</a>
+        <a data-nav-id="NAV-019" class="erp-nav-link" href="/procurement/rfqs/">استعلام و انتخاب تأمین‌کننده</a>
+        <span data-nav-id="NAV-019" class="erp-nav-link is-unavailable" aria-disabled="true">استعلام و انتخاب تأمین‌کننده</span>
+        <a data-nav-id="NAV-020" class="erp-nav-link" href="/procurement/orders/">سفارش‌های خرید</a>
+        <a data-nav-id="NAV-021" class="erp-nav-link" href="/procurement/receipts/">رسید کالا</a>
+        <a data-nav-id="NAV-022" class="erp-nav-link" href="/materials/">مصالح و کالا</a>
+        <a data-nav-id="NAV-023" class="erp-nav-link" href="/inventory/">انبار</a>
+        <a data-nav-id="NAV-024" class="erp-nav-link" href="/parties/">طرف‌های تجاری</a>
+        <a data-nav-id="NAV-013" class="erp-nav-link" href="/commercial/">تجاری و مناقصه</a>
+    </div></details>
+    <details data-nav-id="NAV-025" class="erp-nav-group" open><summary><span>مالی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-026" class="erp-nav-link is-active" href="/treasury/">خزانه‌داری</a>
+        <a data-nav-id="NAV-027" class="erp-nav-link" href="/accounting/">حسابداری</a>
+        <a data-nav-id="NAV-028" class="erp-nav-link" href="/subledgers/">پرداختنی و دریافتنی</a>
+        <a data-nav-id="NAV-029" class="erp-nav-link" href="/expenses/">هزینه‌ها</a>
+        <a data-nav-id="NAV-030" data-workspace-id="WS-15B" class="erp-nav-link" href="/fixed-assets/">دارایی‌های ثابت مالی</a>
+    </div></details>
+    <details data-nav-id="NAV-031" class="erp-nav-group" open><summary><span>منابع انسانی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-032" class="erp-nav-link" href="/workforce/">کارکنان و ساختار سازمانی</a>
+        <a data-nav-id="NAV-033" class="erp-nav-link" href="/timekeeping/">حضور و زمان</a>
+        
+    </div></details>
+    <details data-nav-id="NAV-035" class="erp-nav-group" open><summary><span>تجهیزات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items"><a data-nav-id="NAV-036" data-workspace-id="WS-15A" class="erp-nav-link" href="/equipment/operations/">تجهیزات عملیاتی</a></div></details>
+    
+    <details data-nav-id="NAV-038" class="erp-nav-group" open><summary><span>مدیریت سامانه</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-039" data-workspace-id="WS-19" class="erp-nav-link" href="/workflows/administration/">مدیریت گردش‌کارها</a>
+        <a data-nav-id="NAV-040" class="erp-nav-link" href="/organizations/settings/">پیکربندی و داده‌های پایه</a>
+        <a data-nav-id="NAV-043" class="erp-nav-link" href="/parties/governance/">حاکمیت طرف‌های تجاری</a>
+    </div></details>
+    <a data-nav-id="NAV-041" class="erp-nav-link" href="/accounts/settings/">پروفایل کاربر</a>
+</nav>
+
+
+            </div>
+            
+            <div class="border-t border-slate-800 p-3">
+                <div class="mb-2 flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-[10px] text-slate-400"><span class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>فضای کاری فعال</span><span dir="ltr">ERP</span></div>
+                <form method="post" action="/accounts/logout/"><input type="hidden" name="csrfmiddlewaretoken" value="SYNTHETIC"><button class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-slate-300 transition hover:bg-white/10 hover:text-white" type="submit"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4m7 14 5-5-5-5m5 5H9"/></svg>خروج از حساب</button></form>
+            </div>
+        </aside>
+        <header class="sticky top-0 z-30 h-[60px] border-b border-slate-200 bg-white">
+            <div class="mx-auto flex h-full max-w-[1600px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+                <details class="erp-mobile-nav lg:hidden" data-mobile-nav>
+                    <summary class="grid h-10 w-10 cursor-pointer list-none place-items-center rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50" aria-label="باز کردن فهرست" aria-expanded="false"><svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></summary>
+                    <button class="erp-mobile-nav__backdrop" type="button" data-mobile-nav-close aria-label="بستن فهرست"></button>
+                    <div class="erp-mobile-nav__panel"><button class="erp-btn erp-btn--secondary mb-3 w-full" type="button" data-mobile-nav-close>بستن فهرست</button>
+<nav class="erp-nav" aria-label="ناوبری اصلی" data-canonical-navigation="43">
+    <a data-nav-id="NAV-001" class="erp-nav-link" href="/">خانه</a>
+    <details data-nav-id="NAV-002" class="erp-nav-group" open><summary><span>کار من</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-003" class="erp-nav-link" href="/workflows/workbench/">وظایف من</a>
+        <span data-nav-id="NAV-004" class="erp-nav-link is-unavailable" aria-disabled="true">درخواست‌های من</span>
+        
+        
+    </div></details>
+    <span data-nav-id="NAV-006" class="erp-nav-link is-unavailable" aria-disabled="true">خدمات من</span>
+    <details data-nav-id="NAV-007" class="erp-nav-group" open><summary><span>پروژه‌ها</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-008" class="erp-nav-link" href="/projects/">نمای پروژه</a>
+        <span data-nav-id="NAV-009" class="erp-nav-link is-unavailable" aria-disabled="true">کنترل پروژه</span>
+        <a data-nav-id="NAV-010" class="erp-nav-link" href="/contracts/">قراردادها</a>
+        <a data-nav-id="NAV-011" class="erp-nav-link" href="/billing/claims/">صورت‌وضعیت و صورتحساب</a>
+        <a data-nav-id="NAV-012" class="erp-nav-link" href="/estimates/">برآورد و فهرست‌بها</a>
+        <span data-nav-id="NAV-013" class="erp-nav-link is-unavailable" aria-disabled="true">تجاری و مناقصه</span>
+        <a data-nav-id="NAV-014" class="erp-nav-link" href="/daily-reports/">عملیات کارگاه</a>
+        <span data-nav-id="NAV-015" class="erp-nav-link is-unavailable" aria-disabled="true">HSE و کیفیت</span>
+        <a data-nav-id="NAV-016" class="erp-nav-link" href="/documents/">اسناد پروژه</a>
+    </div></details>
+    <details data-nav-id="NAV-017" class="erp-nav-group" open><summary><span>تأمین و تدارکات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-018" class="erp-nav-link" href="/procurement/">درخواست‌های خرید</a>
+        <a data-nav-id="NAV-019" class="erp-nav-link" href="/procurement/rfqs/">استعلام و انتخاب تأمین‌کننده</a>
+        <span data-nav-id="NAV-019" class="erp-nav-link is-unavailable" aria-disabled="true">استعلام و انتخاب تأمین‌کننده</span>
+        <a data-nav-id="NAV-020" class="erp-nav-link" href="/procurement/orders/">سفارش‌های خرید</a>
+        <a data-nav-id="NAV-021" class="erp-nav-link" href="/procurement/receipts/">رسید کالا</a>
+        <a data-nav-id="NAV-022" class="erp-nav-link" href="/materials/">مصالح و کالا</a>
+        <a data-nav-id="NAV-023" class="erp-nav-link" href="/inventory/">انبار</a>
+        <a data-nav-id="NAV-024" class="erp-nav-link" href="/parties/">طرف‌های تجاری</a>
+        <a data-nav-id="NAV-013" class="erp-nav-link" href="/commercial/">تجاری و مناقصه</a>
+    </div></details>
+    <details data-nav-id="NAV-025" class="erp-nav-group" open><summary><span>مالی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-026" class="erp-nav-link is-active" href="/treasury/">خزانه‌داری</a>
+        <a data-nav-id="NAV-027" class="erp-nav-link" href="/accounting/">حسابداری</a>
+        <a data-nav-id="NAV-028" class="erp-nav-link" href="/subledgers/">پرداختنی و دریافتنی</a>
+        <a data-nav-id="NAV-029" class="erp-nav-link" href="/expenses/">هزینه‌ها</a>
+        <a data-nav-id="NAV-030" data-workspace-id="WS-15B" class="erp-nav-link" href="/fixed-assets/">دارایی‌های ثابت مالی</a>
+    </div></details>
+    <details data-nav-id="NAV-031" class="erp-nav-group" open><summary><span>منابع انسانی</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-032" class="erp-nav-link" href="/workforce/">کارکنان و ساختار سازمانی</a>
+        <a data-nav-id="NAV-033" class="erp-nav-link" href="/timekeeping/">حضور و زمان</a>
+        
+    </div></details>
+    <details data-nav-id="NAV-035" class="erp-nav-group" open><summary><span>تجهیزات</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items"><a data-nav-id="NAV-036" data-workspace-id="WS-15A" class="erp-nav-link" href="/equipment/operations/">تجهیزات عملیاتی</a></div></details>
+    
+    <details data-nav-id="NAV-038" class="erp-nav-group" open><summary><span>مدیریت سامانه</span><span aria-hidden="true">⌄</span></summary><div class="erp-nav-group__items">
+        <a data-nav-id="NAV-039" data-workspace-id="WS-19" class="erp-nav-link" href="/workflows/administration/">مدیریت گردش‌کارها</a>
+        <a data-nav-id="NAV-040" class="erp-nav-link" href="/organizations/settings/">پیکربندی و داده‌های پایه</a>
+        <a data-nav-id="NAV-043" class="erp-nav-link" href="/parties/governance/">حاکمیت طرف‌های تجاری</a>
+    </div></details>
+    <a data-nav-id="NAV-041" class="erp-nav-link" href="/accounts/settings/">پروفایل کاربر</a>
+</nav>
+
+</div>
+                </details>
+                <a class="flex min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-medium text-slate-700" href="/organizations/"><svg class="h-4 w-4 shrink-0 text-blue-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 21h18M5 21V7h8v14m0-10h6v10M8 10h2m-2 4h2m-2 4h2m8-4h-2m2 4h-2"/></svg><span class="hidden text-slate-400 sm:inline">شرکت فعال:</span><span class="max-w-28 truncate sm:max-w-56">Replacement</span></a>
+                <form class="hidden min-w-0 flex-1 md:flex" method="get" action="/search/"><label class="sr-only" for="header-global-search">جستجوی مجاز</label><input id="header-global-search" class="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs" name="q" minlength="2" maxlength="100" autocomplete="off" placeholder="جستجوی پروژه و مصالح"></form>
+                <div class="hidden h-5 w-px bg-slate-200 md:block"></div>
+                <span class="hidden text-[11px] text-slate-500 md:inline">سامانه جامع و یکپارچه مدیریت شرکت</span>
+                <a class="mr-auto flex items-center gap-2 rounded-lg border-r border-slate-200 py-1 pr-3 transition hover:bg-slate-50" href="/accounts/settings/" aria-label="تنظیمات شخصی">
+                    <span class="grid h-8 w-8 place-items-center rounded-full bg-blue-700 text-xs font-bold text-white">R</span>
+                    <span class="hidden text-right sm:block"><strong class="block max-w-36 truncate text-xs font-semibold text-slate-800">replacement-owner</strong><small class="block text-[10px] text-slate-500">تنظیمات شخصی</small></span>
+                </a>
+            </div>
+        </header>
+        <section class="border-b border-slate-200 bg-slate-50/95" aria-label="دامنه کاری مؤثر">
+    <form class="mx-auto flex max-w-[1600px] flex-wrap items-end gap-2 px-4 py-2 sm:px-6 lg:px-8" method="post" action="/organizations/context/">
+        <input type="hidden" name="csrfmiddlewaretoken" value="SYNTHETIC">
+        <input type="hidden" name="next" value="/treasury/operations/cheque_create/">
+        <div class="min-w-44 flex-1 sm:flex-none">
+            <span class="mb-1 block text-[10px] font-semibold text-slate-500">شرکت</span>
+            <span class="flex min-h-9 items-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-800">Replacement</span>
+        </div>
+        <label class="min-w-48 flex-1 sm:flex-none">
+            <span class="mb-1 block text-[10px] font-semibold text-slate-500">پروژه</span>
+            <select class="min-h-9 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-800" name="project_id" data-context-project>
+                <option value="">بدون پروژه / همه دامنه مجاز</option>
+                <option value="326d54ef-8add-43c0-9941-294377ef9919">CASH — Cash project</option>
+            </select>
+        </label>
+        
+        <button class="erp-btn erp-btn--secondary erp-btn--compact min-h-9" type="submit">اعمال دامنه</button>
+        
+    </form>
+</section>
+
+        
+        <main id="main-content" tabindex="-1" class="mx-auto min-w-0 max-w-[1600px] px-4 py-5 sm:px-6 lg:px-8 lg:py-6">
+            
+ 
+<section class="mx-auto max-w-3xl space-y-6">
+  <header><a href="/treasury/operations/" class="text-sm text-slate-600">عملیات خزانه‌داری</a><h1 class="mt-2 text-2xl font-bold">چک جدید</h1></header>
+  
+  <form method="post" enctype="multipart/form-data" class="erp-surface space-y-5 rounded-xl p-5"><input type="hidden" name="csrfmiddlewaretoken" value="SYNTHETIC">
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_direction">
+        نوع تراکنش
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="direction" id="id_direction">
+  <option value="incoming">دریافتی</option>
+
+  <option value="outgoing">پرداختی</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_controlled_account">
+        حساب بانکی<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <select name="controlled_account" required id="id_controlled_account">
+  <option value="" selected>---------</option>
+
+  <option value="a178b474-0787-4d68-b1b1-0007f3eb0540">RETIRE-BANK · RETIRE-BANK</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_amount">
+        مبلغ
+        <span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="number" name="amount" min="0.000001" step="0.000001" required id="id_amount">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_due_date">
+        سررسید<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="text" name="due_date" value="" data-jalali-date="date" data-input-mask="####/##/##" inputmode="numeric" autocomplete="off" required id="id_due_date">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_serial">
+        سریال چک<span class="erp-required" aria-hidden="true" title="الزامی">*</span><span class="sr-only"> (الزامی)</span>
+    </label>
+    <input type="password" name="serial" maxlength="100" required id="id_serial">
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_party">
+        طرف تجاری
+        
+    </label>
+    <select name="party" id="id_party">
+  <option value="" selected>---------</option>
+
+  <option value="ae195350-ad79-4875-b136-e14bb48d4b90">Test supplier</option>
+
+</select>
+    
+    
+</div>
+
+<div class="erp-form-field">
+    <label class="mb-1.5 block text-sm font-medium text-slate-700" for="id_custodian">
+        متولی
+    </label>
+    <select name="custodian" id="id_custodian">
+  <option value="" selected>---------</option>
+
+  <option value="fbdef579-e802-47f8-9136-d918dc4bf7b2">replacement-owner</option>
+
+  <option value="fc44e748-f9bd-465a-8061-7e2707296245">retirement-cash-accountant</option>
+
+</select>
+    
+    
+</div>
+<div class="flex flex-wrap gap-3"><button class="erp-btn erp-btn--primary" type="submit">ثبت چک جدید</button><a class="erp-btn erp-btn--secondary" href="/treasury/operations/">بازگشت</a></div></form>
+</section>
+
+        </main>
+        
+    </div>
+    
+    <script>
+        (() => {
+            document.querySelectorAll("[data-mobile-nav]").forEach((drawer) => {
+                const summary = drawer.querySelector("summary");
+                const close = () => { drawer.open = false; summary.setAttribute("aria-expanded", "false"); };
+                drawer.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(drawer.open)));
+                drawer.querySelectorAll("[data-mobile-nav-close], a").forEach((item) => item.addEventListener("click", close));
+                document.addEventListener("keydown", (event) => { if (event.key === "Escape" && drawer.open) close(); });
+            });
+        })();
+        (() => {
+            const persianLabels = new Map([
+                ["Draft", "پیش‌نویس"],
+                ["Active", "فعال"],
+                ["Approved", "تأییدشده"],
+                ["Completed", "تکمیل‌شده"],
+                ["Labor", "نیروی انسانی"],
+                ["Equipment", "تجهیزات"],
+                ["Material", "مصالح"],
+                ["Other", "سایر"],
+                ["Planning", "در حال برنامه‌ریزی"],
+                ["On hold", "متوقف‌شده"],
+                ["Cancelled", "لغوشده"],
+                ["Submitted", "ارسال‌شده"],
+                ["Terminated", "خاتمه‌یافته"],
+                ["Recorded", "ثبت‌شده"],
+                ["Posted", "ثبت‌شده"],
+                ["Void", "باطل‌شده"],
+            ]);
+            const skippedTags = new Set(["SCRIPT", "STYLE", "TEXTAREA", "CODE", "PRE"]);
+            const localize = () => {
+                const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+                const nodes = [];
+                while (walker.nextNode()) {
+                    if (!skippedTags.has(walker.currentNode.parentElement?.tagName)) nodes.push(walker.currentNode);
+                }
+                nodes.forEach((node) => {
+                    const trimmed = node.nodeValue.trim();
+                    if (persianLabels.has(trimmed)) node.nodeValue = node.nodeValue.replace(trimmed, persianLabels.get(trimmed));
+                });
+            };
+            if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", localize, {
+                once: true
+            });
+            else localize();
+        })();
+    </script>
+    
+</body>
+
+</html>

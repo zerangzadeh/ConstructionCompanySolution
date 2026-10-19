@@ -1,10 +1,22 @@
 from django.urls import path
 
-from apps.treasury import views
+from apps.treasury import operational_views, views
 
 app_name = "treasury"
 
 urlpatterns = [
+    path(
+        "operations/records/<str:resource>/<uuid:object_id>/",
+        operational_views.detail,
+        name="operational_detail",
+    ),
+    path("operations/", operational_views.workspace, name="operations"),
+    path("operations/<str:operation>/", operational_views.operation, name="operation"),
+    path(
+        "operations/<str:operation>/<uuid:object_id>/",
+        operational_views.operation,
+        name="object_operation",
+    ),
     path("movements/new/", views.movement_create, name="movement_create"),
     path(
         "movements/<uuid:movement_id>/", views.movement_detail, name="movement_detail"

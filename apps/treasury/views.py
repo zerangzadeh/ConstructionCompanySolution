@@ -50,8 +50,14 @@ def _reason(request: HttpRequest) -> str:
 
 
 def _date(request: HttpRequest) -> date:
+    from core.forms import parse_jalali_date
+
     try:
-        return date.fromisoformat(request.POST["as_of_date"])
+        raw = request.POST["as_of_date"]
+        try:
+            return parse_jalali_date(raw)
+        except ValueError:
+            return date.fromisoformat(raw)
     except (KeyError, ValueError) as exc:
         raise ValidationError("تاریخ معتبر الزامی است.") from exc
 
@@ -72,11 +78,18 @@ def workbench(request: HttpRequest) -> HttpResponse:
         project_lookup="project_id",
         site_lookup="site_id",
     )
+    global_scope = has_business_permission(
+        user=request.user,
+        organization=organization,
+        permission=BusinessPermissionCode.TREASURY_VIEW,
+    )
     return render(
         request,
         "treasury/workbench.html",
         {
-            "accounts": organization.treasury_accounts.all(),
+            "accounts": organization.treasury_accounts.all()
+            if global_scope
+            else organization.treasury_accounts.none(),
             "can_create_movement": has_business_permission(
                 user=request.user,
                 organization=organization,
@@ -86,10 +99,14 @@ def workbench(request: HttpRequest) -> HttpResponse:
             "recent_movements": movements.select_related("project", "party")[:30],
             "bank_runs": BankReconciliationRun.objects.filter(
                 organization=organization
-            ).select_related("account")[:12],
+            ).select_related("account")[:12]
+            if global_scope
+            else [],
             "gl_runs": TreasuryGLReconciliationRun.objects.filter(
                 organization=organization
-            ).select_related("run_by__user", "review__reviewed_by__user")[:20],
+            ).select_related("run_by__user", "review__reviewed_by__user")[:20]
+            if global_scope
+            else [],
             "can_review_reconciliation": has_business_permission(
                 user=request.user,
                 organization=organization,
@@ -111,13 +128,20 @@ def statement_workbench(request: HttpRequest) -> HttpResponse:
         project_lookup="project_id",
         site_lookup="site_id",
     )
+    global_scope = has_business_permission(
+        user=request.user,
+        organization=organization,
+        permission=BusinessPermissionCode.TREASURY_VIEW,
+    )
     return render(
         request,
         "treasury/statement_workbench.html",
         {
             "imports": BankStatementImport.objects.filter(organization=organization)
             .select_related("account")
-            .prefetch_related("lines")[:25],
+            .prefetch_related("lines")[:25]
+            if global_scope
+            else [],
             "proposals": StatementMatchProposal.objects.filter(
                 organization=organization, movement__in=visible_movements
             ).select_related("statement_line", "movement", "movement_leg")[:50],
