@@ -121,7 +121,12 @@ def export_csv(request: HttpRequest) -> HttpResponse:
 @active_organization_required
 def reconciliation_workbench(request: HttpRequest) -> HttpResponse:
     runs = reconciliation_runs(organization=request.organization, actor=request.user)
-    pairs = ReconciliationPairDefinition.objects.filter(is_active=True).order_by("code")
+    # SPEC012 requires explicit workforce context unavailable in this generic form.
+    pairs = (
+        ReconciliationPairDefinition.objects.filter(is_active=True)
+        .exclude(code="attendance_timesheet")
+        .order_by("code")
+    )
     return _private(
         render(
             request,
@@ -267,7 +272,9 @@ def project_closeout_detail(request: HttpRequest, case_id: str) -> HttpResponse:
     )
 
 
-def _closeout_case_from_request(request: HttpRequest, case_id: str) -> ProjectCloseoutCase:
+def _closeout_case_from_request(
+    request: HttpRequest, case_id: str
+) -> ProjectCloseoutCase:
     case = ProjectCloseoutCase.objects.filter(
         organization=request.organization, pk=case_id
     ).first()

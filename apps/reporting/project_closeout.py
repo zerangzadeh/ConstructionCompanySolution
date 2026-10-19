@@ -90,7 +90,11 @@ class FamilySnapshot:
 
 
 def _family_queryset(
-    *, model_label: str, project_lookup: str, organization: Organization, project: Project
+    *,
+    model_label: str,
+    project_lookup: str,
+    organization: Organization,
+    project: Project,
 ):
     model = apps.get_model(model_label)
     fields = _field_names(model)
@@ -112,7 +116,9 @@ def _family_queryset(
             source_ids = source_model.objects.filter(
                 organization=organization, project=project
             ).values("pk")
-            project_sources |= models.Q(source_type=source_type, source_id__in=source_ids)
+            project_sources |= models.Q(
+                source_type=source_type, source_id__in=source_ids
+            )
         return queryset.filter(
             project_sources,
             source_organization=organization,
@@ -125,6 +131,11 @@ def _family_queryset(
         ).distinct()
     if "organization" in fields:
         queryset = queryset.filter(organization=organization)
+    if model_label == "reporting.ReconciliationRun":
+        # SPEC012 grants no implicit workforce-to-closeout readiness contract.
+        queryset = queryset.exclude(
+            pair_version__definition__code="attendance_timesheet"
+        )
     if project_lookup == "self":
         queryset = queryset.filter(pk=project.pk)
     else:
@@ -157,8 +168,7 @@ def _capture_family(
         if time_field in fields:
             queryset = queryset.filter(**{f"{time_field}__lte": cutoff_at})
         ids = [
-            str(value)
-            for value in queryset.order_by("pk").values_list("pk", flat=True)
+            str(value) for value in queryset.order_by("pk").values_list("pk", flat=True)
         ]
         model_statuses: dict[str, int] = {}
         if "status" in fields:
@@ -263,7 +273,9 @@ def create_closeout_case(
     ).first()
     if existing:
         if existing.request_fingerprint != fingerprint:
-            raise ValidationError("کلید تکرار پرونده با درخواست متفاوت استفاده شده است.")
+            raise ValidationError(
+                "کلید تکرار پرونده با درخواست متفاوت استفاده شده است."
+            )
         return existing
     return ProjectCloseoutCase.objects.create(
         organization=organization,
@@ -314,7 +326,9 @@ def run_closeout_assessment(
     ).first()
     if existing:
         if existing.request_fingerprint != fingerprint:
-            raise ValidationError("کلید تکرار ارزیابی با درخواست متفاوت استفاده شده است.")
+            raise ValidationError(
+                "کلید تکرار ارزیابی با درخواست متفاوت استفاده شده است."
+            )
         if existing.status == ProjectCloseoutAssessmentStatus.COMPLETED:
             return existing
         raise ValidationError("اجرای قبلی این کلید نهایی نشده است.")
@@ -441,9 +455,11 @@ def coordinate_closeout_case(
     assigned_to: User | None = None,
     details: dict[str, object] | None = None,
 ) -> ProjectCloseoutEvent:
-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
-        "project", "current_assessment"
-    ).get(pk=case.pk)
+    locked = (
+        ProjectCloseoutCase.objects.select_for_update(of=("self",))
+        .select_related("project", "current_assessment")
+        .get(pk=case.pk)
+    )
     require_business_permission(
         user=actor,
         organization=locked.organization,
@@ -498,7 +514,10 @@ def _audit_event(event: ProjectCloseoutEvent) -> None:
 
 def _assert_current_sources(locked: ProjectCloseoutCase) -> None:
     assessment = locked.current_assessment
-    if assessment is None or assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED:
+    if (
+        assessment is None
+        or assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED
+    ):
         raise ValidationError("ارزیابی تکمیل‌شده جاری وجود ندارد.")
     for item in assessment.items.all():
         spec = dict(PROJECT_CLOSEOUT_FAMILIES[item.family_code])
@@ -573,9 +592,11 @@ def decide_closeout_case(
         raise ValidationError("ارزیابی جاری وجود ندارد.")
     if assessment.requested_by_id == actor.pk:
         raise PermissionDenied("تهیه‌کننده نمی‌تواند پرونده خود را بررسی یا بپذیرد.")
-    material_last = locked.events.filter(
-        action="coordinate", details__material=True
-    ).order_by("-created_at").first()
+    material_last = (
+        locked.events.filter(action="coordinate", details__material=True)
+        .order_by("-created_at")
+        .first()
+    )
     if decision == "accept" and material_last and material_last.actor_id == actor.pk:
         raise PermissionDenied("آخرین تعیین‌کننده مانع مهم نمی‌تواند تنها پذیرنده باشد.")
     new_state = (
@@ -622,9 +643,11 @@ def reopen_closeout_case(
     operation_key: str,
     expected_revision: int,
 ) -> ProjectCloseoutEvent:
-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
-        "project", "current_assessment"
-    ).get(pk=case.pk)
+    locked = (
+        ProjectCloseoutCase.objects.select_for_update(of=("self",))
+        .select_related("project", "current_assessment")
+        .get(pk=case.pk)
+    )
     require_business_permission(
         user=actor,
         organization=locked.organization,
@@ -680,9 +703,11 @@ def link_closeout_evidence(
     item: ProjectCloseoutItemSnapshot | None = None,
     sensitivity: str = "normal",
 ) -> ProjectCloseoutEvidenceLink:
-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
-        "project"
-    ).get(pk=case.pk)
+    locked = (
+        ProjectCloseoutCase.objects.select_for_update(of=("self",))
+        .select_related("project")
+        .get(pk=case.pk)
+    )
     require_business_permission(
         user=actor,
         organization=locked.organization,
@@ -751,7 +776,9 @@ def closeout_case_detail(
         message="اجازه مشاهده پرونده اختتام را ندارید.",
         project=case.project,
     )
-    _require_family_permissions(actor=actor, organization=organization, project=case.project)
+    _require_family_permissions(
+        actor=actor, organization=organization, project=case.project
+    )
     return case
 
 
@@ -763,9 +790,11 @@ def export_closeout_csv(
     idempotency_key: str,
     purpose: str,
 ) -> tuple[ProjectCloseoutExportManifest, bytes]:
-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
-        "project", "current_assessment"
-    ).get(pk=case.pk)
+    locked = (
+        ProjectCloseoutCase.objects.select_for_update(of=("self",))
+        .select_related("project", "current_assessment")
+        .get(pk=case.pk)
+    )
     for permission in (
         BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_VIEW,
         BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_EXPORT_CREATE,

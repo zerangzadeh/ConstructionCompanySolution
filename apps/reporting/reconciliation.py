@@ -802,6 +802,7 @@ def execute_reconciliation(
     cutoff_at=None,
     project: Project | None = None,
     replaces: ReconciliationRun | None = None,
+    comparison_context: dict[str, str] | None = None,
 ) -> ReconciliationRun:
     require_business_permission(
         user=actor,
@@ -831,6 +832,12 @@ def execute_reconciliation(
     _require_pair_sources(
         actor=actor, organization=organization, project=project, spec=spec
     )
+    if pair_code == "attendance_timesheet":
+        from apps.timekeeping.reconciliation import validate_context
+
+        validate_context(organization, actor, project, comparison_context)
+    elif comparison_context is not None:
+        raise ValidationError("این جفت زمینه کارکرد نمی‌پذیرد.")
     fingerprint = _hash(
         {
             "pair_version": str(version.pk),
@@ -838,6 +845,9 @@ def execute_reconciliation(
             "project": str(project.pk) if project else None,
             "cutoff": cutoff.isoformat(),
             "replaces": str(replaces.pk) if replaces else None,
+            **(
+                {"comparison_context": comparison_context} if comparison_context else {}
+            ),
         }
     )
     existing = (
@@ -849,6 +859,7 @@ def execute_reconciliation(
         if existing.request_fingerprint != fingerprint:
             raise ValidationError("کلید تکرار تطبیق با درخواست متفاوت استفاده شده است.")
         if existing.status == ReconciliationRunStatus.COMPLETED:
+            _guard_context(existing, actor)
             return existing
         raise ValidationError("اجرای قبلی این کلید نهایی نشده است.")
     if replaces is not None:
@@ -858,6 +869,7 @@ def execute_reconciliation(
         ):
             raise ValidationError("اجرای جانشین باید برای همان شرکت و جفت تطبیق باشد.")
         ReconciliationRun.objects.select_for_update().get(pk=replaces.pk)
+        _guard_context(replaces, actor)
     now = timezone.now()
     run = ReconciliationRun.objects.create(
         organization=organization,
@@ -871,8 +883,22 @@ def execute_reconciliation(
         started_at=now,
         replaces=replaces,
     )
-    adapter = ADAPTERS[str(spec["adapter"])]
-    data = adapter(organization, project, cutoff)
+    if pair_code == "attendance_timesheet":
+        from apps.timekeeping.reconciliation import capture
+
+        data = capture(organization, actor, project, cutoff, comparison_context)
+        if replaces:
+            prior = replaces.side_snapshots.get(side="left").source_manifest
+            if (
+                prior["period"] != data.left.manifest["period"]
+                or prior["context"]["relationship_id"]
+                != comparison_context["relationship_id"]
+                or replaces.project_id != run.project_id
+            ):
+                raise ValidationError("جانشین تطبیق باید همان هویت، دوره و دامنه باشد.")
+    else:
+        adapter = ADAPTERS[str(spec["adapter"])]
+        data = adapter(organization, project, cutoff)
     side_payloads = []
     for side_name, side in (("left", data.left), ("right", data.right)):
         payload = {
@@ -898,7 +924,12 @@ def execute_reconciliation(
     ReconciliationRun.objects.filter(pk=run.pk).update(
         status=ReconciliationRunStatus.COMPARING
     )
-    outcome, difference, tolerance_result, materiality_result = _compare(data, spec)
+    if pair_code == "attendance_timesheet":
+        from apps.timekeeping.reconciliation import compare
+
+        outcome, difference, tolerance_result, materiality_result = compare(data)
+    else:
+        outcome, difference, tolerance_result, materiality_result = _compare(data, spec)
     tolerance_result["pair_version_id"] = str(version.pk)
     tolerance_result["specification_hash"] = _hash(spec)
     tie_payload = {
@@ -948,6 +979,14 @@ def execute_reconciliation(
             comparison_grain={
                 "pair": pair_code,
                 "project": str(project.pk) if project else None,
+                **(
+                    {
+                        "context": comparison_context,
+                        "period": data.left.manifest["period"],
+                    }
+                    if pair_code == "attendance_timesheet"
+                    else {}
+                ),
             },
             left_lineage=data.left.manifest,
             right_lineage=data.right.manifest,
@@ -989,6 +1028,7 @@ def review_reconciliation_run(
         .select_related("pair_version__definition")
         .get(pk=run.pk)
     )
+    _guard_context(locked, reviewer, review=True)
     require_business_permission(
         user=reviewer,
         organization=locked.organization,
@@ -1054,6 +1094,11 @@ def record_exception_event(
         .select_related("run", "organization")
         .get(pk=exception.pk)
     )
+    _guard_context(
+        locked.run, actor, review=True, correction_reference=correction_reference
+    )
+    if assigned_to is not None:
+        _guard_context(locked.run, assigned_to, review=True)
     permission_by_action = {
         "assign": BusinessPermissionCode.REPORTING_RECONCILIATION_EXCEPTION_ASSIGN,
         "disposition": BusinessPermissionCode.REPORTING_RECONCILIATION_EXCEPTION_DISPOSITION,
@@ -1141,6 +1186,7 @@ def link_exception_evidence(
     evidence_role: str,
     sensitivity: str = "normal",
 ) -> ReconciliationEvidenceLink:
+    _guard_context(exception.run, actor, review=True)
     require_business_permission(
         user=actor,
         organization=exception.organization,
@@ -1180,6 +1226,7 @@ def replay_reconciliation(
         .select_related("pair_version__definition", "organization")
         .get(pk=original_run.pk)
     )
+    _guard_context(locked, actor)
     require_business_permission(
         user=actor,
         organization=locked.organization,
@@ -1204,9 +1251,20 @@ def replay_reconciliation(
                 "کلید تکرار بازسازی با درخواست متفاوت استفاده شده است."
             )
         return existing
-    current = ADAPTERS[str(spec["adapter"])](
-        locked.organization, locked.project, locked.cutoff_at
-    )
+    if locked.pair_version.definition.code == "attendance_timesheet":
+        from apps.timekeeping.reconciliation import capture
+
+        current = capture(
+            locked.organization,
+            actor,
+            locked.project,
+            locked.cutoff_at,
+            locked.side_snapshots.get(side="left").source_manifest["context"],
+        )
+    else:
+        current = ADAPTERS[str(spec["adapter"])](
+            locked.organization, locked.project, locked.cutoff_at
+        )
     observed_sides = []
     for side in (current.left, current.right):
         observed_sides.append(
@@ -1263,6 +1321,7 @@ def review_rebuild_check(
         .select_related("original_run__project", "organization")
         .get(pk=check.pk)
     )
+    _guard_context(locked.original_run, reviewer, review=True)
     require_business_permission(
         user=reviewer,
         organization=locked.organization,
@@ -1286,6 +1345,12 @@ def review_rebuild_check(
     return locked
 
 
+def _guard_context(run, actor, **kwargs):
+    from apps.timekeeping.reconciliation import guard_run
+
+    guard_run(run, actor, **kwargs)
+
+
 def reconciliation_runs(*, organization: Organization, actor: User):
     require_business_permission(
         user=actor,
@@ -1293,12 +1358,19 @@ def reconciliation_runs(*, organization: Organization, actor: User):
         permission=BusinessPermissionCode.REPORTING_RECONCILIATION_RUN_VIEW,
         message="اجازه مشاهده تطبیق را ندارید.",
     )
-    return (
+    runs = (
         ReconciliationRun.objects.filter(organization=organization)
         .select_related("pair_version__definition", "project", "tie_out", "review")
         .prefetch_related("exceptions__events", "side_snapshots")
         .order_by("-created_at")
     )
+    excluded = []
+    for run in runs.filter(pair_version__definition__code="attendance_timesheet"):
+        try:
+            _guard_context(run, actor)
+        except (PermissionDenied, ValidationError):
+            excluded.append(run.pk)
+    return runs.exclude(pk__in=excluded)
 
 
 def reconciliation_drillthrough(
@@ -1314,6 +1386,7 @@ def reconciliation_drillthrough(
     )
     if run is None:
         raise PermissionDenied("اجرای تطبیق در دسترس نیست.")
+    _guard_context(run, actor)
     for permission in (
         BusinessPermissionCode.REPORTING_RECONCILIATION_RUN_VIEW,
         BusinessPermissionCode.REPORTING_SOURCE_DRILLTHROUGH_VIEW,

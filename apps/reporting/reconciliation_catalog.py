@@ -1,6 +1,25 @@
 from typing import Final
 
 RECONCILIATION_PAIR_SPECS: Final[dict[str, dict[str, object]]] = {
+    "attendance_timesheet": {
+        "persian_name": "مقایسه شواهد حضور و کارکرد",
+        "left_authority": "Timekeeping / Attendance",
+        "right_authority": "Timekeeping / Timesheet",
+        "source_permissions": ["employees.view", "attendance.view", "timesheets.view"],
+        "adapter": "attendance_timesheet",
+        "grain": "explicit_work_relationship/timesheet_period/work_date/project/site",
+        "measure": "observed_seconds",
+        "tolerance": {"kind": "source_policy"},
+        "materiality": {"qualitative": ["observed_difference_requires_review"]},
+        "sensitivity": "sensitive",
+        "governance_reference": "SPEC-012 / CEP-050 / IMB-0077; bounded non-production implementation",
+        "source_owner_approvals": {
+            "left": "Timekeeping / Attendance",
+            "right": "Timekeeping / Timesheet",
+            "canonical_contract": "SPEC-012",
+            "human_signoff": False,
+        },
+    },
     "estimate_budget": {
         "persian_name": "برآورد مصوب به بودجه پذیرفته‌شده",
         "left_authority": "Estimation",

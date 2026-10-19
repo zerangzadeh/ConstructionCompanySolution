@@ -1,0 +1,29 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 16 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_regression_v2_20261019')...
+
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_01_catalogue_permissions_and_profile_publication_controls PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_02_tenant_isolation_and_no_implicit_platform_access PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_03_object_scope_and_source_permissions_are_rechecked PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_04_nine_families_capture_explicit_non_values_never_zero PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_05_cutoff_reproducibility_and_successor_preserve_history PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_06_lifecycle_sod_accept_reject_and_reopen_are_append_only PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_07_idempotency_payload_conflict_and_stale_revision PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_08_atomic_failure_rolls_back_assessment_items_pointer_and_audit PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_09_source_change_requires_successor_and_never_rewrites_original PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_10_dms_exact_version_hash_and_tenant_boundary PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_11_export_is_private_masked_idempotent_and_byte_free PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_12_persian_rtl_jalali_ui_and_private_response PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_13_every_command_has_no_source_domain_effect PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_14_permission_aware_navigation_and_post_only_mutations PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_15_immutable_models_and_constraints_reject_rewrite PASSED
+apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_16_audit_lineage_and_preserved_gates PASSED
+
+============================= 16 passed in 16.29s =============================

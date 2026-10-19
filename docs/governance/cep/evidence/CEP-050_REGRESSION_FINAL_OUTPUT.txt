@@ -1,0 +1,65 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 37 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_regression_v2_20261019')...
+
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_01_catalogue_contains_exactly_thirteen_governed_pairs <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_02_fifteen_permissions_are_registered_and_default_denied <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_03_all_thirteen_pairs_execute_without_fabricating_zero <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_04_tenant_isolation_rejects_foreign_run_drillthrough <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_05_source_permissions_are_rechecked <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_06_idempotent_retry_returns_one_run <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_07_idempotency_collision_fails_closed <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_08_unknown_is_not_zero_or_a_match <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_09_gated_consumer_is_explicit <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_10_unapproved_tolerance_does_not_hide_a_difference <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_11_side_and_tieout_snapshots_are_immutable <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_12_material_runner_cannot_review_own_run <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_13_independent_run_review_is_immutable <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_14_exception_snapshot_has_exact_side_lineage <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_15_exception_event_is_idempotent_and_append_only <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_16_last_disposer_cannot_close_material_exception <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_17_independent_close_and_controlled_reopen_preserve_history <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_18_exact_replay_does_not_rewrite_historical_run <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_19_successor_recalculation_links_without_overwrite <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_20_drillthrough_rechecks_reporting_and_source_permissions <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_21_platform_or_unrelated_user_has_no_implicit_tenant_access <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_22_workbench_is_rtl_jalali_and_private <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_23_run_is_audited_without_source_mutation <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_24_catalogue_and_urls_are_complete <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_25_each_pair_retains_injected_mismatch_and_lineage <- apps\reporting\test_p10_s07_s13.py PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_new_run_keeps_prior_comparison_and_source_identity PASSED
+apps/reporting/test_cep041.py::PersistedToleranceTests::test_policy_absence_is_retained_in_tieout_exception_and_audit PASSED
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_cross_tenant_objects_are_rejected_before_persistence <- apps\timekeeping\test_cep024_scope.py PASSED
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_form_rejects_invalid_site_activity_cascade <- apps\timekeeping\test_cep024_scope.py PASSED
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_matching_project_site_activity_is_allowed <- apps\timekeeping\test_cep024_scope.py PASSED
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_scoped_actor_and_direct_url_cannot_bypass_site_scope <- apps\timekeeping\test_cep024_scope.py PASSED
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_service_and_model_reject_stale_or_unselected_activity_site <- apps\timekeeping\test_cep024_scope.py SUBPASSED(site=<ProjectSite: CEP024 · CEP024-B - Site B>)
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_service_and_model_reject_stale_or_unselected_activity_site <- apps\timekeeping\test_cep024_scope.py SUBPASSED(site=None)
+apps/timekeeping/test_cep050_reconciliation.py::RetainedScopeRegression::test_service_and_model_reject_stale_or_unselected_activity_site <- apps\timekeeping\test_cep024_scope.py PASSED
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_equality_does_not_claim_an_unconfigured_tolerance PASSED
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_exact_catalogue_rule_is_deterministic_and_input_is_unchanged PASSED
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value=None)
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='bad')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='NaN')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='Infinity')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='-1')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds SUBPASSED(value='0.01')
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_invalid_exact_rules_cannot_become_thresholds PASSED
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule=None)
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule={})
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule={'absolute': '100'})
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule={'kind': 'source_policy', 'absolute': '100'})
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule={'kind': 'native_policy', 'absolute': '100'})
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept SUBPASSED(rule={'kind': 'unregistered', 'absolute': '100'})
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_missing_source_native_and_unknown_policies_never_auto_accept PASSED
+apps/reporting/test_cep041.py::ToleranceBoundaryTests::test_source_basis_points_are_not_an_aggregate_money_tolerance PASSED
+
+=================== 37 passed, 15 subtests passed in 16.03s ===================

@@ -129,14 +129,19 @@ def synchronize_metric_catalogue(*, using: str, **kwargs: Any) -> None:
                 defaults={
                     "status": "published",
                     "specification": specification,
-                    "source_owner_approvals": {
-                        "left": spec["left_authority"],
-                        "right": spec["right_authority"],
-                        "reconciliation_owner": "Reporting/Reconciliation",
-                        "acceptance_owner": "Product Owner",
-                    },
+                    "source_owner_approvals": spec.get(
+                        "source_owner_approvals",
+                        {
+                            "left": spec["left_authority"],
+                            "right": spec["right_authority"],
+                            "reconciliation_owner": "Reporting/Reconciliation",
+                            "acceptance_owner": "Product Owner",
+                        },
+                    ),
                     "payload_hash": payload_hash,
-                    "governance_reference": RECONCILIATION_GOVERNANCE_REFERENCE,
+                    "governance_reference": spec.get(
+                        "governance_reference", RECONCILIATION_GOVERNANCE_REFERENCE
+                    ),
                     "published_at": timezone.now(),
                 },
             )

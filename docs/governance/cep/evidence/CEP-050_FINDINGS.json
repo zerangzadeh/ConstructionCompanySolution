@@ -1,0 +1,17 @@
+[
+  {
+    "id": "CEP-050-FINDING-001",
+    "status": "RESOLVED",
+    "kind": "Repository seam / preventing UI scope expansion",
+    "evidence": "The existing generic reporting workbench accepts only project and cannot convey the mandatory explicit WorkRelationship and Timesheet version. Adding the catalogue entry would otherwise expose an unusable execute option.",
+    "resolution": "One selector excludes the context-required workforce pair from generic execute choices. The service and source-scoped historical read model remain available. No forms/templates/endpoints or new UI flow are introduced.",
+    "scope": "Necessary bounded seam adjustment; UI implementation and UI/runtime certification remain N/A."
+  },
+  {
+    "id": "CEP-050-FINDING-002",
+    "status": "RESOLVED",
+    "kind": "Preserve explicit downstream readiness policy",
+    "evidence": "Existing closeout reconciliation_performance family collects all completed project ReconciliationRuns; the new workforce comparison could otherwise count as closeout evidence or expose worker source identifiers through a family lacking native time permissions. SPEC012 prohibits new downstream blocking authority absent explicit policy.",
+    "resolution": "Exclude only the new attendance_timesheet pair from the existing closeout source queryset. No new closeout policy or dependency is created. Focused negative assertion plus retained closeout regression verifies the boundary."
+  }
+]

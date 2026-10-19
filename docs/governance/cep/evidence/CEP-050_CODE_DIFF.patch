@@ -1,0 +1,1186 @@
+diff --git a/apps/timekeeping/reconciliation.py b/apps/timekeeping/reconciliation.py
+new file mode 100644
+index 0000000..4fbaba5
+--- /dev/null
++++ b/apps/timekeeping/reconciliation.py
+@@ -0,0 +1,452 @@
++"""SPEC-012 observations, persisted only in the existing reconciliation read model."""
++
++from __future__ import annotations
++
++from datetime import datetime
++from decimal import Decimal
++from typing import TYPE_CHECKING
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++
++from apps.accounts.models import User
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as Permission
++from apps.organizations.models import Organization
++from apps.projects.models import Project, ProjectSite
++from apps.reporting.reconciliation import PairData, SideData, _hash
++from apps.workforce.models import Employee, WorkRelationship
++
++from .models import (
++    AttendanceCorrectionRequest,
++    AttendanceRecord,
++    AttendanceState,
++    Timesheet,
++    TimesheetEntry,
++    TimesheetState,
++)
++
++PAIR = "attendance_timesheet"
++
++if TYPE_CHECKING:
++    from apps.reporting.models import ReconciliationRun
++
++
++def _require(
++    actor: User,
++    organization: Organization,
++    permission: str,
++    project: Project | None = None,
++    site: ProjectSite | None = None,
++) -> None:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        permission=permission,
++        project=project,
++        site=site,
++        message="مجوز یا دامنه منبع تطبیق کارکرد وجود ندارد.",
++    )
++
++
++def validate_context(
++    organization: Organization,
++    actor: User,
++    project: Project | None,
++    context: dict[str, str] | None,
++) -> tuple[WorkRelationship, Timesheet]:
++    if not isinstance(context, dict) or set(context) != {
++        "relationship_id",
++        "timesheet_id",
++    }:
++        raise ValidationError("رابطه کاری و نسخه کارکرد صریح الزامی است.")
++    for permission in (
++        Permission.EMPLOYEES_VIEW,
++        Permission.ATTENDANCE_VIEW,
++        Permission.TIMESHEETS_VIEW,
++    ):
++        _require(actor, organization, permission, project)
++    try:
++        relationship = WorkRelationship.objects.get(
++            organization=organization, pk=context["relationship_id"]
++        )
++        sheet = Timesheet.objects.get(
++            organization=organization, pk=context["timesheet_id"]
++        )
++    except (WorkRelationship.DoesNotExist, Timesheet.DoesNotExist, ValueError) as exc:
++        raise PermissionDenied("منبع تطبیق در شرکت فعال وجود ندارد.") from exc
++    if (
++        not relationship.legacy_employee_id
++        or sheet.employee_id != relationship.legacy_employee_id
++        or relationship.person.organization_id != organization.pk
++        or sheet.employee.organization_id != organization.pk
++        or sheet.period_start < relationship.effective_start
++        or (
++            relationship.effective_end and sheet.period_end > relationship.effective_end
++        )
++    ):
++        raise ValidationError("پیوند صریح هویت و دوره رابطه کاری معتبر نیست.")
++    return relationship, sheet
++
++
++def _version(row: object, fields: tuple[str, ...]) -> dict[str, str]:
++    payload = {field: str(getattr(row, field)) for field in fields}
++    return {"id": str(row.pk), "version": _hash(payload), **payload}
++
++
++def _grain(row: AttendanceRecord | TimesheetEntry) -> str:
++    return "/".join(
++        str(value or "") for value in (row.work_date, row.project_id, row.site_id)
++    )
++
++
++def capture(
++    organization: Organization,
++    actor: User,
++    project: Project | None,
++    cutoff: datetime,
++    context: dict[str, str],
++) -> PairData:
++    relationship, sheet = validate_context(organization, actor, project, context)
++    relationship = WorkRelationship.objects.select_for_update().get(pk=relationship.pk)
++    Employee.objects.select_for_update().get(
++        pk=relationship.legacy_employee_id, organization=organization
++    )
++    sheet = Timesheet.objects.select_for_update().get(pk=sheet.pk)
++    validate_context(organization, actor, project, context)
++    entries = list(
++        TimesheetEntry.objects.select_for_update(of=("self",))
++        .filter(timesheet=sheet)
++        .select_related("project", "site", "activity")
++        .order_by("pk")
++    )
++    attendance = list(
++        AttendanceRecord.objects.select_for_update(of=("self",))
++        .filter(
++            organization=organization,
++            employee_id=relationship.legacy_employee_id,
++            work_date__range=(sheet.period_start, sheet.period_end),
++        )
++        .select_related("project", "site")
++        .order_by("pk")
++    )
++    for row in [*attendance, *entries]:
++        if (
++            row.organization_id != organization.pk
++            or (row.project_id and row.project.organization_id != organization.pk)
++            or (
++                row.site_id
++                and (
++                    row.site.organization_id != organization.pk
++                    or row.site.project_id != row.project_id
++                )
++            )
++        ):
++            raise ValidationError("ابعاد منبع تطبیق ناسازگار است.")
++        if isinstance(row, TimesheetEntry) and (
++            not sheet.period_start <= row.work_date <= sheet.period_end
++            or (
++                row.activity_id
++                and (
++                    row.activity.organization_id != organization.pk
++                    or row.activity.project_id != row.project_id
++                    or row.activity.site_id != row.site_id
++                )
++            )
++        ):
++            raise ValidationError("ردیف کارکرد خارج از دامنه مصوب است.")
++        if project is None or row.project_id == project.pk:
++            for permission in (Permission.ATTENDANCE_VIEW, Permission.TIMESHEETS_VIEW):
++                _require(actor, organization, permission, row.project, row.site)
++    manifest = {
++        "context": context,
++        "period": [str(sheet.period_start), str(sheet.period_end)],
++        "relationship": _version(
++            relationship,
++            (
++                "person_id",
++                "legacy_employee_id",
++                "effective_start",
++                "effective_end",
++                "updated_at",
++            ),
++        ),
++        "grain": "work_date/project/site; no activity inference",
++        "basis": "observed clock interval seconds versus recorded allocation minutes times60; no payable-time policy",
++    }
++    left_rows, right_rows, left, right = [], [], {}, {}
++    incomplete = False
++    for row in attendance:
++        if project is not None and row.project_id != project.pk:
++            continue
++        left_rows.append(
++            _version(
++                row,
++                (
++                    "work_date",
++                    "project_id",
++                    "site_id",
++                    "check_in_at",
++                    "check_out_at",
++                    "state",
++                    "finalized_at",
++                    "updated_at",
++                ),
++            )
++        )
++        if row.state in {AttendanceState.SUPERSEDED, AttendanceState.REVERSED}:
++            continue
++        if (
++            row.state != AttendanceState.FINALIZED
++            or row.updated_at > cutoff
++            or not row.finalized_at
++            or row.finalized_at > cutoff
++            or not row.check_out_at
++        ):
++            incomplete = True
++            continue
++        delta = row.check_out_at - row.check_in_at
++        seconds = (
++            Decimal(delta.days * 86400 + delta.seconds)
++            + Decimal(delta.microseconds) / 1000000
++        )
++        if seconds <= 0:
++            raise ValidationError("بازه حضور معتبر نیست.")
++        key = _grain(row)
++        left[key] = left.get(key, Decimal(0)) + seconds
++    for row in entries:
++        if project is not None and row.project_id != project.pk:
++            continue
++        right_rows.append(
++            _version(
++                row,
++                (
++                    "work_date",
++                    "project_id",
++                    "site_id",
++                    "activity_id",
++                    "minutes",
++                    "updated_at",
++                ),
++            )
++        )
++        key = _grain(row)
++        right[key] = right.get(key, Decimal(0)) + Decimal(row.minutes) * 60
++    sheet_version = _version(
++        sheet,
++        (
++            "employee_id",
++            "period_start",
++            "period_end",
++            "revision",
++            "declared_minutes",
++            "state",
++            "supersedes_id",
++            "updated_at",
++        ),
++    )
++    if sum(row.minutes for row in entries) != sheet.declared_minutes:
++        raise ValidationError("جمع ردیف‌های نسخه کارکرد با منبع برابر نیست.")
++    reviews = list(
++        sheet.reviews.filter(organization=organization, decision="approved").order_by(
++            "created_at", "pk"
++        )
++    )
++    sheet_version["review_versions"] = [
++        _version(review, ("decision", "reviewer_id", "created_at"))
++        for review in reviews
++    ]
++    eligible_sheet = (
++        sheet.state == TimesheetState.APPROVED
++        and sheet.updated_at <= cutoff
++        and bool(reviews)
++        and reviews[-1].created_at <= cutoff
++    )
++    return PairData(
++        SideData(
++            "Timekeeping / Attendance",
++            "timekeeping.AttendanceRecord",
++            "incomplete" if incomplete else "ready" if left else "unknown",
++            {"observed_seconds": {k: str(v) for k, v in sorted(left.items())}},
++            {**manifest, "records": left_rows},
++        ),
++        SideData(
++            "Timekeeping / Timesheet",
++            "timekeeping.Timesheet",
++            "ready"
++            if eligible_sheet and right
++            else "incomplete"
++            if not eligible_sheet
++            else "unknown",
++            {"observed_seconds": {k: str(v) for k, v in sorted(right.items())}},
++            {**manifest, "sheet": sheet_version, "records": right_rows},
++        ),
++        "observed_seconds",
++        unit="seconds",
++    )
++
++
++def compare(
++    data: PairData,
++) -> tuple[str, dict[str, object], dict[str, object], dict[str, object]]:
++    left = data.left.value["observed_seconds"]
++    right = data.right.value["observed_seconds"]
++    rows = [
++        {
++            "grain": key,
++            "attendance_seconds": left.get(key),
++            "timesheet_seconds": right.get(key),
++            "difference_seconds": str(Decimal(left[key]) - Decimal(right[key]))
++            if key in left and key in right
++            else None,
++        }
++        for key in sorted(left.keys() | right.keys())
++    ]
++    readiness = {data.left.readiness, data.right.readiness}
++    outcome = (
++        "incomplete"
++        if "incomplete" in readiness
++        else "unknown"
++        if "unknown" in readiness
++        else "matched_exact"
++        if rows
++        and all(
++            row["difference_seconds"] is not None
++            and Decimal(row["difference_seconds"]) == 0
++            for row in rows
++        )
++        else "mismatch"
++    )
++    return (
++        outcome,
++        {"observations": rows},
++        {
++            "kind": "source_policy",
++            "status": "unconfigured",
++            "applied": False,
++            "difference_visible": True,
++            "reason": "no_approved_tolerance",
++        },
++        {
++            "material": outcome != "matched_exact",
++            "reason": "observed_difference_requires_review"
++            if outcome != "matched_exact"
++            else "observed_equality",
++        },
++    )
++
++
++def guard_run(
++    run: ReconciliationRun,
++    actor: User,
++    *,
++    review: bool = False,
++    correction_reference: dict[str, object] | None = None,
++) -> None:
++    """Apply native object scope to every generic path exposing this workforce pair."""
++    if run.pair_version.definition.code != PAIR:
++        return
++    sides = list(run.side_snapshots.order_by("side"))
++    if len(sides) != 2 or sides[0].source_manifest.get("context") != sides[
++        1
++    ].source_manifest.get("context"):
++        raise ValidationError("شاهد نسخه‌دار تطبیق ناقص است.")
++    context = sides[0].source_manifest["context"]
++    validate_context(run.organization, actor, run.project, context)
++    if review:
++        for permission in (Permission.ATTENDANCE_REVIEW, Permission.TIMESHEETS_REVIEW):
++            _require(actor, run.organization, permission, run.project)
++    for side in sides:
++        for record in side.source_manifest["records"]:
++            model = AttendanceRecord if side.side == "left" else TimesheetEntry
++            row = (
++                model.objects.select_related("project", "site")
++                .filter(organization=run.organization, pk=record["id"])
++                .first()
++            )
++            if row is None:
++                raise PermissionDenied("شاهد منبع در دامنه فعال نیست.")
++            for permission in (Permission.ATTENDANCE_VIEW, Permission.TIMESHEETS_VIEW):
++                _require(actor, run.organization, permission, row.project, row.site)
++            if review:
++                _require(
++                    actor,
++                    run.organization,
++                    Permission.ATTENDANCE_REVIEW,
++                    row.project,
++                    row.site,
++                )
++                _require(
++                    actor,
++                    run.organization,
++                    Permission.TIMESHEETS_REVIEW,
++                    row.project,
++                    row.site,
++                )
++    if correction_reference:
++        if set(correction_reference) != {"model", "id"}:
++            raise ValidationError("پیوند اصلاح باید شناسه صریح منبع باشد.")
++        if correction_reference["model"] == "timekeeping.AttendanceCorrectionRequest":
++            request = AttendanceCorrectionRequest.objects.filter(
++                organization=run.organization,
++                pk=correction_reference["id"],
++                status="approved",
++                adjustment__isnull=False,
++            ).first()
++            ids = {
++                row["id"]
++                for side in sides
++                if side.side == "left"
++                for row in side.source_manifest["records"]
++            }
++            valid = request is not None and str(request.attendance_id) in ids
++        elif correction_reference["model"] == "timekeeping.Timesheet":
++            sheet = Timesheet.objects.filter(
++                organization=run.organization,
++                pk=correction_reference["id"],
++                state=TimesheetState.APPROVED,
++            ).first()
++            valid = (
++                sheet is not None
++                and str(sheet.supersedes_id) == context["timesheet_id"]
++                and str(sheet.employee_id)
++                == sides[0].source_manifest["relationship"]["legacy_employee_id"]
++                and [str(sheet.period_start), str(sheet.period_end)]
++                == sides[0].source_manifest["period"]
++                and sheet.reviews.filter(
++                    organization=run.organization, decision="approved"
++                ).exists()
++            )
++        else:
++            valid = False
++        if not valid:
++            raise ValidationError("پیوند به اصلاح مصوب همین منبع الزامی است.")
++
++
++@transaction.atomic
++def reconcile_attendance_timesheet(
++    *,
++    organization: Organization,
++    actor: User,
++    relationship: WorkRelationship,
++    timesheet: Timesheet,
++    idempotency_key: str,
++    project: Project | None = None,
++    cutoff_at: datetime | None = None,
++    replaces: ReconciliationRun | None = None,
++) -> ReconciliationRun:
++    from apps.reporting.reconciliation import execute_reconciliation
++
++    return execute_reconciliation(
++        organization=organization,
++        actor=actor,
++        pair_code=PAIR,
++        comparison_context={
++            "relationship_id": str(relationship.pk),
++            "timesheet_id": str(timesheet.pk),
++        },
++        project=project,
++        cutoff_at=cutoff_at,
++        idempotency_key=idempotency_key,
++        replaces=replaces,
++    )
+diff --git a/apps/timekeeping/test_cep050_reconciliation.py b/apps/timekeeping/test_cep050_reconciliation.py
+new file mode 100644
+index 0000000..00a7542
+--- /dev/null
++++ b/apps/timekeeping/test_cep050_reconciliation.py
+@@ -0,0 +1,425 @@
++import json
++from dataclasses import replace
++from datetime import date, datetime, timedelta
++from unittest.mock import patch
++from zoneinfo import ZoneInfo
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import SimpleTestCase, TestCase
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.audit.models import AuditEvent
++from apps.organizations.catalog_bootstrap import synchronize_authorization_catalog
++from apps.organizations.models import BusinessPermissionCode, OrganizationSettings
++from apps.reporting import test_p10_s07_s13 as reporting_baseline
++from apps.reporting.catalog_bootstrap import synchronize_metric_catalogue
++from apps.reporting.models import ReconciliationRun
++from apps.reporting.reconciliation import (
++    PairData,
++    SideData,
++    execute_reconciliation,
++    reconciliation_drillthrough,
++    reconciliation_runs,
++    record_exception_event,
++    replay_reconciliation,
++    review_reconciliation_run,
++)
++from apps.workforce.models import Employee, Person, WorkRelationship
++
++from . import test_cep024_scope as scope_baseline
++from .models import AttendanceRecord, Timesheet, TimesheetEntry, WorkCalendar
++from .reconciliation import PAIR, compare, reconcile_attendance_timesheet
++from .services import (
++    add_timesheet_entry,
++    capture_attendance,
++    create_timesheet,
++    finalize_attendance,
++    request_attendance_correction,
++    review_attendance_correction,
++    review_timesheet,
++    submit_timesheet,
++)
++
++
++class ObservationUnitTests(SimpleTestCase):
++    def test_offsetting_daily_differences_do_not_disappear_in_a_total(self):
++        data = PairData(
++            SideData(
++                "Attendance",
++                "a",
++                "ready",
++                {"observed_seconds": {"day1": "3600", "day2": "1800"}},
++                {},
++            ),
++            SideData(
++                "Timesheet",
++                "t",
++                "ready",
++                {"observed_seconds": {"day1": "1800", "day2": "3600"}},
++                {},
++            ),
++            "observed_seconds",
++        )
++        outcome, differences, tolerance, _ = compare(data)
++        self.assertEqual(outcome, "mismatch")
++        self.assertEqual(
++            [row["difference_seconds"] for row in differences["observations"]],
++            ["1800", "-1800"],
++        )
++        self.assertFalse(tolerance["applied"])
++        data = replace(data, left=replace(data.left, readiness="unknown"))
++        self.assertEqual(compare(data)[0], "unknown")
++
++
++class TimeReconciliationTests(TestCase):
++    _grant = reporting_baseline.P10S07S13AcceptanceTests.__dict__["_grant"]
++
++    @classmethod
++    def setUpTestData(cls):
++        synchronize_authorization_catalog(using="default")
++        synchronize_metric_catalogue(using="default")
++        reporting_baseline.P10S07S13AcceptanceTests.setUpTestData.__func__(cls)
++        cls.corrector = User.objects.create_user(username="time050-corrector")
++        cls._grant(cls.corrector, set(BusinessPermissionCode.values))
++        OrganizationSettings.objects.create(
++            organization=cls.organization, timezone="Asia/Tehran"
++        )
++        cls.employee = Employee.objects.create(
++            organization=cls.organization,
++            employee_number="TIME050",
++            first_name="Fixture",
++            last_name="Worker",
++        )
++        cls.person = Person.objects.create(
++            organization=cls.organization, first_name="Fixture", last_name="Worker"
++        )
++        cls.relationship = WorkRelationship.objects.create(
++            organization=cls.organization,
++            person=cls.person,
++            legacy_employee=cls.employee,
++            employee_number=cls.employee.employee_number,
++            effective_start=date(2026, 1, 1),
++        )
++        cls.calendar = WorkCalendar.objects.create(
++            organization=cls.organization,
++            code="CEP050",
++            name="Fixture calendar",
++            timezone="Asia/Tehran",
++            effective_from=date(2026, 1, 1),
++            working_weekdays=[1, 2, 3, 4, 5],
++            created_by=cls.user,
++        )
++        cls.start = datetime(2026, 2, 1, 8, tzinfo=ZoneInfo("Asia/Tehran"))
++        cls.attendance = capture_attendance(
++            organization=cls.organization,
++            actor=cls.user,
++            employee=cls.employee,
++            calendar=cls.calendar,
++            project=cls.project,
++            work_date=cls.start.date(),
++            check_in_at=cls.start,
++            check_out_at=cls.start + timedelta(hours=1),
++        )
++        cls.attendance = finalize_attendance(
++            organization=cls.organization, actor=cls.reviewer, attendance=cls.attendance
++        )
++        cls.sheet = cls._sheet(50)
++
++    @classmethod
++    def _sheet(cls, minutes, supersedes=None):
++        sheet = create_timesheet(
++            organization=cls.organization,
++            actor=cls.user,
++            employee=cls.employee,
++            period_start=cls.start.date(),
++            period_end=cls.start.date(),
++            declared_minutes=minutes,
++            supersedes=supersedes,
++            correction_reason="native correction" if supersedes else "",
++        )
++        add_timesheet_entry(
++            organization=cls.organization,
++            actor=cls.user,
++            timesheet=sheet,
++            work_date=cls.start.date(),
++            project=cls.project,
++            minutes=minutes,
++        )
++        submit_timesheet(organization=cls.organization, actor=cls.user, timesheet=sheet)
++        review_timesheet(
++            organization=cls.organization,
++            actor=cls.reviewer,
++            timesheet=sheet,
++            approve=True,
++            reason="Native source review",
++        )
++        sheet.refresh_from_db()
++        return sheet
++
++    def _run(self, key="time050", **kwargs):
++        return reconcile_attendance_timesheet(
++            organization=self.organization,
++            actor=self.user,
++            relationship=self.relationship,
++            timesheet=kwargs.pop("timesheet", self.sheet),
++            idempotency_key=key,
++            **kwargs,
++        )
++
++    def _evidence(self, scenario, run):
++        print(
++            "CEP050 RECON "
++            + json.dumps(
++                {
++                    "scenario": scenario,
++                    "run_id": str(run.pk),
++                    "replaces": str(run.replaces_id),
++                    "source_watermark": run.source_watermark,
++                    "outcome": run.tie_out.outcome,
++                    "difference": run.tie_out.difference,
++                    "tolerance": run.tie_out.tolerance_result,
++                    "source_versions": [
++                        side.source_manifest
++                        for side in run.side_snapshots.order_by("side")
++                    ],
++                    "exceptions": run.exceptions.count(),
++                    "source_mutations_by_reconciliation": 0,
++                },
++                sort_keys=True,
++            )
++        )
++
++    def test_mismatch_snapshots_review_and_source_immutability(self):
++        before = (
++            list(AttendanceRecord.objects.values()),
++            list(Timesheet.objects.values()),
++            list(TimesheetEntry.objects.values()),
++        )
++        run = self._run(project=self.project)
++        from apps.reporting.project_closeout import _family_queryset
++
++        self.assertFalse(
++            _family_queryset(
++                model_label="reporting.ReconciliationRun",
++                project_lookup="project",
++                organization=self.organization,
++                project=self.project,
++            )
++            .filter(pk=run.pk)
++            .exists()
++        )
++        self.assertEqual(run.tie_out.outcome, "mismatch")
++        self.assertEqual(
++            run.tie_out.difference["observations"][0]["difference_seconds"], "600"
++        )
++        self.assertFalse(run.tie_out.tolerance_result["applied"])
++        self.assertEqual(
++            before,
++            (
++                list(AttendanceRecord.objects.values()),
++                list(Timesheet.objects.values()),
++                list(TimesheetEntry.objects.values()),
++            ),
++        )
++        for side in run.side_snapshots.all():
++            self.assertEqual(
++                side.source_manifest["context"]["relationship_id"],
++                str(self.relationship.pk),
++            )
++            self.assertEqual(len(side.source_manifest["records"][0]["version"]), 64)
++            side.value = {}
++            with self.assertRaises(ValidationError):
++                side.save()
++        with self.assertRaises(PermissionDenied):
++            review_reconciliation_run(
++                run=run, reviewer=self.user, decision="accepted", reason="self"
++            )
++        review = review_reconciliation_run(
++            run=run,
++            reviewer=self.reviewer,
++            decision="accepted",
++            reason="Observed source difference only",
++        )
++        self.assertEqual(review.reviewer, self.reviewer)
++        self.assertTrue(AuditEvent.objects.filter(entity_id=str(review.pk)).exists())
++        self._evidence("native_observed_mismatch_independent_review", run)
++
++    def test_native_corrections_successor_and_exception_history(self):
++        first = self._run()
++        source_hash = first.source_watermark
++        correction = request_attendance_correction(
++            organization=self.organization,
++            requester=self.corrector,
++            attendance=self.attendance,
++            reason="Correct native interval",
++            replacement_values={"check_out_at": self.start + timedelta(minutes=50)},
++        )
++        correction = review_attendance_correction(
++            organization=self.organization,
++            approver=self.reviewer,
++            correction_request=correction,
++            approve=True,
++            review_reason="Approve native correction",
++        )
++        exception = first.exceptions.get()
++        record_exception_event(
++            exception=exception,
++            actor=self.user,
++            action="disposition",
++            reason="Native correction approved",
++            operation_key="native-correction",
++            correction_reference={
++                "model": "timekeeping.AttendanceCorrectionRequest",
++                "id": str(correction.pk),
++            },
++        )
++        with self.assertRaises(PermissionDenied):
++            record_exception_event(
++                exception=exception,
++                actor=self.user,
++                action="close",
++                reason="self close",
++                operation_key="close-denied",
++            )
++        record_exception_event(
++            exception=exception,
++            actor=self.reviewer,
++            action="close",
++            reason="Independent review",
++            operation_key="closed",
++        )
++        second = self._run(key="successor", replaces=first)
++        self.assertEqual(second.tie_out.outcome, "matched_exact")
++        self.assertEqual(second.replaces_id, first.pk)
++        first.refresh_from_db()
++        self.assertEqual(first.source_watermark, source_hash)
++        self.assertEqual(first.tie_out.outcome, "mismatch")
++        self.assertEqual(first.exceptions.get().events.count(), 2)
++        replay = replay_reconciliation(
++            original_run=first, actor=self.user, idempotency_key="replay"
++        )
++        self.assertEqual(replay.outcome, "mismatched")
++        self.assertEqual(first.side_snapshots.count(), 2)
++        self._evidence("approved_attendance_correction_successor", second)
++
++    def test_timesheet_revision_correction_link_and_prior_versions(self):
++        first = self._run()
++        revision = self._sheet(60, supersedes=self.sheet)
++        record_exception_event(
++            exception=first.exceptions.get(),
++            actor=self.user,
++            action="disposition",
++            reason="Approved native revision",
++            operation_key="revision",
++            correction_reference={
++                "model": "timekeeping.Timesheet",
++                "id": str(revision.pk),
++            },
++        )
++        second = self._run("revision-run", timesheet=revision, replaces=first)
++        self.assertEqual(second.tie_out.outcome, "matched_exact")
++        self.assertEqual(
++            first.side_snapshots.get(side="right").source_manifest["sheet"]["id"],
++            str(self.sheet.pk),
++        )
++        self.assertEqual(
++            second.side_snapshots.get(side="right").source_manifest["sheet"][
++                "supersedes_id"
++            ],
++            str(self.sheet.pk),
++        )
++
++        self._evidence("approved_timesheet_revision_successor", second)
++
++    def test_missing_context_identity_policy_and_correction_fail_closed(self):
++        with self.assertRaises(ValidationError):
++            execute_reconciliation(
++                organization=self.organization,
++                actor=self.user,
++                pair_code=PAIR,
++                idempotency_key="no-context",
++            )
++        original_employee = self.relationship.legacy_employee_id
++        WorkRelationship.objects.filter(pk=self.relationship.pk).update(
++            legacy_employee=None
++        )
++        with self.assertRaises(ValidationError):
++            self._run("unlinked")
++        WorkRelationship.objects.filter(pk=self.relationship.pk).update(
++            legacy_employee_id=original_employee
++        )
++        run = self._run()
++        with self.assertRaises(ValidationError):
++            record_exception_event(
++                exception=run.exceptions.get(),
++                actor=self.user,
++                action="disposition",
++                reason="Invalid cross-domain correction",
++                operation_key="invalid",
++                correction_reference={"model": "payroll.Run", "id": str(self.sheet.pk)},
++            )
++        Timesheet.objects.filter(pk=self.sheet.pk).update(state="draft")
++        incomplete = self._run("unapproved")
++        self.assertEqual(incomplete.tie_out.outcome, "incomplete")
++        AttendanceRecord.objects.filter(pk=self.attendance.pk).update(state="reversed")
++        missing = self._run("missing")
++        self.assertNotEqual(missing.tie_out.outcome, "matched_exact")
++        self.assertEqual(
++            missing.side_snapshots.get(side="left").value["observed_seconds"], {}
++        )
++
++    def test_idempotency_rollback_scope_and_read_paths(self):
++        cutoff = timezone.now()
++        first = self._run(cutoff_at=cutoff)
++        self.assertEqual(self._run(cutoff_at=cutoff).pk, first.pk)
++        with self.assertRaises(ValidationError):
++            self._run(cutoff_at=cutoff + timedelta(seconds=1))
++        before = ReconciliationRun.objects.count()
++        with (
++            patch(
++                "apps.timekeeping.reconciliation.capture",
++                side_effect=ValidationError("source failure"),
++            ),
++            self.assertRaises(ValidationError),
++        ):
++            self._run("rollback")
++        self.assertEqual(before, ReconciliationRun.objects.count())
++        self._grant(
++            self.other,
++            {
++                value
++                for value in BusinessPermissionCode.values
++                if value.startswith("reporting.")
++            },
++        )
++        self.assertFalse(
++            reconciliation_runs(organization=self.organization, actor=self.other)
++            .filter(pk=first.pk)
++            .exists()
++        )
++        with self.assertRaises(PermissionDenied):
++            reconciliation_drillthrough(
++                organization=self.organization, actor=self.other, run_id=str(first.pk)
++            )
++        with self.assertRaises(PermissionDenied):
++            reconciliation_drillthrough(
++                organization=self.other_organization,
++                actor=self.user,
++                run_id=str(first.pk),
++            )
++        self.assertEqual(
++            reconciliation_drillthrough(
++                organization=self.organization, actor=self.user, run_id=str(first.pk)
++            ),
++            first,
++        )
++
++
++class RetainedScopeRegression(scope_baseline.Cep024TimekeepingScopeTests):
++    def setUp(self):
++        from apps.workflows.catalog_bootstrap import synchronize_workflow_catalog
++
++        synchronize_authorization_catalog(using="default")
++        synchronize_workflow_catalog(using="default")
++        super().setUp()
+diff --git a/apps/reporting/reconciliation.py b/apps/reporting/reconciliation.py
+index 5bc4ff2..952a6c5 100644
+--- a/apps/reporting/reconciliation.py
++++ b/apps/reporting/reconciliation.py
+@@ -804,0 +805 @@ def execute_reconciliation(
++    comparison_context: dict[str, str] | None = None,
+@@ -833,0 +835,6 @@ def execute_reconciliation(
++    if pair_code == "attendance_timesheet":
++        from apps.timekeeping.reconciliation import validate_context
++
++        validate_context(organization, actor, project, comparison_context)
++    elif comparison_context is not None:
++        raise ValidationError("این جفت زمینه کارکرد نمی‌پذیرد.")
+@@ -840,0 +848,3 @@ def execute_reconciliation(
++            **(
++                {"comparison_context": comparison_context} if comparison_context else {}
++            ),
+@@ -851,0 +862 @@ def execute_reconciliation(
++            _guard_context(existing, actor)
+@@ -860,0 +872 @@ def execute_reconciliation(
++        _guard_context(replaces, actor)
+@@ -874,2 +886,16 @@ def execute_reconciliation(
+-    adapter = ADAPTERS[str(spec["adapter"])]
+-    data = adapter(organization, project, cutoff)
++    if pair_code == "attendance_timesheet":
++        from apps.timekeeping.reconciliation import capture
++
++        data = capture(organization, actor, project, cutoff, comparison_context)
++        if replaces:
++            prior = replaces.side_snapshots.get(side="left").source_manifest
++            if (
++                prior["period"] != data.left.manifest["period"]
++                or prior["context"]["relationship_id"]
++                != comparison_context["relationship_id"]
++                or replaces.project_id != run.project_id
++            ):
++                raise ValidationError("جانشین تطبیق باید همان هویت، دوره و دامنه باشد.")
++    else:
++        adapter = ADAPTERS[str(spec["adapter"])]
++        data = adapter(organization, project, cutoff)
+@@ -901 +927,6 @@ def execute_reconciliation(
+-    outcome, difference, tolerance_result, materiality_result = _compare(data, spec)
++    if pair_code == "attendance_timesheet":
++        from apps.timekeeping.reconciliation import compare
++
++        outcome, difference, tolerance_result, materiality_result = compare(data)
++    else:
++        outcome, difference, tolerance_result, materiality_result = _compare(data, spec)
+@@ -950,0 +982,8 @@ def execute_reconciliation(
++                **(
++                    {
++                        "context": comparison_context,
++                        "period": data.left.manifest["period"],
++                    }
++                    if pair_code == "attendance_timesheet"
++                    else {}
++                ),
+@@ -991,0 +1031 @@ def review_reconciliation_run(
++    _guard_context(locked, reviewer, review=True)
+@@ -1056,0 +1097,5 @@ def record_exception_event(
++    _guard_context(
++        locked.run, actor, review=True, correction_reference=correction_reference
++    )
++    if assigned_to is not None:
++        _guard_context(locked.run, assigned_to, review=True)
+@@ -1143,0 +1189 @@ def link_exception_evidence(
++    _guard_context(exception.run, actor, review=True)
+@@ -1182,0 +1229 @@ def replay_reconciliation(
++    _guard_context(locked, actor)
+@@ -1207,3 +1254,14 @@ def replay_reconciliation(
+-    current = ADAPTERS[str(spec["adapter"])](
+-        locked.organization, locked.project, locked.cutoff_at
+-    )
++    if locked.pair_version.definition.code == "attendance_timesheet":
++        from apps.timekeeping.reconciliation import capture
++
++        current = capture(
++            locked.organization,
++            actor,
++            locked.project,
++            locked.cutoff_at,
++            locked.side_snapshots.get(side="left").source_manifest["context"],
++        )
++    else:
++        current = ADAPTERS[str(spec["adapter"])](
++            locked.organization, locked.project, locked.cutoff_at
++        )
+@@ -1265,0 +1324 @@ def review_rebuild_check(
++    _guard_context(locked.original_run, reviewer, review=True)
+@@ -1288,0 +1348,6 @@ def review_rebuild_check(
++def _guard_context(run, actor, **kwargs):
++    from apps.timekeeping.reconciliation import guard_run
++
++    guard_run(run, actor, **kwargs)
++
++
+@@ -1296 +1361 @@ def reconciliation_runs(*, organization: Organization, actor: User):
+-    return (
++    runs = (
+@@ -1301,0 +1367,7 @@ def reconciliation_runs(*, organization: Organization, actor: User):
++    excluded = []
++    for run in runs.filter(pair_version__definition__code="attendance_timesheet"):
++        try:
++            _guard_context(run, actor)
++        except (PermissionDenied, ValidationError):
++            excluded.append(run.pk)
++    return runs.exclude(pk__in=excluded)
+@@ -1316,0 +1389 @@ def reconciliation_drillthrough(
++    _guard_context(run, actor)
+diff --git a/apps/reporting/reconciliation_catalog.py b/apps/reporting/reconciliation_catalog.py
+index 3393dbb..4ca95e8 100644
+--- a/apps/reporting/reconciliation_catalog.py
++++ b/apps/reporting/reconciliation_catalog.py
+@@ -3,0 +4,19 @@ RECONCILIATION_PAIR_SPECS: Final[dict[str, dict[str, object]]] = {
++    "attendance_timesheet": {
++        "persian_name": "مقایسه شواهد حضور و کارکرد",
++        "left_authority": "Timekeeping / Attendance",
++        "right_authority": "Timekeeping / Timesheet",
++        "source_permissions": ["employees.view", "attendance.view", "timesheets.view"],
++        "adapter": "attendance_timesheet",
++        "grain": "explicit_work_relationship/timesheet_period/work_date/project/site",
++        "measure": "observed_seconds",
++        "tolerance": {"kind": "source_policy"},
++        "materiality": {"qualitative": ["observed_difference_requires_review"]},
++        "sensitivity": "sensitive",
++        "governance_reference": "SPEC-012 / CEP-050 / IMB-0077; bounded non-production implementation",
++        "source_owner_approvals": {
++            "left": "Timekeeping / Attendance",
++            "right": "Timekeeping / Timesheet",
++            "canonical_contract": "SPEC-012",
++            "human_signoff": False,
++        },
++    },
+diff --git a/apps/reporting/catalog_bootstrap.py b/apps/reporting/catalog_bootstrap.py
+index 7f7b2dc..500d13d 100644
+--- a/apps/reporting/catalog_bootstrap.py
++++ b/apps/reporting/catalog_bootstrap.py
+@@ -132,6 +132,9 @@ def synchronize_metric_catalogue(*, using: str, **kwargs: Any) -> None:
+-                    "source_owner_approvals": {
+-                        "left": spec["left_authority"],
+-                        "right": spec["right_authority"],
+-                        "reconciliation_owner": "Reporting/Reconciliation",
+-                        "acceptance_owner": "Product Owner",
+-                    },
++                    "source_owner_approvals": spec.get(
++                        "source_owner_approvals",
++                        {
++                            "left": spec["left_authority"],
++                            "right": spec["right_authority"],
++                            "reconciliation_owner": "Reporting/Reconciliation",
++                            "acceptance_owner": "Product Owner",
++                        },
++                    ),
+@@ -139 +142,3 @@ def synchronize_metric_catalogue(*, using: str, **kwargs: Any) -> None:
+-                    "governance_reference": RECONCILIATION_GOVERNANCE_REFERENCE,
++                    "governance_reference": spec.get(
++                        "governance_reference", RECONCILIATION_GOVERNANCE_REFERENCE
++                    ),
+diff --git a/apps/reporting/views.py b/apps/reporting/views.py
+index f779b63..d38569f 100644
+--- a/apps/reporting/views.py
++++ b/apps/reporting/views.py
+@@ -124 +124,6 @@ def reconciliation_workbench(request: HttpRequest) -> HttpResponse:
+-    pairs = ReconciliationPairDefinition.objects.filter(is_active=True).order_by("code")
++    # SPEC012 requires explicit workforce context unavailable in this generic form.
++    pairs = (
++        ReconciliationPairDefinition.objects.filter(is_active=True)
++        .exclude(code="attendance_timesheet")
++        .order_by("code")
++    )
+@@ -270 +275,3 @@ def project_closeout_detail(request: HttpRequest, case_id: str) -> HttpResponse:
+-def _closeout_case_from_request(request: HttpRequest, case_id: str) -> ProjectCloseoutCase:
++def _closeout_case_from_request(
++    request: HttpRequest, case_id: str
++) -> ProjectCloseoutCase:
+diff --git a/apps/reporting/test_p10_s07_s13.py b/apps/reporting/test_p10_s07_s13.py
+index cb697d8..e99e2a2 100644
+--- a/apps/reporting/test_p10_s07_s13.py
++++ b/apps/reporting/test_p10_s07_s13.py
+@@ -48 +48,11 @@ from apps.reporting.reconciliation import (
+-from apps.reporting.reconciliation_catalog import RECONCILIATION_PAIR_SPECS
++from apps.reporting.reconciliation_catalog import (
++    RECONCILIATION_PAIR_SPECS as CURRENT_PAIR_SPECS,
++)
++
++# This historical acceptance suite owns the original thirteen financial pairs.
++# CEP050's context-required workforce pair has its own native-source suite.
++RECONCILIATION_PAIR_SPECS = {
++    code: spec
++    for code, spec in CURRENT_PAIR_SPECS.items()
++    if code != "attendance_timesheet"
++}
+@@ -132 +142,5 @@ class P10S07S13AcceptanceTests(TestCase):
+-            set(ReconciliationPairDefinition.objects.values_list("code", flat=True)),
++            set(
++                ReconciliationPairDefinition.objects.exclude(
++                    code="attendance_timesheet"
++                ).values_list("code", flat=True)
++            ),
+@@ -135 +149,4 @@ class P10S07S13AcceptanceTests(TestCase):
+-            ReconciliationPairVersion.objects.filter(status="published").count(), 13
++            ReconciliationPairVersion.objects.filter(status="published")
++            .exclude(definition__code="attendance_timesheet")
++            .count(),
++            13,
+diff --git a/apps/reporting/project_closeout.py b/apps/reporting/project_closeout.py
+index f241de0..e52a308 100644
+--- a/apps/reporting/project_closeout.py
++++ b/apps/reporting/project_closeout.py
+@@ -93 +93,5 @@ def _family_queryset(
+-    *, model_label: str, project_lookup: str, organization: Organization, project: Project
++    *,
++    model_label: str,
++    project_lookup: str,
++    organization: Organization,
++    project: Project,
+@@ -115 +119,3 @@ def _family_queryset(
+-            project_sources |= models.Q(source_type=source_type, source_id__in=source_ids)
++            project_sources |= models.Q(
++                source_type=source_type, source_id__in=source_ids
++            )
+@@ -127,0 +134,5 @@ def _family_queryset(
++    if model_label == "reporting.ReconciliationRun":
++        # SPEC012 grants no implicit workforce-to-closeout readiness contract.
++        queryset = queryset.exclude(
++            pair_version__definition__code="attendance_timesheet"
++        )
+@@ -160,2 +171 @@ def _capture_family(
+-            str(value)
+-            for value in queryset.order_by("pk").values_list("pk", flat=True)
++            str(value) for value in queryset.order_by("pk").values_list("pk", flat=True)
+@@ -266 +276,3 @@ def create_closeout_case(
+-            raise ValidationError("کلید تکرار پرونده با درخواست متفاوت استفاده شده است.")
++            raise ValidationError(
++                "کلید تکرار پرونده با درخواست متفاوت استفاده شده است."
++            )
+@@ -317 +329,3 @@ def run_closeout_assessment(
+-            raise ValidationError("کلید تکرار ارزیابی با درخواست متفاوت استفاده شده است.")
++            raise ValidationError(
++                "کلید تکرار ارزیابی با درخواست متفاوت استفاده شده است."
++            )
+@@ -444,3 +458,5 @@ def coordinate_closeout_case(
+-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
+-        "project", "current_assessment"
+-    ).get(pk=case.pk)
++    locked = (
++        ProjectCloseoutCase.objects.select_for_update(of=("self",))
++        .select_related("project", "current_assessment")
++        .get(pk=case.pk)
++    )
+@@ -501 +517,4 @@ def _assert_current_sources(locked: ProjectCloseoutCase) -> None:
+-    if assessment is None or assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED:
++    if (
++        assessment is None
++        or assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED
++    ):
+@@ -576,3 +595,5 @@ def decide_closeout_case(
+-    material_last = locked.events.filter(
+-        action="coordinate", details__material=True
+-    ).order_by("-created_at").first()
++    material_last = (
++        locked.events.filter(action="coordinate", details__material=True)
++        .order_by("-created_at")
++        .first()
++    )
+@@ -625,3 +646,5 @@ def reopen_closeout_case(
+-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
+-        "project", "current_assessment"
+-    ).get(pk=case.pk)
++    locked = (
++        ProjectCloseoutCase.objects.select_for_update(of=("self",))
++        .select_related("project", "current_assessment")
++        .get(pk=case.pk)
++    )
+@@ -683,3 +706,5 @@ def link_closeout_evidence(
+-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
+-        "project"
+-    ).get(pk=case.pk)
++    locked = (
++        ProjectCloseoutCase.objects.select_for_update(of=("self",))
++        .select_related("project")
++        .get(pk=case.pk)
++    )
+@@ -754 +779,3 @@ def closeout_case_detail(
+-    _require_family_permissions(actor=actor, organization=organization, project=case.project)
++    _require_family_permissions(
++        actor=actor, organization=organization, project=case.project
++    )
+@@ -766,3 +793,5 @@ def export_closeout_csv(
+-    locked = ProjectCloseoutCase.objects.select_for_update(of=("self",)).select_related(
+-        "project", "current_assessment"
+-    ).get(pk=case.pk)
++    locked = (
++        ProjectCloseoutCase.objects.select_for_update(of=("self",))
++        .select_related("project", "current_assessment")
++        .get(pk=case.pk)
++    )

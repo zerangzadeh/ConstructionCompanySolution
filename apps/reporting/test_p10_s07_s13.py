@@ -45,7 +45,17 @@ from apps.reporting.reconciliation import (
     replay_reconciliation,
     review_reconciliation_run,
 )
-from apps.reporting.reconciliation_catalog import RECONCILIATION_PAIR_SPECS
+from apps.reporting.reconciliation_catalog import (
+    RECONCILIATION_PAIR_SPECS as CURRENT_PAIR_SPECS,
+)
+
+# This historical acceptance suite owns the original thirteen financial pairs.
+# CEP050's context-required workforce pair has its own native-source suite.
+RECONCILIATION_PAIR_SPECS = {
+    code: spec
+    for code, spec in CURRENT_PAIR_SPECS.items()
+    if code != "attendance_timesheet"
+}
 
 RECONCILIATION_PERMISSIONS = {
     value
@@ -129,10 +139,17 @@ class P10S07S13AcceptanceTests(TestCase):
     def test_01_catalogue_contains_exactly_thirteen_governed_pairs(self) -> None:
         self.assertEqual(
             set(RECONCILIATION_PAIR_SPECS),
-            set(ReconciliationPairDefinition.objects.values_list("code", flat=True)),
+            set(
+                ReconciliationPairDefinition.objects.exclude(
+                    code="attendance_timesheet"
+                ).values_list("code", flat=True)
+            ),
         )
         self.assertEqual(
-            ReconciliationPairVersion.objects.filter(status="published").count(), 13
+            ReconciliationPairVersion.objects.filter(status="published")
+            .exclude(definition__code="attendance_timesheet")
+            .count(),
+            13,
         )
 
     def test_02_fifteen_permissions_are_registered_and_default_denied(self) -> None:

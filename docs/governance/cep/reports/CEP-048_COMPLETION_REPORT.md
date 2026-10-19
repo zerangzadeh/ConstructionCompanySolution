@@ -1,7 +1,11 @@
 # CEP-048 Completion Report — 2026-10-19
 
 **EXECUTION COMPLETE — 6/6 canonical AC PASS; scoped IMB-0037 DoD MET.**
-Lifecycle CLOSED_VERIFIED. Main execution baseline
+Lifecycle CLOSED_VERIFIED. Subsequent normal completed-work checkpoint
+`d500abf9e2b12c37f261379129e77481b09b22ad` is verified on main/origin/remote with a clean
+post-push tree. [Git evidence](../evidence/CEP-048_GIT_CHECKPOINT.json) and the
+Registry record this separately from the original execution baseline.
+ Main execution baseline
 `9771f1e4d3af0bd663bd6af2466662063e90ab5d` after the verified CEP047 normal checkpoint.
 Current Human serial execution/Git authority and standing bounded non-production
 build authority apply. [Entry evidence](../evidence/CEP-048_ENTRY.json) verifies

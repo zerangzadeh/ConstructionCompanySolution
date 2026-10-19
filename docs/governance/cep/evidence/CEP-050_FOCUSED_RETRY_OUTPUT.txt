@@ -1,0 +1,101 @@
+============================= test session starts =============================
+platform win32 -- Python 3.11.1, pytest-9.1.1, pluggy-1.6.0 -- E:\Construction_Company_Solution\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+django: version: 5.2.17, settings: config.settings.development (from env)
+rootdir: E:\Construction_Company_Solution
+configfile: pytest.ini
+plugins: django-4.14.0
+collecting ... collected 6 items
+
+Using existing test database for alias 'default' ('test_bonira_cep047_focused_v2_20261019')...
+
+apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_idempotency_rollback_scope_and_read_paths ERROR
+IMMEDIATE FAILURE
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+
+apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_mismatch_snapshots_review_and_source_immutability ERROR
+IMMEDIATE FAILURE
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+
+apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_missing_context_identity_policy_and_correction_fail_closed ERROR
+IMMEDIATE FAILURE
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+
+apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_native_corrections_successor_and_exception_history ERROR
+IMMEDIATE FAILURE
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+
+apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_timesheet_revision_correction_link_and_prior_versions ERROR
+IMMEDIATE FAILURE
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+
+apps/timekeeping/test_cep050_reconciliation.py::ObservationUnitTests::test_offsetting_daily_differences_do_not_disappear_in_a_total PASSED
+
+=================================== ERRORS ====================================
+_ ERROR at setup of TimeReconciliationTests.test_idempotency_rollback_scope_and_read_paths _
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+_ ERROR at setup of TimeReconciliationTests.test_mismatch_snapshots_review_and_source_immutability _
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+_ ERROR at setup of TimeReconciliationTests.test_missing_context_identity_policy_and_correction_fail_closed _
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+_ ERROR at setup of TimeReconciliationTests.test_native_corrections_successor_and_exception_history _
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+_ ERROR at setup of TimeReconciliationTests.test_timesheet_revision_correction_link_and_prior_versions _
+apps\timekeeping\test_cep050_reconciliation.py:84: in setUpTestData
+    cls.organization.settings.timezone = "Asia/Tehran"
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\django\db\models\fields\related_descriptors.py:534: in __get__
+    raise self.RelatedObjectDoesNotExist(
+E   apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+=========================== short test summary info ===========================
+ERROR apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_idempotency_rollback_scope_and_read_paths - apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+ERROR apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_mismatch_snapshots_review_and_source_immutability - apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+ERROR apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_missing_context_identity_policy_and_correction_fail_closed - apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+ERROR apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_native_corrections_successor_and_exception_history - apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+ERROR apps/timekeeping/test_cep050_reconciliation.py::TimeReconciliationTests::test_timesheet_revision_correction_link_and_prior_versions - apps.organizations.models.Organization.settings.RelatedObjectDoesNotExist: Organization has no settings.
+========================= 1 passed, 5 errors in 5.77s =========================

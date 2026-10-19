@@ -1,0 +1,14 @@
+{
+  "basis": "Existing CEP047 isolated schema-only configured Development PostgreSQL copies, no production data",
+  "focused_database": "test_bonira_cep047_focused_v2_20261019",
+  "regression_database": "test_bonira_cep047_regression_v2_20261019",
+  "runner": "C:/Users/azera/AppData/Local/Temp/bonira_cep047_resume_20261019/run_tests.py",
+  "options": "--reuse-db --no-migrations; TransactionTestCase serialized rollback retained",
+  "source_schema_evidence": [
+    "CEP-047_RESUME_FOCUSED_SCHEMA_OUTPUT.txt",
+    "CEP-047_RESUME_TEST_ENVIRONMENT.json"
+  ],
+  "catalogue": "Existing authorization/workflow/catalogue synchronization in test fixtures only; no default grants changed",
+  "migration_applicability": "NONE; schema reuse is harness setup, not migration/cutover verification",
+  "runtime_applicability": "N/A; no UAT/production/performance/concurrency or new browser/accessibility certification"
+}
