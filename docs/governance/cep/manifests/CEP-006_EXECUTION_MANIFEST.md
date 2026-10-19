@@ -150,3 +150,13 @@ Django checks and drift PASS; no product migration. AC1-11 retained, AC12-16 new
 proved, scoped DoD PASS. See corrected completion-report addendum and evidence
 CEP-006-EV-001..009. Runtime load/concurrency/browser UTV. Safe Git integration
 and CEP073 entry re-review follow; neither is inferred from these test results.
+
+
+### Actual integration and continuation boundary
+
+Implementation/evidence checkpoint d0eaa16 committed/pushed normally and verified
+on clean local/origin/remote main. No branch/worktree/merge. Post-push073 entry
+review resolves006 finding but blocks full entry on GATE06 and unverified current
+EXT0023.073 NOT_STARTED;57 COMPLETE/6 PARTIAL preserved. See the Git checkpoint
+and073 entry-review JSON cited in the completion report. Follow-up metadata only;
+no application source or migration changed after passing validation.

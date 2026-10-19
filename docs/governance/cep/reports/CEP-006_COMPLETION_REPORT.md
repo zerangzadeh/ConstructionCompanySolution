@@ -155,3 +155,24 @@ Registry reconciliation preserves 57 COMPLETE/6 PARTIAL, CEP057/058/068/077 PART
 CEP065 BLOCKED, and GATE05/06 NOT_PASSED. No Human Sign-off, Production
 Certification/Cutover or production authority. Git checkpoint and subsequent
 CEP073 entry review are recorded separately after actual operations.
+
+
+### Actual Git checkpoint and CEP-073 entry result
+
+Implementation/evidence commit `d0eaa16803fd05442d70e80c00d30882c950a26a`
+was committed and pushed normally to origin/main under the current Human
+instruction. Re-grounding verified HEAD = origin/main = remote main and a clean
+working tree. Direct main integration; no merge, branch or worktree creation.
+See [Git checkpoint](../evidence/CEP-006_IMB0066_GIT_CHECKPOINT.json).
+
+The subsequent [CEP-073 entry review](../evidence/CEP-073_POST_IMB0066_ENTRY_REVIEW.json)
+clears the CEP-006 IMB-0066 prerequisite finding. **CEP-073 remains NOT_STARTED /
+BLOCKED BEFORE ENTRY:** canonical GATE-06 is NOT_PASSED and explicitly blocks
+IMB-0103 verification; EXT-0023 readiness for this current build has not been
+established. Historical frozen P10 evidence is not a current-build runtime PASS.
+CEP-012's historical Registry completion is preserved without a new proof claim;
+local report absence is not treated as proof of nonexistence. Conditional
+migration packages are not assumed complete. Full prerequisite/environment/data
+proof remains required before eventual entry. No CEP-073 runtime scenario,
+Gate PASS, Human Sign-off or production action was executed. The queue stops at
+this bounded completed-remediation and blocked-entry boundary.

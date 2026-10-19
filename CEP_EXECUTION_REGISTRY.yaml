@@ -66,10 +66,10 @@ summary:
   authorized_not_started: 0
   eligible_under_standing_authority: 0
   in_progress: 0
-  blocked_current: 1
+  blocked_current: 2
   partial_current: 6
   failed_current: 0
-  not_started_other_current_governed: 15
+  not_started_other_current_governed: 14
   deferred_post_v1: 7
   remote_main_verified_complete_from_last_audit: null
   last_updated: '2026-10-19'
@@ -443,11 +443,11 @@ ceps:
       path: docs/governance/cep/reports/CEP-006_COMPLETION_REPORT.md
       evidence_presence: RETAINED_HISTORICAL_AND_NEW_IMB0066_PROOF
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: d0eaa16803fd05442d70e80c00d30882c950a26a
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: REMEDIATION_CHECKPOINT_PENDING
+      remote_main_evidence: VERIFIED_D0EAA16_COMPLETE_REMEDIATION_CHECKPOINT
       integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
@@ -463,6 +463,9 @@ ceps:
     - date: '2026-10-19'
       status: COMPLETE
       reason: New bounded list implementation with 13 focused and 11 affected regression PASS, executed SQL bounds, authorization/object/tenant and source-authority/no-write proof. Initial 6 test-fixture failures corrected with evidence retained. AC1-11 valid historical evidence and source retained; AC12-16 newly proved. Scoped DoD PASS, no product migration; runtime UTV retained.
+    - date: '2026-10-19'
+      status: GIT_INTEGRATED
+      reason: Human-authorized d0eaa16 direct main commit/push verified on origin and remote main with clean tree. Post-push CEP073 entry review clears CEP006 finding but remains blocked by GATE06 and unverified current EXT0023. No runtime/production action. Evidence CEP-006_IMB0066_GIT_CHECKPOINT.json.
     reconciliation:
       status: A3_REMEDIATED_WITH_NEW_IMB0066_PROOF
       evidence: docs/governance/cep/evidence/CEP-006_IMB0066_REMEDIATION.json
@@ -3693,39 +3696,54 @@ ceps:
     updated_at: null
     history: []
   CEP-073:
-    title: null
+    title: PostgreSQL runtime, performance and concurrency verification
     phase: VERIFICATION_UAT
-    dependency_status: UNSATISFIED_OR_NOT_YET_EVALUATED
-    eligibility_status: NOT_ELIGIBLE
+    dependency_status: CEP006_REMEDIATED_REGISTRY_MANDATORY_COMPLETE_FULL_ENTRY_PROOF_NOT_GRANTED
+    eligibility_status: BLOCKED_GATE06_AND_UNVERIFIED_CURRENT_EXT0023
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
       status: NOT_STARTED
-      lifecycle: NOT_ELIGIBLE
-      advisor_review: PENDING
+      lifecycle: BLOCKED_BEFORE_ENTRY
+      advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
       passed: null
-      total: null
-      status: UNRECORDED
-    dod: UNRECORDED
-    blockers: []
-    remaining_utv: []
+      total: 12
+      status: UNEXECUTED
+    dod: UNEXECUTED
+    blockers:
+    - BLOCKER-DEPENDENCY / GATE-06 NOT_PASSED; canonical gate failure consequence blocks IMB0103 migration/runtime verification
+    - BLOCKER-EXTERNAL / EXT-0023 current-build verification environment/scenario/data-safety readiness not established by this entry review
+    remaining_utv:
+    - Exact-SHA PostgreSQL migration/runtime and performance/concurrency verification remains unexecuted
     completion_report:
       path: null
-      evidence_presence: UNVERIFIED
+      evidence_presence: ENTRY_REVIEW_ONLY_NO_EXECUTION_CLAIM
     git:
       committed: null
       commit_sha: null
       pushed: null
       merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      remote_main_evidence: NO_VERIFICATION_EXECUTION
     last_execution:
       branch: null
       sha: null
-    updated_at: null
-    history: []
+    updated_at: '2026-10-19'
+    entry_review:
+      evidence: docs/governance/cep/evidence/CEP-073_POST_IMB0066_ENTRY_REVIEW.json
+      branch: main
+      head: d0eaa16803fd05442d70e80c00d30882c950a26a
+      result: BLOCKED_BEFORE_ENTRY
+      cep006_finding: RESOLVED_BY_NEW_IMB0066_IMPLEMENTATION_AND_PROOF
+      gate06: NOT_PASSED
+      ext0023: CURRENT_BUILD_READINESS_UNVERIFIED
+      verification_execution: NOT_STARTED
+    history:
+    - date: '2026-10-19'
+      status: ENTRY_REVIEW_BLOCKED
+      reason: Human-requested post-IMB0066 review at pushed clean d0eaa16 verifies canonical CEP-073 identity and new CEP-006 prerequisite evidence. Mandatory CEP-006/009/012 Registry completion preserved; CEP-012 actual proof not independently revalidated at gate stop and local report absence is not nonexistence. GATE06 canonically blocks IMB0103; current-build EXT0023 readiness not established. No conditional migration assumed complete, no gate or acceptance PASS, no runtime execution or production authority.
   CEP-074:
     title: null
     phase: VERIFICATION_UAT
@@ -4219,9 +4237,9 @@ authority_scope:
   - Production Certification
 repository_state:
   branch: main
-  last_reconciled_head: 5bff28aa143e9048ca83461910d97b9cd30286c8
-  origin_main: 5bff28aa143e9048ca83461910d97b9cd30286c8
-  integration_checkpoint: 5bff28aa143e9048ca83461910d97b9cd30286c8
+  last_reconciled_head: d0eaa16803fd05442d70e80c00d30882c950a26a
+  origin_main: d0eaa16803fd05442d70e80c00d30882c950a26a
+  integration_checkpoint: d0eaa16803fd05442d70e80c00d30882c950a26a
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-19'
 execution_frontier:
@@ -4243,16 +4261,16 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: CEP006_IMB0066_COMPLETE_GIT_CHECKPOINT_THEN_CEP073_ENTRY_REVIEW
+  current_session_continuation: STOP_AT_CEP006_COMPLETE_CEP073_ENTRY_BLOCKED_GATE06_EXT0023
   current_independent_cep: null
   next_entry_review_candidate: CEP-073
-  next_candidate_full_entry_eligibility: REQUIRES_POST_INTEGRATION_ENTRY_REVIEW_NO_PASS_INFERRED
+  next_candidate_full_entry_eligibility: BLOCKED_GATE06_NOT_PASSED_AND_CURRENT_EXT0023_READINESS_UNVERIFIED
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a conditional edge applies or blocks unrelated scope
-  boundary_reason: Bounded Human-authorized CEP006 IMB0066 remediation COMPLETE with 13 focused and 11 affected regression PASS, query/source/authorization proof and 16 AC reconciliation. Historical A3 preserved;57 COMPLETE/6 PARTIAL unchanged. Safe Git checkpoint then repeat CEP073 entry review; GATE05/06 NOT_PASSED and no production authority.
+  boundary_reason: CEP006 IMB0066 remediation COMPLETE and safely pushed as d0eaa16; 13 focused and 11 affected regression PASS with query/source/authorization proof and full implementation AC reconciliation. Historical A3 retained and current006 prerequisite finding resolved. Post-push073 entry remains blocked by canonical GATE06 NOT_PASSED and current-build EXT0023 readiness not established;073 NOT_STARTED. Preserve 57 COMPLETE/6 PARTIAL,065 BLOCKED, GATE05/06 NOT_PASSED; no production authority.
   resume_cep_after_blocker_resolution: CEP-057
   independent_candidates_entry_status: NO_FULL_ENTRY_GRANTED_AFTER_MATERIAL_REGISTRY_CONFLICT
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED

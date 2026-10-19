@@ -1,0 +1,122 @@
+{
+  "schema": "bonira.cep.entry-review.v1",
+  "reviewed_at": "2026-10-19T20:57:38.822619+03:30",
+  "cep": "CEP-073",
+  "scope": "Human-requested post-IMB0066 entry review only; no verification execution",
+  "repository": {
+    "branch": "main",
+    "head": "d0eaa16803fd05442d70e80c00d30882c950a26a",
+    "origin_main": "d0eaa16803fd05442d70e80c00d30882c950a26a",
+    "remote_main": "d0eaa16803fd05442d70e80c00d30882c950a26a",
+    "working_tree_before_review": "CLEAN",
+    "implementation_checkpoint": "d0eaa16"
+  },
+  "canonical_prompt": {
+    "path": "docs/governance/cep/PROMPTS/CEP-073_EXECUTION_PROMPT.md",
+    "sha256": "1ddfee26cd4eeba482856d4785ece6648241c8612bdf1e67943930a0e93356b4",
+    "manifest_match": true,
+    "primary_imbs": [
+      "IMB-0103",
+      "IMB-0109"
+    ]
+  },
+  "authority": "Standing non-production authority remains conditional on all canonical entry requirements; current Human instruction also expressly requires this entry review. No production authority.",
+  "dependencies": {
+    "registry_execution_states": {
+      "CEP-006": "COMPLETE",
+      "CEP-009": "COMPLETE",
+      "CEP-012": "COMPLETE",
+      "CEP-028": "PARTIAL",
+      "CEP-029": "COMPLETE",
+      "CEP-057": "PARTIAL",
+      "CEP-058": "PARTIAL",
+      "CEP-068": "PARTIAL",
+      "CEP-077": "PARTIAL"
+    },
+    "CEP-006": {
+      "result": "SUPPORTED_PREREQUISITE_REMEDIATION_COMPLETE",
+      "evidence": [
+        "docs/governance/cep/evidence/CEP-006_IMB0066_REMEDIATION.json",
+        "docs/governance/cep/evidence/CEP-006_ACCEPTANCE_MAPPING.csv",
+        "output/cep-006/imb0066/retained-evidence.json",
+        "output/cep-006/imb0066/focused.xml",
+        "output/cep-006/imb0066/regression.xml"
+      ],
+      "detail": "Mandatory IMB0048/0066 edge retained. A3 historical adjudication preserved; new IMB0066 product implementation and actual proof now exist. Full implementation claim supported; no runtime PASS inferred."
+    },
+    "CEP-009": {
+      "result": "REGISTRY_COMPLETE_WITH_RETAINED_IMPLEMENTATION_EVIDENCE",
+      "evidence": "docs/governance/cep/reports/CEP-009_COMPLETION_REPORT.md; docs/governance/cep/evidence/CEP-009_ACCEPTANCE_MAPPING.csv",
+      "detail": "SQL balance aggregation and deterministic warehouse/material locks retain their earlier implementation evidence; no new operational-load result claimed."
+    },
+    "CEP-012": {
+      "result": "HISTORICAL_REGISTRY_COMPLETE_NOT_INDEPENDENTLY_REVALIDATED_AT_GATE_STOP",
+      "detail": "Registry completion preserved. Its report pointer is null/REPORT_NOT_FOUND; repository-local absence is not proof of canonical/evidence nonexistence. No new CEP012 adjudication or completion claim. Full prerequisite proof must be checked before eventual entry; current GATE06 already blocks IMB0103."
+    },
+    "conditional_edges": {
+      "CEP-028": "Legacy Payment migration condition remains canonical; no runtime scenario selected",
+      "CEP-029": "Employee/WorkRelationship condition remains canonical; no runtime scenario selected",
+      "CEP-057": "Leave opening migration condition remains canonical; PARTIAL, no scenario may assume it complete",
+      "CEP-058": "Payroll/YTD opening migration condition remains canonical; PARTIAL, no scenario may assume it complete"
+    },
+    "no_dependency_graph_change": true
+  },
+  "gates": {
+    "GATE-01": "PASS; foundation status does not replace migration readiness",
+    "GATE-05": "NOT_PASSED unchanged",
+    "GATE-06": {
+      "registry_status": "NOT_PASSED",
+      "canonical_source": "output/cep-006/imb0066/gate-source.json",
+      "required_imbs": [
+        "IMB-0050",
+        "IMB-0070",
+        "IMB-0075",
+        "IMB-0080",
+        "IMB-0096",
+        "IMB-0097"
+      ],
+      "failure_consequence": "Migration execution and IMB-0103 verification remain blocked.",
+      "result": "BLOCKS_FULL_CEP073_ENTRY"
+    },
+    "GATE-08": "No exit PASS evaluated or issued"
+  },
+  "external_dependency": {
+    "id": "EXT-0023",
+    "phase": "VERIFICATION",
+    "blocks_verification": true,
+    "result": "CURRENT_BUILD_READINESS_NOT_VERIFIED",
+    "source": "CEP073 canonical prompt sections9/10/17; approved consolidated external dependency record retained in FRONTIER_7e1386c_ENTRY_REVIEW.json",
+    "required": "Target PostgreSQL version/configuration, exact application SHA/build, representative data/scenarios and evidence capture",
+    "reviewed_prior_scenario": "docs/architecture/P10_S20_WORKLOAD_ENVIRONMENT_SPECIFICATION.md freezes0db3ac9a9fa70e8a857ef0867d532be5206a14c4; it is not new executed evidence for d0eaa16. No current-build environment/scenario qualification is issued here.",
+    "no_absence_inference": "This review does not claim that no approved environment/scenario exists elsewhere; it records that current entry proof has not been established."
+  },
+  "decision": {
+    "result": "BLOCKED_BEFORE_ENTRY",
+    "resolved_finding": "CEP006 IMB0066 missing implementation/proof; new bounded remediation supports the prerequisite",
+    "remaining_blockers": [
+      "BLOCKER-DEPENDENCY / GATE-06 NOT_PASSED blocks IMB0103 verification",
+      "BLOCKER-EXTERNAL / EXT-0023 current-build verification readiness not established"
+    ],
+    "execution_status": "NOT_STARTED",
+    "cep073_acceptance": "UNEXECUTED",
+    "cep073_dod": "UNEXECUTED",
+    "runtime_migration_performance_concurrency": "NOT_EXECUTED",
+    "next_action": "Satisfy canonical GATE06 and applicable approved dataset requirements; establish current-build EXT0023 environment/scenario/data safety and full prerequisite proof, then repeat entry. Do not bypass conditional PARTIAL migrations.",
+    "clean_operational_stop": true
+  },
+  "preserved": {
+    "complete": 57,
+    "partial": 6,
+    "CEP-057": "PARTIAL",
+    "CEP-058": "PARTIAL",
+    "CEP-068": "PARTIAL",
+    "CEP-077": "PARTIAL",
+    "CEP-065": "BLOCKED",
+    "GATE-05": "NOT_PASSED",
+    "GATE-06": "NOT_PASSED",
+    "production_authorized": false,
+    "human_signoff": "NOT_EXECUTED",
+    "production_certification": "NOT_EXECUTED",
+    "production_cutover": "NOT_EXECUTED"
+  }
+}
