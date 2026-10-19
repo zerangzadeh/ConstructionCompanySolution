@@ -1,0 +1,165 @@
+{
+  "date": "2026-10-19",
+  "scope": "EXPLICIT_HUMAN_CEP057_PARTIAL_GIT_CHECKPOINT_AND_REQUESTED_FRONTIER_IDENTIFICATION",
+  "authorization_source": "Human message: Human Git Authorization — CEP-057 Partial Checkpoint",
+  "authorized_git_operations": [
+    "git add",
+    "git commit",
+    "git push origin main"
+  ],
+  "pre_checkpoint_baseline": "532191d26ecb2d72deac9d0a32d53297493a0a7f",
+  "exclusive_attribution_verified": true,
+  "files": [
+    "CEP_EXECUTION_REGISTRY.yaml",
+    "apps/workforce/leave_opening_preparation.py",
+    "apps/workforce/test_cep057.py",
+    "docs/governance/cep/evidence/CEP-057_ACCEPTANCE_MAPPING.csv",
+    "docs/governance/cep/evidence/CEP-057_CHANGE_MANIFEST.csv",
+    "docs/governance/cep/evidence/CEP-057_EVIDENCE_MANIFEST.csv",
+    "docs/governance/cep/evidence/CEP-057_FINDINGS.json",
+    "docs/governance/cep/evidence/CEP-057_FRAMEWORK_BUILD.json",
+    "docs/governance/cep/evidence/CEP-057_FRAMEWORK_DOCUMENT_CHECK.json",
+    "docs/governance/cep/evidence/CEP-057_FRAMEWORK_TEST_OUTPUT.txt",
+    "docs/governance/cep/manifests/CEP-057_EXECUTION_MANIFEST.md",
+    "docs/governance/cep/reports/CEP-057_COMPLETION_REPORT.md"
+  ],
+  "checkpoint_commit": "95d8cbebb66094def6dcce9879b2a076cd576527",
+  "push_result": "SUCCESS_ORIGIN_MAIN",
+  "post_push_main": "95d8cbebb66094def6dcce9879b2a076cd576527",
+  "post_push_origin_main": "95d8cbebb66094def6dcce9879b2a076cd576527",
+  "post_push_remote_main": "95d8cbebb66094def6dcce9879b2a076cd576527",
+  "post_push_working_tree": "CLEAN_BEFORE_METADATA_RECONCILIATION",
+  "preserved": {
+    "CEP057_execution": "PARTIAL",
+    "CEP057_lifecycle": "PARTIAL_FRAMEWORK_MIGRATION_EXECUTION_BLOCKED",
+    "AC_passed": 0,
+    "AC_total": 7,
+    "EXT0015": "OPEN_APPROVED_DATASET_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_REQUIRED",
+    "GATE06": "NOT_PASSED"
+  },
+  "prohibited_actions_executed": false,
+  "migration_backfill_executed": false,
+  "business_data_mutation": false,
+  "production_action": false,
+  "source_registers": {
+    "dependency": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+    "external_dependency": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+    "gate": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d"
+  },
+  "recomputed_dependency_ready_frontier": [
+    "CEP-028",
+    "CEP-057",
+    "CEP-058",
+    "CEP-065",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "conditional_dependency_review_candidates": [
+    "CEP-068",
+    "CEP-073",
+    "CEP-079"
+  ],
+  "independent_entry_review": {
+    "cep": "CEP-077",
+    "title": "Supply-chain control re-verification",
+    "result": "ENTRY_ELIGIBLE_NON_PRODUCTION_VERIFICATION_ONLY",
+    "execution": "NOT_STARTED",
+    "prompt_sha256": "acba1a8bfc7825534ef660ac3e0c63097b957485a70c73f384b4309f69ace7e7",
+    "primary_imb": "IMB-0107",
+    "canonical_package_sha256": "9087e3da78d00a6a3b208950a392f03c4547c83017a56c4c33257f0a0d2bfd50",
+    "dependency_register_sha256": "c9ea5e693410d9c6f2e86044fdc1d91df03289082adfe304fce620947e5c88f6",
+    "external_dependency_register_sha256": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af",
+    "master_backlog_sha256": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a",
+    "gate_register_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d",
+    "mandatory_dependencies": [
+      {
+        "Dependency ID": "CEP-DEP-044",
+        "Prerequisite CEP": "CEP-013",
+        "Dependent CEP": "CEP-077",
+        "Dependency Source Type": "CANONICAL IMB BLOCKING EDGE",
+        "Source IMB Edge IDs / IMB Pair": "DEP-0111:IMB-0102→IMB-0107",
+        "Strength": "MANDATORY",
+        "Condition": "ALWAYS",
+        "Roadmap Compatibility": "PASS",
+        "Justification": "Supply-chain control re-verification requires the dependency/SCA/SBOM/provenance controls to be implemented first.",
+        "Notes": "Direct CEP dependency exists because at least one canonical inter-CEP blocking IMB edge requires it; no inferred/transitive-only edge added."
+      }
+    ],
+    "external_dependencies": [],
+    "dependency_evidence": [
+      "docs/governance/cep/reports/CEP-013_COMPLETION_REPORT.md",
+      "docs/governance/cep/manifests/CEP-013_EXECUTION_MANIFEST.md",
+      "security/supply_chain/README.md",
+      "docs/governance/cep/supporting/CEP-013_SUPPLY_CHAIN_DECISION.md"
+    ],
+    "implementation_controls_sha256": {
+      "scripts/supply_chain.py": "4038a13ca544f3ee673df6ac69d9d267e881f60aa3da28b4a13d05b74c7b1c51",
+      "tests/test_supply_chain.py": "ebda176e8e43e327ec5b4f2586ebdbaaecfc3776944cd228f425ce6b276c76ad",
+      "requirements-prod-linux.lock": "cdcbd589ddcba168f91cf1ba46916966e0ba13392a0a0cc7fe520c724e8668f6",
+      "requirements-dev-linux.lock": "99b82caa3bd161c00fa06d3a6418af3966a7a70909488253c01058431ebed74e",
+      "security/supply_chain/build_image.json": "9abbed393fbf07eb311453d3c0ac4f05b111f519c17b4257446900fa11606c4b",
+      "security/supply_chain/license_approvals.json": "18115bd6d97ff00659f73ab261fbf2f23bbde1f2798691631fa88c8c0806d61f",
+      "security/supply_chain/vulnerability_exceptions.json": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+      ".github/workflows/supply-chain.yml": "9300796599fd753a261aacd40d578ab49dcb6abc9f193173aafdd5af21bd101f",
+      ".github/dependabot.yml": "81fb16321bb112a715a9dec7b88454e90dfaf95cf2a64eaf4f4cdc6d19885700"
+    },
+    "entry_gate": "Relevant implementation is available: CEP013 COMPLETE with actual lock/acquisition/SCA/SBOM/license/provenance controls. No external verification dependency for077; no global05/06/07 blanket prerequisite inferred.",
+    "exit_gate": {
+      "Gate ID": "GATE-08",
+      "Gate Name": "Runtime Verification",
+      "Gate Type": "RUNTIME VERIFICATION GATE",
+      "Purpose": "Record environment-specific verification only after implementation availability.",
+      "Required IMB IDs": "IMB-0103; IMB-0104; IMB-0105; IMB-0106; IMB-0107; IMB-0108; IMB-0109",
+      "Required External Dependencies": "EXT-0020; EXT-0021; EXT-0022; EXT-0023; EXT-0024 as applicable",
+      "Evidence Required": "Executed runtime scenarios, environment/build identity, logs/results, explicit PASS/FAIL per verification item.",
+      "Pass Condition": "Required verification items have executed evidence; no static evidence is promoted to runtime PASS.",
+      "Failure Consequence": "Affected production/UAT/certification decisions remain blocked or UTV.",
+      "Downstream Work Unlocked": "UAT convergence and Production Certification evidence",
+      "UTV?": "YES until executed",
+      "Human Sign-off?": "NO",
+      "Notes": "Not every feature requires every verification item."
+    },
+    "baseline_checks": [
+      {
+        "command": ".venv\\Scripts\\python.exe scripts/supply_chain.py check-locks",
+        "result": "PASS_EXACT_LINUX_LOCKS_AND_SECRET_ACQUISITION_CONFIG"
+      },
+      {
+        "command": ".venv\\Scripts\\python.exe -m pytest tests/test_supply_chain.py -q -p no:cacheprovider",
+        "result": "9_PASS_0.20_SECONDS_NO_BUSINESS_DATABASE_ACCESS"
+      }
+    ],
+    "independence": "Sole canonical dependency013; no057/028/058/065 dependency, leave input, business table or shared product mutation. No collision with checkpointed leave preparation.",
+    "selection": "Verification-only existing controls have the smallest product collision/blast radius among reviewed candidates;058 needs new Payroll migration work and approved actual inputs,068 mission dependency062 incomplete. Production/other verification candidates need their own full entry review.",
+    "proposed_exact_scenario": "After normal fresh grounding/manifest, run existing scripts/supply_chain.py gate on the exact reviewed commit with disposable wheelhouse and evidence directories; retain acquisition/hash/offline-resolution/image/OSV/license/SBOM/provenance results. No dependency/policy/CI edits or production actions.",
+    "scenario_not_executed": true,
+    "runtime_pass_claimed": false,
+    "full_cep077_ac_pass_claimed": false,
+    "boundary": "Entry readiness is not a scan result. Existing private-repository signed-attestation limitation remains a production/release UTV; immutable development provenance evidence does not waive production attestation."
+  },
+  "next_independent_entry_eligible": "CEP-077",
+  "next_cep_started": false,
+  "post_push_metadata": "Registry, this evidence and report/manifests are follow-up metadata; left uncommitted, outside the already pushed12-file checkpoint. No additional Git checkpoint inferred.",
+  "post_reconciliation_checks": {
+    "execution_states_unchanged_for_all86": true,
+    "cep057_execution_lifecycle_AC_DoD_blockers_unchanged": true,
+    "summary_recomputed": {
+      "execution_state_complete": 57,
+      "authorized_not_started": 0,
+      "eligible_under_standing_authority": 1,
+      "in_progress": 0,
+      "blocked_current": 1,
+      "partial_current": 3,
+      "failed_current": 0,
+      "not_started_other_current_governed": 17,
+      "deferred_post_v1": 7
+    },
+    "new_cep077_state": "NOT_STARTED",
+    "git_diff_check": "PASS",
+    "metadata_files_only": true
+  }
+}

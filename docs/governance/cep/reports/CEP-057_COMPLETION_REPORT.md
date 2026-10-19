@@ -1,3 +1,32 @@
+## Authorized partial Git checkpoint — 2026-10-19
+
+Explicit Human authorization permitted the bounded checkpoint of exactly 12
+reviewed CEP-057 files. Commit `95d8cbebb66094def6dcce9879b2a076cd576527` was pushed to `origin main`.
+Post-push local `main`, `origin/main` and remote main matched; tree was clean.
+[Checkpoint/frontier evidence](../evidence/CEP-057_GIT_CHECKPOINT.json) records
+attribution, source hashes, Git facts and independent entry review.
+
+**CEP-057 remains EXECUTION PARTIAL; 0/7 full AC verified; DoD not met.** Its live
+lifecycle and EXT0015 approved dataset/effective policy/mapping/as-of-cutoff/totals
+blocker are unchanged. No migration/backfill, synthetic migration inputs, business
+data mutation, Production action or GATE06 PASS. The execution baseline remains
+`532191d`; it is distinct from the partial-work Git checkpoint.
+
+Next independent entry-eligible CEP: **CEP-077 — Supply-chain control
+re-verification**, non-production verification only, **NOT_STARTED**. Sole
+prerequisite013 is COMPLETE with actual controls/report present; canonical external
+dependencies NONE. Existing lock/config validation PASS and 9 focused control tests
+PASS; full runtime re-verification has not run and no CEP-077 AC/DoD or Gate08 PASS is
+claimed. No dependency on CEP-057/CEP-065 and no leave/product collision. Other technical
+frontier entries retain their phase-specific entry requirements. CEP-057 may not resume
+until EXT0015 is genuinely satisfied.
+
+This section and post-push Git/frontier reconciliation are follow-up metadata left
+uncommitted; the original 12-file checkpoint is fully pushed. The build-time Git
+status below remains a historical observation, superseded only by this section.
+
+## Retained framework build closeout
+
 # CEP-057 framework build closeout — 2026-10-19
 
 **EXECUTION PARTIAL** — IMB-0075. Read-only opening-source preparation is
