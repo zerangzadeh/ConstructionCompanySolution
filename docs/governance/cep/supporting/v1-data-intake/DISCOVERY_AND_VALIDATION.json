@@ -1,0 +1,228 @@
+{
+  "date": "2026-10-20",
+  "baseline": {
+    "branch": "main",
+    "head": "e15c877dcf81cd3cb408c15aa55ec965db9ad4bc",
+    "origin_main": "e15c877dcf81cd3cb408c15aa55ec965db9ad4bc",
+    "ahead": 0,
+    "behind": 0,
+    "tracked_diff_at_entry": "empty",
+    "prior_registry_checkpoint": "b12994eccf4913062ca2cef095e4ca7db1656e4e",
+    "delta": "e15c877 changes CEP065 checkpoint metadata only"
+  },
+  "scope": "Documentation/templates only: new v1-data-intake directory, two report addenda and narrow Registry intake/repository/frontier metadata. No apps, migrations, configuration or completed CEP records changed.",
+  "authorization": "Current pasted Human request: source discovery, complete intake kits if data absent; attributable git add/commit/push origin main. Standing bounded Development authority does not bypass EXT0015/0017.",
+  "canonical_prompts_sha256": {
+    "CEP-057": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+    "CEP-058": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1"
+  },
+  "recovery_root": "E:\\ERP_Construction_Documents\\New Version\\BONIRA_TRUE_LATEST_STATE_RECONSTRUCTION_20261013\\Consolidated_Packages",
+  "recovery_sources": {
+    "BONIRA_REQUIRED_SPECIFICATION_COMPLETION_CONSOLIDATED_LATEST.zip": {
+      "sha256": "cf45d1f6db5821084205e3cdf0553cd68c036855cd4c1d5bbe1ee28c7e6693be",
+      "members": {
+        "BONIRA_LEAVE_POLICY_SPECIFICATION.md": "3216399546581d95c52ee04517c8a4cd0b02bcd7c9bf23f1e1da623a6cf036a6",
+        "BONIRA_PAYROLL_CUMULATIVE_YTD_SPECIFICATION.md": "aa46900237c4c9c1c0109d00645d07fa5dd3f195edf63470450752c2ed923f3f",
+        "BONIRA_PAYROLL_STATUTORY_SOURCE_PACKAGE_SPECIFICATION.md": "1b9daf5c9487ee3c30ddf641dda77345c2dbd0c97ee21566bfa9a17298d8b81b"
+      }
+    },
+    "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG_CONSOLIDATED_LATEST.zip": {
+      "sha256": "7cc3d73c1673b8d50cec337ea030514248ae0115cfc3aef260e212ad0a04b6be",
+      "members": {
+        "BONIRA_FINAL_IMPLEMENTATION_MASTER_BACKLOG.csv": "98681aba0ac4a66a77ea58543f802fe3e51d3b5bdd98748f8bc24b89dd2d717a"
+      }
+    },
+    "BONIRA_PRODUCT_DECISION_FREEZE_CONSOLIDATED_LATEST.zip": {
+      "sha256": "1c11429f2e0cc16c61b585832537e5035d19d008bccefc4e94f6d18839047599",
+      "members": {
+        "BONIRA_FINAL_PRODUCT_DECISION_REGISTER.md": "bbd1068b60162cb6b027eb66f1aae2cb3f23ad65e8f2bc9b82f1acce8fe20eda"
+      }
+    },
+    "BONIRA_CODEX_EXECUTION_PACKAGE_DESIGN_CONSOLIDATED_LATEST.zip": {
+      "sha256": "15f8d71a3f3e14feed9e7162b81f74ad39b546df9aff3ec5b01e1a676deaf429",
+      "members": {
+        "BONIRA_CEP_EXTERNAL_DEPENDENCY_REGISTER.csv": "e1dae585c60060459c75ac8676b0c5aeb2cbaaaeb1d5422f7a8d23bd3b23c2af"
+      },
+      "applicable_records": [
+        {
+          "External Dependency ID": "EXT-0015",
+          "CEP ID": "CEP-057",
+          "Dependency Phase": "ACTIVATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "YES",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "NO",
+          "Required Gate": "GATE-06",
+          "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE MIGRATION EXECUTION",
+          "Notes": "Leave opening-balance migration dataset — Approved source dataset, employee/WorkRelationship mapping, as-of/cutover date and reconciliation totals"
+        },
+        {
+          "External Dependency ID": "EXT-0017",
+          "CEP ID": "CEP-058",
+          "Dependency Phase": "ACTIVATION",
+          "Blocks Build?": "NO",
+          "Blocks Activation?": "YES",
+          "Blocks Verification?": "NO",
+          "Blocks Production?": "NO",
+          "Required Gate": "GATE-06",
+          "Fail-Closed Behavior": "Build framework may proceed only where canonical IMB permits fail-closed construction; REQUIRED BEFORE MIGRATION EXECUTION",
+          "Notes": "Historical Payroll/YTD opening dataset — Approved historical dataset, employee mapping, cumulative classification, reset boundary and reconciliation totals"
+        }
+      ]
+    }
+  },
+  "inspected_sources_sha256": {
+    "docs/governance/cep/supporting/V1_HUMAN_RESOLUTION_PACK_20261020.md": "6555197e85e754ba04fb46b0aade3713d16f0e1e1c2786f4721d6c8772102b01",
+    "docs/governance/cep/supporting/CONSOLIDATED_HUMAN_AUTHORIZATION_20261017.txt": "8d4205c1437e8789433926c4ba6d189f5a343505baf0e48c16ad1ce26e67958f",
+    "docs/governance/cep/evidence/CEP-029_SOURCE_TARGET_MAPPING.csv": "c15c8a50afaf2cdc6459cf9c245273a3bb1cacd1260f633400758fd03b95ece3",
+    "apps/workforce/leave_opening_preparation.py": "12cf35731c21d3a965486d7e38c3425703c77e0d36c51bb330669ede6a4cade2",
+    "apps/workforce/leave_models.py": "c69a11289bad3456e5bedb38c0ff578d4aac90237d0640a704412d0a18a8fa39",
+    "apps/workforce/leave_services.py": "ba1ba085c5b77b8fff19dc3f9b6694f5f33adb539c2580b4fa3f1c50277dc64d",
+    "apps/workforce/identity_migration.py": "83e446a0774320dc4816e99dea27910a612a3478fabcb8ed58e9e3c3f7cdd8d6",
+    "apps/payroll/opening_preparation.py": "1e4206251fa9364043a4919eaa8f1c87ea35aab5f6a7ac7cb12c46be6d5aee3e",
+    "apps/payroll/cumulative_services.py": "00b57863c6f17d32b256c8f5d148f2a66fd7bc4fbf2d531f7ec2aff79688243a",
+    "apps/payroll/models.py": "fdad2cfd317cd8738172b6c4cb2b559af1b8260411f5a2b0db4418cc6a9cf954",
+    "apps/workforce/management/commands/seed_workforce.py": "e4c2dbe2be56416e8fe533106b0acc89f12b65bbeaac846d276723048331891c",
+    "apps/accounts/management/commands/seed_demo_data.py": "b78cdbe83aa326c831a4128df8f0f69e6409e4a5a52daae23b3fa4f17310d76d",
+    "apps/workforce/migrations/0014_cep023_leave_authority.py": "7d6f122c522370e188a4cfe36d38b7e69849bc28375f3df83ea566d73ec5d26e",
+    "apps/payroll/migrations/0006_cep025_operational_cumulative_ytd.py": "69b61a094816398d618061fd6c5450d50f7e581627b45f2ea7dcc4984d9384b6",
+    "docs/governance/cep/evidence/CEP-057_FINDINGS.json": "caa01121b1776aa89e05fbf28c58a17784d9f5e6d305d60bbc21eb0698efae57",
+    "docs/governance/cep/evidence/CEP-058_FINDINGS.json": "59ce9d9674180ccd48489274126fbe37d2bbe43e1ea5cf82cf40490b94de3d55"
+  },
+  "discovery_scope": [
+    "Repository rg filename/content searches across docs, apps, core for Leave/Payroll/YTD/opening/source/crosswalk/seed/fixture/policy/year and CEP057/058 references; reviewed relevant current authority/evidence and implementation.",
+    "Retained output filenames filtered for Leave/Payroll/YTD/opening/057/058/Human/crosswalk in CSV/XLSX/JSON/ZIP/TXT/MD/PY, excluding database binaries and dependency trees; no authoritative opening source identified.",
+    "Seed/reference code and additive Leave/YTD schema migrations inspected; demonstration/test data and unrelated accounting openings are not approved source packets.",
+    "Approved recovery-only canonical archives rehashed; PD026/031, SPEC011/013/030, IMB0075/0080 and EXT0015/0017 inspected. No supplied tenant openings, concrete Leave policy or approved Payroll-year dates in those records.",
+    "Direct loopback Development aggregate reads and exact existing crosswalk target matching in transaction.atomic with SET TRANSACTION READ ONLY. No source detail/PII exported."
+  ],
+  "read_only_development": {
+    "settings": "config.settings.development",
+    "database_host": "verified loopback; credentials omitted",
+    "transaction": "SET TRANSACTION READ ONLY",
+    "Employee": 10,
+    "Person": 10,
+    "WorkRelationship": 10,
+    "EmployeeIdentityMigration": 4,
+    "LeavePolicyVersion": 0,
+    "LeaveBalanceEntry": 0,
+    "PayrollComponent": 0,
+    "PayrollYearInterval": 0,
+    "approved_payroll_years": 0,
+    "PayrollCumulativeState": 0,
+    "finalized_or_reversed_payroll_runs": 0,
+    "crosswalk_rows": 10,
+    "crosswalk_target_matches": 10,
+    "writes": 0
+  },
+  "reused_authority": {
+    "CEP-023": "Complete Leave target authority; no tenant policy supplied",
+    "CEP-025_Decision-05": "Five signed operational buckets; INFORMATIONAL non-monetary; explicit versioned tenant Payroll-year reset mechanism, correction supersession/no double inclusion",
+    "CEP-029": "10 existing exact Employee/Person/WorkRelationship links confirmed; only missing external-key association requested",
+    "financial_authority": "Existing Payroll and Treasury boundaries retained; no reapproval or new statutory values requested"
+  },
+  "human_resolution_disposition": {
+    "HR-057-01": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-057-02": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-057-03": "EXTERNAL_INPUT_STILL_REQUIRED; existing identity links reused, only external-key gaps/corrections needed",
+    "HR-057-04": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-057-05": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-058-01": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-058-02": "EXTERNAL_INPUT_STILL_REQUIRED; existing identity links reused, only external-key gaps/corrections needed",
+    "HR-058-03": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-058-04": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented",
+    "HR-058-05": "EXTERNAL_INPUT_STILL_REQUIRED; canonical structure reused, no tenant source facts invented"
+  },
+  "executable": {
+    "CEP-057": false,
+    "CEP-058": false
+  },
+  "migration_execution": "NOT_EXECUTED",
+  "product_mutation": false,
+  "schema_mutation": false,
+  "gate_changed": false,
+  "human_signoff": "NOT_EXECUTED",
+  "production_certification": "NOT_EXECUTED",
+  "production_cutover": "NOT_EXECUTED",
+  "unchanged_registry": {
+    "v1_counts": {
+      "COMPLETE": 66,
+      "PARTIAL": 2,
+      "BLOCKED": 0
+    },
+    "CEP-057": {
+      "execution": "PARTIAL",
+      "ac_passed": 0,
+      "ac_total": 7,
+      "dod": "NOT_MET_PARTIAL"
+    },
+    "CEP-058": {
+      "execution": "PARTIAL",
+      "ac_passed": 0,
+      "ac_total": 7,
+      "dod": "NOT_MET_PARTIAL"
+    },
+    "GATE-06": "NOT_PASSED"
+  },
+  "csv_authoring": "Bundled artifact-tool: block-written headers, recalculate, inspect/readback; CSV serialization of authored values. No workbook/formula/visual deliverable requested; text/header schema verified instead of styled renders.",
+  "validation": {
+    "status": "PASS_DOCUMENTATION_ONLY",
+    "application_tests": "NOT_RERUN_DOCUMENTATION_ONLY",
+    "limitations": "No actual approved-data migration/reconciliation/retry/rollback/cutover or AC PASS claimed; prior synthetic framework tests remain prior evidence only",
+    "csv_templates": {
+      "CEP057_LEAVE_OPENING_TEMPLATE.csv": {
+        "columns": 18,
+        "data_rows": 0,
+        "sha256": "70b740061dbf2107c3d5f5abfb7a4d11b72d86f988243f5157002928a0c29735"
+      },
+      "CEP057_IDENTITY_LINK_TEMPLATE.csv": {
+        "columns": 14,
+        "data_rows": 0,
+        "sha256": "a28d75db3396bc43624542616d48b2bacb507cd864cccaa194e8c4b2032a7d44"
+      },
+      "CEP057_RECONCILIATION_CONTROL_TEMPLATE.csv": {
+        "columns": 15,
+        "data_rows": 0,
+        "sha256": "9f46f76cad76e8a8e9127a9de205fe125010d09a7abb7c8fa0a58558fb957bbb"
+      },
+      "CEP058_PAYROLL_YTD_SOURCE_TEMPLATE.csv": {
+        "columns": 27,
+        "data_rows": 0,
+        "sha256": "4c3c268231c9f0024cd492c8026c8e201fb1606406baed28f0c78de7f9607a73"
+      },
+      "CEP058_EMPLOYEE_LINK_TEMPLATE.csv": {
+        "columns": 14,
+        "data_rows": 0,
+        "sha256": "a28d75db3396bc43624542616d48b2bacb507cd864cccaa194e8c4b2032a7d44"
+      },
+      "CEP058_COMPONENT_CROSSWALK_TEMPLATE.csv": {
+        "columns": 13,
+        "data_rows": 0,
+        "sha256": "31ee176c73afe0db482bfd5e7e21b11809cdf3f4117073cf0e83a213775c1356"
+      },
+      "CEP058_RECONCILIATION_CONTROL_TEMPLATE.csv": {
+        "columns": 16,
+        "data_rows": 0,
+        "sha256": "c4d3783a07d24ecf3f46e7751276efb56c1127b89a0086a4863b2b6a256b3ebf"
+      }
+    },
+    "relative_markdown_links_checked": 48,
+    "all_csv_columns_documented": true,
+    "all_ten_hr_ids_mapped": true,
+    "canonical_source_identities_verified": true,
+    "all_completed_and_excluded_cep_records_unchanged": true,
+    "lifecycle_ac_dod_gates_counts_unchanged": true,
+    "tracked_change_scope_verified": true,
+    "visual_render": "NOT_APPLICABLE_HEADER_ONLY_CSV_TEXT_EXCHANGE",
+    "git_diff_check": "PASS_AFTER_REMOVING_SINGLE_EXTRA_EOF_BLANK_LINE"
+  },
+  "preexisting_untracked_preserved": [
+    "docs/governance/cep/supporting/V1_HUMAN_RESOLUTION_PACK_20261020.md",
+    "output/cep061-tooling/",
+    "output/cep061_restore_test_seeds.py",
+    "output/cep062_migration_check.py",
+    "output/cep068_fixture_browser.cjs",
+    "output/cep068_mission_contactsheet.png",
+    "output/cep_closeout_tools.py"
+  ]
+}

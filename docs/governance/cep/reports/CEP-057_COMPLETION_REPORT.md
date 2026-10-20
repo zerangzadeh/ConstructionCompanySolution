@@ -174,3 +174,30 @@ superseded in live Registry, with raw prior records and provenance retained.
 CEP057 remains NOT_STARTED/BLOCKED before product or migration mutation; both
 mandatory prerequisites are unsatisfied. Correct remediation belongs to023/029;
 no057 implementation, historical migration rerun or evidence checkpoint occurred.
+
+
+## Source discovery and data intake — 2026-10-20
+
+Current `main = origin/main = e15c877dcf81cd3cb408c15aa55ec965db9ad4bc` after fetch. Canonical prompt hash
+reverified. [Discovery evidence](../supporting/v1-data-intake/DISCOVERY_AND_VALIDATION.json)
+records current read-only Development counts, approved recovery identities and
+reused foundations. All 10 CEP-029 crosswalk rows still match their tenant,
+Employee, Person and WorkRelationship targets. Decision-05 remains approved; no
+identity foundation, operational YTD category/reset mechanism or Treasury
+authority is reopened. No authoritative tenant opening packet was found in the
+inspected repository, retained supporting files, seed/reference code or approved
+canonical recovery sources.
+
+The [complete intake kit](../supporting/v1-data-intake/README.md) and
+[HR-CEP057 response form](../supporting/v1-data-intake/CEP057_HUMAN_INPUT.md)
+provide exact missing source/policy-or-year/cutoff/controls and conditional
+external-key mappings. Header-only templates contain no source values.
+**EXECUTION PARTIAL; 0/7 actual migration AC; DoD not met.** EXT-0015
+remains unresolved. No actual import/backfill, business writes, target synthesis,
+retry/rollback/cutover, application tests, Gate change or production action.
+Documentation validation covers CSV schema/header emptiness, all field mappings,
+references, unchanged canonical hashes and Registry state/count preservation.
+Application tests were not rerun for documentation-only work. Safe attributable
+add/commit/push is explicitly authorized by the current Human instruction; the
+resulting checkpoint is established by Git history. Pre-existing untracked Human
+artifacts, including the resolution pack, remain untouched and unstaged.

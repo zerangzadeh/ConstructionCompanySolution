@@ -3111,6 +3111,12 @@ ceps:
       status: GIT_INTEGRATED
       reason: Authorized direct commit/push343391c verified main/origin and clean tree; no production action.
   CEP-057:
+    data_intake:
+      status: PREPARED_AUTHORITATIVE_EXTERNAL_INPUTS_STILL_REQUIRED
+      path: docs/governance/cep/supporting/v1-data-intake/CEP057_HUMAN_INPUT.md
+      evidence: docs/governance/cep/supporting/v1-data-intake/DISCOVERY_AND_VALIDATION.json
+      assessed_at: '2026-10-20'
+      migration_execution: NOT_EXECUTED_EXT0015_UNRESOLVED
     closure_triage:
       category: B
       disposition: CURRENT_INDEPENDENT_HUMAN_DATA_OR_POLICY_INPUT_REQUIRED
@@ -3179,6 +3185,9 @@ ceps:
     - date: '2026-10-20'
       status: CURRENT_ENTRY_RECONFIRMED
       reason: Retirement does not supply independent approved package data/policy. Canonical source/dependency review confirms current input boundary; no new approved packet or policy supplied, old prerequisite conflicts not reinstated, no product mutation or synthetic activation.
+    - date: '2026-10-20'
+      status: DATA_INTAKE_KIT_PREPARED
+      reason: Current source discovery reuses CEP029 identity and approved policy foundations; no authoritative tenant opening packet found. Header-only CSVs and HR-mapped source-owner form prepared. PARTIAL,0/7 AC,DoD and EXT0015 unchanged; no product or business-data mutation.
     reentry_review:
       evidence: docs/governance/cep/evidence/CEP-057_REENTRY_REVIEW.json
       prerequisite_outcomes: VERIFIED_023_AND_029_COMPLETE
@@ -3193,6 +3202,12 @@ ceps:
       actual_touch_set: docs/governance/cep/manifests/CEP-057_EXECUTION_MANIFEST.md
       evidence: docs/governance/cep/evidence/CEP-057_FRAMEWORK_BUILD.json
   CEP-058:
+    data_intake:
+      status: PREPARED_AUTHORITATIVE_EXTERNAL_INPUTS_STILL_REQUIRED
+      path: docs/governance/cep/supporting/v1-data-intake/CEP058_HUMAN_INPUT.md
+      evidence: docs/governance/cep/supporting/v1-data-intake/DISCOVERY_AND_VALIDATION.json
+      assessed_at: '2026-10-20'
+      migration_execution: NOT_EXECUTED_EXT0017_UNRESOLVED
     closure_triage:
       category: B
       disposition: CURRENT_INDEPENDENT_HUMAN_DATA_OR_POLICY_INPUT_REQUIRED
@@ -3253,6 +3268,9 @@ ceps:
     - date: '2026-10-20'
       status: CURRENT_ENTRY_RECONFIRMED
       reason: Retirement does not supply independent approved package data/policy. Canonical source/dependency review confirms current input boundary; no new approved packet or policy supplied, old prerequisite conflicts not reinstated, no product mutation or synthetic activation.
+    - date: '2026-10-20'
+      status: DATA_INTAKE_KIT_PREPARED
+      reason: Current source discovery reuses CEP029 identity and approved policy foundations; no authoritative tenant opening packet found. Header-only CSVs and HR-mapped source-owner form prepared. PARTIAL,0/7 AC,DoD and EXT0017 unchanged; no product or business-data mutation.
   CEP-059:
     closure_triage:
       category: COMPLETE
@@ -4570,13 +4588,13 @@ v1_closure_triage:
   category_dependency_pending: []
 repository_state:
   branch: main
-  last_reconciled_head: b12994eccf4913062ca2cef095e4ca7db1656e4e
-  origin_main: b12994eccf4913062ca2cef095e4ca7db1656e4e
-  integration_checkpoint: b12994eccf4913062ca2cef095e4ca7db1656e4e
+  last_reconciled_head: e15c877dcf81cd3cb408c15aa55ec965db9ad4bc
+  origin_main: e15c877dcf81cd3cb408c15aa55ec965db9ad4bc
+  integration_checkpoint: e15c877dcf81cd3cb408c15aa55ec965db9ad4bc
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
   pending_checkpoint_scope: null
-  metadata_boundary: Verified source checkpoint b12994eccf4913062ca2cef095e4ca7db1656e4e; this metadata-only descendant records integration facts; next entry grounds actual HEAD.
+  metadata_boundary: Verified e15c877 main and origin after fetch; only intervening commit since b12994e reconciles CEP065 checkpoint metadata. Intake documentation checkpoint remains separate from CEP completion.
 execution_frontier:
   standing_authority_active: true
   execution_mode: SERIAL_BY_DEFAULT
@@ -4594,19 +4612,19 @@ execution_frontier:
   verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
   next_autonomous_cep: null
-  current_session_continuation: STOP_AT_COMPLETED_CEP065_USER_SCOPE_BOUNDARY
+  current_session_continuation: STOP_AT_EXTERNAL_INPUT_BOUNDARY_WITH_COMPLETE_DATA_INTAKE_KITS
   current_independent_cep: null
   next_entry_review_candidate: null
-  next_candidate_full_entry_eligibility: NONE_WITHIN_AUTHORIZED_CEP065_SCOPE
+  next_candidate_full_entry_eligibility: NONE_057_058_EXTERNAL_INPUTS_UNRESOLVED
   conditional_dependency_entry_review_candidates:
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; no condition or execution authority inferred
-  boundary_reason: CEP065 COMPLETE;057/058 inputs and partial states unchanged; all other CEP execution excluded by current Human instruction; global Gates/Production unchanged
+  boundary_reason: CEP057 and058 remain PARTIAL with EXT0015 and EXT0017 unresolved; authoritative foundations reused and input kits prepared; completed CEPs and069..079 excluded by current Human scope; no Gate or production change
   resume_cep_after_blocker_resolution: null
   independent_candidates_entry_status: NO_OTHER_CEP_REVIEWED_FOR_EXECUTION_THIS_SESSION
   cep057_resume_condition: EXT0015_APPROVED_DATA_POLICY_MAPPING_ASOF_CUTOFF_TOTALS_GENUINELY_SATISFIED
   production_authorized: false
   human_signoff_executed: false
-  current_session_cep_range: CEP-065_ONLY
-  excluded_this_session: CEP057_058_069..079_and_all_other_CEPs;Production;Human_Signoff;Certification
+  current_session_cep_range: CEP-057_AND_CEP-058_DATA_DISCOVERY_AND_INTAKE_ONLY
+  excluded_this_session: ALL_COMPLETED_CEPS;CEP069..079;Post-V1;Production;Human_Signoff;Certification
