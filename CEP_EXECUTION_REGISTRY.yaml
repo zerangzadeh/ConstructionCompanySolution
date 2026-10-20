@@ -3620,11 +3620,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-065_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_SCOPED_AC_DOD_TESTS_MIGRATION_RETENTION_AND_BASELINE_ATTRIBUTION
     git:
-      committed: false
-      commit_sha: null
-      pushed: false
+      committed: true
+      commit_sha: b12994eccf4913062ca2cef095e4ca7db1656e4e
+      pushed: true
       merged_to_main: false
-      remote_main_evidence: PENDING_AUTHORIZED_COMPLETED065_CHECKPOINT
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: docs/governance/cep/evidence/CEP-065_GIT_CHECKPOINT.json
     last_execution:
       branch: main
       sha: 14c32ced2eab37a6322cde36b406fff1a929aade
@@ -3648,6 +3650,9 @@ ceps:
     - date: '2026-10-20'
       status: CLOSED_VERIFIED
       reason: 'Conditional additive evidence persistence: Development and disposable-test reverse/reapply retention PASS;11 source families retained by counts/hashes and nonempty accepted-budget/forecast history verified. Ruff/system/drift/scoped-format/whitespace PASS; old registry formatting reproduced as baseline. No Production, Human Sign-off or other CEP.'
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: 'Authorized completed065 checkpoint b12994eccf4913062ca2cef095e4ca7db1656e4e directly committed on current main and normally pushed; HEAD/origin/remote equality verified.32 attributable files only; all pre-existing untracked paths preserved. This follow-up changes metadata only; no merge or Production action.'
   CEP-066:
     closure_triage:
       category: COMPLETE
@@ -4565,13 +4570,13 @@ v1_closure_triage:
   category_dependency_pending: []
 repository_state:
   branch: main
-  last_reconciled_head: 14c32ced2eab37a6322cde36b406fff1a929aade
-  origin_main: 14c32ced2eab37a6322cde36b406fff1a929aade
-  integration_checkpoint: 14c32ced2eab37a6322cde36b406fff1a929aade
+  last_reconciled_head: b12994eccf4913062ca2cef095e4ca7db1656e4e
+  origin_main: b12994eccf4913062ca2cef095e4ca7db1656e4e
+  integration_checkpoint: b12994eccf4913062ca2cef095e4ca7db1656e4e
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
-  pending_checkpoint_scope: COMPLETED_CEP065_ONLY
-  metadata_boundary: Current14c32ce baseline verified; completed065 checkpoint separately authorized and pending.
+  pending_checkpoint_scope: null
+  metadata_boundary: Verified source checkpoint b12994eccf4913062ca2cef095e4ca7db1656e4e; this metadata-only descendant records integration facts; next entry grounds actual HEAD.
 execution_frontier:
   standing_authority_active: true
   execution_mode: SERIAL_BY_DEFAULT
