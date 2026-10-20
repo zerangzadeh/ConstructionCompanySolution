@@ -3756,11 +3756,12 @@ ceps:
       evidence_presence: VERIFIED_CURRENT_FOCUSED_AFFECTED_REGRESSION
     git:
       committed: true
-      commit_sha: 9bcda007eac9a6f6dd2f4a7fb4790914885f8a99
+      commit_sha: 2499569b6442edd906b5de83070200f53010733f
       pushed: true
       merged_to_main: false
-      remote_main_evidence: VERIFIED_PARTIAL_OVERTIME_CHECKPOINT_ONLY
+      integrated_to_main: true
       integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: VERIFIED_LS_REMOTE
     last_execution:
       branch: main
       sha: a942a081ba6de0858a0de707a473c2ed29c607b6
@@ -3790,6 +3791,9 @@ ceps:
     - date: '2026-10-20'
       status: COMPLETE
       reason: "Full IMB0091 verified:44 distinct focused/affected cases,26 subtests and18 Mission screenshots/visual review PASS;27 overtime artifacts unchanged.6/6 AC,DoD MET;monetary activation held;no migration/Production."
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: "Authorized direct main commit/push 2499569b6442edd906b5de83070200f53010733f; remote verified; no merge or Production action."
     last_verification:
       date: '2026-10-20'
       baseline: a942a081ba6de0858a0de707a473c2ed29c607b6
@@ -4536,9 +4540,9 @@ v1_closure_triage:
   category_dependency_pending: []
 repository_state:
   branch: main
-  last_reconciled_head: a942a081ba6de0858a0de707a473c2ed29c607b6
-  origin_main: a942a081ba6de0858a0de707a473c2ed29c607b6
-  integration_checkpoint: a942a081ba6de0858a0de707a473c2ed29c607b6
+  last_reconciled_head: 2499569b6442edd906b5de83070200f53010733f
+  origin_main: 2499569b6442edd906b5de83070200f53010733f
+  integration_checkpoint: 2499569b6442edd906b5de83070200f53010733f
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
   pending_checkpoint_scope: null

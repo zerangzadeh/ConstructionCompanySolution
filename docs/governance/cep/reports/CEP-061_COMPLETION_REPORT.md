@@ -13,3 +13,5 @@ Ruff lint, touched Treasury format, Django checks, migration drift and diff chec
 Registry COMPLETE/CLOSED_VERIFIED and objective relevant-domain readiness reconciled. Global GATE05 remains NOT_PASSED; unrelated conditional activation is not inferred. Next: CEP066 entry review, then independent062/068 only when their canonical conditions hold.057 authoritative Leave openings,058 Payroll/YTD inputs and065 forecast/cash-flow bindings remain blocked. No069..079 execution.
 
 Safe attributable direct-main add/commit/push authorized; checkpoint follows this evidence boundary and actual SHA is recorded from Git proof. No new branch/worktree/merge/rebase/reset/clean/stash/force-push. Human Sign-off, Production Certification, Production migration/cutover/action: NOT EXECUTED.
+
+Verified Git checkpoint: authorized direct main commit `1548b52aa4cae5eaaa1d207638e4acbe2246a1ca`, pushed to origin/main and remote verified. Actual proof: `../evidence/CEP-061_GIT_CHECKPOINT.json`. No merge, Production action, Human Sign-off or certification. Final metadata-only descendant records these facts without product changes.
