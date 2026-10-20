@@ -1,3 +1,68 @@
+# CEP-057 — EXECUTION COMPLETE (synthetic Development) — 2026-10-20
+
+IMB-0075; **7/7 technical AC verified; scoped DoD PASS** under the explicit
+`DEV-SYNTHETIC-DATA-AUTH-20261020-V2` applicability. Requirements for non-zero real
+organizational history: **N/A — ZERO AUTHORITATIVE DEVELOPMENT HISTORY**. The
+synthetic rows are technical fixtures and never real employee balances.
+
+Baseline `main = origin/main = 0bb5e5f63bc0aeb0e7c327d232264d1647c2b981`;
+tracked tree clean, seven unrelated untracked paths preserved. Canonical prompt
+SHA and recovered PD026/SPEC011, CEP023/029 implementation and installed schema
+verified. [Grounding and final identity map](../evidence/CEP-057_058_SYNTHETIC_GROUNDING.json)
+validate the package manifest/13 members, all six CSVs, counts, totals, dates,
+currency, lineage and synthetic authority. DEV-HR001..010 map to the ten verified
+CEP029 WorkRelationships sorted by stable UUID; imports are partitioned across
+their four tenants without crossing tenant boundaries.
+
+[Executed reconciliation](../evidence/CEP-057_SYNTHETIC_EXECUTION.json): **17/17
+targets; 74.5000 days; annual 65.25, TOIL 9.25; zero source exceptions**. Eight
+Development policies were created through `record_policy`. The inclusive policy
+end maps to the model's exclusive 2027-01-01; native policy revision 1 references
+supplied policy document v2. No fixture value/control total was repaired.
+
+The versioned producer uses the existing immutable Leave ledger. Each source
+retains its version, Employee/WorkRelationship/policy, authority, as-of/cutover and
+dataset digest in immutable provenance. Stable unique keys prohibit duplicate or
+changed-fact retries. Source counts, each policy/unit total and target IDs reconcile.
+Original history is preserved. An injected failure leaves no targets; the actual
+Development insert/rollback/retry and compensating rollback/recovery rehearsals
+passed. Compensating rollback appends exact reversals, blocks subsequent-history
+ambiguity and prevents reactivation of a reversed opening. Completed rehearsals
+retain only the intended 17 opening entries.
+
+Existing permissions initially denied execution and the transaction rolled back.
+The existing Platform Admin role-catalog service supplies only transaction-local
+operator permissions on the existing Tenant Owner role, under the explicit data
+execution authority, then restores the exact original set before commit. The role
+is locked; other connections never see the added grants. Both catalog operations
+are audited. No membership, default grant, role assignment, permission rule or
+security bypass is introduced. This is part of the Development fixture harness.
+
+[Focused/affected tests](../evidence/CEP-057_SYNTHETIC_TESTS.txt): **65 passed,
+29 subtests passed** (11 new import/recovery tests, 16 preparation, existing
+Leave/identity regression). [Ruff, Django check and migration drift](../evidence/CEP-057_SYNTHETIC_CHECKS.txt)
+PASS. No schema change. Initial execution found a Decimal display-scale mismatch
+between freshly written and reloaded mapping responses; canonical four-decimal
+serialization fixed it, with no quantity change. Failed attempts rolled back.
+
+All seven [AC mappings](../evidence/CEP-057_ACCEPTANCE_MAPPING.csv) and six DoD
+obligations have concrete technical evidence: approved target outcome, versioned
+process, reconciliation/exceptions, retained history, documented/exercised recovery,
+and migration/retry tests. Recovery procedure: before any subsequent use, call
+`reverse_leave_opening` with this tenant's mapped originals; retain originals and
+reversals; retry is idempotent. After subsequent use, stop for explicit reconciliation.
+Never delete historical targets or roll schema back destructively.
+
+Registry: CEP057 CLOSED_VERIFIED_DEVELOPMENT_SYNTHETIC, blocker resolved for this
+Development applicability; **V1 67 COMPLETE / 1 PARTIAL / 0 BLOCKED**. GATE06
+evaluation remains separate; no global PASS inferred. Next CEP: CONTINUE CEP058
+immediately under the supplied package. Performance/concurrency and browser runtime
+remain non-blocking UTV. No Production action/cutover, Human Sign-off or Production
+Certification. Authorized attributable add/commit/push is pending the combined
+checkpoint; no branch/worktree/merge/rebase/reset/clean/stash was used.
+
+The dated sections below are historical evidence, superseded by this closeout.
+
 ## Authorized partial Git checkpoint — 2026-10-19
 
 Explicit Human authorization permitted the bounded checkpoint of exactly 12

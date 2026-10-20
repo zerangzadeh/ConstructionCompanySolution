@@ -1157,10 +1157,19 @@ class PayrollCumulativeState(ImmutablePayrollRecord):
     component = models.ForeignKey(PayrollComponent, on_delete=models.PROTECT)
     component_kind = models.CharField(max_length=30, choices=ComponentKind.choices)
     state_version = models.PositiveIntegerField()
-    source_run = models.ForeignKey(PayrollRun, on_delete=models.PROTECT)
-    source_line = models.ForeignKey(
-        PayrollResultLine, on_delete=models.PROTECT, related_name="cumulative_states"
+    source_run = models.ForeignKey(
+        PayrollRun, null=True, blank=True, on_delete=models.PROTECT
     )
+    source_line = models.ForeignKey(
+        PayrollResultLine,
+        null=True,
+        blank=True,
+        on_delete=models.PROTECT,
+        related_name="cumulative_states",
+    )
+    # CEP-058: explicit external opening provenance, never a fabricated Payroll run.
+    opening_key = models.CharField(max_length=64, null=True, blank=True)
+    opening_evidence = models.JSONField(default=dict, blank=True)
     source_version = models.CharField(max_length=64)
     effective_on = models.DateField()
     delta = models.DecimalField(max_digits=24, decimal_places=2)
@@ -1175,9 +1184,41 @@ class PayrollCumulativeState(ImmutablePayrollRecord):
                 fields=["year", "employee", "component", "state_version"],
                 name="payroll_ytd_bucket_version_uq",
             ),
+            models.UniqueConstraint(
+                fields=["year", "opening_key"], name="payroll_ytd_opening_key_uq"
+            ),
+            models.CheckConstraint(
+                condition=(
+                    Q(
+                        source_run__isnull=False,
+                        source_line__isnull=False,
+                        opening_key__isnull=True,
+                    )
+                    | Q(
+                        source_run__isnull=True,
+                        source_line__isnull=True,
+                        opening_key__isnull=False,
+                    )
+                ),
+                name="payroll_ytd_exactly_one_origin_ck",
+            ),
         ]
 
     def clean(self) -> None:
+        if self.opening_key is not None:
+            from .opening_import import validate_opening_state
+
+            validate_opening_state(self)
+            self._validate_sequence()
+            return
+        if (
+            self.source_run_id is None
+            or self.source_line_id is None
+            or self.opening_evidence
+        ):
+            raise ValidationError(
+                "Native cumulative history requires its exact source run and line."
+            )
         validate_related_organizations(
             self,
             year=self.year,
@@ -1217,8 +1258,12 @@ class PayrollCumulativeState(ImmutablePayrollRecord):
             raise ValidationError(
                 "Cumulative state must pin a qualifying finalized source line."
             )
+        self._validate_sequence()
+
+    def _validate_sequence(self) -> None:
         previous = (
-            type(self).objects.filter(
+            type(self)
+            .objects.filter(
                 year_id=self.year_id,
                 employee_id=self.employee_id,
                 component_id=self.component_id,
@@ -1233,7 +1278,9 @@ class PayrollCumulativeState(ImmutablePayrollRecord):
             or self.balance != expected_balance
             or (previous and previous.component_kind != self.component_kind)
         ):
-            raise ValidationError("Cumulative version and signed balance must follow history.")
+            raise ValidationError(
+                "Cumulative version and signed balance must follow history."
+            )
 
 
 class PayrollExceptionSeverity(models.TextChoices):

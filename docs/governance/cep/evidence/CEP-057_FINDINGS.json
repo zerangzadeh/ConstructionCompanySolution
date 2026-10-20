@@ -33,7 +33,7 @@
   },
   {
     "finding_id": "CEP-057-FINDING-002",
-    "status": "OPEN_MIGRATION_EXECUTION_ONLY",
+    "status": "RESOLVED_DEVELOPMENT_SYNTHETIC_APPLICABILITY",
     "classification": "BLOCKER-DATA / EXT-0015",
     "affected_imb": "IMB-0075",
     "affected_ac": [
@@ -54,6 +54,8 @@
     "resolution": "Provide/establish approved tenant source rows and source evidence, policy/version/unit, explicit row mapping and approved as-of/cutover/totals before executing any opening backfill. No synthetic defaults or request-history-derived balances.",
     "framework_build": "MAY_PROCEED_FAIL_CLOSED_UNDER_STANDING_AUTHORITY",
     "safe_action": "STOP serial queue at PARTIAL057; retain tested preparation; establish approved EXT0015 inputs and complete canonical import/reconciliation/rollback before completion or downstream claims",
-    "current_framework_result": "PARTIAL_READ_ONLY_PREPARATION_TESTED; actual migration/import, durable mapping, migration retry and rollback/cutover incomplete; full AC remain unverified"
+    "current_framework_result": "PARTIAL_READ_ONLY_PREPARATION_TESTED; actual migration/import, durable mapping, migration retry and rollback/cutover incomplete; full AC remain unverified",
+    "historical_status": "OPEN_MIGRATION_EXECUTION_ONLY",
+    "resolution_20261020": "DEV-SYNTHETIC-DATA-AUTH-20261020-V2; approved zero real-history applicability; synthetic technical migration proof in CEP-057_SYNTHETIC_EXECUTION.json"
   }
 ]

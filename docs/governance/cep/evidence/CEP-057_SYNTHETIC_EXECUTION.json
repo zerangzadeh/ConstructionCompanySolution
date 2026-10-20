@@ -1,0 +1,305 @@
+{
+  "authority": "DEV-SYNTHETIC-DATA-AUTH-20261020-V2",
+  "synthetic_only": true,
+  "real_history_applicability": "N/A \u2014 ZERO AUTHORITATIVE DEVELOPMENT HISTORY",
+  "manifest_sha256": "8afd738bb2ca2b92a20f1b8b7c7a8d4cba0015ede1e135da26c6a03a93b2f8f3",
+  "tenants": [
+    {
+      "organization_id": "915f515d-ca01-4c15-aa0f-b4452d0f5579",
+      "policy_ids": {
+        "ANNUAL_LEAVE": "46a358ae-928d-421f-9c79-e20b28182bcf",
+        "TIME_OFF_IN_LIEU": "110e08e8-d04a-4aec-bd3b-159fcce7b19a"
+      },
+      "policy_native_version": 1,
+      "source_document_version": 2,
+      "result": {
+        "fingerprint": "e55aabc184b7f963feeaec4290a4abb1a33ff57517e957adb6e80edec2bf654b",
+        "source_count": 3,
+        "created": 0,
+        "mapping": [
+          {
+            "source_id": "DEV-LEAVE-0003",
+            "target_id": "17679598-6d39-4ce8-b385-d5a8ec4201c5",
+            "quantity": "5.0000",
+            "policy_id": "46a358ae-928d-421f-9c79-e20b28182bcf",
+            "relationship_id": "6a58036d-a686-466e-b43b-6e8dba4ec7fd"
+          },
+          {
+            "source_id": "DEV-LEAVE-0014",
+            "target_id": "81629665-92b7-453d-87be-323c1ce5fe40",
+            "quantity": "12.0000",
+            "policy_id": "46a358ae-928d-421f-9c79-e20b28182bcf",
+            "relationship_id": "f0cf9b10-5569-4bff-99ca-e85bc850301a"
+          },
+          {
+            "source_id": "DEV-LEAVE-0015",
+            "target_id": "f49378c4-b219-4b87-a442-b4d455c8643a",
+            "quantity": "2.2500",
+            "policy_id": "110e08e8-d04a-4aec-bd3b-159fcce7b19a",
+            "relationship_id": "f0cf9b10-5569-4bff-99ca-e85bc850301a"
+          }
+        ],
+        "reconciliation": [
+          {
+            "policy_id": "110e08e8-d04a-4aec-bd3b-159fcce7b19a",
+            "unit": "days",
+            "source_quantity": "2.25",
+            "expected_quantity": "2.25",
+            "matched": true
+          },
+          {
+            "policy_id": "46a358ae-928d-421f-9c79-e20b28182bcf",
+            "unit": "days",
+            "source_quantity": "17.00",
+            "expected_quantity": "17.00",
+            "matched": true
+          }
+        ],
+        "exceptions": [],
+        "synthetic_only": true,
+        "production_cutover": false
+      },
+      "retry_created": 0,
+      "transaction_rollback_recovery": "PASS",
+      "compensating_rollback_recovery": "PASS",
+      "exception_test": [
+        "{\"exceptions\": [], \"reconciliation\": [{\"policy_id\": \"110e08e8-d04a-4aec-bd3b-159fcce7b19a\", \"unit\": \"days\", \"source_quantity\": \"2.25\", \"expected_quantity\": \"999999\", \"matched\": false}, {\"policy_id\": \"46a358ae-928d-421f-9c79-e20b28182bcf\", \"unit\": \"days\", \"source_quantity\": \"17.00\", \"expected_quantity\": null, \"matched\": false}]}"
+      ]
+    },
+    {
+      "organization_id": "9b6c657c-7057-4bbd-ae5a-932b05ffb192",
+      "policy_ids": {
+        "ANNUAL_LEAVE": "248f8961-b09a-4659-9fda-6ad1d302cf86",
+        "TIME_OFF_IN_LIEU": "3cf2d46b-bde5-4842-b115-fdef3c5ea373"
+      },
+      "policy_native_version": 1,
+      "source_document_version": 2,
+      "result": {
+        "fingerprint": "8735a1185eb6a43162d49eb6cf154e50164e93750ee5411878a4cfb4c7a671e0",
+        "source_count": 4,
+        "created": 0,
+        "mapping": [
+          {
+            "source_id": "DEV-LEAVE-0004",
+            "target_id": "f85120c9-aa42-4a9f-89ac-f282effec9e0",
+            "quantity": "11.2500",
+            "policy_id": "248f8961-b09a-4659-9fda-6ad1d302cf86",
+            "relationship_id": "812c3d91-f4dc-47c5-a3c6-ff2642d0c46b"
+          },
+          {
+            "source_id": "DEV-LEAVE-0005",
+            "target_id": "b03427b8-86d0-409e-9152-906f29124557",
+            "quantity": "2.0000",
+            "policy_id": "3cf2d46b-bde5-4842-b115-fdef3c5ea373",
+            "relationship_id": "812c3d91-f4dc-47c5-a3c6-ff2642d0c46b"
+          },
+          {
+            "source_id": "DEV-LEAVE-0006",
+            "target_id": "b41de3d5-4cdf-4e29-b2f9-7d4984fcab59",
+            "quantity": "2.0000",
+            "policy_id": "248f8961-b09a-4659-9fda-6ad1d302cf86",
+            "relationship_id": "940deeb2-99d0-4d02-ae4c-6094e4b76d3d"
+          },
+          {
+            "source_id": "DEV-LEAVE-0007",
+            "target_id": "d5d3bec2-56e8-4bb7-8d88-baa5b8fd468a",
+            "quantity": "0.5000",
+            "policy_id": "3cf2d46b-bde5-4842-b115-fdef3c5ea373",
+            "relationship_id": "940deeb2-99d0-4d02-ae4c-6094e4b76d3d"
+          }
+        ],
+        "reconciliation": [
+          {
+            "policy_id": "248f8961-b09a-4659-9fda-6ad1d302cf86",
+            "unit": "days",
+            "source_quantity": "13.25",
+            "expected_quantity": "13.25",
+            "matched": true
+          },
+          {
+            "policy_id": "3cf2d46b-bde5-4842-b115-fdef3c5ea373",
+            "unit": "days",
+            "source_quantity": "2.50",
+            "expected_quantity": "2.50",
+            "matched": true
+          }
+        ],
+        "exceptions": [],
+        "synthetic_only": true,
+        "production_cutover": false
+      },
+      "retry_created": 0,
+      "transaction_rollback_recovery": "PASS",
+      "compensating_rollback_recovery": "PASS",
+      "exception_test": [
+        "{\"exceptions\": [], \"reconciliation\": [{\"policy_id\": \"248f8961-b09a-4659-9fda-6ad1d302cf86\", \"unit\": \"days\", \"source_quantity\": \"13.25\", \"expected_quantity\": \"999999\", \"matched\": false}, {\"policy_id\": \"3cf2d46b-bde5-4842-b115-fdef3c5ea373\", \"unit\": \"days\", \"source_quantity\": \"2.50\", \"expected_quantity\": null, \"matched\": false}]}"
+      ]
+    },
+    {
+      "organization_id": "9f952d50-c609-4d8d-a6ef-aeec15b1e417",
+      "policy_ids": {
+        "ANNUAL_LEAVE": "79b1757d-e6a2-4fff-910c-549c2dc445df",
+        "TIME_OFF_IN_LIEU": "0505bf24-507a-4aa3-9b09-a5a939ca3111"
+      },
+      "policy_native_version": 1,
+      "source_document_version": 2,
+      "result": {
+        "fingerprint": "207ae2d187dd5ad3bfd6072294f06caf64b7bb8c5771966d9eaa8ebb50247551",
+        "source_count": 4,
+        "created": 0,
+        "mapping": [
+          {
+            "source_id": "DEV-LEAVE-0001",
+            "target_id": "214855cd-8c3e-4b0b-84d6-7fa0424ee623",
+            "quantity": "8.5000",
+            "policy_id": "79b1757d-e6a2-4fff-910c-549c2dc445df",
+            "relationship_id": "227831d7-fca2-4d3e-99e1-c4a8250c08f1"
+          },
+          {
+            "source_id": "DEV-LEAVE-0002",
+            "target_id": "5f36edbe-e52e-42f7-ac50-f8467faccc59",
+            "quantity": "1.5000",
+            "policy_id": "0505bf24-507a-4aa3-9b09-a5a939ca3111",
+            "relationship_id": "227831d7-fca2-4d3e-99e1-c4a8250c08f1"
+          },
+          {
+            "source_id": "DEV-LEAVE-0009",
+            "target_id": "77784ee6-e3a2-4fb4-99c5-622344bd8746",
+            "quantity": "7.7500",
+            "policy_id": "79b1757d-e6a2-4fff-910c-549c2dc445df",
+            "relationship_id": "b54cc422-77b3-4eda-b6dc-6d089093a78e"
+          },
+          {
+            "source_id": "DEV-LEAVE-0010",
+            "target_id": "2322ee2f-35f1-4c66-8b76-a67f4180a97a",
+            "quantity": "1.2500",
+            "policy_id": "0505bf24-507a-4aa3-9b09-a5a939ca3111",
+            "relationship_id": "b54cc422-77b3-4eda-b6dc-6d089093a78e"
+          }
+        ],
+        "reconciliation": [
+          {
+            "policy_id": "0505bf24-507a-4aa3-9b09-a5a939ca3111",
+            "unit": "days",
+            "source_quantity": "2.75",
+            "expected_quantity": "2.75",
+            "matched": true
+          },
+          {
+            "policy_id": "79b1757d-e6a2-4fff-910c-549c2dc445df",
+            "unit": "days",
+            "source_quantity": "16.25",
+            "expected_quantity": "16.25",
+            "matched": true
+          }
+        ],
+        "exceptions": [],
+        "synthetic_only": true,
+        "production_cutover": false
+      },
+      "retry_created": 0,
+      "transaction_rollback_recovery": "PASS",
+      "compensating_rollback_recovery": "PASS",
+      "exception_test": [
+        "{\"exceptions\": [], \"reconciliation\": [{\"policy_id\": \"0505bf24-507a-4aa3-9b09-a5a939ca3111\", \"unit\": \"days\", \"source_quantity\": \"2.75\", \"expected_quantity\": \"999999\", \"matched\": false}, {\"policy_id\": \"79b1757d-e6a2-4fff-910c-549c2dc445df\", \"unit\": \"days\", \"source_quantity\": \"16.25\", \"expected_quantity\": null, \"matched\": false}]}"
+      ]
+    },
+    {
+      "organization_id": "cca028cb-a2ff-4485-83ab-a9c1bd1e47b2",
+      "policy_ids": {
+        "ANNUAL_LEAVE": "02aa8382-5fa2-4687-961f-939553a3a782",
+        "TIME_OFF_IN_LIEU": "f7abe007-bced-475f-b530-8846b1068f6b"
+      },
+      "policy_native_version": 1,
+      "source_document_version": 2,
+      "result": {
+        "fingerprint": "a458cbccd9456c8af8fcdbc90825c9dd38af9ba9f214ac0226df3a32a681d37a",
+        "source_count": 6,
+        "created": 0,
+        "mapping": [
+          {
+            "source_id": "DEV-LEAVE-0008",
+            "target_id": "924038dc-3758-43f4-a2e8-5c0e4f7d2e5e",
+            "quantity": "-1.0000",
+            "policy_id": "02aa8382-5fa2-4687-961f-939553a3a782",
+            "relationship_id": "b17e6726-c27e-4525-8d88-6db97dac8880"
+          },
+          {
+            "source_id": "DEV-LEAVE-0011",
+            "target_id": "61b92d3e-0903-4230-8835-43531fbd178d",
+            "quantity": "9.0000",
+            "policy_id": "02aa8382-5fa2-4687-961f-939553a3a782",
+            "relationship_id": "b9816faa-6b15-4b56-8daf-11aeb9412c88"
+          },
+          {
+            "source_id": "DEV-LEAVE-0012",
+            "target_id": "57f0db4e-8fea-4a31-a9bd-506fe2d1962d",
+            "quantity": "0.7500",
+            "policy_id": "f7abe007-bced-475f-b530-8846b1068f6b",
+            "relationship_id": "b9816faa-6b15-4b56-8daf-11aeb9412c88"
+          },
+          {
+            "source_id": "DEV-LEAVE-0013",
+            "target_id": "a13f3625-897b-4459-8f8d-bf51ecb2f669",
+            "quantity": "4.5000",
+            "policy_id": "02aa8382-5fa2-4687-961f-939553a3a782",
+            "relationship_id": "c196da49-0c68-4644-9c15-cbc38c030946"
+          },
+          {
+            "source_id": "DEV-LEAVE-0016",
+            "target_id": "aedf3804-6ddf-4632-aaf6-3fd579680991",
+            "quantity": "6.2500",
+            "policy_id": "02aa8382-5fa2-4687-961f-939553a3a782",
+            "relationship_id": "f97c1817-90d0-4da1-ab35-9ee711a33c73"
+          },
+          {
+            "source_id": "DEV-LEAVE-0017",
+            "target_id": "0c85e8fe-f8ba-4cbb-93bc-902a79b3f31b",
+            "quantity": "1.0000",
+            "policy_id": "f7abe007-bced-475f-b530-8846b1068f6b",
+            "relationship_id": "f97c1817-90d0-4da1-ab35-9ee711a33c73"
+          }
+        ],
+        "reconciliation": [
+          {
+            "policy_id": "02aa8382-5fa2-4687-961f-939553a3a782",
+            "unit": "days",
+            "source_quantity": "18.75",
+            "expected_quantity": "18.75",
+            "matched": true
+          },
+          {
+            "policy_id": "f7abe007-bced-475f-b530-8846b1068f6b",
+            "unit": "days",
+            "source_quantity": "1.75",
+            "expected_quantity": "1.75",
+            "matched": true
+          }
+        ],
+        "exceptions": [],
+        "synthetic_only": true,
+        "production_cutover": false
+      },
+      "retry_created": 0,
+      "transaction_rollback_recovery": "PASS",
+      "compensating_rollback_recovery": "PASS",
+      "exception_test": [
+        "{\"exceptions\": [], \"reconciliation\": [{\"policy_id\": \"02aa8382-5fa2-4687-961f-939553a3a782\", \"unit\": \"days\", \"source_quantity\": \"18.75\", \"expected_quantity\": \"999999\", \"matched\": false}, {\"policy_id\": \"f7abe007-bced-475f-b530-8846b1068f6b\", \"unit\": \"days\", \"source_quantity\": \"1.75\", \"expected_quantity\": null, \"matched\": false}]}"
+      ]
+    }
+  ],
+  "repairs": [],
+  "operator_authorization": {
+    "service": "apps.organizations.access_services.update_organization_role",
+    "role_id": "1304ae31-762b-4726-a865-f68b37ad08d1",
+    "temporary_fixture_permissions": [
+      "leave_balances.manage",
+      "leave_balances.view",
+      "leave_policies.manage"
+    ],
+    "persistent_grant_changes": 0,
+    "restored_exactly": true
+  },
+  "target_count": 17,
+  "target_total_days": "74.5000"
+}

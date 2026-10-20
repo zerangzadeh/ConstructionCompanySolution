@@ -1,3 +1,29 @@
+## Synthetic Development execution entry — 2026-10-20
+
+Baseline main/origin `0bb5e5f63bc0aeb0e7c327d232264d1647c2b981`; tracked tree
+clean. Seven unrelated untracked paths listed in grounding are preserved. Explicit
+current Human request incorporates DEV-SYNTHETIC-DATA-AUTH-20261020-V2 and permits
+attributable add/commit/push. Package manifest and 13 members validated; canonical
+057/023/029 hashes, recovered PD026/SPEC011, prerequisites and configured migration
+currency verified in CEP-057_058_SYNTHETIC_GROUNDING.json. Real history is ZERO;
+synthetic rows cannot prove non-zero real history. Exit GATE06 is not an entry gate.
+
+Actual intended touch set BEFORE implementation: new Development-only
+`apps/workforce/leave_opening_import.py`, `test_cep057_import.py`; package validation,
+grounding and execution scripts under `scripts/cep057_058_*`; retained supplied
+package under `docs/governance/cep/supporting/synthetic-dev-v2/`; 057 execution,
+mapping, reconciliation, exception, rollback/recovery/test/check evidence, existing
+057 manifests/report/findings and Registry. Existing Leave ledger and canonical
+policy services are reused. No schema/UI/permissions/settings changes. Policy end
+is translated from inclusive 2026-12-31 to existing exclusive 2027-01-01. Native
+policy version 1 references supplied policy v2 (document version, not native revision).
+Identity map uses all ten verified CEP029 UUIDs sorted globally; each import remains
+inside its respective tenant. No Production or 069..079 execution.
+
+Closeout preservation: root `.gitattributes` disables newline conversion only for
+the retained immutable supplied package. Staged Git blobs must match every supplied
+SHA-256; normal repository text behavior remains unchanged.
+
 ## Framework preparation build — 2026-10-19
 
 Baseline: current local `main`, HEAD / origin/main / remote main all

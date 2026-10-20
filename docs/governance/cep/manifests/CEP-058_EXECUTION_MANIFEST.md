@@ -53,3 +53,25 @@ and four affected YTD tests PASS; Ruff, Django checks and migration drift PASS.
 EXT-0017 remains unresolved; no backfill or business writes. Initial test-fixture
 failure is retained in `../evidence/CEP-058_TEST_INITIAL_FAILURE.txt`, an added
 evidence-only touch. Full results and STOP are in the Completion Report.
+# Synthetic Development execution entry — 2026-10-20
+
+CEP057 has genuinely completed its Development technical AC/DoD and Registry
+closeout (67 COMPLETE / 1 PARTIAL / 0 BLOCKED); continue058 serially. Baseline
+main/origin0bb5e5f; only attributable057 work is now pending. Immutable058 prompt,
+PD031/SPEC013/030 and Decision05, complete025/029 foundations, supplied manifest,
+81 source/80 included rows, component controls and explicit year/cutoff verified.
+Real-history requirement is N/A — ZERO AUTHORITATIVE DEVELOPMENT HISTORY.
+
+Actual intended touch set BEFORE058 product mutation: `apps/payroll/models.py`
+PayrollCumulativeState only; additive nullable native provenance plus mutually
+exclusive external opening key/evidence fields and constraints in a new0009
+migration; `apps/payroll/opening_import.py`, `test_cep058_import.py` and migration
+test; extend existing057/058 fixture runner with058 year/component/import/recovery;
+058 report/manifests/findings/evidence and Registry. Existing cumulative/approval/
+component services reused; no fabricated finalized Payroll runs/results/lines.
+Decision05 signed buckets, explicit year versions and reset semantics remain.
+Native source rows stay unchanged; external opening provenance is immutable.
+Schema reverse must fail closed once external opening history exists. No endpoint,
+UI, new permission, role, default-grant migration, statutory rule or Production
+action. Existing operator catalog permissions are transaction-local and restored
+before commit, using the existing Platform Admin service and retained audit.

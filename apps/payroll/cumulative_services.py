@@ -227,6 +227,21 @@ def record_cumulative_for_run(
         employee = Employee.objects.select_for_update().get(
             pk=line.run_employee.employee_id, organization=organization
         )
+        opening = PayrollCumulativeState.objects.filter(
+            year=year,
+            employee=employee,
+            component=line.component,
+            opening_key__isnull=False,
+            opening_evidence__reverses__isnull=True,
+        ).first()
+        if (
+            opening
+            and run.period.starts_on.isoformat()
+            < opening.opening_evidence["cutover_on"]
+        ):
+            raise ValidationError(
+                "Native Payroll overlaps the evidenced opening coverage."
+            )
         previous = (
             PayrollCumulativeState.objects.filter(
                 year=year, employee=employee, component=line.component

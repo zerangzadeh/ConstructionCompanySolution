@@ -1,0 +1,32 @@
+{
+  "classification": "BASELINE TEST DEBT",
+  "test": "CorePayrollTests.test_payroll_registry_is_complete_and_default_roles_are_denied",
+  "current_result": "1 failed, 100 passed, 34 subtests passed",
+  "baseline_result": "same assertion at line927; 1 failed in7.04s",
+  "baseline_loader": "scripts/cep057_058_baseline.py loads unmodified HEAD product models and cumulative services in memory; no checkout or source mutation",
+  "head": "0bb5e5f63bc0aeb0e7c327d232264d1647c2b981",
+  "missing_existing_model_labels": [
+    "payroll.StatutorySourcePackage"
+  ],
+  "source_identity": {
+    "apps/payroll/models.py": {
+      "head_sha256": "fdad2cfd317cd8738172b6c4cb2b559af1b8260411f5a2b0db4418cc6a9cf954",
+      "working_sha256": "989176351273053d44536cc0027fca8588176df400ccb70b92c5257128b22023",
+      "top_level_classes_unchanged": true
+    },
+    "apps/payroll/cumulative_services.py": {
+      "head_sha256": "00b57863c6f17d32b256c8f5d148f2a66fd7bc4fbf2d531f7ec2aff79688243a",
+      "working_sha256": "511e48d835504e633bb155cf9a99b679d49e29a73c9847f502a92899070cfba5"
+    },
+    "apps/organizations/permission_registry.py": {
+      "head_sha256": "36e054e6035b2e43846ea3804d9d24304c5594d7b120532b7081744403f93c8b",
+      "working_sha256": "333b59fb039c6de3c552d37dbf0b58bc27b96a3f573728b2c6284c2609a8a8a1"
+    },
+    "apps/payroll/test_p7_s13_s22_core_payroll.py": {
+      "head_sha256": "3d7ddd08f29a2c311e4849552581557d3b5a13c1fa8711333c68abdfda2500df",
+      "working_sha256": "3d7ddd08f29a2c311e4849552581557d3b5a13c1fa8711333c68abdfda2500df"
+    }
+  },
+  "attribution": "No new models introduced; registry and test unchanged; the same existing model-label assertion fails on unmodified HEAD before the opening producer is reached. No fix absorbed into057/058 scope.",
+  "required_migration_tests": "PASS in affected run; current guard checks added to final focused run"
+}

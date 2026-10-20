@@ -1,3 +1,86 @@
+# CEP-058 — EXECUTION COMPLETE (synthetic Development) — 2026-10-20
+
+IMB-0080; **7/7 technical AC verified; scoped DoD PASS**. The finalized real-history
+reconciliation subclause is **N/A — ZERO AUTHORITATIVE DEVELOPMENT HISTORY** under
+`DEV-SYNTHETIC-DATA-AUTH-20261020-V2`; it is not a PASS or fabricated real history.
+This current closeout supersedes the dated partial observations below.
+
+CEP057 completed before058 product mutation. Baseline main/origin
+`0bb5e5f63bc0aeb0e7c327d232264d1647c2b981`; only attributable057 work accumulated,
+and seven unrelated untracked paths remain preserved. Canonical058 SHA,
+PD031/SPEC013/030, Decision05 and completed025/029 foundations verified in
+[grounding](../evidence/CEP-057_058_SYNTHETIC_GROUNDING.json). The supplied manifest
+and 13 members, six exact CSV schemas, internal counts, component/kind controls,
+correction lineage, currency/dates and synthetic-only authority validate.
+
+[Executed reconciliation](../evidence/CEP-058_SYNTHETIC_EXECUTION.json): **81
+source rows →80 immutable YTD targets +1 excluded superseded predecessor;
+IRR 56,574,280,000.00 signed control; zero unresolved source exceptions**. The10
+approved UUID-sorted identity mappings retain each of their four tenants. Thirty-two
+exact-code Development components were created through canonical component
+services, using supplied operational kinds, with no statutory rules/rates. Four
+approved Payroll year-v2 records bind 2026-01-01..2026-12-31, as-of2026-09-30,
+continuation2026-10-01, IRR. Canonical draft versioning retains a non-authoritative
+v1 draft scaffold for each supplied v2 binding; only v2 is approved.
+
+The minimum additive 0009 schema extends the existing PayrollCumulativeState
+authority with mutually exclusive native-line or external-opening provenance,
+unique stable opening keys and immutable source evidence. Native history is
+retained. **No Payroll run/result/line was fabricated**, and no second financial
+authority, posting, settlement or Project Cost fact was created. Existing signed
+Decision05 buckets and explicit year reset remain governing. The signed grand
+control includes employer amounts; it is not inferred take-home pay or a statutory
+liability. Source row DEV-PAY-CORR-0001 remains SUPERSEDED/NO with 188,000,000
+evidence; reciprocal replacement DEV-PAY-0027 alone contributes 238,000,000.
+
+All source IDs map to stable target references or explicit exclusion. Exact retry
+creates zero targets and rejects changed facts or changed year/currency. Actual
+Development insert/rollback/retry and compensating rollback/recovery rehearsals
+passed; native cumulative projections return the imported opening balances. Native
+continuation adds to these same balances, rejects overlap with opening coverage,
+and resets only through explicit year selection. No target history is overwritten.
+The fixture operator uses the existing Platform Admin catalog service with locked,
+transaction-local permissions restored exactly before commit; retained audit and
+operator receipts prove zero persistent grant changes. No role or permission rule
+is invented or bypassed.
+
+[Final focused checks](../evidence/CEP-058_SYNTHETIC_TESTS.txt): **40 passed,
+27 subtests passed**, including 17 import/lineage/security/recovery/continuation
+tests, 17 retained preparation tests, 4 existing YTD tests and 2 real schema
+rollback/reapply tests. The schema tests preserve five native cumulative states
+and their finalized sources, and prove destructive rollback is blocked with real
+external history. [Affected regression](../evidence/CEP-058_SYNTHETIC_AFFECTED_TESTS.txt):
+**100 passed, 34 subtests passed; 1 BASELINE TEST DEBT failure** in the existing core
+Payroll registry test. The exact failure reproduces with unmodified HEAD product
+sources using an in-memory Git loader. [Attribution](../evidence/CEP-058_SYNTHETIC_REGRESSION_ATTRIBUTION.json)
+identifies the already-unregistered `payroll.StatutorySourcePackage`; neither the
+model set, permission registry nor failing test was changed. This adjacent defect
+is recorded, with no repair absorbed into057/058. No full regression PASS claimed.
+
+[Ruff/format, Django and migration-drift checks](../evidence/CEP-058_SYNTHETIC_CHECKS.txt)
+PASS. [Configured Development0009 migration](../evidence/CEP-058_SYNTHETIC_MIGRATION.txt)
+PASS. No required in-scope failure remains. The closure script's initial CSV header
+assumption was corrected to preserve058's existing acceptance-mapping schema;
+documents and Registry were reconciled before final checkpoint.
+
+All six DoD obligations are evidenced: target outcome within approved Development
+applicability, versioned migration, source/target and exceptions, retained history,
+documented/exercised recovery, migration/repeatability tests. Recovery before any
+subsequent bucket use: call `reverse_payroll_opening` on the tenant's mapped
+originals; it appends exact inverse states and retains both origins. Repeating
+rollback is idempotent; an import cannot reactivate a reversed opening. Subsequent
+history requires explicit reconciliation. Do not delete immutable states or
+reverse 0009 once external history exists; its reverse guard fails closed.
+
+Registry:057 and058 COMPLETE; **V1=68 COMPLETE /0 PARTIAL /0 BLOCKED**. GATE06
+is separately evaluated without inferring global PASS from counts. Browser/load/
+concurrency runtime remains non-blocking UTV. Production action/cutover,
+Production Certification and Human Sign-off NOT_EXECUTED;069..079 not executed.
+Authorized attributable add/commit/push is pending the combined Git checkpoint;
+no new branch/worktree, merge/rebase/reset/clean/stash/force push.
+
+## Historical framework and intake records
+
 # CEP-058 — EXECUTION PARTIAL
 
 2026-10-19. IMB-0080 only. **0/7 actual migration AC verified; DoD not met.**

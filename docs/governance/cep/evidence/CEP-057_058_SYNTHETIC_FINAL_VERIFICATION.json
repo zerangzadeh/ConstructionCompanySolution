@@ -1,0 +1,77 @@
+{
+  "scope": "Final read-only Development verification",
+  "real_history_applicability": "N/A — ZERO AUTHORITATIVE DEVELOPMENT HISTORY",
+  "package_manifest_sha256": "8afd738bb2ca2b92a20f1b8b7c7a8d4cba0015ede1e135da26c6a03a93b2f8f3",
+  "package_members": 13,
+  "exact_csv_schemas": 6,
+  "canonical_hashes": {
+    "CEP-023": "d5e4f4391d546d94a151206c299fbc7e061cdc6dcb9ac24d63358b5e6ebb42d3",
+    "CEP-025": "aba57062896f23108f74bcc389ae03c4380190b95429e83ca609ed65403fac33",
+    "CEP-029": "2e5afec0c5fa4ef42dc5aef2439e3fd7458e64c5227a30129076a2bd6a33d93e",
+    "CEP-057": "d3cbff0e2571c6425866ffa6c87876a38a667ca5c10cefd3d6d14a539ccd74a1",
+    "CEP-058": "4f54d74ddee213bbde20fc351abaa01d09c63684e7c3318384a9c34589aa78b1"
+  },
+  "database": {
+    "settings": "config.settings.development",
+    "loopback": true,
+    "read_only_transaction": true,
+    "before": {
+      "LeavePolicyVersion": 0,
+      "LeaveBalanceEntry": 0,
+      "PayrollCumulativeState": 0,
+      "PayrollComponent": 0,
+      "PayrollYearInterval": 0,
+      "PayrollRun": 0
+    },
+    "after": {
+      "leave_targets": 17,
+      "leave_days": "74.5000",
+      "payroll_source_rows": 81,
+      "payroll_targets": 80,
+      "payroll_signed_irr": "56574280000.00",
+      "superseded_evidence_only": 1,
+      "fabricated_payroll_runs": 0
+    },
+    "all_supplied_category_component_kind_controls": "PASS",
+    "cross_tenant_source_target_mismatches": 0,
+    "rollback_reversals_remaining": 0
+  },
+  "gate06": {
+    "status": "NOT_PASSED",
+    "057_contribution": "PASS_DEVELOPMENT_TECHNICAL",
+    "058_contribution": "PASS_DEVELOPMENT_TECHNICAL",
+    "required_imbs": [
+      "IMB-0050",
+      "IMB-0070",
+      "IMB-0075",
+      "IMB-0080",
+      "IMB-0096",
+      "IMB-0097"
+    ],
+    "reason": "No global PASS inferred. Existing CEP012 live Registry lists AC/DoD UNRECORDED and completion evidence UNVERIFIED; its contributions require their own evidence review. EXT0023 runtime verification remains separately governed. No claim that evidence does not exist outside inspected sources. Out of057/058 scope; other CEPs unchanged.",
+    "source_archive_sha256": "54082de6f32d9a26805aaa3050f24a9863d73f840d827274f0cd3145988b6784",
+    "source_member_sha256": "4eca43cb04f5f32afdc2ec177c2c4c8ec1963115d3e23f91e3b07c8b5579358d"
+  },
+  "commands": [
+    "pytest apps/workforce/test_cep057_import.py apps/workforce/test_cep057.py apps/workforce/test_cep023.py apps/workforce/test_cep029.py -q --reuse-db",
+    "pytest apps/payroll/test_cep058_import.py apps/payroll/test_cep058.py apps/payroll/test_cep025_cumulative.py apps/payroll/test_cep058_migration.py -q --reuse-db",
+    "pytest selected affected core Payroll/payslip/inquiry modules; detailed logs retained",
+    "python scripts/cep057_058_baseline.py",
+    "python scripts/cep057_058_execute.py 057",
+    "python scripts/cep057_058_execute.py 058",
+    "manage.py migrate payroll --noinput; manage.py check; manage.py makemigrations --check --dry-run; Ruff checks/format"
+  ],
+  "unchanged_other_cep_records": true,
+  "remaining_057_058_blockers": [],
+  "v1_counts": {
+    "COMPLETE": 68,
+    "PARTIAL": 0,
+    "BLOCKED": 0
+  },
+  "test_results": {
+    "CEP-057": "65 passed;29 subtests passed",
+    "CEP-058_final_focused": "40 passed;27 subtests passed",
+    "affected_regression": "100 passed;34 subtests passed;1 reproducible BASELINE TEST DEBT",
+    "full_regression_pass_claimed": false
+  }
+}
