@@ -6,6 +6,7 @@ import io
 import json
 from dataclasses import dataclass
 from datetime import timedelta
+from uuid import UUID
 
 from django.apps import apps
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -22,6 +23,10 @@ from apps.organizations.authorization import (
 )
 from apps.organizations.models import BusinessPermissionCode, Organization
 from apps.projects.models import Project
+from apps.reporting.financial_closeout import (
+    financial_gate_snapshot,
+    require_financial_sources,
+)
 from apps.reporting.models import (
     ProjectCloseoutAssessment,
     ProjectCloseoutAssessmentStatus,
@@ -150,7 +155,28 @@ def _capture_family(
     organization: Organization,
     project: Project,
     cutoff_at,
+    actor: User,
+    case: ProjectCloseoutCase,
 ) -> FamilySnapshot:
+    if family_code == "reconciliation_performance":
+        evidence = financial_gate_snapshot(
+            organization=organization,
+            project=project,
+            actor=actor,
+            cutoff=cutoff_at,
+            case=case,
+        )
+        return FamilySnapshot(
+            outcome=evidence["outcome"],
+            summary={
+                "financial_families": {
+                    k: v["outcome"] for k, v in evidence["families"].items()
+                }
+            },
+            manifest=evidence,
+            source_hash=evidence["source_watermark"],
+        )
+
     manifests: list[dict[str, object]] = []
     status_counts: dict[str, int] = {}
     total = 0
@@ -216,6 +242,7 @@ def _capture_family(
 def _require_family_permissions(
     *, actor: User, organization: Organization, project: Project
 ) -> None:
+    require_financial_sources(organization, project, actor)
     for spec in PROJECT_CLOSEOUT_FAMILIES.values():
         for permission in spec["permissions"]:
             require_business_permission(
@@ -360,6 +387,8 @@ def run_closeout_assessment(
             organization=locked.organization,
             project=locked.project,
             cutoff_at=cutoff,
+            actor=actor,
+            case=locked,
         )
         item = ProjectCloseoutItemSnapshot.objects.create(
             organization=locked.organization,
@@ -435,11 +464,32 @@ def _event_fingerprint(
 
 
 def _existing_event(
-    *, case: ProjectCloseoutCase, operation_key: str, fingerprint: str
+    *, case: ProjectCloseoutCase, operation_key: str, fingerprint: str, actor: User
 ) -> ProjectCloseoutEvent | None:
     existing = ProjectCloseoutEvent.objects.filter(
         organization=case.organization, operation_key=operation_key
     ).first()
+    if existing:
+        permissions = {
+            "coordinate": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_COORDINATE,
+            "accept": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_ACCEPT,
+            "reject": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_REVIEW,
+            "reopen": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_REOPEN,
+            "cancel": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_PREPARE,
+        }
+        require_business_permission(
+            user=actor,
+            organization=case.organization,
+            project=case.project,
+            permission=permissions[existing.action],
+            message="Current closeout authority required for retry.",
+        )
+        if existing.action in {"accept", "reject", "reopen"}:
+            _require_family_permissions(
+                actor=actor, organization=case.organization, project=case.project
+            )
+        if existing.actor_id != actor.pk:
+            raise PermissionDenied("An action can only be replayed by its actor.")
     if existing and existing.request_fingerprint != fingerprint:
         raise ValidationError("کلید تکرار رویداد با درخواست متفاوت استفاده شده است.")
     return existing
@@ -469,12 +519,76 @@ def coordinate_closeout_case(
     )
     if not reason.strip():
         raise ValidationError("دلیل هماهنگی الزامی است.")
-    payload = details or {}
+    payload = dict(details or {})
+    if "accepted_open_obligations" in payload:
+        require_business_permission(
+            user=actor,
+            organization=locked.organization,
+            project=locked.project,
+            permission=BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_ACCEPT,
+            message="Open obligation acceptance requires closeout acceptance authority.",
+        )
+        if actor.pk == locked.created_by_id:
+            raise PermissionDenied(
+                "An independent actor must accept legitimate open obligations."
+            )
+        from decimal import Decimal
+        from zoneinfo import ZoneInfo
+
+        from apps.subledgers.closeout_projection import settlement_reconciliation
+
+        current = settlement_reconciliation(
+            organization=locked.organization,
+            actor=actor,
+            project=locked.project,
+            as_of_date=timezone.localtime(
+                timezone.now(), ZoneInfo(locked.organization.settings.timezone)
+            ).date(),
+        )
+        rows = {x["obligation"]: x for x in current["rows"]}
+        identities = payload["accepted_open_obligations"]
+        if not isinstance(identities, (list, dict)) or any(
+            str(x) not in rows for x in identities
+        ):
+            raise PermissionDenied(
+                "Open obligation is outside the authorized source scope."
+            )
+        accepted = {}
+        for identity in identities:
+            row = rows[str(identity)]
+            if (
+                row["issues"]
+                or row["state"] != "open"
+                or Decimal(row["outstanding"]) <= 0
+            ):
+                raise ValidationError(
+                    "Only verified, legitimately open obligations may be explicitly accepted."
+                )
+            accepted[str(identity)] = row["economic_hash"]
+        payload["accepted_open_obligations"] = accepted
+        payload["material"] = True
+    if "blocking_exception_ids" in payload:
+        from .models import ReconciliationException
+
+        try:
+            identities = {UUID(str(x)) for x in payload["blocking_exception_ids"]}
+        except (ValueError, TypeError) as exc:
+            raise ValidationError("Invalid linked exception identity.") from exc
+        if ReconciliationException.objects.filter(
+            organization=locked.organization,
+            run__project=locked.project,
+            pk__in=identities,
+        ).count() != len(identities):
+            raise PermissionDenied(
+                "Linked exceptions must belong to this tenant/project."
+            )
+        payload["blocking_exception_ids"] = sorted(str(x) for x in identities)
+
     fingerprint = _event_fingerprint(
         case=locked, action="coordinate", reason=reason, details=payload
     )
     existing = _existing_event(
-        case=locked, operation_key=operation_key, fingerprint=fingerprint
+        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
     )
     if existing:
         return existing
@@ -512,7 +626,7 @@ def _audit_event(event: ProjectCloseoutEvent) -> None:
     )
 
 
-def _assert_current_sources(locked: ProjectCloseoutCase) -> None:
+def _assert_current_sources(locked: ProjectCloseoutCase, actor: User) -> None:
     assessment = locked.current_assessment
     if (
         assessment is None
@@ -527,6 +641,8 @@ def _assert_current_sources(locked: ProjectCloseoutCase) -> None:
             organization=locked.organization,
             project=locked.project,
             cutoff_at=timezone.now(),
+            actor=actor,
+            case=locked,
         )
         if current.source_hash != item.source_hash:
             raise ValidationError(
@@ -562,7 +678,7 @@ def decide_closeout_case(
         revision=expected_revision,
     )
     existing = _existing_event(
-        case=locked, operation_key=operation_key, fingerprint=fingerprint
+        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
     )
     if existing:
         return existing
@@ -613,7 +729,7 @@ def decide_closeout_case(
         )
         if disallowed.exists():
             raise ValidationError("همه کنترل‌های لازم برای پذیرش برآورده نشده‌اند.")
-        _assert_current_sources(locked)
+        _assert_current_sources(locked, actor)
     event = ProjectCloseoutEvent.objects.create(
         organization=locked.organization,
         case=locked,
@@ -664,7 +780,7 @@ def reopen_closeout_case(
         revision=expected_revision,
     )
     existing = _existing_event(
-        case=locked, operation_key=operation_key, fingerprint=fingerprint
+        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
     )
     if existing:
         return existing
@@ -672,6 +788,23 @@ def reopen_closeout_case(
         raise ValidationError("پرونده تغییر کرده است؛ بازگشایی رد شد.")
     if locked.status != ProjectCloseoutCaseStatus.ACCEPTED or not reason.strip():
         raise ValidationError("فقط پرونده پذیرفته‌شده با دلیل قابل بازگشایی است.")
+    if (
+        locked.current_assessment is None
+        or locked.current_assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED
+    ):
+        raise ValidationError("A completed accepted source assessment is required.")
+    # A reason alone cannot assert that authoritative evidence changed.
+    _require_family_permissions(
+        actor=actor, organization=locked.organization, project=locked.project
+    )
+    try:
+        _assert_current_sources(locked, actor)
+    except ValidationError:
+        pass
+    else:
+        raise ValidationError(
+            "A qualifying source change is required before reopening."
+        )
     event = ProjectCloseoutEvent.objects.create(
         organization=locked.organization,
         case=locked,
@@ -898,3 +1031,80 @@ def export_closeout_csv(
             metadata={"case": str(locked.pk), "content_hash": content_hash},
         )
     return manifest, content
+
+
+@transaction.atomic
+def cancel_closeout_case(
+    *,
+    case: ProjectCloseoutCase,
+    actor: User,
+    reason: str,
+    operation_key: str,
+    expected_revision: int,
+) -> ProjectCloseoutEvent:
+    """Policy P10-C: creator withdrawal before acceptance, with retained history."""
+    locked = (
+        ProjectCloseoutCase.objects.select_for_update()
+        .select_related("project")
+        .get(pk=case.pk)
+    )
+    require_business_permission(
+        user=actor,
+        organization=locked.organization,
+        project=locked.project,
+        permission=BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_PREPARE,
+        message="Closeout preparation authority required.",
+    )
+    if actor.pk != locked.created_by_id:
+        raise PermissionDenied("Only the initiator may withdraw this case.")
+    fingerprint = _event_fingerprint(
+        case=locked,
+        action="cancel",
+        reason=reason,
+        details={},
+        revision=expected_revision,
+    )
+    existing = _existing_event(
+        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
+    )
+    if existing:
+        return existing
+    if (
+        locked.revision != expected_revision
+        or not reason.strip()
+        or locked.status not in {"draft", "active", "review_pending"}
+    ):
+        raise ValidationError(
+            "Only a current pre-acceptance case may be cancelled with a reason."
+        )
+    event = ProjectCloseoutEvent.objects.create(
+        organization=locked.organization,
+        case=locked,
+        assessment=locked.current_assessment,
+        action="cancel",
+        previous_state=locked.status,
+        new_state="cancelled",
+        reason=reason.strip(),
+        details={},
+        actor=actor,
+        operation_key=operation_key,
+        request_fingerprint=fingerprint,
+    )
+    ProjectCloseoutCase.objects.filter(pk=locked.pk).update(
+        status="cancelled", revision=models.F("revision") + 1
+    )
+    _audit_event(event)
+    return event
+
+
+def requester_closeout_status(
+    *, organization: Organization, actor: User, case_id: str
+) -> dict:
+    case = (
+        closeout_cases(organization=organization, actor=actor)
+        .filter(pk=case_id, created_by=actor)
+        .first()
+    )
+    if case is None:
+        raise PermissionDenied("Requester case is outside the active scope.")
+    return {"case": str(case.pk), "status": case.status, "revision": case.revision}

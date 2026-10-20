@@ -1,0 +1,122 @@
+.......F.....F..........                                                 [100%]
+================================== FAILURES ===================================
+_____ FinancialCloseoutTests.test_settings_absent_is_explicit_unverified ______
+
+self = <apps.reporting.test_cep066.FinancialCloseoutTests testMethod=test_settings_absent_is_explicit_unverified>
+
+    def test_settings_absent_is_explicit_unverified(self):
+        OrganizationSettings.objects.filter(organization=self.organization).delete()
+        data = self.snapshot()
+>       self.assertTrue(
+            all(x["outcome"] == "unverifiable" for x in data["families"].values())
+        )
+E       AssertionError: False is not true
+
+apps\reporting\test_cep066.py:101: AssertionError
+_ P10S14S17AcceptanceTests.test_06_lifecycle_sod_accept_reject_and_reopen_are_append_only _
+
+self = <apps.reporting.test_p10_s14_s17.P10S14S17AcceptanceTests testMethod=test_06_lifecycle_sod_accept_reject_and_reopen_are_append_only>
+
+    def test_06_lifecycle_sod_accept_reject_and_reopen_are_append_only(self) -> None:
+        case, assessment = self._assessment("lifecycle-case", "lifecycle-assessment")
+        ProjectCloseoutItemSnapshot.objects.filter(assessment=assessment).update(
+            outcome=ProjectCloseoutOutcome.SATISFIED
+        )
+        with self.assertRaises(PermissionDenied):
+            decide_closeout_case(
+                case=case,
+                actor=self.runner,
+                decision="accept",
+                reason="self acceptance forbidden",
+                operation_key="self-accept",
+                expected_revision=case.revision,
+            )
+        with patch("apps.reporting.project_closeout._assert_current_sources"):
+            accepted = decide_closeout_case(
+                case=case,
+                actor=self.reviewer,
+                decision="accept",
+                reason="independent control acceptance",
+                operation_key="independent-accept",
+                expected_revision=case.revision,
+            )
+        case.refresh_from_db()
+        self.assertEqual(case.status, "accepted")
+        Project.objects.filter(pk=self.project.pk).update(name="Changed source evidence")
+>       reopened = reopen_closeout_case(
+            case=case,
+            actor=self.reviewer,
+            reason="new source evidence requires successor",
+            operation_key="reopen-accepted",
+            expected_revision=case.revision,
+        )
+
+apps\reporting\test_p10_s14_s17.py:295:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = <ProjectCloseoutCase: ProjectCloseoutCase object (b9c1487c-bf3e-4bab-985c-20649d11198d)>
+actor = <User: closeout-reviewer>
+reason = 'new source evidence requires successor'
+operation_key = 'reopen-accepted', expected_revision = 3
+
+    @transaction.atomic
+    def reopen_closeout_case(
+        *,
+        case: ProjectCloseoutCase,
+        actor: User,
+        reason: str,
+        operation_key: str,
+        expected_revision: int,
+    ) -> ProjectCloseoutEvent:
+        locked = (
+            ProjectCloseoutCase.objects.select_for_update(of=("self",))
+            .select_related("project", "current_assessment")
+            .get(pk=case.pk)
+        )
+        require_business_permission(
+            user=actor,
+            organization=locked.organization,
+            permission=BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_REOPEN,
+            message="اجازه بازگشایی پرونده اختتام را ندارید.",
+            project=locked.project,
+        )
+        details = {"requires_successor_assessment": True}
+        fingerprint = _event_fingerprint(
+            case=locked,
+            action="reopen",
+            reason=reason,
+            details=details,
+            revision=expected_revision,
+        )
+        existing = _existing_event(
+            case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
+        )
+        if existing:
+            return existing
+        if locked.revision != expected_revision:
+            raise ValidationError("پرونده تغییر کرده است؛ بازگشایی رد شد.")
+        if locked.status != ProjectCloseoutCaseStatus.ACCEPTED or not reason.strip():
+            raise ValidationError("فقط پرونده پذیرفته‌شده با دلیل قابل بازگشایی است.")
+        # A reason alone cannot assert that authoritative evidence changed.
+        _require_family_permissions(
+            actor=actor, organization=locked.organization, project=locked.project
+        )
+        try:
+            _assert_current_sources(locked, actor)
+        except ValidationError:
+            pass
+        else:
+>           raise ValidationError(
+                "A qualifying source change is required before reopening."
+            )
+E           django.core.exceptions.ValidationError: ['A qualifying source change is required before reopening.']
+
+apps\reporting\project_closeout.py:796: ValidationError
+=========================== short test summary info ===========================
+FAILED apps/reporting/test_cep066.py::FinancialCloseoutTests::test_settings_absent_is_explicit_unverified
+FAILED apps/reporting/test_p10_s14_s17.py::P10S14S17AcceptanceTests::test_06_lifecycle_sod_accept_reject_and_reopen_are_append_only
+2 failed, 22 passed in 97.43s (0:01:37)

@@ -1,0 +1,22 @@
+{
+  "baseline": "1548b52aa4cae5eaaa1d207638e4acbe2246a1ca",
+  "execution": "COMPLETE",
+  "AC": "12/12 PASS",
+  "DoD": "MET",
+  "focused_and_affected": "31 PASS:9 new financial closeout;6 APAR projection;16 retained closeout workflow",
+  "prior_affected": "16 pre-existing native writeoff/correction tests PASS in IMB0065 iteration; no new schema",
+  "required_failures_remaining": 0,
+  "resolved_iterations": [
+    "Native settlement reversal fixture keyword/idempotency signature corrected",
+    "Removed stale OrganizationSettings relation cache from source read",
+    "Reopen fixture now advances the authoritative source timestamp with its change",
+    "Native cash fixture now uses a project-scoped receipt rather than an unscoped Payroll request"
+  ],
+  "data_reconciliation": "Exact native grain/supersession; open/settled/reversed/writeoff source states and cutoff tests; unknown GL never zero; no financial writer",
+  "migration": "NONE; no schema or configured business-data change",
+  "activation": "No source activation, global Gate, sign-off, Production certification or cutover",
+  "UTV": [
+    "Full suite and broad runtime/performance/concurrency/browser/UAT remain unverified"
+  ],
+  "source_limits": "L2 draft Accounting recognition, missing period/current GL evidence and unapproved ProjectCost complete coverage remain explicit holds; no automatic posting or completeness inference."
+}

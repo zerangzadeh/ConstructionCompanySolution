@@ -1,0 +1,43 @@
+..F                                                                      [100%]
+================================== FAILURES ===================================
+_ NativeTreasuryCloseoutTests.test_native_posted_cash_requires_current_exact_slice_and_keeps_revision _
+
+self = <apps.reporting.test_cep066.NativeTreasuryCloseoutTests testMethod=test_native_posted_cash_requires_current_exact_slice_and_keeps_revision>
+
+    def test_native_posted_cash_requires_current_exact_slice_and_keeps_revision(self):
+        from apps.treasury.services import run_treasury_gl_reconciliation
+
+        f = self.fixture
+        request, movement = f.paid()
+        kwargs = {
+            "organization": f.organization,
+            "project": request.project,
+            "actor": f.owner,
+            "cutoff": timezone.now(),
+        }
+>       initial = financial_gate_snapshot(**kwargs)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\reporting\test_cep066.py:288:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Handoff Tenant>, project = None
+actor = <User: handoff-owner>
+cutoff = datetime.datetime(2026, 10, 20, 7, 34, 15, 498201, tzinfo=datetime.timezone.utc)
+case = None
+
+    @transaction.atomic
+    def financial_gate_snapshot(*, organization, project, actor, cutoff, case=None):
+        """All eight explicit families, native policy only, stable economic watermark."""
+>       if project.organization_id != organization.pk:
+           ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'NoneType' object has no attribute 'organization_id'
+
+apps\reporting\financial_closeout.py:258: AttributeError
+=========================== short test summary info ===========================
+FAILED apps/reporting/test_cep066.py::NativeTreasuryCloseoutTests::test_native_posted_cash_requires_current_exact_slice_and_keeps_revision
+1 failed, 2 passed in 19.54s

@@ -1,0 +1,1493 @@
+--- a/apps/subledgers/closeout_projection.py
++++ b/apps/subledgers/closeout_projection.py
+@@ -0,0 +1,201 @@
++"""IMB-0065: authorized native facts and one retained slice per exact grain."""
++
++from datetime import date
++from decimal import Decimal
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.models import Organization
++from apps.projects.models import Project
++
++from .models import SubledgerReconciliationAccountSlice
++from .services import (
++    _amounts_as_of,
++    _canonical_hash,
++    _source_reversed_amount_as_of,
++    obligation_queryset,
++)
++
++
++@transaction.atomic
++def settlement_reconciliation(
++    *,
++    organization: Organization,
++    actor: User,
++    as_of_date: date,
++    project: Project | None = None,
++) -> dict[str, object]:
++    """Never create a run, journal, settlement, write-off or source correction."""
++    if type(as_of_date) is not date:
++        raise ValidationError("An exact business-date cutoff is required.")
++    if project is not None and project.organization_id != organization.pk:
++        raise PermissionDenied("Project is outside the active organization.")
++    obligations = obligation_queryset(organization=organization, actor=actor).filter(
++        recognized_on__lte=as_of_date
++    )
++    if project is not None:
++        obligations = obligations.filter(project=project)
++    rows = []
++    for obligation in obligations.select_related("control_account_mapping").order_by(
++        "pk"
++    ):
++        settled, written_off = _amounts_as_of(obligation, as_of_date)
++        reversed_amount = _source_reversed_amount_as_of(obligation, as_of_date)
++        outstanding = (
++            obligation.original_amount - settled - written_off - reversed_amount
++        )
++        state = (
++            "reversed"
++            if reversed_amount
++            else "written_off"
++            if written_off and not outstanding
++            else "settled"
++            if settled and not outstanding
++            else "open"
++        )
++        issues = []
++        if (
++            not obligation.control_account_id
++            or not obligation.control_account_mapping_id
++        ):
++            issues.append("CONTROL_MAPPING_NOT_APPROVED")
++        current = (
++            SubledgerReconciliationAccountSlice.objects.filter(
++                organization=organization,
++                direction=obligation.direction,
++                as_of_date=as_of_date,
++                control_account_id=obligation.control_account_id,
++                invalidation__isnull=True,
++            )
++            .order_by("-grain_revision")
++            .first()
++            if obligation.control_account_id
++            else None
++        )
++        retained = (
++            current.obligation_evidence.filter(
++                organization=organization, obligation=obligation
++            ).first()
++            if current
++            else None
++        )
++        journal_rows = []
++        gl = None
++        if retained is None:
++            issues.append("CURRENT_NATIVE_EVIDENCE_MISSING")
++        else:
++            if (
++                retained.source_kind != obligation.source_kind
++                or retained.source_uuid != obligation.source_uuid
++                or retained.source_version != obligation.source_version
++                or retained.source_hash != obligation.source_hash
++                or retained.outstanding_amount != outstanding
++            ):
++                issues.append("CURRENT_NATIVE_EVIDENCE_STALE")
++            for item in current.journal_line_evidence.filter(
++                organization=organization, obligation=obligation
++            ).select_related("journal", "journal_line"):
++                journal_rows.append(
++                    {
++                        "journal": str(item.journal_id),
++                        "line": str(item.journal_line_id),
++                        "source": str(item.journal_source_uuid),
++                        "version": item.journal_source_version,
++                        "debit": str(item.debit),
++                        "credit": str(item.credit),
++                    }
++                )
++                if (
++                    item.journal.status != "posted"
++                    or item.journal.accounting_date > as_of_date
++                    or item.journal.source_uuid != item.journal_source_uuid
++                    or item.journal.source_version != item.journal_source_version
++                    or item.journal_line.account_id != obligation.control_account_id
++                    or item.journal_line.debit != item.debit
++                    or item.journal_line.credit != item.credit
++                ):
++                    issues.append("UNVERIFIED_JOURNAL_EVIDENCE")
++                    continue
++                value = (
++                    item.debit - item.credit
++                    if obligation.direction == "receivable"
++                    else item.credit - item.debit
++                )
++                gl = (gl or Decimal(0)) + value
++            if gl is None:
++                issues.append("POSTED_CONTROL_ACCOUNT_EVIDENCE_MISSING")
++            elif gl != outstanding:
++                issues.append("CONTROL_ACCOUNT_DIFFERENCE")
++        allocations = [
++            {
++                "id": str(x.pk),
++                "movement": str(x.treasury_movement_id),
++                "amount": str(x.amount),
++                "effective_date": x.effective_date.isoformat(),
++                "reversal": str(x.reversal.pk) if hasattr(x, "reversal") else None,
++            }
++            for x in obligation.settlement_allocations.filter(
++                effective_date__lte=as_of_date
++            ).select_related("reversal")
++        ]
++        row = {
++            "obligation": str(obligation.pk),
++            "project": str(obligation.project_id) if obligation.project_id else None,
++            "source_kind": obligation.source_kind,
++            "source": str(obligation.source_uuid),
++            "source_version": obligation.source_version,
++            "source_hash": obligation.source_hash,
++            "direction": obligation.direction,
++            "state": state,
++            "original": str(obligation.original_amount),
++            "settled": str(settled),
++            "written_off": str(written_off),
++            "reversed": str(reversed_amount),
++            "outstanding": str(outstanding),
++            "gl": str(gl) if gl is not None else None,
++            "control_account": str(obligation.control_account_id)
++            if obligation.control_account_id
++            else None,
++            "mapping": str(obligation.control_account_mapping_id)
++            if obligation.control_account_mapping_id
++            else None,
++            "native_slice": str(current.pk) if current else None,
++            "native_revision": current.grain_revision if current else None,
++            "native_evidence_hash": current.evidence_hash if current else None,
++            "journal_evidence": journal_rows,
++            "settlement_evidence": allocations,
++            "issues": sorted(set(issues)),
++        }
++        # Economic-source fingerprint is independent of repeated native snapshots.
++        row["economic_hash"] = _canonical_hash(
++            {
++                k: row[k]
++                for k in (
++                    "obligation",
++                    "source",
++                    "source_version",
++                    "source_hash",
++                    "original",
++                    "settled",
++                    "written_off",
++                    "reversed",
++                    "outstanding",
++                )
++            }
++        )
++        rows.append(row)
++    return {
++        "organization": str(organization.pk),
++        "project": str(project.pk) if project else None,
++        "as_of_date": as_of_date.isoformat(),
++        "observed_at": timezone.now().isoformat(),
++        "source_watermark": _canonical_hash(rows),
++        "rows": rows,
++        "outstanding_total": str(
++            sum((Decimal(x["outstanding"]) for x in rows), Decimal(0))
++        ),
++        "projection_only": True,
++    }
+--- a/apps/subledgers/test_cep066.py
++++ b/apps/subledgers/test_cep066.py
+@@ -0,0 +1,181 @@
++"""Native AP/AR cutoffs, source states, scope and projection-only behavior."""
++
++import json
++from datetime import date, timedelta
++from decimal import Decimal
++from pathlib import Path
++
++from django.core.exceptions import PermissionDenied
++from django.test import TestCase
++
++from apps.accounting.models import JournalEntry
++from apps.organizations.services import create_organization_with_owner
++from apps.treasury.models import TreasuryMovement
++from tests.retirement_fixtures import explicit_fixture_roles
++
++from . import test_cep044_writeoffs as retained
++from . import tests as foundation
++from .closeout_projection import settlement_reconciliation
++from .models import Obligation, SubledgerReconciliationRun
++from .services import allocate_settlement, reverse_settlement
++from .test_cep044_writeoffs import CEP044Fixture
++
++
++class ProjectionFixture:
++    _member = foundation.SubledgerFoundationTests._member
++    _activate_policy = foundation.SubledgerFoundationTests._activate_policy
++    _obligation = foundation.SubledgerFoundationTests._obligation
++    _posted_receipt = foundation.SubledgerFoundationTests._posted_receipt
++
++    def setUp(self):
++        foundation.SubledgerFoundationTests.setUp(self)
++        explicit_fixture_roles(self.organization)
++
++    def read(self, day=date(2026, 6, 1), **extra):
++        return settlement_reconciliation(
++            organization=self.organization, actor=self.owner, as_of_date=day, **extra
++        )
++
++
++class SettlementProjectionTests(ProjectionFixture, TestCase):
++    def test_native_settlement_reversal_cutoffs_and_no_write(self):
++        obligation = self._obligation()
++        movement = self._posted_receipt()
++        before = self.read()
++        self.assertEqual(before["rows"][0]["state"], "open")
++        allocation = allocate_settlement(
++            organization=self.organization,
++            actor=self.owner,
++            obligation=obligation,
++            movement=movement,
++            amount=Decimal(100),
++            effective_date=date(2026, 6, 1),
++            reason="Synthetic exact settlement",
++            idempotency_key="projection-allocate",
++        )
++        counts = [
++            model.objects.count()
++            for model in (
++                JournalEntry,
++                TreasuryMovement,
++                Obligation,
++                SubledgerReconciliationRun,
++            )
++        ]
++        self.assertEqual(self.read()["rows"][0]["state"], "settled")
++        self.assertEqual(self.read(date(2026, 5, 31))["rows"][0]["state"], "open")
++        self.assertEqual(
++            counts,
++            [
++                model.objects.count()
++                for model in (
++                    JournalEntry,
++                    TreasuryMovement,
++                    Obligation,
++                    SubledgerReconciliationRun,
++                )
++            ],
++        )
++        reverse_settlement(
++            organization=self.organization,
++            actor=self.owner,
++            allocation=allocation,
++            effective_date=date(2026, 6, 2),
++            reason="Synthetic settlement reversal",
++            idempotency_key="projection-reverse",
++        )
++        self.assertEqual(self.read()["rows"][0]["state"], "settled")
++        self.assertEqual(self.read(date(2026, 6, 2))["rows"][0]["state"], "open")
++        self.assertEqual(len(self.read(date(2026, 6, 2))["rows"]), 1)
++
++    def test_missing_mapping_is_not_zero_or_reliable_gl(self):
++        self._obligation()
++        row = self.read()["rows"][0]
++        self.assertIsNone(row["gl"])
++        self.assertIn("CONTROL_MAPPING_NOT_APPROVED", row["issues"])
++        self.assertEqual(Decimal(row["outstanding"]), Decimal(100))
++
++    def test_foreign_tenant_and_unassigned_user_fail_closed(self):
++        from apps.accounts.models import User
++        from apps.projects.models import Project
++
++        denied = User.objects.create_user(username="projection-denied")
++        with self.assertRaises(PermissionDenied):
++            settlement_reconciliation(
++                organization=self.organization,
++                actor=denied,
++                as_of_date=date(2026, 6, 1),
++            )
++        other = create_organization_with_owner(
++            owner=denied, name="Other", slug="projection-other"
++        )
++        project = Project.objects.create(
++            organization=other, code="FOREIGN", name="Foreign", created_by=denied
++        )
++        with self.assertRaises(PermissionDenied):
++            self.read(project=project)
++
++
++class NativeCorrectionProjectionTests(CEP044Fixture, TestCase):
++    def read(self, day=None):
++        return settlement_reconciliation(
++            organization=self.organization, actor=self.owner, as_of_date=day or self.day
++        )
++
++    def test_writeoff_and_inverse_keep_original_cutoff_and_source_version(self):
++        original = self.approve(self.proposal(amount=str(self.target.original_amount)))
++        row = self.read()["rows"][0]
++        self.assertEqual(row["state"], "written_off")
++        before = row["economic_hash"]
++        self.correct(original, effective_date=self.day + timedelta(days=1))
++        self.assertEqual(self.read()["rows"][0]["economic_hash"], before)
++        self.assertEqual(
++            self.read(self.day + timedelta(days=1))["rows"][0]["state"], "open"
++        )
++
++    def test_repeat_native_exact_grain_uses_one_current_source_snapshot(self):
++        from .services import run_subledger_reconciliation
++
++        first = run_subledger_reconciliation(
++            organization=self.organization,
++            actor=self.owner,
++            direction="payable",
++            as_of_date=self.day,
++            idempotency_key="first-native",
++        )
++        second = run_subledger_reconciliation(
++            organization=self.organization,
++            actor=self.owner,
++            direction="payable",
++            as_of_date=self.day,
++            idempotency_key="second-native",
++        )
++        rows = self.read()["rows"]
++        self.assertEqual(len(rows), 1)
++        self.assertEqual(rows[0]["native_slice"], str(second.account_slices.get().pk))
++        self.assertEqual(
++            rows[0]["native_revision"], first.account_slices.get().grain_revision + 1
++        )
++        self.assertEqual(rows[0]["source_version"], self.target.source_version)
++        Path("docs/governance/cep/evidence/CEP-066_APAR_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic": True,
++                    "first_native_run": str(first.pk),
++                    "second_native_run": str(second.pk),
++                    "as_of": self.day.isoformat(),
++                    "result": self.read(),
++                    "no_projection_write": True,
++                },
++                indent=2,
++            )
++        )
++
++    def test_native_source_reversal_is_visible_without_duplicate_obligation(self):
++        retained.WriteOffGovernanceTests.test_native_ap_reversal_and_replacement_accounting_chain(
++            self
++        )
++        rows = self.read()["rows"]
++        original = next(row for row in rows if row["obligation"] == str(self.target.pk))
++        self.assertEqual(original["state"], "reversed")
++        self.assertEqual(len({row["obligation"] for row in rows}), len(rows))
+--- a/apps/reporting/financial_closeout.py
++++ b/apps/reporting/financial_closeout.py
+@@ -0,0 +1,506 @@
++"""SPEC-023 financial gates. Captures evidence; never performs a source action."""
++
++import json
++from dataclasses import asdict
++from datetime import datetime
++from decimal import Decimal
++from uuid import UUID
++from zoneinfo import ZoneInfo
++
++from django.apps import apps
++from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
++from django.db import transaction
++from django.utils import timezone
++
++from apps.accounting.models import JournalEntry
++from apps.accounting.recognition_models import SourceRecognitionDraft
++from apps.accounting.recognition_services import _journal_rows
++from apps.accounting.recognition_sources import digest, read_source
++from apps.accounts.models import User
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization, OrganizationSettings
++from apps.projects.models import Project
++from apps.projects.services import get_project_cost_reconciliation
++from apps.subledgers.closeout_projection import settlement_reconciliation
++from apps.treasury.models import TreasuryGLReconciliationSlice, TreasuryMovement
++
++from .models import ReconciliationException
++
++GATE_FAMILIES = (
++    "accounting_period_controls",
++    "treasury_gl",
++    "subledger_settlement_control",
++    "inventory_gl",
++    "payroll_financial",
++    "fixed_assets_gl",
++    "project_cost_sources",
++    "linked_blocking_exceptions",
++)
++SOURCE_PERMISSIONS = (
++    P.ACCOUNTING_VIEW,
++    P.ACCOUNTING_RECOGNITION_VIEW,
++    P.TREASURY_VIEW,
++    P.SUBLEDGERS_VIEW,
++    P.INVENTORY_VALUATION_VIEW,
++    P.PAYROLL_RESULTS_VIEW,
++    P.FIXED_ASSETS_VIEW,
++    P.PROJECT_COST_RECONCILIATIONS_VIEW,
++)
++
++
++def _result(
++    outcome: str, *, evidence: list | None = None, issues: tuple | list = ()
++) -> dict:
++    return {"outcome": outcome, "evidence": evidence or [], "issues": list(issues)}
++
++
++def require_financial_sources(
++    organization: Organization, project: Project, actor: User
++) -> None:
++    for code in SOURCE_PERMISSIONS:
++        require_business_permission(
++            user=actor,
++            organization=organization,
++            project=project,
++            permission=code,
++            message="Financial source access required.",
++        )
++
++
++def _accounting(organization: Organization, project: Project, cutoff: datetime) -> dict:
++    journals = (
++        JournalEntry.objects.filter(
++            organization=organization,
++            lines__project=project,
++            document_date__lte=cutoff.date(),
++            created_at__lte=cutoff,
++        )
++        .select_related("period")
++        .distinct()
++    )
++    evidence, issues = [], []
++    for journal in journals:
++        event = (
++            journal.period.control_events.filter(created_at__lte=cutoff)
++            .order_by("-sequence")
++            .first()
++        )
++        evidence.append(
++            {
++                "journal": str(journal.pk),
++                "version": journal.source_version,
++                "status": journal.status,
++                "period": str(journal.period_id),
++                "control_event": str(event.pk) if event else None,
++                "control_hash": event.evidence_hash if event else None,
++            }
++        )
++        if (
++            journal.status != "posted"
++            or journal.period.status != "closed"
++            or event is None
++            or event.action != "close"
++        ):
++            issues.append("ACCOUNTING_PERIOD_CONTROL_UNRESOLVED")
++    return _result(
++        "blocked" if issues else "satisfied" if evidence else "not_applicable",
++        evidence=evidence,
++        issues=issues,
++    )
++
++
++def _treasury(organization: Organization, project: Project, cutoff: datetime) -> dict:
++    evidence, issues = [], []
++    for movement in TreasuryMovement.objects.filter(
++        organization=organization,
++        project=project,
++        status="posted",
++        movement_date__lte=cutoff.date(),
++        created_at__lte=cutoff,
++    ).select_related("journal"):
++        legs = list(movement.legs.all())
++        if not legs:
++            issues.append("POSTED_CASH_LEGS_MISSING")
++        for leg in legs:
++            current = (
++                TreasuryGLReconciliationSlice.objects.filter(
++                    organization=organization,
++                    treasury_account_id=leg.account_id,
++                    cutoff_date=cutoff.date(),
++                    currency=movement.currency,
++                    invalidation__isnull=True,
++                )
++                .order_by("-grain_revision")
++                .first()
++            )
++            captured = (
++                current.leg_evidence.filter(organization=organization, leg=leg).first()
++                if current
++                else None
++            )
++            lines = (
++                list(
++                    current.journal_line_evidence.filter(
++                        organization=organization, movement=movement
++                    ).select_related("journal")
++                )
++                if current
++                else []
++            )
++            valid = bool(captured and lines and movement.journal_id)
++            if valid:
++                valid = (
++                    captured.movement_version == movement.version
++                    and captured.occurrence_id == movement.occurrence_id
++                    and captured.amount == leg.amount
++                    and captured.direction == leg.direction
++                    and all(
++                        x.journal.status == "posted"
++                        and x.journal.source_uuid == x.journal_source_uuid
++                        and x.journal.source_version == x.journal_source_version
++                        for x in lines
++                    )
++                )
++                signed_cash = leg.amount if leg.direction == "in" else -leg.amount
++                valid = (
++                    valid
++                    and sum((x.debit - x.credit for x in lines), Decimal(0))
++                    == signed_cash
++                )
++            evidence.append(
++                {
++                    "movement": str(movement.pk),
++                    "version": movement.version,
++                    "leg": str(leg.pk),
++                    "native_slice": str(current.pk) if current else None,
++                    "native_revision": current.grain_revision if current else None,
++                    "journal_lines": [str(x.journal_line_id) for x in lines],
++                    "matched": valid,
++                }
++            )
++            if not valid:
++                issues.append("CURRENT_TREASURY_GL_EVIDENCE_UNVERIFIED")
++    return _result(
++        "blocked" if issues else "satisfied" if evidence else "not_applicable",
++        evidence=evidence,
++        issues=issues,
++    )
++
++
++def _recognition(
++    organization: Organization,
++    project: Project,
++    actor: User,
++    cutoff: datetime,
++    sources: list[tuple[str, UUID]],
++) -> dict:
++    evidence, issues = [], []
++    for kind, identity in sources:
++        effects = (
++            SourceRecognitionDraft.objects.filter(
++                organization=organization,
++                source_kind=kind,
++                source_uuid=identity,
++                created_at__lte=cutoff,
++            )
++            .select_related("journal")
++            .order_by("created_at")
++        )
++        if not effects.exists():
++            issues.append("ACCOUNTING_SOURCE_TARGET_MISSING")
++        for effect in effects:
++            valid = False
++            try:
++                source = read_source(
++                    organization=organization,
++                    actor=actor,
++                    kind=kind,
++                    identity=identity,
++                    permission=P.ACCOUNTING_RECOGNITION_VIEW,
++                    historical_event=effect.source_event,
++                )
++                expected = effect.target_snapshot
++                actual = _journal_rows(effect.journal)
++                keys = (
++                    "source_line_uuid",
++                    "account_id",
++                    "project_id",
++                    "site_id",
++                    "wbs_node_id",
++                    "party_id",
++                )
++                valid = (
++                    source.occurred_on <= cutoff.date()
++                    and digest(source.snapshot()) == effect.source_sha256
++                    and effect.journal.status == "posted"
++                    and effect.journal.accounting_date <= cutoff.date()
++                    and effect.journal.source_uuid == identity
++                    and effect.journal.reconciliation_reference == effect.source_sha256
++                    and len(actual) == len(expected)
++                    and bool(expected)
++                    and all(
++                        all(a[k] == b[k] for k in keys)
++                        and Decimal(a["debit"]) == Decimal(b["debit"])
++                        and Decimal(a["credit"]) == Decimal(b["credit"])
++                        for a, b in zip(actual, expected, strict=True)
++                    )
++                )
++            except (ValidationError, ObjectDoesNotExist):
++                pass
++            # Only the scoped source identity and its immutable reference are exposed.
++            evidence.append(
++                {
++                    "kind": kind,
++                    "source": str(identity),
++                    "effect": str(effect.pk),
++                    "source_version": effect.source_version_reference,
++                    "source_hash": effect.source_sha256,
++                    "journal": str(effect.journal_id),
++                    "journal_status": effect.journal.status,
++                    "matched": valid,
++                }
++            )
++            if not valid:
++                issues.append("POSTED_SOURCE_OWNER_RECOGNITION_UNVERIFIED")
++    return _result(
++        "unverifiable" if issues else "satisfied" if evidence else "not_applicable",
++        evidence=evidence,
++        issues=issues,
++    )
++
++
++@transaction.atomic
++def financial_gate_snapshot(
++    *,
++    organization: Organization,
++    project: Project,
++    actor: User,
++    cutoff: datetime,
++    case=None,
++) -> dict:
++    """All eight explicit families, native policy only, stable economic watermark."""
++    if project.organization_id != organization.pk:
++        raise PermissionDenied("Project is outside the tenant.")
++    require_financial_sources(organization, project, actor)
++    Organization.objects.select_for_update().get(pk=organization.pk)
++    try:
++        cutoff = timezone.localtime(
++            cutoff,
++            ZoneInfo(
++                OrganizationSettings.objects.get(organization=organization).timezone
++            ),
++        )
++    except ObjectDoesNotExist:
++        gates = {
++            name: _result("unverifiable", issues=["ORGANIZATION_SETTINGS_MISSING"])
++            for name in GATE_FAMILIES
++        }
++        return {
++            "families": gates,
++            "source_watermark": digest(gates),
++            "projection_only": True,
++            "outcome": "blocked",
++        }
++    subledger = settlement_reconciliation(
++        organization=organization,
++        actor=actor,
++        project=project,
++        as_of_date=cutoff.date(),
++    )
++    events = (
++        list(case.events.filter(created_at__lte=cutoff).order_by("created_at", "pk"))
++        if case
++        else []
++    )
++    accepted = {}
++    for event in events:
++        if event.action == "coordinate":
++            accepted.update(event.details.get("accepted_open_obligations", {}))
++    sub_issues = [issue for row in subledger["rows"] for issue in row["issues"]]
++    for row in subledger["rows"]:
++        if (
++            Decimal(row["outstanding"]) > 0
++            and accepted.get(row["obligation"]) != row["economic_hash"]
++        ):
++            sub_issues.append("OPEN_OBLIGATION_REQUIRES_EXPLICIT_ACCEPTANCE")
++    gates = {
++        "accounting_period_controls": _accounting(organization, project, cutoff),
++        "treasury_gl": _treasury(organization, project, cutoff),
++        "subledger_settlement_control": _result(
++            "blocked"
++            if sub_issues
++            else "satisfied"
++            if subledger["rows"]
++            else "not_applicable",
++            evidence=subledger["rows"],
++            issues=sub_issues,
++        ),
++    }
++    stocks = apps.get_model("inventory.StockTransaction").objects.filter(
++        organization=organization,
++        project=project,
++        status__in=("posted", "reversed"),
++        occurred_at__lte=cutoff,
++    )
++    inventory = apps.get_model("inventory.InventoryValuationEvent").objects.filter(
++        stock_transaction__in=stocks
++    )
++    gates["inventory_gl"] = _recognition(
++        organization, project, actor, cutoff, [("inventory", x.pk) for x in inventory]
++    )
++    if stocks.exclude(valuation_event__isnull=False).exists():
++        gates["inventory_gl"]["outcome"] = "unverifiable"
++        gates["inventory_gl"]["issues"].append("VALUATION_SOURCE_MISSING")
++    asset_sources = apps.get_model("fixed_assets.AssetTransaction").objects.filter(
++        organization=organization,
++        source_project=project,
++        source_dimensions_captured=True,
++        status__in=("finalized", "reversed"),
++        occurred_on__lte=cutoff.date(),
++    )
++    depreciation_ids = set(
++        apps.get_model("fixed_assets.DepreciationRun")
++        .objects.filter(
++            organization=organization,
++            lines__asset__project=project,
++            status__in=("finalized", "reversed"),
++            fiscal_period__ends_on__lte=cutoff.date(),
++            created_at__lte=cutoff,
++        )
++        .values_list("pk", flat=True)
++    )
++    depreciation_ids.update(
++        SourceRecognitionDraft.objects.filter(
++            organization=organization,
++            source_kind="depreciation",
++            source_snapshot__rows__contains=[{"project_id": str(project.pk)}],
++            created_at__lte=cutoff,
++        ).values_list("source_uuid", flat=True)
++    )
++    gates["fixed_assets_gl"] = _recognition(
++        organization,
++        project,
++        actor,
++        cutoff,
++        [("asset", x.pk) for x in asset_sources]
++        + [("depreciation", x) for x in depreciation_ids],
++    )
++    if (
++        apps.get_model("fixed_assets.AssetTransaction")
++        .objects.filter(
++            organization=organization,
++            asset__project=project,
++            source_dimensions_captured=False,
++            status__in=("finalized", "reversed"),
++            occurred_on__lte=cutoff.date(),
++        )
++        .exists()
++    ):
++        gates["fixed_assets_gl"]["outcome"] = "unverifiable"
++        gates["fixed_assets_gl"]["issues"].append(
++            "HISTORICAL_ASSET_DIMENSIONS_UNVERIFIED"
++        )
++    # Payroll is conditional on actual activated downstream contracts, never labels.
++    requests = apps.get_model("treasury.PaymentRequest").objects.filter(
++        organization=organization,
++        project=project,
++        kind="payroll",
++        created_at__lte=cutoff,
++    )
++    payroll_ids = (
++        SourceRecognitionDraft.objects.filter(
++            organization=organization,
++            source_kind="payroll",
++            source_snapshot__rows__contains=[{"project_id": str(project.pk)}],
++            created_at__lte=cutoff,
++        )
++        .values_list("source_uuid", flat=True)
++        .distinct()
++    )
++    payroll = _recognition(
++        organization, project, actor, cutoff, [("payroll", x) for x in payroll_ids]
++    )
++    for request in requests.select_related("released_movement"):
++        valid = request.status in {"cancelled", "rejected"} or (
++            request.status == "released"
++            and request.released_movement
++            and request.released_movement.status == "posted"
++        )
++        payroll["evidence"].append(
++            {
++                "request": str(request.pk),
++                "source_line": str(request.source_payroll_line_id),
++                "source_version": request.source_payroll_version,
++                "status": request.status,
++            }
++        )
++        if not valid:
++            payroll["issues"].append("PAYROLL_CASH_HANDOFF_UNRESOLVED")
++    payroll["outcome"] = (
++        "blocked"
++        if payroll["issues"]
++        else "satisfied"
++        if payroll["evidence"]
++        else "not_applicable"
++    )
++    gates["payroll_financial"] = payroll
++    cost = get_project_cost_reconciliation(
++        organization=organization, project=project, actor=actor
++    )
++    cost_evidence = json.loads(json.dumps(asdict(cost), default=str)) if cost else None
++    cost_ready = bool(
++        cost
++        and cost.coverage_complete
++        and cost.source_equivalence_established
++        and cost.unresolved_total_difference == 0
++    )
++    gates["project_cost_sources"] = _result(
++        "satisfied" if cost_ready else "unverifiable",
++        evidence=[cost_evidence] if cost_evidence else [],
++        issues=[] if cost_ready else ["PROJECT_COST_COVERAGE_UNVERIFIED"],
++    )
++    linked = {
++        str(identity)
++        for event in events
++        for identity in event.details.get("blocking_exception_ids", [])
++    }
++    exceptions = ReconciliationException.objects.filter(
++        organization=organization, run__project=project, pk__in=linked
++    ).prefetch_related("events")
++    exception_rows = []
++    exception_issues = (
++        ["LINKED_EXCEPTION_SCOPE_INVALID"] if exceptions.count() != len(linked) else []
++    )
++    for exception in exceptions:
++        last = (
++            exception.events.filter(created_at__lte=cutoff)
++            .order_by("created_at", "pk")
++            .last()
++        )
++        state = last.new_state if last else "open"
++        exception_rows.append(
++            {
++                "exception": str(exception.pk),
++                "state": state,
++                "version": exception.snapshot_hash,
++                "event": str(last.pk) if last else None,
++            }
++        )
++        if state != "closed":
++            exception_issues.append("LINKED_BLOCKING_EXCEPTION_UNRESOLVED")
++    gates["linked_blocking_exceptions"] = _result(
++        "blocked" if exception_issues else "satisfied",
++        evidence=exception_rows,
++        issues=exception_issues,
++    )
++    assert set(gates) == set(GATE_FAMILIES)
++    return {
++        "families": gates,
++        "source_watermark": digest(gates),
++        "as_of_date": cutoff.date().isoformat(),
++        "projection_only": True,
++        "outcome": "satisfied"
++        if all(x["outcome"] in {"satisfied", "not_applicable"} for x in gates.values())
++        else "blocked",
++    }
+--- a/apps/reporting/project_closeout.py
++++ b/apps/reporting/project_closeout.py
+@@ -8,0 +9 @@
++from uuid import UUID
+@@ -24,0 +26,4 @@
++from apps.reporting.financial_closeout import (
++    financial_gate_snapshot,
++    require_financial_sources,
++)
+@@ -152,0 +158,2 @@
++    actor: User,
++    case: ProjectCloseoutCase,
+@@ -153,0 +161,19 @@
++    if family_code == "reconciliation_performance":
++        evidence = financial_gate_snapshot(
++            organization=organization,
++            project=project,
++            actor=actor,
++            cutoff=cutoff_at,
++            case=case,
++        )
++        return FamilySnapshot(
++            outcome=evidence["outcome"],
++            summary={
++                "financial_families": {
++                    k: v["outcome"] for k, v in evidence["families"].items()
++                }
++            },
++            manifest=evidence,
++            source_hash=evidence["source_watermark"],
++        )
++
+@@ -218,0 +245 @@
++    require_financial_sources(organization, project, actor)
+@@ -362,0 +390,2 @@
++            actor=actor,
++            case=locked,
+@@ -438 +467 @@
+-    *, case: ProjectCloseoutCase, operation_key: str, fingerprint: str
++    *, case: ProjectCloseoutCase, operation_key: str, fingerprint: str, actor: User
+@@ -442,0 +472,21 @@
++    if existing:
++        permissions = {
++            "coordinate": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_COORDINATE,
++            "accept": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_ACCEPT,
++            "reject": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_REVIEW,
++            "reopen": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_REOPEN,
++            "cancel": BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_PREPARE,
++        }
++        require_business_permission(
++            user=actor,
++            organization=case.organization,
++            project=case.project,
++            permission=permissions[existing.action],
++            message="Current closeout authority required for retry.",
++        )
++        if existing.action in {"accept", "reject", "reopen"}:
++            _require_family_permissions(
++                actor=actor, organization=case.organization, project=case.project
++            )
++        if existing.actor_id != actor.pk:
++            raise PermissionDenied("An action can only be replayed by its actor.")
+@@ -472 +522,65 @@
+-    payload = details or {}
++    payload = dict(details or {})
++    if "accepted_open_obligations" in payload:
++        require_business_permission(
++            user=actor,
++            organization=locked.organization,
++            project=locked.project,
++            permission=BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_ACCEPT,
++            message="Open obligation acceptance requires closeout acceptance authority.",
++        )
++        if actor.pk == locked.created_by_id:
++            raise PermissionDenied(
++                "An independent actor must accept legitimate open obligations."
++            )
++        from decimal import Decimal
++        from zoneinfo import ZoneInfo
++
++        from apps.subledgers.closeout_projection import settlement_reconciliation
++
++        current = settlement_reconciliation(
++            organization=locked.organization,
++            actor=actor,
++            project=locked.project,
++            as_of_date=timezone.localtime(
++                timezone.now(), ZoneInfo(locked.organization.settings.timezone)
++            ).date(),
++        )
++        rows = {x["obligation"]: x for x in current["rows"]}
++        identities = payload["accepted_open_obligations"]
++        if not isinstance(identities, (list, dict)) or any(
++            str(x) not in rows for x in identities
++        ):
++            raise PermissionDenied(
++                "Open obligation is outside the authorized source scope."
++            )
++        accepted = {}
++        for identity in identities:
++            row = rows[str(identity)]
++            if (
++                row["issues"]
++                or row["state"] != "open"
++                or Decimal(row["outstanding"]) <= 0
++            ):
++                raise ValidationError(
++                    "Only verified, legitimately open obligations may be explicitly accepted."
++                )
++            accepted[str(identity)] = row["economic_hash"]
++        payload["accepted_open_obligations"] = accepted
++        payload["material"] = True
++    if "blocking_exception_ids" in payload:
++        from .models import ReconciliationException
++
++        try:
++            identities = {UUID(str(x)) for x in payload["blocking_exception_ids"]}
++        except (ValueError, TypeError) as exc:
++            raise ValidationError("Invalid linked exception identity.") from exc
++        if ReconciliationException.objects.filter(
++            organization=locked.organization,
++            run__project=locked.project,
++            pk__in=identities,
++        ).count() != len(identities):
++            raise PermissionDenied(
++                "Linked exceptions must belong to this tenant/project."
++            )
++        payload["blocking_exception_ids"] = sorted(str(x) for x in identities)
++
+@@ -477 +591 @@
+-        case=locked, operation_key=operation_key, fingerprint=fingerprint
++        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
+@@ -515 +629 @@
+-def _assert_current_sources(locked: ProjectCloseoutCase) -> None:
++def _assert_current_sources(locked: ProjectCloseoutCase, actor: User) -> None:
+@@ -529,0 +644,2 @@
++            actor=actor,
++            case=locked,
+@@ -565 +681 @@
+-        case=locked, operation_key=operation_key, fingerprint=fingerprint
++        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
+@@ -616 +732 @@
+-        _assert_current_sources(locked)
++        _assert_current_sources(locked, actor)
+@@ -667 +783 @@
+-        case=locked, operation_key=operation_key, fingerprint=fingerprint
++        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
+@@ -674,0 +791,17 @@
++    if (
++        locked.current_assessment is None
++        or locked.current_assessment.status != ProjectCloseoutAssessmentStatus.COMPLETED
++    ):
++        raise ValidationError("A completed accepted source assessment is required.")
++    # A reason alone cannot assert that authoritative evidence changed.
++    _require_family_permissions(
++        actor=actor, organization=locked.organization, project=locked.project
++    )
++    try:
++        _assert_current_sources(locked, actor)
++    except ValidationError:
++        pass
++    else:
++        raise ValidationError(
++            "A qualifying source change is required before reopening."
++        )
+@@ -900,0 +1034,77 @@
++
++
++@transaction.atomic
++def cancel_closeout_case(
++    *,
++    case: ProjectCloseoutCase,
++    actor: User,
++    reason: str,
++    operation_key: str,
++    expected_revision: int,
++) -> ProjectCloseoutEvent:
++    """Policy P10-C: creator withdrawal before acceptance, with retained history."""
++    locked = (
++        ProjectCloseoutCase.objects.select_for_update()
++        .select_related("project")
++        .get(pk=case.pk)
++    )
++    require_business_permission(
++        user=actor,
++        organization=locked.organization,
++        project=locked.project,
++        permission=BusinessPermissionCode.REPORTING_PROJECT_CLOSEOUT_CASE_PREPARE,
++        message="Closeout preparation authority required.",
++    )
++    if actor.pk != locked.created_by_id:
++        raise PermissionDenied("Only the initiator may withdraw this case.")
++    fingerprint = _event_fingerprint(
++        case=locked,
++        action="cancel",
++        reason=reason,
++        details={},
++        revision=expected_revision,
++    )
++    existing = _existing_event(
++        case=locked, operation_key=operation_key, fingerprint=fingerprint, actor=actor
++    )
++    if existing:
++        return existing
++    if (
++        locked.revision != expected_revision
++        or not reason.strip()
++        or locked.status not in {"draft", "active", "review_pending"}
++    ):
++        raise ValidationError(
++            "Only a current pre-acceptance case may be cancelled with a reason."
++        )
++    event = ProjectCloseoutEvent.objects.create(
++        organization=locked.organization,
++        case=locked,
++        assessment=locked.current_assessment,
++        action="cancel",
++        previous_state=locked.status,
++        new_state="cancelled",
++        reason=reason.strip(),
++        details={},
++        actor=actor,
++        operation_key=operation_key,
++        request_fingerprint=fingerprint,
++    )
++    ProjectCloseoutCase.objects.filter(pk=locked.pk).update(
++        status="cancelled", revision=models.F("revision") + 1
++    )
++    _audit_event(event)
++    return event
++
++
++def requester_closeout_status(
++    *, organization: Organization, actor: User, case_id: str
++) -> dict:
++    case = (
++        closeout_cases(organization=organization, actor=actor)
++        .filter(pk=case_id, created_by=actor)
++        .first()
++    )
++    if case is None:
++        raise PermissionDenied("Requester case is outside the active scope.")
++    return {"case": str(case.pk), "status": case.status, "revision": case.revision}
+--- a/apps/reporting/test_cep066.py
++++ b/apps/reporting/test_cep066.py
+@@ -0,0 +1,344 @@
++"""Explicit financial gates and governed closeout transitions, no source writes."""
++
++import json
++from pathlib import Path
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.test import TestCase
++from django.utils import timezone
++
++from apps.accounting.models import JournalEntry
++from apps.audit.models import AuditEvent
++from apps.organizations.models import OrganizationMembership, OrganizationSettings
++from apps.treasury.models import TreasuryMovement
++
++from . import test_p10_s14_s17 as retained
++from .financial_closeout import GATE_FAMILIES, financial_gate_snapshot
++from .models import ProjectCloseoutEvent, ProjectCloseoutItemSnapshot
++from .project_closeout import (
++    cancel_closeout_case,
++    coordinate_closeout_case,
++    decide_closeout_case,
++    requester_closeout_status,
++    run_closeout_assessment,
++)
++
++
++class FinancialCloseoutTests(TestCase):
++    setUpTestData = classmethod(
++        retained.P10S14S17AcceptanceTests.setUpTestData.__func__
++    )
++    _grant = classmethod(retained.P10S14S17AcceptanceTests._grant.__func__)
++    _case = retained.P10S14S17AcceptanceTests._case
++    _assessment = retained.P10S14S17AcceptanceTests._assessment
++
++    def setUp(self):
++        OrganizationSettings.objects.get_or_create(
++            organization=self.organization, defaults={"timezone": "Asia/Tehran"}
++        )
++
++    def snapshot(self, **kwargs):
++        return financial_gate_snapshot(
++            organization=self.organization,
++            project=self.project,
++            actor=self.runner,
++            cutoff=timezone.now(),
++            **kwargs,
++        )
++
++    def test_explicit_eight_families_absence_is_not_complete_and_no_source_writes(self):
++        before = [x.objects.count() for x in (JournalEntry, TreasuryMovement)]
++        snapshot = self.snapshot()
++        self.assertEqual(set(snapshot["families"]), set(GATE_FAMILIES))
++        self.assertEqual(snapshot["outcome"], "blocked")
++        self.assertEqual(
++            snapshot["families"]["project_cost_sources"]["outcome"], "unverifiable"
++        )
++        self.assertEqual(
++            snapshot["families"]["treasury_gl"]["outcome"], "not_applicable"
++        )
++        self.assertEqual(
++            snapshot["source_watermark"], self.snapshot()["source_watermark"]
++        )
++        self.assertEqual(
++            before, [x.objects.count() for x in (JournalEntry, TreasuryMovement)]
++        )
++        case, assessment = self._assessment()
++        item = assessment.items.get(family_code="reconciliation_performance")
++        self.assertEqual(item.source_manifest["families"], snapshot["families"])
++        self.assertEqual(item.outcome, "blocked")
++        with self.assertRaises(ValidationError):
++            decide_closeout_case(
++                case=case,
++                actor=self.reviewer,
++                decision="accept",
++                reason="No presence shortcut",
++                operation_key="deny-presence",
++                expected_revision=case.revision,
++            )
++        Path("docs/governance/cep/evidence/CEP-066_FINANCIAL_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic": True,
++                    "snapshot": snapshot,
++                    "assessment": str(assessment.pk),
++                    "native_financial_counts_before": before,
++                    "native_financial_counts_after": [
++                        x.objects.count() for x in (JournalEntry, TreasuryMovement)
++                    ],
++                    "acceptance_blocked": True,
++                },
++                indent=2,
++                default=str,
++            )
++        )
++
++    def test_settings_absent_is_explicit_unverified(self):
++        OrganizationSettings.objects.filter(organization=self.organization).delete()
++        data = self.snapshot()
++        self.assertTrue(
++            all(x["outcome"] == "unverifiable" for x in data["families"].values())
++        )
++
++    def test_denied_actor_and_foreign_project(self):
++        with self.assertRaises(PermissionDenied):
++            financial_gate_snapshot(
++                organization=self.organization,
++                project=self.other_project,
++                actor=self.runner,
++                cutoff=timezone.now(),
++            )
++        with self.assertRaises(PermissionDenied):
++            financial_gate_snapshot(
++                organization=self.organization,
++                project=self.project,
++                actor=self.outsider,
++                cutoff=timezone.now(),
++            )
++
++    def test_protected_open_acceptance_and_exception_links_cannot_be_fabricated(self):
++        case = self._case()
++        for actor in (self.runner, self.reviewer):
++            with self.assertRaises(PermissionDenied):
++                coordinate_closeout_case(
++                    case=case,
++                    actor=actor,
++                    reason="Synthetic open",
++                    operation_key="untrusted-open",
++                    details={"accepted_open_obligations": [str(uuid4())]},
++                )
++        with self.assertRaises(PermissionDenied):
++            coordinate_closeout_case(
++                case=case,
++                actor=self.runner,
++                reason="Foreign exception",
++                operation_key="untrusted-exception",
++                details={"blocking_exception_ids": [str(uuid4())]},
++            )
++        self.assertFalse(ProjectCloseoutEvent.objects.filter(case=case).exists())
++
++    def test_requester_projection_does_not_return_reviewer_or_security_metadata(self):
++        case = self._case()
++        coordinate_closeout_case(
++            case=case,
++            actor=self.reviewer,
++            reason="Confidential review",
++            operation_key="private-review",
++            details={"confidential": "test security metadata"},
++        )
++        self.assertEqual(
++            set(
++                requester_closeout_status(
++                    organization=self.organization, actor=self.runner, case_id=case.pk
++                )
++            ),
++            {"case", "status", "revision"},
++        )
++        with self.assertRaises(PermissionDenied):
++            requester_closeout_status(
++                organization=self.organization, actor=self.reviewer, case_id=case.pk
++            )
++
++    def test_rejection_retry_revoked_actor_and_successor_keep_history(self):
++        case, original = self._assessment()
++        event = decide_closeout_case(
++            case=case,
++            actor=self.reviewer,
++            decision="reject",
++            reason="Unresolved source evidence",
++            operation_key="reject",
++            expected_revision=case.revision,
++        )
++        self.assertTrue(AuditEvent.objects.filter(entity_id=str(event.pk)).exists())
++        other = self.reviewer
++        OrganizationMembership.objects.filter(
++            organization=self.organization, user=other
++        ).update(status="suspended")
++        with self.assertRaises(PermissionDenied):
++            decide_closeout_case(
++                case=case,
++                actor=other,
++                decision="reject",
++                reason="Unresolved source evidence",
++                operation_key="reject",
++                expected_revision=case.revision,
++            )
++        case.refresh_from_db()
++        successor = run_closeout_assessment(
++            case=case,
++            actor=self.runner,
++            idempotency_key="corrected",
++            expected_revision=case.revision,
++        )
++        self.assertEqual(successor.supersedes_id, original.pk)
++        self.assertEqual(original.items.count(), 9)
++        self.assertEqual(event.new_state, "rejected")
++
++    def test_creator_cancel_is_atomic_append_only_and_never_mutates_finance(self):
++        case = self._case()
++        before = TreasuryMovement.objects.count()
++        with self.assertRaises(PermissionDenied):
++            cancel_closeout_case(
++                case=case,
++                actor=self.reviewer,
++                reason="Wrong initiator",
++                operation_key="cancel",
++                expected_revision=case.revision,
++            )
++        event = cancel_closeout_case(
++            case=case,
++            actor=self.runner,
++            reason="Withdraw pending case",
++            operation_key="cancel",
++            expected_revision=case.revision,
++        )
++        replay = cancel_closeout_case(
++            case=case,
++            actor=self.runner,
++            reason="Withdraw pending case",
++            operation_key="cancel",
++            expected_revision=case.revision,
++        )
++        self.assertEqual(event.pk, replay.pk)
++        self.assertEqual(TreasuryMovement.objects.count(), before)
++        self.assertTrue(AuditEvent.objects.filter(entity_id=str(event.pk)).exists())
++        with self.assertRaises(ValidationError):
++            event.reason = "Silent edit"
++            event.save()
++        case.refresh_from_db()
++        self.assertEqual(case.status, "cancelled")
++
++    def test_financial_capture_exception_rolls_back_native_case_assessment_and_audit(
++        self,
++    ):
++        case = self._case()
++        before = (
++            case.revision,
++            ProjectCloseoutItemSnapshot.objects.count(),
++            AuditEvent.objects.count(),
++        )
++        with (
++            patch(
++                "apps.reporting.project_closeout.financial_gate_snapshot",
++                side_effect=ValidationError("source changed"),
++            ),
++            self.assertRaises(ValidationError),
++        ):
++            run_closeout_assessment(
++                case=case, actor=self.runner, idempotency_key="failed"
++            )
++        case.refresh_from_db()
++        self.assertEqual(
++            before,
++            (
++                case.revision,
++                ProjectCloseoutItemSnapshot.objects.count(),
++                AuditEvent.objects.count(),
++            ),
++        )
++
++
++class NativeTreasuryCloseoutTests(TestCase):
++    def setUp(self):
++        from apps.treasury.test_cep061 import PayrollTreasuryFixture
++
++        # Reuse only native setup; no imported TestCase class collection.
++        fixture = PayrollTreasuryFixture()
++        fixture.setUp()
++        self.fixture = fixture
++        from apps.organizations.models import BusinessPermission
++
++        fixture.organization.memberships.get(
++            user=fixture.owner
++        ).role_definition.permissions.add(*BusinessPermission.objects.all())
++
++    def test_native_posted_cash_requires_current_exact_slice_and_keeps_revision(self):
++        from apps.treasury.services import run_treasury_gl_reconciliation
++
++        f = self.fixture
++        from decimal import Decimal
++
++        from apps.projects.models import Project
++        from apps.treasury.services import create_movement
++
++        project = Project.objects.create(
++            organization=f.organization,
++            code="CLOSE-CASH",
++            name="Scoped cash",
++            created_by=f.owner,
++        )
++        movement = create_movement(
++            organization=f.organization,
++            actor=f.owner,
++            kind="receipt",
++            movement_date=timezone.now().date(),
++            amount=Decimal(100),
++            description="Synthetic cash",
++            idempotency_key="native-closeout-cash",
++            account=f.cash.bank,
++            project=project,
++        )
++        f.cash.post(movement)
++        kwargs = {
++            "organization": f.organization,
++            "project": project,
++            "actor": f.owner,
++            "cutoff": timezone.now(),
++        }
++        initial = financial_gate_snapshot(**kwargs)
++        self.assertEqual(initial["families"]["treasury_gl"]["outcome"], "blocked")
++        first = run_treasury_gl_reconciliation(
++            organization=f.organization,
++            actor=f.owner,
++            cutoff_date=kwargs["cutoff"].date(),
++        )
++        result = financial_gate_snapshot(**kwargs)
++        self.assertEqual(result["families"]["treasury_gl"]["outcome"], "satisfied")
++        second = run_treasury_gl_reconciliation(
++            organization=f.organization,
++            actor=f.owner,
++            cutoff_date=kwargs["cutoff"].date(),
++        )
++        current = financial_gate_snapshot(**kwargs)
++        rows = current["families"]["treasury_gl"]["evidence"]
++        self.assertEqual(len(rows), 1)
++        self.assertEqual(rows[0]["native_slice"], str(second.slices.get().pk))
++        self.assertNotEqual(first.pk, second.pk)
++        Path("docs/governance/cep/evidence/CEP-066_TREASURY_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic": True,
++                    "native_movement": str(movement.pk),
++                    "first_native_run": str(first.pk),
++                    "second_native_run": str(second.pk),
++                    "read_only_result": current,
++                },
++                indent=2,
++                default=str,
++            )
++        )
++        self.assertEqual(
++            current["families"]["accounting_period_controls"]["outcome"], "blocked"
++        )
+--- a/apps/reporting/test_p10_s14_s17.py
++++ b/apps/reporting/test_p10_s14_s17.py
+@@ -293,0 +294,3 @@
++        Project.objects.filter(pk=self.project.pk).update(
++            name="Changed source evidence", updated_at=timezone.now()
++        )

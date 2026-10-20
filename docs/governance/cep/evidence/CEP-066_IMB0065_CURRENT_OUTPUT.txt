@@ -1,0 +1,70 @@
+..F..                                                                    [100%]
+================================== FAILURES ===================================
+_ SettlementProjectionTests.test_native_settlement_reversal_cutoffs_and_no_write _
+
+self = <apps.subledgers.test_cep066.SettlementProjectionTests testMethod=test_native_settlement_reversal_cutoffs_and_no_write>
+
+    def test_native_settlement_reversal_cutoffs_and_no_write(self):
+        obligation = self._obligation()
+        movement = self._posted_receipt()
+        before = self.read()
+        self.assertEqual(before["rows"][0]["state"], "open")
+        allocation = allocate_settlement(
+            organization=self.organization,
+            actor=self.owner,
+            obligation=obligation,
+            movement=movement,
+            amount=Decimal(100),
+            effective_date=date(2026, 6, 1),
+            reason="Synthetic exact settlement",
+            idempotency_key="projection-allocate",
+        )
+        counts = [
+            model.objects.count()
+            for model in (
+                JournalEntry,
+                TreasuryMovement,
+                Obligation,
+                SubledgerReconciliationRun,
+            )
+        ]
+        self.assertEqual(self.read()["rows"][0]["state"], "settled")
+        self.assertEqual(self.read(date(2026, 5, 31))["rows"][0]["state"], "open")
+        self.assertEqual(
+            counts,
+            [
+                model.objects.count()
+                for model in (
+                    JournalEntry,
+                    TreasuryMovement,
+                    Obligation,
+                    SubledgerReconciliationRun,
+                )
+            ],
+        )
+>       reverse_settlement(
+            organization=self.organization,
+            actor=self.owner,
+            allocation=allocation,
+            effective_date=date(2026, 6, 2),
+            reason="Synthetic settlement reversal",
+            idempotency_key="projection-reverse",
+        )
+
+apps\subledgers\test_cep066.py:77:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ()
+kwds = {'organization': <Organization: P3 Subledger>, 'actor': <User: p3-sub-owner>, 'allocation': <SettlementAllocation: SettlementAllocation object (5e16c001-faa5-4587-8996-b8d7e46c7c29)>, 'effective_date': datetime.date(2026, 6, 2), ...}
+
+    @wraps(func)
+    def inner(*args, **kwds):
+        with self._recreate_cm():
+>           return func(*args, **kwds)
+                   ^^^^^^^^^^^^^^^^^^^
+E           TypeError: reverse_settlement() missing 1 required keyword-only argument: 'idempotency_key'
+
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: TypeError
+=========================== short test summary info ===========================
+FAILED apps/subledgers/test_cep066.py::SettlementProjectionTests::test_native_settlement_reversal_cutoffs_and_no_write
+1 failed, 4 passed in 32.96s

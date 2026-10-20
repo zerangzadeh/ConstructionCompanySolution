@@ -291,6 +291,9 @@ class P10S14S17AcceptanceTests(TestCase):
             )
         case.refresh_from_db()
         self.assertEqual(case.status, "accepted")
+        Project.objects.filter(pk=self.project.pk).update(
+            name="Changed source evidence", updated_at=timezone.now()
+        )
         reopened = reopen_closeout_case(
             case=case,
             actor=self.reviewer,
