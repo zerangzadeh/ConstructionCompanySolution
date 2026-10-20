@@ -3172,13 +3172,13 @@ ceps:
       evidence_presence: VERIFIED_SYNTHETIC_DEVELOPMENT_EXECUTION_RECONCILIATION_RETRY_ROLLBACK
     git:
       committed: true
-      commit_sha: 95d8cbebb66094def6dcce9879b2a076cd576527
+      commit_sha: acf0769354e6d92c60eb3fe5b193d5f3337ed57c
       pushed: true
       merged_to_main: false
-      remote_main_evidence: VERIFIED_LS_REMOTE
+      remote_main_evidence: VERIFIED_LS_REMOTE_CONTENT_CHECKPOINT
       integrated_to_main: true
       integration_method: DIRECT_COMMIT_TO_MAIN
-      checkpoint_scope: CURRENT_SYNTHETIC_CLOSURE_PENDING_AUTHORIZED_CHECKPOINT; previous SHA is historical
+      checkpoint_scope: COMPLETE_SYNTHETIC_DEVELOPMENT_CLOSURE; final metadata-only descendant separate
     last_execution:
       branch: main
       sha: 0bb5e5f63bc0aeb0e7c327d232264d1647c2b981
@@ -3234,6 +3234,10 @@ ceps:
     - date: '2026-10-20'
       status: CLOSED_VERIFIED
       reason: 7/7 technical AC and scoped DoD verified; non-zero real-history requirement N/A, never PASS; no Production/Sign-off/certification
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: Authorized implementation a0c326b plus exact-package-byte correction acf0769 pushed to origin main and verified; 13 member blob hashes and manifest match supplied bytes.
+        Final metadata-only descendant retains checkpoint facts. No merge, unrelated paths or production action.
     reentry_review:
       evidence: docs/governance/cep/evidence/CEP-057_REENTRY_REVIEW.json
       prerequisite_outcomes: VERIFIED_023_AND_029_COMPLETE
@@ -3288,12 +3292,13 @@ ceps:
       evidence_presence: VERIFIED_SYNTHETIC_DEVELOPMENT_EXECUTION_RECONCILIATION_RETRY_ROLLBACK
     git:
       committed: true
-      commit_sha: b412b09cc9f42c73f67007d13de9305353a8fae3
+      commit_sha: acf0769354e6d92c60eb3fe5b193d5f3337ed57c
       pushed: true
       merged_to_main: false
-      remote_main_evidence: VERIFIED_PARTIAL_FRAMEWORK_CHECKPOINT_ONLY
+      remote_main_evidence: VERIFIED_LS_REMOTE_CONTENT_CHECKPOINT
       integration_method: DIRECT_COMMIT_TO_MAIN
-      checkpoint_scope: CURRENT_SYNTHETIC_CLOSURE_PENDING_AUTHORIZED_CHECKPOINT; previous SHA is historical
+      checkpoint_scope: COMPLETE_SYNTHETIC_DEVELOPMENT_CLOSURE; final metadata-only descendant separate
+      integrated_to_main: true
     last_execution:
       branch: main
       sha: 0bb5e5f63bc0aeb0e7c327d232264d1647c2b981
@@ -3335,6 +3340,10 @@ ceps:
     - date: '2026-10-20'
       status: CLOSED_VERIFIED
       reason: 7/7 technical AC and scoped DoD verified; non-zero real-history requirement N/A, never PASS; no Production/Sign-off/certification
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: Authorized implementation a0c326b plus exact-package-byte correction acf0769 pushed to origin main and verified; 13 member blob hashes and manifest match supplied bytes.
+        Final metadata-only descendant retains checkpoint facts. No merge, unrelated paths or production action.
   CEP-059:
     closure_triage:
       category: COMPLETE
@@ -4650,13 +4659,14 @@ v1_closure_triage:
   category_dependency_pending: []
 repository_state:
   branch: main
-  last_reconciled_head: 0bb5e5f63bc0aeb0e7c327d232264d1647c2b981
-  origin_main: 0bb5e5f63bc0aeb0e7c327d232264d1647c2b981
-  integration_checkpoint: e15c877dcf81cd3cb408c15aa55ec965db9ad4bc
+  last_reconciled_head: acf0769354e6d92c60eb3fe5b193d5f3337ed57c
+  origin_main: acf0769354e6d92c60eb3fe5b193d5f3337ed57c
+  integration_checkpoint: acf0769354e6d92c60eb3fe5b193d5f3337ed57c
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
-  pending_checkpoint_scope: CEP057_058_SYNTHETIC_DEVELOPMENT_CLOSURE
-  metadata_boundary: Main/origin baseline verified; seven unrelated untracked paths preserved; current authorized checkpoint pending
+  pending_checkpoint_scope: null
+  metadata_boundary: Content checkpoint acf0769 verified main/origin/remote and clean tracked tree; final Git-evidence metadata-only descendant is separate. Seven initial unrelated untracked
+    paths preserved.
 execution_frontier:
   standing_authority_active: true
   execution_mode: SERIAL_BY_DEFAULT

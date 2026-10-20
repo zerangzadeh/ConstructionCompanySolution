@@ -266,3 +266,14 @@ Application tests were not rerun for documentation-only work. Safe attributable
 add/commit/push is explicitly authorized by the current Human instruction; the
 resulting checkpoint is established by Git history. Pre-existing untracked Human
 artifacts, including the resolution pack, remain untouched and unstaged.
+
+## Verified synthetic closure Git checkpoint — 2026-10-20
+
+Authorized implementation `a0c326b` and package byte-preservation correction
+`acf0769354e6d92c60eb3fe5b193d5f3337ed57c` committed directly on main and
+pushed to origin/main; local/origin/remote matched at that content checkpoint.
+All 13 committed package members and the manifest retain their supplied SHA-256.
+Seven unrelated untracked paths remain untouched; tracked tree was clean.
+This addendum and Registry Git facts form a separate metadata-only descendant.
+Add/commit/push EXECUTED; branch/worktree/merge/production NOT_EXECUTED.
+[Git evidence](../evidence/CEP-057_058_SYNTHETIC_GIT_CHECKPOINT.json).
