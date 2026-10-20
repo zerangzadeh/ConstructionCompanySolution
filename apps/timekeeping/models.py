@@ -1251,3 +1251,6 @@ class LaborDistributionPreviewLine(AppendOnlyModel):
             site=self.site if self.site_id else None,
             activity=self.activity if self.activity_id else None,
         )
+
+
+from .mission_models import MissionEffect, MissionEffectEvent  # noqa: E402,F401

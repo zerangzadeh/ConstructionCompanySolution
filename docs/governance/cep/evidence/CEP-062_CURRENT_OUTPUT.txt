@@ -1,0 +1,289 @@
+FFFFFFFFFFFFFFF                                                          [100%]
+================================== FAILURES ===================================
+_ MissionRoutingTests.test_absent_policy_is_held_despite_free_text_reference __
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_absent_policy_is_held_despite_free_text_reference>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_cancel_failure_retains_active_original_and_rolls_back_inverse _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_cancel_failure_retains_active_original_and_rolls_back_inverse>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_database_identity_constraints_and_orm_immutability _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_database_identity_constraints_and_orm_immutability>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_duplicate_or_wrong_route_classification_and_unknown_effect_are_held _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_duplicate_or_wrong_route_classification_and_unknown_effect_are_held>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_expense_cancel_and_replacement_use_native_void_history _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_expense_cancel_and_replacement_use_native_void_history>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_immutable_version_payload_mismatch_and_new_version_cannot_double_route _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_immutable_version_payload_mismatch_and_new_version_cannot_double_route>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_issued_advance_requires_native_treasury_reversal_before_resolution _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_issued_advance_requires_native_treasury_reversal_before_resolution>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_late_target_failure_rolls_back_and_successful_retry_revalidates_source _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_late_target_failure_rolls_back_and_successful_retry_revalidates_source>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_native_permissions_tenant_and_source_approval_fail_closed _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_native_permissions_tenant_and_source_approval_fail_closed>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_payroll_correction_is_exact_inverse_with_retained_source_and_replacement _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_payroll_correction_is_exact_inverse_with_retained_source_and_replacement>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_read_only_reconciliation_exposes_native_target_drift _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_read_only_reconciliation_exposes_native_target_drift>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_source_or_policy_drift_during_target_operation_rolls_back _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_source_or_policy_drift_during_target_operation_rolls_back>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_three_independent_effects_have_exactly_one_native_route_each _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_three_independent_effects_have_exactly_one_native_route_each>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingTests.test_unpaid_advance_cancel_is_native_and_never_employee_loan _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_unpaid_advance_cancel_is_native_and_never_employee_loan>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+_ MissionRoutingConcurrencyTests.test_duplicate_source_race_has_one_native_target _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingConcurrencyTests testMethod=test_duplicate_source_race_has_one_native_target>
+
+    def setUp(self):
+        fixtures.PayrollFinancialHandoffTests.setUp(self)
+        for user in (self.owner, self.reviewer):
+            self.organization.memberships.get(
+                user=user
+            ).role_definition.permissions.add(*BusinessPermission.objects.all())
+        explicit_fixture_roles(self.organization)
+>       PlatformExpenseGroup.objects.get_or_create(
+        ^^^^^^^^^^^^^^^^^^^^
+            code="other", defaults={"name": "Other synthetic fixture"}
+        )
+E       NameError: name 'PlatformExpenseGroup' is not defined
+
+apps\timekeeping\test_cep062.py:51: NameError
+=========================== short test summary info ===========================
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_absent_policy_is_held_despite_free_text_reference
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_cancel_failure_retains_active_original_and_rolls_back_inverse
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_database_identity_constraints_and_orm_immutability
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_duplicate_or_wrong_route_classification_and_unknown_effect_are_held
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_expense_cancel_and_replacement_use_native_void_history
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_immutable_version_payload_mismatch_and_new_version_cannot_double_route
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_issued_advance_requires_native_treasury_reversal_before_resolution
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_late_target_failure_rolls_back_and_successful_retry_revalidates_source
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_native_permissions_tenant_and_source_approval_fail_closed
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_payroll_correction_is_exact_inverse_with_retained_source_and_replacement
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_read_only_reconciliation_exposes_native_target_drift
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_source_or_policy_drift_during_target_operation_rolls_back
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_three_independent_effects_have_exactly_one_native_route_each
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_unpaid_advance_cancel_is_native_and_never_employee_loan
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingConcurrencyTests::test_duplicate_source_race_has_one_native_target
+15 failed in 28.58s

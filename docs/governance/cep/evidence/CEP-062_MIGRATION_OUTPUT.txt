@@ -1,0 +1,49 @@
+{
+  "environment": "configured Development PostgreSQL",
+  "plan": [
+    [
+      "timekeeping",
+      "0004_cep062_mission_effect_lineage"
+    ]
+  ],
+  "only_two_new_tables_and_constraints": true,
+  "backfill": false,
+  "legacy_before": {
+    "timekeeping.LeaveMissionRequest": [
+      0,
+      "d41d8cd98f00b204e9800998ecf8427e"
+    ],
+    "payroll.PayrollAdjustment": [
+      0,
+      "d41d8cd98f00b204e9800998ecf8427e"
+    ],
+    "expenses.Expense": [
+      80,
+      "b72332b4d7abe316f58136c4b92bb268"
+    ],
+    "treasury.PaymentRequest": [
+      64,
+      "20ee8f12c27a5b7d6e922ce44e3eaa30"
+    ]
+  },
+  "legacy_after": {
+    "timekeeping.LeaveMissionRequest": [
+      0,
+      "d41d8cd98f00b204e9800998ecf8427e"
+    ],
+    "payroll.PayrollAdjustment": [
+      0,
+      "d41d8cd98f00b204e9800998ecf8427e"
+    ],
+    "expenses.Expense": [
+      80,
+      "b72332b4d7abe316f58136c4b92bb268"
+    ],
+    "treasury.PaymentRequest": [
+      64,
+      "20ee8f12c27a5b7d6e922ce44e3eaa30"
+    ]
+  },
+  "retention_pass": true,
+  "production": false
+}

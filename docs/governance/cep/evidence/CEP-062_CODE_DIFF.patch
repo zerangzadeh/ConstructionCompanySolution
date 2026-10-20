@@ -1,0 +1,1974 @@
+--- a/apps/timekeeping/models.py
++++ b/apps/timekeeping/models.py
+@@ -1253,0 +1254,3 @@
++
++
++from .mission_models import MissionEffect, MissionEffectEvent  # noqa: E402,F401
+--- a/apps/timekeeping/mission_models.py
++++ b/apps/timekeeping/mission_models.py
+@@ -0,0 +1,334 @@
++"""SPEC018 durable routing evidence; monetary target domains retain authority."""
++
++from django.conf import settings
++from django.core.exceptions import ValidationError
++from django.db import models
++from django.db.models import Q
++
++from core.models import CreatedAtModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++# ruff: noqa: RUF012
++
++
++class MissionEvidenceQuerySet(models.QuerySet):
++    def update(self, **kwargs):
++        raise ValidationError("Mission effect history is immutable.")
++
++    def delete(self):
++        raise ValidationError("Mission effect history cannot be deleted.")
++
++    def bulk_create(self, *args, **kwargs):
++        raise ValidationError("Mission evidence requires validated service creation.")
++
++
++class MissionEvidence(UUIDModel, CreatedAtModel):
++    objects = models.Manager.from_queryset(MissionEvidenceQuerySet)()
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args, **kwargs):
++        if not self._state.adding:
++            raise ValidationError(
++                "Mission history is immutable; retain a correction event."
++            )
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args, **kwargs):
++        raise ValidationError("Mission effect history cannot be deleted.")
++
++
++class MissionEffect(MissionEvidence):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    mission = models.ForeignKey(
++        "timekeeping.LeaveMissionRequest",
++        on_delete=models.PROTECT,
++        related_name="financial_effects",
++    )
++    mission_version = models.CharField(max_length=100)
++    effect_id = models.UUIDField()
++    effect_type = models.CharField(max_length=64)
++    route = models.CharField(
++        max_length=16,
++        choices=(
++            ("payroll", "Payroll component"),
++            ("expense", "Direct reimbursement"),
++            ("treasury", "Treasury advance settlement"),
++        ),
++    )
++    identity_hash = models.CharField(max_length=64, unique=True)
++    payload_hash = models.CharField(max_length=64)
++    source_snapshot = models.JSONField()
++    policy_reference = models.CharField(max_length=255)
++    amount = models.DecimalField(max_digits=24, decimal_places=8)
++    currency = models.CharField(max_length=3)
++    payroll_target = models.OneToOneField(
++        "payroll.PayrollAdjustment",
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="mission_effect",
++    )
++    expense_target = models.OneToOneField(
++        "expenses.Expense",
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="mission_effect",
++    )
++    treasury_target = models.OneToOneField(
++        "treasury.PaymentRequest",
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="mission_effect",
++    )
++    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=[
++                    "organization",
++                    "mission",
++                    "mission_version",
++                    "effect_id",
++                    "effect_type",
++                ],
++                name="mission_effect_identity_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(amount__gt=0), name="mission_effect_positive_ck"
++            ),
++            models.CheckConstraint(
++                condition=(
++                    Q(
++                        route="payroll",
++                        payroll_target__isnull=False,
++                        expense_target__isnull=True,
++                        treasury_target__isnull=True,
++                    )
++                    | Q(
++                        route="expense",
++                        payroll_target__isnull=True,
++                        expense_target__isnull=False,
++                        treasury_target__isnull=True,
++                    )
++                    | Q(
++                        route="treasury",
++                        payroll_target__isnull=True,
++                        expense_target__isnull=True,
++                        treasury_target__isnull=False,
++                    )
++                ),
++                name="mission_effect_one_route_ck",
++            ),
++        ]
++
++    def clean(self):
++        from .mission_routing import digest, effect_identity
++
++        validate_related_organizations(
++            self,
++            mission=self.mission,
++            payroll_target=self.payroll_target,
++            expense_target=self.expense_target,
++            treasury_target=self.treasury_target,
++        )
++        if self.mission.kind != "mission" or self.mission.state != "approved":
++            raise ValidationError("Only an approved native Mission can own an effect.")
++        if (
++            not self.mission_version.strip()
++            or not self.effect_type.strip()
++            or not self.policy_reference.strip()
++            or digest(self.source_snapshot) != self.payload_hash
++            or effect_identity(
++                self.organization_id,
++                self.mission_id,
++                self.mission_version,
++                self.effect_id,
++                self.effect_type,
++            )
++            != self.identity_hash
++        ):
++            raise ValidationError(
++                "Exact Mission identity and immutable approved source evidence required."
++            )
++        links = (
++            bool(self.payroll_target_id),
++            bool(self.expense_target_id),
++            bool(self.treasury_target_id),
++        )
++        if links != {
++            "payroll": (True, False, False),
++            "expense": (False, True, False),
++            "treasury": (False, False, True),
++        }.get(self.route):
++            raise ValidationError(
++                "Exactly one native target must match the approved route."
++            )
++        target = self.payroll_target or self.expense_target or self.treasury_target
++        if target is None:
++            raise ValidationError("One typed native target is required.")
++        employee_id = (
++            target.employee_id
++            if self.route != "expense"
++            else target.reimbursement_employee_id
++        )
++        if employee_id != self.mission.employee_id or target.amount != self.amount:
++            raise ValidationError(
++                "Target employee/amount must match the approved effect."
++            )
++        if self.route == "payroll":
++            if (
++                target.run.currency != self.currency
++                or target.source_payload.get("mission_effect_identity")
++                != self.identity_hash
++            ):
++                raise ValidationError(
++                    "Payroll target source identity/currency mismatch."
++                )
++        elif target.project_id != self.mission.project_id or (
++            self.route == "treasury"
++            and (
++                target.site_id != self.mission.site_id
++                or target.kind != "employee_advance"
++            )
++        ):
++            raise ValidationError(
++                "Mission target project/site or native advance classification mismatch."
++            )
++
++
++class MissionEffectEvent(MissionEvidence):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    mission = models.ForeignKey(
++        "timekeeping.LeaveMissionRequest",
++        on_delete=models.PROTECT,
++        related_name="financial_effect_events",
++    )
++    effect = models.ForeignKey(
++        MissionEffect,
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="events",
++    )
++    identity_hash = models.CharField(max_length=64)
++    kind = models.CharField(
++        max_length=16,
++        choices=(
++            ("created", "Created"),
++            ("failed", "Failed"),
++            ("cancelled", "Cancelled"),
++            ("replaced", "Replaced"),
++        ),
++    )
++    replacement = models.OneToOneField(
++        MissionEffect,
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="predecessor_event",
++    )
++    payroll_inverse = models.OneToOneField(
++        "payroll.PayrollAdjustment",
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="mission_inverse_event",
++    )
++    treasury_reversal = models.OneToOneField(
++        "treasury.TreasuryMovement",
++        null=True,
++        blank=True,
++        on_delete=models.PROTECT,
++        related_name="mission_reversal_event",
++    )
++    actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    reason = models.TextField()
++    error_code = models.CharField(max_length=64, blank=True)
++
++    class Meta:
++        constraints = [
++            models.UniqueConstraint(
++                fields=["effect"],
++                condition=Q(kind__in=("cancelled", "replaced")),
++                name="mission_effect_terminal_uq",
++            ),
++            models.UniqueConstraint(
++                fields=["effect"],
++                condition=Q(kind="created"),
++                name="mission_effect_created_uq",
++            ),
++            models.CheckConstraint(
++                condition=Q(kind="failed") | Q(effect__isnull=False),
++                name="mission_event_effect_ck",
++            ),
++            models.CheckConstraint(
++                condition=Q(kind="replaced", replacement__isnull=False)
++                | (~Q(kind="replaced") & Q(replacement__isnull=True)),
++                name="mission_event_replacement_ck",
++            ),
++        ]
++
++    def clean(self):
++        validate_related_organizations(
++            self,
++            mission=self.mission,
++            effect=self.effect,
++            replacement=self.replacement,
++            payroll_inverse=self.payroll_inverse,
++            treasury_reversal=self.treasury_reversal,
++        )
++        if not self.reason.strip():
++            raise ValidationError("Mission event reason required.")
++        if self.effect_id and (
++            self.effect.mission_id != self.mission_id
++            or self.effect.identity_hash != self.identity_hash
++        ):
++            raise ValidationError("Mission event source mismatch.")
++        if self.replacement_id and (
++            self.replacement.mission_id != self.mission_id
++            or self.replacement.effect_id != self.effect.effect_id
++            or self.replacement.effect_type != self.effect.effect_type
++            or self.replacement.mission_version == self.effect.mission_version
++        ):
++            raise ValidationError(
++                "Replacement must retain effect identity in a distinct approved Mission version."
++            )
++        if self.kind in {"cancelled", "replaced"}:
++            target = self.effect
++            if target.route == "payroll":
++                inverse = self.payroll_inverse
++                if (
++                    inverse is None
++                    or inverse.employee_id != target.payroll_target.employee_id
++                    or inverse.component_id != target.payroll_target.component_id
++                    or inverse.amount != -target.amount
++                    or inverse.source_payload.get("reverses_mission_effect")
++                    != target.identity_hash
++                ):
++                    raise ValidationError(
++                        "Exact native Payroll inverse evidence required."
++                    )
++            if target.route == "expense" and target.expense_target.status != "void":
++                raise ValidationError("Native Expense void evidence required.")
++            if (
++                target.route == "treasury"
++                and target.treasury_target.status not in {"cancelled", "rejected"}
++                and (
++                    self.treasury_reversal is None
++                    or not target.treasury_target.released_movement_id
++                    or self.treasury_reversal.reverses_id
++                    != target.treasury_target.released_movement_id
++                    or self.treasury_reversal.status != "posted"
++                )
++            ):
++                raise ValidationError("Native Treasury reversal evidence required.")
+--- a/apps/timekeeping/mission_routing.py
++++ b/apps/timekeeping/mission_routing.py
+@@ -0,0 +1,768 @@
++"""Code-owned SPEC018 framework. Empty policy registry holds monetary activation.
++
++Bindings must validate approved eligibility, immutable MissionVersion/effect IDs,
++classification, amount/currency, dates, target configuration and correction policy.
++They read source evidence only. No tenant-authored callback or default policy exists.
++"""
++
++import hashlib
++import json
++from collections.abc import Callable, Mapping
++from dataclasses import dataclass, fields
++from datetime import date
++from decimal import Decimal
++from types import MappingProxyType
++from uuid import UUID
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import models, transaction
++
++from apps.accounts.models import User
++from apps.expenses.models import ExpenseCategory
++from apps.expenses.services import create_expense_draft, void_expense
++from apps.organizations.authorization import require_business_permission
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization, OrganizationSettings
++from apps.payroll.models import (
++    PayrollAdjustment,
++    PayrollComponent,
++    PayrollRun,
++    PayrollRunEmployee,
++)
++from apps.payroll.services import record_adjustment
++from apps.treasury.models import TreasuryAdvance, TreasuryMovement
++from apps.treasury.services import cancel_payment_request, create_payment_request
++
++from .mission_models import MissionEffect, MissionEffectEvent
++from .models import LeaveMissionRequest
++
++
++class RoutingRejected(ValidationError):
++    def __init__(self, code: str):
++        super().__init__(code, code=code)
++
++
++@dataclass(frozen=True)
++class PayrollTarget:
++    run: PayrollRun
++    component: PayrollComponent
++    kind: str
++    effective_on: date
++    original_result: PayrollRunEmployee | None = None
++
++
++@dataclass(frozen=True)
++class ExpenseTarget:
++    category: str
++    incurred_on: date
++    description: str
++    expense_category: ExpenseCategory | None = None
++
++
++@dataclass(frozen=True)
++class TreasuryTarget:
++    purpose: str
++
++
++@dataclass(frozen=True)
++class EffectSpec:
++    effect_id: UUID
++    effect_type: str
++    route: str
++    amount: Decimal
++    currency: str
++    target: PayrollTarget | ExpenseTarget | TreasuryTarget
++
++
++@dataclass(frozen=True)
++class MissionPlan:
++    # Opaque approved producer version, never updated_at or a caller's counter.
++    mission_version: str
++    approval_reference: str
++    effects: tuple[EffectSpec, ...]
++
++
++@dataclass(frozen=True)
++class MissionPolicyBinding:
++    read_plan: Callable[..., MissionPlan]
++    read_payroll_correction: Callable[..., PayrollTarget | PayrollAdjustment] | None = (
++        None
++    )
++
++
++# (Organization UUID, exact policy reference). Free text is not policy approval.
++POLICIES: Mapping[tuple[str, str], MissionPolicyBinding] = MappingProxyType({})
++
++
++def digest(value: object) -> str:
++    return hashlib.sha256(
++        json.dumps(value, sort_keys=True, separators=(",", ":"), default=str).encode()
++    ).hexdigest()
++
++
++def effect_identity(
++    organization_id, mission_id, mission_version, effect_id, effect_type
++) -> str:
++    return digest(
++        [
++            str(organization_id),
++            str(mission_id),
++            mission_version,
++            str(effect_id),
++            effect_type,
++        ]
++    )
++
++
++def _require(
++    organization: Organization,
++    actor: User,
++    mission: LeaveMissionRequest,
++    permission: str,
++) -> None:
++    require_business_permission(
++        user=actor,
++        organization=organization,
++        project=mission.project,
++        site=mission.site,
++        permission=permission,
++        message="Native Mission authority required.",
++    )
++    if mission.organization_id != organization.pk or mission.kind != "mission":
++        raise PermissionDenied("Mission is outside the active source scope.")
++
++
++def _load(
++    organization: Organization, actor: User, mission_id: UUID, permission: str
++) -> LeaveMissionRequest:
++    Organization.objects.select_for_update().get(pk=organization.pk)
++    mission = (
++        LeaveMissionRequest.objects.select_for_update()
++        .filter(pk=mission_id, organization=organization)
++        .first()
++    )
++    if mission is None:
++        raise PermissionDenied("Mission is outside the active tenant.")
++    _require(organization, actor, mission, permission)
++    return mission
++
++
++def _mission_snapshot(mission: LeaveMissionRequest) -> dict:
++    return {
++        key: str(getattr(mission, key))
++        for key in (
++            "pk",
++            "organization_id",
++            "employee_id",
++            "project_id",
++            "site_id",
++            "kind",
++            "category_code",
++            "starts_at",
++            "ends_at",
++            "reason",
++            "policy_reference",
++            "state",
++            "requested_by_id",
++            "reviewed_by_id",
++            "reviewed_at",
++            "review_reason",
++        )
++    }
++
++
++def _read_plan(
++    organization: Organization, actor: User, mission: LeaveMissionRequest
++) -> tuple[MissionPolicyBinding, MissionPlan]:
++    if (
++        mission.state != "approved"
++        or not mission.reviewed_by_id
++        or mission.reviewed_by_id == mission.requested_by_id
++        or mission.reviewed_at is None
++        or not mission.review_reason.strip()
++    ):
++        raise RoutingRejected("APPROVED_INDEPENDENT_MISSION_REQUIRED")
++    binding = POLICIES.get((str(organization.pk), mission.policy_reference))
++    if binding is None:
++        raise RoutingRejected("APPROVED_MISSION_POLICY_REQUIRED")
++    plan = binding.read_plan(organization=organization, actor=actor, mission=mission)
++    if (
++        not isinstance(plan, MissionPlan)
++        or not plan.mission_version.strip()
++        or len(plan.mission_version) > 100
++        or not plan.approval_reference.strip()
++    ):
++        raise RoutingRejected("APPROVED_MISSION_VERSION_AND_POLICY_EVIDENCE_REQUIRED")
++    seen = set()
++    currency = OrganizationSettings.objects.get(organization=organization).currency
++    for spec in plan.effects:
++        if not isinstance(spec, EffectSpec):
++            raise RoutingRejected("TYPED_APPROVED_EFFECT_REQUIRED")
++        key = (spec.effect_id, spec.effect_type)
++        if (
++            not isinstance(spec, EffectSpec)
++            or not isinstance(spec.effect_id, UUID)
++            or not spec.effect_type.strip()
++            or key in seen
++            or not isinstance(spec.amount, Decimal)
++            or not spec.amount.is_finite()
++            or spec.amount <= 0
++            or spec.currency != currency
++        ):
++            raise RoutingRejected("INVALID_OR_DUPLICATE_APPROVED_EFFECT")
++        seen.add(key)
++        target_type = {
++            "payroll": PayrollTarget,
++            "expense": ExpenseTarget,
++            "treasury": TreasuryTarget,
++        }.get(spec.route)
++        if target_type is None or not isinstance(spec.target, target_type):
++            raise RoutingRejected("ONE_APPROVED_TYPED_ROUTE_REQUIRED")
++    return binding, plan
++
++
++def _snapshot(
++    mission: LeaveMissionRequest, plan: MissionPlan, spec: EffectSpec
++) -> dict:
++    target = {
++        field.name: str(
++            getattr(spec.target, field.name).pk
++            if isinstance(getattr(spec.target, field.name), models.Model)
++            else getattr(spec.target, field.name)
++        )
++        for field in fields(spec.target)
++    }
++    return {
++        "mission": _mission_snapshot(mission),
++        "mission_version": plan.mission_version,
++        "policy_approval": plan.approval_reference,
++        "effect_id": str(spec.effect_id),
++        "effect_type": spec.effect_type,
++        "route": spec.route,
++        "amount": str(spec.amount),
++        "currency": spec.currency,
++        "target_contract": target,
++    }
++
++
++def _spec(plan: MissionPlan, effect_id: UUID, effect_type: str) -> EffectSpec:
++    matches = [
++        x
++        for x in plan.effects
++        if x.effect_id == effect_id and x.effect_type == effect_type
++    ]
++    if len(matches) != 1:
++        raise RoutingRejected("EXACT_APPROVED_EFFECT_REQUIRED")
++    return matches[0]
++
++
++def _native_permission(
++    effect: MissionEffect, organization: Organization, actor: User
++) -> None:
++    code = {
++        "payroll": P.PAYROLL_ADJUST,
++        "expense": P.EXPENSES_CREATE,
++        "treasury": P.TREASURY_PAYMENT_REQUESTS_CREATE,
++    }[effect.route]
++    _require(organization, actor, effect.mission, code)
++
++
++def _create(
++    organization: Organization,
++    actor: User,
++    mission: LeaveMissionRequest,
++    plan: MissionPlan,
++    spec: EffectSpec,
++    reason: str,
++    predecessor: MissionEffect | None = None,
++) -> MissionEffect:
++    snapshot = _snapshot(mission, plan, spec)
++    identity = effect_identity(
++        organization.pk,
++        mission.pk,
++        plan.mission_version,
++        spec.effect_id,
++        spec.effect_type,
++    )
++    prior = MissionEffect.objects.filter(
++        organization=organization, identity_hash=identity
++    ).first()
++    if prior:
++        if predecessor is not None:
++            raise RoutingRejected("REPLACEMENT_VERSION_ALREADY_USED")
++        _native_permission(prior, organization, actor)
++        if not _target_matches(prior):
++            raise RoutingRejected("NATIVE_TARGET_LINEAGE_MISMATCH")
++        if prior.payload_hash != digest(snapshot):
++            raise RoutingRejected("IMMUTABLE_EFFECT_PAYLOAD_MISMATCH")
++        return prior
++    active = MissionEffect.objects.filter(
++        organization=organization,
++        mission=mission,
++        effect_id=spec.effect_id,
++        effect_type=spec.effect_type,
++    ).exclude(events__kind__in=("cancelled", "replaced"))
++    if predecessor:
++        active = active.exclude(pk=predecessor.pk)
++    if active.exists():
++        raise RoutingRejected("PRIOR_EFFECT_REQUIRES_CONTROLLED_RESOLUTION")
++    target = spec.target
++    links = {}
++    if isinstance(target, PayrollTarget):
++        if (
++            target.original_result is not None
++            and target.original_result.employee_id != mission.employee_id
++        ):
++            raise RoutingRejected("EXACT_PAYROLL_EMPLOYEE_REQUIRED")
++        links["payroll_target"] = record_adjustment(
++            organization=organization,
++            actor=actor,
++            run=target.run,
++            employee=mission.employee,
++            component=target.component,
++            kind=target.kind,
++            amount=spec.amount,
++            effective_on=target.effective_on,
++            source_reference="mission:" + identity,
++            reason=reason,
++            original_result=target.original_result,
++            source_payload={"mission_effect_identity": identity, "source": snapshot},
++        )
++    elif isinstance(target, ExpenseTarget):
++        if mission.project is None:
++            raise RoutingRejected("EXPLICIT_EXPENSE_PROJECT_REQUIRED")
++        links["expense_target"] = create_expense_draft(
++            organization=organization,
++            actor=actor,
++            project=mission.project,
++            description=target.description,
++            amount=spec.amount,
++            incurred_on=target.incurred_on,
++            source_reference="mission:" + identity,
++            idempotency_key="mission:" + identity,
++            category=target.category,
++            expense_category=target.expense_category,
++            reimbursement_employee=mission.employee,
++            replaces=predecessor.expense_target
++            if predecessor and predecessor.route == "expense"
++            else None,
++        )
++    else:
++        links["treasury_target"] = create_payment_request(
++            organization=organization,
++            actor=actor,
++            kind="employee_advance",
++            amount=spec.amount,
++            purpose=target.purpose,
++            idempotency_key="mission:" + identity,
++            employee=mission.employee,
++            project=mission.project,
++            site=mission.site,
++        )
++    # Native target services enforce their own permissions, workflow and policy.
++    effect = MissionEffect.objects.create(
++        organization=organization,
++        mission=mission,
++        mission_version=plan.mission_version,
++        effect_id=spec.effect_id,
++        effect_type=spec.effect_type,
++        route=spec.route,
++        identity_hash=identity,
++        payload_hash=digest(snapshot),
++        source_snapshot=snapshot,
++        policy_reference=mission.policy_reference,
++        amount=spec.amount,
++        currency=spec.currency,
++        recorded_by=actor,
++        **links,
++    )
++    MissionEffectEvent.objects.create(
++        organization=organization,
++        mission=mission,
++        effect=effect,
++        identity_hash=identity,
++        kind="created",
++        actor=actor,
++        reason=reason,
++    )
++    return effect
++
++
++def _failure(
++    organization: Organization,
++    actor: User,
++    mission_id: UUID,
++    effect_id: UUID,
++    effect_type: str,
++    reason: str,
++    error: Exception,
++) -> None:
++    # Retain only an authorized source identity and a controlled code; never exception/PII text.
++    with transaction.atomic():
++        mission = _load(organization, actor, mission_id, P.LEAVE_MISSION_REVIEW)
++        code = (
++            error.code
++            if isinstance(error, RoutingRejected)
++            else "TARGET_OPERATION_FAILED"
++        )
++        MissionEffectEvent.objects.create(
++            organization=organization,
++            mission=mission,
++            kind="failed",
++            identity_hash=digest([str(mission_id), str(effect_id), effect_type]),
++            actor=actor,
++            reason=reason,
++            error_code=code,
++        )
++
++
++def route_mission_effect(
++    *,
++    organization: Organization,
++    actor: User,
++    mission_id: UUID,
++    effect_id: UUID,
++    effect_type: str,
++    reason: str,
++) -> MissionEffect:
++    if not reason.strip():
++        raise ValidationError("Mission routing reason required.")
++    authorized = False
++    try:
++        with transaction.atomic():
++            mission = _load(organization, actor, mission_id, P.LEAVE_MISSION_REVIEW)
++            authorized = True
++            _binding, plan = _read_plan(organization, actor, mission)
++            spec = _spec(plan, effect_id, effect_type)
++            before = _snapshot(mission, plan, spec)
++            effect = _create(organization, actor, mission, plan, spec, reason)
++            mission.refresh_from_db()
++            _binding, fresh = _read_plan(organization, actor, mission)
++            if (
++                _snapshot(mission, fresh, _spec(fresh, effect_id, effect_type))
++                != before
++            ):
++                raise RoutingRejected("APPROVED_SOURCE_CHANGED_DURING_TARGET_OPERATION")
++            return effect
++    except Exception as exc:
++        if authorized:
++            _failure(
++                organization, actor, mission_id, effect_id, effect_type, reason, exc
++            )
++        raise
++
++
++def _reverse(
++    organization: Organization,
++    actor: User,
++    mission: LeaveMissionRequest,
++    effect: MissionEffect,
++    binding: MissionPolicyBinding,
++    reason: str,
++) -> dict:
++    _native_permission(effect, organization, actor)
++    if effect.route == "payroll":
++        if binding.read_payroll_correction is None:
++            raise RoutingRejected("APPROVED_PAYROLL_CORRECTION_BINDING_REQUIRED")
++        target = binding.read_payroll_correction(
++            organization=organization, actor=actor, mission=mission, effect=effect
++        )
++        if isinstance(target, PayrollAdjustment):
++            _require(organization, actor, mission, P.PAYROLL_RESULTS_VIEW)
++            inverse = PayrollAdjustment.objects.select_related(
++                "run", "original_result"
++            ).get(pk=target.pk, organization=organization)
++            original = effect.payroll_target
++            if (
++                original.run.status != "finalized"
++                or inverse.run.status != "finalized"
++                or inverse.employee_id != mission.employee_id
++                or inverse.component_id != original.component_id
++                or inverse.amount != -effect.amount
++                or inverse.run.currency != effect.currency
++                or inverse.source_payload.get("reverses_mission_effect")
++                != effect.identity_hash
++                or inverse.original_result is None
++                or inverse.original_result.run_id != original.run_id
++                or inverse.original_result.employee_id != mission.employee_id
++            ):
++                raise RoutingRejected("FINALIZED_NATIVE_PAYROLL_INVERSE_REQUIRED")
++            return {"payroll_inverse": inverse}
++        if not isinstance(target, PayrollTarget):
++            raise RoutingRejected("TYPED_PAYROLL_CORRECTION_REQUIRED")
++        if (
++            effect.payroll_target.run.status != "draft"
++            or target.run.pk != effect.payroll_target.run_id
++        ):
++            raise RoutingRejected("FINALIZED_NATIVE_PAYROLL_INVERSE_REQUIRED")
++        if (
++            not isinstance(target, PayrollTarget)
++            or target.component.pk != effect.payroll_target.component_id
++            or (
++                target.original_result is not None
++                and target.original_result.employee_id != mission.employee_id
++            )
++        ):
++            raise RoutingRejected("EXACT_PAYROLL_COMPONENT_CORRECTION_REQUIRED")
++        inverse = record_adjustment(
++            organization=organization,
++            actor=actor,
++            run=target.run,
++            employee=mission.employee,
++            component=target.component,
++            kind=target.kind,
++            amount=-effect.amount,
++            effective_on=target.effective_on,
++            reason=reason,
++            source_reference="mission-reverse:" + effect.identity_hash,
++            original_result=target.original_result,
++            source_payload={"reverses_mission_effect": effect.identity_hash},
++        )
++        return {"payroll_inverse": inverse}
++    if effect.route == "expense":
++        void_expense(expense=effect.expense_target, actor=actor, reason=reason)
++        effect.expense_target.refresh_from_db()
++        return {}
++    request = effect.treasury_target
++    request.refresh_from_db()
++    if request.status in {"cancelled", "rejected"}:
++        return {}
++    movement = (
++        request.released_movement
++        or TreasuryMovement.objects.filter(origin_request=request).first()
++    )
++    if movement is None:
++        cancel_payment_request(
++            organization=organization, actor=actor, request=request, reason=reason
++        )
++        request.refresh_from_db()
++        return {}
++    # Cash reversal remains a native Treasury operation; routing consumes verified evidence only.
++    _require(organization, actor, mission, P.TREASURY_VIEW)
++    advance = (
++        TreasuryAdvance.objects.filter(
++            organization=organization,
++            request=request,
++            status="reversed",
++            issue_movement=movement,
++        )
++        .select_related("reversal_movement")
++        .first()
++    )
++    if (
++        advance is None
++        or advance.reversal_movement is None
++        or advance.reversal_movement.status != "posted"
++    ):
++        raise RoutingRejected("NATIVE_TREASURY_ADVANCE_REVERSAL_REQUIRED")
++    return {"treasury_reversal": advance.reversal_movement}
++
++
++def resolve_mission_effect(
++    *,
++    organization: Organization,
++    actor: User,
++    effect_id: UUID,
++    reason: str,
++    replace: bool = False,
++) -> MissionEffectEvent:
++    if not reason.strip():
++        raise ValidationError("Mission correction/cancellation reason required.")
++    authorized = False
++    old = MissionEffect.objects.filter(pk=effect_id, organization=organization).first()
++    if old is None:
++        raise PermissionDenied("Effect is outside the active tenant.")
++    try:
++        with transaction.atomic():
++            mission = _load(organization, actor, old.mission_id, P.LEAVE_MISSION_REVIEW)
++            authorized = True
++            binding, plan = _read_plan(organization, actor, mission)
++            old = MissionEffect.objects.select_for_update().get(pk=old.pk)
++            _native_permission(old, organization, actor)
++            previous = old.events.filter(kind__in=("cancelled", "replaced")).first()
++            kind = "replaced" if replace else "cancelled"
++            if previous:
++                if (
++                    previous.kind != kind
++                    or previous.actor_id != actor.pk
++                    or previous.reason != reason.strip()
++                ):
++                    raise RoutingRejected("TERMINAL_CORRECTION_REPLAY_MISMATCH")
++                return previous
++            spec = _spec(plan, old.effect_id, old.effect_type) if replace else None
++            if replace and plan.mission_version == old.mission_version:
++                raise RoutingRejected("DISTINCT_APPROVED_REPLACEMENT_VERSION_REQUIRED")
++            source_before = digest(_mission_snapshot(mission))
++            native = _reverse(organization, actor, mission, old, binding, reason)
++            new = (
++                _create(
++                    organization, actor, mission, plan, spec, reason, predecessor=old
++                )
++                if replace
++                else None
++            )
++            mission.refresh_from_db()
++            _fresh_binding, fresh_plan = _read_plan(organization, actor, mission)
++            if (
++                fresh_plan.mission_version != plan.mission_version
++                or fresh_plan.approval_reference != plan.approval_reference
++                or (
++                    replace
++                    and _snapshot(
++                        mission,
++                        fresh_plan,
++                        _spec(fresh_plan, old.effect_id, old.effect_type),
++                    )
++                    != _snapshot(mission, plan, spec)
++                )
++            ):
++                raise RoutingRejected("APPROVED_POLICY_CHANGED_DURING_CORRECTION")
++            if digest(_mission_snapshot(mission)) != source_before:
++                raise RoutingRejected("APPROVED_SOURCE_CHANGED_DURING_TARGET_OPERATION")
++            return MissionEffectEvent.objects.create(
++                organization=organization,
++                mission=mission,
++                effect=old,
++                identity_hash=old.identity_hash,
++                kind=kind,
++                replacement=new,
++                actor=actor,
++                reason=reason.strip(),
++                **native,
++            )
++    except Exception as exc:
++        if authorized:
++            _failure(
++                organization,
++                actor,
++                old.mission_id,
++                old.effect_id,
++                old.effect_type,
++                reason,
++                exc,
++            )
++        raise
++
++
++def _target_matches(effect: MissionEffect) -> bool:
++    target = effect.payroll_target or effect.expense_target or effect.treasury_target
++    contract = effect.source_snapshot["target_contract"]
++    if (
++        target.organization_id != effect.organization_id
++        or target.amount != effect.amount
++    ):
++        return False
++    if effect.route == "payroll":
++        return (
++            target.employee_id == effect.mission.employee_id
++            and target.run.currency == effect.currency
++            and str(target.run_id) == contract["run"]
++            and str(target.component_id) == contract["component"]
++            and target.kind == contract["kind"]
++            and str(target.effective_on) == contract["effective_on"]
++            and target.source_payload.get("mission_effect_identity")
++            == effect.identity_hash
++            and target.source_payload.get("source") == effect.source_snapshot
++        )
++    if target.project_id != effect.mission.project_id:
++        return False
++    if effect.route == "expense":
++        return (
++            target.reimbursement_employee_id == effect.mission.employee_id
++            and target.source_reference == "mission:" + effect.identity_hash
++            and target.classification == "direct"
++            and str(target.expense_category_id) == contract["expense_category"]
++            and target.category == contract["category"]
++            and str(target.incurred_on) == contract["incurred_on"]
++            and target.description == contract["description"]
++        )
++    return (
++        target.employee_id == effect.mission.employee_id
++        and target.currency == effect.currency
++        and target.kind == "employee_advance"
++        and target.site_id == effect.mission.site_id
++        and target.purpose == contract["purpose"]
++        and target.idempotency_key == "mission:" + effect.identity_hash
++    )
++
++
++@transaction.atomic
++def reconcile_mission_effects(
++    *, organization: Organization, actor: User, mission_id: UUID
++) -> dict:
++    mission = _load(organization, actor, mission_id, P.LEAVE_MISSION_VIEW)
++    try:
++        _binding, plan = _read_plan(organization, actor, mission)
++        active_version = plan.mission_version
++        approved = {(x.effect_id, x.effect_type): x for x in plan.effects}
++        policy_status = "approved_binding"
++    except RoutingRejected as exc:
++        active_version, approved, policy_status = None, {}, exc.code
++    rows = []
++    for effect in mission.financial_effects.select_related(
++        "payroll_target__run", "expense_target", "treasury_target"
++    ):
++        permission = {
++            "payroll": P.PAYROLL_RESULTS_VIEW,
++            "expense": P.EXPENSES_VIEW,
++            "treasury": P.TREASURY_VIEW,
++        }[effect.route]
++        _require(organization, actor, mission, permission)
++        terminal = (
++            effect.events.filter(kind__in=("cancelled", "replaced"))
++            .select_related("replacement", "payroll_inverse", "treasury_reversal")
++            .first()
++        )
++        spec = approved.get((effect.effect_id, effect.effect_type))
++        source_matches = bool(
++            spec
++            and effect.mission_version == active_version
++            and digest(_snapshot(mission, plan, spec)) == effect.payload_hash
++        )
++        target = (
++            effect.payroll_target or effect.expense_target or effect.treasury_target
++        )
++        target_matches = _target_matches(effect)
++        rows.append(
++            {
++                "effect": str(effect.pk),
++                "identity": effect.identity_hash,
++                "mission_version": effect.mission_version,
++                "effect_id": str(effect.effect_id),
++                "effect_type": effect.effect_type,
++                "route": effect.route,
++                "target": str(target.pk),
++                "target_status": target.run.status
++                if effect.route == "payroll"
++                else target.status,
++                "active_source_version": active_version,
++                "source_matches": source_matches,
++                "target_matches": target_matches,
++                "payroll_inverse_run_status": terminal.payroll_inverse.run.status
++                if terminal and terminal.payroll_inverse_id
++                else None,
++                "state": terminal.kind
++                if terminal
++                else "active"
++                if source_matches and target_matches
++                else "target_drift"
++                if not target_matches
++                else "stale_or_policy_held",
++                "replacement": str(terminal.replacement_id)
++                if terminal and terminal.replacement_id
++                else None,
++                "payroll_inverse": str(terminal.payroll_inverse_id)
++                if terminal and terminal.payroll_inverse_id
++                else None,
++                "treasury_reversal": str(terminal.treasury_reversal_id)
++                if terminal and terminal.treasury_reversal_id
++                else None,
++            }
++        )
++    return {
++        "mission": str(mission.pk),
++        "active_source_version": active_version,
++        "policy_status": policy_status,
++        "rows": rows,
++        "projection_only": True,
++    }
+--- a/apps/timekeeping/migrations/0004_cep062_mission_effect_lineage.py
++++ b/apps/timekeeping/migrations/0004_cep062_mission_effect_lineage.py
+@@ -0,0 +1,90 @@
++# Generated by Django 5.2.17 on 2026-10-20 07:49
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('expenses', '0009_expense_reimbursement_employee_expense_replaces_and_more'),
++        ('organizations', '0122_cep023_leave_permissions'),
++        ('payroll', '0008_cep054_payroll_inquiry'),
++        ('timekeeping', '0003_cep022_employment_lifecycle'),
++        ('treasury', '0011_cep061_payroll_lineage'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='MissionEffect',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('mission_version', models.CharField(max_length=100)),
++                ('effect_id', models.UUIDField()),
++                ('effect_type', models.CharField(max_length=64)),
++                ('route', models.CharField(choices=[('payroll', 'Payroll component'), ('expense', 'Direct reimbursement'), ('treasury', 'Treasury advance settlement')], max_length=16)),
++                ('identity_hash', models.CharField(max_length=64, unique=True)),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('source_snapshot', models.JSONField()),
++                ('policy_reference', models.CharField(max_length=255)),
++                ('amount', models.DecimalField(decimal_places=8, max_digits=24)),
++                ('currency', models.CharField(max_length=3)),
++                ('expense_target', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='mission_effect', to='expenses.expense')),
++                ('mission', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='financial_effects', to='timekeeping.leavemissionrequest')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('payroll_target', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='mission_effect', to='payroll.payrolladjustment')),
++                ('recorded_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('treasury_target', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='mission_effect', to='treasury.paymentrequest')),
++            ],
++        ),
++        migrations.CreateModel(
++            name='MissionEffectEvent',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('identity_hash', models.CharField(max_length=64)),
++                ('kind', models.CharField(choices=[('created', 'Created'), ('failed', 'Failed'), ('cancelled', 'Cancelled'), ('replaced', 'Replaced')], max_length=16)),
++                ('reason', models.TextField()),
++                ('error_code', models.CharField(blank=True, max_length=64)),
++                ('actor', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('effect', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='events', to='timekeeping.missioneffect')),
++                ('mission', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='financial_effect_events', to='timekeeping.leavemissionrequest')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('payroll_inverse', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='mission_inverse_event', to='payroll.payrolladjustment')),
++                ('replacement', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='predecessor_event', to='timekeeping.missioneffect')),
++                ('treasury_reversal', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='mission_reversal_event', to='treasury.treasurymovement')),
++            ],
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffect',
++            constraint=models.UniqueConstraint(fields=('organization', 'mission', 'mission_version', 'effect_id', 'effect_type'), name='mission_effect_identity_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffect',
++            constraint=models.CheckConstraint(condition=models.Q(('amount__gt', 0)), name='mission_effect_positive_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffect',
++            constraint=models.CheckConstraint(condition=models.Q(models.Q(('expense_target__isnull', True), ('payroll_target__isnull', False), ('route', 'payroll'), ('treasury_target__isnull', True)), models.Q(('expense_target__isnull', False), ('payroll_target__isnull', True), ('route', 'expense'), ('treasury_target__isnull', True)), models.Q(('expense_target__isnull', True), ('payroll_target__isnull', True), ('route', 'treasury'), ('treasury_target__isnull', False)), _connector='OR'), name='mission_effect_one_route_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffectevent',
++            constraint=models.UniqueConstraint(condition=models.Q(('kind__in', ('cancelled', 'replaced'))), fields=('effect',), name='mission_effect_terminal_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffectevent',
++            constraint=models.UniqueConstraint(condition=models.Q(('kind', 'created')), fields=('effect',), name='mission_effect_created_uq'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffectevent',
++            constraint=models.CheckConstraint(condition=models.Q(('kind', 'failed'), ('effect__isnull', False), _connector='OR'), name='mission_event_effect_ck'),
++        ),
++        migrations.AddConstraint(
++            model_name='missioneffectevent',
++            constraint=models.CheckConstraint(condition=models.Q(models.Q(('kind', 'replaced'), ('replacement__isnull', False)), models.Q(models.Q(('kind', 'replaced'), _negated=True), ('replacement__isnull', True)), _connector='OR'), name='mission_event_replacement_ck'),
++        ),
++    ]
+--- a/apps/timekeeping/test_cep062.py
++++ b/apps/timekeeping/test_cep062.py
+@@ -0,0 +1,748 @@
++"""Synthetic approved bindings; native targets, no actual Mission policy activation."""
++
++import json
++from concurrent.futures import ThreadPoolExecutor
++from dataclasses import replace
++from datetime import timedelta
++from decimal import Decimal
++from pathlib import Path
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import IntegrityError, close_old_connections, connection, transaction
++from django.test import TestCase, TransactionTestCase
++from django.utils import timezone
++
++from apps.accounting.models import JournalEntry
++from apps.expenses.models import PlatformExpenseGroup
++from apps.organizations.models import (
++    BusinessPermission,
++    Organization,
++)
++from apps.payroll import test_p7_s29_s32_financial_handoffs as fixtures
++from apps.payroll.models import PayrollAdjustment
++from apps.payroll.services import create_run
++from apps.projects.models import Project, ProjectCostFact
++from apps.subledgers.models import Obligation
++from apps.treasury.models import PaymentRequest, TreasuryMovement
++from tests.retirement_fixtures import explicit_fixture_roles
++
++from . import mission_routing as api
++from .mission_models import MissionEffect, MissionEffectEvent
++from .models import LeaveMissionRequest
++from .services import (
++    create_leave_mission_request,
++    review_time_request,
++    submit_time_request,
++)
++
++
++class MissionRoutingFixture:
++    _member = fixtures.PayrollFinancialHandoffTests._member
++    _monetary_versions = fixtures.PayrollFinancialHandoffTests._monetary_versions
++
++    def setUp(self):
++        fixtures.PayrollFinancialHandoffTests.setUp(self)
++        for user in (self.owner, self.reviewer):
++            self.organization.memberships.get(
++                user=user
++            ).role_definition.permissions.add(*BusinessPermission.objects.all())
++        explicit_fixture_roles(self.organization)
++        PlatformExpenseGroup.objects.get_or_create(
++            code="other", defaults={"name": "Other synthetic fixture"}
++        )
++        self.project = Project.objects.create(
++            organization=self.organization,
++            code="MISSION",
++            name="Synthetic Mission",
++            created_by=self.owner,
++        )
++        self.mission = create_leave_mission_request(
++            organization=self.organization,
++            actor=self.owner,
++            employee=self.employee,
++            project=self.project,
++            kind="mission",
++            category_code="synthetic-category",
++            starts_at=timezone.now() + timedelta(hours=1),
++            ends_at=timezone.now() + timedelta(hours=9),
++            reason="Synthetic approved request",
++            policy_reference="SYNTHETIC-EXT0016-NOT-ACTIVATION",
++        )
++        submit_time_request(
++            organization=self.organization, actor=self.owner, request=self.mission
++        )
++        review_time_request(
++            organization=self.organization,
++            actor=self.reviewer,
++            request=self.mission,
++            approve=True,
++            reason="Independent synthetic source approval",
++        )
++        self.mission.refresh_from_db()
++        self.adjustment_run = create_run(
++            organization=self.organization,
++            actor=self.owner,
++            period=self.period,
++            code="MISSION-ADJUST",
++            idempotency_key="mission-adjust",
++            employees=[self.employee],
++            kind="off_cycle",
++        )
++        self.payroll_target = api.PayrollTarget(
++            self.adjustment_run,
++            self.component,
++            "off_cycle",
++            self.mission.starts_at.date(),
++        )
++        self.specs = (
++            api.EffectSpec(
++                uuid4(),
++                "synthetic-payroll",
++                "payroll",
++                Decimal("50.00"),
++                "IRR",
++                self.payroll_target,
++            ),
++            api.EffectSpec(
++                uuid4(),
++                "synthetic-direct",
++                "expense",
++                Decimal("30.00"),
++                "IRR",
++                api.ExpenseTarget(
++                    "other",
++                    self.mission.starts_at.date(),
++                    "Synthetic approved direct reimbursement",
++                ),
++            ),
++            api.EffectSpec(
++                uuid4(),
++                "synthetic-advance",
++                "treasury",
++                Decimal("20.00"),
++                "IRR",
++                api.TreasuryTarget("Synthetic approved mission advance"),
++            ),
++        )
++        self.plan = api.MissionPlan(
++            "approved-synthetic-v1",
++            "Synthetic approved effect mapping, no real policy activation",
++            self.specs,
++        )
++        self.binding = api.MissionPolicyBinding(
++            lambda **kw: self.plan,
++            lambda **kw: replace(self.payroll_target, kind="correction"),
++        )
++        self.policies = patch.object(
++            api,
++            "POLICIES",
++            {(str(self.organization.pk), self.mission.policy_reference): self.binding},
++        )
++        self.policies.start()
++        self.addCleanup(self.policies.stop)
++
++    def route(self, index=0, **kwargs):
++        spec = self.specs[index]
++        arguments = {
++            "organization": self.organization,
++            "actor": self.owner,
++            "mission_id": self.mission.pk,
++            "effect_id": spec.effect_id,
++            "effect_type": spec.effect_type,
++            "reason": "Synthetic approved routing",
++        }
++        arguments.update(kwargs)
++        return api.route_mission_effect(**arguments)
++
++    def resolve(self, effect, **kwargs):
++        args = {
++            "organization": self.organization,
++            "actor": self.owner,
++            "effect_id": effect.pk,
++            "reason": "Synthetic explicit cancellation",
++        }
++        args.update(kwargs)
++        return api.resolve_mission_effect(**args)
++
++    def read(self):
++        return api.reconcile_mission_effects(
++            organization=self.organization, actor=self.owner, mission_id=self.mission.pk
++        )
++
++
++class MissionRoutingTests(MissionRoutingFixture, TestCase):
++    def test_three_independent_effects_have_exactly_one_native_route_each(self):
++        before = [
++            m.objects.count()
++            for m in (JournalEntry, TreasuryMovement, Obligation, ProjectCostFact)
++        ]
++        effects = [self.route(i) for i in range(3)]
++        for i, effect in enumerate(effects):
++            self.assertEqual(effect.pk, self.route(i).pk)
++            self.assertEqual(
++                sum(
++                    bool(x)
++                    for x in (
++                        effect.payroll_target_id,
++                        effect.expense_target_id,
++                        effect.treasury_target_id,
++                    )
++                ),
++                1,
++            )
++            self.assertEqual(effect.mission_version, self.plan.mission_version)
++        self.assertEqual(
++            before,
++            [
++                m.objects.count()
++                for m in (JournalEntry, TreasuryMovement, Obligation, ProjectCostFact)
++            ],
++        )
++        self.assertEqual(effects[1].expense_target.status, "draft")
++        self.assertEqual(effects[2].treasury_target.kind, "employee_advance")
++        self.assertEqual(self.mission.state, "approved")
++        result = self.read()
++        self.assertTrue(all(x["source_matches"] for x in result["rows"]))
++        Path("docs/governance/cep/evidence/CEP-062_INTEGRATION_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic_policy_only": True,
++                    "actual_activation": False,
++                    "result": result,
++                    "source_state": self.mission.state,
++                    "native_financial_counts_before": before,
++                    "native_financial_counts_after": [
++                        m.objects.count()
++                        for m in (
++                            JournalEntry,
++                            TreasuryMovement,
++                            Obligation,
++                            ProjectCostFact,
++                        )
++                    ],
++                },
++                indent=2,
++            )
++        )
++
++    def test_absent_policy_is_held_despite_free_text_reference(self):
++        with (
++            patch.object(api, "POLICIES", {}),
++            self.assertRaisesMessage(
++                ValidationError, "APPROVED_MISSION_POLICY_REQUIRED"
++            ),
++        ):
++            self.route()
++        self.assertFalse(MissionEffect.objects.exists())
++        self.assertEqual(
++            MissionEffectEvent.objects.get().error_code,
++            "APPROVED_MISSION_POLICY_REQUIRED",
++        )
++        self.assertEqual(
++            LeaveMissionRequest.objects.get(pk=self.mission.pk).state, "approved"
++        )
++
++    def test_duplicate_or_wrong_route_classification_and_unknown_effect_are_held(self):
++        for plan in (
++            replace(self.plan, effects=(self.specs[0], self.specs[0])),
++            replace(self.plan, effects=(replace(self.specs[0], route="treasury"),)),
++        ):
++            self.plan = plan
++            with self.assertRaises(ValidationError):
++                self.route()
++        self.assertFalse(MissionEffect.objects.exists())
++
++    def test_immutable_version_payload_mismatch_and_new_version_cannot_double_route(
++        self,
++    ):
++        original = self.route()
++        self.plan = replace(
++            self.plan, effects=(replace(self.specs[0], amount=Decimal(51)),)
++        )
++        with self.assertRaisesMessage(
++            ValidationError, "IMMUTABLE_EFFECT_PAYLOAD_MISMATCH"
++        ):
++            self.route()
++        self.plan = replace(self.plan, mission_version="approved-v2")
++        with self.assertRaisesMessage(
++            ValidationError, "PRIOR_EFFECT_REQUIRES_CONTROLLED_RESOLUTION"
++        ):
++            self.route()
++        self.assertEqual(MissionEffect.objects.count(), 1)
++        self.assertEqual(
++            PayrollAdjustment.objects.get(pk=original.payroll_target_id).amount,
++            Decimal(50),
++        )
++
++    def test_late_target_failure_rolls_back_and_successful_retry_revalidates_source(
++        self,
++    ):
++        count = PayrollAdjustment.objects.count()
++        with (
++            patch.object(
++                MissionEffect.objects,
++                "create",
++                side_effect=ValidationError("Internal private target detail"),
++            ),
++            self.assertRaises(ValidationError),
++        ):
++            self.route()
++        self.assertEqual(PayrollAdjustment.objects.count(), count)
++        failure = MissionEffectEvent.objects.get()
++        self.assertEqual(failure.error_code, "TARGET_OPERATION_FAILED")
++        self.assertNotIn("private", failure.error_code)
++        self.assertEqual(self.route().mission_id, self.mission.pk)
++        self.assertEqual(MissionEffectEvent.objects.filter(kind="created").count(), 1)
++
++    def test_source_or_policy_drift_during_target_operation_rolls_back(self):
++        original = self.binding.read_plan
++        reads = []
++
++        def drift(**kwargs):
++            reads.append(True)
++            plan = original(**kwargs)
++            return (
++                plan
++                if len(reads) == 1
++                else replace(plan, mission_version="changed-during-write")
++            )
++
++        with (
++            patch.object(
++                api,
++                "POLICIES",
++                {
++                    (
++                        str(self.organization.pk),
++                        self.mission.policy_reference,
++                    ): api.MissionPolicyBinding(drift)
++                },
++            ),
++            self.assertRaisesMessage(
++                ValidationError, "APPROVED_SOURCE_CHANGED_DURING_TARGET_OPERATION"
++            ),
++        ):
++            self.route()
++        self.assertFalse(MissionEffect.objects.exists())
++        self.assertFalse(PayrollAdjustment.objects.exists())
++
++    def test_native_permissions_tenant_and_source_approval_fail_closed(self):
++        with self.assertRaises(PermissionDenied):
++            self.route(actor=self.denied)
++        other = Organization.objects.create(
++            name="Foreign", slug="foreign-mission", created_by=self.owner
++        )
++        with self.assertRaises(PermissionDenied):
++            self.route(organization=other)
++        LeaveMissionRequest.objects.filter(pk=self.mission.pk).update(state="rejected")
++        with self.assertRaisesMessage(
++            ValidationError, "APPROVED_INDEPENDENT_MISSION_REQUIRED"
++        ):
++            self.route()
++        self.assertFalse(MissionEffect.objects.exists())
++
++    def test_native_target_permissions_remain_independent_of_mission_review(self):
++        from apps.organizations.models import BusinessPermissionCode as P
++
++        membership = self.organization.memberships.get(user=self.actor)
++        membership.role_definition.permissions.add(
++            BusinessPermission.objects.get(code=P.LEAVE_MISSION_REVIEW)
++        )
++        for index in range(3):
++            with (
++                self.subTest(route=self.specs[index].route),
++                self.assertRaises(PermissionDenied),
++            ):
++                self.route(index, actor=self.actor)
++        self.assertFalse(MissionEffect.objects.exists())
++        self.assertEqual(MissionEffectEvent.objects.filter(kind="failed").count(), 3)
++
++    def test_missing_approval_metadata_and_foreign_target_context_are_held(self):
++        from apps.payroll.models import PayrollComponent
++
++        approved_time = self.mission.reviewed_at
++        LeaveMissionRequest.objects.filter(pk=self.mission.pk).update(reviewed_at=None)
++        with self.assertRaisesMessage(
++            ValidationError, "APPROVED_INDEPENDENT_MISSION_REQUIRED"
++        ):
++            self.route()
++        LeaveMissionRequest.objects.filter(pk=self.mission.pk).update(
++            reviewed_at=approved_time
++        )
++        other = Organization.objects.create(
++            name="Foreign target", slug="foreign-native-target", created_by=self.owner
++        )
++        component = PayrollComponent.objects.create(
++            organization=other,
++            code="FOREIGN",
++            name="Foreign component",
++            kind="earning",
++            net_effect="add",
++            created_by=self.owner,
++        )
++        self.plan = replace(
++            self.plan,
++            effects=(
++                replace(
++                    self.specs[0],
++                    target=replace(self.payroll_target, component=component),
++                ),
++            ),
++        )
++        with self.assertRaises(ValidationError):
++            self.route()
++        self.assertFalse(MissionEffect.objects.exists())
++
++    def test_payroll_correction_is_exact_inverse_with_retained_source_and_replacement(
++        self,
++    ):
++        original = self.route()
++        self.plan = replace(
++            self.plan,
++            mission_version="approved-v2",
++            effects=(replace(self.specs[0], amount=Decimal("65.00")),),
++        )
++        event = self.resolve(
++            original, replace=True, reason="Explicit approved correction"
++        )
++        self.assertEqual(event.payroll_inverse.amount, Decimal(-50))
++        self.assertEqual(event.replacement.amount, Decimal(65))
++        self.assertEqual(
++            self.resolve(
++                original, replace=True, reason="Explicit approved correction"
++            ).pk,
++            event.pk,
++        )
++        self.assertEqual(MissionEffect.objects.count(), 2)
++        rows = self.read()["rows"]
++        self.assertEqual({x["state"] for x in rows}, {"replaced", "active"})
++        self.assertEqual(
++            LeaveMissionRequest.objects.get(pk=self.mission.pk).state, "approved"
++        )
++        Path("docs/governance/cep/evidence/CEP-062_CORRECTION_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic": True,
++                    "native_payroll_inverse": str(event.payroll_inverse_id),
++                    "inverse_amount": str(event.payroll_inverse.amount),
++                    "inverse_run_status": event.payroll_inverse.run.status,
++                    "source_state": "approved",
++                    "reconciliation": self.read(),
++                    "cash_or_gl_mutation": False,
++                },
++                indent=2,
++            )
++        )
++
++    def test_expense_cancel_and_replacement_use_native_void_history(self):
++        original = self.route(1)
++        self.plan = replace(
++            self.plan,
++            mission_version="expense-correction-v2",
++            effects=(replace(self.specs[1], amount=Decimal(25)),),
++        )
++        event = self.resolve(original, replace=True)
++        original.expense_target.refresh_from_db()
++        self.assertEqual(original.expense_target.status, "void")
++        self.assertEqual(
++            event.replacement.expense_target.replaces_id, original.expense_target_id
++        )
++        self.assertEqual(event.replacement.expense_target.source_version, 2)
++
++    def test_unpaid_advance_cancel_is_native_and_never_employee_loan(self):
++        original = self.route(2)
++        event = self.resolve(original)
++        original.treasury_target.refresh_from_db()
++        self.assertEqual(original.treasury_target.status, "cancelled")
++        self.assertIsNone(event.treasury_reversal_id)
++        self.assertFalse(TreasuryMovement.objects.exists())
++        self.assertEqual(original.treasury_target.kind, "employee_advance")
++
++    def test_cancel_failure_retains_active_original_and_rolls_back_inverse(self):
++        original = self.route()
++        count = PayrollAdjustment.objects.count()
++        create_event = MissionEffectEvent.objects.create
++
++        def fail_terminal(**kwargs):
++            if kwargs.get("kind") in {"cancelled", "replaced"}:
++                raise ValidationError("Late correction failure")
++            return create_event(**kwargs)
++
++        with (
++            patch.object(
++                MissionEffectEvent.objects, "create", side_effect=fail_terminal
++            ),
++            self.assertRaises(ValidationError),
++        ):
++            self.resolve(original)
++        self.assertEqual(PayrollAdjustment.objects.count(), count)
++        self.assertFalse(
++            original.events.filter(kind__in=("cancelled", "replaced")).exists()
++        )
++
++    def test_finalized_payroll_never_uses_unconsumed_inverse_for_replacement(self):
++        from apps.payroll.models import PayrollRun
++
++        original = self.route()
++        # Inject a finalized marker only to exercise the fail-closed boundary;
++        # this does not claim native Payroll finalization/activation evidence.
++        PayrollRun.objects.filter(pk=self.adjustment_run.pk).update(status="finalized")
++        self.plan = replace(self.plan, mission_version="approved-v2")
++        before = PayrollAdjustment.objects.count()
++        with self.assertRaisesMessage(
++            ValidationError, "FINALIZED_NATIVE_PAYROLL_INVERSE_REQUIRED"
++        ):
++            self.resolve(original, replace=True)
++        self.assertEqual(PayrollAdjustment.objects.count(), before)
++        self.assertEqual(MissionEffect.objects.count(), 1)
++        self.assertFalse(original.events.filter(kind="replaced").exists())
++
++    def test_finalized_native_inverse_reference_is_consumed_without_reversing_run(self):
++        from apps.payroll.models import PayrollRun, PayrollRunEmployee
++        from apps.payroll.services import record_adjustment
++
++        original = self.route()
++        # Sealed synthetic producer fixtures, as in the retained Payroll source
++        # fixture. These markers do not certify Payroll calculation/finalization.
++        PayrollRun.objects.filter(pk=self.adjustment_run.pk).update(status="finalized")
++        PayrollRunEmployee.objects.filter(run=self.adjustment_run).update(
++            status="finalized"
++        )
++        original_result = self.adjustment_run.employee_results.get(
++            employee=self.employee
++        )
++        inverse_run = create_run(
++            organization=self.organization,
++            actor=self.owner,
++            period=self.period,
++            code="MISSION-INV",
++            idempotency_key="mission-inverse-run",
++            employees=[self.employee],
++            kind="adjustment",
++        )
++        inverse = record_adjustment(
++            organization=self.organization,
++            actor=self.owner,
++            run=inverse_run,
++            employee=self.employee,
++            component=self.component,
++            kind="correction",
++            amount=-original.amount,
++            effective_on=self.mission.starts_at.date(),
++            source_reference="mission-reverse:" + original.identity_hash,
++            reason="Explicit synthetic native inverse",
++            original_result=original_result,
++            source_payload={"reverses_mission_effect": original.identity_hash},
++        )
++        PayrollRun.objects.filter(pk=inverse_run.pk).update(status="finalized")
++        successor = create_run(
++            organization=self.organization,
++            actor=self.owner,
++            period=self.period,
++            code="MISSION-RPL",
++            idempotency_key="mission-replacement-run",
++            employees=[self.employee],
++            kind="adjustment",
++        )
++        self.plan = replace(
++            self.plan,
++            mission_version="approved-v2",
++            effects=(
++                replace(
++                    self.specs[0],
++                    target=replace(
++                        self.payroll_target,
++                        run=successor,
++                        original_result=original_result,
++                    ),
++                ),
++            ),
++        )
++        binding = api.MissionPolicyBinding(lambda **kw: self.plan, lambda **kw: inverse)
++        before = PayrollAdjustment.objects.count()
++        with patch.object(
++            api,
++            "POLICIES",
++            {(str(self.organization.pk), self.mission.policy_reference): binding},
++        ):
++            event = self.resolve(original, replace=True)
++        self.assertEqual(event.payroll_inverse_id, inverse.pk)
++        self.assertEqual(PayrollAdjustment.objects.count(), before + 1)
++        self.assertEqual(
++            PayrollRun.objects.get(pk=self.adjustment_run.pk).status, "finalized"
++        )
++        self.assertEqual(event.replacement.payroll_target.run_id, successor.pk)
++
++    def test_read_only_reconciliation_exposes_native_target_drift(self):
++        effect = self.route(2)
++        self.assertTrue(self.read()["rows"][0]["target_matches"])
++        # Inject mutable target drift only in this disposable synthetic fixture.
++        PaymentRequest.objects.filter(pk=effect.treasury_target_id).update(
++            amount=Decimal(99)
++        )
++        count = MissionEffect.objects.count()
++        row = self.read()["rows"][0]
++        self.assertFalse(row["target_matches"])
++        self.assertEqual(row["state"], "target_drift")
++        self.assertEqual(MissionEffect.objects.count(), count)
++        with self.assertRaisesMessage(
++            ValidationError, "NATIVE_TARGET_LINEAGE_MISMATCH"
++        ):
++            self.route(2)
++
++    def test_issued_advance_requires_native_treasury_reversal_before_resolution(self):
++        from apps.organizations.models import PlatformPolicy
++        from apps.treasury.services import (
++            create_movement,
++            decide_payment_request,
++            open_advance,
++            release_payment_request,
++            reverse_advance_issue,
++            submit_payment_request,
++        )
++        from tests.retirement_fixtures import CashFixture
++
++        activate = CashFixture._activate_policy
++
++        def missing_only(cash, code, parameters):
++            if not PlatformPolicy.objects.filter(code=code).exists():
++                activate(cash, code, parameters)
++
++        with patch.object(CashFixture, "_activate_policy", missing_only):
++            cash = CashFixture(organization=self.organization, owner=self.owner)
++        explicit_fixture_roles(self.organization)
++        effect = self.route(2)
++        request = effect.treasury_target
++        submit_payment_request(
++            organization=self.organization,
++            actor=self.owner,
++            request=request,
++            reason="Synthetic submit",
++        )
++        decide_payment_request(
++            organization=self.organization,
++            actor=self.owner,
++            request=request,
++            approve=True,
++            reason="Synthetic approval",
++        )
++        movement = create_movement(
++            organization=self.organization,
++            actor=self.owner,
++            kind="disbursement",
++            movement_date=self.mission.starts_at.date(),
++            amount=effect.amount,
++            description="Synthetic approved advance",
++            idempotency_key="mission-cash",
++            account=cash.bank,
++            project=self.project,
++        )
++        cash.post(movement)
++        movement.refresh_from_db()
++        release_payment_request(
++            organization=self.organization,
++            actor=self.owner,
++            request=request,
++            movement=movement,
++            reason="Synthetic issue",
++        )
++        request.refresh_from_db()
++        with self.assertRaisesMessage(
++            ValidationError, "NATIVE_TREASURY_ADVANCE_REVERSAL_REQUIRED"
++        ):
++            self.resolve(effect)
++        advance = open_advance(
++            organization=self.organization, actor=self.owner, request=request
++        )
++        reverse_advance_issue(
++            organization=self.organization,
++            actor=self.owner,
++            advance=advance,
++            requested_by=self.organization.memberships.get(user=self.reviewer),
++            accounting_date=self.mission.starts_at.date(),
++            period=cash.period,
++            reason="Native Treasury correction",
++        )
++        event = self.resolve(effect)
++        self.assertEqual(event.treasury_reversal.reverses_id, movement.pk)
++        self.assertEqual(event.treasury_reversal.status, "posted")
++        self.assertEqual(event.kind, "cancelled")
++        Path("docs/governance/cep/evidence/CEP-062_ADVANCE_TRACE.json").write_text(
++            json.dumps(
++                {
++                    "synthetic": True,
++                    "native_advance": str(advance.pk),
++                    "original_cash": str(movement.pk),
++                    "native_reversal": str(event.treasury_reversal_id),
++                    "routing_consumed_existing_native_reversal": True,
++                    "reconciliation": self.read(),
++                },
++                indent=2,
++            )
++        )
++
++    def test_database_identity_constraints_and_orm_immutability(self):
++        effect = self.route()
++        for operation in (
++            lambda: MissionEffect.objects.filter(pk=effect.pk).update(route="treasury"),
++            lambda: MissionEffect.objects.filter(pk=effect.pk).delete(),
++            lambda: MissionEffectEvent.objects.all().delete(),
++        ):
++            with self.assertRaises(ValidationError):
++                operation()
++        with (
++            self.assertRaises(IntegrityError),
++            transaction.atomic(),
++            connection.cursor() as cursor,
++        ):
++            cursor.execute(
++                "UPDATE timekeeping_missioneffect SET route='treasury' WHERE id=%s",
++                [effect.pk],
++            )
++        effect.amount = Decimal(999)
++        with self.assertRaises(ValidationError):
++            effect.save()
++        with transaction.atomic(), self.assertRaises(ValidationError):
++            MissionEffect.objects.create(
++                organization=self.organization,
++                mission=self.mission,
++                mission_version=effect.mission_version,
++                effect_id=effect.effect_id,
++                effect_type=effect.effect_type,
++                route=effect.route,
++                identity_hash=effect.identity_hash,
++                payload_hash=effect.payload_hash,
++                source_snapshot=effect.source_snapshot,
++                policy_reference=effect.policy_reference,
++                amount=Decimal(50),
++                currency="IRR",
++                payroll_target=effect.payroll_target,
++                recorded_by=self.owner,
++            )
++
++
++class MissionRoutingConcurrencyTests(MissionRoutingFixture, TransactionTestCase):
++    def test_duplicate_source_race_has_one_native_target(self):
++        from apps.accounts.models import User
++
++        def worker(_):
++            close_old_connections()
++            try:
++                return api.route_mission_effect(
++                    organization=Organization.objects.get(pk=self.organization.pk),
++                    actor=User.objects.get(pk=self.owner.pk),
++                    mission_id=self.mission.pk,
++                    effect_id=self.specs[0].effect_id,
++                    effect_type=self.specs[0].effect_type,
++                    reason="Synthetic duplicate race",
++                ).pk
++            finally:
++                close_old_connections()
++
++        with ThreadPoolExecutor(max_workers=2) as pool:
++            identities = list(pool.map(worker, range(2)))
++        self.assertEqual(len(set(identities)), 1)
++        self.assertEqual(MissionEffect.objects.count(), 1)
++        self.assertEqual(PayrollAdjustment.objects.count(), 1)
+--- a/apps/timekeeping/test_p7_s06_s12_timekeeping.py
++++ b/apps/timekeeping/test_p7_s06_s12_timekeeping.py
+@@ -119 +119 @@
+-        OrganizationMembership.objects.create(
++        membership = OrganizationMembership.objects.create(
+@@ -125,0 +126,10 @@
++            authorization_migrated_at=timezone.now(),
++        )
++        MembershipRoleAssignment.objects.create(
++            organization=self.organization, membership=membership, role=role,
++            reason="Explicit retained Timekeeping fixture authority",
++        )
++        MembershipScopeGrant.objects.create(
++            organization=self.organization, membership=membership,
++            scope_type=AuthorizationScopeType.ORGANIZATION,
++            reason="Explicit retained Timekeeping fixture scope",

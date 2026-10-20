@@ -1,0 +1,148 @@
+......F.......                                                           [100%]
+================================== FAILURES ===================================
+_ MissionRoutingTests.test_issued_advance_requires_native_treasury_reversal_before_resolution _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_issued_advance_requires_native_treasury_reversal_before_resolution>
+
+    def test_issued_advance_requires_native_treasury_reversal_before_resolution(self):
+        from apps.organizations.models import PlatformPolicy
+        from apps.treasury.services import (
+            create_movement,
+            decide_payment_request,
+            release_payment_request,
+            reverse_advance_issue,
+            submit_payment_request,
+        )
+        from tests.retirement_fixtures import CashFixture
+
+        activate = CashFixture._activate_policy
+
+        def missing_only(cash, code, parameters):
+            if not PlatformPolicy.objects.filter(code=code).exists():
+                activate(cash, code, parameters)
+
+        with patch.object(CashFixture, "_activate_policy", missing_only):
+            cash = CashFixture(organization=self.organization, owner=self.owner)
+        explicit_fixture_roles(self.organization)
+        effect = self.route(2)
+        request = effect.treasury_target
+        submit_payment_request(
+            organization=self.organization,
+            actor=self.owner,
+            request=request,
+            reason="Synthetic submit",
+        )
+        decide_payment_request(
+            organization=self.organization,
+            actor=self.owner,
+            request=request,
+            approve=True,
+            reason="Synthetic approval",
+        )
+>       movement = create_movement(
+            organization=self.organization,
+            actor=self.owner,
+            kind="disbursement",
+            movement_date=self.mission.starts_at.date(),
+            amount=effect.amount,
+            description="Synthetic approved advance",
+            idempotency_key="mission-cash",
+            account=cash.bank,
+            origin_request=request,
+            project=self.project,
+        )
+
+apps\timekeeping\test_cep062.py:481:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Handoff Tenant>, actor = <User: handoff-owner>
+kind = 'disbursement', movement_date = datetime.date(2026, 10, 20)
+amount = Decimal('20.00'), description = 'Synthetic approved advance'
+idempotency_key = 'mission-cash'
+account = <TreasuryAccount: TreasuryAccount object (86b9abc0-5b45-4031-bd15-e90309b4c2a6)>
+source_account = None, destination_account = None
+project = <Project: MISSION - Synthetic Mission>, site = None, party = None
+origin_request = <PaymentRequest: PaymentRequest object (7c418fbc-449e-4487-9f04-66737f53c4b0)>
+
+    @transaction.atomic
+    def create_movement(
+        *,
+        organization: Organization,
+        actor,
+        kind: str,
+        movement_date: date,
+        amount: Decimal,
+        description: str,
+        idempotency_key: str,
+        account: TreasuryAccount | None = None,
+        source_account: TreasuryAccount | None = None,
+        destination_account: TreasuryAccount | None = None,
+        project=None,
+        site=None,
+        party=None,
+        origin_request: PaymentRequest | None = None,
+    ) -> TreasuryMovement:
+        # The account rows serialize cash effects. Locking the Organization here
+        # would serialize unrelated movements across every account in the tenant.
+        organization = Organization.objects.get(pk=organization.pk)
+        if not organization.is_active:
+            raise PermissionDenied("Tenant غیرفعال است.")
+        maker = require_business_permission(
+            user=actor,
+            organization=organization,
+            permission=BusinessPermissionCode.TREASURY_MOVEMENTS_CREATE,
+            message="اختیار ایجاد حرکت خزانه‌داری را ندارید.",
+            project=project,
+            site=site,
+        )
+        if kind not in {
+            TreasuryMovementKind.RECEIPT,
+            TreasuryMovementKind.DISBURSEMENT,
+            TreasuryMovementKind.TRANSFER,
+        }:
+            raise ValidationError("نوع حرکت مستقیم معتبر نیست.")
+        if not isinstance(amount, Decimal) or not amount.is_finite() or amount <= 0:
+            raise ValidationError("مبلغ حرکت باید Decimal مثبت و متناهی باشد.")
+        if origin_request is not None:
+            origin_request = PaymentRequest.objects.select_for_update().get(
+                pk=origin_request.pk
+            )
+            if origin_request.kind == PaymentRequestKind.PAYROLL:
+                from .payroll_handoffs import validate_payment_source
+
+                validate_payment_source(origin_request)
+            if (
+                origin_request.organization_id != organization.pk
+                or origin_request.kind
+                not in {
+                    PaymentRequestKind.EMPLOYEE_REIMBURSEMENT,
+                    PaymentRequestKind.PAYROLL,
+                }
+                or origin_request.status != PaymentRequestStatus.APPROVED
+                or (
+                    origin_request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+                    and (
+                        origin_request.source_expense.status != "approved"
+                        or origin_request.source_expense.source_version
+                        != origin_request.source_expense_version
+                    )
+                )
+                or kind != TreasuryMovementKind.DISBURSEMENT
+                or amount != origin_request.amount
+                or project != origin_request.project
+                or site != origin_request.site
+                or party is not None
+            ):
+>               raise ValidationError(
+                    "Movement does not match an approved reimbursement request."
+                )
+E               django.core.exceptions.ValidationError: ['Movement does not match an approved reimbursement request.']
+
+apps\treasury\services.py:503: ValidationError
+=========================== short test summary info ===========================
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_issued_advance_requires_native_treasury_reversal_before_resolution
+1 failed, 13 passed in 72.58s (0:01:12)

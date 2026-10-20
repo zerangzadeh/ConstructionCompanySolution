@@ -1,0 +1,243 @@
+.....FF.F.............                                                [100%]
+================================== FAILURES ===================================
+_ P7TimekeepingTests.test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history _
+
+self = <apps.timekeeping.test_p7_s06_s12_timekeeping.P7TimekeepingTests testMethod=test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history>
+
+    def test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history(
+        self,
+    ) -> None:
+        record = self._attendance()
+        with self.assertRaises(PermissionDenied):
+            finalize_attendance(
+                organization=self.organization,
+                actor=self.owner,
+                attendance=record,
+            )
+>       record = finalize_attendance(
+            organization=self.organization,
+            actor=self.reviewer,
+            attendance=record,
+        )
+
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:188:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:368: in finalize_attendance
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: reviewer>, organization = <Organization: Time Tenant>
+permission = BusinessPermissionCode.ATTENDANCE_REVIEW
+message = 'مجوز یا دامنه لازم برای این عملیات را ندارید.'
+project = <Project: TIME - Time Project>
+site = <ProjectSite: TIME · SITE - Time Site>, allow_any_scope = False
+allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied
+____ P7TimekeepingTests.test_s08_s09_requests_overlap_sod_and_policy_gate _____
+
+self = <apps.timekeeping.test_p7_s06_s12_timekeeping.P7TimekeepingTests testMethod=test_s08_s09_requests_overlap_sod_and_policy_gate>
+
+    def test_s08_s09_requests_overlap_sod_and_policy_gate(self) -> None:
+        leave = create_leave_mission_request(
+            organization=self.organization,
+            actor=self.owner,
+            employee=self.employee,
+            kind="leave",
+            category_code="CONFIGURED",
+            starts_at=datetime(2026, 3, 1, 8, tzinfo=self.zone),
+            ends_at=datetime(2026, 3, 1, 12, tzinfo=self.zone),
+            reason="Request",
+        )
+        # CEP-023 supersedes free-text-only leave approval with source allocation.
+        with self.assertRaises(ValidationError):
+            submit_time_request(
+                organization=self.organization, actor=self.owner, request=leave
+            )
+        with self.assertRaises(ValidationError):
+>           review_time_request(
+                organization=self.organization,
+                actor=self.reviewer,
+                request=leave,
+                approve=True,
+                reason="No policy",
+            )
+
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:314:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:873: in review_time_request
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied
+_ P7TimekeepingTests.test_s11_s12_conservation_immutability_review_and_non_posting_preview _
+
+self = <apps.timekeeping.test_p7_s06_s12_timekeeping.P7TimekeepingTests testMethod=test_s11_s12_conservation_immutability_review_and_non_posting_preview>
+
+    def test_s11_s12_conservation_immutability_review_and_non_posting_preview(
+        self,
+    ) -> None:
+        wbs = WBSNode.objects.create(
+            organization=self.organization,
+            project=self.project,
+            code="WBS",
+            title="Work",
+            created_by=self.owner,
+        )
+        activity = Activity.objects.create(
+            organization=self.organization,
+            project=self.project,
+            wbs_node=wbs,
+            site=self.site,
+            code="ACT",
+            name="Activity",
+            created_by=self.owner,
+        )
+        sheet = create_timesheet(
+            organization=self.organization,
+            actor=self.owner,
+            employee=self.employee,
+            period_start=date(2026, 5, 1),
+            period_end=date(2026, 5, 1),
+            declared_minutes=480,
+        )
+        add_timesheet_entry(
+            organization=self.organization,
+            actor=self.owner,
+            timesheet=sheet,
+            work_date=date(2026, 5, 1),
+            project=self.project,
+            site=self.site,
+            activity=activity,
+            minutes=420,
+        )
+        with self.assertRaises(ValidationError):
+            submit_timesheet(
+                organization=self.organization, actor=self.owner, timesheet=sheet
+            )
+        sheet.declared_minutes = 420
+        sheet.save(update_fields=["declared_minutes", "updated_at"])
+        sheet = submit_timesheet(
+            organization=self.organization, actor=self.owner, timesheet=sheet
+        )
+        with self.assertRaises(ValidationError):
+            sheet.declared_minutes = 400
+            sheet.save()
+>       review_timesheet(
+            organization=self.organization,
+            actor=self.reviewer,
+            timesheet=sheet,
+            approve=True,
+            reason="Allocation reviewed",
+        )
+
+apps\timekeeping\test_p7_s06_s12_timekeeping.py:449:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\services.py:1063: in review_timesheet
+    _scope(
+apps\timekeeping\services.py:74: in _scope
+    require_business_permission(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+user = <User: reviewer>, organization = <Organization: Time Tenant>
+permission = BusinessPermissionCode.TIMESHEETS_REVIEW
+message = 'مجوز یا دامنه لازم برای این عملیات را ندارید.', project = None
+site = None, allow_any_scope = False, allow_site_parent = False
+
+    def require_business_permission(
+        *,
+        user: User,
+        organization: Organization,
+        permission: str | BusinessPermissionCode,
+        message: str,
+        project: Any | None = None,
+        site: Any | None = None,
+        allow_any_scope: bool = False,
+        allow_site_parent: bool = False,
+    ) -> OrganizationMembership:
+        """Deny by default and return the checked membership for scoped workflows."""
+
+        membership = get_active_membership(user=user, organization=organization)
+        if not membership_has_permission(
+            membership, permission
+        ) or not membership_has_scope(
+            membership,
+            project=project,
+            site=site,
+            allow_any_scope=allow_any_scope,
+            allow_site_parent=allow_site_parent,
+        ):
+>           raise PermissionDenied(message)
+E           django.core.exceptions.PermissionDenied: مجوز یا دامنه لازم برای این عملیات را ندارید.
+
+apps\organizations\authorization.py:436: PermissionDenied
+=========================== short test summary info ===========================
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s07_attendance_is_tenant_safe_sod_immutable_and_corrected_by_history
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s08_s09_requests_overlap_sod_and_policy_gate
+FAILED apps/timekeeping/test_p7_s06_s12_timekeeping.py::P7TimekeepingTests::test_s11_s12_conservation_immutability_review_and_non_posting_preview
+3 failed, 19 passed, 3 subtests passed in 63.39s (0:01:03)

@@ -116,13 +116,23 @@ class P7TimekeepingTests(TestCase):
         role.permissions.add(
             *BusinessPermission.objects.filter(code__in=TIME_PERMISSION_CODES)
         )
-        OrganizationMembership.objects.create(
+        membership = OrganizationMembership.objects.create(
             organization=self.organization,
             user=user,
             role_definition=role,
             status=MembershipStatus.ACTIVE,
             joined_at=timezone.now(),
             assigned_by=self.owner,
+            authorization_migrated_at=timezone.now(),
+        )
+        MembershipRoleAssignment.objects.create(
+            organization=self.organization, membership=membership, role=role,
+            reason="Explicit retained Timekeeping fixture authority",
+        )
+        MembershipScopeGrant.objects.create(
+            organization=self.organization, membership=membership,
+            scope_type=AuthorizationScopeType.ORGANIZATION,
+            reason="Explicit retained Timekeeping fixture scope",
         )
         return user
 

@@ -1,0 +1,179 @@
+....F.....F.                                                             [100%]
+================================== FAILURES ===================================
+_ MissionRoutingTests.test_expense_cancel_and_replacement_use_native_void_history _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_expense_cancel_and_replacement_use_native_void_history>
+
+    def test_expense_cancel_and_replacement_use_native_void_history(self):
+>       original = self.route(1)
+                   ^^^^^^^^^^^^^
+
+apps\timekeeping\test_cep062.py:384:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\timekeeping\test_cep062.py:153: in route
+    return api.route_mission_effect(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\mission_routing.py:427: in route_mission_effect
+    effect = _create(organization, actor, mission, plan, spec, reason)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\mission_routing.py:323: in _create
+    links["expense_target"] = create_expense_draft(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Handoff Tenant>
+project = <Project: MISSION - Synthetic Mission>, actor = <User: handoff-owner>
+description = 'Synthetic approved direct reimbursement'
+amount = Decimal('30.00'), incurred_on = datetime.date(2026, 10, 20)
+source_reference = 'mission:be6d04e095260362d8b89445d7e8fc7bd1eee6b519d3268be38125ac48f7ff83'
+idempotency_key = 'mission:be6d04e095260362d8b89445d7e8fc7bd1eee6b519d3268be38125ac48f7ff83'
+phase = None, category = 'other', vendor_name = '', party = None
+expense_category = None, classification = ExpenseClassification.DIRECT
+receipt_reference = '', notes = '', recurrence_template = None
+recurrence_occurrence_on = None
+reimbursement_employee = <Employee: PAY-001 - کارمند تحویل>, replaces = None
+
+    @transaction.atomic
+    def create_expense_draft(
+        *,
+        organization: Organization,
+        project: Project,
+        actor: User,
+        description: str,
+        amount: Decimal,
+        incurred_on: date,
+        source_reference: str,
+        idempotency_key: str,
+        phase: ProjectPhase | None = None,
+        category: str = LegacyExpenseCategory.OTHER,
+        vendor_name: str = "",
+        party: BusinessParty | None = None,
+        expense_category: ExpenseCategory | None = None,
+        classification: str = ExpenseClassification.DIRECT,
+        receipt_reference: str = "",
+        notes: str = "",
+        recurrence_template: RecurringExpenseTemplate | None = None,
+        recurrence_occurrence_on: date | None = None,
+        reimbursement_employee: Employee | None = None,
+        replaces: Expense | None = None,
+    ) -> Expense:
+        """Create a reviewable draft; no payable, posting, cash, or cost fact is made."""
+
+        _validate_context(
+            actor=actor,
+            organization=organization,
+            project=project,
+            permission=BusinessPermissionCode.EXPENSES_CREATE,
+        )
+        normalized_key = idempotency_key.strip()
+        if not normalized_key:
+            raise ValueError("An idempotency key is required.")
+        if phase is not None:
+            _validate_phase(organization=organization, project=project, phase=phase)
+        if not description.strip() or not source_reference.strip():
+            raise ValueError("Description and retained source reference are required.")
+        if amount <= Decimal("0.00"):
+            raise ValueError("Expense amount must be positive.")
+        if not PlatformExpenseGroup.objects.filter(
+            code=category, is_active=True, archived_at__isnull=True
+        ).exists():
+>           raise ValueError("Invalid primary expense group.")
+E           ValueError: Invalid primary expense group.
+
+apps\expenses\services.py:289: ValueError
+_ MissionRoutingTests.test_three_independent_effects_have_exactly_one_native_route_each _
+
+self = <apps.timekeeping.test_cep062.MissionRoutingTests testMethod=test_three_independent_effects_have_exactly_one_native_route_each>
+
+    def test_three_independent_effects_have_exactly_one_native_route_each(self):
+        before = [
+            m.objects.count()
+            for m in (JournalEntry, TreasuryMovement, Obligation, ProjectCostFact)
+        ]
+>       effects = [self.route(i) for i in range(3)]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\timekeeping\test_cep062.py:177:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\timekeeping\test_cep062.py:177: in <listcomp>
+    effects = [self.route(i) for i in range(3)]
+               ^^^^^^^^^^^^^
+apps\timekeeping\test_cep062.py:153: in route
+    return api.route_mission_effect(**arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\mission_routing.py:427: in route_mission_effect
+    effect = _create(organization, actor, mission, plan, spec, reason)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\timekeeping\mission_routing.py:323: in _create
+    links["expense_target"] = create_expense_draft(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+organization = <Organization: Handoff Tenant>
+project = <Project: MISSION - Synthetic Mission>, actor = <User: handoff-owner>
+description = 'Synthetic approved direct reimbursement'
+amount = Decimal('30.00'), incurred_on = datetime.date(2026, 10, 20)
+source_reference = 'mission:bf2d2e2f19a072e7399616e8cedf494a69227846f59027f5a3343d52d33f8838'
+idempotency_key = 'mission:bf2d2e2f19a072e7399616e8cedf494a69227846f59027f5a3343d52d33f8838'
+phase = None, category = 'other', vendor_name = '', party = None
+expense_category = None, classification = ExpenseClassification.DIRECT
+receipt_reference = '', notes = '', recurrence_template = None
+recurrence_occurrence_on = None
+reimbursement_employee = <Employee: PAY-001 - کارمند تحویل>, replaces = None
+
+    @transaction.atomic
+    def create_expense_draft(
+        *,
+        organization: Organization,
+        project: Project,
+        actor: User,
+        description: str,
+        amount: Decimal,
+        incurred_on: date,
+        source_reference: str,
+        idempotency_key: str,
+        phase: ProjectPhase | None = None,
+        category: str = LegacyExpenseCategory.OTHER,
+        vendor_name: str = "",
+        party: BusinessParty | None = None,
+        expense_category: ExpenseCategory | None = None,
+        classification: str = ExpenseClassification.DIRECT,
+        receipt_reference: str = "",
+        notes: str = "",
+        recurrence_template: RecurringExpenseTemplate | None = None,
+        recurrence_occurrence_on: date | None = None,
+        reimbursement_employee: Employee | None = None,
+        replaces: Expense | None = None,
+    ) -> Expense:
+        """Create a reviewable draft; no payable, posting, cash, or cost fact is made."""
+
+        _validate_context(
+            actor=actor,
+            organization=organization,
+            project=project,
+            permission=BusinessPermissionCode.EXPENSES_CREATE,
+        )
+        normalized_key = idempotency_key.strip()
+        if not normalized_key:
+            raise ValueError("An idempotency key is required.")
+        if phase is not None:
+            _validate_phase(organization=organization, project=project, phase=phase)
+        if not description.strip() or not source_reference.strip():
+            raise ValueError("Description and retained source reference are required.")
+        if amount <= Decimal("0.00"):
+            raise ValueError("Expense amount must be positive.")
+        if not PlatformExpenseGroup.objects.filter(
+            code=category, is_active=True, archived_at__isnull=True
+        ).exists():
+>           raise ValueError("Invalid primary expense group.")
+E           ValueError: Invalid primary expense group.
+
+apps\expenses\services.py:289: ValueError
+=========================== short test summary info ===========================
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_expense_cancel_and_replacement_use_native_void_history
+FAILED apps/timekeeping/test_cep062.py::MissionRoutingTests::test_three_independent_effects_have_exactly_one_native_route_each
+2 failed, 10 passed in 34.58s
