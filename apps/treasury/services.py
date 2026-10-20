@@ -471,20 +471,38 @@ def create_movement(
     if not isinstance(amount, Decimal) or not amount.is_finite() or amount <= 0:
         raise ValidationError("مبلغ حرکت باید Decimal مثبت و متناهی باشد.")
     if origin_request is not None:
-        origin_request = PaymentRequest.objects.select_for_update().get(pk=origin_request.pk)
+        origin_request = PaymentRequest.objects.select_for_update().get(
+            pk=origin_request.pk
+        )
+        if origin_request.kind == PaymentRequestKind.PAYROLL:
+            from .payroll_handoffs import validate_payment_source
+
+            validate_payment_source(origin_request)
         if (
             origin_request.organization_id != organization.pk
-            or origin_request.kind != PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            or origin_request.kind
+            not in {
+                PaymentRequestKind.EMPLOYEE_REIMBURSEMENT,
+                PaymentRequestKind.PAYROLL,
+            }
             or origin_request.status != PaymentRequestStatus.APPROVED
-            or origin_request.source_expense.status != "approved"
-            or origin_request.source_expense.source_version != origin_request.source_expense_version
+            or (
+                origin_request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+                and (
+                    origin_request.source_expense.status != "approved"
+                    or origin_request.source_expense.source_version
+                    != origin_request.source_expense_version
+                )
+            )
             or kind != TreasuryMovementKind.DISBURSEMENT
             or amount != origin_request.amount
             or project != origin_request.project
             or site != origin_request.site
             or party is not None
         ):
-            raise ValidationError("Movement does not match an approved reimbursement request.")
+            raise ValidationError(
+                "Movement does not match an approved reimbursement request."
+            )
     if kind == TreasuryMovementKind.TRANSFER:
         if (
             not source_account
@@ -713,11 +731,20 @@ def approve_and_post_movement(
     if movement.status != TreasuryMovementStatus.SUBMITTED:
         raise ValidationError("فقط حرکت ارسال‌شده قابل تأیید و ثبت است.")
     if movement.origin_request_id:
-        source_request = PaymentRequest.objects.select_for_update().get(pk=movement.origin_request_id)
-        if (
-            source_request.status != PaymentRequestStatus.APPROVED
-            or source_request.source_expense.status != "approved"
-            or source_request.source_expense.source_version != source_request.source_expense_version
+        source_request = PaymentRequest.objects.select_for_update().get(
+            pk=movement.origin_request_id
+        )
+        if source_request.kind == PaymentRequestKind.PAYROLL:
+            from .payroll_handoffs import validate_payment_source
+
+            validate_payment_source(source_request)
+        if source_request.status != PaymentRequestStatus.APPROVED or (
+            source_request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            and (
+                source_request.source_expense.status != "approved"
+                or source_request.source_expense.source_version
+                != source_request.source_expense_version
+            )
         ):
             raise ValidationError("Reimbursement source changed before cash posting.")
     policy = _approval_policy(
@@ -1663,10 +1690,18 @@ def verify_treasury_gl_reconciliation_review(
 
 
 def _request_payload(
-    *, kind: str, amount: Decimal, purpose: str, employee, party, project, site,
+    *,
+    kind: str,
+    amount: Decimal,
+    purpose: str,
+    employee,
+    party,
+    project,
+    site,
     source_expense=None,
+    source_payroll_line=None,
 ) -> dict[str, object]:
-    return {
+    payload = {
         "kind": kind,
         "amount": str(amount),
         "purpose": purpose.strip(),
@@ -1675,8 +1710,18 @@ def _request_payload(
         "project": str(project.pk) if project else None,
         "site": str(site.pk) if site else None,
         "source_expense": str(source_expense.pk) if source_expense else None,
-        "source_expense_version": source_expense.source_version if source_expense else None,
+        "source_expense_version": source_expense.source_version
+        if source_expense
+        else None,
     }
+    if source_payroll_line is not None:
+        payload.update(
+            {
+                "source_payroll_line": str(source_payroll_line.pk),
+                "source_payroll_version": source_payroll_line.content_digest,
+            }
+        )
+    return payload
 
 
 @transaction.atomic
@@ -1693,6 +1738,7 @@ def create_payment_request(
     project=None,
     site=None,
     source_expense=None,
+    source_payroll_line=None,
 ) -> PaymentRequest:
     organization = _lock_organization(organization)
     maker = require_business_permission(
@@ -1707,11 +1753,18 @@ def create_payment_request(
         raise ValidationError("نوع درخواست پرداخت معتبر نیست.")
     if not isinstance(amount, Decimal) or not amount.is_finite() or amount <= 0:
         raise ValidationError("مبلغ درخواست باید Decimal مثبت و متناهی باشد.")
-    if kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT:
+    if kind == PaymentRequestKind.PAYROLL:
+        if source_payroll_line is None or employee is None or party or source_expense:
+            raise ValidationError("A Payroll request needs an exact employee source.")
+    elif source_payroll_line is not None:
+        raise ValidationError("Only Payroll requests may link Payroll.")
+    elif kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT:
         if source_expense is not None:
             from apps.expenses.models import Expense
 
-            source_expense = Expense.objects.select_for_update().get(pk=source_expense.pk)
+            source_expense = Expense.objects.select_for_update().get(
+                pk=source_expense.pk
+            )
         if (
             source_expense is None
             or source_expense.organization_id != organization.pk
@@ -1723,7 +1776,9 @@ def create_payment_request(
             or source_expense.project_id != getattr(project, "pk", None)
             or party is not None
         ):
-            raise ValidationError("A reimbursement needs one approved direct Expense and employee.")
+            raise ValidationError(
+                "A reimbursement needs one approved direct Expense and employee."
+            )
     elif kind == PaymentRequestKind.EMPLOYEE_ADVANCE:
         if employee is None or party is not None or source_expense is not None:
             raise ValidationError("تنخواه کارمند به دقیقاً یک کارمند نیاز دارد.")
@@ -1740,6 +1795,7 @@ def create_payment_request(
         project=project,
         site=site,
         source_expense=source_expense,
+        source_payroll_line=source_payroll_line,
     )
     digest = _payload_hash(payload)
     normalized_key = idempotency_key.strip()
@@ -1759,7 +1815,13 @@ def create_payment_request(
         payload_hash=digest,
         employee=employee,
         source_expense=source_expense,
-        source_expense_version=source_expense.source_version if source_expense else None,
+        source_expense_version=source_expense.source_version
+        if source_expense
+        else None,
+        source_payroll_line=source_payroll_line,
+        source_payroll_version=source_payroll_line.content_digest
+        if source_payroll_line
+        else "",
         party=party,
         project=project,
         site=site,
@@ -1820,6 +1882,10 @@ def submit_payment_request(
         raise ValidationError("فقط پیش‌نویس همین Tenant قابل ارسال است.")
     if request.created_by_id != submitter.pk:
         raise PermissionDenied("فقط سازنده می‌تواند درخواست را ارسال کند.")
+    if request.kind == PaymentRequestKind.PAYROLL:
+        from .payroll_handoffs import validate_payment_source
+
+        validate_payment_source(request)
     now = timezone.now()
     PaymentRequest.objects.filter(pk=request.pk).update(
         status=PaymentRequestStatus.SUBMITTED,
@@ -1875,6 +1941,10 @@ def decide_payment_request(
         or request.status != PaymentRequestStatus.SUBMITTED
     ):
         raise ValidationError("فقط درخواست ارسال‌شده همین Tenant قابل تصمیم است.")
+    if approve and request.kind == PaymentRequestKind.PAYROLL:
+        from .payroll_handoffs import validate_payment_source
+
+        validate_payment_source(request)
     maker = _active_membership(
         organization=organization, membership=request.submitted_by
     )
@@ -1934,11 +2004,31 @@ def cancel_payment_request(
         raise ValidationError("درخواست در این وضعیت قابل لغو نیست.")
     if request.created_by_id != actor_membership.pk:
         raise PermissionDenied("فقط سازنده می‌تواند درخواست را لغو کند.")
+    origin = (
+        TreasuryMovement.objects.select_for_update()
+        .filter(origin_request=request)
+        .first()
+    )
+    if request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT and origin:
+        raise ValidationError(
+            "A reimbursement with a cash movement cannot be cancelled."
+        )
     if (
-        request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
-        and TreasuryMovement.objects.filter(origin_request=request).exists()
+        request.kind == PaymentRequestKind.PAYROLL
+        and origin
+        and (
+            request.source_payroll_line.proposal.run.status != "reversed"
+            or (
+                origin.status == TreasuryMovementStatus.POSTED
+                and not TreasuryMovement.objects.filter(
+                    reverses=origin, status="posted"
+                ).exists()
+            )
+        )
     ):
-        raise ValidationError("A reimbursement with a cash movement cannot be cancelled.")
+        raise ValidationError(
+            "Resolve the source and native cash reversal before cancellation."
+        )
     previous = request.status
     PaymentRequest.objects.filter(pk=request.pk).update(
         status=PaymentRequestStatus.CANCELLED, updated_at=timezone.now()
@@ -1983,6 +2073,11 @@ def release_payment_request(
     )
     request = PaymentRequest.objects.select_for_update().get(pk=request.pk)
     movement = TreasuryMovement.objects.select_for_update().get(pk=movement.pk)
+    if (
+        request.organization_id != organization.pk
+        or movement.organization_id != organization.pk
+    ):
+        raise PermissionDenied("Request and movement must belong to the active tenant.")
     if request.status == PaymentRequestStatus.RELEASED:
         if request.released_movement_id == movement.pk:
             return request
@@ -2001,17 +2096,28 @@ def release_payment_request(
         or movement.currency != request.currency
         or movement.party_id != request.party_id
         or (
-            request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            request.kind
+            in {PaymentRequestKind.EMPLOYEE_REIMBURSEMENT, PaymentRequestKind.PAYROLL}
             and (
                 movement.origin_request_id != request.pk
-                or request.source_expense.status != "approved"
-                or request.source_expense.source_version != request.source_expense_version
+                or (
+                    request.kind == PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+                    and (
+                        request.source_expense.status != "approved"
+                        or request.source_expense.source_version
+                        != request.source_expense_version
+                    )
+                )
                 or movement.project_id != request.project_id
                 or movement.site_id != request.site_id
             )
         )
     ):
         raise ValidationError("حرکت پرداخت قطعی با درخواست هم‌خوان نیست.")
+    if request.kind == PaymentRequestKind.PAYROLL:
+        from .payroll_handoffs import validate_payment_source
+
+        validate_payment_source(request)
     PaymentRequest.objects.filter(pk=request.pk).update(
         status=PaymentRequestStatus.RELEASED,
         released_movement=movement,

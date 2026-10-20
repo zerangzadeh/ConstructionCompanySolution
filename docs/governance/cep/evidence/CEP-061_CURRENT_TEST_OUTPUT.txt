@@ -1,0 +1,61 @@
+....F........................................            [100%]
+================================== FAILURES ===================================
+_ PayrollTreasuryTests.test_native_cash_post_release_and_retained_cash_reversal _
+
+self = <apps.treasury.test_cep061.PayrollTreasuryTests testMethod=test_native_cash_post_release_and_retained_cash_reversal>
+
+    def test_native_cash_post_release_and_retained_cash_reversal(self):
+        request, movement = self.paid()
+        self.assertEqual(movement.status, "posted")
+        line = self.reversal_source()
+        with self.assertRaises(ValidationError):
+            self.consume(line)
+        reversal = reverse_posted_movement(
+            organization=self.organization,
+            actor=self.owner,
+            movement=movement,
+            period=self.cash.period,
+            requested_by=self.cash.accountant_membership,
+            accounting_date=date(2026, 10, 20),
+            reason="Native exact reversal",
+        )
+        link = self.consume(line, reversal_movement=reversal)
+        self.assertEqual(self.consume(line, reversal_movement=reversal).pk, link.pk)
+        self.assertEqual(link.request_id, request.pk)
+        self.assertEqual(link.reversal_movement_id, reversal.pk)
+>       trace = api.reconcile_payment_handoff(
+            organization=self.organization,
+            actor=self.owner,
+            proposal_id=line.proposal_id,
+        )
+
+apps\treasury\test_cep061.py:235:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\treasury\payroll_handoffs.py:226: in reconcile_payment_handoff
+    _permission(organization, actor, P.TREASURY_PAYMENT_REQUESTS_VIEW)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+cls = <enum 'BusinessPermissionCode'>, name = 'TREASURY_PAYMENT_REQUESTS_VIEW'
+
+    def __getattr__(cls, name):
+        """
+        Return the enum member matching `name`
+
+        We use __getattr__ instead of descriptors or inserting into the enum
+        class' __dict__ in order to support `name` and `value` being both
+        properties for enum members (which live in the class' __dict__) and
+        enum members themselves.
+        """
+        if _is_dunder(name):
+            raise AttributeError(name)
+        try:
+            return cls._member_map_[name]
+        except KeyError:
+>           raise AttributeError(name) from None
+E           AttributeError: TREASURY_PAYMENT_REQUESTS_VIEW
+
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\enum.py:787: AttributeError
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep061.py::PayrollTreasuryTests::test_native_cash_post_release_and_retained_cash_reversal
+1 failed, 44 passed, 16 subtests passed in 518.04s (0:08:38)

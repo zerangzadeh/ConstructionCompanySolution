@@ -1,0 +1,39 @@
+....F..                                                                  [100%]
+================================== FAILURES ===================================
+_ PayrollTreasuryTests.test_native_cash_post_release_and_retained_cash_reversal _
+
+self = <apps.treasury.test_cep061.PayrollTreasuryTests testMethod=test_native_cash_post_release_and_retained_cash_reversal>
+
+    def test_native_cash_post_release_and_retained_cash_reversal(self):
+        request, movement = self.paid()
+        self.assertEqual(movement.status, "posted")
+        line = self.reversal_source()
+        with self.assertRaises(ValidationError):
+            self.consume(line)
+>       reversal = reverse_posted_movement(
+            organization=self.organization,
+            actor=self.owner,
+            movement=movement,
+            period=self.cash.period,
+            requested_by=self.owner_membership,
+            accounting_date=date(2026, 10, 20),
+            reason="Native exact reversal",
+        )
+
+apps\treasury\test_cep061.py:199:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+args = ()
+kwds = {'organization': <Organization: Handoff Tenant>, 'actor': <User: handoff-owner>, 'movement': <TreasuryMovement: TreasuryMovement object (7344e102-106e-4354-9be9-1d3f8e5fdf0e)>, 'period': <FiscalPeriod: RETIREMENT-TEST/1>, ...}
+
+    @wraps(func)
+    def inner(*args, **kwds):
+        with self._recreate_cm():
+>           return func(*args, **kwds)
+                   ^^^^^^^^^^^^^^^^^^^
+E           TypeError: reverse_posted_movement() missing 1 required keyword-only argument: 'requested_by'
+
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: TypeError
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep061.py::PayrollTreasuryTests::test_native_cash_post_release_and_retained_cash_reversal
+1 failed, 6 passed in 15.23s

@@ -1,0 +1,54 @@
+F.............                                                           [100%]
+================================== FAILURES ===================================
+_ PayrollTreasuryTests.test_cancel_after_pending_cash_and_stale_source_posting_are_blocked _
+
+self = <apps.treasury.test_cep061.PayrollTreasuryTests testMethod=test_cancel_after_pending_cash_and_stale_source_posting_are_blocked>
+
+    def test_cancel_after_pending_cash_and_stale_source_posting_are_blocked(self):
+        request = self.consume()
+        submit_payment_request(
+            organization=self.organization,
+            actor=self.owner,
+            request=request,
+            reason="Submit",
+        )
+        decide_payment_request(
+            organization=self.organization,
+            actor=self.owner,
+            request=request,
+            approve=True,
+            reason="Approve",
+        )
+        movement = create_movement(
+            organization=self.organization,
+            actor=self.owner,
+            kind="disbursement",
+            movement_date=date(2026, 10, 20),
+            amount=request.amount,
+            description="Salary settlement",
+            idempotency_key="cash",
+            account=self.cash.bank,
+            origin_request=request,
+        )
+        with self.assertRaises(ValidationError):
+            cancel_payment_request(
+                organization=self.organization,
+                actor=self.owner,
+                request=request,
+                reason="Cannot cancel",
+            )
+        line = self.reversal_source()
+        with self.assertRaises(ValidationError):
+            self.cash.post(movement)
+        self.consume(line)
+        request.refresh_from_db()
+        self.assertEqual(request.status, "cancelled")
+>       self.assertEqual(TreasuryMovement.objects.get(pk=movement.pk).status, "draft")
+E       AssertionError: 'submitted' != 'draft'
+E       - submitted
+E       + draft
+
+apps\treasury\test_cep061.py:402: AssertionError
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep061.py::PayrollTreasuryTests::test_cancel_after_pending_cash_and_stale_source_posting_are_blocked
+1 failed, 13 passed, 27 deselected in 77.42s (0:01:17)

@@ -1,0 +1,677 @@
+....F..FFFFFFF....................F                            [100%]
+================================== FAILURES ===================================
+_ PayrollTreasuryTests.test_native_cash_post_release_and_retained_cash_reversal _
+
+self = <apps.treasury.test_cep061.PayrollTreasuryTests testMethod=test_native_cash_post_release_and_retained_cash_reversal>
+
+    def test_native_cash_post_release_and_retained_cash_reversal(self):
+        request, movement = self.paid()
+        self.assertEqual(movement.status, "posted")
+        line = self.reversal_source()
+        with self.assertRaises(ValidationError):
+            self.consume(line)
+        reversal = reverse_posted_movement(
+            organization=self.organization,
+            actor=self.owner,
+            movement=movement,
+            period=self.cash.period,
+            requested_by=self.cash.accountant_membership,
+            accounting_date=date(2026, 10, 20),
+            reason="Native exact reversal",
+        )
+        link = self.consume(line, reversal_movement=reversal)
+        self.assertEqual(self.consume(line, reversal_movement=reversal).pk, link.pk)
+        self.assertEqual(link.request_id, request.pk)
+        self.assertEqual(link.reversal_movement_id, reversal.pk)
+>       trace = api.reconcile_payment_handoff(
+            organization=self.organization,
+            actor=self.owner,
+            proposal_id=line.proposal_id,
+        )
+
+apps\treasury\test_cep061.py:214:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\treasury\payroll_handoffs.py:227: in reconcile_payment_handoff
+    _permission(organization, actor, P.TREASURY_PAYMENT_REQUESTS_VIEW)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+cls = <enum 'BusinessPermissionCode'>, name = 'TREASURY_PAYMENT_REQUESTS_VIEW'
+
+    def __getattr__(cls, name):
+        """
+        Return the enum member matching `name`
+
+        We use __getattr__ instead of descriptors or inserting into the enum
+        class' __dict__ in order to support `name` and `value` being both
+        properties for enum members (which live in the class' __dict__) and
+        enum members themselves.
+        """
+        if _is_dunder(name):
+            raise AttributeError(name)
+        try:
+            return cls._member_map_[name]
+        except KeyError:
+>           raise AttributeError(name) from None
+E           AttributeError: TREASURY_PAYMENT_REQUESTS_VIEW
+
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\enum.py:787: AttributeError
+_ TreasuryClaimSettlementTransitionTests.test_active_subledger_allocation_blocks_claim_correction _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_active_subledger_allocation_blocks_claim_correction>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementTransitionTests.test_claim_endpoint_uses_posted_treasury_receipt_with_csrf _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_claim_endpoint_uses_posted_treasury_receipt_with_csrf>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementTransitionTests.test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementTransitionTests.test_partial_settlement_retry_and_caps_use_one_subledger_authority _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_partial_settlement_retry_and_caps_use_one_subledger_authority>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementTransitionTests.test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementTransitionTests.test_tenant_permission_state_and_receipt_context_fail_closed _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementTransitionTests testMethod=test_tenant_permission_state_and_receipt_context_fail_closed>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ UnrecognizedClaimSettlementTests.test_settlement_does_not_implicitly_recognize_ar _
+
+self = <apps.billing.test_payment_retirement.UnrecognizedClaimSettlementTests testMethod=test_settlement_does_not_implicitly_recognize_ar>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+_ TreasuryClaimSettlementConcurrencyTests.test_concurrent_partial_settlements_cannot_exceed_claim_capacity _
+
+self = <apps.billing.test_payment_retirement.TreasuryClaimSettlementConcurrencyTests testMethod=test_concurrent_partial_settlements_cannot_exceed_claim_capacity>
+
+    def setUp(self):
+        billing_fixture.ProjectBaselineWorkflowTests.setUp(self)
+        self._configure_reporting_line()
+>       self.claim = self._approve_claim(self._claim_for_approval())
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+apps\billing\test_payment_retirement.py:53:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+apps\billing\tests.py:915: in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+apps\billing\tests.py:650: in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:638: in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+apps\billing\tests.py:494: in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+apps\billing\tests.py:483: in _approved_baseline
+    request_project_baseline_approval(
+apps\billing\services.py:630: in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:540: in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py:81: in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+apps\billing\workflow.py:422: in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+.venv\Lib\site-packages\django\db\models\manager.py:87: in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <QuerySet []>, args = ()
+kwargs = {'workflow_type': <WorkflowType: billing.project_baseline_approval>, 'code': 'project_baseline_f61', 'is_active': True}
+
+    def get(self, *args, **kwargs):
+        """
+        Perform the query and return a single object matching the given
+        keyword arguments.
+        """
+        if self.query.combinator and (args or kwargs):
+            raise NotSupportedError(
+                "Calling QuerySet.get(...) with filters after %s() is not "
+                "supported." % self.query.combinator
+            )
+        clone = self._chain() if self.query.combinator else self.filter(*args, **kwargs)
+        if self.query.can_filter() and not self.query.distinct_fields:
+            clone = clone.order_by()
+        limit = None
+        if (
+            not clone.query.select_for_update
+            or connections[clone.db].features.supports_select_for_update_with_limit
+        ):
+            limit = MAX_GET_RESULTS
+            clone.query.set_limits(high=limit)
+        num = len(clone)
+        if num == 1:
+            return clone._result_cache[0]
+        if not num:
+>           raise self.model.DoesNotExist(
+                "%s matching query does not exist." % self.model._meta.object_name
+            )
+E           apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+.venv\Lib\site-packages\django\db\models\query.py:635: DoesNotExist
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep061.py::PayrollTreasuryTests::test_native_cash_post_release_and_retained_cash_reversal
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_active_subledger_allocation_blocks_claim_correction
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_claim_endpoint_uses_posted_treasury_receipt_with_csrf
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_draft_disbursement_and_wrong_project_receipts_are_not_settlement_sources
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_partial_settlement_retry_and_caps_use_one_subledger_authority
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_reversal_retains_history_reopens_capacity_and_blocks_cash_reversal_until_clear
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementTransitionTests::test_tenant_permission_state_and_receipt_context_fail_closed
+FAILED apps/billing/test_payment_retirement.py::UnrecognizedClaimSettlementTests::test_settlement_does_not_implicitly_recognize_ar
+FAILED apps/billing/test_payment_retirement.py::TreasuryClaimSettlementConcurrencyTests::test_concurrent_partial_settlements_cannot_exceed_claim_capacity
+9 failed, 26 passed, 10 subtests passed in 153.77s (0:02:33)

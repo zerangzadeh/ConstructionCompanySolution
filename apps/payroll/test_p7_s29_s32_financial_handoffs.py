@@ -276,13 +276,13 @@ class PayrollFinancialHandoffTests(TransactionTestCase):
             ),
         )
 
-    def test_accounting_and_payment_fail_closed_without_downstream_authority(
+    def test_accounting_mapping_held_and_payment_is_only_a_treasury_proposal(
         self,
     ) -> None:
         accounting = self._prepare(FinancialHandoffFamily.ACCOUNTING)
         payment = self._prepare(FinancialHandoffFamily.PAYMENT)
         self.assertIn("ACCOUNT_MAPPING_NOT_CONFIGURED", accounting.exception_codes)
-        self.assertIn("PAYMENT_AUTHORITY_NOT_CONFIGURED", payment.exception_codes)
+        self.assertFalse(payment.has_exceptions)
         with self.assertRaises(ValidationError):
             review_financial_handoff(
                 organization=self.organization,

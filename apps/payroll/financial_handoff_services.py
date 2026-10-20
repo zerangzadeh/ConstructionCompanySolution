@@ -347,6 +347,8 @@ def prepare_financial_handoff(
                     line_kind=line_kind,
                     amount=result.net_amount,
                     payee_reference=payee,
+                    project=result.project if family == FinancialHandoffFamily.PAYMENT else None,
+                    site=result.site if family == FinancialHandoffFamily.PAYMENT else None,
                     lineage={
                         "result_id": str(result.pk),
                         "calculation_digest": run.calculation_digest,
@@ -357,8 +359,6 @@ def prepare_financial_handoff(
             statutory, statutory_exceptions = _statutory_liability_lines(run)
             specs.extend(statutory)
             exceptions.extend(statutory_exceptions)
-        else:
-            exceptions.append("PAYMENT_AUTHORITY_NOT_CONFIGURED")
     elif family == FinancialHandoffFamily.ACCOUNTING:
         for result in results:
             for line in result.lines.all():

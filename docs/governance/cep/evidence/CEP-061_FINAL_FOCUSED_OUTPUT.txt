@@ -1,0 +1,23 @@
+.......F....                                                             [100%]
+================================== FAILURES ===================================
+_ PayrollTreasuryTests.test_rejected_or_corrupt_source_version_cannot_create_request _
+
+self = <apps.treasury.test_cep061.PayrollTreasuryTests testMethod=test_rejected_or_corrupt_source_version_cannot_create_request>
+
+    def test_rejected_or_corrupt_source_version_cannot_create_request(self):
+        review = self.proposal.review
+>       type(review).objects.filter(pk=review.pk).update(disposition="rejected")
+
+apps\treasury\test_cep061.py:150:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <ImmutableQuerySet []>, kwargs = {'disposition': 'rejected'}
+
+    def update(self, **kwargs: object) -> int:
+>       raise ValidationError("سابقه قطعی حقوق و دستمزد قابل تغییر نیست.")
+E       django.core.exceptions.ValidationError: ['سابقه قطعی حقوق و دستمزد قابل تغییر نیست.']
+
+apps\payroll\models.py:35: ValidationError
+=========================== short test summary info ===========================
+FAILED apps/treasury/test_cep061.py::PayrollTreasuryTests::test_rejected_or_corrupt_source_version_cannot_create_request
+1 failed, 11 passed, 27 deselected in 107.07s (0:01:47)

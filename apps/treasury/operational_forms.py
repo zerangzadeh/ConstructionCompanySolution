@@ -149,7 +149,14 @@ class TransferForm(OperationalForm):
 
 
 class RequestCreateForm(OperationalForm):
-    kind = forms.ChoiceField(label="نوع درخواست", choices=PaymentRequestKind.choices)
+    kind = forms.ChoiceField(
+        label="نوع درخواست",
+        choices=[
+            pair
+            for pair in PaymentRequestKind.choices
+            if pair[0] != PaymentRequestKind.PAYROLL
+        ],
+    )
     amount = money()
     purpose = forms.CharField(label="شرح درخواست", max_length=500)
     employee = choice(Employee, "کارمند ذی‌نفع", required=False)

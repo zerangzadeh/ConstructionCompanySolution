@@ -65,6 +65,7 @@ class ChequeStatus(models.TextChoices):
 
 
 class PaymentRequestKind(models.TextChoices):
+    PAYROLL = "payroll", "پرداخت حقوق"
     PAYMENT = "payment", "درخواست پرداخت"
     EMPLOYEE_ADVANCE = "employee_advance", "تنخواه کارمند"
     VENDOR_ADVANCE = "vendor_advance", "پیش‌پرداخت تأمین‌کننده"
@@ -463,7 +464,11 @@ class TreasuryMovement(UUIDModel, TimeStampedModel):
             raise ValidationError({"site": "کارگاه باید متعلق به پروژه باشد."})
         if self.origin_request_id and (
             self.kind != TreasuryMovementKind.DISBURSEMENT
-            or self.origin_request.kind != PaymentRequestKind.EMPLOYEE_REIMBURSEMENT
+            or self.origin_request.kind
+            not in {
+                PaymentRequestKind.EMPLOYEE_REIMBURSEMENT,
+                PaymentRequestKind.PAYROLL,
+            }
             or self.origin_request.status != PaymentRequestStatus.APPROVED
             or self.amount != self.origin_request.amount
             or self.currency != self.origin_request.currency
@@ -1015,6 +1020,14 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
         related_name="treasury_payment_request",
     )
     source_expense_version = models.PositiveIntegerField(null=True, blank=True)
+    source_payroll_line = models.OneToOneField(
+        "payroll.FinancialHandoffLine",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="treasury_request",
+    )
+    source_payroll_version = models.CharField(max_length=64, blank=True, default="")
     party = models.ForeignKey(
         "parties.BusinessParty", on_delete=models.PROTECT, null=True, blank=True
     )
@@ -1080,6 +1093,8 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                         party__isnull=True,
                         source_expense__isnull=True,
                         source_expense_version__isnull=True,
+                        source_payroll_line__isnull=True,
+                        source_payroll_version="",
                     )
                     | Q(
                         kind__in=[
@@ -1090,6 +1105,8 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                         party__isnull=False,
                         source_expense__isnull=True,
                         source_expense_version__isnull=True,
+                        source_payroll_line__isnull=True,
+                        source_payroll_version="",
                     )
                     | Q(
                         kind=PaymentRequestKind.EMPLOYEE_REIMBURSEMENT,
@@ -1097,6 +1114,19 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                         party__isnull=True,
                         source_expense__isnull=False,
                         source_expense_version__isnull=False,
+                        source_payroll_line__isnull=True,
+                        source_payroll_version="",
+                    )
+                    | (
+                        Q(
+                            kind=PaymentRequestKind.PAYROLL,
+                            employee__isnull=False,
+                            party__isnull=True,
+                            source_expense__isnull=True,
+                            source_expense_version__isnull=True,
+                            source_payroll_line__isnull=False,
+                        )
+                        & ~Q(source_payroll_version="")
                     )
                 ),
                 name="treasury_request_beneficiary_consistent",
@@ -1117,6 +1147,8 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                 "employee_id",
                 "source_expense_id",
                 "source_expense_version",
+                "source_payroll_line_id",
+                "source_payroll_version",
                 "party_id",
                 "project_id",
                 "site_id",
@@ -1137,6 +1169,7 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
             self,
             employee=self.employee,
             source_expense=self.source_expense,
+            source_payroll_line=self.source_payroll_line,
             party=self.party,
             project=self.project,
             site=self.site,
@@ -1165,11 +1198,17 @@ class PaymentRequest(UUIDModel, TimeStampedModel):
                 )
         elif self.source_expense_id or self.source_expense_version is not None:
             raise ValidationError("Only reimbursement requests may link an Expense.")
+        if self.kind == PaymentRequestKind.PAYROLL:
+            from .payroll_handoffs import validate_payment_source
+
+            validate_payment_source(self)
+        elif self.source_payroll_line_id or self.source_payroll_version:
+            raise ValidationError("Only Payroll requests may link Payroll sources.")
         self.full_clean(validate_constraints=False)
         super().save(*args, **kwargs)
 
     def delete(self, *args: object, **kwargs: object):
-        if self.status != PaymentRequestStatus.DRAFT:
+        if self.source_payroll_line_id or self.status != PaymentRequestStatus.DRAFT:
             raise ValidationError("درخواست ارسال‌شده قابل حذف نیست.")
         return super().delete(*args, **kwargs)
 
@@ -1846,8 +1885,6 @@ class BankReconciliationRunProvenance(
             raise ValidationError("طبقه‌بندی منشأ تطبیق بانکی معتبر نیست.")
 
 
-
-
 class TreasuryMovementDocumentLink(AbstractTypedDocumentLink):
     """Treasury-owned document evidence; it never creates a cash effect."""
 
@@ -1865,3 +1902,74 @@ class TreasuryMovementDocumentLink(AbstractTypedDocumentLink):
                 name="treasury_movement_document_uq",
             )
         ]
+
+
+class PayrollDisbursementReversal(ImmutableTreasuryEvidence, UUIDModel, CreatedAtModel):
+    """Target-owned retained link; native Treasury services own cancellation/cash."""
+
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.PROTECT
+    )
+    source_line = models.OneToOneField(
+        "payroll.FinancialHandoffLine", on_delete=models.PROTECT
+    )
+    source_version = models.CharField(max_length=64)
+    request = models.OneToOneField(
+        PaymentRequest, on_delete=models.PROTECT, related_name="payroll_reversal"
+    )
+    reversal_movement = models.OneToOneField(
+        TreasuryMovement, on_delete=models.PROTECT, null=True, blank=True
+    )
+    recorded_by = models.ForeignKey(
+        "organizations.OrganizationMembership", on_delete=models.PROTECT
+    )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        validate_related_organizations(
+            self,
+            source_line=self.source_line,
+            request=self.request,
+            reversal_movement=self.reversal_movement,
+            recorded_by=self.recorded_by,
+        )
+        if self.source_version != self.source_line.content_digest:
+            raise ValidationError("Payroll reversal source version mismatch.")
+        if self.source_line.proposal.record_kind != "reversal":
+            raise ValidationError("Payroll reversal occurrence required.")
+        original = self.request.source_payroll_line
+        if (
+            original is None
+            or self.source_line.proposal.predecessor_id != original.proposal_id
+            or self.source_line.employee_id != original.employee_id
+            or self.source_line.amount != -self.request.amount
+        ):
+            raise ValidationError("Exact Payroll predecessor/employee/amount required.")
+        cash = (
+            self.request.released_movement
+            or TreasuryMovement.objects.filter(
+                origin_request=self.request, status="posted"
+            ).first()
+        )
+        if cash is not None:
+            if (
+                self.reversal_movement is None
+                or self.reversal_movement.reverses_id != cash.pk
+                or self.reversal_movement.status != "posted"
+            ):
+                raise ValidationError("Native posted cash reversal required.")
+            if (
+                not self.request.released_movement_id
+                and self.request.status != "cancelled"
+            ):
+                raise ValidationError("Unreleased reversed request must be cancelled.")
+        elif (
+            self.request.status not in {"cancelled", "rejected"}
+            or self.reversal_movement_id
+        ):
+            raise ValidationError(
+                "Unpaid request must be cancelled without cash effect."
+            )

@@ -1,0 +1,40 @@
+{
+  "baseline": "77fcb7f0320d03f93df24f88c4340149c3ae8bdb",
+  "execution": "COMPLETE",
+  "AC": "12/12 PASS",
+  "DoD": "MET",
+  "current_focused": "13 PASS + corrected edge assertion 1 PASS;14 distinct current focused cases including concurrency and native HTTP replay",
+  "broader_affected": "44 PASS;16 subtests PASS;1 new reconciliation enum error in broad run resolved and revalidated in focused current run",
+  "required_failures_remaining": 0,
+  "fixture_corrections": [
+    "Explicit synthetic Payroll adjust authority",
+    "Refresh cash instance and supply independent native reversal requester",
+    "Corruption injection uses raw SQL only in disposable tests because immutable ORM correctly denies mutation",
+    "Failed posting retains submitted draft rather than draft state"
+  ],
+  "environment_debt": "Missing existing WorkflowTemplate catalogue in reused test DB restored using unchanged0018/0019/0020 forward seeds; no product change",
+  "checks": [
+    "Ruff lint PASS",
+    "Touched Treasury format PASS",
+    "Django system PASS",
+    "Migration drift NONE",
+    "Git diff whitespace PASS"
+  ],
+  "migration": "Minimum additive treasury0011 applied on configured Development PostgreSQL;64 existing requests preserve content; no backfill",
+  "authority": "Current bounded Human override; prompts unchanged",
+  "held_history": "Pre-consumer proposals retaining unavailable-consumer exception remain immutable/held; no inferred backfill or current statutory activation",
+  "UTV": [
+    "Full-suite validation, broad performance/concurrency/load and Production runtime remain UTV; bounded PostgreSQL duplicate race only"
+  ],
+  "production": false,
+  "human_signoff": "NOT_EXECUTED",
+  "commands": [
+    ".venv\\Scripts\\python.exe -m pytest apps/treasury/test_cep061.py apps/billing/test_payment_retirement.py apps/treasury/test_cep060_workspace.py --reuse-db -q",
+    ".venv\\Scripts\\python.exe -m pytest apps/treasury/test_cep061.py apps/treasury/test_cep060_workspace.py --reuse-db -q -k \"PayrollTreasuryTests or PayrollTreasuryConcurrencyTests or test_request_create_replay_approval_cash_link_and_release\"",
+    ".venv\\Scripts\\python.exe -m pytest apps/treasury/test_cep061.py::PayrollTreasuryTests::test_cancel_after_pending_cash_and_stale_source_posting_are_blocked --reuse-db -q",
+    ".venv\\Scripts\\python.exe manage.py check",
+    ".venv\\Scripts\\python.exe manage.py makemigrations --check --dry-run",
+    "Configured Development call_command migrate treasury0011; before/after retained-row digest assertion",
+    "Ruff check all8 touched Python modules; Ruff format --check touched Treasury modules; git diff --check"
+  ]
+}
