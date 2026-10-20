@@ -62,12 +62,12 @@ inventory:
   verification_uat: CEP-073..CEP-079
   post_v1_range: CEP-080..CEP-086
 summary:
-  execution_state_complete: 64
+  execution_state_complete: 65
   authorized_not_started: 0
-  eligible_under_standing_authority: 1
+  eligible_under_standing_authority: 0
   in_progress: 0
   blocked_current: 2
-  partial_current: 6
+  partial_current: 5
   failed_current: 0
   not_started_other_current_governed: 7
   deferred_post_v1: 7
@@ -75,8 +75,8 @@ summary:
   last_updated: '2026-10-20'
   remote_main_complete_count_status: REQUIRES_FULL_REPORT_RECONCILIATION
   v1_closure_counts:
-    COMPLETE: 64
-    PARTIAL: 3
+    COMPLETE: 65
+    PARTIAL: 2
     BLOCKED: 1
   v1_blocked_count_semantics: Not-started records with explicit current entry/dependency blockers; partials separate
 gates:
@@ -3428,11 +3428,13 @@ ceps:
       path: docs/governance/cep/reports/CEP-062_COMPLETION_REPORT.md
       evidence_presence: VERIFIED_CURRENT_FOCUSED_AFFECTED_REGRESSION
     git:
-      committed: null
-      commit_sha: null
-      pushed: null
-      merged_to_main: null
-      remote_main_evidence: UNVERIFIED
+      committed: true
+      commit_sha: a942a081ba6de0858a0de707a473c2ed29c607b6
+      pushed: true
+      merged_to_main: false
+      integrated_to_main: true
+      integration_method: DIRECT_COMMIT_TO_MAIN
+      remote_main_evidence: VERIFIED_LS_REMOTE
     last_execution:
       branch: main
       sha: 2739948e43e43b8abd4e570b34dcbb0ab17baa6a
@@ -3447,6 +3449,9 @@ ceps:
     - date: '2026-10-20'
       status: COMPLETE
       reason: "Current19 distinct focused cases and20 affected regressions PASS;6/6 AC and DoD MET as fail-closed framework. Minimum2-table Development override executed with retention/reapply proof. EXT0016 activation held; no Production."
+    - date: '2026-10-20'
+      status: GIT_INTEGRATED
+      reason: "Authorized direct main commit/push a942a081ba6de0858a0de707a473c2ed29c607b6; remote verified; no merge or Production action."
   CEP-063:
     title: ESS leave, attendance and timesheet self-service
     phase: V1_IMPLEMENTATION
@@ -3722,36 +3727,33 @@ ceps:
       reason: Authorized direct commit/push fe75a51dd477df3a0cc95f039c7f1007f683179a verified on origin main; clean checkpoint, no merge or production action.
   CEP-068:
     closure_triage:
-      category: PARTIAL
-      disposition: CURRENT_POST_RETIREMENT_REVIEW_COMPLETE
-      evidence: docs/governance/cep/evidence/V1_PAYMENT_DEPENDENCY_RECONCILIATION_20261020.json
+      category: COMPLETE
+      disposition: CURRENT_FULL_PACKAGE_VERIFIED
+      evidence: docs/governance/cep/evidence/CEP-068_MISSION_VALIDATION.json
       assessed_at: '2026-10-20'
-      root_human_input_cep: CEP-062
-      minimum_resolution: Complete062 and Mission entry/evidence. Overtime tests/screenshots verified; no obsolete Payment or browser-setting approval requested.
     title: ESS mission and overtime requests
     phase: V1_IMPLEMENTATION
-    dependency_status: SATISFIED_CEP026_AND_CEP062
-    eligibility_status: ELIGIBLE_MISSION_RESUME_OVERTIME_EVIDENCE_PRESERVED
+    dependency_status: SATISFIED_CANONICAL_REQUIREMENTS
+    eligibility_status: SATISFIED_EXECUTION_COMPLETE
     authorization:
       status: NOT_AUTHORIZED
       authorization_id: null
       source: null
     execution:
-      status: PARTIAL
-      lifecycle: PARTIAL_OVERTIME_VERIFIED_MISSION_BLOCKED
+      status: COMPLETE
+      lifecycle: CLOSED_VERIFIED
       advisor_review: NOT_REQUIRED_CURRENT_GOVERNANCE
     acceptance:
-      passed: 0
+      passed: 6
       total: 6
-      status: FULL_PACKAGE_PARTIAL_MISSION_UNVERIFIED_OVERTIME_SCREENSHOTS_VERIFIED
-    dod: NOT_MET_PARTIAL
+      status: VERIFIED
+    dod: MET
     blockers: []
     remaining_utv:
-    - Mission implementation/linkage/screenshots after062
-    - Broader authenticated browser/accessibility/load/UAT;12 Overtime fixture screenshots are bounded proof only
+    - "Actual EXT0016 monetary route activation, full authenticated browser workflow/UAT, broader accessibility/browser/load/performance remain unverified. Isolated synthetic fixture QA is bounded evidence."
     completion_report:
       path: docs/governance/cep/reports/CEP-068_COMPLETION_REPORT.md
-      evidence_presence: VERIFIED_OVERTIME_TESTS_AND_12_SCREENSHOTS_MISSION_UNVERIFIED
+      evidence_presence: VERIFIED_CURRENT_FOCUSED_AFFECTED_REGRESSION
     git:
       committed: true
       commit_sha: 9bcda007eac9a6f6dd2f4a7fb4790914885f8a99
@@ -3761,7 +3763,7 @@ ceps:
       integration_method: DIRECT_COMMIT_TO_MAIN
     last_execution:
       branch: main
-      sha: b412b09cc9f42c73f67007d13de9305353a8fae3
+      sha: a942a081ba6de0858a0de707a473c2ed29c607b6
     updated_at: '2026-10-20'
     history:
     - date: '2026-10-19'
@@ -3782,20 +3784,25 @@ ceps:
     - date: '2026-10-20'
       status: DEPENDENCY_RESOLVED
       reason: "062 framework COMPLETE with held monetary activation;026 complete and GATE02 PASS. Resume Mission scope/evidence after safe062 checkpoint; retain passing overtime evidence."
+    - date: '2026-10-20'
+      status: RESUMED
+      reason: "062 pushed checkpoint verified;026/GATE02 and canonical source conditions satisfied. Bounded Mission own entry/status/linkage/evidence touch set recorded; overtime artifacts preserved; no monetary activation or migration."
+    - date: '2026-10-20'
+      status: COMPLETE
+      reason: "Full IMB0091 verified:44 distinct focused/affected cases,26 subtests and18 Mission screenshots/visual review PASS;27 overtime artifacts unchanged.6/6 AC,DoD MET;monetary activation held;no migration/Production."
     last_verification:
       date: '2026-10-20'
-      baseline: 96e3566d63dd329191f3b32f07add834b32a3bc3
-      execution: PARTIAL
-      full_AC: 0/6
-      DoD: NOT_MET
-      overtime_tests: 11 PASS;9 subtests PASS
-      screenshots: 12
-      source_changed: false
-      screenshot_gap: RESOLVED_FOR_OVERTIME_BY_ISOLATED_FIXTURE_QA
-      remaining: Mission062 and Mission evidence; broader authenticated browser/accessibility/UAT unverified
-      settings_changed: false
+      baseline: a942a081ba6de0858a0de707a473c2ed29c607b6
+      execution: COMPLETE
+      full_AC: 6/6 PASS
+      DoD: MET
+      focused_and_affected: 44 distinct PASS;26 subtests
+      mission_screenshots: 18
+      overtime_screenshots_preserved: 12
+      protected_overtime_artifacts_unchanged: 27
+      scope: Complete Mission+Overtime request/read framework;monetary activation held
       production_action: false
-      evidence_checkpoint_sha: bd1a5fc8e34f7684f9e9f628a936634dc7ea16e1
+      evidence: docs/governance/cep/evidence/CEP-068_MISSION_VALIDATION.json
   CEP-069:
     title: Statutory package production activation control
     phase: PRODUCTION_CERTIFICATION
@@ -4512,27 +4519,26 @@ authority_scope:
 v1_closure_triage:
   assessed_at: '2026-10-20'
   scope: CEP-001..CEP-068_NON_COMPLETE_ONLY
-  evidence: docs/governance/cep/evidence/CEP-061_VALIDATION.json
-  category_a_closable_now:
-  - CEP-068
+  evidence: docs/governance/cep/evidence/V1_CLOSURE_20261020_FINAL.json
+  category_a_closable_now: []
   category_b_human_resolution_required:
   - CEP-057
   - CEP-058
   - CEP-065
   category_c_external_parked: []
-  v1_complete: 64
-  v1_partial: 3
+  v1_complete: 65
+  v1_partial: 2
   v1_not_started: 1
   v1_entry_blocked_not_started: 1
   implementation_closable_now: false
-  next_action: COMPLETE_READY068_MISSION_PRESERVE_OVERTIME
+  next_action: SUPPLY_AUTHORITATIVE057_LEAVE_OPENINGS_058_PAYROLL_YTD_AND065_APPROVED_BINDINGS
   category_entry_review_pending: []
   category_dependency_pending: []
 repository_state:
   branch: main
-  last_reconciled_head: 2739948e43e43b8abd4e570b34dcbb0ab17baa6a
-  origin_main: 2739948e43e43b8abd4e570b34dcbb0ab17baa6a
-  integration_checkpoint: 2739948e43e43b8abd4e570b34dcbb0ab17baa6a
+  last_reconciled_head: a942a081ba6de0858a0de707a473c2ed29c607b6
+  origin_main: a942a081ba6de0858a0de707a473c2ed29c607b6
+  integration_checkpoint: a942a081ba6de0858a0de707a473c2ed29c607b6
   integration_method: DIRECT_COMMIT_TO_MAIN
   last_reconciled_at: '2026-10-20'
   pending_checkpoint_scope: null
@@ -4553,21 +4559,20 @@ execution_frontier:
   - CEP-077
   - CEP-078
   dependency_ready_is_not_entry_gate_or_execution_authority: true
-  verified_build_eligible_unblocked:
-  - CEP-068
+  verified_build_eligible_unblocked: []
   verified_verification_eligible_unblocked: []
-  next_autonomous_cep: CEP-068
-  current_session_continuation: CONTINUE_CEP068_AFTER_SAFE_CEP062_CHECKPOINT
+  next_autonomous_cep: null
+  current_session_continuation: V1_FRONTIER_EXHAUSTED_REQUIRED_INPUTS057_058_065
   current_independent_cep: null
-  next_entry_review_candidate: CEP-068
-  next_candidate_full_entry_eligibility: CEP068_DOMAIN_DEPENDENCIES_AND_GATE02_SATISFIED
+  next_entry_review_candidate: null
+  next_candidate_full_entry_eligibility: NO_ENTRY_ELIGIBLE_V1_CEP
   conditional_dependency_entry_review_candidates:
   - CEP-068
   - CEP-073
   - CEP-079
   conditional_dependency_rule: Evaluate canonical scope conditions; never assume a
     conditional edge applies or blocks unrelated scope
-  boundary_reason: 061 complete under bounded migration override;066 relevant domain
+  boundary_reason: Completed061_066_062_068_under_bounded_nonproduction_authority;057_058_065_inputs_unchanged;069..079_and_PostV1_excluded;no_Production_authority.
     convergence satisfied.062/068 authorized sequence remains;057/058/065 inputs not
     supplied. Global gate/Production unchanged.
   resume_cep_after_blocker_resolution: null

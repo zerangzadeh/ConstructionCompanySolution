@@ -326,7 +326,12 @@ class ESSOvertimeTests(TestCase):
             self.client_for(csrf=True).post(self.url("create"), data).status_code, 403
         )
 
-    def test_mission_create_read_submit_stay_unavailable(self):
+    def test_mission_without_source_permissions_stays_unavailable(self):
+        self.role.permissions.remove(
+            *BusinessPermission.objects.filter(
+                code__in=[P.LEAVE_MISSION_REQUEST, P.LEAVE_MISSION_VIEW]
+            )
+        )
         client = self.client_for()
         self.assertEqual(
             client.get(self.url("create", kind="mission")).status_code, 403

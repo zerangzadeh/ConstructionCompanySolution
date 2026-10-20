@@ -17,6 +17,7 @@ from .ess_timekeeping_forms import (
     CorrectionForm,
     EntryForm,
     LeaveForm,
+    MissionForm,
     OvertimeForm,
     TimesheetForm,
 )
@@ -52,6 +53,7 @@ def index(request):
         ("correction", "درخواست‌های اصلاح حضور من"),
         ("timesheet", "کارکرد من"),
         ("overtime", "درخواست‌های اضافه‌کاری من"),
+        ("mission", "درخواست‌های مأموریت من"),
     ]:
         try:
             rows = list(
@@ -91,6 +93,7 @@ def create(request, kind):
         "leave": (LeaveForm, P.LEAVE_MISSION_REQUEST, "درخواست مرخصی"),
         "timesheet": (TimesheetForm, P.TIMESHEETS_PREPARE, "کارکرد جدید"),
         "overtime": (OvertimeForm, P.OVERTIME_REQUEST, "درخواست اضافه‌کاری"),
+        "mission": (MissionForm, P.LEAVE_MISSION_REQUEST, "درخواست مأموریت"),
     }
     if kind not in forms:
         raise PermissionDenied(service.DENIED)
@@ -100,11 +103,15 @@ def create(request, kind):
         organization=request.organization,
         permission=permission,
         message=service.DENIED,
+        allow_any_scope=kind == "mission",
     )
     service.subject(actor=request.user, organization=request.organization)
     with timezone.override(ZoneInfo(request.organization.settings.timezone)):
         form = form_type(
-            request.POST or None, organization=request.organization, actor=request.user
+            request.POST or None,
+            request.FILES or None,
+            organization=request.organization,
+            actor=request.user,
         )
         if request.method == "POST" and form.is_valid():
             try:
@@ -112,6 +119,7 @@ def create(request, kind):
                     "leave": service.create_own_leave,
                     "timesheet": service.create_own_timesheet,
                     "overtime": service.create_own_overtime,
+                    "mission": service.create_own_mission,
                 }[kind]
                 record = command(
                     actor=request.user,
@@ -149,7 +157,18 @@ def detail(request, kind, record_id):
     return render(
         request,
         "workforce/ess_timekeeping_detail.html",
-        {"record": record, "kind": kind, "entries": entries},
+        {
+            "record": record,
+            "kind": kind,
+            "entries": entries,
+            "mission_routing": service.own_mission_routing_status(
+                actor=request.user,
+                organization=request.organization,
+                record_id=record.pk,
+            )
+            if kind == "mission"
+            else None,
+        },
     )
 
 

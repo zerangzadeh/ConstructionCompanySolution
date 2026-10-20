@@ -1,10 +1,12 @@
 """Own ESS orchestration; source domains retain every state and calculation."""
 
 from datetime import date, datetime, time, timedelta
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 
 from apps.accounts.models import User
@@ -13,7 +15,9 @@ from apps.audit.services import record_audit_event
 from apps.organizations.authorization import require_business_permission, scope_queryset
 from apps.organizations.models import BusinessPermissionCode as P
 from apps.organizations.models import Organization
+from apps.projects.models import Project, ProjectSite
 from apps.timekeeping import services as source
+from apps.timekeeping.mission_models import MissionEffectEvent
 from apps.timekeeping.models import (
     AttendanceCorrectionRequest,
     AttendanceRecord,
@@ -30,6 +34,7 @@ from .models import EmployeeProjectAssignment
 DENIED = "اطلاعات مجاز در این شرکت یافت نشد."
 SOURCES = {
     "leave": (LeaveMissionRequest, "employee", P.LEAVE_MISSION_VIEW),
+    "mission": (LeaveMissionRequest, "employee", P.LEAVE_MISSION_VIEW),
     "attendance": (AttendanceRecord, "employee", P.ATTENDANCE_VIEW),
     "correction": (
         AttendanceCorrectionRequest,
@@ -65,11 +70,11 @@ def own_rows(*, actor, organization, kind):
         organization=organization,
         **{employee_field: own.current_relationship.legacy_employee_id},
     )
-    if kind == "leave":
-        rows = rows.filter(kind="leave")
+    if kind in {"leave", "mission"}:
+        rows = rows.filter(kind=kind)
     if kind == "correction":
         rows = rows.filter(requested_by=actor)
-    if kind == "overtime":
+    if kind in {"overtime", "mission"}:
         zone = ZoneInfo(organization.settings.timezone)
         relationship = own.current_relationship
         rows = rows.filter(
@@ -193,13 +198,25 @@ def create_own_leave(
 @transaction.atomic
 def submit_own(*, actor, organization, kind, record_id):
     organization = Organization.objects.select_for_update().get(pk=organization.pk)
+    expected_mission_relationship = (
+        subject(actor=actor, organization=organization)[1].current_relationship.pk
+        if kind == "mission"
+        else None
+    )
     record = own_record(
         actor=actor, organization=organization, kind=kind, record_id=record_id
     )
-    if kind in {"leave", "overtime"}:
+    if kind in {"leave", "overtime", "mission"}:
         result = source.submit_time_request(
             organization=organization, actor=actor, request=record
         )
+        if kind == "mission":
+            _mission_identity_audit(
+                actor=actor,
+                organization=organization,
+                record=result,
+                expected_relationship_id=expected_mission_relationship,
+            )
         if kind == "overtime":
             _overtime_identity_audit(
                 actor=actor, organization=organization, record=result
@@ -344,3 +361,126 @@ def add_own_entry(
         activity=activity,
         minutes=minutes,
     )
+
+
+def _mission_identity_audit(
+    *,
+    actor: User,
+    organization: Organization,
+    record: LeaveMissionRequest,
+    expected_relationship_id: UUID,
+) -> None:
+    _, own = subject(actor=actor, organization=organization)
+    if (
+        own.current_relationship.pk != expected_relationship_id
+        or own.current_relationship.legacy_employee_id != record.employee_id
+    ):
+        raise PermissionDenied(DENIED)
+
+    record_audit_event(
+        action=AuditAction.TIME_REQUEST_TRANSITIONED,
+        organization=organization,
+        actor=actor,
+        entity_type=record._meta.label_lower,
+        entity_id=str(record.pk),
+        changes={"state": record.state},
+        metadata={
+            "origin": "ess_mission",
+            "person_id": str(own.person.pk),
+            "relationship_id": str(own.current_relationship.pk),
+            "relationship_start": own.current_relationship.effective_start.isoformat(),
+            "relationship_end": str(own.current_relationship.effective_end or ""),
+            "employee_id": str(record.employee_id),
+        },
+    )
+
+
+@transaction.atomic
+def create_own_mission(
+    *,
+    actor: User,
+    organization: Organization,
+    starts_at: datetime,
+    ends_at: datetime,
+    category_code: str,
+    reason: str,
+    project: Project | None = None,
+    site: ProjectSite | None = None,
+) -> LeaveMissionRequest:
+    organization = Organization.objects.select_for_update().get(pk=organization.pk)
+    organization, own = subject(actor=actor, organization=organization)
+    zone = ZoneInfo(organization.settings.timezone)
+    relationship = own.current_relationship
+    if (
+        not timezone.is_aware(starts_at)
+        or not timezone.is_aware(ends_at)
+        or ends_at <= starts_at
+        or timezone.localtime(starts_at, zone).date() < relationship.effective_start
+        or (
+            relationship.effective_end
+            and timezone.localtime(ends_at, zone).date() > relationship.effective_end
+        )
+    ):
+        raise ValidationError("بازه مأموریت باید در محدوده رابطه کاری مجاز باشد.")
+    record = source.create_leave_mission_request(
+        organization=organization,
+        actor=actor,
+        employee=relationship.legacy_employee,
+        kind="mission",
+        category_code=category_code,
+        starts_at=starts_at,
+        ends_at=ends_at,
+        reason=reason,
+        project=project,
+        site=site,
+    )
+    _mission_identity_audit(
+        actor=actor,
+        organization=organization,
+        record=record,
+        expected_relationship_id=relationship.pk,
+    )
+    return record
+
+
+def own_mission_routing_status(
+    *, actor: User, organization: Organization, record_id: UUID
+) -> list[dict]:
+    """Own source linkage only; never read protected target-domain financial data."""
+    mission = own_record(
+        actor=actor, organization=organization, kind="mission", record_id=record_id
+    )
+    labels = {
+        "payroll": "حقوق و دستمزد",
+        "expense": "بازپرداخت هزینه",
+        "treasury": "تسویه تنخواه",
+    }
+    rows = []
+    effects = (
+        mission.financial_effects.filter(organization=organization)
+        .only("id", "organization_id", "mission_id", "route")
+        .prefetch_related(
+            Prefetch(
+                "events",
+                queryset=MissionEffectEvent.objects.filter(
+                    organization=organization
+                ).only("effect_id", "kind"),
+            )
+        )
+    )
+    for effect in effects:
+        terminal = next(
+            (x for x in effect.events.all() if x.kind in {"cancelled", "replaced"}),
+            None,
+        )
+        rows.append(
+            {
+                "route": labels[effect.route],
+                "status": "اصلاح اثر ثبت شده است"
+                if terminal and terminal.kind == "replaced"
+                else "لغو اثر ثبت شده است"
+                if terminal
+                else "ارجاع برای پردازش ثبت شده است",
+            }
+        )
+    return rows

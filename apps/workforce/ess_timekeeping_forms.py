@@ -172,3 +172,82 @@ class EntryForm(ESSForm):
             project_lookup="project",
             site_lookup="site",
         )
+
+
+class MissionForm(ESSForm):
+    category_code = forms.CharField(label="نوع مأموریت", max_length=50)
+    starts_at = forms.DateTimeField(label="شروع مأموریت")
+    ends_at = forms.DateTimeField(label="پایان مأموریت")
+    reason = forms.CharField(
+        label="دلیل و شرح مأموریت",
+        max_length=2000,
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+    project = forms.ModelChoiceField(
+        label="پروژه (اختیاری)", queryset=Project.objects.none(), required=False
+    )
+    site = forms.ModelChoiceField(
+        label="کارگاه (اختیاری)", queryset=ProjectSite.objects.none(), required=False
+    )
+
+    def __init__(self, *args, organization, actor, **kwargs):
+        super().__init__(*args, organization=organization, actor=actor, **kwargs)
+        membership = get_active_membership(user=actor, organization=self.organization)
+        self.fields["project"].queryset = scope_queryset(
+            Project.objects.filter(
+                organization=self.organization, deleted_at__isnull=True
+            ),
+            membership=membership,
+            project_lookup="pk",
+            include_site_parent=True,
+        )
+        self.fields["site"].queryset = scope_queryset(
+            ProjectSite.objects.filter(organization=self.organization),
+            membership=membership,
+            project_lookup="project",
+            site_lookup="pk",
+        )
+
+    def clean(self):
+        data = super().clean()
+        if (
+            any(
+                key in self.data
+                for key in (
+                    "organization",
+                    "organization_id",
+                    "employee",
+                    "employee_id",
+                    "person_id",
+                    "relationship_id",
+                    "work_relationship_id",
+                    "policy_reference",
+                    "route",
+                    "effect_id",
+                    "mission_version",
+                    "amount",
+                    "rate",
+                    "multiplier",
+                    "cap",
+                    "state",
+                    "approved_by",
+                    "project_id",
+                    "site_id",
+                    "attachment",
+                    "attachments",
+                )
+            )
+            or self.files
+        ):
+            raise forms.ValidationError("درخواست شامل مقدار غیرمجاز است.")
+        if (
+            data.get("starts_at")
+            and data.get("ends_at")
+            and data["ends_at"] <= data["starts_at"]
+        ):
+            raise forms.ValidationError("پایان مأموریت باید پس از شروع باشد.")
+        if data.get("site") and (
+            not data.get("project") or data["site"].project_id != data["project"].pk
+        ):
+            raise forms.ValidationError("کارگاه باید متعلق به پروژه انتخاب‌شده باشد.")
+        return data
