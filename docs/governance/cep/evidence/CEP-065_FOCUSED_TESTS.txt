@@ -1,0 +1,40 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_billing_owner_fields_and_invalid_states_fail_closed (apps.projects.test_cep065_cashflow.CashflowAdapterTests.test_billing_owner_fields_and_invalid_states_fail_closed) ... ok
+test_persisted_apar_owner_evidence_without_invented_posting (apps.projects.test_cep065_cashflow.CashflowAdapterTests.test_persisted_apar_owner_evidence_without_invented_posting) ... ok
+test_cash_control_and_bucket_aggregation_preserve_all_decimal_digits (apps.projects.test_cep065_cashflow.CashflowTests.test_cash_control_and_bucket_aggregation_preserve_all_decimal_digits) ... ok
+test_changed_cash_source_blocks_approval_but_allows_rejection (apps.projects.test_cep065_cashflow.CashflowTests.test_changed_cash_source_blocks_approval_but_allows_rejection) ... ok
+test_cross_tenant_source_read_and_inactive_membership_are_denied (apps.projects.test_cep065_cashflow.CashflowTests.test_cross_tenant_source_read_and_inactive_membership_are_denied) ... ok
+test_current_tenant_state_and_missing_historical_settings_fail_closed (apps.projects.test_cep065_cashflow.CashflowTests.test_current_tenant_state_and_missing_historical_settings_fail_closed) ... ok
+test_database_rejects_late_bulk_insert_and_source_permission_is_rechecked (apps.projects.test_cep065_cashflow.CashflowTests.test_database_rejects_late_bulk_insert_and_source_permission_is_rechecked) ... ok
+test_draft_schedule_reference_requires_explicit_cash_timing (apps.projects.test_cep065_cashflow.CashflowTests.test_draft_schedule_reference_requires_explicit_cash_timing) ... ok
+test_invalid_timing_float_currency_source_and_controls_fail_closed (apps.projects.test_cep065_cashflow.CashflowTests.test_invalid_timing_float_currency_source_and_controls_fail_closed) ... ok
+test_late_attachment_queryset_update_delete_and_snapshot_corruption_denied (apps.projects.test_cep065_cashflow.CashflowTests.test_late_attachment_queryset_update_delete_and_snapshot_corruption_denied) ... ok
+test_late_reforecast_and_cancellation_preserve_baseline_and_old_snapshot (apps.projects.test_cep065_cashflow.CashflowTests.test_late_reforecast_and_cancellation_preserve_baseline_and_old_snapshot) ... ok
+test_month_boundaries_horizon_timezone_and_overdue_not_rolled (apps.projects.test_cep065_cashflow.CashflowTests.test_month_boundaries_horizon_timezone_and_overdue_not_rolled) ... ok
+test_native_commercial_terms_are_evidence_without_automatic_payment_timing (apps.projects.test_cep065_cashflow.CashflowTests.test_native_commercial_terms_are_evidence_without_automatic_payment_timing) ... ok
+test_native_commitment_and_forecast_sources_preserve_identity_not_cash_formula (apps.projects.test_cep065_cashflow.CashflowTests.test_native_commitment_and_forecast_sources_preserve_identity_not_cash_formula) ... ok
+test_native_treasury_event_cutoff_reversal_and_future_cash (apps.projects.test_cep065_cashflow.CashflowTests.test_native_treasury_event_cutoff_reversal_and_future_cash) ... ok
+test_overlap_duplicates_and_unknown_source_cannot_be_approved (apps.projects.test_cep065_cashflow.CashflowTests.test_overlap_duplicates_and_unknown_source_cannot_be_approved) ... ok
+test_retry_is_exact_and_rebuild_ignores_current_source_pointers (apps.projects.test_cep065_cashflow.CashflowTests.test_retry_is_exact_and_rebuild_ignores_current_source_pointers) ... ok
+test_reviewed_monthly_comparison_retains_exact_cash_and_source_approval (apps.projects.test_cep065_cashflow.CashflowTests.test_reviewed_monthly_comparison_retains_exact_cash_and_source_approval) ... ok
+test_unallocated_amounts_reconcile_but_expose_incomplete_coverage (apps.projects.test_cep065_cashflow.CashflowTests.test_unallocated_amounts_reconcile_but_expose_incomplete_coverage) ... ok
+test_unapproved_forecast_and_postcutoff_approval_are_not_comparable (apps.projects.test_cep065_cashflow.CashflowTests.test_unapproved_forecast_and_postcutoff_approval_are_not_comparable) ... ok
+test_reverse_reapply_retains_accepted_budget_and_forecast (apps.projects.test_cep065_migration.CashflowMigrationTests.test_reverse_reapply_retains_accepted_budget_and_forecast) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 77.184s
+
+OK
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 21 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

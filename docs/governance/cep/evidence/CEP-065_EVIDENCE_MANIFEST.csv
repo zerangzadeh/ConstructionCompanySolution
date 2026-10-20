@@ -1,4 +1,12 @@
 evidence_id,paths,result
-CEP-065-EV-001,CEP-065_ENTRY.json,Canonical hash/dependency/authority checked; entry blocked
-CEP-065-EV-002,CEP-065_REPOSITORY_AND_SCHEMA.json,Read-only configured schema/model metadata; no source rows exported
-CEP-065-EV-003,CEP-065_FINDINGS.json,Required bounded approved source/cutoff contract unresolved; no execution PASS
+CEP-065-EV-001,CEP-065_ENTRY.json,HISTORICAL: canonical entry blocked before Human resolution; no historical execution PASS
+CEP-065-EV-002,CEP-065_REPOSITORY_AND_SCHEMA.json,HISTORICAL read-only prior schema evidence
+CEP-065-EV-003,CEP-065_FINDINGS.json,Original finding retained; resolved by explicit CEP065-CASHFLOW-v1 approval and final evidence
+CEP-065-EV-004,../supporting/CEP-065_CASHFLOW_V1_HUMAN_RESOLUTION.txt,Exact Human approval of HR065-01..05 and bounded Development/Git execution
+CEP-065-EV-005,CEP-065_BASELINE_TESTS.txt;CEP-065_FOCUSED_TESTS.txt,Baseline6 PASS; final21/21 focused PostgreSQL checks PASS
+CEP-065-EV-006,CEP-065_DEVELOPMENT_MIGRATION.txt;CEP-065_MIGRATION_RETENTION.json;CEP-065_MIGRATION_REHEARSAL.py,PASS: Development forward/reverse/reapply;11 retained source families exact counts/hashes; new tables empty; focused nonempty history retention
+CEP-065-EV-007,CEP-065_AFFECTED_REGRESSION.txt;CEP-065_REGRESSION_ATTRIBUTION.json,78 run;66 PASS;12 unchanged legacy setup errors before CEP065 code; no attributable regression
+CEP-065-EV-008,CEP-065_CHECKS.txt;CEP-065_BASELINE_FORMAT_CHECK.txt,Django check/drift/Ruff lint/scoped format/whitespace PASS; old registry whole-file format debt independently reproduced
+CEP-065-EV-009,CEP-065_PRODUCT_DIFF.txt;CEP-065_CHANGE_MANIFEST.csv,Actual staged product diff and bounded change inventory
+CEP-065-EV-010,CEP-065_PERMISSION_REGISTRY.txt;CEP-065_REGISTRY_DELTA.txt;CEP-065_REGISTRY_ATTRIBUTION.json;CEP-065_REGISTRY_DELTA_CHECK.py,New models registered exactly once under existing capability;2/8 registry checks PASS and6 unchanged baseline failures; no new permission/grant debt
+CEP-065-EV-011,CEP-065_VALIDATION.json;CEP-065_OPTIONAL_LEGACY_BILLING_PROBE.txt,AC6/6 and scoped DoD MET; frontier/counts reconciled; optional old Billing lifecycle probe failed before adapter; source adapter contracts verified; wider runtime UTV

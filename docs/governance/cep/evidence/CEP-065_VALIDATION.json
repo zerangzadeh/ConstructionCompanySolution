@@ -1,0 +1,170 @@
+{
+  "date": "2026-10-20",
+  "execution": "COMPLETE",
+  "lifecycle": "CLOSED_VERIFIED",
+  "baseline": "14c32ced2eab37a6322cde36b406fff1a929aade",
+  "decision": "CEP065-CASHFLOW-v1",
+  "AC": "6/6 PASS",
+  "DoD": "MET",
+  "focused": {
+    "run": 21,
+    "pass": 21
+  },
+  "affected_regression": {
+    "run": 78,
+    "pass": 66,
+    "baseline_setup_errors": 12
+  },
+  "permission_registry": {
+    "run": 8,
+    "pass": 2,
+    "baseline_failures": 6,
+    "new_models_owned_once": true,
+    "baseline_debt_unchanged": true
+  },
+  "required_attributable_failures": 0,
+  "checks": "Django/Ruff/drift/scoped-format/whitespace PASS; pre-existing whole-file registry formatting debt preserved with baseline proof",
+  "migration": "Configured Development and disposable PostgreSQL reverse/reapply retention PASS; two additive empty evidence tables; no real-source backfill",
+  "v1_closure_counts": {
+    "COMPLETE": 66,
+    "PARTIAL": 2,
+    "BLOCKED": 0
+  },
+  "global_gates_changed": false,
+  "relevant_gate05_065": "PASS; no global Gate PASS",
+  "remaining_v1": [
+    "CEP-057 PARTIAL",
+    "CEP-058 PARTIAL"
+  ],
+  "dependency_ready_current_governed": [
+    "CEP-057",
+    "CEP-058",
+    "CEP-069",
+    "CEP-070",
+    "CEP-071",
+    "CEP-072",
+    "CEP-077",
+    "CEP-078"
+  ],
+  "conditional_review": [
+    "CEP-073",
+    "CEP-079"
+  ],
+  "dependency_evaluation": {
+    "CEP-057": {
+      "mandatory": [
+        "CEP-023",
+        "CEP-029"
+      ],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-058": {
+      "mandatory": [
+        "CEP-025",
+        "CEP-029"
+      ],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-069": {
+      "mandatory": [
+        "CEP-052"
+      ],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-070": {
+      "mandatory": [],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-071": {
+      "mandatory": [],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-072": {
+      "mandatory": [],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-073": {
+      "mandatory": [
+        "CEP-006",
+        "CEP-009",
+        "CEP-012"
+      ],
+      "unmet": [],
+      "has_conditional": true
+    },
+    "CEP-074": {
+      "mandatory": [
+        "CEP-070"
+      ],
+      "unmet": [
+        "CEP-070"
+      ],
+      "has_conditional": false
+    },
+    "CEP-075": {
+      "mandatory": [
+        "CEP-071"
+      ],
+      "unmet": [
+        "CEP-071"
+      ],
+      "has_conditional": false
+    },
+    "CEP-076": {
+      "mandatory": [
+        "CEP-072"
+      ],
+      "unmet": [
+        "CEP-072"
+      ],
+      "has_conditional": false
+    },
+    "CEP-077": {
+      "mandatory": [
+        "CEP-013"
+      ],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-078": {
+      "mandatory": [
+        "CEP-003",
+        "CEP-017"
+      ],
+      "unmet": [],
+      "has_conditional": false
+    },
+    "CEP-079": {
+      "mandatory": [],
+      "unmet": [],
+      "has_conditional": true
+    }
+  },
+  "other_cep_execution": false,
+  "production_action": false,
+  "human_signoff": false,
+  "git": "authorized completed065 checkpoint pending",
+  "UTV": [
+    "full suite",
+    "performance/concurrency runtime",
+    "broader browser/accessibility/UAT",
+    "optional native Billing lifecycle integration; canonical integration N/A"
+  ],
+  "source_sha256": {
+    "apps/projects/cashflow.py": "f070a341f9528e969a2a1f6bdbaed28b334bfd8265bab9a7fcfe75bb7255dbc0",
+    "apps/projects/cashflow_models.py": "28862e9849375368d9bc369e89047c91d745b65c6983dfc6753358d9866e21a7",
+    "apps/projects/forecast_governance.py": "b463581620652b73919cd3eb886a8c00932721d2fc2facd69128bd64313ca6e6",
+    "apps/projects/models.py": "b7a21dd9e922c195ba71e58e64aff3d84a4a449ab3359460ad9a7b1dd9697d9c",
+    "apps/projects/migrations/0011_cep065_cashflow_evidence.py": "9526497b74f198ad8313bdf1f29c5eb3a7c3a93386bc8e861e468c435c638676",
+    "apps/projects/test_cep065_cashflow.py": "826fa3e93c8897e558ce106637fc6851f5b5a4bb08c9cfef9343d2bb2f8a9c14",
+    "apps/projects/test_cep065_migration.py": "a76fb0b9d6a5af9ec70dc652792351ece86a51fa93070d91b690e32931f485f5",
+    "apps/organizations/permission_registry.py": "333b59fb039c6de3c552d37dbf0b58bc27b96a3f573728b2c6284c2609a8a8a1"
+  },
+  "canonical_prompt_sha256": "535bad1d9143c0c8e474872b683e70f899ceb7f13bebca9d71fcdf94b31599fc"
+}

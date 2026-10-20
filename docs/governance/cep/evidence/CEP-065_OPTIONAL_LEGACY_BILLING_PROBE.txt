@@ -1,0 +1,92 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_native_apar_evidence_does_not_require_a_new_posting (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_apar_evidence_does_not_require_a_new_posting) ... ERROR
+test_native_approved_payable_billing_evidence (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_approved_payable_billing_evidence) ... ERROR
+test_native_approved_receivable_billing_evidence (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_approved_receivable_billing_evidence) ... ERROR
+
+======================================================================
+ERROR: test_native_apar_evidence_does_not_require_a_new_posting (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_apar_evidence_does_not_require_a_new_posting)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_cep065_cashflow.py", line 627, in test_native_apar_evidence_does_not_require_a_new_posting
+    forecast=self.context(helper),
+             ^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\test_cep065_cashflow.py", line 580, in context
+    project=helper.project,
+            ^^^^^^^^^^^^^^
+AttributeError: 'SubledgerFoundationTests' object has no attribute 'project'
+
+======================================================================
+ERROR: test_native_approved_payable_billing_evidence (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_approved_payable_billing_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_cep065_cashflow.py", line 607, in test_native_approved_payable_billing_evidence
+    helper.setUp()
+  File "E:\Construction_Company_Solution\apps\billing\test_payable_certificates.py", line 79, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_native_approved_receivable_billing_evidence (apps.projects.test_cep065_cashflow.CashflowOwnerEvidenceTests.test_native_approved_receivable_billing_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_cep065_cashflow.py", line 592, in test_native_approved_receivable_billing_evidence
+    claim = helper._approve_claim(helper._claim_for_approval())
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\tests.py", line 915, in _claim_for_approval
+    return self._claim()
+           ^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\tests.py", line 650, in _claim
+    record = record or self._verified_record()
+                       ^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\tests.py", line 638, in _verified_record
+    record = self._record()
+             ^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\tests.py", line 494, in _record
+    baseline = self._approved_baseline()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\tests.py", line 483, in _approved_baseline
+    request_project_baseline_approval(
+  File "E:\Construction_Company_Solution\apps\billing\services.py", line 630, in request_project_baseline_approval
+    return request_project_baseline_approval_with_workflow(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\workflow.py", line 540, in request_project_baseline_approval_with_workflow
+    ensure_project_baseline_workflow(organization=organization, actor=actor)
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\billing\workflow.py", line 422, in ensure_project_baseline_workflow
+    template = WorkflowTemplate.objects.get(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\.venv\Lib\site-packages\django\db\models\query.py", line 635, in get
+    raise self.model.DoesNotExist(
+apps.workflows.models.WorkflowTemplate.DoesNotExist: WorkflowTemplate matching query does not exist.
+
+----------------------------------------------------------------------
+Ran 3 tests in 3.681s
+
+FAILED (errors=3)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 3 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

@@ -1,0 +1,21 @@
+COMMAND: .venv/Scripts/python.exe manage.py check
+System check identified no issues (0 silenced).
+
+
+EXIT: 0
+COMMAND: .venv/Scripts/python.exe manage.py makemigrations --check --dry-run
+No changes detected
+
+
+EXIT: 0
+COMMAND: .venv/Scripts/ruff.exe check apps/projects/cashflow.py apps/projects/cashflow_models.py apps/projects/forecast_governance.py apps/projects/models.py apps/organizations/permission_registry.py apps/projects/test_cep065_cashflow.py apps/projects/test_cep065_migration.py
+All checks passed!
+
+EXIT: 0
+COMMAND: .venv/Scripts/ruff.exe format --check apps/projects/cashflow.py apps/projects/cashflow_models.py apps/projects/forecast_governance.py apps/projects/test_cep065_cashflow.py apps/projects/test_cep065_migration.py
+5 files already formatted
+
+EXIT: 0
+COMMAND: git diff --check
+
+EXIT: 0

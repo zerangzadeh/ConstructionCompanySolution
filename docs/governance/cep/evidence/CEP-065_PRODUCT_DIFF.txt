@@ -1,0 +1,2100 @@
+diff --git a/apps/organizations/permission_registry.py b/apps/organizations/permission_registry.py
+index e093278..c69a83d 100644
+--- a/apps/organizations/permission_registry.py
++++ b/apps/organizations/permission_registry.py
+@@ -563,0 +564,2 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
++            "projects.ProjectCashflowSupplement",
++            "projects.ProjectCashflowSnapshot",
+@@ -578,0 +581 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
++            "apps.projects.cashflow",
+diff --git a/apps/projects/cashflow.py b/apps/projects/cashflow.py
+new file mode 100644
+index 0000000..a09c0ac
+--- /dev/null
++++ b/apps/projects/cashflow.py
+@@ -0,0 +1,936 @@
++"""Explicit cash planning evidence; no cash, cost or posting mutation."""
++
++from __future__ import annotations
++
++import json
++from collections import defaultdict
++from collections.abc import Iterable
++from datetime import date, datetime
++from decimal import Decimal, Inexact, InvalidOperation, localcontext
++from hashlib import sha256
++from uuid import UUID
++from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import transaction
++from django.utils import timezone
++
++from apps.accounts.models import User
++from apps.organizations.models import BusinessPermissionCode as P
++from apps.organizations.models import Organization
++from apps.organizations.services import get_organization_settings
++from apps.projects.cashflow_models import (
++    ProjectCashflowSnapshot,
++    ProjectCashflowSupplement,
++)
++from apps.projects.models import (
++    BudgetAllocation,
++    Project,
++    ProjectCostFact,
++    ProjectCostForecast,
++    ProjectForecastTransition,
++    ProjectScheduleItem,
++)
++from apps.projects.services import _require_budget_access
++from apps.treasury.models import TreasuryMovement
++from core.tenant_validation import validate_related_organizations
++
++POLICY = "CEP065-CASHFLOW-v1"
++DIRECTIONS = {"RECEIPT", "DISBURSEMENT"}
++
++
++def digest(value: object) -> str:
++    return sha256(
++        json.dumps(
++            value, sort_keys=True, separators=(",", ":"), ensure_ascii=True
++        ).encode()
++    ).hexdigest()
++
++
++def _amount(value: object) -> Decimal:
++    if not isinstance(value, (str, Decimal, int)) or isinstance(value, bool):
++        raise ValidationError(
++            "Cash amounts must be exact Decimal values, never floats."
++        )
++    try:
++        amount = Decimal(value)
++    except (ValueError, InvalidOperation, TypeError) as exc:
++        raise ValidationError("Invalid cash amount.") from exc
++    if not amount.is_finite() or amount < 0:
++        raise ValidationError("Cash amounts must be finite and non-negative.")
++    return amount
++
++
++def _add_exact(left: Decimal, right: Decimal) -> Decimal:
++    """Conserve source precision, including large cross-source control totals."""
++    exponent = min(left.as_tuple().exponent, right.as_tuple().exponent, 0)
++    with localcontext() as context:
++        context.prec = max(left.adjusted(), right.adjusted(), 0) - exponent + 3
++        context.traps[Inexact] = True
++        return left + right
++
++
++def _sum_exact(values: Iterable[Decimal]) -> Decimal:
++    total = Decimal(0)
++    for value in values:
++        total = _add_exact(total, value)
++    return total
++
++
++def _text(value: object) -> str:
++    if not isinstance(value, str) or not value.strip():
++        raise ValidationError("Explicit non-empty evidence references are required.")
++    return value.strip()
++
++
++def _date(value: object) -> date:
++    if not isinstance(value, str):
++        raise ValidationError("Use an explicit ISO cash-event date.")
++    try:
++        parsed = date.fromisoformat(value)
++        if parsed.isoformat() != value:
++            raise ValueError
++        return parsed
++    except ValueError as exc:
++        raise ValidationError("Use an explicit ISO cash-event date.") from exc
++
++
++def _access(organization, project, actor, permission=P.PROJECT_COSTS_VIEW) -> None:
++    _require_budget_access(
++        organization=organization, project=project, actor=actor, permission=permission
++    )
++
++
++def _source(*, reference: dict, forecast: ProjectCostForecast, actor) -> dict:
++    """Resolve real, scoped owner evidence; caller hashes/versions are never trusted."""
++    from apps.billing.models import PayableCertificate, ProgressClaim
++    from apps.contracts.models import ContractTermVersion
++    from apps.subledgers.models import Obligation
++
++    if not isinstance(reference, dict):
++        raise ValidationError("An explicit source reference is required.")
++    family = reference.get("family")
++    configuration = {
++        "budget_allocation": (BudgetAllocation, P.BUDGETS_VIEW),
++        "forecast": (ProjectCostForecast, P.PROJECT_COSTS_VIEW),
++        "commitment": (ProjectCostFact, P.PROJECT_COSTS_VIEW),
++        "contract_terms": (ContractTermVersion, P.CONTRACTS_VIEW),
++        "billing_claim": (ProgressClaim, P.CLAIMS_VIEW),
++        "billing_certificate": (
++            PayableCertificate,
++            P.PAYABLE_CERTIFICATES_VIEW,
++        ),
++        "obligation": (Obligation, P.SUBLEDGERS_VIEW),
++    }
++    if family not in configuration:
++        raise ValidationError("Unregistered cash-flow source family.")
++    model, permission = configuration[family]
++    _access(forecast.organization, forecast.project, actor, permission)
++    try:
++        obj = model.objects.select_for_update().get(
++            pk=reference.get("id"), organization_id=forecast.organization_id
++        )
++    except (model.DoesNotExist, ValueError, ValidationError) as exc:
++        raise ValidationError("Cash source is unavailable in this tenant.") from exc
++    approved_at = None
++    event = ""
++    line = str(obj.pk)
++    currency = forecast.currency
++    if family == "budget_allocation":
++        budget = obj.manifest_line.manifest.budget
++        validate_related_organizations(
++            obj,
++            line=obj.manifest_line,
++            manifest=obj.manifest_line.manifest,
++            budget=budget,
++            estimate=obj.manifest_line.manifest.estimate,
++            revision=obj.manifest_line.manifest.estimate_revision,
++            wbs=obj.wbs_node,
++            cbs=obj.cbs_node,
++            cost_center=obj.cost_center,
++        )
++        if obj.wbs_node and obj.wbs_node.project_id != forecast.project_id:
++            raise ValidationError(
++                "Budget cash evidence has another project's WBS context."
++            )
++        if budget.pk != forecast.budget_id or budget.status != "accepted":
++            raise ValidationError(
++                "Cash baseline evidence requires its accepted pinned Budget."
++            )
++        project_id = budget.project_id
++        version = budget.version_number
++        approved_at = budget.accepted_at
++        evidence = {
++            "amount": str(obj.amount),
++            "budget_id": str(budget.pk),
++            "budget_hash": budget.payload_hash,
++            "manifest_line_id": str(obj.manifest_line_id),
++            "estimate_revision_id": str(
++                obj.manifest_line.manifest.estimate_revision_id
++            ),
++            "estimate_revision_number": obj.manifest_line.manifest.estimate_revision_number,
++            "wbs_id": str(obj.wbs_node_id),
++            "cbs_id": str(obj.cbs_node_id),
++            "cost_center_id": str(obj.cost_center_id or ""),
++            "basis": obj.allocation_basis_reference,
++        }
++        currency = budget.currency
++    elif family == "forecast":
++        validate_related_organizations(obj, budget=obj.budget)
++        if obj.pk != forecast.pk:
++            raise ValidationError(
++                "Forecast planning assumptions must belong to this reviewed version."
++            )
++        project_id = obj.project_id
++        version = obj.version_number
++        # Approval of this immutable subject approves its supplement atomically.
++        evidence = {
++            "cutoff_date": str(obj.cutoff_date),
++            "watermark": obj.source_watermark,
++            "budget_id": str(obj.budget_id),
++            "assumptions": obj.assumptions,
++            "eac": str(obj.eac),
++            "uncommitted_etc": str(obj.uncommitted_etc),
++        }
++        currency = obj.currency
++    elif family == "commitment":
++        validate_related_organizations(
++            obj,
++            producer=obj.contract,
++            wbs=obj.wbs_node,
++            cbs=obj.cbs_node,
++            cost_center=obj.cost_center,
++        )
++        if (
++            obj.kind
++            not in {
++                "commitment_authorized",
++                "commitment_adjustment",
++                "commitment_relief",
++            }
++            or obj.contract.status != "approved"
++        ):
++            raise ValidationError(
++                "An approved commitment producer and classified fact are required."
++            )
++        project_id, version = obj.project_id, obj.source_version
++        approved_at = obj.contract.approved_at
++        event = obj.economic_event_id
++        line = obj.source_line_id
++        currency = obj.currency
++        evidence = {
++            "producer_id": str(obj.contract_id),
++            "producer_version": obj.contract.version,
++            "source_id": obj.source_id,
++            "source_version": obj.source_version,
++            "source_line_id": line,
++            "kind": obj.kind,
++            "amount": str(obj.amount),
++            "payload_hash": obj.payload_hash,
++            "recognition_date": str(obj.recognition_date),
++            "wbs_id": str(obj.wbs_node_id or ""),
++            "cbs_id": str(obj.cbs_node_id or ""),
++            "cost_center_id": str(obj.cost_center_id or ""),
++        }
++    elif family == "contract_terms":
++        validate_related_organizations(obj, contract=obj.contract)
++        if obj.status != "approved":
++            raise ValidationError("Approved commercial terms are required.")
++        project_id, version = obj.contract.project_id, obj.version
++        approved_at = obj.approved_at
++        evidence = {
++            "contract_id": str(obj.contract_id),
++            "direction": obj.contract.direction,
++            "effective_from": str(obj.effective_from),
++            "payment_due_days": obj.payment_due_days,
++            "approval_reason": obj.approval_reason,
++        }
++    elif family in {"billing_claim", "billing_certificate"}:
++        validate_related_organizations(
++            obj, contract=obj.contract, terms=obj.contract_term_version
++        )
++        if (
++            obj.contract.project_id != forecast.project_id
++            or obj.contract_term_version.contract_id != obj.contract_id
++        ):
++            raise ValidationError(
++                "Billing cash evidence has inconsistent commercial context."
++            )
++        if obj.status != "approved":
++            raise ValidationError("Approved Billing evidence is required.")
++        project_id, version = obj.project_id, obj.revision_number
++        approved_at = obj.approved_at
++        currency = obj.currency_code
++        evidence = {
++            "contract_id": str(obj.contract_id),
++            "terms_id": str(obj.contract_term_version_id),
++            "net_amount": str(obj.net_amount),
++            "due_date": str(obj.due_date or ""),
++            "calculation_snapshot": obj.calculation_snapshot,
++        }
++    else:
++        validate_related_organizations(obj, contract=obj.contract)
++        if obj.contract and obj.contract.project_id != forecast.project_id:
++            raise ValidationError(
++                "Obligation commercial context belongs to another project."
++            )
++        project_id, version = obj.project_id, obj.source_version
++        if obj.source_reversal_evidence is not None:
++            raise ValidationError("An unreversed, source-owned obligation is required.")
++        approved_at = obj.created_at
++        currency = obj.currency
++        line = obj.source_line_key or str(obj.pk)
++        evidence = {
++            "source_kind": obj.source_kind,
++            "source_uuid": str(obj.source_uuid),
++            "source_hash": obj.source_hash,
++            "source_status": obj.source_status,
++            "original_amount": str(obj.original_amount),
++            "due_date": str(obj.due_date or ""),
++            "contract_id": str(obj.contract_id or ""),
++            "journal_id": str(obj.recognition_journal_id or ""),
++        }
++    if project_id != forecast.project_id or currency != forecast.currency:
++        raise ValidationError(
++            "Cash evidence must share project and currency; no inferred allocation or FX."
++        )
++    if family != "forecast" and approved_at is None:
++        raise ValidationError("Source approval history is missing.")
++    return {
++        "family": family,
++        "id": str(obj.pk),
++        "version": str(version),
++        "line": line,
++        "project_id": str(project_id),
++        "currency": currency,
++        "economic_event_id": event,
++        "recorded_at": obj.created_at.isoformat(),
++        "approved_at": approved_at.isoformat() if approved_at else None,
++        "status": getattr(obj, "status", "accepted_source"),
++        "evidence": evidence,
++        "hash": digest(evidence),
++    }
++
++
++def _rows(*, rows: list, forecast: ProjectCostForecast, actor, predecessor) -> list:
++    if not isinstance(rows, list) or not rows:
++        raise ValidationError("Explicit cash allocation rows are required.")
++    result, identities, sources_by_event = [], set(), {}
++    previous = (
++        {r["key"]: r for r in predecessor.manifest["rows"]} if predecessor else {}
++    )
++    for supplied in rows:
++        if not isinstance(supplied, dict):
++            raise ValidationError("Invalid cash allocation row.")
++        key, event = (
++            _text(supplied.get("key")),
++            _text(supplied.get("economic_event_id")),
++        )
++        direction = supplied.get("direction")
++        if direction not in DIRECTIONS or key in identities:
++            raise ValidationError(
++                "Cash directions and allocation identities must be unambiguous."
++            )
++        identities.add(key)
++        amount = _amount(supplied.get("cash_amount"))
++        if not amount:
++            raise ValidationError("Cash allocation amounts must be positive.")
++        source = _source(
++            reference=supplied.get("source", {}), forecast=forecast, actor=actor
++        )
++        if supplied.get("currency", source["currency"]) != source["currency"]:
++            raise ValidationError(
++                "Cash row currency conflicts with its authoritative source."
++            )
++        if source["economic_event_id"] and event != source["economic_event_id"]:
++            raise ValidationError(
++                "Commitment economic-event identity cannot be replaced."
++            )
++        group = f"{source['family']}:{source['id']}"
++        if event in sources_by_event and sources_by_event[event] != group:
++            raise ValidationError(
++                "Overlapping source representations require one selected cash source per event."
++            )
++        sources_by_event[event] = group
++        state = supplied.get("state", "allocated")
++        if state not in {"allocated", "unallocated", "cancelled"}:
++            raise ValidationError("Unknown cash allocation state.")
++        expected = supplied.get("expected_cash_on")
++        reason = supplied.get("exception_reason", "")
++        if state == "allocated":
++            expected = _date(expected).isoformat()
++        elif state == "unallocated":
++            if expected is not None:
++                raise ValidationError("Unallocated cash must not invent timing.")
++            reason = _text(reason)
++        else:
++            prior = previous.get(key)
++            if (
++                not prior
++                or prior["economic_event_id"] != event
++                or prior["direction"] != direction
++                or _amount(prior["cash_amount"]) != amount
++            ):
++                raise ValidationError(
++                    "Cancellation requires exact retained predecessor allocation evidence."
++                )
++            expected, reason = None, _text(reason)
++        row = {
++            "key": key,
++            "economic_event_id": event,
++            "direction": direction,
++            "cash_amount": str(amount),
++            "currency": source["currency"],
++            "source_group": group,
++            "source": source,
++            "state": state,
++            "expected_cash_on": expected,
++            "cash_basis": _text(supplied.get("cash_basis")),
++            "timing_basis": _text(supplied.get("timing_basis")),
++            "cost_cash_difference_evidence": _text(
++                supplied.get("cost_cash_difference_evidence")
++            ),
++            "exception_reason": reason,
++            "references": [],
++        }
++        for reference in supplied.get("references", []):
++            row["references"].append(
++                _source(reference=reference, forecast=forecast, actor=actor)
++            )
++        if supplied.get("schedule_item_id"):
++            _access(
++                forecast.organization, forecast.project, actor, P.PROJECT_SCHEDULES_VIEW
++            )
++            try:
++                item = ProjectScheduleItem.objects.select_related("schedule").get(
++                    pk=supplied["schedule_item_id"],
++                    organization=forecast.organization,
++                    project=forecast.project,
++                )
++            except (
++                ProjectScheduleItem.DoesNotExist,
++                ValueError,
++                ValidationError,
++            ) as exc:
++                raise ValidationError(
++                    "Schedule reference is unavailable in this project."
++                ) from exc
++            validate_related_organizations(
++                item, schedule=item.schedule, wbs=item.wbs_node
++            )
++            if item.schedule.project_id != forecast.project_id or (
++                item.wbs_node and item.wbs_node.project_id != forecast.project_id
++            ):
++                raise ValidationError(
++                    "The schedule revision belongs to another project."
++                )
++            row["schedule"] = {
++                "id": str(item.pk),
++                "revision_id": str(item.schedule_id),
++                "hash": item.schedule.payload_hash,
++                "version": item.schedule.version_number,
++                "state": item.schedule.status,
++                "planned_start": str(item.planned_start),
++                "planned_finish": str(item.planned_finish),
++                "item_hash": digest(
++                    {
++                        "id": str(item.pk),
++                        "code": item.code,
++                        "wbs_id": str(item.wbs_node_id or ""),
++                        "planned_start": str(item.planned_start),
++                        "planned_finish": str(item.planned_finish),
++                        "source_reference": item.source_reference,
++                    }
++                ),
++            }
++        result.append(row)
++    return result
++
++
++def _controls(rows: list, supplied: list) -> list:
++    totals = defaultdict(lambda: {"cash_amount": Decimal(0), "row_count": 0})
++    for row in rows:
++        key = (row["source_group"], row["direction"], row["currency"])
++        totals[key]  # Even cancellation-only groups require explicit zero controls.
++        if row["state"] == "cancelled":
++            continue
++        totals[key]["cash_amount"] = _add_exact(
++            totals[key]["cash_amount"], _amount(row["cash_amount"])
++        )
++        totals[key]["row_count"] += 1
++    controls = {}
++    for control in supplied:
++        key = (
++            _text(control.get("source_group")),
++            control.get("direction"),
++            control.get("currency"),
++        )
++        if key in controls or key[1] not in DIRECTIONS:
++            raise ValidationError("Invalid or duplicate source control.")
++        controls[key] = {
++            "cash_amount": _amount(control.get("cash_amount")),
++            "row_count": control.get("row_count"),
++        }
++        if type(control.get("row_count")) is not int or control["row_count"] < 0:
++            raise ValidationError("Explicit source control row counts are required.")
++    if dict(totals) != controls:
++        raise ValidationError(
++            "Dated allocations plus explicit exceptions must reconcile exactly to approved source controls."
++        )
++    return [
++        {
++            "source_group": k[0],
++            "direction": k[1],
++            "currency": k[2],
++            "cash_amount": str(v["cash_amount"]),
++            "row_count": v["row_count"],
++        }
++        for k, v in sorted(controls.items())
++    ]
++
++
++@transaction.atomic
++def prepare_cashflow_supplement(
++    *,
++    forecast: ProjectCostForecast,
++    actor: User,
++    rows: list[dict],
++    controls: list[dict],
++) -> ProjectCashflowSupplement:
++    project = Project.objects.select_for_update().get(pk=forecast.project_id)
++    forecast = (
++        ProjectCostForecast.objects.select_for_update(of=("self",))
++        .select_related("review", "organization", "budget")
++        .get(pk=forecast.pk)
++    )
++    _access(forecast.organization, project, actor, P.PROJECT_FORECASTS_PREPARE)
++    if forecast.review.status != "draft" or forecast.created_by_id != actor.pk:
++        raise PermissionDenied(
++            "Only the forecast preparer may attach cash evidence before submission."
++        )
++    predecessor = None
++    prior_review = forecast.review.predecessor
++    while prior_review is not None and predecessor is None:
++        predecessor = ProjectCashflowSupplement.objects.filter(
++            forecast_id=prior_review.forecast_id
++        ).first()
++        prior_review = prior_review.predecessor
++    resolved = _rows(rows=rows, forecast=forecast, actor=actor, predecessor=predecessor)
++    normalized_controls = _controls(resolved, controls)
++    manifest = {
++        "policy_version": POLICY,
++        "forecast_id": str(forecast.pk),
++        "forecast_version": forecast.version_number,
++        "budget_id": str(forecast.budget_id),
++        "budget_version": forecast.budget.version_number,
++        "budget_hash": forecast.budget.payload_hash,
++        "currency": forecast.currency,
++        "cost_source_coverage_complete": forecast.coverage_complete,
++        "rows": resolved,
++        "controls": normalized_controls,
++    }
++    existing = ProjectCashflowSupplement.objects.filter(forecast=forecast).first()
++    if existing:
++        if existing.payload_hash != digest(manifest):
++            raise ValidationError(
++                "Changed cash evidence requires a new forecast version."
++            )
++        return existing
++    return ProjectCashflowSupplement.objects.create(
++        organization=forecast.organization,
++        project=project,
++        forecast=forecast,
++        predecessor=predecessor,
++        created_by=actor,
++        manifest=manifest,
++        payload_hash=digest(manifest),
++    )
++
++
++def validate_cashflow_review(*, forecast: ProjectCostForecast, actor: User) -> None:
++    """Called inside existing submission/decision transactions; never grants approval."""
++    supplement = ProjectCashflowSupplement.objects.filter(forecast=forecast).first()
++    if supplement is None:
++        return  # Legacy cost-only forecast behavior remains intact.
++    if (
++        digest(supplement.manifest) != supplement.payload_hash
++        or supplement.policy_version != POLICY
++    ):
++        raise ValidationError("Cash supplement evidence integrity failed.")
++    for row in supplement.manifest["rows"]:
++        for source in [row["source"], *row["references"]]:
++            current = _source(reference=source, forecast=forecast, actor=actor)
++            if current != source:
++                raise ValidationError(
++                    "Cash source changed during review; create a new forecast version."
++                )
++
++
++def _approval(supplement, as_of: datetime, *, baseline: bool) -> dict:
++    if supplement.created_at > as_of or supplement.forecast.created_at > as_of:
++        raise ValidationError("Cash evidence did not exist at the knowledge cutoff.")
++    transitions = list(
++        ProjectForecastTransition.objects.filter(
++            review__forecast=supplement.forecast, created_at__lte=as_of
++        ).order_by("sequence")
++    )
++    approved = next(
++        (t for t in reversed(transitions) if t.new_status == "approved"), None
++    )
++    if approved is None or (not baseline and transitions[-1].new_status != "approved"):
++        raise ValidationError(
++            "Select approved baseline and current approved forecast evidence as of the cutoff."
++        )
++    for row in supplement.manifest["rows"]:
++        for source in [row["source"], *row["references"]]:
++            for timestamp in (source["recorded_at"], source["approved_at"]):
++                if timestamp and datetime.fromisoformat(timestamp) > as_of:
++                    raise ValidationError(
++                        "Source evidence postdates the knowledge cutoff."
++                    )
++    return {
++        "transition_id": str(approved.pk),
++        "actor_id": str(approved.actor_id),
++        "approved_at": approved.created_at.isoformat(),
++        "status_history": [
++            {
++                "id": str(t.pk),
++                "sequence": t.sequence,
++                "status": t.new_status,
++                "at": t.created_at.isoformat(),
++            }
++            for t in transitions
++        ],
++    }
++
++
++def _require_sources(supplement, actor) -> None:
++    permissions = {
++        "budget_allocation": P.BUDGETS_VIEW,
++        "forecast": P.PROJECT_COSTS_VIEW,
++        "commitment": P.PROJECT_COSTS_VIEW,
++        "contract_terms": P.CONTRACTS_VIEW,
++        "billing_claim": P.CLAIMS_VIEW,
++        "billing_certificate": P.PAYABLE_CERTIFICATES_VIEW,
++        "obligation": P.SUBLEDGERS_VIEW,
++    }
++    for row in supplement.manifest["rows"]:
++        for source in [row["source"], *row["references"]]:
++            _access(
++                supplement.organization,
++                supplement.project,
++                actor,
++                permissions[source["family"]],
++            )
++        if "schedule" in row:
++            _access(
++                supplement.organization,
++                supplement.project,
++                actor,
++                P.PROJECT_SCHEDULES_VIEW,
++            )
++
++
++def _next_month(day: date) -> date:
++    return date(day.year + (day.month == 12), day.month % 12 + 1, 1)
++
++
++def render_manifest(manifest: dict) -> dict:
++    """Deterministic rebuild using retained evidence only; no current-source reads."""
++    start, end = _date(manifest["horizon_start"]), _date(manifest["horizon_end"])
++    buckets = {}
++    cursor = start
++    while cursor < end:
++        buckets[cursor.isoformat()] = {
++            name: {direction: Decimal(0) for direction in sorted(DIRECTIONS)}
++            for name in ("baseline", "forecast", "actual")
++        }
++        cursor = _next_month(cursor)
++    exceptions = []
++    outside = {
++        name: {d: Decimal(0) for d in sorted(DIRECTIONS)}
++        for name in ("baseline", "forecast", "actual")
++    }
++    controls = {}
++    for name in ("baseline", "forecast", "actual"):
++        layer = manifest[name]
++        controls[name] = layer["controls"]
++        for row in layer["rows"]:
++            if row["state"] == "cancelled":
++                continue
++            if row["state"] != "allocated":
++                exceptions.append(
++                    {
++                        "layer": name,
++                        "key": row["key"],
++                        "amount": row["cash_amount"],
++                        "reason": row["exception_reason"],
++                    }
++                )
++                continue
++            event_date = _date(row["expected_cash_on"])
++            amount = _amount(row["cash_amount"])
++            if row.get("sign", 1) == -1:
++                amount = amount.copy_negate()
++            direction = row["direction"]
++            if not start <= event_date < end:
++                outside[name][direction] = _add_exact(outside[name][direction], amount)
++            else:
++                target = buckets[event_date.replace(day=1).isoformat()][name]
++                target[direction] = _add_exact(target[direction], amount)
++
++    def strings(value):
++        if isinstance(value, Decimal):
++            return str(value)
++        if isinstance(value, dict):
++            return {k: strings(v) for k, v in value.items()}
++        return value
++
++    return {
++        "buckets": strings(buckets),
++        "out_of_horizon": strings(outside),
++        "exceptions": exceptions,
++        "complete": not exceptions,
++        "coverage": {
++            "cash_controls_reconciled": True,
++            "cash_timing_complete": not exceptions,
++            "cost_source_coverage_complete": {
++                name: manifest[name]["cost_source_coverage_complete"]
++                for name in ("baseline", "forecast")
++            },
++            "actual_scope": "Posted native Treasury movements explicitly assigned to this project at the retained cutoff",
++        },
++        "controls": controls,
++        "policy_version": manifest["policy_version"],
++    }
++
++
++@transaction.atomic
++def capture_cashflow_comparison(
++    *,
++    organization: Organization,
++    project: Project,
++    actor: User,
++    baseline_id: UUID | str,
++    forecast_id: UUID | str,
++    knowledge_as_of: datetime,
++    horizon_start: date,
++    horizon_end: date,
++    idempotency_key: str,
++) -> ProjectCashflowSnapshot:
++    organization = Organization.objects.select_for_update().get(pk=organization.pk)
++    project = Project.objects.select_for_update().get(pk=project.pk)
++    _access(organization, project, actor)
++    _access(organization, project, actor, P.TREASURY_VIEW)
++    captured_at = timezone.now()
++    if (
++        not isinstance(knowledge_as_of, datetime)
++        or timezone.is_naive(knowledge_as_of)
++        or knowledge_as_of > captured_at
++    ):
++        raise ValidationError(
++            "An aware knowledge cutoff no later than capture time is required."
++        )
++    if (
++        type(horizon_start) is not date
++        or type(horizon_end) is not date
++        or horizon_start.day != 1
++        or horizon_end.day != 1
++        or horizon_end <= horizon_start
++    ):
++        raise ValidationError(
++            "An explicit non-empty, month-aligned horizon is required."
++        )
++    idempotency_key = _text(idempotency_key)
++    supplements = []
++    for pk in (baseline_id, forecast_id):
++        try:
++            s = ProjectCashflowSupplement.objects.select_related(
++                "forecast", "organization", "project"
++            ).get(pk=pk, organization=organization, project=project)
++        except (
++            ProjectCashflowSupplement.DoesNotExist,
++            ValidationError,
++            ValueError,
++        ) as exc:
++            raise ValidationError(
++                "Cash supplement is unavailable in this project."
++            ) from exc
++        _require_sources(s, actor)
++        supplements.append(s)
++    existing = ProjectCashflowSnapshot.objects.filter(
++        organization=organization, project=project, idempotency_key=idempotency_key
++    ).first()
++    if existing:
++        if (
++            existing.baseline_id,
++            existing.forecast_id,
++            existing.knowledge_as_of,
++            existing.horizon_start,
++            existing.horizon_end,
++        ) != (
++            supplements[0].pk,
++            supplements[1].pk,
++            knowledge_as_of,
++            horizon_start,
++            horizon_end,
++        ):
++            raise ValidationError("Cash comparison retry identity conflicts.")
++        rebuild_cashflow_snapshot(snapshot=existing, actor=actor)
++        return existing
++    settings = get_organization_settings(organization=organization)
++    if settings.updated_at > knowledge_as_of:
++        raise ValidationError(
++            "Tenant timezone/currency history is unavailable at this cutoff."
++        )
++    try:
++        tenant_zone = ZoneInfo(settings.timezone)
++    except (ZoneInfoNotFoundError, ValueError) as exc:
++        raise ValidationError("Authoritative tenant timezone is required.") from exc
++    manifest = {
++        "policy_version": POLICY,
++        "knowledge_as_of": knowledge_as_of.isoformat(),
++        "captured_at": captured_at.isoformat(),
++        "timezone": settings.timezone,
++        "settings_id": str(settings.pk),
++        "settings_recorded_at": settings.updated_at.isoformat(),
++        "horizon_start": horizon_start.isoformat(),
++        "horizon_end": horizon_end.isoformat(),
++        "organization_id": str(organization.pk),
++        "project_id": str(project.pk),
++    }
++    for name, s in zip(("baseline", "forecast"), supplements, strict=True):
++        if (
++            s.policy_version != POLICY
++            or digest(s.manifest) != s.payload_hash
++            or s.manifest["currency"] != settings.currency
++        ):
++            raise ValidationError(
++                "Cash source policy, currency or manifest integrity failed."
++            )
++        if name == "forecast":
++            validate_cashflow_review(forecast=s.forecast, actor=actor)
++        approval = _approval(s, knowledge_as_of, baseline=name == "baseline")
++        manifest[name] = {
++            **s.manifest,
++            "supplement_id": str(s.pk),
++            "payload_hash": s.payload_hash,
++            "recorded_at": s.created_at.isoformat(),
++            "approval": approval,
++            "rows": [
++                {
++                    **row,
++                    "approval_actor_id": approval["actor_id"],
++                    "approved_at": approval["approved_at"],
++                }
++                for row in s.manifest["rows"]
++            ],
++        }
++    movements = (
++        TreasuryMovement.objects.filter(
++            organization=organization,
++            project=project,
++            status="posted",
++            posted_at__lte=knowledge_as_of,
++            created_at__lte=knowledge_as_of,
++            movement_date__lte=knowledge_as_of.astimezone(tenant_zone).date(),
++        )
++        .select_related("reverses")
++        .order_by("pk")
++    )
++    cash_rows = []
++    for movement in movements:
++        if movement.kind == "transfer":
++            continue  # Internal account transfers are not project receipts/payments.
++        original = movement.reverses if movement.kind == "reversal" else movement
++        if original is not None and original.kind == "transfer":
++            continue
++        if original is None or original.kind not in {"receipt", "disbursement"}:
++            raise ValidationError(
++                "Treasury cash direction/reversal lineage is unavailable."
++            )
++        if (
++            movement.currency != settings.currency
++            or not movement.journal_id
++            or original.organization_id != organization.pk
++            or original.project_id != project.pk
++        ):
++            raise ValidationError(
++                "Treasury evidence does not match this scoped cash comparison."
++            )
++        cash_rows.append(
++            {
++                "key": str(movement.pk),
++                "state": "allocated",
++                "expected_cash_on": movement.movement_date.isoformat(),
++                "cash_amount": str(movement.amount),
++                "direction": original.kind.upper(),
++                "sign": -1 if movement.kind == "reversal" else 1,
++                "version": movement.version,
++                "hash": movement.payload_hash,
++                "journal_id": str(movement.journal_id),
++                "posted_at": movement.posted_at.isoformat(),
++                "reverses_id": str(movement.reverses_id or ""),
++                "currency": movement.currency,
++            }
++        )
++    manifest["actual"] = {
++        "rows": cash_rows,
++        "controls": {
++            "row_count": len(cash_rows),
++            "source": "treasury.TreasuryMovement",
++            "currency": settings.currency,
++            "totals": {
++                d: str(
++                    _sum_exact(
++                        (
++                            _amount(r["cash_amount"]).copy_negate()
++                            if r["sign"] == -1
++                            else _amount(r["cash_amount"])
++                            for r in cash_rows
++                            if r["direction"] == d
++                        ),
++                    )
++                )
++                for d in sorted(DIRECTIONS)
++            },
++        },
++    }
++    result = render_manifest(manifest)
++    return ProjectCashflowSnapshot.objects.create(
++        organization=organization,
++        project=project,
++        created_by=actor,
++        baseline=supplements[0],
++        forecast=supplements[1],
++        knowledge_as_of=knowledge_as_of,
++        horizon_start=horizon_start,
++        horizon_end=horizon_end,
++        timezone_name=settings.timezone,
++        idempotency_key=idempotency_key,
++        manifest=manifest,
++        result=result,
++        payload_hash=digest({"manifest": manifest, "result": result}),
++    )
++
++
++def rebuild_cashflow_snapshot(
++    *, snapshot: ProjectCashflowSnapshot, actor: User
++) -> dict:
++    snapshot = ProjectCashflowSnapshot.objects.select_related(
++        "organization", "project", "baseline", "forecast"
++    ).get(pk=snapshot.pk)
++    _access(snapshot.organization, snapshot.project, actor)
++    _access(snapshot.organization, snapshot.project, actor, P.TREASURY_VIEW)
++    _require_sources(snapshot.baseline, actor)
++    _require_sources(snapshot.forecast, actor)
++    if snapshot.policy_version != POLICY or snapshot.payload_hash != digest(
++        {"manifest": snapshot.manifest, "result": snapshot.result}
++    ):
++        raise ValidationError(
++            "Retained cash comparison evidence is missing or corrupt."
++        )
++    rebuilt = render_manifest(snapshot.manifest)
++    if rebuilt != snapshot.result:
++        raise ValidationError("Retained cash comparison cannot be reproduced.")
++    return rebuilt
+diff --git a/apps/projects/cashflow_models.py b/apps/projects/cashflow_models.py
+new file mode 100644
+index 0000000..045eb98
+--- /dev/null
++++ b/apps/projects/cashflow_models.py
+@@ -0,0 +1,102 @@
++"""Immutable planning supplements and retained comparisons under CEP065-CASHFLOW-v1."""
++
++from typing import ClassVar
++
++from django.conf import settings
++from django.core.exceptions import ValidationError
++from django.db import models
++
++from core.models import TimeStampedModel, UUIDModel
++from core.tenant_validation import validate_related_organizations
++
++
++class CashflowEvidence(UUIDModel, TimeStampedModel):
++    organization = models.ForeignKey(
++        "organizations.Organization", on_delete=models.PROTECT
++    )
++    project = models.ForeignKey("projects.Project", on_delete=models.PROTECT)
++    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
++    policy_version = models.CharField(max_length=40, default="CEP065-CASHFLOW-v1")
++    payload_hash = models.CharField(max_length=64)
++
++    class Meta:
++        abstract = True
++
++    def save(self, *args: object, **kwargs: object) -> None:
++        if not self._state.adding:
++            raise ValidationError(
++                "Cash-flow evidence is immutable; create a successor."
++            )
++        validate_related_organizations(self, project=self.project)
++        self.full_clean()
++        super().save(*args, **kwargs)
++
++    def delete(self, *args: object, **kwargs: object) -> None:
++        raise ValidationError("Cash-flow evidence cannot be deleted.")
++
++
++class ProjectCashflowSupplement(CashflowEvidence):
++    forecast = models.OneToOneField(
++        "projects.ProjectCostForecast",
++        on_delete=models.PROTECT,
++        related_name="cashflow_supplement",
++    )
++    predecessor = models.ForeignKey(
++        "self", null=True, blank=True, on_delete=models.PROTECT
++    )
++    manifest = models.JSONField()
++
++    def clean(self) -> None:
++        validate_related_organizations(
++            self, forecast=self.forecast, predecessor=self.predecessor
++        )
++        if self.forecast.project_id != self.project_id:
++            raise ValidationError("Cash supplement and forecast must share a project.")
++        if self.predecessor and (
++            self.predecessor.project_id != self.project_id
++            or self.predecessor.forecast.version_number >= self.forecast.version_number
++        ):
++            raise ValidationError(
++                "A predecessor must be an older same-project supplement."
++            )
++
++
++class ProjectCashflowSnapshot(CashflowEvidence):
++    baseline = models.ForeignKey(
++        ProjectCashflowSupplement,
++        on_delete=models.PROTECT,
++        related_name="baseline_snapshots",
++    )
++    forecast = models.ForeignKey(
++        ProjectCashflowSupplement,
++        on_delete=models.PROTECT,
++        related_name="forecast_snapshots",
++    )
++    knowledge_as_of = models.DateTimeField()
++    horizon_start = models.DateField()
++    horizon_end = models.DateField()
++    timezone_name = models.CharField(max_length=64)
++    idempotency_key = models.CharField(max_length=120)
++    manifest = models.JSONField()
++    result = models.JSONField()
++
++    class Meta:
++        constraints: ClassVar[list] = [
++            models.UniqueConstraint(
++                fields=["organization", "project", "idempotency_key"],
++                name="cashflow_snapshot_retry_uq",
++            ),
++            models.CheckConstraint(
++                condition=models.Q(horizon_end__gt=models.F("horizon_start")),
++                name="cashflow_horizon_order_ck",
++            ),
++        ]
++
++    def clean(self) -> None:
++        validate_related_organizations(
++            self, baseline=self.baseline, forecast=self.forecast
++        )
++        if any(s.project_id != self.project_id for s in (self.baseline, self.forecast)):
++            raise ValidationError("Comparison sources must share one project.")
++        if self.horizon_start.day != 1 or self.horizon_end.day != 1:
++            raise ValidationError("Cash-flow horizons must start on month boundaries.")
+diff --git a/apps/projects/forecast_governance.py b/apps/projects/forecast_governance.py
+index ec85033..f42189e 100644
+--- a/apps/projects/forecast_governance.py
++++ b/apps/projects/forecast_governance.py
+@@ -144,0 +145,3 @@ def submit_project_cost_forecast(
++    from .cashflow import validate_cashflow_review
++
++    validate_cashflow_review(forecast=locked, actor=actor)
+@@ -203,0 +207,4 @@ def decide_project_cost_forecast(
++    from .cashflow import validate_cashflow_review
++
++    if approved:
++        validate_cashflow_review(forecast=locked, actor=actor)
+diff --git a/apps/projects/migrations/0011_cep065_cashflow_evidence.py b/apps/projects/migrations/0011_cep065_cashflow_evidence.py
+new file mode 100644
+index 0000000..691b9a7
+--- /dev/null
++++ b/apps/projects/migrations/0011_cep065_cashflow_evidence.py
+@@ -0,0 +1,100 @@
++# Generated by Django 5.2.17 on 2026-10-20 12:26
++
++import django.db.models.deletion
++import uuid
++from django.conf import settings
++from django.db import migrations, models
++
++
++GUARDS = r"""
++CREATE FUNCTION projects_cashflow_immutable() RETURNS trigger AS $$
++BEGIN
++    RAISE EXCEPTION 'cash-flow evidence is immutable';
++END;
++$$ LANGUAGE plpgsql;
++CREATE TRIGGER cashflow_supplement_immutable BEFORE UPDATE OR DELETE
++ON projects_projectcashflowsupplement FOR EACH ROW EXECUTE FUNCTION projects_cashflow_immutable();
++CREATE TRIGGER cashflow_snapshot_immutable BEFORE UPDATE OR DELETE
++ON projects_projectcashflowsnapshot FOR EACH ROW EXECUTE FUNCTION projects_cashflow_immutable();
++CREATE FUNCTION projects_cashflow_insert() RETURNS trigger AS $$
++DECLARE state text; tenant uuid; project uuid; preparer uuid;
++BEGIN
++    SELECT r.status, f.organization_id, f.project_id, f.created_by_id
++    INTO state, tenant, project, preparer
++    FROM projects_projectforecastreview r
++    JOIN projects_projectcostforecast f ON f.id = r.forecast_id
++    WHERE r.forecast_id = NEW.forecast_id FOR UPDATE OF r;
++    IF state IS DISTINCT FROM 'draft' OR tenant IS DISTINCT FROM NEW.organization_id
++       OR project IS DISTINCT FROM NEW.project_id OR preparer IS DISTINCT FROM NEW.created_by_id THEN
++        RAISE EXCEPTION 'cash supplement requires the same tenant/project/preparer and a draft forecast';
++    END IF;
++    RETURN NEW;
++END;
++$$ LANGUAGE plpgsql;
++CREATE TRIGGER cashflow_supplement_insert BEFORE INSERT ON projects_projectcashflowsupplement
++FOR EACH ROW EXECUTE FUNCTION projects_cashflow_insert();
++"""
++REVERSE_GUARDS = r"""
++DROP TRIGGER cashflow_supplement_insert ON projects_projectcashflowsupplement;
++DROP FUNCTION projects_cashflow_insert();
++DROP TRIGGER cashflow_snapshot_immutable ON projects_projectcashflowsnapshot;
++DROP TRIGGER cashflow_supplement_immutable ON projects_projectcashflowsupplement;
++DROP FUNCTION projects_cashflow_immutable();
++"""
++
++
++class Migration(migrations.Migration):
++
++    dependencies = [
++        ('organizations', '0122_cep023_leave_permissions'),
++        ('projects', '0010_projectforecastreview_projectforecasttransition_and_more'),
++        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
++    ]
++
++    operations = [
++        migrations.CreateModel(
++            name='ProjectCashflowSupplement',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='زمان آخرین به\u200cروزرسانی')),
++                ('policy_version', models.CharField(default='CEP065-CASHFLOW-v1', max_length=40)),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('manifest', models.JSONField()),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('forecast', models.OneToOneField(on_delete=django.db.models.deletion.PROTECT, related_name='cashflow_supplement', to='projects.projectcostforecast')),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('predecessor', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, to='projects.projectcashflowsupplement')),
++                ('project', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='projects.project')),
++            ],
++            options={
++                'abstract': False,
++            },
++        ),
++        migrations.CreateModel(
++            name='ProjectCashflowSnapshot',
++            fields=[
++                ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False, verbose_name='شناسه')),
++                ('created_at', models.DateTimeField(auto_now_add=True, verbose_name='زمان ایجاد')),
++                ('updated_at', models.DateTimeField(auto_now=True, verbose_name='زمان آخرین به\u200cروزرسانی')),
++                ('policy_version', models.CharField(default='CEP065-CASHFLOW-v1', max_length=40)),
++                ('payload_hash', models.CharField(max_length=64)),
++                ('knowledge_as_of', models.DateTimeField()),
++                ('horizon_start', models.DateField()),
++                ('horizon_end', models.DateField()),
++                ('timezone_name', models.CharField(max_length=64)),
++                ('idempotency_key', models.CharField(max_length=120)),
++                ('manifest', models.JSONField()),
++                ('result', models.JSONField()),
++                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
++                ('organization', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='organizations.organization')),
++                ('project', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='projects.project')),
++                ('baseline', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='baseline_snapshots', to='projects.projectcashflowsupplement')),
++                ('forecast', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='forecast_snapshots', to='projects.projectcashflowsupplement')),
++            ],
++            options={
++                'constraints': [models.UniqueConstraint(fields=('organization', 'project', 'idempotency_key'), name='cashflow_snapshot_retry_uq'), models.CheckConstraint(condition=models.Q(('horizon_end__gt', models.F('horizon_start'))), name='cashflow_horizon_order_ck')],
++            },
++        ),
++        migrations.RunSQL(GUARDS, REVERSE_GUARDS),
++    ]
+diff --git a/apps/projects/models.py b/apps/projects/models.py
+index 39720ac..33fd0f9 100644
+--- a/apps/projects/models.py
++++ b/apps/projects/models.py
+@@ -11,0 +12,5 @@ from core.tenant_validation import validate_related_organizations
++from .cashflow_models import (  # noqa: F401
++    ProjectCashflowSnapshot,
++    ProjectCashflowSupplement,
++)
++
+diff --git a/apps/projects/test_cep065_cashflow.py b/apps/projects/test_cep065_cashflow.py
+new file mode 100644
+index 0000000..9ec3179
+--- /dev/null
++++ b/apps/projects/test_cep065_cashflow.py
+@@ -0,0 +1,829 @@
++"""Approved cash timing, lifecycle, scope, cutoff and reproducible-history proofs."""
++
++from copy import deepcopy
++from datetime import date, timedelta
++from decimal import Decimal
++from unittest.mock import patch
++from uuid import uuid4
++
++from django.core.exceptions import PermissionDenied, ValidationError
++from django.db import DatabaseError, transaction
++from django.test import TestCase
++from django.utils import timezone
++
++from apps.projects import test_cep020_forecast_budget_control as fixtures
++from apps.projects.cashflow import (
++    capture_cashflow_comparison,
++    digest,
++    prepare_cashflow_supplement,
++    rebuild_cashflow_snapshot,
++    render_manifest,
++)
++from apps.projects.cashflow_models import (
++    ProjectCashflowSnapshot,
++    ProjectCashflowSupplement,
++)
++from apps.projects.forecast_governance import (
++    forecast_submission_key,
++    submit_project_cost_forecast,
++)
++from apps.projects.models import BudgetAllocation, ProjectForecastTransition
++from apps.workflows.runtime import claim_work_item, complete_work_item
++
++
++class CashflowTests(TestCase):
++    setUp = fixtures.ForecastGovernanceTests.setUp
++    _draft = fixtures.ForecastGovernanceTests._draft
++    _classify_and_submit = fixtures.ForecastGovernanceTests._classify_and_submit
++    _forecast = fixtures.ForecastGovernanceTests._forecast
++    _workflow = fixtures.ForecastGovernanceTests._workflow
++
++    def row(self, *, key="work-1", amount="100.000001", when="2026-10-01", **extra):
++        source = BudgetAllocation.objects.get(
++            manifest_line__manifest__budget=self.budget, sequence=1
++        )
++        return {
++            "key": key,
++            "economic_event_id": "work-1",
++            "direction": "DISBURSEMENT",
++            "source": {"family": "budget_allocation", "id": str(source.pk)},
++            "cash_amount": amount,
++            "expected_cash_on": when,
++            "cash_basis": "Explicit approved cash planning amount; not estimated cost",
++            "timing_basis": "Approved payment planning assumption CF-1/v1",
++            "cost_cash_difference_evidence": "CF-1/v1 separately states cost/cash differences",
++            **extra,
++        }
++
++    def supplement(self, forecast, rows=None):
++        rows = [self.row()] if rows is None else rows
++        controls = {}
++        for row in rows:
++            key = (
++                row["source"]["family"] + ":" + row["source"]["id"],
++                row["direction"],
++            )
++            controls.setdefault(key, {"cash_amount": Decimal(0), "row_count": 0})
++            if row.get("state") == "cancelled":
++                continue
++            controls[key]["cash_amount"] += Decimal(row["cash_amount"])
++            controls[key]["row_count"] += 1
++        return prepare_cashflow_supplement(
++            forecast=forecast,
++            actor=self.preparer,
++            rows=rows,
++            controls=[
++                {
++                    "source_group": k[0],
++                    "direction": k[1],
++                    "currency": "IRR",
++                    "cash_amount": str(v["cash_amount"]),
++                    "row_count": v["row_count"],
++                }
++                for k, v in controls.items()
++            ],
++        )
++
++    def approve(self, forecast):
++        instance = submit_project_cost_forecast(
++            forecast=forecast,
++            actor=self.preparer,
++            workflow_version=self.workflow,
++            reason="Cash amounts, source controls and explicit dates reviewed",
++            idempotency_key=forecast_submission_key(forecast),
++        )
++        item = instance.work_items.get()
++        claim_work_item(
++            actor=self.approver,
++            organization=self.organization,
++            work_item_id=item.pk,
++            idempotency_key=f"claim-{forecast.pk}",
++        )
++        complete_work_item(
++            actor=self.approver,
++            organization=self.organization,
++            work_item_id=item.pk,
++            outcome="approved",
++            idempotency_key=f"approve-{forecast.pk}",
++            command_context={"reason": "Independent cash supplement acceptance"},
++        )
++
++    def ready(self, rows=None):
++        self.workflow = self._workflow()
++        f = self._forecast()
++        s = self.supplement(f, rows)
++        self.approve(f)
++        return f, s
++
++    def capture(self, baseline, forecast=None, **extra):
++        return capture_cashflow_comparison(
++            organization=self.organization,
++            project=self.project,
++            actor=self.approver,
++            baseline_id=baseline.pk,
++            forecast_id=(forecast or baseline).pk,
++            knowledge_as_of=extra.pop("knowledge_as_of", timezone.now()),
++            horizon_start=extra.pop("horizon_start", date(2026, 10, 1)),
++            horizon_end=extra.pop("horizon_end", date(2026, 12, 1)),
++            idempotency_key=extra.pop("idempotency_key", str(uuid4())),
++            **extra,
++        )
++
++    def test_reviewed_monthly_comparison_retains_exact_cash_and_source_approval(self):
++        f, s = self.ready()
++        before = (
++            self.project.estimated_budget,
++            self.project.actual_budget,
++            self.budget.payload_hash,
++        )
++        snapshot = self.capture(s)
++        self.assertEqual(
++            snapshot.result["buckets"]["2026-10-01"]["forecast"]["DISBURSEMENT"],
++            "100.000001",
++        )
++        self.assertTrue(snapshot.result["complete"])
++        self.assertEqual(
++            snapshot.manifest["forecast"]["approval"]["actor_id"], str(self.approver.pk)
++        )
++        self.assertEqual(
++            snapshot.manifest["forecast"]["rows"][0]["source"]["version"],
++            str(self.budget.version_number),
++        )
++        self.assertEqual(
++            rebuild_cashflow_snapshot(snapshot=snapshot, actor=self.approver),
++            snapshot.result,
++        )
++        self.project.refresh_from_db()
++        self.budget.refresh_from_db()
++        self.assertEqual(
++            before,
++            (
++                self.project.estimated_budget,
++                self.project.actual_budget,
++                self.budget.payload_hash,
++            ),
++        )
++        self.assertEqual(f.eac, Decimal("100.00"))
++
++    def test_invalid_timing_float_currency_source_and_controls_fail_closed(self):
++        f = self._forecast()
++        for changes in (
++            {"expected_cash_on": None},
++            {"expected_cash_on": "2026-10-32"},
++            {"cash_amount": 0.1},
++            {"cash_amount": "NaN"},
++            {"currency": "USD"},
++            {"cash_amount": "0"},
++            {"source": {"family": "recognition_date", "id": str(uuid4())}},
++            {"source": {"family": "budget_allocation", "id": str(uuid4())}},
++        ):
++            with self.subTest(changes=changes), self.assertRaises(ValidationError):
++                prepare_cashflow_supplement(
++                    forecast=f,
++                    actor=self.preparer,
++                    rows=[self.row(**changes)],
++                    controls=[],
++                )
++        with self.assertRaises(ValidationError):
++            prepare_cashflow_supplement(
++                forecast=f, actor=self.preparer, rows=[self.row()], controls=[]
++            )
++        self.assertFalse(ProjectCashflowSupplement.objects.exists())
++
++    def test_unallocated_amounts_reconcile_but_expose_incomplete_coverage(self):
++        rows = [
++            self.row(amount="70"),
++            self.row(
++                key="unallocated-1",
++                amount="30",
++                when=None,
++                state="unallocated",
++                exception_reason="Cash timing evidence missing",
++            ),
++        ]
++        _, s = self.ready(rows)
++        result = self.capture(s).result
++        self.assertFalse(result["complete"])
++        self.assertEqual(
++            len(result["exceptions"]), 2
++        )  # one explicit exception in each selected plan
++        self.assertEqual(result["controls"]["forecast"][0]["cash_amount"], "100")
++
++    def test_late_reforecast_and_cancellation_preserve_baseline_and_old_snapshot(self):
++        _, first = self.ready()
++        old = self.capture(first)
++        next_forecast = self._forecast()
++        second = self.supplement(
++            next_forecast, [self.row(when="2026-11-01", amount="120")]
++        )
++        self.approve(next_forecast)
++        corrected = self.capture(first, second)
++        self.assertEqual(
++            corrected.result["buckets"]["2026-10-01"]["baseline"]["DISBURSEMENT"],
++            "100.000001",
++        )
++        self.assertEqual(
++            corrected.result["buckets"]["2026-11-01"]["forecast"]["DISBURSEMENT"], "120"
++        )
++        self.assertEqual(second.predecessor_id, first.pk)
++        third_forecast = self._forecast()
++        third = self.supplement(
++            third_forecast,
++            [
++                self.row(
++                    amount="120",
++                    when=None,
++                    state="cancelled",
++                    exception_reason="Approved cancellation",
++                )
++            ],
++        )
++        self.approve(third_forecast)
++        cancelled = self.capture(first, third)
++        self.assertEqual(
++            cancelled.result["buckets"]["2026-11-01"]["forecast"]["DISBURSEMENT"], "0"
++        )
++        self.assertEqual(
++            rebuild_cashflow_snapshot(snapshot=old, actor=self.approver), old.result
++        )
++        with self.assertRaises(ValidationError):
++            self.capture(first, second)
++        with self.assertRaises(ValidationError):
++            self.capture(first, second, knowledge_as_of=old.knowledge_as_of)
++
++    def test_month_boundaries_horizon_timezone_and_overdue_not_rolled(self):
++        self.organization.settings.timezone = "Asia/Tehran"
++        self.organization.settings.save()
++        _, s = self.ready(
++            [
++                self.row(key="before", when="2026-09-30", amount="2"),
++                self.row(key="inside", when="2026-10-01", amount="3"),
++                self.row(key="end", when="2026-12-01", amount="5"),
++            ]
++        )
++        snap = self.capture(s)
++        self.assertEqual(snap.timezone_name, "Asia/Tehran")
++        self.assertEqual(snap.result["out_of_horizon"]["forecast"]["DISBURSEMENT"], "7")
++        self.assertEqual(
++            snap.result["buckets"]["2026-10-01"]["forecast"]["DISBURSEMENT"], "3"
++        )
++        for extra in (
++            {"horizon_start": date(2026, 10, 2)},
++            {"horizon_end": date(2026, 10, 1)},
++            {"knowledge_as_of": timezone.now().replace(tzinfo=None)},
++            {"knowledge_as_of": timezone.now() + timedelta(days=1)},
++        ):
++            with self.subTest(extra=extra), self.assertRaises(ValidationError):
++                self.capture(s, **extra)
++
++    def test_native_treasury_event_cutoff_reversal_and_future_cash(self):
++        from apps.treasury import tests as treasury
++        from apps.treasury.services import reverse_posted_movement
++
++        _, supplement = self.ready()
++        self.owner = self.preparer
++        self.owner_membership = self.organization.memberships.get(user=self.owner)
++        self.accountant_membership = self.organization.memberships.get(
++            user=self.approver
++        )
++        for code, parameters in treasury.ACCOUNTING_INITIAL_POLICY_PARAMETERS.items():
++            if code in {
++                treasury.ACCOUNTING_MONEY_PRECISION_POLICY_CODE,
++                treasury.ACCOUNTING_ROUNDING_POLICY_CODE,
++            }:
++                treasury.TreasuryFoundationTests._activate_policy(
++                    self, code, parameters
++                )
++        treasury.TreasuryFoundationTests._activate_policy(
++            self,
++            treasury.TREASURY_SELF_APPROVAL_POLICY_CODE,
++            {"allow_self_approval": True},
++        )
++        year = treasury.create_fiscal_year(
++            organization=self.organization,
++            actor=self.owner,
++            code="CF65",
++            name="Cash test year",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++            calendar_version=1,
++        )
++        self.period = treasury.create_fiscal_period(
++            organization=self.organization,
++            actor=self.owner,
++            fiscal_year=year,
++            number=1,
++            name="Cash test period",
++            starts_on=date(2026, 1, 1),
++            ends_on=date(2026, 12, 31),
++        )
++        cash_gl = treasury.create_account(
++            organization=self.organization,
++            actor=self.owner,
++            code="CF1101",
++            name="Cash",
++            account_type="asset",
++            is_posting=True,
++        )
++        self.clearing_gl = treasury.create_account(
++            organization=self.organization,
++            actor=self.owner,
++            code="CF2199",
++            name="Clearing",
++            account_type="liability",
++            is_posting=True,
++        )
++        bank = treasury.TreasuryFoundationTests._bank(
++            self, "CFBANK", "IR0000065", cash_gl
++        )
++
++        def receipt(key, amount):
++            movement = treasury.create_movement(
++                organization=self.organization,
++                actor=self.owner,
++                kind="receipt",
++                movement_date=date(2026, 10, 1),
++                amount=Decimal(amount),
++                description="CEP065 native test receipt",
++                idempotency_key=key,
++                account=bank,
++                project=self.project,
++            )
++            return treasury.TreasuryFoundationTests._post(self, movement)
++
++        original = receipt("native-1", "30")
++        cutoff = timezone.now()
++        old = self.capture(supplement, knowledge_as_of=cutoff)
++        reverse_posted_movement(
++            organization=self.organization,
++            actor=self.owner,
++            movement=original,
++            requested_by=self.accountant_membership,
++            accounting_date=date(2026, 10, 2),
++            period=self.period,
++            reason="Native reversal test",
++        )
++        receipt("late-backdated", "7")
++        historical = self.capture(supplement, knowledge_as_of=cutoff)
++        current = self.capture(supplement)
++        self.assertEqual(
++            historical.result["buckets"]["2026-10-01"]["actual"]["RECEIPT"], "30.000000"
++        )
++        self.assertEqual(
++            current.result["buckets"]["2026-10-01"]["actual"]["RECEIPT"], "7.000000"
++        )
++        self.assertEqual(current.manifest["actual"]["controls"]["row_count"], 3)
++        self.assertEqual(
++            rebuild_cashflow_snapshot(snapshot=old, actor=self.approver), old.result
++        )
++
++    def test_overlap_duplicates_and_unknown_source_cannot_be_approved(self):
++        f = self._forecast()
++        with self.assertRaises(ValidationError):
++            self.supplement(f, [self.row(), self.row()])
++        with self.assertRaises(ValidationError):
++            self.supplement(
++                f,
++                [
++                    self.row(),
++                    self.row(
++                        key="another", source={"family": "forecast", "id": str(f.pk)}
++                    ),
++                ],
++            )
++
++    def test_native_commitment_and_forecast_sources_preserve_identity_not_cash_formula(
++        self,
++    ):
++        from apps.projects import test_p4_integrated_cost as cost
++
++        contract = cost.IntegratedProjectCostTests._contract(self, "commitment")
++        fact = cost.IntegratedProjectCostTests._fact(
++            self, contract, "commitment_authorized", "600.00", "CF65-COMMIT"
++        )
++        f = self._forecast()
++        row = self.row(
++            amount="17",
++            source={"family": "commitment", "id": str(fact.pk)},
++            economic_event_id=fact.economic_event_id,
++        )
++        supplement = self.supplement(
++            f,
++            [
++                row,
++                self.row(
++                    key="assumption",
++                    economic_event_id="uncommitted-cash-1",
++                    amount="9",
++                    source={"family": "forecast", "id": str(f.pk)},
++                ),
++            ],
++        )
++        self.assertEqual(
++            supplement.manifest["rows"][0]["source"]["evidence"]["amount"], "600.00"
++        )
++        self.assertEqual(supplement.manifest["rows"][0]["cash_amount"], "17")
++        self.assertEqual(supplement.manifest["rows"][1]["cash_amount"], "9")
++        with self.assertRaises(ValidationError):
++            self.supplement(
++                self._forecast(),
++                [
++                    self.row(
++                        source={"family": "commitment", "id": str(fact.pk)},
++                        economic_event_id="invented-event",
++                    )
++                ],
++            )
++
++    def test_native_commercial_terms_are_evidence_without_automatic_payment_timing(
++        self,
++    ):
++        from apps.contracts.services import (
++            approve_contract_term_version,
++            create_contract,
++            create_contract_term_version,
++        )
++
++        contract = create_contract(
++            organization=self.organization,
++            project=self.project,
++            actor=self.preparer,
++            contract_number="CF65",
++            title="Commercial evidence",
++            counterparty_name="Test party",
++            direction="receivable",
++            contract_type="client",
++        )
++        terms = create_contract_term_version(
++            organization=self.organization,
++            actor=self.preparer,
++            contract=contract,
++            effective_from=date(2026, 1, 1),
++            payment_due_days=45,
++            reason="Explicit commercial test terms",
++        )
++        f = self._forecast()
++        row = self.row(
++            source={"family": "contract_terms", "id": str(terms.pk)},
++            direction="RECEIPT",
++            amount="250",
++            when="2026-11-03",
++        )
++        with self.assertRaises(ValidationError):
++            self.supplement(f, [row])
++        approve_contract_term_version(
++            organization=self.organization,
++            actor=self.approver,
++            term_version=terms,
++            reason="Independent commercial approval",
++        )
++        supplement = self.supplement(f, [row])
++        self.assertEqual(
++            supplement.manifest["rows"][0]["expected_cash_on"], "2026-11-03"
++        )
++        self.assertEqual(
++            supplement.manifest["rows"][0]["source"]["evidence"]["payment_due_days"], 45
++        )
++
++    def test_late_attachment_queryset_update_delete_and_snapshot_corruption_denied(
++        self,
++    ):
++        f, s = self.ready()
++        with self.assertRaises(PermissionDenied):
++            self.supplement(f)
++        for operation in (
++            lambda: ProjectCashflowSupplement.objects.filter(pk=s.pk).update(
++                manifest={}
++            ),
++            lambda: ProjectCashflowSupplement.objects.filter(pk=s.pk).delete(),
++        ):
++            with self.assertRaises(DatabaseError), transaction.atomic():
++                operation()
++        snap = self.capture(s)
++        with self.assertRaises(DatabaseError), transaction.atomic():
++            ProjectCashflowSnapshot.objects.filter(pk=snap.pk).update(result={})
++        snap.result = {}
++        with self.assertRaises(ValidationError):
++            snap.save()
++        with self.assertRaises(ValidationError):
++            s.delete()
++
++    def test_cross_tenant_source_read_and_inactive_membership_are_denied(self):
++        f = self._forecast()
++        with self.assertRaises(PermissionDenied):
++            prepare_cashflow_supplement(
++                forecast=f, actor=self.outsider, rows=[], controls=[]
++            )
++        _, s = self.ready()
++        with self.assertRaises(PermissionDenied):
++            rebuild_cashflow_snapshot(snapshot=self.capture(s), actor=self.outsider)
++        self.organization.memberships.filter(user=self.approver).update(
++            status="suspended"
++        )
++        with self.assertRaises(PermissionDenied):
++            self.capture(s)
++
++    def test_retry_is_exact_and_rebuild_ignores_current_source_pointers(self):
++        _, s = self.ready()
++        cutoff = timezone.now()
++        first = self.capture(s, knowledge_as_of=cutoff, idempotency_key="same-capture")
++        self.assertEqual(
++            self.capture(s, knowledge_as_of=cutoff, idempotency_key="same-capture").pk,
++            first.pk,
++        )
++        with self.assertRaises(ValidationError):
++            self.capture(
++                s,
++                knowledge_as_of=cutoff,
++                idempotency_key="same-capture",
++                horizon_end=date(2027, 1, 1),
++            )
++        with patch(
++            "apps.projects.cashflow._source",
++            side_effect=AssertionError("Current source read during rebuild"),
++        ):
++            self.assertEqual(
++                rebuild_cashflow_snapshot(snapshot=first, actor=self.approver),
++                first.result,
++            )
++        damaged = deepcopy(first.manifest)
++        del damaged["forecast"]
++        self.assertNotEqual(digest(damaged), digest(first.manifest))
++        self.assertEqual(render_manifest(first.manifest), first.result)
++
++    def test_unapproved_forecast_and_postcutoff_approval_are_not_comparable(self):
++        self.workflow = self._workflow()
++        f = self._forecast()
++        s = self.supplement(f)
++        before = timezone.now()
++        with self.assertRaises(ValidationError):
++            self.capture(s)
++        self.approve(f)
++        with self.assertRaises(ValidationError):
++            self.capture(s, knowledge_as_of=before)
++        self.assertEqual(
++            ProjectForecastTransition.objects.filter(
++                review__forecast=f, new_status="approved"
++            ).count(),
++            1,
++        )
++
++    def test_draft_schedule_reference_requires_explicit_cash_timing(self):
++        from apps.projects.services import (
++            add_project_schedule_item,
++            create_project_schedule_revision,
++        )
++
++        schedule = create_project_schedule_revision(
++            organization=self.organization,
++            project=self.project,
++            actor=self.preparer,
++            occurrence_id="CF65-SCHEDULE",
++            data_date=date(2026, 10, 1),
++            planned_start=date(2026, 10, 1),
++            planned_finish=date(2026, 12, 1),
++            calendar_reference="Evidence only calendar",
++            assumptions="No schedule acceptance",
++        )
++        item = add_project_schedule_item(
++            schedule=schedule,
++            actor=self.preparer,
++            code="M1",
++            name="Evidence milestone",
++            planned_start=date(2026, 10, 15),
++            planned_finish=date(2026, 10, 15),
++            source_reference="Milestone evidence v1",
++            is_milestone=True,
++        )
++        _, supplement = self.ready(
++            [self.row(when="2026-11-03", schedule_item_id=str(item.pk))]
++        )
++        retained = self.capture(supplement).manifest["forecast"]["rows"][0]
++        self.assertEqual(retained["expected_cash_on"], "2026-11-03")
++        self.assertEqual(retained["schedule"]["planned_start"], "2026-10-15")
++        self.assertEqual(len(retained["schedule"]["item_hash"]), 64)
++        schedule.refresh_from_db()
++        self.assertEqual(schedule.status, "draft")
++
++    def test_cash_control_and_bucket_aggregation_preserve_all_decimal_digits(self):
++        self.workflow = self._workflow()
++        forecast = self._forecast()
++        rows = [
++            self.row(key="large", amount="12345678901234567890123456789.123456"),
++            self.row(key="small", amount="0.000001"),
++        ]
++        source_group = "budget_allocation:" + rows[0]["source"]["id"]
++        supplement = prepare_cashflow_supplement(
++            forecast=forecast,
++            actor=self.preparer,
++            rows=rows,
++            controls=[
++                {
++                    "source_group": source_group,
++                    "direction": "DISBURSEMENT",
++                    "currency": "IRR",
++                    "row_count": 2,
++                    "cash_amount": "12345678901234567890123456789.123457",
++                }
++            ],
++        )
++        self.approve(forecast)
++        result = self.capture(supplement).result
++        self.assertEqual(
++            result["buckets"]["2026-10-01"]["forecast"]["DISBURSEMENT"],
++            "12345678901234567890123456789.123457",
++        )
++
++    def test_current_tenant_state_and_missing_historical_settings_fail_closed(self):
++        from apps.organizations.models import Organization, OrganizationSettings
++
++        _, supplement = self.ready()
++        saved = self.capture(supplement)
++        cutoff = timezone.now()
++        OrganizationSettings.objects.filter(organization=self.organization).update(
++            updated_at=cutoff + timedelta(seconds=1)
++        )
++        with self.assertRaisesMessage(ValidationError, "history is unavailable"):
++            self.capture(supplement, knowledge_as_of=cutoff)
++        self.assertEqual(
++            rebuild_cashflow_snapshot(snapshot=saved, actor=self.approver), saved.result
++        )
++        Organization.objects.filter(pk=self.organization.pk).update(status="suspended")
++        self.assertEqual(
++            self.organization.status, "active"
++        )  # Stale client object cannot authorize capture.
++        with self.assertRaises(PermissionDenied):
++            self.capture(supplement)
++
++    def test_changed_cash_source_blocks_approval_but_allows_rejection(self):
++        self.workflow = self._workflow()
++        forecast = self._forecast()
++        self.supplement(forecast)
++        instance = submit_project_cost_forecast(
++            forecast=forecast,
++            actor=self.preparer,
++            workflow_version=self.workflow,
++            reason="Review explicit source evidence",
++            idempotency_key=forecast_submission_key(forecast),
++        )
++        item = instance.work_items.get()
++        claim_work_item(
++            actor=self.approver,
++            organization=self.organization,
++            work_item_id=item.pk,
++            idempotency_key="claim-stale-cash",
++        )
++        with patch(
++            "apps.projects.cashflow._source",
++            side_effect=ValidationError("Source changed"),
++        ):
++            with self.assertRaises(ValidationError):
++                complete_work_item(
++                    actor=self.approver,
++                    organization=self.organization,
++                    work_item_id=item.pk,
++                    outcome="approved",
++                    idempotency_key="stale-cash-approve",
++                    command_context={"reason": "Cannot approve stale source"},
++                )
++            complete_work_item(
++                actor=self.approver,
++                organization=self.organization,
++                work_item_id=item.pk,
++                outcome="rejected",
++                idempotency_key="stale-cash-reject",
++                command_context={"reason": "Reject stale source evidence"},
++            )
++        forecast.review.refresh_from_db()
++        self.assertEqual(forecast.review.status, "rejected")
++
++    def test_database_rejects_late_bulk_insert_and_source_permission_is_rechecked(self):
++        from apps.organizations.models import BusinessPermission, OrganizationRole
++        from apps.organizations.models import BusinessPermissionCode as P
++
++        _, supplement = self.ready()
++        next_forecast = self._forecast()
++        self.approve(next_forecast)
++        with (
++            self.assertRaisesMessage(DatabaseError, "cash supplement requires"),
++            transaction.atomic(),
++        ):
++            ProjectCashflowSupplement.objects.bulk_create(
++                [
++                    ProjectCashflowSupplement(
++                        organization=self.organization,
++                        project=self.project,
++                        forecast=next_forecast,
++                        created_by=self.preparer,
++                        payload_hash="a" * 64,
++                        manifest={"late": True},
++                    )
++                ]
++            )
++        role = OrganizationRole.objects.get(
++            code="company_owner", organization__isnull=True
++        )
++        role.permissions.remove(BusinessPermission.objects.get(code=P.BUDGETS_VIEW))
++        with self.assertRaises(PermissionDenied):
++            self.capture(supplement)
++
++
++class CashflowAdapterTests(TestCase):
++    """Unit contracts for approved owner records; real AP evidence retains scope."""
++
++    setUp = fixtures.ForecastGovernanceTests.setUp
++    _draft = fixtures.ForecastGovernanceTests._draft
++    _classify_and_submit = fixtures.ForecastGovernanceTests._classify_and_submit
++    _forecast = fixtures.ForecastGovernanceTests._forecast
++
++    def test_billing_owner_fields_and_invalid_states_fail_closed(self):
++        from apps.billing.models import PayableCertificate, ProgressClaim
++        from apps.contracts.models import Contract, ContractTermVersion
++        from apps.projects.cashflow import _source
++
++        forecast = self._forecast()
++        for family, model in (
++            ("billing_claim", ProgressClaim),
++            ("billing_certificate", PayableCertificate),
++        ):
++            # Resolve a typed owner-record snapshot: approval lifecycles belong to Billing.
++            contract = Contract(
++                id=uuid4(), organization=self.organization, project=self.project
++            )
++            terms = ContractTermVersion(
++                id=uuid4(), organization=self.organization, contract=contract
++            )
++            source = model(
++                id=uuid4(),
++                organization=self.organization,
++                project=self.project,
++                status="approved",
++                revision_number=2,
++                currency_code="IRR",
++                net_amount=Decimal("123.4567"),
++                approved_at=timezone.now(),
++                created_at=timezone.now(),
++                contract=contract,
++                contract_term_version=terms,
++                calculation_snapshot={"source_version": 2},
++                due_date=date(2026, 11, 7),
++            )
++            with patch.object(model.objects, "select_for_update") as query:
++                query.return_value.get.return_value = source
++                resolved = _source(
++                    reference={"family": family, "id": str(source.pk)},
++                    forecast=forecast,
++                    actor=self.preparer,
++                )
++                query.return_value.get.assert_called_with(
++                    pk=str(source.pk), organization_id=self.organization.pk
++                )
++                self.assertEqual(resolved["version"], "2")
++                self.assertEqual(resolved["evidence"]["net_amount"], "123.4567")
++                for field, bad in (
++                    ("status", "draft"),
++                    ("currency_code", "USD"),
++                    ("project_id", uuid4()),
++                    ("approved_at", None),
++                ):
++                    previous = getattr(source, field)
++                    setattr(source, field, bad)
++                    with self.assertRaises(ValidationError):
++                        _source(
++                            reference={"family": family, "id": str(source.pk)},
++                            forecast=forecast,
++                            actor=self.preparer,
++                        )
++                    setattr(source, field, previous)
++
++    def test_persisted_apar_owner_evidence_without_invented_posting(self):
++        from apps.projects.cashflow import _source
++        from apps.subledgers.models import Obligation
++
++        forecast = self._forecast()
++        source_id = uuid4()
++        obligation = Obligation.objects.create(
++            organization=self.organization,
++            project=self.project,
++            direction="receivable",
++            source_kind="test.exact-source.v1",
++            source_uuid=source_id,
++            source_version=1,
++            source_status="final",
++            source_hash="a" * 64,
++            source_snapshot={"source": str(source_id)},
++            party_name_snapshot="CEP065 test source",
++            original_amount=Decimal(100),
++            recognized_on=date(2026, 10, 1),
++            due_date=date(2026, 11, 1),
++            idempotency_key=str(source_id),
++            payload_hash="b" * 64,
++            recognized_by=self.organization.memberships.get(user=self.preparer),
++        )
++        resolved = _source(
++            reference={"family": "obligation", "id": str(obligation.pk)},
++            forecast=forecast,
++            actor=self.preparer,
++        )
++        self.assertEqual(resolved["evidence"]["original_amount"], "100.000000")
++        self.assertEqual(resolved["evidence"]["journal_id"], "")
+diff --git a/apps/projects/test_cep065_migration.py b/apps/projects/test_cep065_migration.py
+new file mode 100644
+index 0000000..2dc06fc
+--- /dev/null
++++ b/apps/projects/test_cep065_migration.py
+@@ -0,0 +1,71 @@
++"""Conditional expand/reverse/reapply preserves existing planning history."""
++
++import json
++
++from django.db import connection
++from django.db.migrations.executor import MigrationExecutor
++from django.test import TransactionTestCase
++
++from apps.projects import test_cep020_forecast_budget_control as fixtures
++from apps.projects.models import BudgetAllocation, BudgetVersion, ProjectCostForecast
++
++
++class CashflowMigrationTests(TransactionTestCase):
++    serialized_rollback = True
++    setUp = fixtures.ForecastGovernanceTests.setUp
++    _draft = fixtures.ForecastGovernanceTests._draft
++    _classify_and_submit = fixtures.ForecastGovernanceTests._classify_and_submit
++    _forecast = fixtures.ForecastGovernanceTests._forecast
++
++    def test_reverse_reapply_retains_accepted_budget_and_forecast(self):
++        forecast = self._forecast()
++
++        def retained():
++            return json.dumps(
++                {
++                    "budget": list(
++                        BudgetVersion.objects.filter(pk=self.budget.pk).values()
++                    ),
++                    "allocations": list(
++                        BudgetAllocation.objects.filter(
++                            manifest_line__manifest__budget=self.budget
++                        )
++                        .order_by("pk")
++                        .values()
++                    ),
++                    "forecast": list(
++                        ProjectCostForecast.objects.filter(pk=forecast.pk).values()
++                    ),
++                },
++                default=str,
++                sort_keys=True,
++            )
++
++        before = retained()
++        old = [
++            (
++                "projects",
++                "0010_projectforecastreview_projectforecasttransition_and_more",
++            )
++        ]
++        new = [("projects", "0011_cep065_cashflow_evidence")]
++        try:
++            MigrationExecutor(connection).migrate(old)
++            self.assertNotIn(
++                "projects_projectcashflowsupplement",
++                connection.introspection.table_names(),
++            )
++            self.assertEqual(before, retained())
++            MigrationExecutor(connection).migrate(new)
++            self.assertIn(
++                "projects_projectcashflowsnapshot",
++                connection.introspection.table_names(),
++            )
++            self.assertEqual(before, retained())
++            with connection.cursor() as cursor:
++                cursor.execute(
++                    "SELECT count(*) FROM pg_trigger WHERE tgname IN ('cashflow_supplement_insert', 'cashflow_supplement_immutable', 'cashflow_snapshot_immutable')"
++                )
++                self.assertEqual(cursor.fetchone()[0], 3)
++        finally:
++            MigrationExecutor(connection).migrate(new)

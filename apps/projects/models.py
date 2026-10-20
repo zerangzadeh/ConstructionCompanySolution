@@ -9,6 +9,11 @@ from core.identifiers import canonicalize_upper_identifier
 from core.models import TimeStampedModel, UUIDModel
 from core.tenant_validation import validate_related_organizations
 
+from .cashflow_models import (  # noqa: F401
+    ProjectCashflowSnapshot,
+    ProjectCashflowSupplement,
+)
+
 
 class ProjectStatus(models.TextChoices):
     PLANNING = "planning", "در حال برنامه‌ریزی"

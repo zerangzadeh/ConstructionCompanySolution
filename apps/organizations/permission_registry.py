@@ -561,6 +561,8 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
             "projects.ProjectCostForecast",
             "projects.ProjectForecastReview",
             "projects.ProjectForecastTransition",
+            "projects.ProjectCashflowSupplement",
+            "projects.ProjectCashflowSnapshot",
         ),
         (
             P.PROJECT_COST_SOURCES_MANAGE,
@@ -576,6 +578,7 @@ PERMISSION_RESOURCES: tuple[PermissionResource, ...] = (
         (
             "apps.projects.services",
             "apps.projects.forecast_governance",
+            "apps.projects.cashflow",
             "apps.projects.budget_control",
         ),
     ),

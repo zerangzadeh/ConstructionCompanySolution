@@ -1,0 +1,244 @@
+CEP-065 BOUNDED HUMAN RESOLUTION
+
+Human Decision Authority: Azam Zerangzadeh
+Decision ID: CEP065-CASHFLOW-v1
+
+I approve the following bounded cash-flow bindings for CEP-065.
+
+HR-065-01 — Plan/forecast sources
+
+Extend the existing Project Controls forecast versions with an immutable
+cash-allocation supplement reviewed through the existing forecast workflow,
+including independent preparer/reviewer separation.
+
+Each comparison explicitly selects an approved baseline supplement and an
+approved forecast supplement. Each pins its accepted BudgetVersion, approved
+ProjectCostForecast version, and applicable producer/commercial evidence.
+
+Eligible supporting evidence is:
+
+- accepted BudgetVersion/BudgetAllocation with pinned Estimate revision lineage;
+- approved ProjectCostForecast and its retained source manifest;
+- commitment facts under approved producer contracts, retaining source versions,
+  adjustments and relief links;
+- approved ContractTermVersion, Billing claim/certificate or AP/AR obligation
+  evidence where applicable to a planned receipt or disbursement.
+
+Each cash row records tenant/project, source family/UUID/version/line/hash,
+economic-event identity, applicable contract/WBS/CBS context, direction
+RECEIPT or DISBURSEMENT, positive Decimal cash_amount, source currency,
+cash-basis evidence, and approval actor/time.
+
+cash_amount is an explicitly reviewed planning amount.
+
+Do not derive it automatically from:
+- BudgetAllocation.amount
+- EAC
+- recognition amounts
+- open commitment
+
+Retain cost-to-cash differences and their supporting evidence.
+
+Reconcile row counts and receipt/disbursement totals by source group and
+currency to control totals approved with the supplement.
+
+Do not perform FX conversion.
+
+A previously approved forecast cannot acquire unreviewed cash rows.
+New cash content requires a new reviewed forecast version.
+
+
+HR-065-02 — Forecast timing
+
+Every cash allocation requires:
+
+`expected_cash_on`
+
+as an ISO date explicitly approved with the allocation, together with its source
+document/version and the source date-field or stated planning-assumption reference.
+
+A contractual due date may be copied only when explicitly selected in that
+approved allocation.
+
+Do not infer cash dates automatically from:
+
+- recognition date
+- invoice date
+- schedule start/finish
+- milestone date
+- payment_due_days
+
+Missing dates remain explicit exceptions.
+
+Overdue expected dates remain in their original buckets until an approved
+successor changes them. Do not automatically roll them to today.
+
+
+HR-065-03 — Reporting periods
+
+Use Gregorian calendar-month buckets in the tenant
+`OrganizationSettings.timezone`.
+
+Retain the timezone in each snapshot.
+
+Require explicit:
+
+- `horizon_start`
+- `horizon_end`
+
+Both must be the first day of a month and:
+
+`horizon_end > horizon_start`
+
+The horizon and each bucket use:
+
+[start inclusive, end exclusive)
+
+No default horizon may be inferred.
+
+Use identical boundaries for baseline, forecast and actual comparison.
+
+Retain out-of-horizon amounts separately in reconciliation controls.
+
+
+HR-065-04 — Allocation
+
+Use explicit Decimal amount splits only.
+
+For each source group and direction:
+
+dated allocations
++
+explicitly identified unallocated exceptions
+
+must equal the approved cash control total exactly in the source currency.
+
+Do not use:
+
+- equal spreading
+- duration weighting
+- automatic percentage allocation
+- automatic schedule-to-cash conversion
+
+An allocation may reference an immutable schedule revision/item UUID and hash,
+including draft schedule evidence, but its `expected_cash_on` requires independent
+approval within the cash supplement.
+
+This reference does NOT constitute schedule acceptance.
+
+Identify overlapping commitment, invoice, obligation and forecast representations
+using economic-event/source lineage.
+
+The approved supplement selects one cash representation per event/allocation.
+Related documents remain references.
+
+Missing allocation, ambiguous overlap or unreconciled totals prevent a complete
+comparison.
+
+Partial results may remain visible only when their exceptions and coverage are
+explicitly exposed.
+
+
+HR-065-05 — Cutoff and corrections
+
+Each snapshot requires a timezone-aware:
+
+`knowledge_as_of`
+
+timestamp no later than capture time.
+
+Capture and retain source:
+
+- versions
+- approval/status history
+- hashes
+- reconciliation controls
+- policy version
+
+Plan/forecast inputs qualify only when recorded and approved by
+`knowledge_as_of`.
+
+Resolve their state from retained history at that timestamp.
+
+Future `expected_cash_on` dates remain eligible when they fall within the
+reporting horizon.
+
+For actual cash:
+
+- `posted_at <= knowledge_as_of`
+- `movement_date` must be no later than the tenant-local date of
+  `knowledge_as_of`
+
+Use the approved Treasury actual-cash authority.
+
+A later-recorded or later-approved backdated change enters only a subsequent
+snapshot.
+
+Its effect is placed in the bucket of its authoritative cash-event date,
+including an earlier bucket when applicable.
+
+For plan/forecast corrections, use the approved successor effective by the
+knowledge cutoff instead of its predecessor.
+
+An approved cancellation removes that planned contribution from subsequent
+snapshots.
+
+Retain the complete correction/replacement chain.
+
+An existing snapshot must be rebuildable from its retained manifest and must
+never be rebuilt from today's source pointers.
+
+Missing historical state/version evidence blocks reconstruction.
+
+
+==================================================
+EXECUTION AUTHORIZATION
+==================================================
+
+The five Human Resolution items:
+
+- HR-065-01
+- HR-065-02
+- HR-065-03
+- HR-065-04
+- HR-065-05
+
+are now APPROVED under `CEP065-CASHFLOW-v1`.
+
+Proceed immediately with CEP-065 under the existing bounded
+Development / Non-Production authority.
+
+Do not perform another Human-resolution or architecture-analysis round unless
+implementation reveals a genuinely new material business decision outside the
+approved bindings above.
+
+Execution:
+
+ground
+→ record touch set
+→ implement
+→ required migration only if canonical/authorized
+→ focused tests
+→ affected regression
+→ reconciliation/evidence
+→ CEP completion report
+→ Registry reconciliation
+→ safe Git checkpoint
+
+Completion requires the existing canonical CEP-065 Scope, AC and DoD to PASS.
+
+Do not weaken tests or acceptance criteria to obtain completion.
+
+Do not execute CEP-057 or CEP-058 in this session.
+Do not execute CEP-069..079.
+No Production action.
+No Production Certification.
+No Human Sign-off.
+
+Allowed safe Git actions:
+`git add`
+`git commit`
+`git push origin main`
+
+Strict token discipline:
+routine implementation silent; report only a genuine blocker or final CEP-065 result.

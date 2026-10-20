@@ -142,6 +142,9 @@ def submit_project_cost_forecast(
     ):
         raise PermissionDenied("The forecast workflow belongs to another authority.")
     _assert_source_current(review)
+    from .cashflow import validate_cashflow_review
+
+    validate_cashflow_review(forecast=locked, actor=actor)
     _record_transition(
         review=review,
         actor=actor,
@@ -201,6 +204,10 @@ def decide_project_cost_forecast(
     if actor.pk == locked.created_by_id:
         raise PermissionDenied("A forecast preparer cannot review their own version.")
     _assert_source_current(review)
+    from .cashflow import validate_cashflow_review
+
+    if approved:
+        validate_cashflow_review(forecast=locked, actor=actor)
     if approved and review.predecessor_id:
         predecessor = ProjectForecastReview.objects.select_for_update().get(
             pk=review.predecessor_id,

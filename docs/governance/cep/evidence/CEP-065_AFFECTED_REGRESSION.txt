@@ -1,0 +1,275 @@
+Using existing test database for alias 'default' ('test_construction_erp')...
+
+test_approved_reforecast_supersedes_without_changing_budget (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_approved_reforecast_supersedes_without_changing_budget) ... ok
+test_budget_control_contract_pins_policy_and_audits_override (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_budget_control_contract_pins_policy_and_audits_override) ... ok
+test_budget_control_is_inert_and_zero_tolerance_is_exact (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_budget_control_is_inert_and_zero_tolerance_is_exact) ... ok
+test_budget_control_rejects_absent_policy_even_in_isolated_contract_test (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_budget_control_rejects_absent_policy_even_in_isolated_contract_test) ... ok
+test_rejection_and_cross_tenant_read_fail_closed (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_rejection_and_cross_tenant_read_fail_closed) ... ok
+test_review_requires_current_source_and_an_assigned_work_item (apps.projects.test_cep020_forecast_budget_control.ForecastGovernanceTests.test_review_requires_current_source_and_an_assigned_work_item) ... ok
+test_commitment_actual_accrual_replacement_and_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_commitment_actual_accrual_replacement_and_projection) ... ERROR
+test_contract_precedes_facts_is_idempotent_and_enforces_sod (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_contract_precedes_facts_is_idempotent_and_enforces_sod) ... ERROR
+test_coverage_forecast_and_fail_closed_gates (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_coverage_forecast_and_fail_closed_gates) ... ERROR
+test_cross_tenant_and_database_immutability (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_cross_tenant_and_database_immutability) ... ERROR
+test_project_detail_exposes_permission_scoped_incomplete_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_project_detail_exposes_permission_scoped_incomplete_projection) ... ERROR
+test_acceptance_does_not_mutate_financial_or_legacy_authorities (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_acceptance_does_not_mutate_financial_or_legacy_authorities) ... ERROR
+test_accepted_baseline_and_payload_are_database_immutable (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_accepted_baseline_and_payload_are_database_immutable) ... ERROR
+test_complete_manifest_conserves_source_and_exposes_planning_evidence (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_complete_manifest_conserves_source_and_exposes_planning_evidence) ... ERROR
+test_idempotent_handoff_and_stale_predecessor_conflict (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_idempotent_handoff_and_stale_predecessor_conflict) ... ERROR
+test_missing_authoritative_currency_fails_at_product_owner_gate (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_authoritative_currency_fails_at_product_owner_gate) ... ERROR
+test_missing_mapping_and_non_conserving_split_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_mapping_and_non_conserving_split_fail_closed) ... ERROR
+test_tenant_object_permission_and_sod_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_tenant_object_permission_and_sod_fail_closed) ... ERROR
+test_account_masks_identifier_and_rejects_cross_tenant_access (apps.treasury.tests.TreasuryFoundationTests.test_account_masks_identifier_and_rejects_cross_tenant_access) ... ok
+test_ambiguous_exact_candidates_remain_suggestions (apps.treasury.tests.TreasuryFoundationTests.test_ambiguous_exact_candidates_remain_suggestions) ... ok
+test_cash_to_gl_review_is_independent_idempotent_and_tamper_evident (apps.treasury.tests.TreasuryFoundationTests.test_cash_to_gl_review_is_independent_idempotent_and_tamper_evident) ... ok
+test_cheque_changes_bank_cash_only_when_cleared (apps.treasury.tests.TreasuryFoundationTests.test_cheque_changes_bank_cash_only_when_cleared) ... ok
+test_direct_receipt_posts_once_with_exact_evidence_and_reconciles (apps.treasury.tests.TreasuryFoundationTests.test_direct_receipt_posts_once_with_exact_evidence_and_reconciles) ... ok
+test_employee_advance_cash_settlement_reversal_and_reconciliation (apps.treasury.tests.TreasuryFoundationTests.test_employee_advance_cash_settlement_reversal_and_reconciliation) ... ok
+test_employee_reimbursement_cash_links_one_approved_expense (apps.treasury.tests.TreasuryFoundationTests.test_employee_reimbursement_cash_links_one_approved_expense) ... ok
+test_exact_match_clearing_reversal_and_bank_reconciliation (apps.treasury.tests.TreasuryFoundationTests.test_exact_match_clearing_reversal_and_bank_reconciliation) ... ok
+test_payment_request_is_idempotent_and_policy_controls_self_approval (apps.treasury.tests.TreasuryFoundationTests.test_payment_request_is_idempotent_and_policy_controls_self_approval) ... ok
+test_self_approval_and_protected_accounting_post_fail_closed (apps.treasury.tests.TreasuryFoundationTests.test_self_approval_and_protected_accounting_post_fail_closed) ... ok
+test_statement_import_is_bounded_idempotent_and_policy_checked (apps.treasury.tests.TreasuryFoundationTests.test_statement_import_is_bounded_idempotent_and_policy_checked) ... ok
+test_transfer_is_one_atomic_movement_with_two_cash_legs (apps.treasury.tests.TreasuryFoundationTests.test_transfer_is_one_atomic_movement_with_two_cash_legs) ... ok
+test_01_catalogue_contains_exactly_six_approved_metrics (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_01_catalogue_contains_exactly_six_approved_metrics) ... ok
+test_02_all_six_definitions_have_required_governance_fields (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_02_all_six_definitions_have_required_governance_fields) ... ok
+test_03_sixteen_permissions_are_default_denied (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_03_sixteen_permissions_are_default_denied) ... ok
+test_04_missing_permission_denies_runtime (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_04_missing_permission_denies_runtime) ... ok
+test_05_platform_admin_has_no_implicit_tenant_access (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_05_platform_admin_has_no_implicit_tenant_access) ... ok
+test_06_project_scope_filters_dashboard_results (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_06_project_scope_filters_dashboard_results) ... ok
+test_07_refresh_is_exactly_idempotent (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_07_refresh_is_exactly_idempotent) ... ok
+test_08_idempotency_collision_fails_closed (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_08_idempotency_collision_fails_closed) ... ok
+test_09_material_result_rejects_runner_self_review (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_09_material_result_rejects_runner_self_review) ... ok
+test_10_independent_review_is_immutable_and_idempotent (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_10_independent_review_is_immutable_and_idempotent) ... ok
+test_11_final_result_cannot_be_rewritten (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_11_final_result_cannot_be_rewritten) ... ok
+test_12_drillthrough_requires_source_domain_permission (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_12_drillthrough_requires_source_domain_permission) ... ok
+test_13_authorized_drillthrough_returns_manifest_without_writeback (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_13_authorized_drillthrough_returns_manifest_without_writeback) ... ok
+test_14_export_is_scoped_idempotent_and_stores_no_bytes (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_14_export_is_scoped_idempotent_and_stores_no_bytes) ... ok
+test_15_dashboard_is_rtl_jalali_and_private_non_cacheable (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_15_dashboard_is_rtl_jalali_and_private_non_cacheable) ... ok
+test_16_refresh_and_export_have_no_source_mutation_and_are_audited (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_16_refresh_and_export_have_no_source_mutation_and_are_audited) ... ok
+test_17_dashboard_suppresses_incomplete_latest_snapshot (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_17_dashboard_suppresses_incomplete_latest_snapshot) ... ok
+test_18_dashboard_requires_source_permission (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_18_dashboard_requires_source_permission) ... ok
+test_19_drillthrough_requires_result_view_permission (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_19_drillthrough_requires_result_view_permission) ... ok
+test_20_dashboard_suppresses_stale_snapshot (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_20_dashboard_suppresses_stale_snapshot) ... ok
+test_21_empty_source_reconciles_to_traceable_incomplete_result (apps.reporting.test_p10_s02_s06.P10S02S06AcceptanceTests.test_21_empty_source_reconciles_to_traceable_incomplete_result) ... ok
+test_01_catalogue_contains_exactly_six_approved_metrics (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_01_catalogue_contains_exactly_six_approved_metrics) ... ok
+test_02_all_six_definitions_have_required_governance_fields (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_02_all_six_definitions_have_required_governance_fields) ... ok
+test_03_sixteen_permissions_are_default_denied (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_03_sixteen_permissions_are_default_denied) ... ok
+test_04_missing_permission_denies_runtime (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_04_missing_permission_denies_runtime) ... ok
+test_05_platform_admin_has_no_implicit_tenant_access (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_05_platform_admin_has_no_implicit_tenant_access) ... ok
+test_06_project_scope_filters_dashboard_results (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_06_project_scope_filters_dashboard_results) ... ok
+test_07_refresh_is_exactly_idempotent (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_07_refresh_is_exactly_idempotent) ... ok
+test_08_idempotency_collision_fails_closed (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_08_idempotency_collision_fails_closed) ... ok
+test_09_material_result_rejects_runner_self_review (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_09_material_result_rejects_runner_self_review) ... ok
+test_10_independent_review_is_immutable_and_idempotent (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_10_independent_review_is_immutable_and_idempotent) ... ok
+test_11_final_result_cannot_be_rewritten (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_11_final_result_cannot_be_rewritten) ... ok
+test_12_drillthrough_requires_source_domain_permission (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_12_drillthrough_requires_source_domain_permission) ... ok
+test_13_authorized_drillthrough_returns_manifest_without_writeback (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_13_authorized_drillthrough_returns_manifest_without_writeback) ... ok
+test_14_export_is_scoped_idempotent_and_stores_no_bytes (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_14_export_is_scoped_idempotent_and_stores_no_bytes) ... ok
+test_15_dashboard_is_rtl_jalali_and_private_non_cacheable (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_15_dashboard_is_rtl_jalali_and_private_non_cacheable) ... ok
+test_16_refresh_and_export_have_no_source_mutation_and_are_audited (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_16_refresh_and_export_have_no_source_mutation_and_are_audited) ... ok
+test_17_dashboard_suppresses_incomplete_latest_snapshot (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_17_dashboard_suppresses_incomplete_latest_snapshot) ... ok
+test_18_dashboard_requires_source_permission (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_18_dashboard_requires_source_permission) ... ok
+test_19_drillthrough_requires_result_view_permission (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_19_drillthrough_requires_result_view_permission) ... ok
+test_20_dashboard_suppresses_stale_snapshot (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_20_dashboard_suppresses_stale_snapshot) ... ok
+test_21_empty_source_reconciles_to_traceable_incomplete_result (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_21_empty_source_reconciles_to_traceable_incomplete_result) ... ok
+test_cep049_cross_tenant_project_denied_before_aggregation (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_cep049_cross_tenant_project_denied_before_aggregation) ... ok
+test_cep049_drillthrough_template_shows_coverage_and_version (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_cep049_drillthrough_template_shows_coverage_and_version) ... ok
+test_cep049_empty_cost_is_traceable_and_incomplete (apps.reporting.test_cep049.ProjectControlsRuntimeTests.test_cep049_empty_cost_is_traceable_and_incomplete) ... ok
+test_actual_reversal_and_mixed_currency_fail_closed (apps.reporting.test_cep049.ProjectControlsAdapterTests.test_actual_reversal_and_mixed_currency_fail_closed) ... ok
+test_commitment_relief_is_subtracted_and_versions_are_pinned (apps.reporting.test_cep049.ProjectControlsAdapterTests.test_commitment_relief_is_subtracted_and_versions_are_pinned) ... ok
+test_only_governing_accepted_budget_lines_are_queried (apps.reporting.test_cep049.ProjectControlsAdapterTests.test_only_governing_accepted_budget_lines_are_queried) ... ok
+
+======================================================================
+ERROR: test_commitment_actual_accrual_replacement_and_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_commitment_actual_accrual_replacement_and_projection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_integrated_cost.py", line 33, in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_contract_precedes_facts_is_idempotent_and_enforces_sod (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_contract_precedes_facts_is_idempotent_and_enforces_sod)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_integrated_cost.py", line 33, in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_coverage_forecast_and_fail_closed_gates (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_coverage_forecast_and_fail_closed_gates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_integrated_cost.py", line 33, in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_cross_tenant_and_database_immutability (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_cross_tenant_and_database_immutability)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_integrated_cost.py", line 33, in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_project_detail_exposes_permission_scoped_incomplete_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_project_detail_exposes_permission_scoped_incomplete_projection)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_integrated_cost.py", line 33, in setUp
+    budget_helpers.BudgetPreparationTests.setUp(self)
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_acceptance_does_not_mutate_financial_or_legacy_authorities (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_acceptance_does_not_mutate_financial_or_legacy_authorities)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_accepted_baseline_and_payload_are_database_immutable (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_accepted_baseline_and_payload_are_database_immutable)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_complete_manifest_conserves_source_and_exposes_planning_evidence (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_complete_manifest_conserves_source_and_exposes_planning_evidence)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_idempotent_handoff_and_stale_predecessor_conflict (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_idempotent_handoff_and_stale_predecessor_conflict)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_authoritative_currency_fails_at_product_owner_gate (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_authoritative_currency_fails_at_product_owner_gate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_missing_mapping_and_non_conserving_split_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_mapping_and_non_conserving_split_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+======================================================================
+ERROR: test_tenant_object_permission_and_sod_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_tenant_object_permission_and_sod_fail_closed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "E:\Construction_Company_Solution\apps\projects\test_p4_budget_preparation.py", line 69, in setUp
+    self.project = create_project(
+                   ^^^^^^^^^^^^^^^
+  File "C:\Users\azera\AppData\Local\Programs\Python\Python311\Lib\contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "E:\Construction_Company_Solution\apps\projects\services.py", line 169, in create_project
+    raise PermissionDenied("\u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.")
+django.core.exceptions.PermissionDenied: \u0627\u062c\u0627\u0632\u0647 \u0627\u06cc\u062c\u0627\u062f \u067e\u0631\u0648\u0698\u0647 \u062f\u0631 \u0627\u06cc\u0646 \u0633\u0627\u0632\u0645\u0627\u0646 \u0631\u0627 \u0646\u062f\u0627\u0631\u06cc\u062f.
+
+----------------------------------------------------------------------
+Ran 78 tests in 33.575s
+
+FAILED (errors=12)
+Preserving test database for alias 'default' ('test_construction_erp')...
+
+Found 78 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: financials, messages, staticfiles
+  Apply all migrations: accounting, accounts, admin, audit, auth, billing, commercial, compliance, contenttypes, contracts, daily_reports, documents, equipment, estimates, expenses, fixed_assets, inventory, knowledge, materials, organizations, parties, partner_qualification, payments, payroll, procurement, projects, quality, reporting, safety, sessions, subledgers, support, timekeeping, treasury, workflows, workforce
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  No migrations to apply.
+System check identified no issues (0 silenced).

@@ -1,0 +1,426 @@
+COMMAND: .venv/Scripts/python.exe manage.py check
+System check identified no issues (0 silenced).
+
+
+EXIT: 0
+COMMAND: .venv/Scripts/python.exe manage.py makemigrations --check --dry-run
+No changes detected
+
+
+EXIT: 0
+COMMAND: .venv/Scripts/ruff.exe check apps/projects/cashflow.py apps/projects/cashflow_models.py apps/projects/forecast_governance.py apps/projects/models.py apps/organizations/permission_registry.py apps/projects/test_cep065_cashflow.py apps/projects/test_cep065_migration.py
+All checks passed!
+
+EXIT: 0
+COMMAND: .venv/Scripts/ruff.exe format --check apps/projects/cashflow.py apps/projects/cashflow_models.py apps/projects/forecast_governance.py apps/organizations/permission_registry.py apps/projects/test_cep065_cashflow.py apps/projects/test_cep065_migration.py
+unformatted: File would be reformatted
+    --> apps\organizations\permission_registry.py:21:27
+     |
+20   |     PermissionResource(
+
+     -         "leave_authority", "سیاست و مانده مرخصی",
+
+21   +         "leave_authority",
+
+22   +         "سیاست و مانده مرخصی",
+
+23   |         ("workforce.LeavePolicyVersion", "workforce.LeaveBalanceEntry"),
+
+--------------------------------------------------------------------------------
+27   |     PermissionResource(
+
+     -         "subledgers_payroll", "ثبت و تحویل بدهی حقوق به AP",
+
+     -         ("subledgers.PayrollAPEnrollment", "subledgers.PayrollAPEnrollmentEvent", "subledgers.PayrollAPDraft", "subledgers.PayrollAPReversal", "subledgers.PayrollAPOperation"),
+
+     -         (P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE, P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE, P.SUBLEDGERS_PAYROLL_PREPARE, P.SUBLEDGERS_PAYROLL_VIEW),
+
+28   +         "subledgers_payroll",
+
+29   +         "ثبت و تحویل بدهی حقوق به AP",
+
+30   +         (
+
+31   +             "subledgers.PayrollAPEnrollment",
+
+32   +             "subledgers.PayrollAPEnrollmentEvent",
+
+33   +             "subledgers.PayrollAPDraft",
+
+34   +             "subledgers.PayrollAPReversal",
+
+35   +             "subledgers.PayrollAPOperation",
+
+36   +         ),
+
+37   +         (
+
+38   +             P.SUBLEDGERS_PAYROLL_ENROLLMENTS_MANAGE,
+
+39   +             P.SUBLEDGERS_PAYROLL_ENROLLMENTS_APPROVE,
+
+40   +             P.SUBLEDGERS_PAYROLL_PREPARE,
+
+41   +             P.SUBLEDGERS_PAYROLL_VIEW,
+
+42   +         ),
+
+43   |         ("apps.subledgers.payroll_handoffs",),
+
+44   |     ),
+
+45   |     PermissionResource(
+
+     -         "accounting_recognition", "نگاشت و شواهد شناسایی حسابداری",
+
+     -         ("accounting.RecognitionMappingVersion", "accounting.RecognitionMappingApproval", "accounting.SourceRecognitionDraft"),
+
+     -         (P.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE, P.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE, P.ACCOUNTING_RECOGNITION_PREPARE, P.ACCOUNTING_RECOGNITION_VIEW),
+
+46   +         "accounting_recognition",
+
+47   +         "نگاشت و شواهد شناسایی حسابداری",
+
+48   +         (
+
+49   +             "accounting.RecognitionMappingVersion",
+
+50   +             "accounting.RecognitionMappingApproval",
+
+51   +             "accounting.SourceRecognitionDraft",
+
+52   +         ),
+
+53   +         (
+
+54   +             P.ACCOUNTING_RECOGNITION_MAPPINGS_MANAGE,
+
+55   +             P.ACCOUNTING_RECOGNITION_MAPPINGS_APPROVE,
+
+56   +             P.ACCOUNTING_RECOGNITION_PREPARE,
+
+57   +             P.ACCOUNTING_RECOGNITION_VIEW,
+
+58   +         ),
+
+59   |         ("apps.accounting.recognition_services", "apps.accounting.recognition_sources"),
+
+60   |     ),
+
+     -     PermissionResource("employment_records", "سوابق مؤثر استخدام", ("workforce.EmploymentRecord",),
+
+     -         (P.EMPLOYMENT_RECORDS_MANAGE, P.EMPLOYMENT_RECORDS_VIEW_OWN), ("apps.workforce.employment_services",)),
+
+     -     PermissionResource("offboarding", "بررسی پایان همکاری", ("workforce.OffboardingCase", "workforce.OffboardingReview"),
+
+     -         (P.OFFBOARDING_START, P.OFFBOARDING_VIEW, P.OFFBOARDING_REVIEW), ("apps.workforce.employment_services",)),
+
+     -     PermissionResource("rosters", "برنامه شیفت", ("timekeeping.RosterVersion", "timekeeping.RosterSlot"),
+
+     -         (P.ROSTERS_MANAGE, P.ROSTERS_VIEW), ("apps.timekeeping.roster_services",)),
+
+61   |     PermissionResource(
+
+     -         "indexation_rules", "قوانین تعدیل حاکم‌شده",
+
+62   +         "employment_records",
+
+63   +         "سوابق مؤثر استخدام",
+
+64   +         ("workforce.EmploymentRecord",),
+
+65   +         (P.EMPLOYMENT_RECORDS_MANAGE, P.EMPLOYMENT_RECORDS_VIEW_OWN),
+
+66   +         ("apps.workforce.employment_services",),
+
+67   +     ),
+
+68   +     PermissionResource(
+
+69   +         "offboarding",
+
+70   +         "بررسی پایان همکاری",
+
+71   +         ("workforce.OffboardingCase", "workforce.OffboardingReview"),
+
+72   +         (P.OFFBOARDING_START, P.OFFBOARDING_VIEW, P.OFFBOARDING_REVIEW),
+
+73   +         ("apps.workforce.employment_services",),
+
+74   +     ),
+
+75   +     PermissionResource(
+
+76   +         "rosters",
+
+77   +         "برنامه شیفت",
+
+78   +         ("timekeeping.RosterVersion", "timekeeping.RosterSlot"),
+
+79   +         (P.ROSTERS_MANAGE, P.ROSTERS_VIEW),
+
+80   +         ("apps.timekeeping.roster_services",),
+
+81   +     ),
+
+82   +     PermissionResource(
+
+83   +         "indexation_rules",
+
+84   +         "قوانین تعدیل حاکم‌شده",
+
+85   |         ("billing.IndexationRuleVersion",),
+
+--------------------------------------------------------------------------------
+89   |     PermissionResource(
+
+     -         "indexation", "محاسبات تعدیل حاکم‌شده",
+
+90   +         "indexation",
+
+91   +         "محاسبات تعدیل حاکم‌شده",
+
+92   |         ("billing.IndexationCalculation",),
+
+93   |         (P.INDEXATION_CALCULATE, P.INDEXATION_CORRECT),
+
+94   |         ("apps.billing.indexation",),
+
+95   |     ),
+
+     -     PermissionResource("ess_evidence","سوابق شخصی",(),(P.ESS_EVIDENCE_VIEW,),("apps.workforce.own_evidence","apps.documents.employee_access")),
+
+     -     PermissionResource("hr_certificates","چارچوب گواهی منابع انسانی",("workforce.HRCertificateType","workforce.HRCertificateRequest","workforce.HRCertificateReview","workforce.HRCertificateGeneration","workforce.HRCertificateCancellation"),(P.HR_CERTIFICATES_VIEW,P.HR_CERTIFICATES_REQUEST,P.HR_CERTIFICATES_REVIEW,P.HR_CERTIFICATES_GENERATE,P.HR_CERTIFICATES_CONFIGURE,P.HR_CERTIFICATES_CANCEL),("apps.workforce.certificate_services","apps.workforce.certificate_workflow","apps.workforce.certificate_views")),
+
+     -     PermissionResource("personal_data", "درخواست تغییر اطلاعات شخصی",
+
+     -         ("workforce.PersonalDataEnrollment", "workforce.PersonalDataRequest", "workforce.PersonalDataDecision"),
+
+     -         (P.PERSONAL_DATA_VIEW,P.PERSONAL_DATA_REQUEST,P.PERSONAL_DATA_REVIEW,P.PERSONAL_DATA_CONFIGURE),
+
+     -         ("apps.workforce.personal_change_services","apps.workforce.personal_change_views","apps.workforce.personal_change_workflow")),
+
+96   |     PermissionResource(
+
+97   +         "ess_evidence",
+
+98   +         "سوابق شخصی",
+
+99   +         (),
+
+100  +         (P.ESS_EVIDENCE_VIEW,),
+
+101  +         ("apps.workforce.own_evidence", "apps.documents.employee_access"),
+
+102  +     ),
+
+103  +     PermissionResource(
+
+104  +         "hr_certificates",
+
+105  +         "چارچوب گواهی منابع انسانی",
+
+106  +         (
+
+107  +             "workforce.HRCertificateType",
+
+108  +             "workforce.HRCertificateRequest",
+
+109  +             "workforce.HRCertificateReview",
+
+110  +             "workforce.HRCertificateGeneration",
+
+111  +             "workforce.HRCertificateCancellation",
+
+112  +         ),
+
+113  +         (
+
+114  +             P.HR_CERTIFICATES_VIEW,
+
+115  +             P.HR_CERTIFICATES_REQUEST,
+
+116  +             P.HR_CERTIFICATES_REVIEW,
+
+117  +             P.HR_CERTIFICATES_GENERATE,
+
+118  +             P.HR_CERTIFICATES_CONFIGURE,
+
+119  +             P.HR_CERTIFICATES_CANCEL,
+
+120  +         ),
+
+121  +         (
+
+122  +             "apps.workforce.certificate_services",
+
+123  +             "apps.workforce.certificate_workflow",
+
+124  +             "apps.workforce.certificate_views",
+
+125  +         ),
+
+126  +     ),
+
+127  +     PermissionResource(
+
+128  +         "personal_data",
+
+129  +         "درخواست تغییر اطلاعات شخصی",
+
+130  +         (
+
+131  +             "workforce.PersonalDataEnrollment",
+
+132  +             "workforce.PersonalDataRequest",
+
+133  +             "workforce.PersonalDataDecision",
+
+134  +         ),
+
+135  +         (
+
+136  +             P.PERSONAL_DATA_VIEW,
+
+137  +             P.PERSONAL_DATA_REQUEST,
+
+138  +             P.PERSONAL_DATA_REVIEW,
+
+139  +             P.PERSONAL_DATA_CONFIGURE,
+
+140  +         ),
+
+141  +         (
+
+142  +             "apps.workforce.personal_change_services",
+
+143  +             "apps.workforce.personal_change_views",
+
+144  +             "apps.workforce.personal_change_workflow",
+
+145  +         ),
+
+146  +     ),
+
+147  +     PermissionResource(
+
+148  |         "membership",
+
+--------------------------------------------------------------------------------
+598  |     PermissionResource(
+
+     -         "variation_billing_eligibility", "اهلیت منبع تغییر برای Billing",
+
+599  +         "variation_billing_eligibility",
+
+600  +         "اهلیت منبع تغییر برای Billing",
+
+601  |         ("billing.VariationBillingEligibility",),
+
+--------------------------------------------------------------------------------
+605  |     PermissionResource(
+
+     -         "price_books", "منابع و نگاشت فهرست‌بها",
+
+     -         ("estimates.PriceBook", "estimates.PriceBookVersion", "estimates.PriceBookRow", "estimates.PriceBookActivation", "estimates.EstimatePriceBookMapping"),
+
+606  +         "price_books",
+
+607  +         "منابع و نگاشت فهرست‌بها",
+
+608  +         (
+
+609  +             "estimates.PriceBook",
+
+610  +             "estimates.PriceBookVersion",
+
+611  +             "estimates.PriceBookRow",
+
+612  +             "estimates.PriceBookActivation",
+
+613  +             "estimates.EstimatePriceBookMapping",
+
+614  +         ),
+
+615  |         (P.PRICE_BOOKS_MANAGE, P.PRICE_BOOKS_ACTIVATE, P.PRICE_BOOK_MAPPINGS_MANAGE),
+
+--------------------------------------------------------------------------------
+1201 |         "پرسش‌های شخصی و تخصیص‌یافته حقوق",
+
+     -         ("payroll.PayrollInquiry", "payroll.PayrollInquiryResponse", "payroll.PayrollInquiryEvidenceLink"),
+
+     -         (P.PAYROLL_INQUIRIES_VIEW, P.PAYROLL_INQUIRIES_REQUEST, P.PAYROLL_INQUIRIES_RESPOND),
+
+     -         ("apps.payroll.ess_services", "apps.payroll.ess_views", "apps.payroll.inquiry_workflow", "apps.documents.services"),
+
+1202 +         (
+
+1203 +             "payroll.PayrollInquiry",
+
+1204 +             "payroll.PayrollInquiryResponse",
+
+1205 +             "payroll.PayrollInquiryEvidenceLink",
+
+1206 +         ),
+
+1207 +         (
+
+1208 +             P.PAYROLL_INQUIRIES_VIEW,
+
+1209 +             P.PAYROLL_INQUIRIES_REQUEST,
+
+1210 +             P.PAYROLL_INQUIRIES_RESPOND,
+
+1211 +         ),
+
+1212 +         (
+
+1213 +             "apps.payroll.ess_services",
+
+1214 +             "apps.payroll.ess_views",
+
+1215 +             "apps.payroll.inquiry_workflow",
+
+1216 +             "apps.documents.services",
+
+1217 +         ),
+
+1218 |     ),
+
+1219 |     PermissionResource(
+
+     -         "payroll_ess", "حقوق قطعی شخصی", ("payroll.Payslip",),
+
+1220 +         "payroll_ess",
+
+1221 +         "حقوق قطعی شخصی",
+
+1222 +         ("payroll.Payslip",),
+
+1223 |         (P.PAYROLL_ESS_VIEW, P.PAYROLL_ESS_EXPORT),
+
+--------------------------------------------------------------------------------
+1408 |         "فرصت‌ها و پیشنهادهای مناقصه پیمانکار",
+
+     -         ("commercial.TenderBid", "commercial.TenderBidRevision", "commercial.TenderBidEvidence"),
+
+1409 +         (
+
+1410 +             "commercial.TenderBid",
+
+1411 +             "commercial.TenderBidRevision",
+
+1412 +             "commercial.TenderBidEvidence",
+
+1413 +         ),
+
+1414 |         (P.TENDER_BIDS_VIEW, P.TENDER_BIDS_PREPARE, P.TENDER_BIDS_TRANSITION),
+
+     |
+
+1 file would be reformatted, 5 files already formatted
+
+EXIT: 1
+COMMAND: git diff --check
+
+EXIT: 0

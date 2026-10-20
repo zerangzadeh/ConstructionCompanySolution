@@ -1,0 +1,43 @@
+{
+  "baseline": "14c32ced2eab37a6322cde36b406fff1a929aade",
+  "regression": {
+    "run": 78,
+    "pass": 66,
+    "errors": 12
+  },
+  "failures": [
+    "test_commitment_actual_accrual_replacement_and_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_commitment_actual_accrual_replacement_and_projection)",
+    "test_contract_precedes_facts_is_idempotent_and_enforces_sod (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_contract_precedes_facts_is_idempotent_and_enforces_sod)",
+    "test_coverage_forecast_and_fail_closed_gates (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_coverage_forecast_and_fail_closed_gates)",
+    "test_cross_tenant_and_database_immutability (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_cross_tenant_and_database_immutability)",
+    "test_project_detail_exposes_permission_scoped_incomplete_projection (apps.projects.test_p4_integrated_cost.IntegratedProjectCostTests.test_project_detail_exposes_permission_scoped_incomplete_projection)",
+    "test_acceptance_does_not_mutate_financial_or_legacy_authorities (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_acceptance_does_not_mutate_financial_or_legacy_authorities)",
+    "test_accepted_baseline_and_payload_are_database_immutable (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_accepted_baseline_and_payload_are_database_immutable)",
+    "test_complete_manifest_conserves_source_and_exposes_planning_evidence (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_complete_manifest_conserves_source_and_exposes_planning_evidence)",
+    "test_idempotent_handoff_and_stale_predecessor_conflict (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_idempotent_handoff_and_stale_predecessor_conflict)",
+    "test_missing_authoritative_currency_fails_at_product_owner_gate (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_authoritative_currency_fails_at_product_owner_gate)",
+    "test_missing_mapping_and_non_conserving_split_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_missing_mapping_and_non_conserving_split_fail_closed)",
+    "test_tenant_object_permission_and_sod_fail_closed (apps.projects.test_p4_budget_preparation.BudgetPreparationTests.test_tenant_object_permission_and_sod_fail_closed)"
+  ],
+  "classification": "BASELINE_TEST_DEBT",
+  "evidence": {
+    "apps/projects/test_p4_budget_preparation.py": {
+      "unchanged_from_HEAD": true,
+      "canonical_content_sha256": "521d6fe19f0ad2754997ef0b07f4313fc81e52e6bc7e177cdd0ba360abc084c0"
+    },
+    "apps/projects/test_p4_integrated_cost.py": {
+      "unchanged_from_HEAD": true,
+      "canonical_content_sha256": "a6841035369596b26bbd79eb66f6240842dd98472106f5a2ec11e00949996508"
+    },
+    "apps/projects/services.py": {
+      "unchanged_from_HEAD": true,
+      "canonical_content_sha256": "fced71c6da888b23d01afa0c6aedcfb8603b33e2affdddb9c70224a937c40d89"
+    },
+    "apps/organizations/authorization.py": {
+      "unchanged_from_HEAD": true,
+      "canonical_content_sha256": "cee0db9c66ca2d89ef677d5ad77b627ebb1ba5a6dc5b15f9ba4cc3140c367567"
+    }
+  },
+  "failure_boundary": "All12 fail in BudgetPreparationTests.setUp line69 calling unchanged create_project line169: implicit legacy role setup does not satisfy current explicit membership-scoped authorization. No cash supplement, comparison, forecast submit/decision hook or new schema guard reached. Conditional migration changes only two new tables/guards; no permission or source-data migration. Existing tests preserved.",
+  "optional_billing_probe": "Legacy fixtures failed before cashflow adapter: missing migration-owned WorkflowTemplate or implicit role authority. Native lifecycle integration is N/A to065; approved record adapters have focused unit contracts and real AP scoped evidence."
+}
